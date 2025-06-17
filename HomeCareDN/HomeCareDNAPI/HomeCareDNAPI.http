@@ -1,0 +1,6 @@
+@HomeCareDNAPI_HostAddress = http://localhost:5252
+
+GET {{HomeCareDNAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

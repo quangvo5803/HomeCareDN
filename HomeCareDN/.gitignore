@@ -1,0 +1,64 @@
+# Tệp thư mục hệ thống
+bin/
+obj/
+*.user
+*.suo
+*.log
+*.ncb
+*.sdf
+*.cache
+*.env
+.vscode/
+.idea/
+*.code-workspace
+
+# Tệp biên dịch
+*.dll
+*.pdb
+*.exe
+*.out
+*.app
+*.ipa
+*.dSYM/
+
+# Tệp cấu hình riêng tư
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+appsettings.json
+# Dữ liệu tạm thời và thư mục build
+*.pid
+*.lock
+*.cache
+*.temp
+*.TMP
+*.bak
+logs/
+temp/
+node_modules/
+wwwroot/dist/
+dist/
+coverage/
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Visual Studio Code workspace
+.vscode/
+*.code-workspace
+
+# Các thư mục build của .NET Core
+project.lock.json
+project.assets.json
+logs/
+.lldb/
+*.sqlite
+*.sqlite3
+
+# Tệp từ Resharper & Rider
+*.sln.docstates
+.idea/
+.vs/
+/appsettings.json
