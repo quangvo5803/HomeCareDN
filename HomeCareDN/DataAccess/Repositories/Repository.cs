@@ -98,7 +98,18 @@ namespace DataAccess.Repositories
                     );
                 }
             }
-
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (
+                    var includeProp in includeProperties.Split(
+                        new char[] { ',' },
+                        StringSplitOptions.RemoveEmptyEntries
+                    )
+                )
+                {
+                    query = query.Include(includeProp);
+                }
+            }
             // Sort
             if (!string.IsNullOrEmpty(sortBy))
             {
@@ -120,18 +131,6 @@ namespace DataAccess.Repositories
                 query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             }
 
-            if (!string.IsNullOrEmpty(includeProperties))
-            {
-                foreach (
-                    var includeProp in includeProperties.Split(
-                        new char[] { ',' },
-                        StringSplitOptions.RemoveEmptyEntries
-                    )
-                )
-                {
-                    query = query.Include(includeProp);
-                }
-            }
             return await query.ToListAsync();
         }
 

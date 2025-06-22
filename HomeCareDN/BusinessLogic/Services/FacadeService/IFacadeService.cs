@@ -1,4 +1,9 @@
-﻿namespace BusinessLogic.Services.FacadeService
+﻿using BusinessLogic.Services.Interfaces;
+
+namespace BusinessLogic.Services.FacadeService
 {
-    public interface IFacadeService { }
+    public interface IFacadeService
+    {
+        IServiceRequestService ServiceRequestService { get; }
+    }
 }
