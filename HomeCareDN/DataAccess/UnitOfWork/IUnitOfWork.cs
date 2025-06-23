@@ -8,6 +8,7 @@ namespace DataAccess.UnitOfWork
     public interface IUnitOfWork
     {
         IImageRepository ImageRepository { get; }
+        IServiceRequestRepository ServiceRequestRepository { get; }
         Task SaveAsync();
     }
 }
