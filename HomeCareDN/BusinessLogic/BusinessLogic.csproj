@@ -12,10 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\Application\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
   </ItemGroup>
 
