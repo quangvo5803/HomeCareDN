@@ -44,6 +44,10 @@ namespace HomeCareDNAPI.Controllers
             {
                 return BadRequest("Invalid service request data.");
             }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var createdRequest =
                 await _facadeService.ServiceRequestService.CreateServiceRequestAsync(requestDto);
             return CreatedAtAction(
@@ -61,6 +65,10 @@ namespace HomeCareDNAPI.Controllers
             if (requestDto == null)
             {
                 return BadRequest("Invalid service request data.");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
             var updatedRequest =
                 await _facadeService.ServiceRequestService.UpdateServiceRequestAsync(requestDto);
