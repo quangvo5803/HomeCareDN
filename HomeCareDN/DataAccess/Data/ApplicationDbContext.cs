@@ -8,15 +8,30 @@ namespace DataAccess.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options) { }
 
+        public DbSet<ServiceRequest> ServiceRequests { get; set; }
+        public DbSet<ContractorApplication> ContractorApplications { get; set; }
         public DbSet<Image> Images { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
-            // Additional model configurations can be added here
-        }
+            builder.Entity<ServiceRequest>(entity =>
+            {
+                entity.Property(e => e.ServiceType).HasConversion<string>();
 
-        // DbSets for your entities can be added here, e.g.:
-        // public DbSet<YourEntity> YourEntities { get; set; }
+                entity.Property(e => e.PackageOption).HasConversion<string>();
+
+                entity.Property(e => e.BuildingType).HasConversion<string>();
+
+                entity.Property(e => e.MainStructureType).HasConversion<string>();
+
+                entity.Property(e => e.DesignStyle).HasConversion<string>();
+            });
+
+            builder.Entity<ContractorApplication>(entity =>
+            {
+                entity.Property(e => e.Status).HasConversion<string>();
+            });
+            base.OnModelCreating(builder);
+        }
     }
 }

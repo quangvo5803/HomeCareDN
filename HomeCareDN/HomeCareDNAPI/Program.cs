@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
+using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI
 {
@@ -71,6 +72,8 @@ namespace HomeCareDNAPI
                 .Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AuthorizeDbContext>()
                 .AddDefaultTokenProviders();
+            /// Automapper
+            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -79,25 +82,7 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            if (app.Environment.IsProduction())
-            {
-                app.UseExceptionHandler(errorApp =>
-                {
-                    errorApp.Run(async context =>
-                    {
-                        context.Response.StatusCode = 500;
-                        context.Response.ContentType = "application/json";
-
-                        var response = new
-                        {
-                            statusCode = 500,
-                            message = "Có lỗi xảy ra trong hệ thống. Vui lòng thử lại sau.",
-                        };
-
-                        await context.Response.WriteAsJsonAsync(response);
-                    });
-                });
-            }
+            app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 
