@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Service;
+using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using Ultitity.Extensions;
@@ -10,20 +11,21 @@ namespace HomeCareDNAPI.Mapping
     {
         public AutoMapperProfile()
         {
-            // Mapping CreateRequestDto → ServiceRequest
-            CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            // Mapping ServiceRequest → CreateRequestDto
             CreateMap<ServiceRequest, ServiceRequestCreateRequestDto>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-            // Mapping UpdateRequestDto
-            // Mapping UpdateRequestDto
-            CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
 
             CreateMap<ServiceRequest, ServiceRequestUpdateRequestDto>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+
+            CreateMap<ContractorApplication, ContractorApplicationCreateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+
+            CreateMap<ContractorApplication, ContractorApplicationUpdateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
 
             // Complex mapping (Response)
             CreateMap<ServiceRequest, ServiceRequestDto>()
@@ -65,6 +67,13 @@ namespace HomeCareDNAPI.Mapping
 
             //Service
             CreateMap<Service, ServiceDto>()
+
+            CreateMap<ContractorApplication, ContractorApplicationDto>()
+                .ForMember(
+                    dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.GetDisplayName())
+                )
+
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt =>
@@ -75,6 +84,7 @@ namespace HomeCareDNAPI.Mapping
                         )
                 );
 
+
             //Service Create
             CreateMap<ServiceCreateDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
@@ -82,6 +92,7 @@ namespace HomeCareDNAPI.Mapping
             //Service Update
             CreateMap<ServiceUpdateDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
+
         }
     }
 }

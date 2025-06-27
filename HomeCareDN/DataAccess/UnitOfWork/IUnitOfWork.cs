@@ -1,7 +1,4 @@
-﻿using DataAccess.Data;
-using DataAccess.Repositories.Interfaces;
-using Microsoft.Extensions.Configuration;
-using WebApi.Repositories;
+﻿using DataAccess.Repositories.Interfaces;
 
 namespace DataAccess.UnitOfWork
 {
@@ -10,6 +7,7 @@ namespace DataAccess.UnitOfWork
         IImageRepository ImageRepository { get; }
         IServiceRequestRepository ServiceRequestRepository { get; }
         IServiceRepository ServiceRepository { get; }
+        IContractorApplicationRepository ContractorApplicationRepository { get; }
         Task SaveAsync();
     }
 }

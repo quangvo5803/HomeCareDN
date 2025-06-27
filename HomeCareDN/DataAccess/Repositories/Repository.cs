@@ -52,11 +52,16 @@ namespace DataAccess.Repositories
 
         public async Task<IEnumerable<T>> GetRangeAsync(
             Expression<Func<T, bool>> filter,
-            string? includeProperties = null
+            string? includeProperties = null,
+            string? sortBy = null,
+            bool? isAscending = true,
+            int pageNumber = 1,
+            int pageSize = 10
         )
         {
             IQueryable<T> query = dbSet.AsNoTracking();
             query = query.Where(filter);
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (
@@ -68,6 +73,49 @@ namespace DataAccess.Repositories
                 {
                     query = query.Include(includeProp);
                 }
+            }
+            // Sort
+            bool hasSort = false;
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                var property = typeof(T).GetProperty(
+                    sortBy,
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance
+                );
+                if (property != null)
+                {
+                    query =
+                        (isAscending ?? true)
+                            ? query.OrderBy(e => EF.Property<object>(e, property.Name))
+                            : query.OrderByDescending(e => EF.Property<object>(e, property.Name));
+
+                    hasSort = true;
+                }
+            }
+
+            // Sort by default key if no sort is specified
+            if (!hasSort)
+            {
+                var keyProperty = typeof(T)
+                    .GetProperties()
+                    .FirstOrDefault(p =>
+                        p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
+                        || p.Name.Equals($"{typeof(T).Name}Id", StringComparison.OrdinalIgnoreCase)
+                    );
+
+                if (keyProperty != null)
+                {
+                    query = query.OrderBy(e => EF.Property<object>(e, keyProperty.Name));
+                }
+                else
+                {
+                    query = query.OrderBy(e => 0);
+                }
+            }
+            // Pagination
+            if (pageNumber > 0 && pageSize > 0)
+            {
+                query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
             }
             return await query.ToListAsync();
         }
@@ -111,6 +159,7 @@ namespace DataAccess.Repositories
                 }
             }
             // Sort
+            bool hasSort = false;
             if (!string.IsNullOrEmpty(sortBy))
             {
                 var property = typeof(T).GetProperty(
@@ -123,6 +172,28 @@ namespace DataAccess.Repositories
                         (isAscending ?? true)
                             ? query.OrderBy(e => EF.Property<object>(e, property.Name))
                             : query.OrderByDescending(e => EF.Property<object>(e, property.Name));
+
+                    hasSort = true;
+                }
+            }
+
+            // Sort by default key if no sort is specified
+            if (!hasSort)
+            {
+                var keyProperty = typeof(T)
+                    .GetProperties()
+                    .FirstOrDefault(p =>
+                        p.Name.Equals("Id", StringComparison.OrdinalIgnoreCase)
+                        || p.Name.Equals($"{typeof(T).Name}Id", StringComparison.OrdinalIgnoreCase)
+                    );
+
+                if (keyProperty != null)
+                {
+                    query = query.OrderBy(e => EF.Property<object>(e, keyProperty.Name));
+                }
+                else
+                {
+                    query = query.OrderBy(e => 0);
                 }
             }
             // Pagination

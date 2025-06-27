@@ -5,7 +5,6 @@
         public Guid ServiceRequestID { get; set; }
 
         public required string UserID { get; set; }
-
         public required string ServiceType { get; set; }
         public required string? PackageOption { get; set; }
         public required string BuildingType { get; set; }
