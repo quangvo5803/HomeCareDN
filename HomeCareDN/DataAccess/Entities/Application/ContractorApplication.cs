@@ -6,6 +6,7 @@ namespace DataAccess.Entities.Application
     {
         [Key]
         public Guid ContractorApplicationID { get; set; }
+        public required Guid ServiceRequestID { get; set; }
 
         [Required]
         public required string UserID { get; set; }
@@ -13,6 +14,7 @@ namespace DataAccess.Entities.Application
         public double EstimatePrice { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
+        public ICollection<Image>? Images { get; set; }
     }
 
     public enum ApplicationStatus
