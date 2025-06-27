@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250627064425_AddContractorApplicationImage")]
+    partial class AddContractorApplicationImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,7 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Property<double>("EstimatePrice")
                         .HasColumnType("float");
 
-                    b.Property<Guid>("ServiceRequestID")
+                    b.Property<Guid?>("ServiceRequestID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -146,9 +149,7 @@ namespace DataAccess.Migrations.ApplicationDb
                 {
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
                         .WithMany("ContractorApplications")
-                        .HasForeignKey("ServiceRequestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ServiceRequestID");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>

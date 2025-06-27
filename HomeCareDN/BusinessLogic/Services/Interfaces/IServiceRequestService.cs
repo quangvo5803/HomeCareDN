@@ -1,17 +1,18 @@
 ﻿using BusinessLogic.DTOs.Application.ServiceRequest;
-using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface IServiceRequestService
     {
-        Task<ServiceRequestDto> CreateServiceRequestAsync(
-            ServiceRequestCreateRequestDto requestDto
-        );
         Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id);
-        Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync();
+        Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync(
+            ServiceRequestGetAllDto getAllRequestDto
+        );
+        Task<ServiceRequestDto> CreateServiceRequestAsync(
+            ServiceRequestCreateRequestDto createRequestDto
+        );
         Task<ServiceRequestDto> UpdateServiceRequestAsync(
-            ServiceRequestUpdateRequestDto requestDto
+            ServiceRequestUpdateRequestDto updateRequestDto
         );
         Task DeleteServiceRequestAsync(Guid id);
     }

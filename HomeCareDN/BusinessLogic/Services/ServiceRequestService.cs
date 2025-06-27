@@ -2,7 +2,6 @@
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
-using Microsoft.AspNetCore.Http;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services.Interfaces
@@ -16,6 +15,49 @@ namespace BusinessLogic.Services.Interfaces
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync(
+            ServiceRequestGetAllDto request
+        )
+        {
+            var serviceRequests = await _unitOfWork.ServiceRequestRepository.GetAllAsync(
+                request.FilterOn,
+                request.FilterQuery,
+                request.SortBy,
+                request.IsAscending,
+                request.PageNumber,
+                request.PageSize,
+                includeProperties: "Images"
+            );
+            if (serviceRequests == null || !serviceRequests.Any())
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "ServiceRequests", new[] { "No service requests found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var serviceRequestDtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(serviceRequests);
+            return serviceRequestDtos;
+        }
+
+        public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == id,
+                includeProperties: "Images"
+            );
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var serviceRequestDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+            return serviceRequestDto;
         }
 
         public async Task<ServiceRequestDto> CreateServiceRequestAsync(
@@ -84,57 +126,6 @@ namespace BusinessLogic.Services.Interfaces
             return _mapper.Map<ServiceRequestDto>(serviceRequest);
         }
 
-        public async Task DeleteServiceRequestAsync(Guid id)
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == id,
-                includeProperties: "Images"
-            );
-            if (serviceRequest == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest);
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
-            {
-                foreach (var image in serviceRequest.Images)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-                }
-            }
-            await _unitOfWork.SaveAsync();
-        }
-
-        public async Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync()
-        {
-            var serviceRequests = await _unitOfWork.ServiceRequestRepository.GetAllAsync(
-                includeProperties: "Images"
-            );
-            var serviceRequestDtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(serviceRequests);
-            return serviceRequestDtos;
-        }
-
-        public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id)
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(sr =>
-                sr.ServiceRequestID == id
-            );
-            if (serviceRequest == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            var serviceRequestDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-            return serviceRequestDto;
-        }
-
         public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
             ServiceRequestUpdateRequestDto requestDto
         )
@@ -189,7 +180,10 @@ namespace BusinessLogic.Services.Interfaces
             {
                 throw new CustomValidationException(errors);
             }
+
             _mapper.Map(requestDto, serviceRequest);
+            await _unitOfWork.SaveAsync();
+
             if (serviceRequest.Images != null && serviceRequest.Images.Any())
             {
                 foreach (var image in serviceRequest.Images)
@@ -217,6 +211,31 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
             return serviceDto;
+        }
+
+        public async Task DeleteServiceRequestAsync(Guid id)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == id,
+                includeProperties: "Images"
+            );
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest);
+            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            {
+                foreach (var image in serviceRequest.Images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+            await _unitOfWork.SaveAsync();
         }
     }
 }
