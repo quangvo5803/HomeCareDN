@@ -8,11 +8,9 @@ using System.Threading.Tasks;
 
 namespace BusinessLogic.DTOs.Application.Service
 {
-    public class ServiceCreateDto
+    public class ServiceUpdateRequestDto
     {
-        [Required]
-        public required string UserID { get; set; }
-
+        public Guid ServiceID { get; set; }
         [Required]
         public required string Name { get; set; }
         public string? Description { get; set; }

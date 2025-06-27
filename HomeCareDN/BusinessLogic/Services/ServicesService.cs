@@ -33,7 +33,7 @@ namespace BusinessLogic.Services
             return serviceMapper;
         }
 
-        public async Task<ServiceDto> CreateServiceAsync(ServiceCreateDto serviceCreateDto)
+        public async Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto)
         {
             var errors = new Dictionary<string, string[]>();
 
@@ -115,7 +115,7 @@ namespace BusinessLogic.Services
             return _mapper.Map<ServiceDto>(service); 
         }
 
-        public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateDto serviceUpdateDto)
+        public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
             var serviceRequest = await _unitOfWork.ServiceRepository
                 .GetAsync(s => s.ServiceID == serviceUpdateDto.ServiceID, includeProperties: "Images");
@@ -167,7 +167,7 @@ namespace BusinessLogic.Services
             }
 
             _mapper.Map(serviceUpdateDto, serviceRequest);
-
+            await _unitOfWork.SaveAsync();
             if (serviceRequest.Images != null && serviceRequest.Images.Any())
             {
                 foreach (var image in serviceRequest.Images)

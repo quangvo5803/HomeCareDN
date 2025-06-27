@@ -66,7 +66,7 @@ namespace HomeCareDNAPI.Mapping
 
 
             //Service
-            CreateMap<Service, ServiceDto>()
+            CreateMap<Service, ServiceDto>();
 
             CreateMap<ContractorApplication, ContractorApplicationDto>()
                 .ForMember(
@@ -86,11 +86,11 @@ namespace HomeCareDNAPI.Mapping
 
 
             //Service Create
-            CreateMap<ServiceCreateDto, Service>()
+            CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
 
             //Service Update
-            CreateMap<ServiceUpdateDto, Service>()
+            CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
 
         }

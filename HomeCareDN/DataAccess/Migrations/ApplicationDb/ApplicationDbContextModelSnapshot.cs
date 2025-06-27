@@ -207,7 +207,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                 {
                     b.Navigation("Images");
-                });
+                }));
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {

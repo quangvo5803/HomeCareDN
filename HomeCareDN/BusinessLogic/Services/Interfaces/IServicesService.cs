@@ -10,9 +10,9 @@ namespace BusinessLogic.Services.Interfaces
     public interface IServicesService
     {
         Task<IEnumerable<ServiceDto>> GetAllServiceAsync();
-        Task<ServiceDto> CreateServiceAsync(ServiceCreateDto serviceCreateDto);
+        Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto);
         Task<ServiceDto> GetServiceByIdAsync(Guid id);
-        Task<ServiceDto> UpdateServiceAsync(ServiceUpdateDto serviceUpdateDto);
+        Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto);
         Task DeleteServiceAsync(Guid id);
     }
 }

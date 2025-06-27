@@ -24,7 +24,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateService(ServiceCreateDto serviceCreate)
+        public async Task<IActionResult> CreateService(ServiceCreateRequestDto serviceCreate)
         {
             if (serviceCreate == null) 
                 return BadRequest("Invalid service request data.");
@@ -50,7 +50,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateService(ServiceUpdateDto serviceUpdate)
+        public async Task<IActionResult> UpdateService(ServiceUpdateRequestDto serviceUpdate)
         {
             if (serviceUpdate == null)
             {
