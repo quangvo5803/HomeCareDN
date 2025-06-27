@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using Ultitity.Extensions;
@@ -60,6 +61,27 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+
+
+            //Service
+            CreateMap<Service, ServiceDto>()
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.ImageUrl).ToList()
+                                : new List<string>()
+                        )
+                );
+
+            //Service Create
+            CreateMap<ServiceCreateDto, Service>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
+
+            //Service Update
+            CreateMap<ServiceUpdateDto, Service>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore()).ReverseMap();
         }
     }
 }
