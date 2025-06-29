@@ -74,11 +74,16 @@ namespace HomeCareDNAPI.Mapping
                 )
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            // ContractorApplication Create and Update
+            // ContractorApplication Create
             CreateMap<ContractorApplication, ContractorApplicationCreateRequestDto>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ReverseMap();
-
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
+                .ForMember(
+                    dest => dest.Status,
+                    opt => opt.MapFrom(src => (ApplicationStatus)src.Status)
+                )
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            // ContractorApplication Update
             CreateMap<ContractorApplication, ContractorApplicationUpdateRequestDto>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -164,7 +169,10 @@ namespace HomeCareDNAPI.Mapping
                 )
                 .ForMember(
                     dest => dest.DesignStyle,
-                    opt => opt.MapFrom(src => src.DesignStyle.GetDisplayName())
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.DesignStyle != null ? src.DesignStyle.GetDisplayName() : null
+                        )
                 )
                 .ForMember(
                     dest => dest.ImageUrls,
