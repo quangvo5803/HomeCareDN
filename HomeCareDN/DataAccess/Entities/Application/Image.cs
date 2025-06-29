@@ -12,6 +12,9 @@ namespace DataAccess.Entities.Application
         public required string ImageUrl { get; set; }
         public Guid? MaterialID { get; set; }
         public Guid? ServiceRequestID { get; set; }
+        public Guid? ServiceID { get; set; }
+        public Guid? ContractorApplicationID { get; set; }
         public string PublicId { get; set; }
+        
     }
 }

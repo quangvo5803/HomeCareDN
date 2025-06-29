@@ -6,7 +6,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
     public class ServiceRequestCreateRequestDto
     {
         [Required]
-        public string UserID { get; set; } = string.Empty;
+        public required string UserID { get; set; }
 
         [Required]
         public int ServiceType { get; set; }

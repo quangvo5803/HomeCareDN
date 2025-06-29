@@ -6,5 +6,7 @@ namespace BusinessLogic.Services.FacadeService
     {
         IServiceRequestService ServiceRequestService { get; }
         IMaterialService MaterialService { get; }
+        IServicesService ServicesService { get; }
+        IContractorApplicationService ContractorApplicationService { get; }
     }
 }

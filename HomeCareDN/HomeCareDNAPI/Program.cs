@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
+using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI
 {
@@ -84,25 +85,7 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            if (app.Environment.IsProduction())
-            {
-                app.UseExceptionHandler(errorApp =>
-                {
-                    errorApp.Run(async context =>
-                    {
-                        context.Response.StatusCode = 500;
-                        context.Response.ContentType = "application/json";
-
-                        var response = new
-                        {
-                            statusCode = 500,
-                            message = "Có lỗi xảy ra trong hệ thống. Vui lòng thử lại sau.",
-                        };
-
-                        await context.Response.WriteAsJsonAsync(response);
-                    });
-                });
-            }
+            app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

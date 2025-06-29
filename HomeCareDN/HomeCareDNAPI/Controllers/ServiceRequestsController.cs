@@ -16,10 +16,12 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllHardServiceRequests()
+        public async Task<IActionResult> GetAllHardServiceRequests(
+            [FromQuery] ServiceRequestGetAllDto request
+        )
         {
             var serviceRequests =
-                await _facadeService.ServiceRequestService.GetAllHardServiceRequestsAsync();
+                await _facadeService.ServiceRequestService.GetAllHardServiceRequestsAsync(request);
             return Ok(serviceRequests);
         }
 
@@ -37,12 +39,16 @@ namespace HomeCareDNAPI.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateServiceRequest(
-            ServiceRequestCreateRequestDto requestDto
+            [FromQuery] ServiceRequestCreateRequestDto requestDto
         )
         {
             if (requestDto == null)
             {
                 return BadRequest("Invalid service request data.");
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
             var createdRequest =
                 await _facadeService.ServiceRequestService.CreateServiceRequestAsync(requestDto);
@@ -55,15 +61,23 @@ namespace HomeCareDNAPI.Controllers
 
         [HttpPut]
         public async Task<IActionResult> UpdateServiceRequest(
-            ServiceRequestUpdateRequestDto requestDto
+            [FromQuery] ServiceRequestUpdateRequestDto requestDto
         )
         {
             if (requestDto == null)
             {
                 return BadRequest("Invalid service request data.");
             }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var updatedRequest =
                 await _facadeService.ServiceRequestService.UpdateServiceRequestAsync(requestDto);
+            if (updatedRequest == null)
+            {
+                return NotFound("Service request not found or could not be updated.");
+            }
             return Ok(updatedRequest);
         }
 
