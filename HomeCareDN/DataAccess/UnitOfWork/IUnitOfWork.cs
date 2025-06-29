@@ -9,6 +9,7 @@ namespace DataAccess.UnitOfWork
     {
         IImageRepository ImageRepository { get; }
         IServiceRequestRepository ServiceRequestRepository { get; }
+        IMaterialRepository MaterialRepository { get; }
         Task SaveAsync();
     }
 }

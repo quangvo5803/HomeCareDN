@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using Ultitity.Extensions;
@@ -60,6 +61,25 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+
+            // Mapping Material
+            
+            CreateMap<MaterialRequestCreateMaterialRequestDto, Material>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore()); 
+
+            CreateMap<Material, MaterialRequestCreateMaterialRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            
+            CreateMap<MaterialRequestUpdateMaterialRequestDto, Material>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<Material, MaterialRequestUpdateMaterialRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            
+            CreateMap<Material, MaterialRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images));
         }
     }
 }
