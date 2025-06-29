@@ -80,8 +80,14 @@ namespace HomeCareDNAPI.Mapping
                 .ReverseMap();
 
             CreateMap<ContractorApplication, ContractorApplicationUpdateRequestDto>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ReverseMap();
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
+                .ForMember(
+                    dest => dest.Status,
+                    opt => opt.MapFrom(src => (ApplicationStatus)src.Status)
+                )
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             //Service Create
             CreateMap<Service, ServiceCreateRequestDto>()

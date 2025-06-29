@@ -256,7 +256,6 @@ namespace BusinessLogic.Services
                     );
                 }
             }
-            await _unitOfWork.SaveAsync();
             return _mapper.Map<ContractorApplicationDto>(application);
         }
 

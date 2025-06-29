@@ -19,8 +19,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         [Required]
         public int MainStructureType { get; set; }
 
-        [Required]
-        public int DesignStyle { get; set; }
+        public int? DesignStyle { get; set; }
 
         [Required]
         public double Width { get; set; }
@@ -31,8 +30,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         [Required]
         public int Floors { get; set; }
 
-        [Required]
-        public double EstimatePrice { get; set; }
+        public double? EstimatePrice { get; set; }
 
         public string? Description { get; set; }
 
