@@ -32,6 +32,15 @@ namespace DataAccess.Data
             {
                 entity.Property(e => e.Status).HasConversion<string>();
             });
+
+            builder.Entity<Service>(entity =>
+            {
+                entity.Property(e => e.ServiceType).HasConversion<string>();
+
+                entity.Property(e => e.PackageOption).HasConversion<string>();
+
+                entity.Property(e => e.BuildingType).HasConversion<string>();
+            });
             base.OnModelCreating(builder);
         }
     }

@@ -66,7 +66,24 @@ namespace HomeCareDNAPI.Mapping
 
 
             //Service
-            CreateMap<Service, ServiceDto>();
+            CreateMap<Service, ServiceDto>()
+                .ForMember(
+                    dest => dest.ServiceType,
+                    opt => opt.MapFrom(src => src.ServiceType.GetDisplayName())
+                )
+                .ForMember(
+                    dest => dest.PackageOption,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.PackageOption.HasValue
+                                ? src.PackageOption.Value.GetDisplayName()
+                                : null
+                        )
+                )
+                .ForMember(
+                    dest => dest.BuildingType,
+                    opt => opt.MapFrom(src => src.BuildingType.GetDisplayName())
+                );
 
             CreateMap<ContractorApplication, ContractorApplicationDto>()
                 .ForMember(

@@ -11,9 +11,12 @@ namespace BusinessLogic.DTOs.Application.Service
     {
         public Guid ServiceID { get; set; }
         [Required]
-        public required string UserID { get; set; }
-        [Required]
         public required string Name { get; set; }
+
+        public required string ServiceType { get; set; }
+        public required string? PackageOption { get; set; }
+        public required string BuildingType { get; set; }
+
         public string? Description { get; set; }
         public double PriceEsstimate { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
