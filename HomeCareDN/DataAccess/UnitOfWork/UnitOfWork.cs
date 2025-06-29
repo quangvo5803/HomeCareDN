@@ -12,6 +12,7 @@ namespace DataAccess.UnitOfWork
         private readonly IConfiguration _configuration;
         public IImageRepository ImageRepository { get; private set; }
         public IServiceRequestRepository ServiceRequestRepository { get; private set; }
+        public IMaterialRepository MaterialRepository { get; private set; }
         public IServiceRepository ServiceRepository { get; private set; }
         public IContractorApplicationRepository ContractorApplicationRepository
         {
@@ -19,13 +20,13 @@ namespace DataAccess.UnitOfWork
             private set;
         }
 
-
         public UnitOfWork(ApplicationDbContext db, IConfiguration configuration)
         {
             _db = db;
             _configuration = configuration;
             ImageRepository = new ImageRepository(_db, _configuration);
             ServiceRequestRepository = new ServiceRequestRepository(_db);
+            MaterialRepository = new MaterialRepository(_db);
             ServiceRepository = new ServiceRepository(_db);
             ContractorApplicationRepository = new ContractorApplicationRepository(_db);
         }

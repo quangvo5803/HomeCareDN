@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
@@ -20,7 +21,41 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
 
-            // ServiceRequest
+            // ServiceRequest Create
+            CreateMap<ServiceRequest, ServiceRequestCreateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            // ServiceRequest Update
+            CreateMap<ServiceRequest, ServiceRequestUpdateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            //Service Create
+            CreateMap<Service, ServiceCreateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+
+            //Service Update
+            CreateMap<Service, ServiceUpdateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            // ContractorApplication Create
+            CreateMap<ContractorApplication, ContractorApplicationCreateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            // ContractorApplication Update
+            CreateMap<ContractorApplication, ContractorApplicationUpdateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            // Material Create
+            CreateMap<Material, MaterialCreateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+            // Material Update
+            CreateMap<Material, MaterialUpdateRequestDto>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ReverseMap();
+
+            // Complex mapping (Response)
             CreateMap<ServiceRequest, ServiceRequestDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -31,35 +66,26 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
-
-            CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            // ContractorApplication
-            CreateMap<ContractorApplication, ContractorApplicationDto>()
-                .ForMember(
-                    dest => dest.ImageUrls,
-                    opt =>
-                        opt.MapFrom(src =>
-                            src.Images != null
-                                ? src.Images.Select(i => i.ImageUrl).ToList()
-                                : new List<string>()
-                        )
-                );
-
-            CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
-                .ForMember(dest => dest.Status, opt => opt.Ignore())
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            // Service
+            //Service
             CreateMap<Service, ServiceDto>()
                 .ForMember(
+                    dest => dest.ServiceType,
+                    opt => opt.MapFrom(src => src.ServiceType.GetDisplayName())
+                )
+                .ForMember(
+                    dest => dest.PackageOption,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.PackageOption.HasValue
+                                ? src.PackageOption.Value.GetDisplayName()
+                                : null
+                        )
+                )
+                .ForMember(
+                    dest => dest.BuildingType,
+                    opt => opt.MapFrom(src => src.BuildingType.GetDisplayName())
+                )
+                .ForMember(
                     dest => dest.ImageUrls,
                     opt =>
                         opt.MapFrom(src =>
@@ -69,11 +95,30 @@ namespace HomeCareDNAPI.Mapping
                         )
                 );
 
-            CreateMap<ServiceCreateRequestDto, Service>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
-            CreateMap<ServiceUpdateRequestDto, Service>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<ContractorApplication, ContractorApplicationDto>()
+                .ForMember(
+                    dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.GetDisplayName())
+                )
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.ImageUrl).ToList()
+                                : new List<string>()
+                        )
+                );
+            CreateMap<Material, MaterialDto>()
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.ImageUrl).ToList()
+                                : new List<string>()
+                        )
+                );
         }
     }
 }

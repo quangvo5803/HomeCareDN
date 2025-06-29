@@ -60,7 +60,6 @@ namespace BusinessLogic.Services
                 {
                     if (image.Length > 5 * 1024 * 1024) // 5 MB
                     {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
                         {
                             if (errors.ContainsKey(nameof(serviceCreateDto.Images)))
                             {
@@ -205,6 +204,7 @@ namespace BusinessLogic.Services
                     );
                 }
             }
+
             var serviceDto = _mapper.Map<ServiceDto>(serviceRequest);
             return serviceDto;
         }
