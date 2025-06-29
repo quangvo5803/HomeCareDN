@@ -17,9 +17,9 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllServices()
+        public async Task<IActionResult> GetAllServices([FromQuery] ServiceGetAllDto getAllDto)
         {
-            var service = await _facadeService.ServicesService.GetAllServiceAsync();
+            var service = await _facadeService.ServicesService.GetAllServiceAsync(getAllDto);
             return Ok(service);
         }
 
