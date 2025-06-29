@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Service;
-using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
@@ -18,7 +17,6 @@ namespace BusinessLogic.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
 
         public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync(ServiceGetAllDto getAllDto)
         {
@@ -112,8 +110,10 @@ namespace BusinessLogic.Services
 
         public async Task<ServiceDto> GetServiceByIdAsync(Guid id)
         {
-            var service = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == id, includeProperties: "Images");
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: "Images"
+            );
 
             if (service == null)
             {
@@ -123,13 +123,15 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<ServiceDto>(service); 
+            return _mapper.Map<ServiceDto>(service);
         }
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == serviceUpdateDto.ServiceID, includeProperties: "Images");
+            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == serviceUpdateDto.ServiceID,
+                includeProperties: "Images"
+            );
             var errors = new Dictionary<string, string[]>();
 
             if (serviceRequest == null)
@@ -203,16 +205,16 @@ namespace BusinessLogic.Services
                     );
                 }
             }
-            
-            await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceDto>(serviceRequest);
             return serviceDto;
         }
 
         public async Task DeleteServiceAsync(Guid id)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == id, includeProperties: "Images");
+            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: "Images"
+            );
             if (serviceRequest == null)
             {
                 var errors = new Dictionary<string, string[]>

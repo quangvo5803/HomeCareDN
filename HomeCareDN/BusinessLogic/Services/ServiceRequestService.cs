@@ -78,24 +78,16 @@ namespace BusinessLogic.Services.Interfaces
 
                 foreach (var image in requestDto.Images)
                 {
-                    if (image.Length > 5 * 1024 * 1024) // 5 MB
+                    if (image.Length > 5 * 1024 * 1024)
                     {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
+                        if (!errors.ContainsKey(nameof(requestDto.Images)))
                         {
-                            if (errors.ContainsKey(nameof(requestDto.Images)))
-                            {
-                                var messages = errors[nameof(requestDto.Images)].ToList();
-                                messages.Add("Each image must be less than 5 MB.");
-                                errors[nameof(requestDto.Images)] = messages.ToArray();
-                            }
-                            else
-                            {
-                                errors.Add(
-                                    nameof(requestDto.Images),
-                                    new[] { "Each image must be less than 5 MB." }
-                                );
-                            }
+                            errors[nameof(requestDto.Images)] = new List<string>().ToArray();
                         }
+
+                        var messages = errors[nameof(requestDto.Images)].ToList();
+                        messages.Add("Each image must be less than 5 MB.");
+                        errors[nameof(requestDto.Images)] = messages.ToArray();
                     }
                 }
             }

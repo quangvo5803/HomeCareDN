@@ -112,13 +112,40 @@ namespace BusinessLogic.Services
                     "ContractorApplication",
                     new[] { "Contractor application creation request cannot be null." }
                 );
+                throw new CustomValidationException(errors);
             }
-            if (createRequestDto?.Images != null && createRequestDto.Images.Count > 5)
+            if (createRequestDto.Images != null)
             {
-                errors.Add(
-                    "Images",
-                    new[] { "A maximum of 5 images can be uploaded for a contractor application." }
-                );
+                if (createRequestDto.Images.Count > 5)
+                {
+                    errors.Add(
+                        nameof(createRequestDto.Images),
+                        new[] { "You can only upload a maximum of 5 images." }
+                    );
+                }
+
+                foreach (var image in createRequestDto.Images)
+                {
+                    if (image.Length > 5 * 1024 * 1024) // 5 MB
+                    {
+                        if (image.Length > 5 * 1024 * 1024) // 5 MB
+                        {
+                            if (errors.ContainsKey(nameof(createRequestDto.Images)))
+                            {
+                                var messages = errors[nameof(createRequestDto.Images)].ToList();
+                                messages.Add("Each image must be less than 5 MB.");
+                                errors[nameof(createRequestDto.Images)] = messages.ToArray();
+                            }
+                            else
+                            {
+                                errors.Add(
+                                    nameof(createRequestDto.Images),
+                                    new[] { "Each image must be less than 5 MB." }
+                                );
+                            }
+                        }
+                    }
+                }
             }
             if (errors.Any())
             {
@@ -127,6 +154,23 @@ namespace BusinessLogic.Services
             var contractorApplication = _mapper.Map<ContractorApplication>(createRequestDto);
             await _unitOfWork.ContractorApplicationRepository.AddAsync(contractorApplication);
             await _unitOfWork.SaveAsync();
+            if (createRequestDto.Images != null)
+            {
+                foreach (var image in createRequestDto.Images)
+                {
+                    Image imageUpload = new Image
+                    {
+                        ImageID = Guid.NewGuid(),
+                        ContractorApplicationID = contractorApplication.ContractorApplicationID,
+                        ImageUrl = "",
+                    };
+                    await _unitOfWork.ImageRepository.UploadImageAsync(
+                        image,
+                        "HomeCareDN/ContractorApplication",
+                        imageUpload
+                    );
+                }
+            }
             return _mapper.Map<ContractorApplicationDto>(contractorApplication);
         }
 
@@ -134,26 +178,85 @@ namespace BusinessLogic.Services
             ContractorApplicationUpdateRequestDto updateRequestDto
         )
         {
+            var errors = new Dictionary<string, string[]>();
+
             var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
                 ca.ContractorApplicationID == updateRequestDto.ContractorApplicationID
             );
             if (application == null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    {
-                        "ContractorApplicationID",
-                        new[]
-                        {
-                            $"Contractor application with ID {updateRequestDto.ContractorApplicationID} not found.",
-                        }
-                    },
-                };
+                errors.Add(
+                    "ContractorApplication",
+                    new[] { "Contractor application update request cannot be null." }
+                );
                 throw new CustomValidationException(errors);
             }
+            if (updateRequestDto.Images != null)
+            {
+                if (updateRequestDto.Images.Count > 5)
+                {
+                    errors.Add(
+                        nameof(updateRequestDto.Images),
+                        new[] { "You can only upload a maximum of 5 images." }
+                    );
+                }
+
+                foreach (var image in updateRequestDto.Images)
+                {
+                    if (image.Length > 5 * 1024 * 1024) // 5 MB
+                    {
+                        if (image.Length > 5 * 1024 * 1024) // 5 MB
+                        {
+                            if (errors.ContainsKey(nameof(updateRequestDto.Images)))
+                            {
+                                var messages = errors[nameof(updateRequestDto.Images)].ToList();
+                                messages.Add("Each image must be less than 5 MB.");
+                                errors[nameof(updateRequestDto.Images)] = messages.ToArray();
+                            }
+                            else
+                            {
+                                errors.Add(
+                                    nameof(updateRequestDto.Images),
+                                    new[] { "Each image must be less than 5 MB." }
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+
             _mapper.Map(updateRequestDto, application);
             await _unitOfWork.SaveAsync();
 
+            if (application.Images != null && application.Images.Any())
+            {
+                foreach (var image in application.Images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+            if (updateRequestDto.Images != null)
+            {
+                foreach (var image in updateRequestDto.Images)
+                {
+                    Image imageUpload = new Image
+                    {
+                        ImageID = Guid.NewGuid(),
+                        ContractorApplicationID = updateRequestDto.ContractorApplicationID,
+                        ImageUrl = "",
+                    };
+                    await _unitOfWork.ImageRepository.UploadImageAsync(
+                        image,
+                        "HomeCareDN/ContractorApplication",
+                        imageUpload
+                    );
+                }
+            }
+            await _unitOfWork.SaveAsync();
             return _mapper.Map<ContractorApplicationDto>(application);
         }
 
