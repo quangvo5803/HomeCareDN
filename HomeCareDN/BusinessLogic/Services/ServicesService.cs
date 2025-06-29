@@ -4,11 +4,6 @@ using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -25,11 +20,27 @@ namespace BusinessLogic.Services
         }
 
 
-        public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync()
+        public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync(ServiceGetAllDto getAllDto)
         {
-            var service = await _unitOfWork.ServiceRepository
-                .GetAllAsync(includeProperties: "Images");
-            var serviceMapper = _mapper.Map<IEnumerable<ServiceDto>>(service);
+            var serviceRequests = await _unitOfWork.ServiceRepository.GetAllAsync(
+                getAllDto.FilterOn,
+                getAllDto.FilterQuery,
+                getAllDto.SortBy,
+                getAllDto.IsAscending,
+                getAllDto.PageNumber,
+                getAllDto.PageSize,
+                includeProperties: "Images"
+            );
+            if (serviceRequests == null || !serviceRequests.Any())
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Service", new[] { "No service requests found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            var serviceMapper = _mapper.Map<IEnumerable<ServiceDto>>(serviceRequests);
             return serviceMapper;
         }
 
