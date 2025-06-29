@@ -20,7 +20,7 @@ namespace BusinessLogic.Services
 
         public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync(ServiceGetAllDto getAllDto)
         {
-            var serviceRequests = await _unitOfWork.ServiceRepository.GetAllAsync(
+            var services = await _unitOfWork.ServiceRepository.GetAllAsync(
                 getAllDto.FilterOn,
                 getAllDto.FilterQuery,
                 getAllDto.SortBy,
@@ -29,16 +29,16 @@ namespace BusinessLogic.Services
                 getAllDto.PageSize,
                 includeProperties: "Images"
             );
-            if (serviceRequests == null || !serviceRequests.Any())
+            if (services == null || !services.Any())
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Service", new[] { "No service requests found." } },
+                    { "Service", new[] { "No service found." } },
                 };
                 throw new CustomValidationException(errors);
             }
 
-            var serviceMapper = _mapper.Map<IEnumerable<ServiceDto>>(serviceRequests);
+            var serviceMapper = _mapper.Map<IEnumerable<ServiceDto>>(services);
             return serviceMapper;
         }
 
@@ -127,13 +127,13 @@ namespace BusinessLogic.Services
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == serviceUpdateDto.ServiceID,
                 includeProperties: "Images"
             );
             var errors = new Dictionary<string, string[]>();
 
-            if (serviceRequest == null)
+            if (service == null)
             {
                 errors.Add(
                     "ServiceID",
@@ -178,11 +178,15 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            _mapper.Map(serviceUpdateDto, serviceRequest);
+            _mapper.Map(serviceUpdateDto, service);
             await _unitOfWork.SaveAsync();
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            // Delete old images
+            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceID == service.ServiceID
+            );
+            if (existingImages != null && existingImages.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in existingImages)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
@@ -194,7 +198,7 @@ namespace BusinessLogic.Services
                     Image imageUpload = new Image
                     {
                         ImageID = Guid.NewGuid(),
-                        ServiceID = serviceRequest.ServiceID,
+                        ServiceID = service.ServiceID,
                         ImageUrl = "",
                     };
                     await _unitOfWork.ImageRepository.UploadImageAsync(
@@ -204,8 +208,7 @@ namespace BusinessLogic.Services
                     );
                 }
             }
-
-            var serviceDto = _mapper.Map<ServiceDto>(serviceRequest);
+            var serviceDto = _mapper.Map<ServiceDto>(service);
             return serviceDto;
         }
 

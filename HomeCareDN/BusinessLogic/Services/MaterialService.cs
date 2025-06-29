@@ -81,25 +81,46 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                throw new KeyNotFoundException($"Material with ID {id} not found.");
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Material", new[] { "No material found." } },
+                };
+                throw new CustomValidationException(errors);
             }
 
             return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<IEnumerable<MaterialDto>> GetAllHardMaterialAsync()
+        public async Task<IEnumerable<MaterialDto>> GetAllHardMaterialAsync(
+            MaterialGetAllRequestDto requestDto
+        )
         {
             var materials = await _unitOfWork.MaterialRepository.GetAllAsync(
+                requestDto.FilterOn,
+                requestDto.FilterQuery,
+                requestDto.SortBy,
+                requestDto.IsAscending,
+                requestDto.PageNumber,
+                requestDto.PageSize,
                 includeProperties: "Images"
             );
+            if (materials == null || !materials.Any())
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Material", new[] { "No material found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
 
             return _mapper.Map<IEnumerable<MaterialDto>>(materials);
         }
 
         public async Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto)
         {
-            var material = await _unitOfWork.MaterialRepository.GetAsync(m =>
-                m.MaterialID == requestDto.MaterialID
+            var material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == requestDto.MaterialID,
+                includeProperties: "Images"
             );
 
             var errors = new Dictionary<string, string[]>();
@@ -151,7 +172,7 @@ namespace BusinessLogic.Services
 
             _mapper.Map(requestDto, material);
             await _unitOfWork.SaveAsync();
-
+            // Delete old images if they exist
             var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
                 i.MaterialID == material.MaterialID
             );
@@ -180,7 +201,6 @@ namespace BusinessLogic.Services
                 }
             }
 
-            await _unitOfWork.SaveAsync();
             return _mapper.Map<MaterialDto>(material);
         }
 
@@ -190,7 +210,11 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                throw new KeyNotFoundException($"Material with ID {id} not found.");
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MaterailID", new[] { $"Material with ID {id} not found." } },
+                };
+                throw new CustomValidationException(errors);
             }
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.MaterialID == id);
             if (images != null && images.Any())

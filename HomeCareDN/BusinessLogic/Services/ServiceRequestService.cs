@@ -175,10 +175,14 @@ namespace BusinessLogic.Services.Interfaces
 
             _mapper.Map(requestDto, serviceRequest);
             await _unitOfWork.SaveAsync();
+            // Delete existing images
+            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == serviceRequest.ServiceRequestID
+            );
 
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            if (existingImages != null && existingImages.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in existingImages)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
@@ -200,7 +204,6 @@ namespace BusinessLogic.Services.Interfaces
                     );
                 }
             }
-            await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
             return serviceDto;
         }

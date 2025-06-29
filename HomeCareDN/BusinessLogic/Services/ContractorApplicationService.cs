@@ -180,8 +180,9 @@ namespace BusinessLogic.Services
         {
             var errors = new Dictionary<string, string[]>();
 
-            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
-                ca.ContractorApplicationID == updateRequestDto.ContractorApplicationID
+            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == updateRequestDto.ContractorApplicationID,
+                includeProperties: "Images"
             );
             if (application == null)
             {
@@ -231,10 +232,14 @@ namespace BusinessLogic.Services
 
             _mapper.Map(updateRequestDto, application);
             await _unitOfWork.SaveAsync();
+            // Delete existing images
+            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ContractorApplicationID == updateRequestDto.ContractorApplicationID
+            );
 
-            if (application.Images != null && application.Images.Any())
+            if (existingImages != null && existingImages.Any())
             {
-                foreach (var image in application.Images)
+                foreach (var image in existingImages)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
