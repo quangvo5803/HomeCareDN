@@ -1,17 +1,13 @@
-﻿using BusinessLogic.DTOs.Application.MaterialRequest;
+﻿using BusinessLogic.DTOs.Application.Material;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface IMaterialService
     {
-        Task<MaterialRequestDto> CreateMaterialRequestAsync(
-           MaterialRequestCreateMaterialRequestDto requestDto
-       );
-        Task<MaterialRequestDto> GetMaterialRequestByIdAsync(Guid id);
-        Task<IEnumerable<MaterialRequestDto>> GetAllHardMaterialRequestsAsync();
-        Task<MaterialRequestDto> UpdateMaterialRequestAsync(
-            MaterialRequestUpdateMaterialRequestDto requestDto
-        );
-        Task DeleteMaterialRequestAsync(Guid id);
+        Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto);
+        Task<MaterialDto> GetMaterialByIdAsync(Guid id);
+        Task<IEnumerable<MaterialDto>> GetAllHardMaterialAsync();
+        Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto);
+        Task DeleteMaterialAsync(Guid id);
     }
 }

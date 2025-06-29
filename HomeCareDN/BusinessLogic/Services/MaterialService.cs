@@ -1,14 +1,9 @@
 ﻿using AutoMapper;
-using BusinessLogic.DTOs.Application.MaterialRequest;
-using BusinessLogic.DTOs.Application.SearchAndFilter;
+using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {
@@ -21,20 +16,63 @@ namespace BusinessLogic.Services
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-           
         }
-        public async Task<MaterialRequestDto> CreateMaterialRequestAsync(
-            MaterialRequestCreateMaterialRequestDto requestDto)
+
+        public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
+            var errors = new Dictionary<string, string[]>();
+
+            if (requestDto.Images != null)
+            {
+                if (requestDto.Images.Count > 5)
+                {
+                    errors.Add(
+                        nameof(requestDto.Images),
+                        new[] { "You can only upload a maximum of 5 images." }
+                    );
+                }
+
+                foreach (var image in requestDto.Images)
+                {
+                    if (image.Length > 5 * 1024 * 1024) // 5 MB
+                    {
+                        errors.Add(
+                            nameof(requestDto.Images),
+                            new[] { "Each image must be less than 5 MB." }
+                        );
+                    }
+                }
+            }
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+
             var material = _mapper.Map<Material>(requestDto);
 
             await _unitOfWork.MaterialRepository.AddAsync(material);
             await _unitOfWork.SaveAsync();
-
-            return _mapper.Map<MaterialRequestDto>(material);
+            if (requestDto.Images != null)
+            {
+                foreach (var image in requestDto.Images)
+                {
+                    Image imageUpload = new Image
+                    {
+                        ImageID = Guid.NewGuid(),
+                        MaterialID = material.MaterialID,
+                        ImageUrl = "",
+                    };
+                    await _unitOfWork.ImageRepository.UploadImageAsync(
+                        image,
+                        "HomeCareDN/Material",
+                        imageUpload
+                    );
+                }
+            }
+            return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(Guid id)
+        public async Task<MaterialDto> GetMaterialByIdAsync(Guid id)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
@@ -46,53 +84,125 @@ namespace BusinessLogic.Services
                 throw new KeyNotFoundException($"Material with ID {id} not found.");
             }
 
-            return _mapper.Map<MaterialRequestDto>(material);
+            return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<IEnumerable<MaterialRequestDto>> GetAllHardMaterialRequestsAsync()
+        public async Task<IEnumerable<MaterialDto>> GetAllHardMaterialAsync()
         {
             var materials = await _unitOfWork.MaterialRepository.GetAllAsync(
                 includeProperties: "Images"
             );
 
-            return _mapper.Map<IEnumerable<MaterialRequestDto>>(materials);
+            return _mapper.Map<IEnumerable<MaterialDto>>(materials);
         }
 
-        public async Task<MaterialRequestDto> UpdateMaterialRequestAsync(
-            MaterialRequestUpdateMaterialRequestDto requestDto)
+        public async Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto)
         {
-            var material = await _unitOfWork.MaterialRepository.GetAsync(
-                m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images"
+            var material = await _unitOfWork.MaterialRepository.GetAsync(m =>
+                m.MaterialID == requestDto.MaterialID
             );
+
+            var errors = new Dictionary<string, string[]>();
 
             if (material == null)
             {
-                throw new KeyNotFoundException(
-                    $"Material with ID {requestDto.MaterialID} not found.");
+                errors.Add(
+                    "ServiceID",
+                    new[] { $"Service request with ID {requestDto.MaterialID} not found." }
+                );
+                throw new CustomValidationException(errors);
+            }
+
+            if (requestDto.Images != null)
+            {
+                if (requestDto.Images.Count > 5)
+                {
+                    errors.Add(
+                        nameof(requestDto.Images),
+                        new[] { "You can only upload a maximum of 5 images." }
+                    );
+                }
+
+                foreach (var image in requestDto.Images)
+                {
+                    if (image.Length > 5 * 1024 * 1024)
+                    {
+                        if (errors.ContainsKey(nameof(requestDto.Images)))
+                        {
+                            var messages = errors[nameof(requestDto.Images)].ToList();
+                            messages.Add("Each image must be less than 5 MB.");
+                            errors[nameof(requestDto.Images)] = messages.ToArray();
+                        }
+                        else
+                        {
+                            errors.Add(
+                                nameof(requestDto.Images),
+                                new[] { "Each image must be less than 5 MB." }
+                            );
+                        }
+                    }
+                }
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
             }
 
             _mapper.Map(requestDto, material);
             await _unitOfWork.SaveAsync();
 
-            return _mapper.Map<MaterialRequestDto>(material);
+            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.MaterialID == material.MaterialID
+            );
+            if (existingImages != null && existingImages.Any())
+            {
+                foreach (var image in existingImages)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+            if (requestDto.Images != null)
+            {
+                foreach (var image in requestDto.Images)
+                {
+                    Image imageUpload = new Image
+                    {
+                        ImageID = Guid.NewGuid(),
+                        MaterialID = material.MaterialID,
+                        ImageUrl = "",
+                    };
+                    await _unitOfWork.ImageRepository.UploadImageAsync(
+                        image,
+                        "HomeCareDN/Material",
+                        imageUpload
+                    );
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task DeleteMaterialRequestAsync(Guid id)
+        public async Task DeleteMaterialAsync(Guid id)
         {
-            var material = await _unitOfWork.MaterialRepository.GetAsync(
-                m => m.MaterialID == id,
-                includeProperties: "Images"
-            );
+            var material = await _unitOfWork.MaterialRepository.GetAsync(m => m.MaterialID == id);
 
             if (material == null)
             {
                 throw new KeyNotFoundException($"Material with ID {id} not found.");
             }
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.MaterialID == id);
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
 
             _unitOfWork.MaterialRepository.Remove(material);
             await _unitOfWork.SaveAsync();
         }
-
     }
 }

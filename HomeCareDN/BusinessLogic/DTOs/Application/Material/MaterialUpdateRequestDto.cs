@@ -1,9 +1,10 @@
-﻿using DataAccess.Entities.Application;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Application;
+using Microsoft.AspNetCore.Http;
 
-namespace BusinessLogic.DTOs.Application.MaterialRequest
+namespace BusinessLogic.DTOs.Application.Material
 {
-    public class MaterialRequestUpdateMaterialRequestDto
+    public class MaterialUpdateRequestDto
     {
         [Required]
         public Guid MaterialID { get; set; }
@@ -16,6 +17,6 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public string? Unit { get; set; }
         public string? Description { get; set; }
         public double UnitPrice { get; set; }
-        public ICollection<Image>? Images { get; set; }
+        public List<IFormFile>? Images { get; set; }
     }
 }

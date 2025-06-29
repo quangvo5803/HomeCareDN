@@ -94,16 +94,6 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Property<Guid>("MaterialID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-                };
-            modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
-                {
-                    b.Property<Guid>("ServiceID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("BuildingType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -123,20 +113,36 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialID");
-
                     b.ToTable("Materials");
+                });
+            modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
+                {
+                    b.Property<Guid>("ServiceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BuildingType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PackageOption")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("PriceEsstimate")
                         .HasColumnType("float");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ServiceType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceID");
-
                     b.ToTable("Services");
                 });
 

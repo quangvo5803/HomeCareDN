@@ -1,8 +1,8 @@
 ﻿using DataAccess.Entities.Application;
 
-namespace BusinessLogic.DTOs.Application.MaterialRequest
+namespace BusinessLogic.DTOs.Application.Material
 {
-    public class MaterialRequestDto
+    public class MaterialDto
     {
         public Guid MaterialID { get; set; }
         public required string UserID { get; set; }
@@ -10,6 +10,6 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public string? Unit { get; set; }
         public string? Description { get; set; }
         public double UnitPrice { get; set; }
-        public ICollection<Image>? Images { get; set; }
+        public ICollection<string>? ImageUrls { get; set; }
     }
 }
