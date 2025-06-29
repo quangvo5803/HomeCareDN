@@ -223,7 +223,6 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            _unitOfWork.ServiceRepository.Remove(serviceRequest);
             if (serviceRequest.Images != null && serviceRequest.Images.Any())
             {
                 foreach (var image in serviceRequest.Images)
@@ -231,6 +230,7 @@ namespace BusinessLogic.Services
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
             }
+            _unitOfWork.ServiceRepository.Remove(serviceRequest);
             await _unitOfWork.SaveAsync();
         }
     }

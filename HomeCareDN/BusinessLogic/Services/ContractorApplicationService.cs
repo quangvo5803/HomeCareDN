@@ -278,6 +278,13 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+            if (application.Images != null && application.Images.Any())
+            {
+                foreach (var image in application.Images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
             _unitOfWork.ContractorApplicationRepository.Remove(application);
             await _unitOfWork.SaveAsync();
         }
