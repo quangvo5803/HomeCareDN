@@ -78,11 +78,9 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<ContractorApplication, ContractorApplicationCreateRequestDto>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
             CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
-                .ForMember(
-                    dest => dest.Status,
-                    opt => opt.MapFrom(src => (ApplicationStatus)src.Status)
-                )
+                .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
+
             // ContractorApplication Update
             CreateMap<ContractorApplication, ContractorApplicationUpdateRequestDto>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
