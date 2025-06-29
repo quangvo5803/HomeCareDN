@@ -211,11 +211,8 @@ namespace BusinessLogic.Services
 
         public async Task DeleteServiceAsync(Guid id)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
-                s => s.ServiceID == id,
-                includeProperties: "Images"
-            );
-            if (serviceRequest == null)
+            var service = await _unitOfWork.ServiceRepository.GetAsync(s => s.ServiceID == id);
+            if (service == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
@@ -223,14 +220,15 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.ServiceID == id);
+            if (images != null && images.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in images)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
             }
-            _unitOfWork.ServiceRepository.Remove(serviceRequest);
+            _unitOfWork.ServiceRepository.Remove(service);
             await _unitOfWork.SaveAsync();
         }
     }

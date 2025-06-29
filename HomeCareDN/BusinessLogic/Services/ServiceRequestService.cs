@@ -207,9 +207,8 @@ namespace BusinessLogic.Services.Interfaces
 
         public async Task DeleteServiceRequestAsync(Guid id)
         {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == id,
-                includeProperties: "Images"
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(sr =>
+                sr.ServiceRequestID == id
             );
             if (serviceRequest == null)
             {
@@ -219,9 +218,12 @@ namespace BusinessLogic.Services.Interfaces
                 };
                 throw new CustomValidationException(errors);
             }
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == id
+            );
+            if (images != null && images.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in images)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
