@@ -11,6 +11,7 @@ namespace DataAccess.Data
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<ContractorApplication> ContractorApplications { get; set; }
         public DbSet<Image> Images { get; set; }
+        public DbSet<Service> Services { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -30,6 +31,15 @@ namespace DataAccess.Data
             builder.Entity<ContractorApplication>(entity =>
             {
                 entity.Property(e => e.Status).HasConversion<string>();
+            });
+
+            builder.Entity<Service>(entity =>
+            {
+                entity.Property(e => e.ServiceType).HasConversion<string>();
+
+                entity.Property(e => e.PackageOption).HasConversion<string>();
+
+                entity.Property(e => e.BuildingType).HasConversion<string>();
             });
             base.OnModelCreating(builder);
         }

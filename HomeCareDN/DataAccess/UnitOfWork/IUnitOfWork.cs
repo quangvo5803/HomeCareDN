@@ -6,6 +6,7 @@ namespace DataAccess.UnitOfWork
     {
         IImageRepository ImageRepository { get; }
         IServiceRequestRepository ServiceRequestRepository { get; }
+        IServiceRepository ServiceRepository { get; }
         IContractorApplicationRepository ContractorApplicationRepository { get; }
         Task SaveAsync();
     }
