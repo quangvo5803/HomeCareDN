@@ -19,7 +19,6 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-
         public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync(ServiceGetAllDto getAllDto)
         {
             var serviceRequests = await _unitOfWork.ServiceRepository.GetAllAsync(
@@ -62,7 +61,6 @@ namespace BusinessLogic.Services
                 {
                     if (image.Length > 5 * 1024 * 1024) // 5 MB
                     {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
                         {
                             if (errors.ContainsKey(nameof(serviceCreateDto.Images)))
                             {
@@ -112,8 +110,10 @@ namespace BusinessLogic.Services
 
         public async Task<ServiceDto> GetServiceByIdAsync(Guid id)
         {
-            var service = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == id, includeProperties: "Images");
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: "Images"
+            );
 
             if (service == null)
             {
@@ -123,13 +123,15 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<ServiceDto>(service); 
+            return _mapper.Map<ServiceDto>(service);
         }
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == serviceUpdateDto.ServiceID, includeProperties: "Images");
+            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == serviceUpdateDto.ServiceID,
+                includeProperties: "Images"
+            );
             var errors = new Dictionary<string, string[]>();
 
             if (serviceRequest == null)
@@ -203,7 +205,7 @@ namespace BusinessLogic.Services
                     );
                 }
             }
-            
+
             await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceDto>(serviceRequest);
             return serviceDto;
@@ -211,8 +213,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteServiceAsync(Guid id)
         {
-            var serviceRequest = await _unitOfWork.ServiceRepository
-                .GetAsync(s => s.ServiceID == id, includeProperties: "Images");
+            var serviceRequest = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: "Images"
+            );
             if (serviceRequest == null)
             {
                 var errors = new Dictionary<string, string[]>

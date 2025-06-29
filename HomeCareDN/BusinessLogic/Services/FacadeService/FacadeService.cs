@@ -14,9 +14,9 @@ namespace BusinessLogic.Services.FacadeService
         private readonly IMapper _mapper;
 
         public IServiceRequestService ServiceRequestService { get; }
+        public IMaterialService MaterialService { get; }
         public IServicesService ServicesService { get; }
         public IContractorApplicationService ContractorApplicationService { get; }
-
 
         public FacadeService(
             IUnitOfWork unitOfWork,
@@ -30,6 +30,7 @@ namespace BusinessLogic.Services.FacadeService
             _emailQueue = emailQueue;
             _mapper = mapper;
             ServiceRequestService = new ServiceRequestService(_unitOfWork, _mapper);
+            MaterialService = new MaterialService(_unitOfWork, _mapper);
             ServicesService = new ServicesService(_unitOfWork, _mapper);
             ContractorApplicationService = new ContractorApplicationService(_unitOfWork, _mapper);
         }

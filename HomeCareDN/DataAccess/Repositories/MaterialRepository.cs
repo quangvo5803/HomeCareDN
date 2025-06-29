@@ -4,14 +4,14 @@ using DataAccess.Repositories.Interfaces;
 
 namespace DataAccess.Repositories
 {
-    public class ServiceRepository : Repository<Service>, IServiceRepository
+    public class MaterialRepository : Repository<Material>, IMaterialRepository
     {
         private readonly ApplicationDbContext _db;
-
-        public ServiceRepository(ApplicationDbContext db)
+        public MaterialRepository(ApplicationDbContext db)
             : base(db)
         {
             _db = db;
         }
     }
+
 }
