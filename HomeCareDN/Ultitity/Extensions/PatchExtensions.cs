@@ -2,6 +2,8 @@
 
 namespace Ultitity.Extensions
 {
+    using System.Reflection;
+
     public static class PatchExtensions
     {
         public static void PatchFrom<TSource, TDestination>(this TDestination dest, TSource source)
@@ -18,7 +20,6 @@ namespace Ultitity.Extensions
                 var destProp = destProps.FirstOrDefault(p =>
                     p.Name == sourceProp.Name && p.CanWrite
                 );
-
                 if (destProp == null)
                     continue;
 
@@ -28,11 +29,30 @@ namespace Ultitity.Extensions
                 if (value == null)
                     continue;
 
-                // Nếu kiểu dữ liệu không assignable thì bỏ qua
-                if (!destProp.PropertyType.IsAssignableFrom(sourceProp.PropertyType))
-                    continue;
+                try
+                {
+                    // Nếu kiểu destination có thể nhận trực tiếp
+                    if (destProp.PropertyType.IsAssignableFrom(sourceProp.PropertyType))
+                    {
+                        destProp.SetValue(dest, value);
+                    }
+                    else
+                    {
+                        // Nếu kiểu source là nullable, lấy underlying type
+                        var targetType =
+                            Nullable.GetUnderlyingType(destProp.PropertyType)
+                            ?? destProp.PropertyType;
 
-                destProp.SetValue(dest, value);
+                        // Convert kiểu và gán giá trị
+                        var convertedValue = Convert.ChangeType(value, targetType);
+                        destProp.SetValue(dest, convertedValue);
+                    }
+                }
+                catch
+                {
+                    // Bỏ qua nếu không convert được (hoặc log nếu muốn)
+                    continue;
+                }
             }
         }
     }
