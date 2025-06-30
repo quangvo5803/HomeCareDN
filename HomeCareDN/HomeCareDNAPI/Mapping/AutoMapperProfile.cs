@@ -24,35 +24,22 @@ namespace HomeCareDNAPI.Mapping
             // ServiceRequest Create
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            // ServiceRequest Update
-            CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             //Service Create
             CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            //Service Update
-            CreateMap<ServiceUpdateRequestDto, Service>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // ContractorApplication Create
             CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            // ContractorApplication Update
-            CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
             // Material Create
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            // Material Update
-            CreateMap<MaterialUpdateRequestDto, Material>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // Complex mapping (Response)
+
+            // ServiceRequest
             CreateMap<ServiceRequest, ServiceRequestDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -74,7 +61,7 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
-
+            // ContractorApplication
             CreateMap<ContractorApplication, ContractorApplicationDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -85,6 +72,7 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+            // Material
             CreateMap<Material, MaterialDto>()
                 .ForMember(
                     dest => dest.ImageUrls,

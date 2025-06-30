@@ -4,6 +4,7 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Ultitity.Exceptions;
+using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -169,8 +170,7 @@ namespace BusinessLogic.Services
             {
                 throw new CustomValidationException(errors);
             }
-
-            _mapper.Map(requestDto, material);
+            material.PatchFrom(requestDto);
             await _unitOfWork.SaveAsync();
             // Delete old images if they exist
             var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
