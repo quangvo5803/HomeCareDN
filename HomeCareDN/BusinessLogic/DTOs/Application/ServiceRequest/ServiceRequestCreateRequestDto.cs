@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.ServiceRequest
@@ -9,17 +10,17 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public required string UserID { get; set; }
 
         [Required]
-        public int ServiceType { get; set; }
+        public ServiceType ServiceType { get; set; }
 
-        public int? PackageOption { get; set; }
-
-        [Required]
-        public int BuildingType { get; set; }
+        public PackageOption? PackageOption { get; set; }
 
         [Required]
-        public int MainStructureType { get; set; }
+        public BuildingType BuildingType { get; set; }
 
-        public int? DesignStyle { get; set; }
+        [Required]
+        public MainStructureType MainStructureType { get; set; }
+
+        public DesignStyle? DesignStyle { get; set; }
 
         [Required]
         public double Width { get; set; }
