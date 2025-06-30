@@ -1,6 +1,4 @@
-﻿using DataAccess.Entities.Application;
-
-namespace BusinessLogic.DTOs.Application.Material
+﻿namespace BusinessLogic.DTOs.Application.Material
 {
     public class MaterialDto
     {

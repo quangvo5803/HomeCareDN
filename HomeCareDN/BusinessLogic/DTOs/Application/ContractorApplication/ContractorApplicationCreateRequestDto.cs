@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.ContractorApplication

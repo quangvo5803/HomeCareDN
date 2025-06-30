@@ -1,6 +1,4 @@
-﻿using DataAccess.Entities.Application;
-
-namespace BusinessLogic.DTOs.Application.ContractorApplication
+﻿namespace BusinessLogic.DTOs.Application.ContractorApplication
 {
     public class ContractorApplicationDto
     {
@@ -10,7 +8,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         public string? Description { get; set; }
         public double EstimatePrice { get; set; }
         public DateTime CreatedAt { get; set; }
-        public ApplicationStatus Status { get; set; }
+        public string? Status { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
     }
 }

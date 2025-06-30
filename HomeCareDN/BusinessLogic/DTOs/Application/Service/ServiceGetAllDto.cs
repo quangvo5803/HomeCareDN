@@ -1,5 +1,4 @@
-﻿
-namespace BusinessLogic.DTOs.Application.Service
+﻿namespace BusinessLogic.DTOs.Application.Service
 {
     public class ServiceGetAllDto
     {
