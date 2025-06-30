@@ -3,6 +3,7 @@ using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Ultitity.Exceptions;
+using Ultitity.Extensions;
 
 namespace BusinessLogic.Services.Interfaces
 {
@@ -78,24 +79,16 @@ namespace BusinessLogic.Services.Interfaces
 
                 foreach (var image in requestDto.Images)
                 {
-                    if (image.Length > 5 * 1024 * 1024) // 5 MB
+                    if (image.Length > 5 * 1024 * 1024)
                     {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
+                        if (!errors.ContainsKey(nameof(requestDto.Images)))
                         {
-                            if (errors.ContainsKey(nameof(requestDto.Images)))
-                            {
-                                var messages = errors[nameof(requestDto.Images)].ToList();
-                                messages.Add("Each image must be less than 5 MB.");
-                                errors[nameof(requestDto.Images)] = messages.ToArray();
-                            }
-                            else
-                            {
-                                errors.Add(
-                                    nameof(requestDto.Images),
-                                    new[] { "Each image must be less than 5 MB." }
-                                );
-                            }
+                            errors[nameof(requestDto.Images)] = new List<string>().ToArray();
                         }
+
+                        var messages = errors[nameof(requestDto.Images)].ToList();
+                        messages.Add("Each image must be less than 5 MB.");
+                        errors[nameof(requestDto.Images)] = messages.ToArray();
                     }
                 }
             }
@@ -181,12 +174,17 @@ namespace BusinessLogic.Services.Interfaces
                 throw new CustomValidationException(errors);
             }
 
-            _mapper.Map(requestDto, serviceRequest);
-            await _unitOfWork.SaveAsync();
+            serviceRequest.PatchFrom(requestDto);
 
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            await _unitOfWork.SaveAsync();
+            // Delete existing images
+            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == serviceRequest.ServiceRequestID
+            );
+
+            if (existingImages != null && existingImages.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in existingImages)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
@@ -208,16 +206,14 @@ namespace BusinessLogic.Services.Interfaces
                     );
                 }
             }
-            await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
             return serviceDto;
         }
 
         public async Task DeleteServiceRequestAsync(Guid id)
         {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == id,
-                includeProperties: "Images"
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(sr =>
+                sr.ServiceRequestID == id
             );
             if (serviceRequest == null)
             {
@@ -227,14 +223,17 @@ namespace BusinessLogic.Services.Interfaces
                 };
                 throw new CustomValidationException(errors);
             }
-            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest);
-            if (serviceRequest.Images != null && serviceRequest.Images.Any())
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == id
+            );
+            if (images != null && images.Any())
             {
-                foreach (var image in serviceRequest.Images)
+                foreach (var image in images)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
             }
+            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest);
             await _unitOfWork.SaveAsync();
         }
     }

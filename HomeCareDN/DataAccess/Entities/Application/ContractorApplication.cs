@@ -19,8 +19,13 @@ namespace DataAccess.Entities.Application
 
     public enum ApplicationStatus
     {
+        [Display(Name = "Đang chờ")]
         Pending,
+
+        [Display(Name = "Được chọn")]
         Approved,
+
+        [Display(Name = "Bị từ chối")]
         Rejected,
     }
 }

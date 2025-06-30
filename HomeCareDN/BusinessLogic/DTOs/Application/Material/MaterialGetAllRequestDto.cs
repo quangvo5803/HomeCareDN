@@ -1,6 +1,6 @@
-﻿namespace BusinessLogic.DTOs.Application.Service
+﻿namespace BusinessLogic.DTOs.Application.Material
 {
-    public class ServiceGetAllDto
+    public class MaterialGetAllRequestDto
     {
         public string? FilterOn { get; set; } = null;
         public string? FilterQuery { get; set; } = null;

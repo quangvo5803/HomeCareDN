@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Application;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.Service
 {
@@ -14,10 +10,11 @@ namespace BusinessLogic.DTOs.Application.Service
         public required string Name { get; set; }
 
         [Required]
-        public int ServiceType { get; set; }
-        public int? PackageOption { get; set; }
+        public ServiceType ServiceType { get; set; }
+        public PackageOption? PackageOption { get; set; }
+
         [Required]
-        public int BuildingType { get; set; }
+        public BuildingType BuildingType { get; set; }
 
         public string? Description { get; set; }
         public double PriceEsstimate { get; set; }

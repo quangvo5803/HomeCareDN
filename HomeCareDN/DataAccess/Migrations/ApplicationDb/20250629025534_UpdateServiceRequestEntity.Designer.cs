@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250629025534_UpdateServiceRequestEntity")]
+    partial class UpdateServiceRequestEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,50 +85,30 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ImageID");
-                    b.HasIndex("MaterialID");
+
                     b.HasIndex("ContractorApplicationID");
+
                     b.HasIndex("ServiceID");
+
                     b.HasIndex("ServiceRequestID");
+
                     b.ToTable("Images");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
-                {
-                    b.Property<Guid>("MaterialID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Unit")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("UnitPrice")
-                        .HasColumnType("float");
-
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("MaterialID");
-                    b.ToTable("Materials");
-                });
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
                     b.Property<Guid>("ServiceID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("BuildingType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BuildingType")
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -135,14 +118,12 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Property<double>("PriceEsstimate")
                         .HasColumnType("float");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ServiceType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceID");
+
                     b.ToTable("Services");
                 });
 
@@ -211,9 +192,6 @@ namespace DataAccess.Migrations.ApplicationDb
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.Material", null)
-                        .WithMany("Images")
-                        .HasForeignKey("MaterialID");
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
                         .WithMany("Images")
                         .HasForeignKey("ContractorApplicationID");
@@ -227,10 +205,6 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasForeignKey("ServiceRequestID");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b => 
-                {
-                    b.Navigation("Images");
-                });
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Navigation("Images");

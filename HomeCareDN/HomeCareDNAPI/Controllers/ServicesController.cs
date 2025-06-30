@@ -26,13 +26,15 @@ namespace HomeCareDNAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateService(ServiceCreateRequestDto serviceCreate)
         {
-            if (serviceCreate == null) 
+            if (serviceCreate == null)
                 return BadRequest("Invalid service request data.");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createServiceRequest = await _facadeService.ServicesService.CreateServiceAsync(serviceCreate);
+            var createServiceRequest = await _facadeService.ServicesService.CreateServiceAsync(
+                serviceCreate
+            );
 
             return CreatedAtAction(
                 nameof(GetServiceById),
@@ -45,7 +47,8 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetServiceById(Guid id)
         {
             var serviceRequest = await _facadeService.ServicesService.GetServiceByIdAsync(id);
-            if (serviceRequest == null) return BadRequest("Id Null");
+            if (serviceRequest == null)
+                return BadRequest("Id Null");
             return Ok(serviceRequest);
         }
 
@@ -61,7 +64,9 @@ namespace HomeCareDNAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var updateServiceRequest = await _facadeService.ServicesService.UpdateServiceAsync(serviceUpdate);
+            var updateServiceRequest = await _facadeService.ServicesService.UpdateServiceAsync(
+                serviceUpdate
+            );
             return Ok(updateServiceRequest);
         }
 
@@ -73,8 +78,7 @@ namespace HomeCareDNAPI.Controllers
                 return BadRequest(ModelState);
             }
             await _facadeService.ServicesService.DeleteServiceAsync(id);
-            return Ok();
+            return NoContent();
         }
-
     }
 }
