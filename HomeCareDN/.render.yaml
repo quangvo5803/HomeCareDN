@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: homecare-api
+    env: docker
+    region: singapore
+    plan: free
+    branch: develop
+    rootDir: HomeCareDNAPI
+    autoDeploy: true
