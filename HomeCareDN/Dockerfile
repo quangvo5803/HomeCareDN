@@ -6,7 +6,7 @@ COPY *.sln ./
 COPY HomeCareDNAPI/*.csproj ./HomeCareDNAPI/
 COPY BusinessLogic/*.csproj ./BusinessLogic/
 COPY DataAccess/*.csproj ./DataAccess/
-COPY Utility/*.csproj ./Utility/
+COPY Ultitity/*.csproj ./Ultitity/
 
 COPY . .
 
