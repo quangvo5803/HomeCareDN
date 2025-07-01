@@ -1,21 +1,32 @@
+# ------------------------
+# Stage 1: Build
+# ------------------------
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+# Set working directory inside container
 WORKDIR /src
 
-COPY HomeCareDN.sln ./
-COPY BusinessLogic/*.csproj ./BusinessLogic/
-COPY DataAccess/*.csproj ./DataAccess/
-COPY Utility/*.csproj ./Utility/
-COPY HomeCareDNAPI/*.csproj ./HomeCareDNAPI/
-
-RUN dotnet restore
-
+# Copy the entire source code
 COPY . .
 
-WORKDIR /src/HomeCareDNAPI
-RUN dotnet publish -c Release -o /app/publish
+# Restore dependencies
+RUN dotnet restore HomeCareDN.sln
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Publish the API project
+RUN dotnet publish HomeCareDNAPI/HomeCareDNAPI.csproj -c Release -o /app --no-restore
+
+# ------------------------
+# Stage 2: Runtime
+# ------------------------
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
 WORKDIR /app
-COPY --from=build /app/publish .
+
+# Copy the published output from the build stage
+COPY --from=build /app .
+
+# Expose the port your API runs on (optional)
 EXPOSE 80
+
+# Start the API
 ENTRYPOINT ["dotnet", "HomeCareDNAPI.dll"]
