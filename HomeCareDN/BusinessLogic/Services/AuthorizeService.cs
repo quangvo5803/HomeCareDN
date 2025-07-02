@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email.Interface;
+using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {
@@ -37,7 +38,13 @@ namespace BusinessLogic.Services
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                throw new InvalidOperationException("Email chưa được đăng ký.");
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Account", new[] { "Email not registered." } },
+                };
+                throw new CustomValidationException(errors);
+            }
 
             await SendOtpInternalAsync(user, "Login");
         }
@@ -65,9 +72,11 @@ namespace BusinessLogic.Services
                 }
                 else
                 {
-                    throw new InvalidOperationException(
-                        "Email đã được đăng ký và xác minh trước đó."
-                    );
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "Email has been registered and verified before." } },
+                    };
+                    throw new CustomValidationException(errors);
                 }
             }
         }
@@ -75,7 +84,16 @@ namespace BusinessLogic.Services
         private async Task SendOtpInternalAsync(ApplicationUser user, string purpose)
         {
             if (DateTime.UtcNow.AddMinutes(2) > user.OTPExpiresAt)
-                throw new InvalidOperationException("Bạn chỉ có thể yêu cầu mã mới sau 2 phút.");
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    {
+                        "Account",
+                        new[] { "You are only sent a confirmation email every 2 minutes." }
+                    },
+                };
+                throw new CustomValidationException(errors);
+            }
 
             var otp = new Random().Next(100000, 999999).ToString();
             user.CurrentOTP = otp;
@@ -128,9 +146,14 @@ namespace BusinessLogic.Services
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null || user.CurrentOTP != otp || user.OTPExpiresAt < DateTime.UtcNow)
             {
-                throw new Exception(
-                    "Người dùng không tồn tại hoặc mã OTP đã hết hạn hoặc không chính xác."
-                );
+                var errors = new Dictionary<string, string[]>
+                {
+                    {
+                        "Account",
+                        new[] { "User does not exist or OTP code is expired or incorrect." }
+                    },
+                };
+                throw new CustomValidationException(errors);
             }
             user.CurrentOTP = null;
             user.OTPExpiresAt = null;
@@ -158,27 +181,51 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<TokenResponseDto> RefreshTokenAsync(string refreshToken)
+        public async Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto requestDto)
         {
-            var rt = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
-            if (rt == null || rt.ExpiresAt < DateTime.UtcNow)
+            var errors = new Dictionary<string, string[]>();
+
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(
+                requestDto.RefreshToken
+            );
+            if (refreshToken == null || refreshToken.UserId != requestDto.UserId)
             {
-                throw new Exception("Refresh token không hợp lệ hoặc đã hết hạn.");
+                errors.Add("Account", new[] { "Refresh token incorrect or user mismatch." });
+                throw new CustomValidationException(errors);
             }
-            await _refreshTokenRepository.DeleteAsync(rt);
-            var user = await _userManager.FindByIdAsync(rt.UserId);
-            var newAccessToken = await GenerateToken(user);
-            var newRefreshToken = GenerateRefeshToken();
-            var newRt = new RefreshToken
+
+            if (refreshToken.ExpiresAt < DateTime.UtcNow)
             {
-                Token = newRefreshToken,
-                UserId = user.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-            };
-            await _refreshTokenRepository.AddAsync(newRt);
+                await _refreshTokenRepository.DeleteAsync(refreshToken);
+                errors.Add("Account", new[] { "Refresh token expired." });
+                throw new CustomValidationException(errors);
+            }
+
+            var user = await _userManager.FindByIdAsync(refreshToken.UserId);
+            if (user == null || !user.EmailConfirmed)
+            {
+                errors.Add(
+                    "Account",
+                    new[] { user == null ? "User not found." : "Email not confirmed." }
+                );
+                throw new CustomValidationException(errors);
+            }
+
+            var accessToken = await GenerateToken(user);
+            var newRefreshToken = GenerateRefeshToken();
+
+            await _refreshTokenRepository.AddAsync(
+                new RefreshToken
+                {
+                    Token = newRefreshToken,
+                    UserId = user.Id,
+                    ExpiresAt = DateTime.UtcNow.AddDays(7),
+                }
+            );
+
             return new TokenResponseDto
             {
-                AccessToken = newAccessToken,
+                AccessToken = accessToken,
                 RefreshToken = newRefreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
             };
