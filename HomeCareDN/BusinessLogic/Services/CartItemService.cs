@@ -23,10 +23,6 @@ namespace BusinessLogic.Services
             var cartItem = _mapper.Map<CartItem>(requestDto);
             await _unitOfWork.CartItemRepository.AddAsync(cartItem);
             await _unitOfWork.SaveAsync();
-            cartItem = await _unitOfWork.CartItemRepository.GetAsync(
-                ci => ci.CartItemID == cartItem.CartItemID,
-                "Material.Images"
-            );
             return _mapper.Map<CartItemDto>(cartItem);
         }
 

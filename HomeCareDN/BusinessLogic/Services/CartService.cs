@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Cart;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
@@ -22,78 +20,55 @@ namespace BusinessLogic.Services
 
         public async Task<CartDto> CreateCartAsync(CartCreateRequestDto requestDto)
         {
-            var cart = new Cart
+            var existing = await _unitOfWork.CartRepository.GetAsync(c => c.UserID == requestDto.UserID);
+            if (existing != null)
             {
-                CartID = Guid.NewGuid(),
-                UserID = requestDto.UserID
-            };
+                return _mapper.Map<CartDto>(existing);
+            }
+
+            var cart = _mapper.Map<Cart>(requestDto);
 
             await _unitOfWork.CartRepository.AddAsync(cart);
             await _unitOfWork.SaveAsync();
+
             return _mapper.Map<CartDto>(cart);
         }
 
-        public async Task<CartDto> GetCartByIdAsync(Guid id)
+
+        public async Task<CartDto> GetCartByUserIdAsync(string userId)
         {
             var cart = await _unitOfWork.CartRepository.GetAsync(
-                c => c.CartID == id,
+                c => c.UserID == userId,
                 includeProperties: "CartItems.Material.Images"
             );
 
-            return _mapper.Map<CartDto>(cart);
-        }
-
-        public async Task<IEnumerable<CartDto>> GetAllHardCartAsync(CartGetAllRequestDto requestDto)
-        {
-            var carts = await _unitOfWork.CartRepository.GetAllAsync(
-                filterOn: !string.IsNullOrEmpty(requestDto.FilterOn) ? requestDto.FilterOn : null,
-                filterQuery: requestDto.FilterQuery,
-                sortBy: requestDto.SortBy,
-                isAscending: requestDto.IsAscending,
-                pageNumber: requestDto.PageNumber,
-                pageSize: requestDto.PageSize,
-                includeProperties: "CartItems.Material.Images"
-            );
-
-            if (carts == null || !carts.Any())
+            if (cart == null)
             {
                 var errors = new Dictionary<string, string[]>
-        {
-            { "Cart", new[] { "No cart(s) found." } }
-        };
+                {
+                    { "Cart", new[] { $"No cart found for user {userId}." } }
+                };
                 throw new CustomValidationException(errors);
             }
 
-            return _mapper.Map<IEnumerable<CartDto>>(carts);
-        }
-
-
-        public async Task<CartDto> UpdateCartAsync(CartUpdateRequestDto requestDto)
-        {
-            var cart = await _unitOfWork.CartRepository.GetAsync(c => c.CartID == requestDto.CartID, "CartItems");
-
-            if (cart == null) throw new Exception("Cart not found");
-
-            foreach (var item in requestDto.CartItems)
-            {
-                var existing = cart.CartItems.FirstOrDefault(ci => ci.CartItemID == item.CartItemID);
-                if (existing != null)
-                {
-                    existing.Quantity = item.Quantity;
-                }
-            }
-
-            await _unitOfWork.SaveAsync();
             return _mapper.Map<CartDto>(cart);
         }
 
         public async Task DeleteCartAsync(Guid id)
         {
             var cart = await _unitOfWork.CartRepository.GetAsync(c => c.CartID == id);
-            if (cart == null) throw new Exception("Cart not found");
+
+            if (cart == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Cart", new[] { $"Cart with ID {id} not found." } }
+                };
+                throw new CustomValidationException(errors);
+            }
+
             _unitOfWork.CartRepository.Remove(cart);
             await _unitOfWork.SaveAsync();
         }
     }
-
 }
