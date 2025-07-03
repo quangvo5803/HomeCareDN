@@ -37,7 +37,7 @@ namespace BusinessLogic.Services
             {
                 throw new CustomValidationException(new Dictionary<string, string[]>
                 {
-                    { "CartItem", new[] { $"CartItem with ID {id} not found." } }
+                    { "CartItem", new[] { $"CartItem with ID: {id} not found." } }
                 });
             }
 
@@ -48,12 +48,15 @@ namespace BusinessLogic.Services
         {
             var items = await _unitOfWork.CartItemRepository.GetRangeAsync(
                 ci => ci.CartID == requestDto.CartID,
-                includeProperties: "Material.Images",
-                sortBy: null,
-                isAscending: true,
-                pageNumber: 1,
-                pageSize: int.MaxValue
+                includeProperties: "Material.Images"
             );
+            if (!items.Any())
+            {
+                throw new CustomValidationException(new Dictionary<string, string[]>
+                {
+                    { "CartItems", new[] { $"No CartItems found for CartID: {requestDto.CartID}." } }
+                });
+            }
             return _mapper.Map<IEnumerable<CartItemDto>>(items);
         }
 
@@ -63,7 +66,7 @@ namespace BusinessLogic.Services
             if (cartItem == null)
                 throw new CustomValidationException(new Dictionary<string, string[]>
                 {
-                    { "CartItem", new[] { $"CartItem with ID {requestDto.CartItemID} not found." } }
+                    { "CartItem", new[] { $"CartItem with ID: {requestDto.CartItemID} not found." } }
                 });
 
             cartItem.Quantity = requestDto.Quantity;
@@ -76,7 +79,7 @@ namespace BusinessLogic.Services
         {
             var cartItem = await _unitOfWork.CartItemRepository.GetAsync(ci => ci.CartItemID == id);
             if (cartItem == null)
-                throw new KeyNotFoundException($"CartItem with ID {id} not found.");
+                throw new KeyNotFoundException($"CartItem with ID: {id} not found.");
 
             _unitOfWork.CartItemRepository.Remove(cartItem);
             await _unitOfWork.SaveAsync();

@@ -43,7 +43,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Cart", new[] { $"No cart found for user {userId}." } }
+                    { "Cart", new[] { $"No cart found for user: {userId}." } }
                 };
                 throw new CustomValidationException(errors);
             }
@@ -59,7 +59,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Cart", new[] { $"Cart with ID {id} not found." } }
+                    { "Cart", new[] { $"Cart with ID: {id} not found." } }
                 };
                 throw new CustomValidationException(errors);
             }
