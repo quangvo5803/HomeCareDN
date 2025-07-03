@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.CartItem;
 using BusinessLogic.DTOs.Application.Cart;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;

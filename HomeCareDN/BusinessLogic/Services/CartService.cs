@@ -25,12 +25,9 @@ namespace BusinessLogic.Services
             {
                 return _mapper.Map<CartDto>(existing);
             }
-
             var cart = _mapper.Map<Cart>(requestDto);
-
             await _unitOfWork.CartRepository.AddAsync(cart);
             await _unitOfWork.SaveAsync();
-
             return _mapper.Map<CartDto>(cart);
         }
 

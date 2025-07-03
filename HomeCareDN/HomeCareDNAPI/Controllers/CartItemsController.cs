@@ -1,47 +1,45 @@
-﻿using BusinessLogic.DTOs.Application.Cart;
+﻿using BusinessLogic.DTOs.Application.CartItem;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class CartItemsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
+
         public CartItemsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllCartItems([FromQuery] CartItemGetAllRequestDto requestDto)
+        [HttpGet("cart/{cartId}")]
+        public async Task<IActionResult> GetByCartId(Guid cartId)
         {
-            var items = await _facadeService.CartItemService.GetAllHardCartItemAsync(requestDto);
+            var dto = new CartItemGetAllByCartIdRequestDto { CartID = cartId };
+            var items = await _facadeService.CartItemService.GetAllCartItemsByCartIdAsync(dto);
             return Ok(items);
         }
-
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCartItemById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             var item = await _facadeService.CartItemService.GetCartItemByIdAsync(id);
-            if (item == null)
-                return NotFound();
             return Ok(item);
         }
-
         [HttpPost]
-        public async Task<IActionResult> CreateCartItem([FromBody] CartItemCreateRequestDto requestDto)
+        public async Task<IActionResult> Create([FromBody] CartItemCreateRequestDto requestDto)
         {
             if (requestDto == null)
                 return BadRequest("Invalid cart item data.");
 
             var created = await _facadeService.CartItemService.CreateCartItemAsync(requestDto);
-            return CreatedAtAction(nameof(GetCartItemById), new { id = created.CartItemID }, created);
+            return CreatedAtAction(nameof(GetById), new { id = created.CartItemID }, created);
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCartItem([FromBody] CartItemUpdateRequestDto requestDto)
+        public async Task<IActionResult> Update([FromBody] CartItemUpdateRequestDto requestDto)
         {
             if (requestDto == null)
                 return BadRequest("Invalid cart item data.");
@@ -50,18 +48,17 @@ namespace HomeCareDNAPI.Controllers
             return Ok(updated);
         }
 
-
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCartItem(Guid id)
+        public async Task<IActionResult> Delete(Guid id)
         {
             try
             {
                 await _facadeService.CartItemService.DeleteCartItemAsync(id);
                 return NoContent();
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound($"CartItem with ID {id} not found.");
+                return NotFound(ex.Message);
             }
         }
     }

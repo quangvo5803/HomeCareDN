@@ -1,6 +1,6 @@
 ﻿using BusinessLogic.DTOs.Application.Material;
 
-namespace BusinessLogic.DTOs.Application.Cart
+namespace BusinessLogic.DTOs.Application.CartItem
 {
     public class CartItemDto
     {

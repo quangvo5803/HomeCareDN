@@ -1,4 +1,5 @@
-﻿namespace BusinessLogic.DTOs.Application.Cart
+﻿using BusinessLogic.DTOs.Application.CartItem;
+namespace BusinessLogic.DTOs.Application.Cart
 {
     public class CartDto
     {
