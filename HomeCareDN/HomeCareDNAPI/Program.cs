@@ -39,9 +39,6 @@ namespace HomeCareDNAPI
                     builder.Configuration.GetConnectionString("AuthorizeConnection")
                 )
             );
-
-            builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
             builder
                 .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

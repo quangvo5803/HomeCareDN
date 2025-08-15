@@ -8,5 +8,8 @@ namespace BusinessLogic.Services.FacadeService
         IMaterialService MaterialService { get; }
         IServicesService ServicesService { get; }
         IContractorApplicationService ContractorApplicationService { get; }
+        ICartItemService CartItemService { get; }
+        ICartService CartService { get; }
+
     }
 }

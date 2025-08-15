@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.CartItem;
+using BusinessLogic.DTOs.Application.Cart;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
@@ -36,6 +38,18 @@ namespace HomeCareDNAPI.Mapping
             // Material Create
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            // Cart Create
+            CreateMap<CartCreateRequestDto, Cart>()
+                .ForMember(dest => dest.CartItems, opt => opt.Ignore());
+
+            // CartItem Create
+            CreateMap<CartItemCreateRequestDto, CartItem>()
+                .ForMember(dest => dest.Cart, opt => opt.Ignore())
+                .ForMember(dest => dest.Material, opt => opt.Ignore());
+
+
+
 
             // Complex mapping (Response)
 
@@ -83,6 +97,20 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+            // Cart
+            CreateMap<Cart, CartDto>()
+                .ForMember(
+                    dest => dest.CartItems,
+                    opt => opt.MapFrom(src => src.CartItems != null ? src.CartItems : new List<CartItem>())
+                );
+            // CartItem
+            CreateMap<CartItem, CartItemDto>()
+                .ForMember(
+                    dest => dest.Material,
+                    opt => opt.MapFrom(src => src.Material)
+                );
+
+
         }
     }
 }
