@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
-
-// Mock data for contacts and navigation
-// In a real application, this would come from an API or a data file.
-const contacts = {
-  phone: '(+84) 123 456 789',
-  email: 'contact@homecaredn.com',
-  hours: 'Mon - Fri: 8:00am - 6:00pm',
-};
+import { contacts } from '../data.js';
+import { Link } from 'react-router-dom';
 
 // New, more structured navigation data with a dropdown menu
 const navItems = [
@@ -54,7 +48,7 @@ export default function Header() {
               </div>
               <div className="inline-flex items-center gap-2 hover:text-blue-600 transition-colors">
                 <i className="far fa-clock text-blue-500" />
-                <span className="font-medium">{contacts.hours}</span>
+                <span className="font-medium">{contacts.address}</span>
               </div>
             </div>
           </div>
@@ -104,9 +98,7 @@ export default function Header() {
                   ) : (
                     // Dropdown menu item
                     <>
-                      <button
-                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none"
-                      >
+                      <button className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none">
                         {item.label}
                         <i className="ml-2 fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180" />
                       </button>
@@ -131,18 +123,20 @@ export default function Header() {
 
             {/* Action Buttons */}
             <div className="flex items-center gap-3">
-              <button
+              <Link
+                to="/login"
                 type="button"
                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Login
-              </button>
-              <button
+              </Link>
+              <Link
+                to="/register"
                 type="button"
                 className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
               >
                 Register
-              </button>
+              </Link>
               <button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-gray-50 border border-gray-300 hover:border-blue-500 rounded-full transition-all duration-300">
                 <i className="fas fa-globe text-lg" />
               </button>
@@ -192,7 +186,11 @@ export default function Header() {
                           className="w-full text-left py-2 text-gray-700 hover:text-blue-600 font-medium transition-colors focus:outline-none flex justify-between items-center"
                         >
                           {item.label}
-                          <i className={`fas fa-chevron-down text-xs transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : ''}`} />
+                          <i
+                            className={`fas fa-chevron-down text-xs transition-transform duration-300 ${
+                              isServicesOpen ? 'rotate-180' : ''
+                            }`}
+                          />
                         </button>
                         {isServicesOpen && (
                           <ul className="pl-4 mt-2 space-y-2">
@@ -217,12 +215,18 @@ export default function Header() {
               {/* Mobile Action Buttons */}
               <div className="pt-4 border-t space-y-3">
                 <div className="flex gap-3">
-                  <button className="flex-1 py-3 text-gray-700 border border-gray-200 rounded-full hover:border-blue-500 hover:text-blue-600 transition-colors">
+                  <Link
+                    to="/login"
+                    className="flex-1 py-3 text-gray-700 border border-gray-200 rounded-full hover:border-blue-500 hover:text-blue-600 transition-colors"
+                  >
                     Login
-                  </button>
-                  <button className="flex-1 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors">
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex-1 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                  >
                     Register
-                  </button>
+                  </Link>
                 </div>
                 <div className="flex items-center justify-between">
                   <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600">
