@@ -16,28 +16,28 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromQuery] RegisterRequestDto dto)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto dto)
         {
             await _authorizeService.SendRegisterOtpAsync(dto.Email, dto.FullName);
             return Ok(new { message = "OTP đã được gửi đến email của bạn" });
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromQuery] LoginRequestDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
             await _authorizeService.SendLoginOtpAsync(dto.Email);
             return Ok(new { message = "OTP đã được gửi đến email của bạn" });
         }
 
         [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtp([FromQuery] VerifyOTPRequestDto dto)
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOTPRequestDto dto)
         {
             var tokens = await _authorizeService.VerifyOtpAsync(dto.Email, dto.OTP);
             return Ok(tokens);
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromQuery] RefreshTokenRequestDto dto)
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
         {
             var tokens = await _authorizeService.RefreshTokenAsync(dto);
             return Ok(tokens);

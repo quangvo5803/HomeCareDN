@@ -1,7 +1,7 @@
 export const contacts = {
-  phone: '+012 345 6789',
-  email: 'info@example.com',
-  hours: 'Mon - Fri : 09 AM - 09 PM',
+  phone: '+84 585 837 306',
+  email: 'homecaredn68@gmail.com',
+  address: 'FPT University, Da Nang, Vietnam',
 };
 
 export const carouselSlides = [

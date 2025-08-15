@@ -1,4 +1,5 @@
 import { contacts } from '../data';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
@@ -20,8 +21,8 @@ export default function Header() {
                 <span className="font-medium">{contacts.email}</span>
               </div>
               <div className="inline-flex items-center gap-2 hover:text-primary transition-colors">
-                <i className="far fa-clock text-primary" />
-                <span className="font-medium">{contacts.hours}</span>
+                <i className="fa fa-house text-primary" />
+                <span className="font-medium">{contacts.address}</span>
               </div>
             </div>
           </div>
@@ -50,7 +51,7 @@ export default function Header() {
                 placeholder="Search..."
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300"
               />
-              <i className="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <i className="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
           </div>
 
@@ -78,20 +79,22 @@ export default function Header() {
             {/* Action Buttons */}
             <div className="flex items-center gap-3">
               {/* Login Button */}
-              <button
+              <Link
+                to="/Login"
                 type="button"
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
               >
                 Login
-              </button>
+              </Link>
 
               {/* Register Button */}
-              <button
+              <Link
+                to="/Register"
                 type="button"
-                class="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
+                className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
               >
                 Register
-              </button>
+              </Link>
 
               {/* Globe Button */}
               <button className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-primary hover:bg-gray-50 border border-gray-300 hover:border-primary rounded-full transition-all duration-300">

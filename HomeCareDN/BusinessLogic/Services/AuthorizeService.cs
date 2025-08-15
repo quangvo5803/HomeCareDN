@@ -83,13 +83,13 @@ namespace BusinessLogic.Services
 
         private async Task SendOtpInternalAsync(ApplicationUser user, string purpose)
         {
-            if (DateTime.UtcNow.AddMinutes(2) > user.OTPExpiresAt)
+            if (DateTime.UtcNow.AddSeconds(30) > user.OTPExpiresAt)
             {
                 var errors = new Dictionary<string, string[]>
                 {
                     {
                         "Account",
-                        new[] { "You are only sent a confirmation email every 2 minutes." }
+                        new[] { "You are only sent a confirmation email every 30 seconds." }
                     },
                 };
                 throw new CustomValidationException(errors);

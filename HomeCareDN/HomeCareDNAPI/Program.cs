@@ -59,6 +59,20 @@ namespace HomeCareDNAPI
                         ),
                     };
                 });
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(
+                    "AllowReactApp",
+                    policy =>
+                    {
+                        policy
+                            .WithOrigins("http://localhost:5173") // domain React
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials(); // nếu dùng cookie/session
+                    }
+                );
+            });
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
@@ -75,9 +89,8 @@ namespace HomeCareDNAPI
             /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-           
-
             var app = builder.Build();
+            app.UseCors("AllowReactApp");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
