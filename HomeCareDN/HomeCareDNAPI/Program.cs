@@ -70,6 +70,8 @@ namespace HomeCareDNAPI
                     }
                 );
             });
+            builder.Services.AddHttpContextAccessor();
+
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();

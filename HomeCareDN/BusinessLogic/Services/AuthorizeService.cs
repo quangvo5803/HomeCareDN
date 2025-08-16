@@ -5,6 +5,7 @@ using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,18 +21,21 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public AuthorizeService(
             IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             IEmailQueue emailQueue,
-            IRefreshTokenRepository refreshTokenRepository
+            IRefreshTokenRepository refreshTokenRepository,
+            IHttpContextAccessor httpContextAccessor
         )
         {
             _configuration = configuration;
             _userManager = userManager;
             _emailQueue = emailQueue;
             _refreshTokenRepository = refreshTokenRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task SendLoginOtpAsync(string email)
@@ -83,20 +87,28 @@ namespace BusinessLogic.Services
 
         private async Task SendOtpInternalAsync(ApplicationUser user, string purpose)
         {
-            if (DateTime.UtcNow.AddSeconds(30) > user.OTPExpiresAt)
+            if (
+                user.LastOTPSentAt.HasValue
+                && DateTime.UtcNow < user.LastOTPSentAt.Value.AddSeconds(30)
+            )
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    {
-                        "Account",
-                        new[] { "You are only sent a confirmation email every 30 seconds." }
-                    },
+                    { "Account", new[] { "You can only request OTP every 30 seconds." } },
                 };
                 throw new CustomValidationException(errors);
             }
 
-            var otp = new Random().Next(100000, 999999).ToString();
-            user.CurrentOTP = otp;
+            user.LastOTPSentAt = DateTime.UtcNow;
+
+            var otpBytes = new byte[4];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(otpBytes);
+            }
+            var otp = BitConverter.ToUInt32(otpBytes, 0) % 1000000;
+            var otpString = otp.ToString("D6");
+            user.CurrentOTP = otpString;
             user.OTPExpiresAt = DateTime.UtcNow.AddMinutes(5);
             await _userManager.UpdateAsync(user);
 
@@ -173,24 +185,43 @@ namespace BusinessLogic.Services
             }
             await _refreshTokenRepository.AddAsync(rt);
             await _userManager.UpdateAsync(user);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                }
+            );
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
-                RefreshToken = refreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
             };
         }
 
-        public async Task<TokenResponseDto> RefreshTokenAsync(RefreshTokenRequestDto requestDto)
+        public async Task<TokenResponseDto> RefreshTokenAsync()
         {
             var errors = new Dictionary<string, string[]>();
 
-            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(
-                requestDto.RefreshToken
-            );
-            if (refreshToken == null || refreshToken.UserId != requestDto.UserId)
+            // Lấy refresh token từ cookie
+            var refreshTokenValue = _httpContextAccessor.HttpContext.Request.Cookies[
+                "refreshToken"
+            ];
+            if (string.IsNullOrEmpty(refreshTokenValue))
             {
-                errors.Add("Account", new[] { "Refresh token incorrect or user mismatch." });
+                errors.Add("Account", new[] { "No refresh token provided." });
+                throw new CustomValidationException(errors);
+            }
+
+            // Lấy refresh token từ DB
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshTokenValue);
+            if (refreshToken == null)
+            {
+                errors.Add("Account", new[] { "Invalid refresh token." });
                 throw new CustomValidationException(errors);
             }
 
@@ -201,6 +232,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+            // Lấy user tương ứng
             var user = await _userManager.FindByIdAsync(refreshToken.UserId);
             if (user == null || !user.EmailConfirmed)
             {
@@ -211,9 +243,14 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+            // Tạo access token mới
             var accessToken = await GenerateToken(user);
+
+            // Tạo refresh token mới
             var newRefreshToken = GenerateRefeshToken();
 
+            // Xóa refresh token cũ và lưu refresh token mới
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
             await _refreshTokenRepository.AddAsync(
                 new RefreshToken
                 {
@@ -223,10 +260,22 @@ namespace BusinessLogic.Services
                 }
             );
 
+            // Ghi refresh token mới vào cookie
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                newRefreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // nếu test localhost có thể đổi false
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(7),
+                }
+            );
+
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
-                RefreshToken = newRefreshToken,
                 AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
             };
         }

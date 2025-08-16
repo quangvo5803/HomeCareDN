@@ -1,39 +1,33 @@
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
+import AuthContext from '../context/AuthContext';
 import Loading from '../components/Loading';
 
 export default function VerifyOTP() {
+  const { login } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
   const email = location.state?.email || '';
-
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!otp.trim()) {
-      console.log('Vui lòng nhập mã OTP');
-      return;
-    }
-
+    if (!otp.trim()) return toast.error('Vui lòng nhập mã OTP');
     setLoading(true);
     try {
-      await authService.verifyOtp(email, otp);
+      const response = await authService.verifyOtp(email, otp);
       toast.success('Đăng nhập thành công');
+      login(response.data.accessToken);
     } catch (err) {
       let message =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Có lỗi xảy ra, vui lòng thử lại';
-
-      // Nếu có errors, lấy thông báo đầu tiên
+        err?.response?.data?.message || err?.message || 'Có lỗi xảy ra';
       if (err?.response?.data?.errors) {
         const errors = err.response.data.errors;
-        const firstErrorKey = Object.keys(errors)[0];
-        message = errors[firstErrorKey][0] || message;
+        const firstKey = Object.keys(errors)[0];
+        message = errors[firstKey][0] || message;
       }
-
       toast.error(message);
     } finally {
       setLoading(false);
@@ -41,9 +35,23 @@ export default function VerifyOTP() {
   };
 
   const handleBackToLogin = () => {
-    console.log('Quay lại trang đăng nhập');
+    navigate('/login'); // quay về login
   };
+
+  const handleResendOtp = async () => {
+    if (!email) return toast.error('Không tìm thấy email');
+    try {
+      await authService.resendOtp(email);
+      toast.success('Đã gửi lại mã OTP, vui lòng kiểm tra email');
+    } catch (err) {
+      toast.error(
+        err?.response?.data?.message || 'Không thể gửi lại OTP, thử lại sau'
+      );
+    }
+  };
+
   if (loading) return <Loading />;
+
   return (
     <div className="min-h-screen w-full relative overflow-hidden">
       {/* Background Image */}
@@ -77,7 +85,8 @@ export default function VerifyOTP() {
 
           {/* Subtitle */}
           <p className="text-gray-500 text-center mb-8">
-            We have sent a verification code to {'{Email}'}
+            We have sent a verification code to{' '}
+            <span className="font-medium">{email}</span>
           </p>
 
           {/* OTP Form */}
@@ -96,7 +105,6 @@ export default function VerifyOTP() {
 
             {/* Buttons */}
             <div className="space-y-4">
-              {/* Login Button */}
               <button
                 onClick={handleLogin}
                 className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
@@ -104,7 +112,6 @@ export default function VerifyOTP() {
                 Login
               </button>
 
-              {/* Back to Login Button */}
               <button
                 onClick={handleBackToLogin}
                 className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
@@ -118,7 +125,10 @@ export default function VerifyOTP() {
           <div className="text-center mt-6">
             <p className="text-gray-600 text-sm">
               Didn't receive the code?{' '}
-              <button className="text-blue-600 hover:text-blue-800 font-medium">
+              <button
+                onClick={handleResendOtp}
+                className="text-blue-600 hover:text-blue-800 font-medium"
+              >
                 Resend
               </button>
             </p>

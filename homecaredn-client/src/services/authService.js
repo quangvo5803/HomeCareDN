@@ -1,19 +1,34 @@
+// src/services/authService.js
 import api from '../api';
 
 export const authService = {
-  register: (Email, FullName) => {
-    return api.post(`/Authorize/register`, { Email, FullName });
+  register: async (email, fullName) => {
+    return api.post('/Authorize/register', { email, fullName });
   },
 
-  login: (Email) => {
-    return api.post(`/Authorize/login`, { Email });
+  login: async (email) => {
+    return api.post('/Authorize/login', { email });
   },
 
-  verifyOtp: (Email, OTP) => {
-    return api.post(`/Authorize/verify-otp`, { Email, OTP });
+  verifyOtp: async (email, otp) => {
+    const response = await api.post('/Authorize/verify-otp', { email, otp });
+    // Lưu accessToken vào localStorage
+    if (response.data?.accessToken) {
+      localStorage.setItem('accessToken', response.data.accessToken);
+    }
+    return response;
   },
 
-  refreshToken: (UserId, RefreshToken) => {
-    return api.post(`/Authorize/refresh-token`, { UserId, RefreshToken });
+  refreshToken: async () => {
+    // refresh token backend lấy từ cookie, không cần gửi body
+    const response = await api.post('/Authorize/refresh-token');
+    if (response.data?.accessToken) {
+      localStorage.setItem('accessToken', response.data.accessToken);
+    }
+    return response;
+  },
+
+  logout: () => {
+    localStorage.removeItem('accessToken');
   },
 };
