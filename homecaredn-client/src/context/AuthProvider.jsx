@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import jwt_decode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import { authService } from '../services/authService';
 import AuthContext from './AuthContext';
 
@@ -10,7 +10,7 @@ export default function AuthProvider({ children }) {
 
   const parseToken = useCallback((token) => {
     try {
-      const decoded = jwt_decode(token);
+      const decoded = jwtDecode(token);
       return {
         token,
         role:
