@@ -1,46 +1,44 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { authService } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import { toast } from 'react-toastify';
+import AuthContext from '../context/AuthContext';
+import { handleApiError } from '../utils/handleApiError';
+import { useTranslation } from 'react-i18next';
 
 export default function Register() {
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { setPendingEmail } = useContext(AuthContext);
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
     if (!fullName.trim()) {
-      toast.error('Vui lòng nhập họ và tên');
+      toast.error(t('ERROR.NULL_NAME'));
       return;
     }
     if (!email.trim()) {
-      toast.error('Vui lòng nhập email');
+      toast.error(t('ERROR.NULL_EMAIL'));
       return;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      toast.error('Email không hợp lệ');
+      toast.error(t('ERROR.INVALID_NAME'));
       return;
     }
 
     setLoading(true);
     try {
-      await authService.Register(email);
+      await authService.register(email, fullName);
+      setPendingEmail(email);
+      toast.success(t('SUCCESS.SEND_OTP'));
+      navigate('/VerifyOTP', { state: { email } });
     } catch (err) {
-      let message =
-        err?.response?.data?.message ||
-        err?.message ||
-        'Có lỗi xảy ra, vui lòng thử lại';
-
-      // Nếu có errors, lấy thông báo đầu tiên
-      if (err?.response?.data?.errors) {
-        const errors = err.response.data.errors;
-        const firstErrorKey = Object.keys(errors)[0];
-        message = errors[firstErrorKey][0] || message;
-      }
-
-      toast.error(message);
+      toast.error(handleApiError(err));
     } finally {
       setLoading(false);
     }
@@ -79,16 +77,17 @@ export default function Register() {
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
                 alt="HomeCareDN Banner"
-                className="max-w-48 h-auto mx-auto mb-4"
+                className="max-w-full h-auto object-contain cursor-pointer transition-transform duration-300 transform hover:scale-105"
+                onClick={() => navigate('/Home')}
               />
             </div>
 
             {/* Centered Title and Subtitle */}
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
-                Chào mừng bạn đến với HomeCareDN
+                {t('register.title')}
               </h2>
-              <p className="text-gray-600">Cách xây dựng ngôi nhà của bạn</p>
+              <p className="text-gray-600">{t('register.subtitle')}</p>
             </div>
 
             <div className="space-y-6">
@@ -110,7 +109,7 @@ export default function Register() {
                       : 'top-3 text-base text-gray-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600'
                   }`}
                 >
-                  Full Name
+                  {t('register.name_placeholder')}
                 </label>
               </div>
 
@@ -132,7 +131,7 @@ export default function Register() {
                       : 'top-3 text-base text-gray-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600'
                   }`}
                 >
-                  Email
+                  {t('register.email_placeholder')}
                 </label>
               </div>
 
@@ -174,7 +173,7 @@ export default function Register() {
             <div className="flex items-center my-8">
               <div className="flex-1 border-t border-gray-300"></div>
               <span className="px-4 text-sm text-gray-500 bg-white">
-                Hoặc đăng ký với
+                {t('register.another_register')}
               </span>
               <div className="flex-1 border-t border-gray-300"></div>
             </div>
@@ -203,18 +202,20 @@ export default function Register() {
                 />
               </svg>
               <span className="text-gray-700 font-medium">
-                Đăng ký với Google
+                {t('BUTTON.RegisterGoogle')}
               </span>
             </button>
 
             {/* Login Link */}
             <div className="text-center mt-8">
-              <span className="text-gray-600">Đã có tài khoản? </span>
+              <span className="text-gray-600">
+                {t('register.have_account')}
+              </span>
               <button
                 onClick={handleSignIn}
                 className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200"
               >
-                Đăng nhập ngay
+                {t('register.login_link')}
               </button>
             </div>
           </div>
@@ -225,7 +226,8 @@ export default function Register() {
           <img
             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
             alt="HomeCareDN Banner"
-            className="max-w-full h-auto object-contain"
+            className="max-w-full h-auto object-contain cursor-pointer transition-transform duration-300 transform hover:scale-105"
+            onClick={() => navigate('/Home')}
           />
         </div>
       </div>
