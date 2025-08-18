@@ -4,7 +4,7 @@ namespace BusinessLogic.DTOs.Authorize
 {
     public class LoginRequestDto
     {
-        [Required, EmailAddress]
+        [Required]
         public required string Email { get; set; }
     }
 }

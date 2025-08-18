@@ -1,0 +1,29 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore HomeCareDN/HomeCareDN.sln
+
+      - name: Build
+        run: dotnet build HomeCareDN/HomeCareDN.sln --no-restore --configuration Release
+
+      - name: Run Tests (nếu có)
+        run: dotnet test HomeCareDN/HomeCareDN.sln --no-build --verbosity normal

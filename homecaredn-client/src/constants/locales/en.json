@@ -1,0 +1,81 @@
+{
+  "header": {
+    "home": "Home",
+    "about": "About Us",
+    "services": "Our Services",
+    "construction": "Construction Home",
+    "repair": "Repair Home",
+    "material": "Material",
+    "contact": "Contact Us",
+    "login": "Login",
+    "register": "Register",
+    "search": "Search...",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "home":{
+    "slider_category1": "Commercial",
+    "slider_category2": "Residential",
+    "slider_category3": "Industrial",
+    "slider_subtitle": "Welcome to HomeCareDN",
+    "slider1_title": "A construction and renovation brokerage firm.",
+    "slider2_title": "Professional Tiling & Painting Services",
+    "slider3_title": "Full range of building materials you need",
+    "slider_button": "More Details",
+    "about_subtitle": "About Us",
+    "about_title1": "Unique Solutions For ",
+    "about_title2": "Commercial, Residential and Industries!",
+    "about_description": "We are a leading construction and renovation brokerage firm, dedicated to delivering innovative and tailored solutions for both residential and industrial projects. Our team combines expertise, creativity, and precision to ensure every project meets the highest standards of quality, safety, and sustainability. From concept to completion, we transform visions into reality, making your spaces functional, beautiful, and future-ready.",
+    "about_feature1": "Ontime at services",
+    "about_feature2": "24/7 hours services",
+    "about_feature3": "Thorough and professional",
+    "about_experience": "Years",
+    "about_experience1" :"Experience"
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Welcome back!",
+    "email_placeholder": "Enter your email",
+    "another_login": "Or login with",
+    "not_have_account": "Don't have an account? ",
+    "register_link": " Register now"
+  },
+  "register":{
+    "title": "Register",
+    "subtitle": "Create a new account",
+    "name_placeholder": "Enter your full name",
+    "email_placeholder": "Enter your email",
+    "another_register": "Or register with ",
+    "have_account": "Already have an account? ",
+    "login_link": " Login now"
+  },
+  "verifyotp": {
+    "title": "Verify OTP",
+    "subtitle": "We have sent an OTP code to your email ",
+    "otp_placeholder": "Enter OTP code",
+    "resend_in": "Resend after ",
+    "resend_otp": "Resend",
+    "not_receive_otp": "Did not receive the code? "
+  },
+  "BUTTON": {
+    "Login": "Login",
+    "Register": "Register",
+    "SendOTP": "Send OTP Code",
+    "MoreDetails": "More Details",
+    "LoginGoogle": "Login with Google",
+    "RegisterGoogle": "Register with Google",
+    "BackToLogin": "Back to Login Page"
+  },
+  "ERROR":{
+    "LOGIN_NOT_FOUND": "Email not registered",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
+    "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
+    "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
+    "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
+    "REGISTER_ALREADY_EXISTS": "Email already registered"
+  },
+  "SUCCESS": {
+    "SEND_OTP": "OTP code sent successfully.",
+    "LOGIN": "Login successful."
+  }
+}

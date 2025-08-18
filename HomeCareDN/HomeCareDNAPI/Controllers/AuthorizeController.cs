@@ -37,9 +37,9 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        public async Task<IActionResult> RefreshToken()
         {
-            var tokens = await _authorizeService.RefreshTokenAsync(dto.RefreshToken);
+            var tokens = await _authorizeService.RefreshTokenAsync();
             return Ok(tokens);
         }
     }

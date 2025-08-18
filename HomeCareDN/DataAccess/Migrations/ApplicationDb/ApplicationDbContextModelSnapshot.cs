@@ -22,6 +22,45 @@ namespace DataAccess.Migrations.ApplicationDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
+                {
+                    b.Property<Guid>("CartID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CartID");
+
+                    b.ToTable("Carts");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
+                {
+                    b.Property<Guid>("CartItemID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CartID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MaterialID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.HasKey("CartItemID");
+
+                    b.HasIndex("CartID");
+
+                    b.HasIndex("MaterialID");
+
+                    b.ToTable("CartItems");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Property<Guid>("ContractorApplicationID")
@@ -91,7 +130,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -123,7 +162,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("MaterialID");
 
-                    b.ToTable("Materials", (string)null);
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
@@ -155,7 +194,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
@@ -212,6 +251,25 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.ToTable("ServiceRequests", (string)null);
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.Cart", "Cart")
+                        .WithMany("CartItems")
+                        .HasForeignKey("CartID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entities.Application.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cart");
+
+                    b.Navigation("Material");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
@@ -238,6 +296,11 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
                         .WithMany("Images")
                         .HasForeignKey("ServiceRequestID");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>

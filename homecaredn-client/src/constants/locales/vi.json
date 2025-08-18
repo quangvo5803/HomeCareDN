@@ -1,0 +1,85 @@
+{
+  "header": {
+    "home": "Trang Chủ",
+    "about": "Về Chúng Tôi",
+    "services": "Dịch Vụ",
+    "construction": "Xây Nhà",
+    "repair": "Sửa Chữa",
+    "material": "Vật Liệu",
+    "contact": "Liên Hệ",
+    "search": "Tìm kiếm...",
+    "profile": "Hồ Sơ",
+    "logout": "Đăng Xuất"
+  },
+  "home": {
+    "slider_category1": "Thương mại",
+    "slider_category2": "Nhà ở",
+    "slider_category3": "Công nghiệp",
+    "slider_subtitle": "Chào mừng đến với HomeCareDN",
+    "slider1_title": "Công ty môi giới thi công và cải tạo công trình.",
+    "slider2_title": "Dịch vụ ốp lát & sơn chuyên nghiệp",
+    "slider3_title": "Cung cấp đầy đủ các loại vật liệu xây dựng bạn cần",
+    "slider_button": "Xem thêm chi tiết",
+    "about_subtitle": "Về chúng tôi",
+    "about_title1": "Giải pháp độc đáo cho ",
+    "about_title2": "Thương mại, Nhà ở và Công nghiệp!",
+    "about_description": "Chúng tôi là công ty môi giới hàng đầu trong lĩnh vực xây dựng và cải tạo, cam kết mang đến các giải pháp sáng tạo và phù hợp riêng cho cả dự án dân dụng lẫn công nghiệp. Đội ngũ của chúng tôi kết hợp chuyên môn, sáng tạo và sự tỉ mỉ để đảm bảo mỗi dự án đều đạt tiêu chuẩn cao nhất về chất lượng, an toàn và bền vững. Từ ý tưởng đến hoàn thiện, chúng tôi biến những tầm nhìn thành hiện thực, tạo nên không gian vừa tiện nghi, vừa thẩm mỹ và sẵn sàng cho tương lai.",
+    "about_feature1": "Dịch vụ đúng giờ",
+    "about_feature2": "Dịch vụ 24/7",
+    "about_feature3": "Đầy đủ và chuyên nghiệp",
+    "about_experience": "Năm",
+    "about_experience1" :"Kinh nghiệm"
+  },
+  "login": {
+    "title": "Đăng Nhập",
+    "subtitle": "Chào mừng bạn quay trở lại!",
+    "email_placeholder": "Nhập email của bạn",
+    "another_login": "Hoặc đăng nhập với",
+    "not_have_account": "Bạn chưa có tài khoản? ",
+    "register_link": " Đăng ký ngay"
+  },
+  "register":{
+    "title": "Đăng Ký",
+    "subtitle": "Tạo tài khoản mới",
+    "name_placeholder": "Nhập họ và tên của bạn",
+    "email_placeholder": "Nhập email của bạn",
+    "another_register": "Hoặc đăng ký với",
+    "register_button": "Đăng Ký",
+    "have_account": "Đã có tài khoản? ",
+    "login_link": " Đăng nhập ngay"
+  },
+  "verifyotp": {
+    "title": "Xác Thực OTP",
+    "subtitle": "Chúng tôi đã gửi mã OTP đến email ",
+    "otp_placeholder": "Nhập mã OTP",
+    "resend_in": "Gửi lại sau ",
+    "resend_otp": "Gửi lại",
+    "not_receive_otp": "Không nhận được mã? "
+  },
+  "BUTTON": {
+    "Login": "Đăng Nhập",
+    "Register": "Đăng Ký",
+    "SendOTP": "Gửi Mã OTP",
+    "MoreDetails": "Xem Thêm Chi Tiết",
+    "LoginGoogle": "Đăng Nhập với Google",
+    "RegisterGoogle": "Đăng Ký với Google",
+    "BackToLogin": "Quay Về Trang Đăng Nhập"
+  },
+  "ERROR":{
+    "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
+    "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
+    "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
+    "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
+    "NULL_NAME": "Vui lòng nhập họ và tên.",
+    "NULL_EMAIL": "Vui lòng nhập email.",
+    "INVALID_EMAIL": "Email không hợp lệ.",
+    "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
+    "NULL_OTP": "Vui lòng nhập mã OTP."
+  },
+  "SUCCESS": {
+    "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
+    "LOGIN": "Đăng nhập thành công."
+  }
+}
