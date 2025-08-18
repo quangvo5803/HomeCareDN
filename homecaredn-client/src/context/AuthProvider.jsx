@@ -1,3 +1,4 @@
+// src/context/AuthProvider.jsx
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
@@ -7,7 +8,9 @@ import AuthContext from './AuthContext';
 export default function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [pendingEmail, setPendingEmail] = useState(null);
 
+  // Parse JWT token
   const parseToken = useCallback((token) => {
     try {
       const decoded = jwtDecode(token);
@@ -35,14 +38,20 @@ export default function AuthProvider({ children }) {
     }
   }, []);
 
+  // Đăng nhập
   const login = useCallback(
     (token) => {
       localStorage.setItem('accessToken', token);
       const parsed = parseToken(token);
       if (parsed) {
         setUser(parsed);
+        setPendingEmail(null);
         if (parsed.role === 'Admin') {
-          navigate('/admin/dashboard');
+          navigate('/AdminDashboard');
+        } else if (parsed.role === 'Contractor') {
+          navigate('/ContractorDashboard');
+        } else if (parsed.role === 'Distributor') {
+          navigate('/DistributorDashboard');
         } else {
           navigate('/');
         }
@@ -51,13 +60,16 @@ export default function AuthProvider({ children }) {
     [navigate, parseToken]
   );
 
+  // Đăng xuất
   const logout = useCallback(() => {
     localStorage.removeItem('accessToken');
     setUser(null);
+    setPendingEmail(null);
     authService.logout();
-    navigate('/login');
+    navigate('/Login');
   }, [navigate]);
 
+  // Load token từ localStorage khi F5
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -72,7 +84,14 @@ export default function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, isAuthenticated: !!user }}
+      value={{
+        user,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        pendingEmail,
+        setPendingEmail,
+      }}
     >
       {children}
     </AuthContext.Provider>

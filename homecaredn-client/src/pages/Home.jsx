@@ -1,286 +1,186 @@
-import React from 'react';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
-// Dữ liệu mock cho các phần của trang chủ
-const heroData = {
-  title: 'A Construction & Renovation Company',
-  subtitle: 'Welcome to APEX',
-  buttonText: 'Read More',
-  image:
-    'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749277173/carousel-1_cusbvg.jpg',
-};
-
-const aboutUsData = {
-  title: 'Unique Solutions For Residentials & Industries!',
-  subtitle: '25 Years Experience',
-  description:
-    'Tempor erat elitr at rebum at at clita. Diam dolor diam ipsum tempor sit. Clita erat ipsum et lorem et sit, sed stet lorem sit clita duo justo magna dolore erat amet',
-  features: [
-    'Skilled & Professional',
-    '24/7 House Services',
-    'Verified Professionals',
-  ],
-  image:
-    'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749285221/about_upkv2j.jpg',
-};
-const processItems = [
+const slides = [
   {
-    number: '01',
-    title: 'Construction',
-    description:
-      'Aliqu diam diam et eos erat ipsum lorem stet clita duo justo erat amet',
+    id: 1,
     image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-1_gdm2t1.jpg',
+      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749277173/carousel-1_cusbvg.jpg',
+    subtitle: 'home.slider_subtitle',
+    title: 'home.slider1_title',
+    categories: [
+      'home.slider_category1',
+      'home.slider_category2',
+      'home.slider_category3',
+    ],
   },
   {
-    number: '02',
-    title: 'Mechanical',
-    description:
-      'Aliqu diam diam et eos erat ipsum lorem stet clita duo justo erat amet',
+    id: 2,
     image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-2_fxjryy.jpg',
+      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749277173/carousel-2_ilxsvw.jpg',
+    subtitle: 'home.slider_subtitle',
+    title: 'home.slider2_title',
+    categories: [
+      'home.slider_category1',
+      'home.slider_category2',
+      'home.slider_category3',
+    ],
   },
   {
-    number: '03',
-    title: 'Architecture',
-    description:
-      'Aliqu diam diam et eos erat ipsum lorem stet clita duo justo erat amet',
+    id: 3,
     image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286667/fact-3_ag7tin.jpg',
-  },
-  {
-    number: '04',
-    title: 'Interior Design',
-    description:
-      'Aliqu diam diam et eos erat ipsum lorem stet clita duo justo erat amet',
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-4_jhvrtl.jpg',
+      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749277424/vat-lieu-xay-dung_fcixhr.jpg',
+    subtitle: 'home.slider_subtitle',
+    title: 'home.slider3_title',
+    categories: [
+      'home.slider_category1',
+      'home.slider_category2',
+      'home.slider_category3',
+    ],
   },
 ];
 
-const serviceItems = [
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-1_dswhst.jpg',
-    title: 'Building Construction',
-  },
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-2_tmscpu.jpg',
-    title: 'Home Maintenance',
-  },
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-3_sqc14e.jpg',
-    title: 'Renovation and Painting',
-  },
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-4_swwy8b.jpg',
-    title: 'Wiring and Installation',
-  },
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-5_hxqszr.jpg',
-    title: 'Filling and Painting',
-  },
-  {
-    image:
-      'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-6_lyqrs4.jpg',
-    title: 'Interior Design',
-  },
-];
+export default function Home() {
+  const [current, setCurrent] = useState(0);
+  const { t } = useTranslation();
 
-const companyFeaturesData = {
-  title: 'Our Specialization And Company Features',
-  features: [
-    { text: 'A large number of satisfied customers' },
-    { text: '25 years of professional experience' },
-    { text: 'A large number of certified companies' },
-    { text: 'Always on time and ready to serve' },
-  ],
-  image:
-    'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749285221/about_upkv2j.jpg',
-  yearsOfExperience: '25 Years',
-};
+  const prevSlide = () => {
+    setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  };
 
-export default function HomePage() {
+  const nextSlide = () => {
+    setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
+  };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextSlide();
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [current]);
+
   return (
-    <>
-      <Header />
-      <div className="bg-white text-gray-800">
-        {/* 1. Hero Section */}
+    <div>
+      {/* Carousel */}
+      <div className="relative w-full h-[90vh] overflow-hidden">
         <div
-          className="relative bg-cover bg-center h-[600px] lg:h-[800px] flex items-center justify-center"
-          style={{ backgroundImage: `url(${heroData.image})` }}
+          className="flex transition-transform duration-700"
+          style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="relative text-center text-white p-6 z-10">
-            <p className="text-xl font-medium mb-2">{heroData.subtitle}</p>
-            <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-4">
-              {heroData.title}
-            </h1>
-            <button className="bg-orange-500 text-white font-medium px-8 py-3 rounded-md hover:bg-orange-600 transition-colors">
-              {heroData.buttonText}
-            </button>
-          </div>
-        </div>
-
-        {/* 2. About Us Section */}
-        <section className="py-16 lg:py-24">
-          <div className="container mx-auto max-w-screen-xl px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Cột trái: Hình ảnh */}
-            <div className="flex-1 relative">
-              <div className="relative">
-                <img
-                  src={aboutUsData.image}
-                  alt="About Us"
-                  className="w-full h-auto object-cover rounded-lg shadow-lg"
-                />
-                {/* Khung '25 Years Experience' */}
-                <div className="absolute top-[-32px] left-[-32px] bg-orange-500 text-white font-bold text-center p-6 w-48 h-48 flex flex-col items-center justify-center shadow-xl">
-                  <p className="text-6xl mb-2 leading-none">25</p>
-                  <p className="text-xl mb-1">Years</p>
-                  <p className="text-xl">Experience</p>
-                </div>
-              </div>
-            </div>
-            {/* Cột phải: Nội dung */}
-            <div className="flex-1 space-y-6">
-              <p className="text-orange-500 font-semibold uppercase">
-                ABOUT US
-              </p>
-              <div className="border-l-4 border-orange-500 pl-4">
-                <h2 className="text-4xl font-bold leading-tight">
-                  {aboutUsData.title}
-                </h2>
-              </div>
-              <p className="text-gray-600 leading-relaxed">
-                {aboutUsData.description}
-              </p>
-              <p className="text-gray-600 leading-relaxed">
-                {aboutUsData.description2}
-              </p>
-              <div className="flex flex-wrap gap-x-8">
-                {aboutUsData.features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-2 mt-4">
-                    <i className="fas fa-check text-orange-500" />
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="bg-blue-600 text-white font-medium px-8 py-3 rounded-md hover:bg-blue-700 transition-colors">
-                Read More
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* 2.5. Process/Steps Section */}
-        <section className="relative">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-            {processItems.map((item, index) => (
-              <div
-                key={index}
-                className="relative h-96 bg-cover bg-center group"
-                style={{ backgroundImage: `url(${item.image})` }}
-              >
-                {/* Lớp phủ tối */}
-                {/* Lớp phủ tối */}
-                <div className="absolute inset-0 bg-black/50 group-hover:bg-black/60 transition-colors duration-300" />
-
-                {/* Nội dung */}
-                <div className="absolute inset-0 flex flex-col items-start justify-end p-8 text-white">
-                  <p className="text-7xl font-bold text-orange-500 mb-4">
-                    {item.number}
-                  </p>
-                  <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-sm mb-4 leading-relaxed max-w-xs">
-                    {item.description}
-                  </p>
+          {slides.map((slide) => (
+            <div key={slide.id} className="w-full flex-shrink-0 relative">
+              <img
+                src={slide.image}
+                alt="Slide"
+                className="w-full h-[90vh] object-cover"
+              />
+              {/* Caption Overlay */}
+              <div className="absolute inset-0 bg-black/40 flex items-center">
+                <div className="container mx-auto text-left px-6 md:px-20">
+                  <h5 className="text-white uppercase mb-3 text-sm md:text-base tracking-wider">
+                    {t(slide.subtitle)}
+                  </h5>
+                  <h1 className="text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl">
+                    {t(slide.title)}
+                  </h1>
+                  <ol className="flex flex-wrap gap-6 mb-6">
+                    {slide.categories.map((cat, i) => (
+                      <li
+                        key={i}
+                        className="text-white text-base md:text-lg flex items-center gap-2"
+                      >
+                        <span className="w-3 h-3 bg-orange-500 rounded-full inline-block"></span>
+                        {t(cat)}
+                      </li>
+                    ))}
+                  </ol>
                   <a
                     href="#"
-                    className="flex items-center text-sm font-medium text-white hover:text-orange-500 transition-colors duration-300"
+                    className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 py-3 rounded-md shadow-lg transition"
                   >
-                    READ MORE <i className="fas fa-arrow-right ml-2" />
+                    {t('home.slider_button')}
                   </a>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
 
-        {/* 3. Our Services Section */}
-        <section className="bg-gray-50 py-16 lg:py-24">
-          <div className="container mx-auto max-w-screen-xl px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">
-                Construction & Renovation Solutions
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut
-                dolore lorem kasd vero ipsum sit eirmod sit.
+        {/* Controls */}
+        <button
+          onClick={prevSlide}
+          className="absolute top-1/2 left-6 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-4 rounded-full"
+        >
+          ❮
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute top-1/2 right-6 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white p-4 rounded-full"
+        >
+          ❯
+        </button>
+      </div>
+      {/* About us*/}
+      <section className="max-w-7xl mx-auto py-16 px-6 grid md:grid-cols-2 gap-10 items-center">
+        {/* Left side - Image with overlay box */}
+        <div className="relative">
+          {/* Orange box overlay */}
+          <div className="absolute -top-6 -left-6 bg-orange-500 text-white text-center shadow-lg w-32 aspect-square flex flex-col items-center justify-center">
+            <h2 className="text-4xl font-bold">25</h2>
+            <p className="text-lg font-semibold">
+              {t('home.about_experience')}
+            </p>
+            <p className="text-sm">{t('home.about_experience1')}</p>
+          </div>
+
+          {/* Image */}
+          <img
+            src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749285221/about_upkv2j.jpg"
+            alt="Engineer"
+            className="w-full h-auto object-contain"
+          />
+        </div>
+
+        {/* Right side - Content */}
+        <div>
+          {/* About Us Title */}
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-1 h-6 bg-orange-500"></div>
+            <span className="uppercase text-gray-600 font-semibold">
+              {t('home.about_subtitle')}
+            </span>
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            {t('home.about_title1')}
+            <br /> {t('home.about_title2')}
+          </h2>
+
+          <p className="text-gray-600 mb-4">{t('home.about_description')}</p>
+
+          {/* Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 border-t pt-6">
+            <div className="flex items-center justify-center gap-3">
+              <i className="fa fa-check text-orange-500 text-5xl"></i>
+              <p className="font-semibold text-l text-gray-800">
+                {t('home.about_feature1')}
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {serviceItems.map((service, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-md overflow-hidden transform hover:scale-105 transition-transform duration-300"
-                >
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-6 text-center">
-                    <h3 className="text-xl font-bold mb-2">{service.title}</h3>
-                    <a href="#" className="text-orange-500 hover:underline">
-                      Read More <i className="fas fa-arrow-right ml-2" />
-                    </a>
-                  </div>
-                </div>
-              ))}
+            <div className="flex items-center justify-center gap-3">
+              <i className="fa fa-check text-orange-500 text-5xl"></i>
+              <p className="font-semibold text-l text-gray-800">
+                {t('home.about_feature2')}
+              </p>
+            </div>
+            <div className="flex items-center justify-center gap-3">
+              <i className="fa fa-check text-orange-500 text-5xl"></i>
+              <p className="font-semibold text-l text-gray-800">
+                {t('home.about_feature3')}
+              </p>
             </div>
           </div>
-        </section>
-
-        {/* 4. Company Features Section */}
-        <section className="py-16 lg:py-24">
-          <div className="container mx-auto max-w-screen-xl px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="flex-1 space-y-6">
-              <div className="relative inline-block px-4 py-2 bg-orange-500 text-white font-bold rounded-lg transform -rotate-1">
-                <span className="relative z-10">
-                  {companyFeaturesData.yearsOfExperience}
-                </span>
-              </div>
-              <h2 className="text-4xl font-bold leading-tight">
-                {companyFeaturesData.title}
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {companyFeaturesData.features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <i className="fas fa-check text-orange-500" />
-                    <span className="text-gray-700">{feature.text}</span>
-                  </div>
-                ))}
-              </div>
-              <button className="bg-blue-600 text-white font-medium px-8 py-3 rounded-md hover:bg-blue-700 transition-colors">
-                Explore Now
-              </button>
-            </div>
-            <div className="flex-1 relative rounded-lg overflow-hidden shadow-lg">
-              <img
-                src={companyFeaturesData.image}
-                alt="Company Features"
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          </div>
-        </section>
-      </div>
-      <Footer />
-    </>
+        </div>
+      </section>
+    </div>
   );
 }

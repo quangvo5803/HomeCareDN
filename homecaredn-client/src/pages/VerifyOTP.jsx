@@ -1,34 +1,52 @@
-import { useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
 import AuthContext from '../context/AuthContext';
 import Loading from '../components/Loading';
+import { handleApiError } from '../utils/handleApiError';
+import { useTranslation } from 'react-i18next';
 
 export default function VerifyOTP() {
-  const { login } = useContext(AuthContext);
+  const [t] = useTranslation();
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+  const { login, pendingEmail } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const email = location.state?.email || '';
+  const email = pendingEmail || location.state?.email || '';
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setCanResend(true);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  useEffect(() => {
+    if (!email) {
+      toast.error(t('ERROR.NOT_FOUND_EMAIL'));
+      navigate('/Login', { replace: true });
+    }
+  }, [email, navigate, t]);
+
   const handleLogin = async () => {
-    if (!otp.trim()) return toast.error('Vui lòng nhập mã OTP');
+    if (!otp.trim()) return toast.error(t('ERROR.NULL_OTP'));
     setLoading(true);
     try {
       const response = await authService.verifyOtp(email, otp);
-      toast.success('Đăng nhập thành công');
+      toast.success(t('SUCCESS.LOGIN'));
       login(response.data.accessToken);
     } catch (err) {
-      let message =
-        err?.response?.data?.message || err?.message || 'Có lỗi xảy ra';
-      if (err?.response?.data?.errors) {
-        const errors = err.response.data.errors;
-        const firstKey = Object.keys(errors)[0];
-        message = errors[firstKey][0] || message;
-      }
-      toast.error(message);
+      toast.error(handleApiError(err));
     } finally {
       setLoading(false);
     }
@@ -39,14 +57,12 @@ export default function VerifyOTP() {
   };
 
   const handleResendOtp = async () => {
-    if (!email) return toast.error('Không tìm thấy email');
+    if (!email) return toast.error(t('ERROR.NOT_FOUND_EMAIL'));
     try {
       await authService.resendOtp(email);
-      toast.success('Đã gửi lại mã OTP, vui lòng kiểm tra email');
+      toast.success(t('SUCCESS.SEND_OTP'));
     } catch (err) {
-      toast.error(
-        err?.response?.data?.message || 'Không thể gửi lại OTP, thử lại sau'
-      );
+      toast.error(handleApiError(err));
     }
   };
 
@@ -61,10 +77,7 @@ export default function VerifyOTP() {
           backgroundImage:
             'url(https://res.cloudinary.com/dl4idg6ey/image/upload/v1749267431/loginBg_q3gjez.png)',
         }}
-      >
-        {/* Blue overlay */}
-        <div className="absolute inset-0 bg-blue-600 bg-opacity-60"></div>
-      </div>
+      ></div>
 
       {/* Content */}
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
@@ -74,18 +87,19 @@ export default function VerifyOTP() {
             <img
               src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
               alt="HomeCareOn"
-              className="h-16 mx-auto mb-4"
+              className="h-16 mx-auto mb-4 cursor-pointer transition-transform duration-300 transform hover:scale-110"
+              onClick={() => navigate('/Home')}
             />
           </div>
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-800 text-center mb-2">
-            Verify OTP
+            {t('verifyotp.title')}
           </h1>
 
           {/* Subtitle */}
           <p className="text-gray-500 text-center mb-8">
-            We have sent a verification code to{' '}
+            {t('verifyotp.subtitle')}{' '}
             <span className="font-medium">{email}</span>
           </p>
 
@@ -95,7 +109,7 @@ export default function VerifyOTP() {
             <div>
               <input
                 type="text"
-                placeholder="Enter OTP"
+                placeholder={t('verifyotp.otp_placeholder')}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg tracking-widest"
@@ -107,16 +121,17 @@ export default function VerifyOTP() {
             <div className="space-y-4">
               <button
                 onClick={handleLogin}
-                className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
+                disabled={!otp.trim()}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                Login
+                {t('BUTTON.Login')}
               </button>
 
               <button
                 onClick={handleBackToLogin}
                 className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200"
               >
-                Back to Login Page
+                {t('BUTTON.BackToLogin')}
               </button>
             </div>
           </div>
@@ -124,13 +139,19 @@ export default function VerifyOTP() {
           {/* Resend Code */}
           <div className="text-center mt-6">
             <p className="text-gray-600 text-sm">
-              Didn't receive the code?{' '}
-              <button
-                onClick={handleResendOtp}
-                className="text-blue-600 hover:text-blue-800 font-medium"
-              >
-                Resend
-              </button>
+              {t('verifyotp.not_receive_otp')}{' '}
+              {canResend ? (
+                <button
+                  onClick={handleResendOtp}
+                  className="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  {t('verifyotp.resend_otp')}
+                </button>
+              ) : (
+                <span className="font-medium text-gray-800">
+                  {t('verifyotp.resend_in')} {timeLeft}s
+                </span>
+              )}
             </p>
           </div>
         </div>

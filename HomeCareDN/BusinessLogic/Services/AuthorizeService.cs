@@ -45,7 +45,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Account", new[] { "Email not registered." } },
+                    { "Account", new[] { "LOGIN_NOT_FOUND" } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -78,7 +78,7 @@ namespace BusinessLogic.Services
                 {
                     var errors = new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "Email has been registered and verified before." } },
+                        { "Account", new[] { "REGISTER_ALREADY_EXISTS" } },
                     };
                     throw new CustomValidationException(errors);
                 }
@@ -89,12 +89,12 @@ namespace BusinessLogic.Services
         {
             if (
                 user.LastOTPSentAt.HasValue
-                && DateTime.UtcNow < user.LastOTPSentAt.Value.AddSeconds(30)
+                && DateTime.UtcNow < user.LastOTPSentAt.Value.AddSeconds(59)
             )
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Account", new[] { "You can only request OTP every 30 seconds." } },
+                    { "Account", new[] { "LOGIN_OTP_REQUEST_TOO_FREQUENT" } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -160,10 +160,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    {
-                        "Account",
-                        new[] { "User does not exist or OTP code is expired or incorrect." }
-                    },
+                    { "Account", new[] { "LOGIN_OTP_INCORECT" } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -213,7 +210,7 @@ namespace BusinessLogic.Services
             ];
             if (string.IsNullOrEmpty(refreshTokenValue))
             {
-                errors.Add("Account", new[] { "No refresh token provided." });
+                errors.Add("Account", new[] { "LOGIN_TOKEN_INVALID" });
                 throw new CustomValidationException(errors);
             }
 
@@ -221,14 +218,14 @@ namespace BusinessLogic.Services
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(refreshTokenValue);
             if (refreshToken == null)
             {
-                errors.Add("Account", new[] { "Invalid refresh token." });
+                errors.Add("Account", new[] { "LOGIN_TOKEN_INVALID" });
                 throw new CustomValidationException(errors);
             }
 
             if (refreshToken.ExpiresAt < DateTime.UtcNow)
             {
                 await _refreshTokenRepository.DeleteAsync(refreshToken);
-                errors.Add("Account", new[] { "Refresh token expired." });
+                errors.Add("Account", new[] { "LOGIN_TOKEN_EXPIRED" });
                 throw new CustomValidationException(errors);
             }
 
@@ -238,7 +235,7 @@ namespace BusinessLogic.Services
             {
                 errors.Add(
                     "Account",
-                    new[] { user == null ? "User not found." : "Email not confirmed." }
+                    new[] { user == null ? "LOGIN_NOT_FOUND" : "LOGIN_EMAIL_NOT_CONFIRMED" }
                 );
                 throw new CustomValidationException(errors);
             }
@@ -276,7 +273,7 @@ namespace BusinessLogic.Services
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
-                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(5),
             };
         }
 
@@ -324,7 +321,7 @@ namespace BusinessLogic.Services
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials: credentials
             );
             return token;

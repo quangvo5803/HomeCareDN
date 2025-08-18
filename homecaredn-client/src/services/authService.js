@@ -9,7 +9,9 @@ export const authService = {
   login: async (email) => {
     return api.post('/Authorize/login', { email });
   },
-
+  resendOtp: async (email) => {
+    return api.post('/Authorize/login', { email });
+  },
   verifyOtp: async (email, otp) => {
     const response = await api.post('/Authorize/verify-otp', { email, otp });
     // Lưu accessToken vào localStorage
