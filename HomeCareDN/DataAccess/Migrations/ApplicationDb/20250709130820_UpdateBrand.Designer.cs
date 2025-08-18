@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709130820_UpdateBrand")]
+    partial class UpdateBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,7 +55,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("ContractorApplications", (string)null);
+                    b.ToTable("ContractorApplications");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -91,7 +94,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -123,7 +126,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("MaterialID");
 
-                    b.ToTable("Materials", (string)null);
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
@@ -155,7 +158,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
@@ -209,7 +212,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceRequestID");
 
-                    b.ToTable("ServiceRequests", (string)null);
+                    b.ToTable("ServiceRequests");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>

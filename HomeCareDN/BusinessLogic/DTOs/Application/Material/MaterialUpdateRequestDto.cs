@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.Material
@@ -7,8 +8,9 @@ namespace BusinessLogic.DTOs.Application.Material
     {
         [Required]
         public Guid MaterialID { get; set; }
-
+        public Guid? CategoryID { get; set; }
         public string? Name { get; set; }
+        public Brand? Brand { get; set; }
         public string? Unit { get; set; }
         public string? Description { get; set; }
         public double? UnitPrice { get; set; }

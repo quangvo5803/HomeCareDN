@@ -19,6 +19,7 @@ namespace DataAccess.UnitOfWork
             get;
             private set;
         }
+        public ICategoryRepository CategoryRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IConfiguration configuration)
         {
@@ -29,6 +30,7 @@ namespace DataAccess.UnitOfWork
             MaterialRepository = new MaterialRepository(_db);
             ServiceRepository = new ServiceRepository(_db);
             ContractorApplicationRepository = new ContractorApplicationRepository(_db);
+            CategoryRepository = new CategoryRepository(_db);
         }
 
         public async Task SaveAsync()

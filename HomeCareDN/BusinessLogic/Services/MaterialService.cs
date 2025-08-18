@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.SearchAndFilter;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogic.Services
 {
@@ -77,7 +80,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images"
+                includeProperties: "Images,Category"
             );
 
             if (material == null)
@@ -103,7 +106,7 @@ namespace BusinessLogic.Services
                 requestDto.IsAscending,
                 requestDto.PageNumber,
                 requestDto.PageSize,
-                includeProperties: "Images"
+                includeProperties: "Images,Category"
             );
             if (materials == null || !materials.Any())
             {
@@ -121,7 +124,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images"
+                includeProperties: "Images,Category"
             );
 
             var errors = new Dictionary<string, string[]>();
@@ -227,6 +230,72 @@ namespace BusinessLogic.Services
 
             _unitOfWork.MaterialRepository.Remove(material);
             await _unitOfWork.SaveAsync();
+        }
+
+
+        public async Task<IEnumerable<SearchResponseDto>> FilterMaterialsAsync(FilterRequestDto requestDto)
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            if (requestDto.MinUnitPrice.HasValue && requestDto.MinUnitPrice < 0)
+            {
+                errors.Add(nameof(requestDto.MinUnitPrice), new[] { "MinUnitPrice must be greater than or equal to 0." });
+            }
+
+            if (requestDto.MaxUnitPrice.HasValue && requestDto.MaxUnitPrice < 0)
+            {
+                errors.Add(nameof(requestDto.MaxUnitPrice), new[] { "MaxUnitPrice must be greater than or equal to 0." });
+            }
+
+            if (requestDto.MinUnitPrice.HasValue && requestDto.MaxUnitPrice.HasValue &&
+                requestDto.MinUnitPrice > requestDto.MaxUnitPrice)
+            {
+                errors.Add("UnitPrice", new[] { "MinUnitPrice cannot be greater than MaxUnitPrice." });
+            }
+
+            if (!string.IsNullOrWhiteSpace(requestDto.CategoryName) && requestDto.CategoryName.Length < 2)
+            {
+                errors.Add(nameof(requestDto.CategoryName), new[] { "CategoryName must be at least 2 characters long." });
+            }
+
+            if (requestDto.Brand.HasValue && !Enum.IsDefined(typeof(Brand), requestDto.Brand.Value))
+            {
+                errors.Add(nameof(requestDto.Brand), new[] { "Invalid brand value." });
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+
+            var query = _unitOfWork.MaterialRepository.GetQueryable(includeProperties: "Category,Images");
+
+            if (!string.IsNullOrEmpty(requestDto.CategoryName))
+            {
+                query = query.Where(m => m.Category.CategoryName == requestDto.CategoryName);
+            }
+
+            if (requestDto.Brand.HasValue)
+            {
+                query = query.Where(m => m.Brand == requestDto.Brand.Value);
+            }
+            if (requestDto.MinUnitPrice.HasValue)
+            {
+                query = query.Where(m => m.UnitPrice >= requestDto.MinUnitPrice.Value);
+            }
+
+            if (requestDto.MaxUnitPrice.HasValue)
+            {
+                query = query.Where(m => m.UnitPrice <= requestDto.MaxUnitPrice.Value);
+            }
+
+            var materials = await query.ToListAsync();
+
+            if (!materials.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<IEnumerable<SearchResponseDto>>(materials);
         }
     }
 }
