@@ -1,6 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-[#111827] text-gray-400 font-sans">
       <div className="container mx-auto max-w-screen-xl px-4 py-16 lg:px-6 lg:py-24">
@@ -8,14 +11,14 @@ export default function Footer() {
           {/* Cột 1: Logo và Mô tả */}
           <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-2">
-              {/* Thay thế bằng logo thực tế của bạn nếu cần */}
-              <div className="bg-orange-500 w-8 h-8 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">A</span>
-              </div>
-              <span className="text-white text-3xl font-bold">APEX</span>
+              <img
+                src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
+                alt="HomeCareDN Logo"
+                className="w-auto h-12 object-contain"
+              />
             </div>
             <p className="text-sm leading-relaxed max-w-sm">
-              Diam dolor diam ipsum sit. Aliqu diam amet diam et eos. Clita erat ipsum et lorem et elit, sed stet lorem sit clita.
+              {t("footer.description")}
             </p>
             <div className="flex space-x-2">
               <a href="#" className="flex items-center justify-center w-8 h-8 rounded border border-gray-600 text-gray-400 hover:text-white hover:border-white transition-colors duration-300">
@@ -35,55 +38,55 @@ export default function Footer() {
 
           {/* Cột 2: Địa chỉ */}
           <div>
-            <h2 className="text-white text-2xl font-bold mb-4">Address</h2>
+            <h2 className="text-white text-2xl font-bold mb-4">{t("footer.address.title")}</h2>
             <ul className="space-y-3 text-sm">
               <li className="flex items-start">
                 <i className="fas fa-map-marker-alt mt-1 mr-3 text-orange-500" />
-                <span>123 Street, New York, USA</span>
+                <span>{t("footer.address.location")}</span>
               </li>
               <li className="flex items-start">
                 <i className="fas fa-phone-alt mt-1 mr-3 text-orange-500" />
-                <span>+012 345 67890</span>
+                <span>{t("footer.address.phone")}</span>
               </li>
               <li className="flex items-start">
                 <i className="fas fa-envelope-open mt-1 mr-3 text-orange-500" />
-                <span>info@example.com</span>
+                <span>{t("footer.address.email")}</span>
               </li>
             </ul>
           </div>
 
           {/* Cột 3: Liên kết nhanh */}
           <div>
-            <h2 className="text-white text-2xl font-bold mb-4">Quick Links</h2>
+            <h2 className="text-white text-2xl font-bold mb-4">{t("footer.quickLinks.title")}</h2>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a href="#" className="hover:text-white transition-colors duration-300">
-                  About Us
+                  {t("footer.quickLinks.about")}
                 </a>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a href="#" className="hover:text-white transition-colors duration-300">
-                  Contact Us
+                  {t("footer.quickLinks.contact")}
                 </a>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a href="#" className="hover:text-white transition-colors duration-300">
-                  Our Services
+                  {t("footer.quickLinks.services")}
                 </a>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a href="#" className="hover:text-white transition-colors duration-300">
-                  Terms & Condition
+                  {t("footer.quickLinks.terms")}
                 </a>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a href="#" className="hover:text-white transition-colors duration-300">
-                  Support
+                  {t("footer.quickLinks.support")}
                 </a>
               </li>
             </ul>
@@ -91,35 +94,41 @@ export default function Footer() {
 
           {/* Cột 4: Newsletter */}
           <div>
-            <h2 className="text-white text-2xl font-bold mb-4">Newsletter</h2>
+            <h2 className="text-white text-2xl font-bold mb-4">{t("footer.newsletter.title")}</h2>
             <p className="text-sm mb-4">
-              Dolor amet sit justo amet elitr clita ipsum elitr est.
+              {t("footer.newsletter.description")}
             </p>
-            <div className="flex">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="w-full bg-[#1e293b] text-gray-200 border border-[#1e293b] focus:outline-none focus:border-orange-500 px-4 py-3 text-sm"
-              />
-              <button className="bg-orange-500 text-white font-medium px-6 py-3 hover:bg-orange-600 transition-colors duration-300">
-                SignUp
-              </button>
-            </div>
+          <div className="flex">
+            <input
+              type="email"
+              placeholder={t("footer.newsletter.placeholder")}
+              className="w-full bg-[#1e293b] text-gray-200 border border-[#1e293b] 
+                        focus:outline-none focus:border-orange-500 px-3 py-2 text-sm rounded-l-md"
+            />
+            <button 
+              className="bg-orange-500 text-white font-medium px-5 py-2 
+                        hover:bg-orange-600 transition-colors duration-300 rounded-r-md whitespace-nowrap"
+            >
+              {t("footer.newsletter.signup")}
+            </button>
+          </div>
+
+
           </div>
         </div>
       </div>
 
-      {/* Dòng dưới cùng */}
+      {/* Dòng dưới cùng
       <div className="border-t border-gray-700 mt-8 py-4 text-center text-gray-500 text-sm">
         <div className="container mx-auto max-w-screen-xl px-4 lg:px-6 flex flex-col md:flex-row justify-between items-center">
-          <p>© Your Site Name. All Right Reserved.</p>
+          <p>{t("footer.bottom.copyright")}</p>
           <p>
-            Designed By <a href="https://htmlcodex.com" className="text-orange-500 hover:underline">HTML Codex</a>
+            {t("footer.bottom.designed")} <a href="https://htmlcodex.com" className="text-orange-500 hover:underline">HTML Codex</a>
             <br className="md:hidden" />
-            Distributed By: <a href="https://themewagon.com" className="text-orange-500 hover:underline">ThemeWagon</a>
+            {t("footer.bottom.distributed")} <a href="https://themewagon.com" className="text-orange-500 hover:underline">ThemeWagon</a>
           </p>
         </div>
-      </div>
+      </div> */}
     </footer>
   );
 }
