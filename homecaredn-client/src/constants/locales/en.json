@@ -56,13 +56,10 @@
     "services_subtitle": "Our Services",
     "services_title": "Construction And Renovation Solutions",
     "services_more": "More Services",
-    "service1_title": "Building Construction",
-    "service2_title": "Home Maintainance",
-    "service3_title": "Renovation and Painting",
-    "service4_title": "Wiring and installation",
-    "service5_title": "Tiling and Painting",
-    "service6_title": "Interior Design",
-    "service_desc": "Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos",
+    
+    "material_subtitle": "Our Materials",
+    "material_title": "Materials for Construction and Renovation",
+    "material_more": "More Materials",
 
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
@@ -73,7 +70,7 @@
     "testimonial1_text": "The system is very easy to use and convenient. I can manage repair and construction requests quickly and clearly. Very satisfied with the user experience.",
     "testimonial1_name": "Client Name",
     "testimonial1_role": "Profession",
-    "testimonial2_text": "I am very satisfied with this system. Progress, cost and personnel management are all done clearly and transparently. Thanks to the system, the construction and repair process becomes professional and has less risks.",
+    "testimonial2_text": "I am very satisfied with this system.Progress, cost and personnel management are all done clearly and transparently. Thanks to the system, the construction and repair process becomes professional and has less risks.",
     "testimonial2_name": "Client Name",
     "testimonial2_role": "Profession"
   },

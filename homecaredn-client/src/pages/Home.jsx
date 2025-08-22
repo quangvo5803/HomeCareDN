@@ -86,43 +86,100 @@ const SERVICE_ITEMS = [
   {
     id: 'build',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-1_dswhst.jpg',
-    titleKey: 'home.service1_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Building Construction',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
   {
     id: 'maintain',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-2_tmscpu.jpg',
-    titleKey: 'home.service2_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Home Maintainance',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
   {
     id: 'reno-paint',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-3_sqc14e.jpg',
-    titleKey: 'home.service3_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Renovation and Painting',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
   {
     id: 'wiring',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-4_swwy8b.jpg',
-    titleKey: 'home.service4_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Wiring and installation',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
   {
     id: 'tiling-paint',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-5_hxqszr.jpg',
-    titleKey: 'home.service5_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Tiling and Painting',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
   {
     id: 'interior',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-6_lyqrs4.jpg',
-    titleKey: 'home.service6_title',
-    descKey: 'home.service_desc',
+    titleKey: 'Interior Design',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+];
+
+const MATERIALS = [
+  {
+    id: 'Cement',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830746/28b970d7-6ada-4c01-a83e-17e4e068537a.png',
+    titleKey: 'Cement',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Wood',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830852/ac2be91c-2038-41ac-8878-0759bd25a803.png',
+    titleKey: 'Wood',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Iron',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830632/978e5e3d-3d50-4949-b2d2-fbb93a3ae22a.png',
+    titleKey: 'Iron',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'ceramic tiles',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830684/81028f90-f24c-480f-a510-6c4c45d8c708.png',
+    titleKey: 'Ceramic tiles',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Tools',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830818/0722b748-038c-45de-8132-d65d36433d9b.png',
+    titleKey: 'Tools',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'water pipe',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830902/6e964ad1-e1d8-43c7-bed2-aff7be26fdd7.png',
+    titleKey: 'Water pipe',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
     href: '#',
   },
 ];
@@ -148,9 +205,9 @@ function useInView(options) {
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       // chỉ trigger khi phần tử đi từ dưới lên (boundingClientRect.top > 0)
-      if (entry.isIntersecting && entry.boundingClientRect.top > 0) {
+      if (entry.isIntersecting) {
         setVisible(true);
-        observer.unobserve(entry.target); // chạy 1 lần rồi thôi
+        observer.unobserve(entry.target);
       }
     }, options);
 
@@ -208,12 +265,14 @@ export default function Home() {
       setIdx(baseSlides.length);
     }
   }, [idx, hasMany, extSlides.length, baseSlides.length]);
+
   useEffect(() => {
     if (!anim) {
       const id = requestAnimationFrame(() => setAnim(true));
       return () => cancelAnimationFrame(id);
     }
   }, [anim]);
+
   useEffect(() => {
     if (pausedRef.current || !hasMany) return;
     const id = setTimeout(tNext, 5000);
@@ -562,13 +621,91 @@ export default function Home() {
           </div>
         </section>
       </Reveal>
+
+      {/*Material  */}
+      <Reveal>
+        <section className="py-12">
+          <div className="container mx-auto max-w-7xl px-6">
+            {/* header row */}
+            <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-6 mb-10 ">
+              <div className="w-full lg:w-auto">
+                <div className="border-l-4 border-orange-500 pl-4">
+                  <h6 className="text-gray-600 uppercase mb-2 tracking-wide">
+                    {t('home.material_subtitle')}
+                  </h6>
+                  <h2 className="text-3xl md:text-4xl font-bold leading-tight m-0">
+                    {t('home.material_title')}
+                  </h2>
+                </div>
+              </div>
+              <div className="w-full lg:w-auto text-left lg:text-right">
+                <a
+                  href="#"
+                  className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition  "
+                >
+                  {t('home.material_more')}
+                </a>
+              </div>
+            </div>
+
+            {/* grid */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {MATERIALS.map((it, idx) => (
+                <article
+                  key={idx}
+                  className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full  "
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={it.img}
+                      alt={t(it.titleKey)}
+                      className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
+
+                  <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
+                    <h5 className="text-lg font-semibold mb-2">
+                      {t(it.titleKey)}
+                    </h5>
+                    <p className="text-gray-600 mb-4 group-hover:text-white">
+                      {t(it.descKey)}
+                    </p>
+
+                    <a
+                      href={it.href}
+                      className="inline-flex items-center gap-2 text-orange-500 text-sm font-medium underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
+                      aria-label={`${t('home.fact_read_more')} ${t(
+                        it.titleKey
+                      )}`}
+                    >
+                      {t('home.fact_read_more')}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
+                      </svg>
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      </Reveal>
+
       {/* Testimonial */}
       <Reveal>
         <section className="py-12">
           <div className="container mx-auto max-w-7xl px-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
               {/* Left column */}
-              <div className="lg:col-span-5  ">
+              <div className="lg:col-span-5">
                 <div className="border-l-4 border-orange-500 pl-4 mb-6">
                   <h6 className="text-gray-500 uppercase tracking-wider text-sm">
                     {t('home.testimonial_subtitle')}
@@ -583,7 +720,7 @@ export default function Home() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-10">
-                  <div className=" ">
+                  <div>
                     <div className="flex items-center mb-1">
                       {/* Users icon */}
                       <svg
@@ -592,7 +729,17 @@ export default function Home() {
                         fill="currentColor"
                         aria-hidden="true"
                       >
-                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                        <path
+                          d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 
+                           1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 
+                           2.99-1.34 2.99-3S9.66 5 8 5 
+                           5 6.34 5 8s1.34 3 3 3zm0 
+                           2c-2.33 0-7 1.17-7 3.5V19h14v-2.5
+                           C15 14.17 10.33 13 8 13zm8 
+                           0c-.29 0-.62.02-.97.05 
+                           1.16.84 1.97 1.97 1.97 3.45V19h6
+                           v-2.5c0-2.33-4.67-3.5-7-3.5z"
+                        />
                       </svg>
                       <span className="ml-3 text-3xl font-extrabold">123+</span>
                     </div>
@@ -601,7 +748,7 @@ export default function Home() {
                     </h5>
                   </div>
 
-                  <div className=" ">
+                  <div>
                     <div className="flex items-center mb-1">
                       {/* Check icon */}
                       <svg
@@ -610,7 +757,10 @@ export default function Home() {
                         fill="currentColor"
                         aria-hidden="true"
                       >
-                        <path d="M9 16.17 4.83 12 3.41 13.41 9 19 21 7l-1.41-1.41z" />
+                        <path
+                          d="M9 16.17 4.83 12 3.41 13.41 
+                           9 19 21 7l-1.41-1.41z"
+                        />
                       </svg>
                       <span className="ml-3 text-3xl font-extrabold">123+</span>
                     </div>
@@ -623,7 +773,7 @@ export default function Home() {
 
               {/* Right column: slider */}
               <div
-                className="lg:col-span-7  "
+                className="lg:col-span-7"
                 onMouseEnter={() => (pausedRef.current = true)}
                 onMouseLeave={() => (pausedRef.current = false)}
                 onFocusCapture={() => (pausedRef.current = true)}
@@ -642,21 +792,29 @@ export default function Home() {
                     onTransitionEnd={handleTransitionEnd}
                   >
                     {extSlides.map((it, i) => (
-                      <article key={i} className="basis-full shrink-0 w-full">
-                        <div className="text-left">
+                      <article
+                        key={i}
+                        className="min-w-full shrink-0 flex items-center justify-center"
+                      >
+                        <div className="max-w-2xl text-left bg-white rounded-lg p-6 shadow">
                           <div className="flex items-start gap-4">
+                            {/* Avatar */}
                             <img
                               src={it.img}
                               alt={t(it.nameKey)}
-                              className="h-16 w-16 rounded-md object-cover mt-1"
+                              className="h-16 w-16 rounded-md object-cover mt-1 flex-shrink-0"
                               loading={i === 1 ? 'eager' : 'lazy'}
                               decoding="async"
                             />
+
+                            {/* Content */}
                             <div className="flex-1">
-                              <p className="text-gray-600 leading-relaxed mb-3">
-                                {t(it.textKey)}
+                              <p className="text-gray-600 leading-relaxed mb-3 whitespace-pre-line">
+                                {t(it.textKey).split('\\n').join('\n')}
                               </p>
+
                               <div className="w-16 h-[5px] bg-orange-500 mb-3 rounded-full" />
+
                               <h5 className="font-semibold text-gray-900">
                                 {t(it.nameKey)}
                               </h5>
@@ -675,7 +833,9 @@ export default function Home() {
                     <button
                       onClick={tPrev}
                       aria-label={t('home.prev') || 'Previous'}
-                      className="w-10 h-10 inline-flex items-center justify-center rounded-full border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white transition  "
+                      className="w-10 h-10 inline-flex items-center justify-center rounded-full 
+                           border-2 border-orange-500 text-orange-500 
+                           hover:bg-orange-500 hover:text-white transition"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -683,13 +843,19 @@ export default function Home() {
                         fill="currentColor"
                         aria-hidden="true"
                       >
-                        <path d="M10.828 12 15.12 7.707 13.707 6.293 8 12l5.707 5.707 1.414-1.414z" />
+                        <path
+                          d="M10.828 12 15.12 7.707 
+                           13.707 6.293 8 12l5.707 
+                           5.707 1.414-1.414z"
+                        />
                       </svg>
                     </button>
                     <button
                       onClick={tNext}
                       aria-label={t('home.next') || 'Next'}
-                      className="w-10 h-10 inline-flex items-center justify-center rounded-full border-2 border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white transition  "
+                      className="w-10 h-10 inline-flex items-center justify-center rounded-full 
+                           border-2 border-orange-500 text-orange-500 
+                           hover:bg-orange-500 hover:text-white transition"
                     >
                       <svg
                         viewBox="0 0 24 24"
@@ -697,7 +863,11 @@ export default function Home() {
                         fill="currentColor"
                         aria-hidden="true"
                       >
-                        <path d="M13.172 12 8.88 7.707l1.414-1.414L16 12l-5.707 5.707-1.414-1.414z" />
+                        <path
+                          d="M13.172 12 8.88 7.707
+                           l1.414-1.414L16 12l-5.707 
+                           5.707-1.414-1.414z"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -707,6 +877,7 @@ export default function Home() {
           </div>
         </section>
       </Reveal>
+
       {/* Back to Top */}
       <button
         onClick={handleBackTop}
@@ -734,7 +905,7 @@ export default function Home() {
 }
 function Reveal({ children }) {
   const [ref, visible] = useInView({
-    threshold: 0.2,
+    threshold: 0.15,
     rootMargin: '0px 0px -50px 0px',
   });
   return (
