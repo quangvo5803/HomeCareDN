@@ -17,6 +17,7 @@ namespace BusinessLogic.Services.FacadeService
         public IMaterialService MaterialService { get; }
         public IServicesService ServicesService { get; }
         public IContractorApplicationService ContractorApplicationService { get; }
+        public ICategoryService CategoryService { get; }
         public ICartItemService CartItemService { get; }
         public ICartService CartService { get; }
 
@@ -35,6 +36,7 @@ namespace BusinessLogic.Services.FacadeService
             MaterialService = new MaterialService(_unitOfWork, _mapper);
             ServicesService = new ServicesService(_unitOfWork, _mapper);
             ContractorApplicationService = new ContractorApplicationService(_unitOfWork, _mapper);
+            CategoryService = new CategoryService(_unitOfWork, _mapper);
             CartItemService = new CartItemService(_unitOfWork, _mapper);
             CartService = new CartService(_unitOfWork, _mapper);
         }

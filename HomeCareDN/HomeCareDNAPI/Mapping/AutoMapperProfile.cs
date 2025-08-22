@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.CartItem;
 using BusinessLogic.DTOs.Application.Cart;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.SearchAndFilter;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
@@ -22,6 +24,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<Brand, string>().ConvertUsing(src => src.GetDisplayName());
+            
 
             // ServiceRequest Create
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
@@ -39,6 +43,13 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
+            //Category Create
+            CreateMap<CategoryCreateRequestDto, Category>().ReverseMap();
+
+            //Category Update
+            CreateMap<CategoryUpdateRequestDto, Category>()
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            
             // Cart Create
             CreateMap<CartCreateRequestDto, Cart>()
                 .ForMember(dest => dest.CartItems, opt => opt.Ignore());
@@ -97,6 +108,27 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+
+            //Category
+            CreateMap<Category, CategoryDto>();
+
+
+            //Filter
+            CreateMap<Material, SearchResponseDto>()
+             .ForMember(dest => dest.UserId,
+                 opt => opt.MapFrom(src => src.UserID))
+             .ForMember(dest => dest.UnitPrice,
+                 opt => opt.MapFrom(src => src.UnitPrice))
+             .ForMember(dest => dest.CategoryName,
+                 opt => opt.MapFrom(src => src.Category.CategoryName))
+             .ForMember(dest => dest.Description,
+                 opt => opt.MapFrom(src => src.Description))
+             .ForMember(dest => dest.ImageUrls,
+                 opt => opt.MapFrom(src =>
+                     src.Images != null ? src.Images.Select(i => i.ImageUrl).ToList() : new List<string>())
+             );
+
+
             // Cart
             CreateMap<Cart, CartDto>()
                 .ForMember(
@@ -109,7 +141,6 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.Material,
                     opt => opt.MapFrom(src => src.Material)
                 );
-
 
         }
     }

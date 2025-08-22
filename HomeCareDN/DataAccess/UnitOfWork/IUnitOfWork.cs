@@ -11,6 +11,7 @@ namespace DataAccess.UnitOfWork
         ICartRepository CartRepository { get; }
         IServiceRepository ServiceRepository { get; }
         IContractorApplicationRepository ContractorApplicationRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
         Task SaveAsync();
     }
 }

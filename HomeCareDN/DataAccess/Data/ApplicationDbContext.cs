@@ -15,6 +15,7 @@ namespace DataAccess.Data
         public DbSet<Cart> Carts { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -43,6 +44,11 @@ namespace DataAccess.Data
                 entity.Property(e => e.PackageOption).HasConversion<string>();
 
                 entity.Property(e => e.BuildingType).HasConversion<string>();
+            });
+
+            builder.Entity<Material>(entity =>
+            {
+                entity.Property(e => e.Brand).HasConversion<string>();
             });
             base.OnModelCreating(builder);
         }

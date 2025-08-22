@@ -13,7 +13,7 @@
     "profile": "Profile",
     "logout": "Logout"
   },
-  "home":{
+  "home": {
     "slider_category1": "Commercial",
     "slider_category2": "Residential",
     "slider_category3": "Industrial",
@@ -30,7 +30,7 @@
     "about_feature2": "24/7 hours services",
     "about_feature3": "Thorough and professional",
     "about_experience": "Years",
-    "about_experience1" :"Experience",
+    "about_experience1": "Experience",
 
     "facts_aria": "Workflow",
     "fact_read_more": "READ MORE",
@@ -42,7 +42,7 @@
     "fact_step3_desc": "Compare profiles, negotiate terms and choose the most suitable option.",
     "fact_step4_title": "Connect & work",
     "fact_step4_desc": "Sign agreements, monitor progress, acceptance and post-construction support.",
-  
+
     "features_subtitle": "Why Choose Us!",
     "features_title": "Our Specialization And Company Features",
     "features_intro": "We provide a comprehensive solution for finding and managing construction contractors. From partner selection, progress monitoring to quality assurance, the system helps you save time and costs in every project.",
@@ -56,14 +56,14 @@
     "services_subtitle": "Our Services",
     "services_title": "Construction And Renovation Solutions",
     "services_more": "More Services",
-    
+
     "material_subtitle": "Our Materials",
     "material_title": "Materials for Construction and Renovation",
     "material_more": "More Materials",
 
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
-    "testimonial_intro":"The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
+    "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
     "testimonial_happy_clients": "Happy Clients",
     "testimonial_projects_done": "Projects Done",
     "testimonial_carousel_aria": "Client testimonials",
@@ -82,7 +82,7 @@
     "not_have_account": "Don't have an account? ",
     "register_link": " Register now"
   },
-  "register":{
+  "register": {
     "title": "Register",
     "subtitle": "Create a new account",
     "name_placeholder": "Enter your full name",
@@ -127,7 +127,7 @@
     "UI sample for": "UI Sample For",
     "latest_applications": "Latest Applications",
     "view_all": "View All",
-    "contractor_portal": "Contractor Portal",
+    "contractor_portal": "Portal",
     "id": "ID",
     "view": "View",
     "search_placeholder": "Search applications",
@@ -152,7 +152,7 @@
     "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page"
   },
-  "ERROR":{
+  "ERROR": {
     "LOGIN_NOT_FOUND": "Email not registered",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
@@ -169,14 +169,85 @@
     "SEND_OTP": "OTP code sent successfully.",
     "LOGIN": "Login successful."
   },
-  "footer":{
+  "adminNavbar": {
+    "searchPlaceholder": "Type here...",
+    "logout": "Logout"
+  },
+  "adminFooter": {
+    "madeWith": "© {{year}}, made with ❤️ by",
+    "teamName": "HomeCareDN Teams"
+  },
+  "adminSidebar": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "service": "Services",
+      "serviceRequest": "Service Request",
+      "material": "Material"
+    },
+    "account": {
+      "title": "Account pages",
+      "profile": "Profile",
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    }
+  },
+  "adminDashboard": {
+    "v1": {
+      "todayMoney": "Today'S Money",
+      "sinceYesterday": "since yesterday"
+    },
+    "v2": {
+      "todayUsers": "Today's Users",
+      "sinceLastWeek": "since last week"
+    },
+    "v3": {
+      "newClients": "New Clients",
+      "sinceLastQuarter": "since last quarter"
+    },
+    "v4": {
+      "sales": "Sales",
+      "thanLastMonth": "than last month"
+    },
+    "salesChart": {
+      "salesOverview": "Sales overview"
+    },
+    "pieChart": {
+      "serviceRequests": "Service Requests",
+      "construction": "Construction",
+      "repair": "Repair",
+      "material": "Material"
+    },
+    "contractors": {
+      "title": "Top Contractors",
+      "email": "Email",
+      "serviceRequest": "Service Request",
+      "values": "Values",
+      "bounce": "Bounce"
+    },
+    "distributors": {
+      "title": "Top Distributors",
+      "email": "Email",
+      "sales": "Sales",
+      "values": "Values",
+      "bounce": "Bounce"
+    },
+    "viewAll": "View all"
+  },
+  "roles": {
+    "Distributor": "Distributor",
+    "Contractor": "Contractor",
+    "Admin": "Admin",
+    "Customer": "Customer"
+  },
+
+  "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
-    "title": "Address",
-    "location": "FPT, Hoa Hai, Ngu Hanh Son, Da Nang",
-    "phone": "+012 345 67890",
-    "email": "homecaredn43@gmail.com"
-    }, 
+      "title": "Address",
+      "location": "FPT, Hoa Hai, Ngu Hanh Son, Da Nang",
+      "phone": "+012 345 67890",
+      "email": "homecaredn43@gmail.com"
+    },
     "quickLinks": {
       "title": "Quick Links",
       "about": "About Us",
@@ -197,5 +268,4 @@
       "distributed": "Distributed By:"
     }
   }
-
 }

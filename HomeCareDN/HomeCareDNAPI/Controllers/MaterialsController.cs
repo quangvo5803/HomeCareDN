@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.SearchAndFilter;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -80,6 +81,17 @@ namespace HomeCareDNAPI.Controllers
             {
                 return NotFound($"Material with ID {id} not found.");
             }
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> Filter([FromQuery] FilterRequestDto filter)
+        {
+            if (filter == null)
+            {
+                return BadRequest("Invalid material request data.");
+            }
+            var results = await _facadeService.MaterialService.FilterMaterialsAsync(filter);
+            return Ok(results);
         }
     }
 }

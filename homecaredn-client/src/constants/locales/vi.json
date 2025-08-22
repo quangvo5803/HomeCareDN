@@ -30,7 +30,7 @@
     "about_feature2": "Dịch vụ 24/7",
     "about_feature3": "Đầy đủ và chuyên nghiệp",
     "about_experience": "Năm",
-    "about_experience1" :"Kinh nghiệm",
+    "about_experience1": "Kinh nghiệm",
 
     "facts_aria": "Quy trình làm việc",
     "fact_read_more": "Đọc thêm",
@@ -43,14 +43,14 @@
     "fact_step4_title": "Kết nối & làm việc",
     "fact_step4_desc": "Ký thoả thuận, theo dõi tiến độ, nghiệm thu và hỗ trợ sau thi công.",
 
-    "features_subtitle": "Tại sao chọn chúng tôi!", 
-    "features_title": "Chuyên môn của chúng tôi và các tính năng của công ty", 
+    "features_subtitle": "Tại sao chọn chúng tôi!",
+    "features_title": "Chuyên môn của chúng tôi và các tính năng của công ty",
     "features_intro": "Chúng tôi mang đến giải pháp toàn diện cho việc tìm kiếm và quản lý nhà thầu xây dựng. Từ khâu lựa chọn đối tác, giám sát tiến độ cho đến đảm bảo chất lượng, hệ thống giúp bạn tiết kiệm thời gian và chi phí trong mỗi dự án.",
-    "features_img_alt": "Tính năng của Công ty", 
-    "features_item1_title": "Số lượng lớn dịch vụ được cung cấp", 
-    "features_item2_title": "hơn 25 năm kinh nghiệm chuyên môn", 
-    "features_item3_title": "Một lượng lớn khách hàng tri ân", 
-    "features_item4_title": "Luôn đáng tin cậy và giá cả phải chăng", 
+    "features_img_alt": "Tính năng của Công ty",
+    "features_item1_title": "Số lượng lớn dịch vụ được cung cấp",
+    "features_item2_title": "hơn 25 năm kinh nghiệm chuyên môn",
+    "features_item3_title": "Một lượng lớn khách hàng tri ân",
+    "features_item4_title": "Luôn đáng tin cậy và giá cả phải chăng",
     "features_item_desc": "Giải pháp tối ưu, minh bạch và nhanh chóng trong mọi giai đoạn của dự án xây dựng và sửa chữa.",
 
     "services_subtitle": "Dịch vụ của chúng tôi",
@@ -78,7 +78,7 @@
     "not_have_account": "Bạn chưa có tài khoản? ",
     "register_link": " Đăng ký ngay"
   },
-  "register":{
+  "register": {
     "title": "Đăng Ký",
     "subtitle": "Tạo tài khoản mới",
     "name_placeholder": "Nhập họ và tên của bạn",
@@ -123,7 +123,7 @@
     "UI sample for": "Mẫu Giao Diện Cho",
     "latest_applications": "Các Đơn Mới Nhất",
     "view_all": "Xem Tất Cả",
-    "contractor_portal": "Cổng Thông Tin Nhà Thầu",
+    "contractor_portal": "Cổng Thông Tin",
     "id": "Mã",
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
@@ -148,7 +148,7 @@
     "RegisterGoogle": "Đăng Ký với Google",
     "BackToLogin": "Quay Về Trang Đăng Nhập"
   },
-  "ERROR":{
+  "ERROR": {
     "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
     "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
@@ -164,6 +164,76 @@
   "SUCCESS": {
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
     "LOGIN": "Đăng nhập thành công."
+  },
+  "adminNavbar": {
+    "searchPlaceholder": "Nhập vào đây...",
+    "logout": "Đăng Xuất"
+  },
+  "adminFooter": {
+    "madeWith": "© {{year}}, được tạo ra với ❤️ bởi",
+    "teamName": "Nhóm HomeCareDN"
+  },
+  "adminSidebar": {
+    "menu": {
+      "dashboard": "Bảng điều khiển",
+      "service": "Dịch vụ",
+      "serviceRequest": "Dịch vụ đã yêu cầu",
+      "material": "Vật liệu"
+    },
+    "account": {
+      "title": "Trang cá nhân",
+      "profile": "Hồ sơ",
+      "signIn": "Đăng nhập",
+      "signUp": "Đăng ký"
+    }
+  },
+  "adminDashboard": {
+    "v1": {
+      "todayMoney": "Doanh thu hôm nay",
+      "sinceYesterday": "so với hôm qua"
+    },
+    "v2": {
+      "todayUsers": "Người dùng hôm nay",
+      "sinceLastWeek": "so với tuần trước"
+    },
+    "v3": {
+      "newClients": "Khách hàng mới",
+      "sinceLastQuarter": "so với quý trước"
+    },
+    "v4": {
+      "sales": "Doanh số",
+      "thanLastMonth": "so với tháng trước"
+    },
+    "salesChart": {
+      "salesOverview": "Tổng quan doanh số"
+    },
+    "pieChart": {
+      "serviceRequests": "Yêu cầu dịch vụ",
+      "construction": "Xây dựng",
+      "repair": "Sửa chữa",
+      "material": "Vật liệu"
+    },
+    "contractors": {
+      "title": "Nhà thầu hàng đầu",
+      "email": "Email",
+      "serviceRequest": "Số yêu cầu dịch vụ",
+      "values": "Giá trị",
+      "bounce": "Tăng trưởng"
+    },
+    "distributors": {
+      "title": "Nhà phân phối hàng đầu",
+      "email": "Email",
+      "sales": "Doanh số",
+      "values": "Giá trị",
+      "bounce": "Tăng trưởng"
+    },
+    "viewAll": "Xem tất cả"
+  },
+  "roles": {
+    "Distributor": "Nhà phân phối",
+    "Contractor": "Nhà thầu",
+    "Admin": "Quản trị viên",
+    "Customer": "Khách hàng"
   },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",

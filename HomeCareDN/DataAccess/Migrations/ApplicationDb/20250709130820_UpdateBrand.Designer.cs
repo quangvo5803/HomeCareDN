@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250709130820_UpdateBrand")]
+    partial class UpdateBrand
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,45 +24,6 @@ namespace DataAccess.Migrations.ApplicationDb
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
-                {
-                    b.Property<Guid>("CartID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserID")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CartID");
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
-                {
-                    b.Property<Guid>("CartItemID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CartID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MaterialID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("CartItemID");
-
-                    b.HasIndex("CartID");
-
-                    b.HasIndex("MaterialID");
-
-                    b.ToTable("CartItems");
-                });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
@@ -91,7 +55,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("ContractorApplications", (string)null);
+                    b.ToTable("ContractorApplications");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -248,26 +212,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceRequestID");
 
-                    b.ToTable("ServiceRequests", (string)null);
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataAccess.Entities.Application.Material", "Material")
-                        .WithMany()
-                        .HasForeignKey("MaterialID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Material");
+                    b.ToTable("ServiceRequests");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
@@ -296,11 +241,6 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
                         .WithMany("Images")
                         .HasForeignKey("ServiceRequestID");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
-                {
-                    b.Navigation("CartItems");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
