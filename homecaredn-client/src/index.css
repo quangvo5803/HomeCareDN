@@ -1,10 +1,77 @@
 @import "tailwindcss";
 
-
 :root {
   --font-body: 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
   --font-heading: 'Poppins', var(--font-body);
+  --primary: #f97316;
 }
 
 body { font-family: var(--font-body); }
 .h-heading { font-family: var(--font-heading); }
+
+/* ================= HERO ================ */
+
+/* Kenburns nhẹ cho ảnh hero */
+@keyframes kenburns {
+  0%   { transform: scale(1) translateZ(0); }
+  100% { transform: scale(1.12) translateZ(0); }
+}
+.motion-reduce .animate-kenburns { animation: none !important; }
+.animate-kenburns {
+  animation: kenburns 12s ease-in-out both;
+  will-change: transform;
+}
+
+/* Vignette nhẹ cho hero */
+.hero-vignette::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+  pointer-events: none;
+}
+
+/* ================= FACTS ================ */
+.facts-stroke {
+  font-family: var(--font-heading);
+  color: transparent;
+  -webkit-text-stroke: 2px var(--primary);
+  text-stroke: 2px var(--primary);
+  line-height: .85;
+}
+
+/* ================= REVEAL ON SCROLL ================ */
+/* Ẩn trước */
+.reveal-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+  will-change: opacity, transform;
+}
+/* Hiện khi có class */
+.reveal-up.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ================= ANIMATION TIỆN DỤNG ================ */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translate3d(0, 30px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes slideInDown {
+  0% { transform: translate3d(0, -40px, 0); opacity: 0; }
+  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+}
+.animated { animation-duration: .9s; animation-fill-mode: both; }
+.fadeInUp { animation-name: fadeInUp; }
+.slideInDown { animation-name: slideInDown; }
+
+/* ================= ACCESSIBILITY ================ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-kenburns, .animated, .reveal-up {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
