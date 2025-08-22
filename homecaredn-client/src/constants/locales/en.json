@@ -13,7 +13,7 @@
     "profile": "Profile",
     "logout": "Logout"
   },
-  "home":{
+  "home": {
     "slider_category1": "Commercial",
     "slider_category2": "Residential",
     "slider_category3": "Industrial",
@@ -30,7 +30,7 @@
     "about_feature2": "24/7 hours services",
     "about_feature3": "Thorough and professional",
     "about_experience": "Years",
-    "about_experience1" :"Experience"
+    "about_experience1": "Experience"
   },
   "login": {
     "title": "Login",
@@ -40,7 +40,7 @@
     "not_have_account": "Don't have an account? ",
     "register_link": " Register now"
   },
-  "register":{
+  "register": {
     "title": "Register",
     "subtitle": "Create a new account",
     "name_placeholder": "Enter your full name",
@@ -66,7 +66,7 @@
     "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page"
   },
-  "ERROR":{
+  "ERROR": {
     "LOGIN_NOT_FOUND": "Email not registered",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
@@ -77,5 +77,69 @@
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
     "LOGIN": "Login successful."
+  },
+  "adminNavbar": {
+    "searchPlaceholder": "Type here...",
+    "logout": "Logout"
+  },
+  "adminFooter": {
+    "madeWith": "© {{year}}, made with ❤️ by",
+    "teamName": "HomeCareDN Teams"
+  },
+  "adminSidebar": {
+    "menu": {
+      "dashboard": "Dashboard",
+      "service": "Services",
+      "serviceRequest": "Service Request",
+      "material": "Material"
+    },
+    "account": {
+      "title": "Account pages",
+      "profile": "Profile",
+      "signIn": "Sign In",
+      "signUp": "Sign Up"
+    }
+  },
+  "adminDashboard": {
+    "v1": {
+      "todayMoney": "Today'S Money",
+      "sinceYesterday": "since yesterday"
+    },
+    "v2": {
+      "todayUsers": "Today's Users",
+      "sinceLastWeek": "since last week"
+    },
+    "v3": {
+      "newClients": "New Clients",
+      "sinceLastQuarter": "since last quarter"
+    },
+    "v4": {
+      "sales": "Sales",
+      "thanLastMonth": "than last month"
+    },
+    "salesChart": {
+      "salesOverview": "Sales overview",
+      "moreIn": "more in"
+    },
+    "pieChart": {
+      "serviceRequests": "Service Requests",
+      "construction": "Construction",
+      "repair": "Repair",
+      "material": "Material"
+    },
+    "contractors": {
+      "title": "Top Contractors",
+      "email": "Email",
+      "serviceRequest": "Service Request",
+      "values": "Values",
+      "bounce": "Bounce"
+    },
+    "distributors": {
+      "title": "Top Distributors",
+      "email": "Email",
+      "sales": "Sales",
+      "values": "Values",
+      "bounce": "Bounce"
+    }
   }
 }
