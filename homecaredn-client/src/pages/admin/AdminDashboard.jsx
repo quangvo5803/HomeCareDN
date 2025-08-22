@@ -1,5 +1,5 @@
-import SalesChart from "../../components/admin/SalesChart";
-import PieChart from "../../components/admin/PieChart";
+import SalesChart from "../../components/LineChart";
+import PieChart from "../../components/PieChart";
 import Sidebar from "../../components/admin/Sidebar";
 import Navbar from "../../components/admin/Navbar";
 import Footer from "../../components/admin/Footer";
@@ -186,24 +186,11 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
-          {/* biểu đồ đường */}
+          {/* biểu đồ*/}
           <div className="flex flex-wrap mt-6 -mx-3">
+            {/* biểu đồ đường*/}
             <div className="w-full max-w-full px-3 mt-0 lg:w-7/12 lg:flex-none">
-              <div className="border-black/12.5 dark:bg-slate-850 dark:shadow-dark-xl shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
-                <div className="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid p-6 pt-4 pb-0">
-                  <h6 className="capitalize dark:text-white">
-                    {t("adminDashboard.salesChart.salesOverview")}
-                  </h6>
-                  <p className="mb-0 text-sm leading-normal dark:text-white dark:opacity-60">
-                    <i className="fa fa-arrow-up text-emerald-500"></i>
-                    <span className="font-semibold">4%</span>{" "}
-                    {t("adminDashboard.salesChart.moreIn")} 2021
-                  </p>
-                </div>
-                <div className="flex-auto p-4">
-                  <SalesChart />
-                </div>
-              </div>
+              <SalesChart />
             </div>
 
             {/* biểu đồ tròn */}
@@ -268,6 +255,15 @@ export default function AdminDashboard() {
                       })}
                     </tbody>
                   </table>
+                  {/* Nút View All */}
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={() => console.log("View all clicked")}
+                      className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                    >
+                      {t("adminDashboard.viewAll")}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -327,6 +323,15 @@ export default function AdminDashboard() {
                       })}
                     </tbody>
                   </table>
+                  {/* Nút View All */}
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={() => console.log("View all clicked")}
+                      className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
+                    >
+                      {t("adminDashboard.viewAll")}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -83,7 +83,7 @@
     "UI sample for": "Mẫu Giao Diện Cho",
     "latest_applications": "Các Đơn Mới Nhất",
     "view_all": "Xem Tất Cả",
-    "contractor_portal": "Cổng Thông Tin Nhà Thầu",
+    "contractor_portal": "Cổng Thông Tin",
     "id": "Mã",
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
@@ -165,8 +165,7 @@
       "thanLastMonth": "so với tháng trước"
     },
     "salesChart": {
-      "salesOverview": "Tổng quan doanh số",
-      "moreIn": "nhiều hơn trong"
+      "salesOverview": "Tổng quan doanh số"
     },
     "pieChart": {
       "serviceRequests": "Yêu cầu dịch vụ",
@@ -187,6 +186,13 @@
       "sales": "Doanh số",
       "values": "Giá trị",
       "bounce": "Tăng trưởng"
-    }
+    },
+    "viewAll": "Xem tất cả"
+  },
+  "roles": {
+    "Distributor": "Nhà phân phối",
+    "Contractor": "Nhà thầu",
+    "Admin": "Quản trị viên",
+    "Customer": "Khách hàng"
   }
 }

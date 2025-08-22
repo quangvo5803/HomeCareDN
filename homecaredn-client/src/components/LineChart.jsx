@@ -1,4 +1,5 @@
 import { Line } from "react-chartjs-2";
+import { useTranslation } from "react-i18next";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,6 +23,7 @@ ChartJS.register(
 );
 
 export default function SalesChart() {
+  const { t } = useTranslation();
   const data = {
     labels: [
       "Jan",
@@ -69,5 +71,29 @@ export default function SalesChart() {
     },
   };
 
-  return <Line data={data} options={options} height={200} />;
+  return (
+    <div className="border-black/12.5 dark:bg-slate-850 dark:shadow-dark-xl shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
+      <div className="border-black/12.5 mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-solid p-6 pt-4 pb-0">
+        <h6 className="capitalize dark:text-white">
+          {t("adminDashboard.salesChart.salesOverview")}
+        </h6>
+
+        {/* Dropdown chọn năm */}
+        <select className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white">
+          {Array.from({ length: 6 }, (_, i) => {
+            const year = new Date().getFullYear() - i;
+            return (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+
+      <div className="flex-auto p-4">
+        <Line data={data} options={options} height={200} />
+      </div>
+    </div>
+  );
 }
