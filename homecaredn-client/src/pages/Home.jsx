@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import SupportChatWidget from "../components/SupportChatWidget";
 const slides = [
   {
     id: 1,
@@ -60,6 +60,7 @@ export default function Home() {
   }, [current]);
 
   return (
+    
     <div>
       {/* Carousel */}
       <div className="relative w-full h-[90vh] overflow-hidden">
@@ -181,6 +182,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      <SupportChatWidget /> 
     </div>
   );
 }
