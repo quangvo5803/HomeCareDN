@@ -30,7 +30,49 @@
     "about_feature2": "24/7 hours services",
     "about_feature3": "Thorough and professional",
     "about_experience": "Years",
-    "about_experience1": "Experience"
+    "about_experience1": "Experience",
+
+    "facts_aria": "Workflow",
+    "fact_read_more": "READ MORE",
+    "fact_step1_title": "Find suitable contractors/distributors",
+    "fact_step1_desc": "Provide requirements, scope and budget for the system to suggest suitable partners.",
+    "fact_step2_title": "Applying contractors/distributors",
+    "fact_step2_desc": "Partners submit capacity profiles, quotes, timelines and implementation conditions.",
+    "fact_step3_title": "Select the optimal partner",
+    "fact_step3_desc": "Compare profiles, negotiate terms and choose the most suitable option.",
+    "fact_step4_title": "Connect & work",
+    "fact_step4_desc": "Sign agreements, monitor progress, acceptance and post-construction support.",
+
+    "features_subtitle": "Why Choose Us!",
+    "features_title": "Our Specialization And Company Features",
+    "features_intro": "We provide a comprehensive solution for finding and managing construction contractors. From partner selection, progress monitoring to quality assurance, the system helps you save time and costs in every project.",
+    "features_img_alt": "Company Features",
+    "features_item1_title": "Large number of services provided",
+    "features_item2_title": "25+ years of professional experience",
+    "features_item3_title": "A large number of grateful customers",
+    "features_item4_title": "Always reliable and affordable prices",
+    "features_item_desc": "Optimal, transparent and fast solutions in every stage of construction and repair projects.",
+
+    "services_subtitle": "Our Services",
+    "services_title": "Construction And Renovation Solutions",
+    "services_more": "More Services",
+
+    "material_subtitle": "Our Materials",
+    "material_title": "Materials for Construction and Renovation",
+    "material_more": "More Materials",
+
+    "testimonial_subtitle": "Testimonial",
+    "testimonial_title": "What Our Happy Clients Say!",
+    "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
+    "testimonial_happy_clients": "Happy Clients",
+    "testimonial_projects_done": "Projects Done",
+    "testimonial_carousel_aria": "Client testimonials",
+    "testimonial1_text": "The system is very easy to use and convenient. I can manage repair and construction requests quickly and clearly. Very satisfied with the user experience.",
+    "testimonial1_name": "Client Name",
+    "testimonial1_role": "Profession",
+    "testimonial2_text": "I am very satisfied with this system.Progress, cost and personnel management are all done clearly and transparently. Thanks to the system, the construction and repair process becomes professional and has less risks.",
+    "testimonial2_name": "Client Name",
+    "testimonial2_role": "Profession"
   },
   "login": {
     "title": "Login",
@@ -46,6 +88,7 @@
     "name_placeholder": "Enter your full name",
     "email_placeholder": "Enter your email",
     "another_register": "Or register with ",
+    "register_button": "Register",
     "have_account": "Already have an account? ",
     "login_link": " Login now"
   },
@@ -115,7 +158,12 @@
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
     "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
     "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "REGISTER_ALREADY_EXISTS": "Email already registered"
+    "REGISTER_ALREADY_EXISTS": "Email already registered",
+    "NULL_NAME": "Please enter your full name.",
+    "NULL_EMAIL": "Please enter your email.",
+    "INVALID_EMAIL": "Invalid email.",
+    "NOT_FOUND_EMAIL": "Email not found for verification.",
+    "NULL_OTP": "Please enter OTP code."
   },
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
@@ -190,5 +238,34 @@
     "Contractor": "Contractor",
     "Admin": "Admin",
     "Customer": "Customer"
+  },
+
+  "footer": {
+    "description": "We provide modern solutions for businesses and individuals.",
+    "address": {
+      "title": "Address",
+      "location": "FPT, Hoa Hai, Ngu Hanh Son, Da Nang",
+      "phone": "+012 345 67890",
+      "email": "homecaredn43@gmail.com"
+    },
+    "quickLinks": {
+      "title": "Quick Links",
+      "about": "About Us",
+      "contact": "Contact Us",
+      "services": "Our Services",
+      "terms": "Terms & Condition",
+      "support": "Support"
+    },
+    "newsletter": {
+      "title": "Newsletter",
+      "description": "Subscribe to receive the latest updates from us.",
+      "placeholder": "Your email",
+      "signup": "Sign Up"
+    },
+    "bottom": {
+      "copyright": "© Your Site Name. All Right Reserved.",
+      "designed": "Designed By",
+      "distributed": "Distributed By:"
+    }
   }
 }

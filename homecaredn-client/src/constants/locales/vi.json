@@ -7,6 +7,8 @@
     "repair": "Sửa Chữa",
     "material": "Vật Liệu",
     "contact": "Liên Hệ",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
     "search": "Tìm kiếm...",
     "profile": "Hồ Sơ",
     "logout": "Đăng Xuất"
@@ -28,7 +30,45 @@
     "about_feature2": "Dịch vụ 24/7",
     "about_feature3": "Đầy đủ và chuyên nghiệp",
     "about_experience": "Năm",
-    "about_experience1": "Kinh nghiệm"
+    "about_experience1": "Kinh nghiệm",
+
+    "facts_aria": "Quy trình làm việc",
+    "fact_read_more": "Đọc thêm",
+    "fact_step1_title": "Tìm nhà thầu/nhà phân phối phù hợp",
+    "fact_step1_desc": "Cung cấp yêu cầu, phạm vi và ngân sách để hệ thống đề xuất đối tác phù hợp.",
+    "fact_step2_title": "Các nhà thầu/nhà phân phối ",
+    "fact_step2_desc": "Đối tác gửi hồ sơ năng lực, báo giá, timeline và điều kiện thực hiện.",
+    "fact_step3_title": "Lựa chọn đối tác tối ưu",
+    "fact_step3_desc": "So sánh hồ sơ, thương lượng điều khoản và chọn phương án phù hợp nhất.",
+    "fact_step4_title": "Kết nối & làm việc",
+    "fact_step4_desc": "Ký thoả thuận, theo dõi tiến độ, nghiệm thu và hỗ trợ sau thi công.",
+
+    "features_subtitle": "Tại sao chọn chúng tôi!",
+    "features_title": "Chuyên môn của chúng tôi và các tính năng của công ty",
+    "features_intro": "Chúng tôi mang đến giải pháp toàn diện cho việc tìm kiếm và quản lý nhà thầu xây dựng. Từ khâu lựa chọn đối tác, giám sát tiến độ cho đến đảm bảo chất lượng, hệ thống giúp bạn tiết kiệm thời gian và chi phí trong mỗi dự án.",
+    "features_img_alt": "Tính năng của Công ty",
+    "features_item1_title": "Số lượng lớn dịch vụ được cung cấp",
+    "features_item2_title": "hơn 25 năm kinh nghiệm chuyên môn",
+    "features_item3_title": "Một lượng lớn khách hàng tri ân",
+    "features_item4_title": "Luôn đáng tin cậy và giá cả phải chăng",
+    "features_item_desc": "Giải pháp tối ưu, minh bạch và nhanh chóng trong mọi giai đoạn của dự án xây dựng và sửa chữa.",
+
+    "services_subtitle": "Dịch vụ của chúng tôi",
+    "services_title": "Giải pháp xây dựng và cải tạo",
+    "services_more": "Thêm dịch vụ",
+
+    "testimonial_subtitle": "Lời chứng thực",
+    "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
+    "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
+    "testimonial_happy_clients": "Khách hàng hài lòng",
+    "testimonial_projects_done": "Các dự án đã thực hiện",
+    "testimonial_carousel_aria": "Lời chứng thực của khách hàng",
+    "testimonial1_text": "Hệ thống rất dễ sử dụng và tiện lợi. Tôi có thể quản lý các yêu cầu sửa chữa và xây dựng một cách nhanh chóng và rõ ràng. Rất hài lòng với trải nghiệm người dùng.",
+    "testimonial1_name": "Tên khách hàng",
+    "testimonial1_role": "Nghề nghiệp",
+    "testimonial2_text": "Tôi rất hài lòng với hệ thống này. Tiến độ, chi phí và quản lý nhân sự đều được thực hiện rõ ràng và minh bạch. Nhờ có hệ thống, quy trình xây dựng và sửa chữa trở nên chuyên nghiệp và ít rủi ro hơn.",
+    "testimonial2_name": "Tên khách hàng",
+    "testimonial2_role": "Nghề nghiệp"
   },
   "login": {
     "title": "Đăng Nhập",
@@ -194,5 +234,33 @@
     "Contractor": "Nhà thầu",
     "Admin": "Quản trị viên",
     "Customer": "Khách hàng"
+  },
+  "footer": {
+    "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
+    "address": {
+      "title": "Liên Hệ",
+      "location": "FPT, Hòa Hải, Ngũ Hành Sơn, Đà Nẵng",
+      "phone": "+84 123 456 789",
+      "email": "homecaredn43@gmail.com"
+    },
+    "quickLinks": {
+      "title": "Tiện ích",
+      "about": "Về chúng tôi",
+      "contact": "Liên hệ",
+      "services": "Dịch vụ",
+      "terms": "Điều khoản & Điều kiện",
+      "support": "Hỗ trợ"
+    },
+    "newsletter": {
+      "title": "Bản tin",
+      "description": "Đăng ký để nhận thông tin mới nhất từ chúng tôi.",
+      "placeholder": "Nhập email của bạn",
+      "signup": "Đăng ký"
+    },
+    "bottom": {
+      "copyright": "© Tên trang web của bạn. Bảo lưu mọi quyền.",
+      "designed": "Thiết kế bởi",
+      "distributed": "Phân phối bởi:"
+    }
   }
 }
