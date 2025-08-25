@@ -45,6 +45,7 @@ namespace DataAccess.Data
 
                 entity.Property(e => e.BuildingType).HasConversion<string>();
             });
+
             base.OnModelCreating(builder);
         }
     }

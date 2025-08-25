@@ -43,5 +43,12 @@ namespace HomeCareDNAPI.Controllers
             var tokenResponse = await _authorizeService.RefreshTokenAsync();
             return Ok(tokenResponse);
         }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _authorizeService.Logout();
+            return Ok();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Azure;
 using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
@@ -276,6 +277,39 @@ namespace BusinessLogic.Services
         }
 
         #endregion
+        public async Task Logout()
+        {
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(cookieToken))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
+            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                "",
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // bắt buộc khi HTTPS
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
+                }
+            );
+        }
 
         #region JWT
 

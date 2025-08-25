@@ -10,11 +10,8 @@ export const authService = {
     return res;
   },
   resentOtp: (email) => api.post('/Authorize/login', { email }),
-  refreshToken: () => api.post('/Authorize/refresh-token'), // backend đọc cookie HttpOnly
-  logout: () => {
-    localStorage.removeItem('accessToken');
-    window.location.href = '/Login';
-  },
+  refreshToken: () => api.post('/Authorize/refresh-token'),
+  logout: () => api.post('/Authorize/logout'),
 };
 
 export default authService;

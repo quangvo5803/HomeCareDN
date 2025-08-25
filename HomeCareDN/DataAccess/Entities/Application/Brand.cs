@@ -11,9 +11,7 @@ namespace DataAccess.Entities.Application
         [Required]
         public required string BrandName { get; set; }
         public string? BrandDescription { get; set; }
-
-        [Required]
-        public required Guid BrandLogoID { get; set; }
+        public Guid? BrandLogoID { get; set; }
 
         public ICollection<Material>? Materials { get; set; }
 

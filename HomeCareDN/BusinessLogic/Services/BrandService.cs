@@ -59,8 +59,7 @@ namespace BusinessLogic.Services
             {
                 await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
             }
-            //Không cần xóa vì khi xóa image đã tự động xóa brand
-            //_unitOfWork.BrandRepository.Remove(brand);
+            _unitOfWork.BrandRepository.Remove(brand);
             await _unitOfWork.SaveAsync();
         }
 

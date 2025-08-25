@@ -221,7 +221,7 @@
     "letStart" :"Start by adding your first brand",
     "brandModal":{
       "title": "Add new brand",
-      "tilte2": "Update brand",
+      "title2": "Update brand",
       "brandName": "Brand name",
       "brandNamePlaceholder": "Enter brand name...",
       "brandDescription" : "Brand description",

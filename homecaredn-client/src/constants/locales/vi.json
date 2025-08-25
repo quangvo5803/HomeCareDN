@@ -217,7 +217,7 @@
     "letStart" :"Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
     "brandModal":{
       "title": "Thêm thương hiệu mới",
-      "tilte2": "Cập nhật thương hiệu",
+      "title2": "Cập nhật thương hiệu",
       "brandName": "Tên thương hiệu",
       "brandNamePlaceholder": "Nhập tên thương hiệu...",
       "brandDescription" : "Mô tả thương hiệu",
