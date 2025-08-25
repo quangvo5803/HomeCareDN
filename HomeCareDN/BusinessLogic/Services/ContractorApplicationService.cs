@@ -20,30 +20,6 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ContractorApplicationDto>> GetAllContractorApplicationsAsync(
-            ContractorApplicationGetAllRequestDto getAllRequestDto
-        )
-        {
-            var applications = await _unitOfWork.ContractorApplicationRepository.GetAllAsync(
-                getAllRequestDto.FilterOn,
-                getAllRequestDto.FilterQuery,
-                getAllRequestDto.SortBy,
-                getAllRequestDto.IsAscending,
-                getAllRequestDto.PageNumber,
-                getAllRequestDto.PageSize,
-                includeProperties: "Images"
-            );
-            if (applications == null || !applications.Any())
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ContractorApplications", new[] { "No contractor applications found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            return _mapper.Map<List<ContractorApplicationDto>>(applications);
-        }
-
         public async Task<ContractorApplicationDto> GetContractorApplicationByIdAsync(
             Guid contractorApplicationId
         )

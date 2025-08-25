@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Entities.Application
 {
@@ -13,9 +8,15 @@ namespace DataAccess.Entities.Application
         public Guid CategoryID { get; set; }
 
         [Required]
-        public string CategoryName { get; set; }
+        [MaxLength(100)]
+        public string CategoryName { get; set; } = null!;
 
+        // Có thể phân loại đa cấp (Category cha/con)
+        public Guid? ParentCategoryID { get; set; }
+        public Category? ParentCategory { get; set; }
+        public ICollection<Category>? SubCategories { get; set; }
+
+        // Quan hệ với Material
         public ICollection<Material>? Materials { get; set; }
     }
-
 }

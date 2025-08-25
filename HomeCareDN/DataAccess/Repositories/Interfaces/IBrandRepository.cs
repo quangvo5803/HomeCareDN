@@ -2,5 +2,5 @@
 
 namespace DataAccess.Repositories.Interfaces
 {
-    public interface ICartRepository : IRepository<Cart> { }
+    public interface IBrandRepository : IRepository<Brand> { }
 }

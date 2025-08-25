@@ -4,10 +4,11 @@ using DataAccess.Repositories.Interfaces;
 
 namespace DataAccess.Repositories
 {
-    internal class CartRepository : Repository<Cart>, ICartRepository
+    public class BrandRepository : Repository<Brand>, IBrandRepository
     {
         private readonly ApplicationDbContext _db;
-        public CartRepository(ApplicationDbContext db)
+
+        public BrandRepository(ApplicationDbContext db)
             : base(db)
         {
             _db = db;

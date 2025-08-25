@@ -10,6 +10,5 @@ namespace BusinessLogic.Services.Interfaces
         Task<TokenResponseDto> VerifyOtpAsync(string email, string otp);
         Task<TokenResponseDto> RefreshTokenAsync();
         Task<string> GenerateToken(ApplicationUser user);
-        string GenerateRefeshToken();
     }
 }

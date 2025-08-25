@@ -6,8 +6,8 @@
         public required string UserID { get; set; }
         public required string CategoryID { get; set; }
         public required string Name { get; set; }
-        
-        public required string Brand { get; set; }
+
+        public required string BrandName { get; set; }
         public string? Unit { get; set; }
         public string? Description { get; set; }
         public double UnitPrice { get; set; }

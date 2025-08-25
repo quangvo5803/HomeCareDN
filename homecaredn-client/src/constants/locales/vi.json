@@ -96,7 +96,7 @@
     "resend_otp": "Gửi lại",
     "not_receive_otp": "Không nhận được mã? "
   },
-  "contractordashboard": {
+  "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
@@ -139,32 +139,6 @@
       "pending_payments": "▼ 1 quá hạn"
     }
   },
-  "BUTTON": {
-    "Login": "Đăng Nhập",
-    "Register": "Đăng Ký",
-    "SendOTP": "Gửi Mã OTP",
-    "MoreDetails": "Xem Thêm Chi Tiết",
-    "LoginGoogle": "Đăng Nhập với Google",
-    "RegisterGoogle": "Đăng Ký với Google",
-    "BackToLogin": "Quay Về Trang Đăng Nhập"
-  },
-  "ERROR": {
-    "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
-    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
-    "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
-    "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
-    "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
-    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
-    "NULL_NAME": "Vui lòng nhập họ và tên.",
-    "NULL_EMAIL": "Vui lòng nhập email.",
-    "INVALID_EMAIL": "Email không hợp lệ.",
-    "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
-    "NULL_OTP": "Vui lòng nhập mã OTP."
-  },
-  "SUCCESS": {
-    "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
-    "LOGIN": "Đăng nhập thành công."
-  },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -176,6 +150,7 @@
   "adminSidebar": {
     "menu": {
       "dashboard": "Bảng điều khiển",
+      "brand": "Thương hiệu",
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu"
@@ -188,21 +163,21 @@
     }
   },
   "adminDashboard": {
-    "v1": {
-      "todayMoney": "Doanh thu hôm nay",
-      "sinceYesterday": "so với hôm qua"
+    "statisticMoney": {
+      "todayMoney": "Thu nhập hôm nay",
+      "sinceLastMonth": " so với tháng trước"
     },
-    "v2": {
-      "todayUsers": "Người dùng hôm nay",
-      "sinceLastWeek": "so với tuần trước"
+    "statisticUser": {
+      "todayUsers": "Tổng số người dùng tháng này",
+      "sinceLastMonth": " so với tháng trước"
     },
-    "v3": {
-      "newClients": "Khách hàng mới",
-      "sinceLastQuarter": "so với quý trước"
+    "statisticServiceRequest": {
+      "newServiceRequest": "Yêu cầu dịch vụ mới",
+      "sinceLastMonth": " so với tháng trước"
     },
-    "v4": {
-      "sales": "Doanh số",
-      "thanLastMonth": "so với tháng trước"
+    "statisticSales": {
+      "sales": "Doanh thu",
+      "sinceLastMonth": " so với tháng trước"
     },
     "salesChart": {
       "salesOverview": "Tổng quan doanh số"
@@ -228,6 +203,28 @@
       "bounce": "Tăng trưởng"
     },
     "viewAll": "Xem tất cả"
+  },
+  "adminBrandManager":{
+    "title":"Quản lý thương hiệu",
+    "subtitle" : "Quản lý danh sách các thương hiệu sản phẩm",
+    "brands": "thương hiệu",
+    "no": "STT",
+    "brandName": "Tên thương hiệu",
+    "numberOfMaterial": "Số lượng sản phẩm",
+    "action": "Thao tác",
+    "materials": "sản phẩm",
+    "noBrand" : "Chưa có thương hiệu nào",
+    "letStart" :"Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
+    "brandModal":{
+      "title": "Thêm thương hiệu mới",
+      "tilte2": "Cập nhật thương hiệu",
+      "brandName": "Tên thương hiệu",
+      "brandNamePlaceholder": "Nhập tên thương hiệu...",
+      "brandDescription" : "Mô tả thương hiệu",
+      "brandDescriptionPlaceholder": "Nhập mô tả thương hiệu...",
+      "brandLogo" :"Logo thương hiệu",
+      "chooseFile": "Chọn tệp tải lên"
+    }
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -262,5 +259,54 @@
       "designed": "Thiết kế bởi",
       "distributed": "Phân phối bởi:"
     }
+  },
+  "BUTTON": {
+    "Login": "Đăng Nhập",
+    "Register": "Đăng Ký",
+    "SendOTP": "Gửi Mã OTP",
+    "MoreDetails": "Xem Thêm Chi Tiết",
+    "LoginGoogle": "Đăng Nhập với Google",
+    "RegisterGoogle": "Đăng Ký với Google",
+    "BackToLogin": "Quay Về Trang Đăng Nhập",
+    "AddNewBrand": "Thêm thương hiệu mới",
+    "UpdateBrand": "Cập nhật thương hiệu",
+    "View": "Xem",
+    "Edit" : "Sửa",
+    "Delete": "Xóa",
+    "Cancel": "Hủy bỏ"
+  },
+  "ModalPopup":{
+    "DeleteBrandModal":{
+      "title": "Bạn có chắc chắn?",
+      "text" : "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeletingLoadingModal":
+    {
+      "title": "Đang xóa...",
+      "text": "Vui lòng chờ trong giây lát."
+    }
+  },
+  "ERROR": {
+    "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
+    "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
+    "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
+    "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
+    "NULL_NAME": "Vui lòng nhập họ và tên.",
+    "NULL_EMAIL": "Vui lòng nhập email.",
+    "INVALID_EMAIL": "Email không hợp lệ.",
+    "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
+    "NULL_OTP": "Vui lòng nhập mã OTP.",
+
+    "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
+    "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu."
+  },
+  "SUCCESS": {
+    "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
+    "LOGIN": "Đăng nhập thành công.",
+    "DELETE": "Đã xóa thành công",
+    "BRAND_ADD": "Thêm thương hiệu thành công",
+    "BRAND_UPDATE": "Cập nhật thương hiệu thành công"
   }
 }

@@ -4,9 +4,6 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IContractorApplicationService
     {
-        Task<List<ContractorApplicationDto>> GetAllContractorApplicationsAsync(
-            ContractorApplicationGetAllRequestDto getAllRequestDto
-        );
         Task<ContractorApplicationDto> GetContractorApplicationByIdAsync(
             Guid contractorApplicationId
         );
