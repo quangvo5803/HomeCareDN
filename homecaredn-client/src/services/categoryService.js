@@ -13,19 +13,17 @@ export const categoryService = {
   },
 
   // Admin-only APIs
-  createCategory: async ({ CategoryName, ParentCategoryID }) => {
+  createCategory: async ({ CategoryName }) => {
     const response = await api.post('/Admin/create-category', {
       categoryName: CategoryName,
-      parentCategoryID: ParentCategoryID || null,
     });
     return response.data;
   },
 
-  updateCategory: async ({ CategoryID, CategoryName, ParentCategoryID }) => {
+  updateCategory: async ({ CategoryID, CategoryName }) => {
     const response = await api.put('/Admin/update-category', {
       categoryID: CategoryID,
       categoryName: CategoryName,
-      parentCategoryID: ParentCategoryID || null,
     });
     return response.data;
   },

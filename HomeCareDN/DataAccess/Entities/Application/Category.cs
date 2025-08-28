@@ -11,11 +11,6 @@ namespace DataAccess.Entities.Application
         [MaxLength(100)]
         public string CategoryName { get; set; } = null!;
 
-        // Có thể phân loại đa cấp (Category cha/con)
-        public Guid? ParentCategoryID { get; set; }
-        public Category? ParentCategory { get; set; }
-        public ICollection<Category>? SubCategories { get; set; }
-
         // Quan hệ với Material
         public ICollection<Material>? Materials { get; set; }
     }

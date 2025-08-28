@@ -46,14 +46,6 @@ export default function AdminCategoryManager() {
 
   // Delete Category
   const handleDelete = async (categoryId) => {
-    const hasChildren = categories.some(
-      (c) => c.parentCategoryID === categoryId
-    );
-
-    if (hasChildren) {
-      toast.error(t('ERROR.CANNOT_DELETE_CATEGORY_WITH_CHILDREN'));
-      return;
-    }
     Swal.fire({
       title: t('ModalPopup.DeleteCategoryModal.title'),
       text: t('ModalPopup.DeleteCategoryModal.text'),
@@ -163,12 +155,6 @@ export default function AdminCategoryManager() {
                     <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       {t('adminCategoryManager.categoryName')}
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      {t('adminCategoryManager.parentCategoryName')}
-                    </th>
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      {t('adminCategoryManager.subCategories')}
-                    </th>
                     <th className=" px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       {t('adminCategoryManager.numberOfMaterials')}
                     </th>
@@ -196,19 +182,7 @@ export default function AdminCategoryManager() {
                             {cat.categoryName}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm font-medium text-gray-900 break-words">
-                            {cat.parentCategoryName
-                              ? cat.parentCategoryName
-                              : t('adminCategoryManager.noParent')}
-                          </div>
-                        </td>
-                        <td className=" px-4 py-4 text-center align-middle">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                            {cat.subCategories?.length || 0}{' '}
-                            {t('adminCategoryManager.categories')}
-                          </span>
-                        </td>
+
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             {cat.materials?.length || 0}{' '}

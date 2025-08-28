@@ -22,7 +22,7 @@ namespace BusinessLogic.Services
         public async Task<ICollection<CategoryDto>> GetAllCategories()
         {
             var categories = await _unitOfWork.CategoryRepository.GetAllAsync(
-                includeProperties: "ParentCategory,SubCategories,Materials"
+                includeProperties: "Materials"
             );
             var categoiresDtos = _mapper.Map<ICollection<CategoryDto>>(categories);
             return categoiresDtos;

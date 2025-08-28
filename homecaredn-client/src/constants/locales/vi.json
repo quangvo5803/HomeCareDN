@@ -233,21 +233,17 @@
     "categories":"danh mục",
     "no":"STT",
     "categoryName": "Tên danh mục",
-    "parentCategoryName": "Tên danh mục cha",
-    "subCategories": "Số danh mục con",
     "numberOfMaterials": "Số lượng sản phẩm",
     "materials": "sản phẩm",
     "action":"Thao tác",
     "noCategory": "Chưa có danh mục nào",
     "letStart":"Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
-    "noParent": "Không có danh mục cha",
     "categoryModal":{
       "title": "Thêm danh mục mới",
       "title2": "Cập nhật thương hiệu",
       "categoryName": "Tên danh mục",
-      "categoryNamePlaceholder": "Nhập tên danh mục...",
-      "parentCategory": "Danh mục cha",
-      "noParent": "Không có danh mục cha"
+      "categoryNamePlaceholder": "Nhập tên danh mục..."
+
     }
   },
   "roles": {

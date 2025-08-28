@@ -2,40 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 
-export default function CategoryModal({
-  isOpen,
-  onClose,
-  onSave,
-  category,
-  categories,
-}) {
+export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
-  const [parentCategoryID, setParentCategoryID] = useState(null);
 
   // Khi mở modal, nếu có category (edit) thì fill dữ liệu
   useEffect(() => {
     if (isOpen) {
       if (category) {
         setCategoryName(category.categoryName || '');
-        setParentCategoryID(category.parentCategoryID || null);
       } else {
         setCategoryName('');
-        setParentCategoryID(null);
       }
     }
   }, [isOpen, category]);
-  const getAllDescendantIds = (categoryId, categories) => {
-    const childIds = categories
-      .filter((c) => c.parentCategoryID === categoryId)
-      .map((c) => c.categoryID);
 
-    let all = [...childIds];
-    childIds.forEach((childId) => {
-      all = [...all, ...getAllDescendantIds(childId, categories)];
-    });
-    return all;
-  };
   const handleSubmit = () => {
     if (!categoryName.trim()) {
       toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
@@ -44,7 +25,6 @@ export default function CategoryModal({
 
     const data = {
       CategoryName: categoryName,
-      ParentCategoryID: parentCategoryID || null,
     };
 
     if (category?.categoryID) {
@@ -92,43 +72,6 @@ export default function CategoryModal({
               onChange={(e) => setCategoryName(e.target.value)}
             />
           </div>
-
-          {/* Parent Category */}
-          {categories && categories.length > 0 && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminCategoryManager.categoryModal.parentCategory')}
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={parentCategoryID || ''}
-                onChange={(e) => setParentCategoryID(e.target.value || null)}
-              >
-                <option value="">
-                  {t('adminCategoryManager.categoryModal.noParent')}
-                </option>
-                {categories
-                  .filter((c) => {
-                    if (!category) return true; // khi create thì cho chọn hết
-                    if (c.categoryID === category.categoryID) return false; // chặn chính nó
-
-                    // lấy toàn bộ cây con của category hiện tại
-                    const descendants = getAllDescendantIds(
-                      category.categoryID,
-                      categories
-                    );
-                    if (descendants.includes(c.categoryID)) return false; // chặn con/cháu
-
-                    return true;
-                  })
-                  .map((c) => (
-                    <option key={c.categoryID} value={c.categoryID}>
-                      {c.categoryName}
-                    </option>
-                  ))}
-              </select>
-            </div>
-          )}
         </div>
 
         {/* Footer */}

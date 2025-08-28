@@ -237,21 +237,17 @@
     "categories":"category(es)",
     "no":"NO",
     "categoryName": "Category name",
-    "parentCategoryName": "Parent category name",
-    "subCategories": "Number of subcategory",
     "numberOfMaterials": "Number of Material",
     "materials": "Material(s)",
     "action":"Action",
     "noCategory": "No category yes",
     "letStart":"Start by adding your first category.",
-    "noParent": "No parent category",
     "categoryModal":{
       "title": "Add new category",
       "title2": "Update category",
       "categoryName": "Category name",
-      "categoryNamePlaceholder": "Enter category name...",
-      "parentCategory": "Parent category",
-      "noParent": "No parent category"
+      "categoryNamePlaceholder": "Enter category name..."
+
     }
   },
   "roles": {

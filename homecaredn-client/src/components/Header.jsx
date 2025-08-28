@@ -64,7 +64,7 @@ export default function Header() {
           </a>
 
           {/* Search Bar (Desktop) */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-8">
+          <div className="hidden lg:flex flex-1">
             <div className="relative w-full">
               <input
                 type="text"
