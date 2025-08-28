@@ -66,7 +66,7 @@ namespace BusinessLogic.Services
         public async Task<ICollection<BrandDto>> GetAllBrands()
         {
             var brands = await _unitOfWork.BrandRepository.GetAllAsync(
-                includeProperties: "LogoImage"
+                includeProperties: "LogoImage,Materials"
             );
             var brandDtos = _mapper.Map<ICollection<BrandDto>>(brands);
             return brandDtos;

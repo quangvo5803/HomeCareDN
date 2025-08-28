@@ -173,7 +173,8 @@ namespace BusinessLogic.Services
                 await _refreshTokenRepository.DeleteAsync(oldToken);
 
             // Tạo token mới
-            var accessToken = await GenerateToken(user);
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             var refreshToken = GenerateRefreshToken();
             var rt = new RefreshToken
             {
@@ -202,7 +203,7 @@ namespace BusinessLogic.Services
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(AccessTokenMinutes),
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ khớp với JWT
                 UserId = user.Id,
             };
         }
@@ -242,7 +243,8 @@ namespace BusinessLogic.Services
                 );
 
             // Tạo access token mới
-            var accessToken = await GenerateToken(user);
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
             // Gia hạn refresh token nếu còn < 1 ngày
             if ((refreshToken.ExpiresAt - DateTime.UtcNow).TotalDays < 1)
@@ -269,9 +271,7 @@ namespace BusinessLogic.Services
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                AccessTokenExpiresAt = DateTime
-                    .UtcNow.AddMinutes(AccessTokenMinutes)
-                    .AddMinutes(Random.Shared.Next(-5, 6)),
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ không random nữa
                 UserId = user.Id,
             };
         }
@@ -346,7 +346,7 @@ namespace BusinessLogic.Services
                 claims: claims,
                 expires: DateTime
                     .UtcNow.AddMinutes(AccessTokenMinutes)
-                    .AddMinutes(Random.Shared.Next(-5, 6)),
+                    .AddSeconds(Random.Shared.Next(-30, 31)),
                 signingCredentials: creds
             );
         }

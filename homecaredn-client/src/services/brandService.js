@@ -1,16 +1,18 @@
-import api from '../../api';
+import api from '../api';
 
 export const brandService = {
+  //Public APIs
   getAllBrands: async () => {
-    const response = await api.get('/Admin/get-all-brands');
+    const response = await api.get('/Brands/get-all-brands');
     return response.data;
   },
 
   getBrandById: async (id) => {
-    const response = await api.get(`/Admin/get-brand/${id}`);
+    const response = await api.get(`/Brands/get-brand/${id}`);
     return response.data;
   },
 
+  //Admin-only APIs
   createBrand: async ({ BrandName, BrandDescription, LogoFile }) => {
     const formData = new FormData();
     formData.append('BrandName', BrandName);

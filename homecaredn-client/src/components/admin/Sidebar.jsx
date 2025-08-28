@@ -21,6 +21,11 @@ export default function Sidebar() {
       link: '/Admin/BrandManager',
     },
     {
+      icon: 'text-blue-500 fa-solid fa-layer-group',
+      title: 'category',
+      link: '/Admin/CategoryManager',
+    },
+    {
       icon: 'text-red-500 fa-solid fa-code-pull-request',
       title: 'service',
       link: '/Admin/Service',

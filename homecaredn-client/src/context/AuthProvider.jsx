@@ -61,7 +61,10 @@ export default function AuthProvider({ children }) {
           if (res.data?.accessToken) {
             localStorage.setItem('accessToken', res.data.accessToken);
             const parsed = parseToken(res.data.accessToken);
-            if (parsed) setUser(parsed);
+            if (parsed) {
+              setUser(parsed);
+              scheduleRefresh(parsed.exp);
+            }
           }
         } catch {
           logout();

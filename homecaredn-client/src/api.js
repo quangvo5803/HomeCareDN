@@ -1,25 +1,37 @@
 // api.js
 import axios from 'axios';
 import { authService } from './services/authService';
+import { toast } from 'react-toastify';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7155/api',
+  baseURL: '/api',
   withCredentials: true, // cookie HttpOnly
 });
 
-// gắn accessToken
+// Request interceptor -> gắn accessToken
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// xử lý 401 → refresh token
+// Response interceptor -> xử lý lỗi
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
+    // 🛑 Network Error (server tắt / không kết nối được)
+    if (error.message === 'Network Error' && !error.response) {
+      if (!originalRequest._networkHandled) {
+        originalRequest._networkHandled = true; // tránh toast nhiều lần
+        toast.error('Không thể kết nối tới server, vui lòng thử lại sau!');
+        console.warn('API unreachable'); // chỉ log ngắn gọn, không log URL
+      }
+      return Promise.reject({ ...error, handled: true });
+    }
+
+    // 🛑 401 Unauthorized → thử refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {

@@ -2,34 +2,39 @@ import { useEffect, useState } from 'react';
 import BrandModal from '../../components/admin/BrandModal';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { brandService } from '../../services/admin/brandService';
 import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
 import Swal from 'sweetalert2';
+import { useBrand } from '../../hook/useBrand';
+import { Pagination } from 'antd';
 
 export default function AdminBrandManager() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { t } = useTranslation();
-  const [loading, setLoading] = useState(false);
-  const [brands, setBrands] = useState([]);
+  const {
+    brands,
+    loading,
+    fetchBrands,
+    createBrand,
+    updateBrand,
+    deleteBrand,
+  } = useBrand();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
-  //  Load dữ liệu
-  const fetchBrand = async () => {
-    try {
-      setLoading(true);
-      const res = await brandService.getAllBrands();
-      setBrands(res);
-    } catch (err) {
-      toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
-    }
-  };
+  //  Fetch brands khi vào trang
   useEffect(() => {
-    fetchBrand();
-  }, []);
-
+    fetchBrands();
+  }, [fetchBrands]);
+  //Pagination
+  const indexOfLastItem = currentPage * pageSize;
+  const indexOfFirstItem = indexOfLastItem - pageSize;
+  const currentBrands = brands.slice(indexOfFirstItem, indexOfLastItem);
+  if (currentPage > 1 && currentBrands.length === 1) {
+    setCurrentPage(currentPage - 1);
+  }
+  //View Brand
   const handleView = (brand) => {
     alert(`Xem thông tin: ${brand.brandLogo}`);
   };
@@ -58,42 +63,37 @@ export default function AdminBrandManager() {
           });
 
           // Gọi API
-          await brandService.deleteBrand(brandId);
-
-          // Cập nhật state
-          setBrands((prev) => prev.filter((b) => b.brandID !== brandId));
+          await deleteBrand(brandId);
 
           Swal.close(); // đóng loading
           toast.success(t('SUCCESS.DELETE'));
         } catch (err) {
           Swal.close();
+          if (err.handled) return;
           toast.error(handleApiError(err));
         }
       }
     });
   };
 
-  //Handle Add New Brand
+  // 📌 Create / Update
   const handleSave = async (brandData) => {
     try {
-      setLoading(true);
       if (brandData.BrandID) {
         // Update
-        await brandService.updateBrand(brandData);
+        await updateBrand(brandData);
         toast.success(t('SUCCESS.BRAND_UPDATE'));
-        fetchBrand();
       } else {
         // Create
-        const createdBrand = await brandService.createBrand(brandData);
-        setBrands([...brands, createdBrand]);
+        await createBrand(brandData);
+        setCurrentPage(1);
         toast.success(t('SUCCESS.BRAND_ADD'));
       }
       setIsModalOpen(false);
       setEditingBrand(null);
     } catch (err) {
+      if (err.handled) return;
       toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -146,13 +146,13 @@ export default function AdminBrandManager() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('adminBrandManager.no')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('adminBrandManager.brandName')}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('adminBrandManager.numberOfMaterial')}
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -162,22 +162,23 @@ export default function AdminBrandManager() {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {brands && brands.length > 0 ? (
-                  brands.map((brand, index) => (
+                  currentBrands.map((brand, index) => (
                     <tr
                       key={brand.brandID}
                       className={`hover:bg-gray-50 transition-colors duration-150 ${
                         index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
                       }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
+                      <td className="px-6 py-4 text-center align-middle">
+                        <div className="flex items-center justify-center">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {index + 1}
+                            {indexOfFirstItem + index + 1}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
+
+                      <td className="px-6 py-4 text-center align-middle">
+                        <div className="flex items-center justify-center">
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 overflow-hidden">
                             {brand.brandLogo ? (
                               <img
@@ -193,32 +194,29 @@ export default function AdminBrandManager() {
                               </div>
                             )}
                           </div>
-
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {brand.brandName}
-                            </div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {brand.brandName}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {brand.materials?.length || 0}{' '}
-                            {t('adminBrandManager.materials')}
-                          </span>
-                        </div>
+
+                      <td className="px-6 py-4 text-center align-middle">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {brand.materials?.length || 0}{' '}
+                          {t('adminBrandManager.materials')}
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center">
+
+                      <td className="px-6 py-4 text-center align-middle">
                         <div className="flex items-center justify-center space-x-2">
                           <button
-                            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors duration-200"
+                            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                             onClick={() => handleView(brand)}
                           >
                             {t('BUTTON.View')}
                           </button>
                           <button
-                            className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 hover:border-amber-400 transition-colors duration-200"
+                            className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                             onClick={() => {
                               setEditingBrand(brand);
                               setIsModalOpen(true);
@@ -227,7 +225,7 @@ export default function AdminBrandManager() {
                             {t('BUTTON.Edit')}
                           </button>
                           <button
-                            className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 transition-colors duration-200"
+                            className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(brand.brandID)}
                           >
                             {t('BUTTON.Delete')}
@@ -272,6 +270,16 @@ export default function AdminBrandManager() {
                 )}
               </tbody>
             </table>
+            {/* Pagination */}
+            <div className="flex justify-center py-4">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={brands.length}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false} // nếu muốn đổi số item / trang thì để true
+              />
+            </div>
           </div>
         </div>
       </div>

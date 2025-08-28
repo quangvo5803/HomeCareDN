@@ -155,6 +155,7 @@
     "menu": {
       "dashboard": "Dashboard",
       "brand": "Brands",
+      "category": "Material Category",
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material"
@@ -211,14 +212,14 @@
   "adminBrandManager":{
     "title":"Brand Manager",
     "subtitle" : "Manage brand list",
-    "brands": "brand",
+    "brands": "brands",
     "no": "NO",
     "brandName": "Brand name",
     "numberOfMaterial": "Number of Material",
     "action": "Action",
-    "materials": "Materials",
+    "materials": "Material(s)",
     "noBrand" : "No brand yet",
-    "letStart" :"Start by adding your first brand",
+    "letStart" :"Start by adding your first brand.",
     "brandModal":{
       "title": "Add new brand",
       "title2": "Update brand",
@@ -228,6 +229,29 @@
       "brandDescriptionPlaceholder": "Enter brand description...",
       "brandLogo" :"Brand logo",
       "chooseFile": "Choose file to upload"
+    }
+  },
+  "adminCategoryManager":{
+    "title": "Material Category Manager",
+    "subtitle" : "Manage material category list",
+    "categories":"category(es)",
+    "no":"NO",
+    "categoryName": "Category name",
+    "parentCategoryName": "Parent category name",
+    "subCategories": "Number of subcategory",
+    "numberOfMaterials": "Number of Material",
+    "materials": "Material(s)",
+    "action":"Action",
+    "noCategory": "No category yes",
+    "letStart":"Start by adding your first category.",
+    "noParent": "No parent category",
+    "categoryModal":{
+      "title": "Add new category",
+      "title2": "Update category",
+      "categoryName": "Category name",
+      "categoryNamePlaceholder": "Enter category name...",
+      "parentCategory": "Parent category",
+      "noParent": "No parent category"
     }
   },
   "roles": {
@@ -275,6 +299,8 @@
     "BackToLogin": "Back to Login Page",
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
+    "AddNewCategory": "Add new Category",
+    "UpdateCategory" : "Update Category",
     "View": "View",
     "Edit" : "Edit",
     "Delete": "Delete",
@@ -284,6 +310,11 @@
     "DeleteBrandModal":{
       "title": "Are you sure?",
       "text" : "This brand will be deleted and cannot be restored!"
+    },
+    "DeleteCategoryModal":
+    {
+      "title": "Are you sure?",
+      "text" : "This category will be deleted and cannot be restored!"
     },
     "DeletingLoadingModal":
     {
@@ -303,15 +334,19 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
+    "NETWORK_ERROR" : "Unable to connect to server, please try again later!",
 
     "REQUIRED_BRANDNAME": "Please enter brand name.",
-    "REQUIRED_BRANDLOGO": "Please upload your brand logo"
+    "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
+    "REQUIRED_CATEGORYNAME": "Please enter category name."
   },
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
     "LOGIN": "Login successfully.",
     "DELETE": "Delete successfully.",
     "BRAND_ADD": "Add brand successfully.",
-    "BRAND_UPDATE": "Update brand successfully."
+    "BRAND_UPDATE": "Update brand successfully.",
+    "CATEGORY_ADD": "Add category successfully",
+    "CATEGORY_UPDATE": "Update category successfully."
   }
 }

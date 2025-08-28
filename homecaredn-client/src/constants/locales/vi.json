@@ -151,6 +151,7 @@
     "menu": {
       "dashboard": "Bảng điều khiển",
       "brand": "Thương hiệu",
+      "category": "Danh mục vật liệu",
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu"
@@ -226,6 +227,29 @@
       "chooseFile": "Chọn tệp tải lên"
     }
   },
+  "adminCategoryManager":{
+    "title": "Quản lí danh mục vật liệu",
+    "subtitle" : "Quản lí danh sác các danh mục vật liệu",
+    "categories":"danh mục",
+    "no":"STT",
+    "categoryName": "Tên danh mục",
+    "parentCategoryName": "Tên danh mục cha",
+    "subCategories": "Số danh mục con",
+    "numberOfMaterials": "Số lượng sản phẩm",
+    "materials": "sản phẩm",
+    "action":"Thao tác",
+    "noCategory": "Chưa có danh mục nào",
+    "letStart":"Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
+    "noParent": "Không có danh mục cha",
+    "categoryModal":{
+      "title": "Thêm danh mục mới",
+      "title2": "Cập nhật thương hiệu",
+      "categoryName": "Tên danh mục",
+      "categoryNamePlaceholder": "Nhập tên danh mục...",
+      "parentCategory": "Danh mục cha",
+      "noParent": "Không có danh mục cha"
+    }
+  },
   "roles": {
     "Distributor": "Nhà phân phối",
     "Contractor": "Nhà thầu",
@@ -270,6 +294,8 @@
     "BackToLogin": "Quay Về Trang Đăng Nhập",
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
+    "AddNewCategory": "Thêm danh mục mới",
+    "UpdateCategory":"Cập nhật danh mục",
     "View": "Xem",
     "Edit" : "Sửa",
     "Delete": "Xóa",
@@ -279,6 +305,11 @@
     "DeleteBrandModal":{
       "title": "Bạn có chắc chắn?",
       "text" : "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
+    },    
+    "DeleteCategoryModal":
+    {
+      "title": "Bạn có chắc chắn?",
+      "text": "Danh mục này sẽ bị xóa và không thể khôi phục!"
     },
     "DeletingLoadingModal":
     {
@@ -298,15 +329,20 @@
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
+    "NETWORK_ERROR" : "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
+
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
-    "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu."
+    "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
+    "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục."
   },
   "SUCCESS": {
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
     "LOGIN": "Đăng nhập thành công.",
-    "DELETE": "Đã xóa thành công",
-    "BRAND_ADD": "Thêm thương hiệu thành công",
-    "BRAND_UPDATE": "Cập nhật thương hiệu thành công"
+    "DELETE": "Đã xóa thành công.",
+    "BRAND_ADD": "Thêm thương hiệu thành công.",
+    "BRAND_UPDATE": "Cập nhật thương hiệu thành công.",
+    "CATEGORY_ADD": "Thêm danh mục thành công.",
+    "CATEGORY_UPDATE": "Cập nhật danh mục thành công."
   }
 }

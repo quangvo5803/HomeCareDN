@@ -4,6 +4,7 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface ICategoryService
     {
+        Task<ICollection<CategoryDto>> GetAllCategories();
         Task<CategoryDto> GetCategoryByIdAsync(Guid id);
         Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto);
         Task<CategoryDto> UpdateCategoryAsync(CategoryUpdateRequestDto requestDto);

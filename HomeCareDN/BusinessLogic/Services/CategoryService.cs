@@ -4,6 +4,7 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Ultitity.Exceptions;
+using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -16,6 +17,15 @@ namespace BusinessLogic.Services
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+        }
+
+        public async Task<ICollection<CategoryDto>> GetAllCategories()
+        {
+            var categories = await _unitOfWork.CategoryRepository.GetAllAsync(
+                includeProperties: "ParentCategory,SubCategories,Materials"
+            );
+            var categoiresDtos = _mapper.Map<ICollection<CategoryDto>>(categories);
+            return categoiresDtos;
         }
 
         public async Task<CategoryDto> GetCategoryByIdAsync(Guid id)
@@ -69,7 +79,7 @@ namespace BusinessLogic.Services
             {
                 throw new CustomValidationException(errors);
             }
-            _mapper.Map(requestDto, category);
+            category.PatchFrom(requestDto);
 
             await _unitOfWork.SaveAsync();
 

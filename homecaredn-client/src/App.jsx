@@ -12,6 +12,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBrandManager from './pages/admin/AdminBrandManager';
+import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -91,6 +92,7 @@ function Layout() {
         >
           <Route index element={<AdminDashboard />} />
           <Route path="BrandManager" element={<AdminBrandManager />} />
+          <Route path="CategoryManager" element={<AdminCategoryManager />} />
         </Route>
 
         {/* Contractor routes */}

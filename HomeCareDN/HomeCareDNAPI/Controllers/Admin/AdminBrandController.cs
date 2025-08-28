@@ -18,20 +18,6 @@ namespace HomeCareDNAPI.Controllers.Admin
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-brands")]
-        public async Task<IActionResult> GetAllBrands()
-        {
-            var brands = await _facadeService.BrandService.GetAllBrands();
-            return Ok(brands);
-        }
-
-        [HttpGet("get-brand/{id:guid}")]
-        public async Task<IActionResult> GetBrand(Guid id)
-        {
-            var brand = await _facadeService.BrandService.GetBrandByID(id);
-            return Ok(brand);
-        }
-
         [HttpPost("create-brand")]
         public async Task<IActionResult> CreateBrand([FromForm] BrandCreateRequestDto dto)
         {
