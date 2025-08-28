@@ -6,6 +6,8 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
   const { t } = useTranslation();
   const [brandName, setBrandName] = useState('');
   const [brandDescription, setBrandDescription] = useState('');
+  const [brandNameEN, setBrandNameEN] = useState('');
+  const [brandDescriptionEN, setBrandDescriptionEN] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
 
@@ -15,11 +17,15 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
       if (brand) {
         setBrandName(brand.brandName || '');
         setBrandDescription(brand.brandDescription || '');
+        setBrandNameEN(brand.brandNameEN || '');
+        setBrandDescriptionEN(brand.brandDescriptionEN || '');
         setLogoPreview(brand.brandLogo || null);
         setLogoFile(null); // reset file mới
       } else {
         setBrandName('');
         setBrandDescription('');
+        setBrandNameEN('');
+        setBrandDescriptionEN('');
         setLogoFile(null);
         setLogoPreview(null);
       }
@@ -52,6 +58,8 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
     const data = {
       BrandName: brandName,
       BrandDescription: brandDescription,
+      BrandNameEN: brandNameEN,
+      brandDescription: brandDescriptionEN,
     };
 
     // Nếu edit thì giữ brandID
@@ -119,7 +127,35 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
               onChange={(e) => setBrandDescription(e.target.value)}
             />
           </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              {t('adminBrandManager.brandModal.brandNameEN')}{' '}
+            </label>
+            <input
+              type="text"
+              placeholder={t(
+                'adminBrandManager.brandModal.brandNamePlaceholderEN'
+              )}
+              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={brandNameEN}
+              onChange={(e) => setBrandNameEN(e.target.value)}
+            />
+          </div>
 
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              {t('adminBrandManager.brandModal.brandDescriptionEN')}
+            </label>
+            <textarea
+              placeholder={t(
+                'adminBrandManager.brandModal.brandDescriptionPlaceholderEN'
+              )}
+              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows="3"
+              value={brandDescriptionEN}
+              onChange={(e) => setBrandDescriptionEN(e.target.value)}
+            />
+          </div>
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               {t('adminBrandManager.brandModal.brandLogo')}{' '}

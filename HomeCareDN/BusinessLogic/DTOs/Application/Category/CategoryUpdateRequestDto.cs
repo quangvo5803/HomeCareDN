@@ -7,5 +7,6 @@ namespace BusinessLogic.DTOs.Application.Category
         [Required]
         public Guid CategoryID { get; set; }
         public string? CategoryName { get; set; }
+        public string? CategoryNameEN { get; set; }
     }
 }

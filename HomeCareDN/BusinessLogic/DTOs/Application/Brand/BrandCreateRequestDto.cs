@@ -8,6 +8,8 @@ namespace BusinessLogic.DTOs.Application.Brand
         [Required(ErrorMessage = "REQUIRED_BRANDNAME")]
         public required string BrandName { get; set; }
         public string? BrandDescription { get; set; }
+        public string? BrandNameEN { get; set; }
+        public string? BrandDescriptionEN { get; set; }
 
         [Required(ErrorMessage = "REQUIRED_BRANDLOGO")]
         public required IFormFile LogoFile { get; set; }

@@ -11,7 +11,7 @@ import CategoryModal from '../../components/admin/CategoryModal';
 export default function AdminCategoryManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const {
     categories,
@@ -179,7 +179,9 @@ export default function AdminCategoryManager() {
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
                           <div className="text-sm font-medium text-gray-900 break-words">
-                            {cat.categoryName}
+                            {i18n.language === 'vi'
+                              ? cat.categoryName
+                              : cat.categoryNameEN || cat.categoryName}
                           </div>
                         </td>
 

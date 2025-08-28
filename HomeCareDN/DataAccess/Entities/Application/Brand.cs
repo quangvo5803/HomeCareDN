@@ -8,11 +8,15 @@ namespace DataAccess.Entities.Application
         [Key]
         public Guid BrandID { get; set; }
 
+        //VI
         [Required]
         public required string BrandName { get; set; }
         public string? BrandDescription { get; set; }
         public Guid? BrandLogoID { get; set; }
 
+        //EN
+        public required string BrandNameEN { get; set; }
+        public string? BrandDescriptionEN { get; set; }
         public ICollection<Material>? Materials { get; set; }
 
         [ForeignKey("BrandLogoID")]

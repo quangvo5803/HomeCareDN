@@ -223,6 +223,10 @@
       "brandNamePlaceholder": "Nhập tên thương hiệu...",
       "brandDescription" : "Mô tả thương hiệu",
       "brandDescriptionPlaceholder": "Nhập mô tả thương hiệu...",
+      "brandNameEN": "Tên thương hiệu(Tiếng Anh)",
+      "brandNamePlaceholderEN": "Nhập tên thương hiệu bằng tiếng Anh...",
+      "brandDescriptionEN" : "Mô tả thương hiệu(Tiếng Anh)",
+      "brandDescriptionPlaceholderEN": "Nhập mô tả thương hiệu bằng tiếng Anh...",
       "brandLogo" :"Logo thương hiệu",
       "chooseFile": "Chọn tệp tải lên"
     }
@@ -242,8 +246,9 @@
       "title": "Thêm danh mục mới",
       "title2": "Cập nhật thương hiệu",
       "categoryName": "Tên danh mục",
-      "categoryNamePlaceholder": "Nhập tên danh mục..."
-
+      "categoryNamePlaceholder": "Nhập tên danh mục...",
+      "categoryNameEN": "Tên danh mục(Tiếng Anh)",
+      "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh..."
     }
   },
   "roles": {
