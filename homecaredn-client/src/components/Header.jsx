@@ -54,7 +54,7 @@ export default function Header() {
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <a href="/" className="flex items-center group">
-            <div className="w-32 h-20 rounded-xl overflow-hidden group-hover:scale-110 transition-transform duration-300">
+            <div className="w-32 h-16 rounded-xl overflow-hidden group-hover:scale-110 transition-transform duration-300">
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
                 alt="HomeCareDN Logo"
@@ -64,7 +64,7 @@ export default function Header() {
           </a>
 
           {/* Search Bar (Desktop) */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-8">
+          <div className="hidden lg:flex flex-1">
             <div className="relative w-full">
               <input
                 type="text"

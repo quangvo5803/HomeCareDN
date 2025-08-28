@@ -1,7 +1,7 @@
-import { useAuth } from "../../hook/useAuth";
-import { useTranslation } from "react-i18next";
-import ReactCountryFlag from "react-country-flag";
-import React, { useState } from "react";
+import { useAuth } from '../../hook/useAuth';
+import { useTranslation } from 'react-i18next';
+import ReactCountryFlag from 'react-country-flag';
+import React, { useState } from 'react';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -19,8 +19,8 @@ export default function Navbar() {
   return (
     <nav
       className="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all ease-in shadow-none duration-250 rounded-2xl lg:flex-nowrap lg:justify-start"
-      navbar-main
-      navbar-scroll="false"
+      data-navbar-main="true"
+      data-navbar-scroll="false"
     >
       <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
         <div className="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto justify-end gap-4">
@@ -32,7 +32,7 @@ export default function Navbar() {
             <input
               type="text"
               className="pl-9 pr-3 py-2 w-full text-sm rounded-lg border border-gray-300 dark:bg-slate-850 dark:text-white bg-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder={t("adminNavbar.searchPlaceholder")}
+              placeholder={t('adminNavbar.searchPlaceholder')}
             />
           </div>
 
@@ -47,14 +47,14 @@ export default function Navbar() {
             {openLang && (
               <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1">
                 <button
-                  onClick={() => changeLanguage("en")}
+                  onClick={() => changeLanguage('en')}
                   className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
                 >
                   <ReactCountryFlag countryCode="US" svg className="text-lg" />
                   <span>English</span>
                 </button>
                 <button
-                  onClick={() => changeLanguage("vi")}
+                  onClick={() => changeLanguage('vi')}
                   className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
                 >
                   <ReactCountryFlag countryCode="VN" svg className="text-lg" />
@@ -94,7 +94,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 w-full px-3 py-2 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-md whitespace-nowrap"
                 >
                   <i className="fa-solid fa-arrow-right-from-bracket"></i>
-                  <span>{t("adminNavbar.logout")}</span>
+                  <span>{t('adminNavbar.logout')}</span>
                 </button>
               </div>
             )}

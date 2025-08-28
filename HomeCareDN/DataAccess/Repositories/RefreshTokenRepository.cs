@@ -43,5 +43,14 @@ namespace DataAccess.Repositories
             _db.RefreshTokens.Remove(token);
             await _db.SaveChangesAsync();
         }
+
+        public async Task UpdateAsync(RefreshToken token)
+        {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+
+            _db.RefreshTokens.Update(token);
+            await _db.SaveChangesAsync();
+        }
     }
 }

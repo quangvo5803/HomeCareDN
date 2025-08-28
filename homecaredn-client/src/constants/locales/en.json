@@ -100,7 +100,7 @@
     "resend_otp": "Resend",
     "not_receive_otp": "Did not receive the code? "
   },
-  "contractordashboard": {
+  "partnerDashboard": {
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
@@ -143,32 +143,6 @@
       "pending_payments": "▼ 1 overdue"
     }
   },
-  "BUTTON": {
-    "Login": "Login",
-    "Register": "Register",
-    "SendOTP": "Send OTP Code",
-    "MoreDetails": "More Details",
-    "LoginGoogle": "Login with Google",
-    "RegisterGoogle": "Register with Google",
-    "BackToLogin": "Back to Login Page"
-  },
-  "ERROR": {
-    "LOGIN_NOT_FOUND": "Email not registered",
-    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
-    "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
-    "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
-    "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "REGISTER_ALREADY_EXISTS": "Email already registered",
-    "NULL_NAME": "Please enter your full name.",
-    "NULL_EMAIL": "Please enter your email.",
-    "INVALID_EMAIL": "Invalid email.",
-    "NOT_FOUND_EMAIL": "Email not found for verification.",
-    "NULL_OTP": "Please enter OTP code."
-  },
-  "SUCCESS": {
-    "SEND_OTP": "OTP code sent successfully.",
-    "LOGIN": "Login successful."
-  },
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -180,6 +154,8 @@
   "adminSidebar": {
     "menu": {
       "dashboard": "Dashboard",
+      "brand": "Brands",
+      "category": "Material Category",
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material"
@@ -192,21 +168,21 @@
     }
   },
   "adminDashboard": {
-    "v1": {
-      "todayMoney": "Today'S Money",
-      "sinceYesterday": "since yesterday"
+    "statisticMoney": {
+      "todayMoney": "Today's Money",
+      "sinceLastMonth": " since last month"
     },
-    "v2": {
-      "todayUsers": "Today's Users",
-      "sinceLastWeek": "since last week"
+    "statisticUser": {
+      "todayUsers": "This month's Users",
+      "sinceLastMonth": " since last month"
     },
-    "v3": {
-      "newClients": "New Clients",
-      "sinceLastQuarter": "since last quarter"
+    "statisticServiceRequest": {
+      "newServiceRequest": "New Service Requests",
+      "sinceLastMonth": " since last month"
     },
-    "v4": {
+    "statisticSales": {
       "sales": "Sales",
-      "thanLastMonth": "than last month"
+      "sinceLastMonth": " since last month"
     },
     "salesChart": {
       "salesOverview": "Sales overview"
@@ -232,6 +208,47 @@
       "bounce": "Bounce"
     },
     "viewAll": "View all"
+  },
+  "adminBrandManager":{
+    "title":"Brand Manager",
+    "subtitle" : "Manage brand list",
+    "brands": "brands",
+    "no": "NO",
+    "brandName": "Brand name",
+    "numberOfMaterial": "Number of Material",
+    "action": "Action",
+    "materials": "Material(s)",
+    "noBrand" : "No brand yet",
+    "letStart" :"Start by adding your first brand.",
+    "brandModal":{
+      "title": "Add new brand",
+      "title2": "Update brand",
+      "brandName": "Brand name",
+      "brandNamePlaceholder": "Enter brand name...",
+      "brandDescription" : "Brand description",
+      "brandDescriptionPlaceholder": "Enter brand description...",
+      "brandLogo" :"Brand logo",
+      "chooseFile": "Choose file to upload"
+    }
+  },
+  "adminCategoryManager":{
+    "title": "Material Category Manager",
+    "subtitle" : "Manage material category list",
+    "categories":"category(es)",
+    "no":"NO",
+    "categoryName": "Category name",
+    "numberOfMaterials": "Number of Material",
+    "materials": "Material(s)",
+    "action":"Action",
+    "noCategory": "No category yes",
+    "letStart":"Start by adding your first category.",
+    "categoryModal":{
+      "title": "Add new category",
+      "title2": "Update category",
+      "categoryName": "Category name",
+      "categoryNamePlaceholder": "Enter category name..."
+
+    }
   },
   "roles": {
     "Distributor": "Distributor",
@@ -267,5 +284,65 @@
       "designed": "Designed By",
       "distributed": "Distributed By:"
     }
+  },
+  "BUTTON": {
+    "Login": "Login",
+    "Register": "Register",
+    "SendOTP": "Send OTP Code",
+    "MoreDetails": "More Details",
+    "LoginGoogle": "Login with Google",
+    "RegisterGoogle": "Register with Google",
+    "BackToLogin": "Back to Login Page",
+    "AddNewBrand": "Add new Brand",
+    "UpdateBrand": "Update Brand",
+    "AddNewCategory": "Add new Category",
+    "UpdateCategory" : "Update Category",
+    "View": "View",
+    "Edit" : "Edit",
+    "Delete": "Delete",
+    "Cancel": "Cancel"
+  },
+  "ModalPopup":{
+    "DeleteBrandModal":{
+      "title": "Are you sure?",
+      "text" : "This brand will be deleted and cannot be restored!"
+    },
+    "DeleteCategoryModal":
+    {
+      "title": "Are you sure?",
+      "text" : "This category will be deleted and cannot be restored!"
+    },
+    "DeletingLoadingModal":
+    {
+      "title": "Deleting...",
+      "text": "Please wait a moment."
+    }
+  },
+  "ERROR": {
+    "LOGIN_NOT_FOUND": "Email not registered",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
+    "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
+    "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
+    "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
+    "REGISTER_ALREADY_EXISTS": "Email already registered",
+    "NULL_NAME": "Please enter your full name.",
+    "NULL_EMAIL": "Please enter your email.",
+    "INVALID_EMAIL": "Invalid email.",
+    "NOT_FOUND_EMAIL": "Email not found for verification.",
+    "NULL_OTP": "Please enter OTP code.",
+    "NETWORK_ERROR" : "Unable to connect to server, please try again later!",
+
+    "REQUIRED_BRANDNAME": "Please enter brand name.",
+    "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
+    "REQUIRED_CATEGORYNAME": "Please enter category name."
+  },
+  "SUCCESS": {
+    "SEND_OTP": "OTP code sent successfully.",
+    "LOGIN": "Login successfully.",
+    "DELETE": "Delete successfully.",
+    "BRAND_ADD": "Add brand successfully.",
+    "BRAND_UPDATE": "Update brand successfully.",
+    "CATEGORY_ADD": "Add category successfully",
+    "CATEGORY_UPDATE": "Update category successfully."
   }
 }

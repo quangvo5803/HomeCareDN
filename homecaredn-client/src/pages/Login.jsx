@@ -33,6 +33,7 @@ export default function Login() {
       toast.success(t('SUCCESS.SEND_OTP'));
       navigate('/VerifyOTP', { state: { email } });
     } catch (err) {
+      if (err.handled) return;
       toast.error(handleApiError(err));
     } finally {
       setLoading(false);

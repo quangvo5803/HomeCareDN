@@ -9,7 +9,10 @@ import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
 
 //Admin pages
+import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminBrandManager from './pages/admin/AdminBrandManager';
+import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -80,13 +83,18 @@ function Layout() {
 
         {/* Admin routes */}
         <Route
-          path="/AdminDashboard"
+          path="/Admin"
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
-              <AdminDashboard />
+              <AdminLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="BrandManager" element={<AdminBrandManager />} />
+          <Route path="CategoryManager" element={<AdminCategoryManager />} />
+        </Route>
+
         {/* Contractor routes */}
         <Route
           path="/ContractorDashboard"
@@ -126,7 +134,7 @@ function Layout() {
 function getRedirectPath(user) {
   switch (user?.role) {
     case 'Admin':
-      return '/AdminDashboard';
+      return '/Admin';
     case 'Contractor':
       return '/ContractorDashboard';
     case 'Distributor':

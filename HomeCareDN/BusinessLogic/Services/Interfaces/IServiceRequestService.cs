@@ -5,9 +5,6 @@ namespace BusinessLogic.Services.Interfaces
     public interface IServiceRequestService
     {
         Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id);
-        Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync(
-            ServiceRequestGetAllDto getAllRequestDto
-        );
         Task<ServiceRequestDto> CreateServiceRequestAsync(
             ServiceRequestCreateRequestDto createRequestDto
         );

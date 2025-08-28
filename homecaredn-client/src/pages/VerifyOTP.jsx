@@ -62,6 +62,7 @@ export default function VerifyOTP() {
       await authService.resendOtp(email);
       toast.success(t('SUCCESS.SEND_OTP'));
     } catch (err) {
+      if (err.handled) return;
       toast.error(handleApiError(err));
     }
   };

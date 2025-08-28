@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
-using BusinessLogic.DTOs.Application.CartItem;
-using BusinessLogic.DTOs.Application.Cart;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
-using BusinessLogic.DTOs.Application.SearchAndFilter;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
@@ -24,8 +22,6 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<Brand, string>().ConvertUsing(src => src.GetDisplayName());
-            
 
             // ServiceRequest Create
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
@@ -44,23 +40,10 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             //Category Create
-            CreateMap<CategoryCreateRequestDto, Category>().ReverseMap();
-
-            //Category Update
-            CreateMap<CategoryUpdateRequestDto, Category>()
-                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-            
-            // Cart Create
-            CreateMap<CartCreateRequestDto, Cart>()
-                .ForMember(dest => dest.CartItems, opt => opt.Ignore());
-
-            // CartItem Create
-            CreateMap<CartItemCreateRequestDto, CartItem>()
-                .ForMember(dest => dest.Cart, opt => opt.Ignore())
-                .ForMember(dest => dest.Material, opt => opt.Ignore());
-
-
-
+            CreateMap<CategoryCreateRequestDto, Category>();
+            //Brand Create
+            CreateMap<BrandCreateRequestDto, Brand>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             // Complex mapping (Response)
 
@@ -107,41 +90,27 @@ namespace HomeCareDNAPI.Mapping
                                 ? src.Images.Select(i => i.ImageUrl).ToList()
                                 : new List<string>()
                         )
+                )
+                .ForMember(
+                    dest => dest.BrandName,
+                    opt =>
+                        opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
                 );
 
             //Category
-            CreateMap<Category, CategoryDto>();
+            CreateMap<Category, CategoryDto>()
+                .ReverseMap();
 
-
-            //Filter
-            CreateMap<Material, SearchResponseDto>()
-             .ForMember(dest => dest.UserId,
-                 opt => opt.MapFrom(src => src.UserID))
-             .ForMember(dest => dest.UnitPrice,
-                 opt => opt.MapFrom(src => src.UnitPrice))
-             .ForMember(dest => dest.CategoryName,
-                 opt => opt.MapFrom(src => src.Category.CategoryName))
-             .ForMember(dest => dest.Description,
-                 opt => opt.MapFrom(src => src.Description))
-             .ForMember(dest => dest.ImageUrls,
-                 opt => opt.MapFrom(src =>
-                     src.Images != null ? src.Images.Select(i => i.ImageUrl).ToList() : new List<string>())
-             );
-
-
-            // Cart
-            CreateMap<Cart, CartDto>()
+            //Brand
+            CreateMap<Brand, BrandDto>()
                 .ForMember(
-                    dest => dest.CartItems,
-                    opt => opt.MapFrom(src => src.CartItems != null ? src.CartItems : new List<CartItem>())
-                );
-            // CartItem
-            CreateMap<CartItem, CartItemDto>()
-                .ForMember(
-                    dest => dest.Material,
-                    opt => opt.MapFrom(src => src.Material)
-                );
-
+                    dest => dest.BrandLogo,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.ImageUrl : string.Empty
+                        )
+                )
+                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
         }
     }
 }

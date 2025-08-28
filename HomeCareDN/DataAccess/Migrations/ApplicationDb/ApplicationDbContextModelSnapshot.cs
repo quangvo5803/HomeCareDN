@@ -22,43 +22,43 @@ namespace DataAccess.Migrations.ApplicationDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
                 {
-                    b.Property<Guid>("CartID")
+                    b.Property<Guid>("BrandID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserID")
+                    b.Property<string>("BrandDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("BrandLogoID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BrandName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CartID");
+                    b.HasKey("BrandID");
 
-                    b.ToTable("Carts");
+                    b.HasIndex("BrandLogoID");
+
+                    b.ToTable("Brands");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
+            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
                 {
-                    b.Property<Guid>("CartItemID")
+                    b.Property<Guid>("CategoryID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CartID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<Guid>("MaterialID")
-                        .HasColumnType("uniqueidentifier");
+                    b.HasKey("CategoryID");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("CartItemID");
-
-                    b.HasIndex("CartID");
-
-                    b.HasIndex("MaterialID");
-
-                    b.ToTable("CartItems");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
@@ -91,13 +91,16 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("ContractorApplications", (string)null);
+                    b.ToTable("ContractorApplications");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.Property<Guid>("ImageID")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BrandID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ContractorApplicationID")
@@ -139,16 +142,19 @@ namespace DataAccess.Migrations.ApplicationDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("BrandID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CategoryID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Unit")
                         .HasColumnType("nvarchar(max)");
@@ -161,6 +167,10 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialID");
+
+                    b.HasIndex("BrandID");
+
+                    b.HasIndex("CategoryID");
 
                     b.ToTable("Materials");
                 });
@@ -248,26 +258,16 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceRequestID");
 
-                    b.ToTable("ServiceRequests", (string)null);
+                    b.ToTable("ServiceRequests");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.CartItem", b =>
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.Cart", "Cart")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CartID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataAccess.Entities.Application.Material", "Material")
+                    b.HasOne("DataAccess.Entities.Application.Image", "LogoImage")
                         .WithMany()
-                        .HasForeignKey("MaterialID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BrandLogoID");
 
-                    b.Navigation("Cart");
-
-                    b.Navigation("Material");
+                    b.Navigation("LogoImage");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
@@ -298,9 +298,33 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasForeignKey("ServiceRequestID");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Cart", b =>
+            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
                 {
-                    b.Navigation("CartItems");
+                    b.HasOne("DataAccess.Entities.Application.Brand", "Brand")
+                        .WithMany("Materials")
+                        .HasForeignKey("BrandID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entities.Application.Category", "Category")
+                        .WithMany("Materials")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
+                {
+                    b.Navigation("Materials");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
+                {
+                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
