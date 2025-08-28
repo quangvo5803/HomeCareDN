@@ -5,14 +5,17 @@ import { toast } from 'react-toastify';
 export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
+  const [categoryNameEN, setCategoryNameEN] = useState('');
 
   // Khi mở modal, nếu có category (edit) thì fill dữ liệu
   useEffect(() => {
     if (isOpen) {
       if (category) {
         setCategoryName(category.categoryName || '');
+        setCategoryNameEN(category.categoryNameEN || '');
       } else {
         setCategoryName('');
+        setCategoryNameEN('');
       }
     }
   }, [isOpen, category]);
@@ -25,6 +28,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
 
     const data = {
       CategoryName: categoryName,
+      CategoryNameEN: categoryNameEN,
     };
 
     if (category?.categoryID) {
@@ -70,6 +74,21 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
               className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
+            />
+          </div>
+          {/* Category Name English */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              {t('adminCategoryManager.categoryModal.categoryNameEN')}{' '}
+            </label>
+            <input
+              type="text"
+              placeholder={t(
+                'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
+              )}
+              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              value={categoryNameEN}
+              onChange={(e) => setCategoryNameEN(e.target.value)}
             />
           </div>
         </div>

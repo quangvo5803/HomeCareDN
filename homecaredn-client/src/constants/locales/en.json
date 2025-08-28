@@ -227,6 +227,10 @@
       "brandNamePlaceholder": "Enter brand name...",
       "brandDescription" : "Brand description",
       "brandDescriptionPlaceholder": "Enter brand description...",
+      "brandNameEN": "Brand name(English)",
+      "brandNamePlaceholderEN": "Enter brand name in English...",
+      "brandDescriptionEN" : "Brand description(English)",
+      "brandDescriptionPlaceholderEN": "Enter brand description in e...",
       "brandLogo" :"Brand logo",
       "chooseFile": "Choose file to upload"
     }
@@ -246,8 +250,9 @@
       "title": "Add new category",
       "title2": "Update category",
       "categoryName": "Category name",
-      "categoryNamePlaceholder": "Enter category name..."
-
+      "categoryNamePlaceholder": "Enter category name...",
+      "categoryNameEN": "Category name(English)",
+      "categoryNamePlaceholderEN": "Enter category name in English..."
     }
   },
   "roles": {

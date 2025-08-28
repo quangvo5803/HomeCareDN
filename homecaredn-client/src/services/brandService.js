@@ -13,10 +13,19 @@ export const brandService = {
   },
 
   //Admin-only APIs
-  createBrand: async ({ BrandName, BrandDescription, LogoFile }) => {
+  createBrand: async ({
+    BrandName,
+    BrandDescription,
+    BrandNameEN,
+    BrandDescriptionEN,
+    LogoFile,
+  }) => {
     const formData = new FormData();
     formData.append('BrandName', BrandName);
     if (BrandDescription) formData.append('BrandDescription', BrandDescription);
+    if (BrandNameEN) formData.append('BrandNameEN', BrandNameEN);
+    if (BrandDescriptionEN)
+      formData.append('BrandDescriptionEN', BrandDescriptionEN);
     formData.append('LogoFile', LogoFile);
 
     const response = await api.post('/Admin/create-brand', formData, {
@@ -27,11 +36,21 @@ export const brandService = {
     return response.data;
   },
 
-  updateBrand: async ({ BrandID, BrandName, BrandDescription, LogoFile }) => {
+  updateBrand: async ({
+    BrandID,
+    BrandName,
+    BrandDescription,
+    BrandNameEN,
+    BrandDescriptionEN,
+    LogoFile,
+  }) => {
     const formData = new FormData();
     formData.append('BrandID', BrandID);
     formData.append('BrandName', BrandName);
     if (BrandDescription) formData.append('BrandDescription', BrandDescription);
+    if (BrandNameEN) formData.append('BrandNameEN', BrandNameEN);
+    if (BrandDescriptionEN)
+      formData.append('BrandDescriptionEN', BrandDescriptionEN);
     if (LogoFile) formData.append('LogoFile', LogoFile);
 
     const response = await api.put('/Admin/update-brand', formData, {

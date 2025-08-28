@@ -7,9 +7,13 @@ namespace DataAccess.Entities.Application
         [Key]
         public Guid CategoryID { get; set; }
 
+        //VI
         [Required]
         [MaxLength(100)]
-        public string CategoryName { get; set; } = null!;
+        public required string CategoryName { get; set; }
+
+        //EN
+        public string? CategoryNameEN { get; set; }
 
         // Quan hệ với Material
         public ICollection<Material>? Materials { get; set; }
