@@ -8,6 +8,7 @@ namespace DataAccess.Entities.Authorize
         public Gender? Gender { get; set; }
         public string? CurrentOTP { get; set; }
         public DateTime? OTPExpiresAt { get; set; }
+        public DateTime? LastOTPSentAt { get; set; }
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
     }
 

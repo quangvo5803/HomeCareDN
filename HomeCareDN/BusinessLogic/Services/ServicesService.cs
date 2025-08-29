@@ -19,30 +19,6 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ServiceDto>> GetAllServiceAsync(ServiceGetAllDto getAllDto)
-        {
-            var services = await _unitOfWork.ServiceRepository.GetAllAsync(
-                getAllDto.FilterOn,
-                getAllDto.FilterQuery,
-                getAllDto.SortBy,
-                getAllDto.IsAscending,
-                getAllDto.PageNumber,
-                getAllDto.PageSize,
-                includeProperties: "Images"
-            );
-            if (services == null || !services.Any())
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Service", new[] { "No service found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
-            var serviceMapper = _mapper.Map<IEnumerable<ServiceDto>>(services);
-            return serviceMapper;
-        }
-
         public async Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto)
         {
             var errors = new Dictionary<string, string[]>();

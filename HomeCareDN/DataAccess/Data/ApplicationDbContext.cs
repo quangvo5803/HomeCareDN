@@ -1,4 +1,5 @@
-﻿using DataAccess.Entities.Application;
+﻿using System.Reflection.Emit;
+using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data
@@ -13,6 +14,8 @@ namespace DataAccess.Data
         public DbSet<Image> Images { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -42,6 +45,7 @@ namespace DataAccess.Data
 
                 entity.Property(e => e.BuildingType).HasConversion<string>();
             });
+
             base.OnModelCreating(builder);
         }
     }

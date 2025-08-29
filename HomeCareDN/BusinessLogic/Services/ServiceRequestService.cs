@@ -18,31 +18,6 @@ namespace BusinessLogic.Services.Interfaces
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ServiceRequestDto>> GetAllHardServiceRequestsAsync(
-            ServiceRequestGetAllDto request
-        )
-        {
-            var serviceRequests = await _unitOfWork.ServiceRequestRepository.GetAllAsync(
-                request.FilterOn,
-                request.FilterQuery,
-                request.SortBy,
-                request.IsAscending,
-                request.PageNumber,
-                request.PageSize,
-                includeProperties: "Images"
-            );
-            if (serviceRequests == null || !serviceRequests.Any())
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ServiceRequests", new[] { "No service requests found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            var serviceRequestDtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(serviceRequests);
-            return serviceRequestDtos;
-        }
-
         public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id)
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(

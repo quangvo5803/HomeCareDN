@@ -9,6 +9,8 @@ namespace DataAccess.UnitOfWork
         IMaterialRepository MaterialRepository { get; }
         IServiceRepository ServiceRepository { get; }
         IContractorApplicationRepository ContractorApplicationRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
+        IBrandRepository BrandRepository { get; }
         Task SaveAsync();
     }
 }

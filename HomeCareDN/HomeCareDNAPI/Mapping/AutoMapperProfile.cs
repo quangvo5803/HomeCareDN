@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application.Brand;
+using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
@@ -36,6 +38,12 @@ namespace HomeCareDNAPI.Mapping
             // Material Create
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            //Category Create
+            CreateMap<CategoryCreateRequestDto, Category>();
+            //Brand Create
+            CreateMap<BrandCreateRequestDto, Brand>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             // Complex mapping (Response)
 
@@ -82,7 +90,27 @@ namespace HomeCareDNAPI.Mapping
                                 ? src.Images.Select(i => i.ImageUrl).ToList()
                                 : new List<string>()
                         )
+                )
+                .ForMember(
+                    dest => dest.BrandName,
+                    opt =>
+                        opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
                 );
+
+            //Category
+            CreateMap<Category, CategoryDto>()
+                .ReverseMap();
+
+            //Brand
+            CreateMap<Brand, BrandDto>()
+                .ForMember(
+                    dest => dest.BrandLogo,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.ImageUrl : string.Empty
+                        )
+                )
+                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
         }
     }
 }

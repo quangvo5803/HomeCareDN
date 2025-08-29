@@ -22,6 +22,55 @@ namespace DataAccess.Migrations.ApplicationDb
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
+                {
+                    b.Property<Guid>("BrandID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BrandDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BrandDescriptionEN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("BrandLogoID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BrandNameEN")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("BrandID");
+
+                    b.HasIndex("BrandLogoID");
+
+                    b.ToTable("Brands");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
+                {
+                    b.Property<Guid>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CategoryNameEN")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CategoryID");
+
+                    b.ToTable("Categories");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Property<Guid>("ContractorApplicationID")
@@ -61,6 +110,9 @@ namespace DataAccess.Migrations.ApplicationDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("BrandID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("ContractorApplicationID")
                         .HasColumnType("uniqueidentifier");
 
@@ -82,10 +134,15 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ImageID");
-                    b.HasIndex("MaterialID");
+
                     b.HasIndex("ContractorApplicationID");
+
+                    b.HasIndex("MaterialID");
+
                     b.HasIndex("ServiceID");
+
                     b.HasIndex("ServiceRequestID");
+
                     b.ToTable("Images");
                 });
 
@@ -95,12 +152,19 @@ namespace DataAccess.Migrations.ApplicationDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("BrandID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CategoryID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Unit")
                         .HasColumnType("nvarchar(max)");
@@ -113,19 +177,28 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialID");
+
+                    b.HasIndex("BrandID");
+
+                    b.HasIndex("CategoryID");
+
                     b.ToTable("Materials");
                 });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
                     b.Property<Guid>("ServiceID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("BuildingType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("BuildingType")
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -135,14 +208,12 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Property<double>("PriceEsstimate")
                         .HasColumnType("float");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ServiceType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceID");
+
                     b.ToTable("Services");
                 });
 
@@ -200,6 +271,15 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.ToTable("ServiceRequests");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.Image", "LogoImage")
+                        .WithMany()
+                        .HasForeignKey("BrandLogoID");
+
+                    b.Navigation("LogoImage");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
@@ -211,12 +291,13 @@ namespace DataAccess.Migrations.ApplicationDb
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.Material", null)
-                        .WithMany("Images")
-                        .HasForeignKey("MaterialID");
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
                         .WithMany("Images")
                         .HasForeignKey("ContractorApplicationID");
+
+                    b.HasOne("DataAccess.Entities.Application.Material", null)
+                        .WithMany("Images")
+                        .HasForeignKey("MaterialID");
 
                     b.HasOne("DataAccess.Entities.Application.Service", null)
                         .WithMany("Images")
@@ -227,11 +308,41 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasForeignKey("ServiceRequestID");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b => 
+            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.Brand", "Brand")
+                        .WithMany("Materials")
+                        .HasForeignKey("BrandID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entities.Application.Category", "Category")
+                        .WithMany("Materials")
+                        .HasForeignKey("CategoryID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Brand");
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
+                {
+                    b.Navigation("Materials");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
+                {
+                    b.Navigation("Materials");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Navigation("Images");
                 });
-            modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
                 {
                     b.Navigation("Images");
                 });

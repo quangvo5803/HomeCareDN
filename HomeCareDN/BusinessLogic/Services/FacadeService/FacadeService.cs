@@ -17,6 +17,8 @@ namespace BusinessLogic.Services.FacadeService
         public IMaterialService MaterialService { get; }
         public IServicesService ServicesService { get; }
         public IContractorApplicationService ContractorApplicationService { get; }
+        public ICategoryService CategoryService { get; }
+        public IBrandService BrandService { get; }
 
         public FacadeService(
             IUnitOfWork unitOfWork,
@@ -33,6 +35,8 @@ namespace BusinessLogic.Services.FacadeService
             MaterialService = new MaterialService(_unitOfWork, _mapper);
             ServicesService = new ServicesService(_unitOfWork, _mapper);
             ContractorApplicationService = new ContractorApplicationService(_unitOfWork, _mapper);
+            CategoryService = new CategoryService(_unitOfWork, _mapper);
+            BrandService = new BrandService(_unitOfWork, _mapper);
         }
     }
 }

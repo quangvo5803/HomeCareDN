@@ -1,15 +1,19 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Azure;
 using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email.Interface;
+using Ultitity.Exceptions;
+using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -19,25 +23,37 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        private const int AccessTokenMinutes = 5;
+        private const int RefreshTokenDays = 7;
+        private const int OtpExpiryMinutes = 5;
+        private const int OtpThrottleSeconds = 60;
 
         public AuthorizeService(
             IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             IEmailQueue emailQueue,
-            IRefreshTokenRepository refreshTokenRepository
+            IRefreshTokenRepository refreshTokenRepository,
+            IHttpContextAccessor httpContextAccessor
         )
         {
             _configuration = configuration;
             _userManager = userManager;
             _emailQueue = emailQueue;
             _refreshTokenRepository = refreshTokenRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+        #region OTP
 
         public async Task SendLoginOtpAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                throw new InvalidOperationException("Email chưa được đăng ký.");
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]> { { "Account", new[] { "LOGIN_NOT_FOUND" } } }
+                );
 
             await SendOtpInternalAsync(user, "Login");
         }
@@ -49,43 +65,57 @@ namespace BusinessLogic.Services
             {
                 user = new ApplicationUser
                 {
+                    Email = email,
                     UserName = email,
                     FullName = fullName,
-                    Email = email,
                 };
                 await _userManager.CreateAsync(user);
                 await _userManager.AddToRoleAsync(user, "Customer");
+            }
+
+            if (!user.EmailConfirmed)
+            {
                 await SendOtpInternalAsync(user, "Register");
             }
             else
             {
-                if (!user.EmailConfirmed)
-                {
-                    await SendOtpInternalAsync(user, "Register");
-                }
-                else
-                {
-                    throw new InvalidOperationException(
-                        "Email đã được đăng ký và xác minh trước đó."
-                    );
-                }
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "REGISTER_ALREADY_EXISTS" } },
+                    }
+                );
             }
         }
 
         private async Task SendOtpInternalAsync(ApplicationUser user, string purpose)
         {
-            if (DateTime.UtcNow.AddMinutes(2) > user.OTPExpiresAt)
-                throw new InvalidOperationException("Bạn chỉ có thể yêu cầu mã mới sau 2 phút.");
+            if (
+                user.LastOTPSentAt.HasValue
+                && DateTime.UtcNow < user.LastOTPSentAt.Value.AddSeconds(OtpThrottleSeconds)
+            )
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "OTP_REQUEST_TOO_FREQUENT" } },
+                    }
+                );
 
-            var otp = new Random().Next(100000, 999999).ToString();
-            user.CurrentOTP = otp;
-            user.OTPExpiresAt = DateTime.UtcNow.AddMinutes(5);
+            // Tạo OTP
+            var otpBytes = new byte[4];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(otpBytes);
+            var otp = BitConverter.ToUInt32(otpBytes, 0) % 1000000;
+            user.CurrentOTP = otp.ToString("D6");
+            user.OTPExpiresAt = DateTime.UtcNow.AddMinutes(OtpExpiryMinutes);
+            user.LastOTPSentAt = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
 
+            // Gửi Email
             var subject =
                 purpose == "Login"
-                    ? "Đăng nhập HomeCareDN: Đây là mã xác minh gồm 6 chữ số mà bạn đã yêu cầu"
-                    : "Đăng kí HomeCareDN: Đây là mã xác minh gồm 6 chữ số mà bạn đã yêu cầu";
+                    ? "Đăng nhập HomeCareDN: Mã xác minh 6 chữ số"
+                    : "Đăng ký HomeCareDN: Mã xác minh 6 chữ số";
             string purposeContent =
                 purpose == "Login"
                     ? "Bạn đã yêu cầu mã xác minh để đăng nhập vào HomeCareDN. Vui lòng nhập mã dưới đây để tiếp tục."
@@ -117,89 +147,177 @@ namespace BusinessLogic.Services
                 + $"</table>"
                 + $"</td></tr>"
                 + $"</table>";
-            if (user.Email != null)
-            {
+
+            if (!string.IsNullOrEmpty(user.Email))
                 _emailQueue.QueueEmail(user.Email, subject, htmlMessage);
-            }
         }
 
         public async Task<TokenResponseDto> VerifyOtpAsync(string email, string otp)
         {
             var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null || user.CurrentOTP != otp || user.OTPExpiresAt < DateTime.UtcNow)
-            {
-                throw new Exception(
-                    "Người dùng không tồn tại hoặc mã OTP đã hết hạn hoặc không chính xác."
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "OTP_INVALID_OR_EXPIRED" } },
+                    }
                 );
-            }
+
             user.CurrentOTP = null;
             user.OTPExpiresAt = null;
             user.EmailConfirmed = true;
-            var accessToken = await GenerateToken(user);
-            var refreshToken = GenerateRefeshToken();
+
+            // Xóa refresh token cũ
+            var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
+            if (oldToken != null)
+                await _refreshTokenRepository.DeleteAsync(oldToken);
+
+            // Tạo token mới
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var refreshToken = GenerateRefreshToken();
             var rt = new RefreshToken
             {
                 Token = refreshToken,
                 UserId = user.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
+                ExpiresAt = DateTime.UtcNow.AddDays(RefreshTokenDays),
             };
-            var token = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
-            if (token != null)
-            {
-                await _refreshTokenRepository.DeleteAsync(token);
-            }
             await _refreshTokenRepository.AddAsync(rt);
             await _userManager.UpdateAsync(user);
+
+            // Gửi cookie HttpOnly
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                    Path = "/",
+                }
+            );
+
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ khớp với JWT
+                UserId = user.Id,
             };
         }
 
-        public async Task<TokenResponseDto> RefreshTokenAsync(string refreshToken)
+        #endregion
+
+        #region Token
+
+        public async Task<TokenResponseDto> RefreshTokenAsync()
         {
-            var rt = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
-            if (rt == null || rt.ExpiresAt < DateTime.UtcNow)
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(cookieToken))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
+            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            var user = await _userManager.FindByIdAsync(refreshToken.UserId);
+
+            if (user == null || !user.EmailConfirmed)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            // Tạo access token mới
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+            // Gia hạn refresh token nếu còn < 1 ngày
+            if ((refreshToken.ExpiresAt - DateTime.UtcNow).TotalDays < 1)
             {
-                throw new Exception("Refresh token không hợp lệ hoặc đã hết hạn.");
+                var newRefreshToken = GenerateRefreshToken();
+                refreshToken.PatchFrom(newRefreshToken);
+                await _refreshTokenRepository.UpdateAsync(refreshToken);
+
+                _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                    "refreshToken",
+                    newRefreshToken,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                        Path = "/",
+                    }
+                );
             }
-            await _refreshTokenRepository.DeleteAsync(rt);
-            var user = await _userManager.FindByIdAsync(rt.UserId);
-            var newAccessToken = await GenerateToken(user);
-            var newRefreshToken = GenerateRefeshToken();
-            var newRt = new RefreshToken
-            {
-                Token = newRefreshToken,
-                UserId = user.Id,
-                ExpiresAt = DateTime.UtcNow.AddDays(7),
-            };
-            await _refreshTokenRepository.AddAsync(newRt);
+
             return new TokenResponseDto
             {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken,
-                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(30),
+                AccessToken = accessToken,
+                RefreshToken = refreshToken.Token,
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ không random nữa
+                UserId = user.Id,
             };
         }
+
+        #endregion
+        public async Task Logout()
+        {
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(cookieToken))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
+            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                    }
+                );
+
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                "refreshToken",
+                "",
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // bắt buộc khi HTTPS
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
+                }
+            );
+        }
+
+        #region JWT
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
             var claims = await GetClaims(user);
             var tokenOptions = GenerateTokenOptions(claims);
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
-            return tokenString;
-        }
-
-        public string GenerateRefeshToken()
-        {
-            var randomNumber = new byte[64];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-            }
-            return Convert.ToBase64String(randomNumber);
+            return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
         }
 
         private async Task<List<Claim>> GetClaims(ApplicationUser user)
@@ -209,12 +327,10 @@ namespace BusinessLogic.Services
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
             var roles = await _userManager.GetRolesAsync(user);
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
             return claims;
         }
 
@@ -223,15 +339,26 @@ namespace BusinessLogic.Services
             var key = new SymmetricSecurityKey(
                 System.Text.Encoding.UTF8.GetBytes(_configuration["JWT:Key"])
             );
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            return new JwtSecurityToken(
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
-                claims,
-                expires: DateTime.Now.AddMinutes(30),
-                signingCredentials: credentials
+                claims: claims,
+                expires: DateTime
+                    .UtcNow.AddMinutes(AccessTokenMinutes)
+                    .AddSeconds(Random.Shared.Next(-30, 31)),
+                signingCredentials: creds
             );
-            return token;
         }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        #endregion
     }
 }

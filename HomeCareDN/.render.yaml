@@ -5,5 +5,5 @@ services:
     region: singapore
     plan: free
     branch: develop
-    rootDir: HomeCareDN/HomeCareDNAPI
+    rootDir: HomeCareDN
     autoDeploy: true

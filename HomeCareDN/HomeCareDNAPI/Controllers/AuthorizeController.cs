@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI.Controllers
 {
@@ -37,10 +38,17 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        public async Task<IActionResult> RefreshToken()
         {
-            var tokens = await _authorizeService.RefreshTokenAsync(dto.RefreshToken);
-            return Ok(tokens);
+            var tokenResponse = await _authorizeService.RefreshTokenAsync();
+            return Ok(tokenResponse);
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _authorizeService.Logout();
+            return Ok();
         }
     }
 }
