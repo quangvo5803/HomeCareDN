@@ -51,7 +51,6 @@ namespace Ultitity.Extensions
                 catch
                 {
                     // Bỏ qua nếu không convert được (hoặc log nếu muốn)
-                    continue;
                 }
             }
         }
