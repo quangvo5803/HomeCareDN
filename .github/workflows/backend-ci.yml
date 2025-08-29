@@ -2,14 +2,37 @@ name: Backend CI
 
 on:
   push:
-    branches: [ develop ]
+    branches:
+      - '**' # chạy trên tất cả các nhánh khi push
   pull_request:
-    branches: [ develop ]
+    branches:
+      - develop
+      - main
 
 jobs:
-  build-and-test:
+  sonar:
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          args: >
+            -Dsonar.projectKey=quangvo5803_HomeCareDN
+            -Dsonar.organization=quangvo5803
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build-and-test:
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
