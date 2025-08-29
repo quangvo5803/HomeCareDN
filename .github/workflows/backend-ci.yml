@@ -22,7 +22,7 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+	uses: SonarSource/sonarcloud-github-action@3f5b41d6a893a7a01d13c4a564376efbbec8c28b
         with:
           args: >
             -Dsonar.projectKey=quangvo5803_HomeCareDN
