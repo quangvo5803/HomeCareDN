@@ -12,10 +12,10 @@ namespace DataAccess.Data
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
-            builder
+            base.OnModelCreating(modelBuilder);
+            modelBuilder
                 .Entity<IdentityRole>()
                 .HasData(
                     new IdentityRole

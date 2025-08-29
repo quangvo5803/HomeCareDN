@@ -2,7 +2,7 @@
 
 namespace BusinessLogic.DTOs.Authorize
 {
-    public class VerifyOTPRequestDto
+    public class VerifyOtpRequestDto
     {
         [Required]
         public required string Email { get; set; }
