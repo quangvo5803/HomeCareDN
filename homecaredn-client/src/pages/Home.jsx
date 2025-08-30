@@ -917,5 +917,4 @@ function Reveal({ children }) {
 }
 Reveal.propTypes = {
   children: PropTypes.node.isRequired,
-  className: PropTypes.string,
 };

@@ -42,7 +42,7 @@ namespace Ultitity.Email
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Email sending failed: {message}", ex.Message);
+                _logger.LogError(ex, "Email sending failed: {Message}", ex.Message);
                 throw new InvalidOperationException($"Email sending failed: {ex.Message}", ex);
             }
         }

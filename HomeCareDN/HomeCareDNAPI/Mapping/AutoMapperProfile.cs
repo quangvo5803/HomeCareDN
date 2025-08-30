@@ -102,7 +102,7 @@ namespace HomeCareDNAPI.Mapping
         // ------------------------
         // Helper method for ImageUrls
         // ------------------------
-        private List<string> ImagesToUrls(IEnumerable<Image>? images)
+        private static List<string> ImagesToUrls(IEnumerable<Image>? images)
         {
             return images?.Select(i => i.ImageUrl).ToList() ?? new List<string>();
         }

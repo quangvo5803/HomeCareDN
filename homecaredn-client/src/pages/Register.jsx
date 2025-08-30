@@ -74,21 +74,17 @@ export default function Register() {
         <div className="w-full md:w-1/2 p-8 md:p-12 flex items-center justify-center">
           <div className="max-w-sm mx-auto w-full">
             {/* Mobile Banner */}
-            <div
-              className="md:hidden text-center mb-8 cursor-pointer"
+            <button
+              type="button"
+              className="md:hidden text-center mb-8 cursor-pointer p-0 border-0 bg-transparent"
               onClick={() => navigate('/Home')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') navigate('/Home');
-              }}
             >
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
                 alt="HomeCareDN Banner"
                 className="max-w-full h-auto object-contain transition-transform duration-300 transform hover:scale-105"
               />
-            </div>
+            </button>
 
             {/* Centered Title and Subtitle */}
             <div className="text-center mb-8">
@@ -230,21 +226,17 @@ export default function Register() {
         </div>
 
         {/* Right Side - Banner Image */}
-        <div
+        <button
+          type="button"
           className="hidden md:flex md:w-1/2 bg-white items-center justify-center p-8 cursor-pointer"
           onClick={() => navigate('/Home')}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') navigate('/Home');
-          }}
         >
           <img
             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
             alt="HomeCareDN Banner"
             className="max-w-full h-auto object-contain transition-transform duration-300 transform hover:scale-105"
           />
-        </div>
+        </button>
       </div>
     </div>
   );
