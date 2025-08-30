@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import AuthContext from './AuthContext';
 import { authService } from '../services/authService';
+import PropTypes from 'prop-types';
 
 export default function AuthProvider({ children }) {
   const navigate = useNavigate();
@@ -121,3 +122,7 @@ export default function AuthProvider({ children }) {
     </AuthContext.Provider>
   );
 }
+// PropTypes
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

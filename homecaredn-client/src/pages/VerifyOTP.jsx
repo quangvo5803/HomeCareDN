@@ -85,12 +85,17 @@ export default function VerifyOTP() {
         <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
           {/* Logo */}
           <div className="text-center mb-8">
-            <img
-              src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
-              alt="HomeCareOn"
-              className="h-16 mx-auto mb-4 cursor-pointer transition-transform duration-300 transform hover:scale-110"
+            <button
               onClick={() => navigate('/Home')}
-            />
+              className="p-0 border-0 bg-transparent cursor-pointer"
+              aria-label="Go to Home"
+            >
+              <img
+                src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
+                alt="HomeCareOn"
+                className="h-16 mx-auto mb-4 transition-transform duration-300 transform hover:scale-110"
+              />
+            </button>
           </div>
 
           {/* Title */}

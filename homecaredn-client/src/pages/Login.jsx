@@ -64,12 +64,19 @@ export default function Login() {
       {/* Main Login Container */}
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full flex relative z-10">
         {/* Left Side - Banner Image */}
-        <div className="hidden md:flex md:w-1/2 bg-white items-center justify-center p-8">
+        <div
+          className="hidden md:flex md:w-1/2 bg-white items-center justify-center p-8 cursor-pointer"
+          onClick={() => navigate('/Home')}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') navigate('/Home');
+          }}
+        >
           <img
             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
             alt="HomeCareDN Banner"
-            className="max-w-full h-auto object-contain cursor-pointer transition-transform duration-300 transform hover:scale-105"
-            onClick={() => navigate('/Home')}
+            className="max-w-full h-auto object-contain transition-transform duration-300 transform hover:scale-105"
           />
         </div>
 
@@ -77,12 +84,19 @@ export default function Login() {
         <div className="w-full md:w-1/2 p-8 md:p-12 flex items-center justify-center">
           <div className="max-w-sm mx-auto w-full">
             {/* Mobile Banner */}
-            <div className="md:hidden text-center mb-8">
+            <div
+              className="md:hidden text-center mb-8 cursor-pointer"
+              onClick={() => navigate('/Home')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') navigate('/Home');
+              }}
+            >
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749217489/loginBanner_vsrezl.png"
                 alt="HomeCareDN Banner"
-                className="max-w-full h-auto object-contain cursor-pointer transition-transform duration-300 transform hover:scale-105"
-                onClick={() => navigate('/Home')}
+                className="max-w-full h-auto object-contain transition-transform duration-300 transform hover:scale-105"
               />
             </div>
 

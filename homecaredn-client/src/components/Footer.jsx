@@ -52,7 +52,7 @@ export default function Footer() {
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.about')}
@@ -61,7 +61,7 @@ export default function Footer() {
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.contact')}
@@ -70,7 +70,7 @@ export default function Footer() {
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.services')}
@@ -79,7 +79,7 @@ export default function Footer() {
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.terms')}
@@ -88,7 +88,7 @@ export default function Footer() {
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.support')}
