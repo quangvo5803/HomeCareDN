@@ -63,7 +63,11 @@ export const BrandProvider = ({ children }) => {
         setBrands((prev) =>
           prev.map((b) =>
             b.brandID === updated.brandID
-              ? { ...b, ...updated, image: updated.image ?? b.image }
+              ? {
+                  ...b,
+                  ...updated,
+                  brandLogo: updated.brandLogo ?? b.brandLogo,
+                }
               : b
           )
         );

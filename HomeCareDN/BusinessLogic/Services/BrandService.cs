@@ -88,8 +88,9 @@ namespace BusinessLogic.Services
         public async Task<BrandDto> UpdateBrandAsync(BrandUpdateRequestDto requestDto)
         {
             var errors = new Dictionary<string, string[]>();
-            var brand = await _unitOfWork.BrandRepository.GetAsync(b =>
-                b.BrandID == requestDto.BrandID
+            var brand = await _unitOfWork.BrandRepository.GetAsync(
+                b => b.BrandID == requestDto.BrandID,
+                includeProperties: "LogoImage,Materials"
             );
             if (brand == null)
             {

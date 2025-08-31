@@ -58,9 +58,9 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
 
     const data = {
       BrandName: brandName,
-      BrandDescription: brandDescription,
-      BrandNameEN: brandNameEN,
-      brandDescriptionEN: brandDescriptionEN,
+      BrandDescription: brandDescription || null,
+      BrandNameEN: brandNameEN || null,
+      BrandDescriptionEN: brandDescriptionEN || null,
     };
 
     // Nếu edit thì giữ brandID
