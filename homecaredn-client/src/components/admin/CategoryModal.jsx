@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 
 export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   const { t } = useTranslation();
@@ -113,3 +114,19 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
     </div>
   );
 }
+// PropTypes
+CategoryModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  category: PropTypes.shape({
+    categoryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    categoryName: PropTypes.string,
+    categoryNameEN: PropTypes.string,
+  }),
+};
+
+// Default props
+CategoryModal.defaultProps = {
+  category: null,
+};

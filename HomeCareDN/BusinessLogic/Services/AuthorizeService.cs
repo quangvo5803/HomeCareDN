@@ -30,6 +30,10 @@ namespace BusinessLogic.Services
         private const int OtpExpiryMinutes = 5;
         private const int OtpThrottleSeconds = 60;
 
+        private const string ACCOUNT_STR = "Account";
+        private const string REFRESH_TOKEN_STR = "refreshToken";
+        private const string LOGIN_TOKEN_EXPIRED_STR = "LOGIN_TOKEN_EXPIRED";
+
         public AuthorizeService(
             IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
@@ -52,7 +56,10 @@ namespace BusinessLogic.Services
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
                 throw new CustomValidationException(
-                    new Dictionary<string, string[]> { { "Account", new[] { "LOGIN_NOT_FOUND" } } }
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { "LOGIN_NOT_FOUND" } },
+                    }
                 );
 
             await SendOtpInternalAsync(user, "Login");
@@ -82,7 +89,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "REGISTER_ALREADY_EXISTS" } },
+                        { ACCOUNT_STR, new[] { "REGISTER_ALREADY_EXISTS" } },
                     }
                 );
             }
@@ -97,7 +104,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "OTP_REQUEST_TOO_FREQUENT" } },
+                        { ACCOUNT_STR, new[] { "OTP_REQUEST_TOO_FREQUENT" } },
                     }
                 );
 
@@ -159,7 +166,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "OTP_INVALID_OR_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { "OTP_INVALID_OR_EXPIRED" } },
                     }
                 );
 
@@ -187,7 +194,7 @@ namespace BusinessLogic.Services
 
             // Gửi cookie HttpOnly
             _httpContextAccessor.HttpContext.Response.Cookies.Append(
-                "refreshToken",
+                REFRESH_TOKEN_STR,
                 refreshToken,
                 new CookieOptions
                 {
@@ -214,12 +221,12 @@ namespace BusinessLogic.Services
 
         public async Task<TokenResponseDto> RefreshTokenAsync()
         {
-            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
             if (string.IsNullOrEmpty(cookieToken))
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -228,7 +235,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -238,7 +245,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -254,7 +261,7 @@ namespace BusinessLogic.Services
                 await _refreshTokenRepository.UpdateAsync(refreshToken);
 
                 _httpContextAccessor.HttpContext.Response.Cookies.Append(
-                    "refreshToken",
+                    REFRESH_TOKEN_STR,
                     newRefreshToken,
                     new CookieOptions
                     {
@@ -279,12 +286,12 @@ namespace BusinessLogic.Services
         #endregion
         public async Task Logout()
         {
-            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies["refreshToken"];
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
             if (string.IsNullOrEmpty(cookieToken))
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -293,13 +300,13 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Account", new[] { "LOGIN_TOKEN_EXPIRED" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
             await _refreshTokenRepository.DeleteAsync(refreshToken);
             _httpContextAccessor.HttpContext.Response.Cookies.Append(
-                "refreshToken",
+                REFRESH_TOKEN_STR,
                 "",
                 new CookieOptions
                 {
@@ -337,7 +344,7 @@ namespace BusinessLogic.Services
         private JwtSecurityToken GenerateTokenOptions(List<Claim> claims)
         {
             var key = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(_configuration["JWT:Key"])
+                System.Text.Encoding.UTF8.GetBytes(_configuration["JWT:Key"]) // NOSONAR
             );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             return new JwtSecurityToken(
@@ -351,7 +358,7 @@ namespace BusinessLogic.Services
             );
         }
 
-        public string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
             using var rng = RandomNumberGenerator.Create();

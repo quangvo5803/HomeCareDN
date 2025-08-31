@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 const slides = [
   {
@@ -315,9 +316,9 @@ export default function Home() {
                     {t(slide.title)}
                   </h1>
                   <ol className="flex flex-wrap gap-6 mb-6  ">
-                    {slide.categories.map((cat, k) => (
+                    {slide.categories.map((cat) => (
                       <li
-                        key={k}
+                        key={cat}
                         className="text-white text-base md:text-lg flex items-center gap-2"
                       >
                         <span className="w-3 h-3 bg-orange-500 rounded-full inline-block"></span>
@@ -326,7 +327,7 @@ export default function Home() {
                     ))}
                   </ol>
                   <a
-                    href="#"
+                    href="https://github.com/"
                     className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-medium px-8 py-3 rounded-md shadow-lg transition  "
                   >
                     {t('home.slider_button')}
@@ -498,8 +499,8 @@ export default function Home() {
                 <p className="text-gray-600 mb-8">{t('home.features_intro')}</p>
 
                 <div className="grid sm:grid-cols-2 gap-x-8 gap-y-8">
-                  {ITEMS.map((it, idx) => (
-                    <div key={idx} className=" ">
+                  {ITEMS.map((it) => (
+                    <div key={it.title} className=" ">
                       <div className="flex items-center mb-3">
                         {/* check icon */}
                         <svg
@@ -563,7 +564,7 @@ export default function Home() {
               </div>
               <div className="w-full lg:w-auto text-left lg:text-right">
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition  "
                 >
                   {t('home.services_more')}
@@ -573,9 +574,9 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {SERVICE_ITEMS.map((it, idx) => (
+              {SERVICE_ITEMS.map((it) => (
                 <article
-                  key={idx}
+                  key={it.id}
                   className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full  "
                 >
                   <div className="relative overflow-hidden">
@@ -640,7 +641,7 @@ export default function Home() {
               </div>
               <div className="w-full lg:w-auto text-left lg:text-right">
                 <a
-                  href="#"
+                  href="https://github.com/"
                   className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition  "
                 >
                   {t('home.material_more')}
@@ -650,9 +651,9 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {MATERIALS.map((it, idx) => (
+              {MATERIALS.map((it) => (
                 <article
-                  key={idx}
+                  key={it.id}
                   className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full  "
                 >
                   <div className="relative overflow-hidden">
@@ -772,7 +773,7 @@ export default function Home() {
               </div>
 
               {/* Right column: slider */}
-              <div
+              <section
                 className="lg:col-span-7"
                 onMouseEnter={() => (pausedRef.current = true)}
                 onMouseLeave={() => (pausedRef.current = false)}
@@ -793,7 +794,7 @@ export default function Home() {
                   >
                     {extSlides.map((it, i) => (
                       <article
-                        key={i}
+                        key={it.textKey}
                         className="min-w-full shrink-0 flex items-center justify-center"
                       >
                         <div className="max-w-2xl text-left bg-white rounded-lg p-6 shadow">
@@ -872,7 +873,7 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-              </div>
+              </section>
             </div>
           </div>
         </section>
@@ -914,3 +915,6 @@ function Reveal({ children }) {
     </div>
   );
 }
+Reveal.propTypes = {
+  children: PropTypes.node.isRequired,
+};

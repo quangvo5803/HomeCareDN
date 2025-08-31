@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.ContractorApplication;
@@ -14,82 +16,56 @@ namespace HomeCareDNAPI.Mapping
     {
         public AutoMapperProfile()
         {
+            // ------------------------
             // Enum to string mapping
-            CreateMap<ServiceType, string>()
-                .ConvertUsing(src => src.GetDisplayName());
-            CreateMap<PackageOption, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<BuildingType, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            // ------------------------
+            MapEnumsToString();
 
-            // ServiceRequest Create
+            // ------------------------
+            // Create/Update DTO -> Entity (Write)
+            // ------------------------
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            //Service Create
             CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            // ContractorApplication Create
             CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            // Material Create
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            //Category Create
             CreateMap<CategoryCreateRequestDto, Category>();
-            //Brand Create
+
             CreateMap<BrandCreateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
-            // Complex mapping (Response)
-
-            // ServiceRequest
+            // ------------------------
+            // Entity -> DTO (Read / Response)
+            // ------------------------
             CreateMap<ServiceRequest, ServiceRequestDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
-                    opt =>
-                        opt.MapFrom(src =>
-                            src.Images != null
-                                ? src.Images.Select(i => i.ImageUrl).ToList()
-                                : new List<string>()
-                        )
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
-            //Service
+
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
-                    opt =>
-                        opt.MapFrom(src =>
-                            src.Images != null
-                                ? src.Images.Select(i => i.ImageUrl).ToList()
-                                : new List<string>()
-                        )
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
-            // ContractorApplication
+
             CreateMap<ContractorApplication, ContractorApplicationDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
-                    opt =>
-                        opt.MapFrom(src =>
-                            src.Images != null
-                                ? src.Images.Select(i => i.ImageUrl).ToList()
-                                : new List<string>()
-                        )
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
-            // Material
+
             CreateMap<Material, MaterialDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
-                    opt =>
-                        opt.MapFrom(src =>
-                            src.Images != null
-                                ? src.Images.Select(i => i.ImageUrl).ToList()
-                                : new List<string>()
-                        )
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )
                 .ForMember(
                     dest => dest.BrandName,
@@ -97,11 +73,8 @@ namespace HomeCareDNAPI.Mapping
                         opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
                 );
 
-            //Category
-            CreateMap<Category, CategoryDto>()
-                .ReverseMap();
+            CreateMap<Category, CategoryDto>().ReverseMap();
 
-            //Brand
             CreateMap<Brand, BrandDto>()
                 .ForMember(
                     dest => dest.BrandLogo,
@@ -111,6 +84,27 @@ namespace HomeCareDNAPI.Mapping
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+        }
+
+        // ------------------------
+        // Helper method for enums
+        // ------------------------
+        private void MapEnumsToString()
+        {
+            CreateMap<ServiceType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PackageOption, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<BuildingType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
+        }
+
+        // ------------------------
+        // Helper method for ImageUrls
+        // ------------------------
+        private static List<string> ImagesToUrls(IEnumerable<Image>? images)
+        {
+            return images?.Select(i => i.ImageUrl).ToList() ?? new List<string>();
         }
     }
 }
