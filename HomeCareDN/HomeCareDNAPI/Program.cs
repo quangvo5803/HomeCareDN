@@ -18,7 +18,7 @@ using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

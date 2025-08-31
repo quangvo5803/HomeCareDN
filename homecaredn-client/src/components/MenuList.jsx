@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../services/authService';
 import AuthContext from '../context/AuthContext';
+import PropTypes from 'prop-types';
 
 export default function Sidebar({
   serviceRequestsCount = 0,
@@ -24,44 +25,44 @@ export default function Sidebar({
       {
         key: 'dashboard',
         label: t('partnerDashboard.dashboard'),
-        icon: <i class="fa-solid fa-house"></i>,
+        icon: <i className="fa-solid fa-house"></i>,
         to: '/contractor',
       },
       {
         key: 'service_requests',
         label: t('partnerDashboard.service_requests'),
-        icon: <i class="fa-solid fa-calendar"></i>,
+        icon: <i className="fa-solid fa-calendar"></i>,
         to: '/service-requests',
         badge: serviceRequestsCount,
       },
       {
         key: 'applications',
         label: t('partnerDashboard.my_applications'),
-        icon: <i class="fa-solid fa-calendar-check"></i>,
+        icon: <i className="fa-solid fa-calendar-check"></i>,
         to: '/applications',
       },
       {
         key: 'payments',
         label: t('partnerDashboard.commission_payments'),
-        icon: <i class="fa-solid fa-money-bill"></i>,
+        icon: <i className="fa-solid fa-money-bill"></i>,
         to: '/payments',
       },
       {
         key: 'reviews',
         label: t('partnerDashboard.reviews'),
-        icon: <i class="fa-solid fa-star"></i>,
+        icon: <i className="fa-solid fa-star"></i>,
         to: '/reviews',
       },
       {
         key: 'profile',
         label: t('partnerDashboard.profile_management'),
-        icon: <i class="fa-solid fa-user-tie"></i>,
+        icon: <i className="fa-solid fa-user-tie"></i>,
         to: '/profile',
       },
       {
         key: 'logout',
         label: t('header.logout'),
-        icon: <i class="fa-solid fa-right-from-bracket text-red-500"></i>,
+        icon: <i className="fa-solid fa-right-from-bracket text-red-500"></i>,
         onClick: () => {
           if (typeof ctxLogout === 'function') ctxLogout();
           authService.logout();
@@ -141,3 +142,12 @@ export default function Sidebar({
     </aside>
   );
 }
+Sidebar.propTypes = {
+  serviceRequestsCount: PropTypes.number,
+  className: PropTypes.string,
+  brand: PropTypes.shape({
+    logoUrl: PropTypes.string,
+    title: PropTypes.string,
+    subtitleKey: PropTypes.string,
+  }),
+};

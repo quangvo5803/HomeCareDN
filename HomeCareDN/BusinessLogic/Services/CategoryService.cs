@@ -45,12 +45,6 @@ namespace BusinessLogic.Services
 
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
-            var errors = new Dictionary<string, string[]>();
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
-            }
-
             var rsMapper = _mapper.Map<Category>(requestDto);
 
             await _unitOfWork.CategoryRepository.AddAsync(rsMapper);
@@ -72,11 +66,6 @@ namespace BusinessLogic.Services
                     "CategoryID",
                     new[] { $"Category request with ID {requestDto.CategoryID} not found." }
                 );
-                throw new CustomValidationException(errors);
-            }
-
-            if (errors.Any())
-            {
                 throw new CustomValidationException(errors);
             }
             category.PatchFrom(requestDto);

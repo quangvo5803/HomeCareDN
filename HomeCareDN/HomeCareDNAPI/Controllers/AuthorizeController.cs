@@ -31,7 +31,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("verify-otp")]
-        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOTPRequestDto dto)
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequestDto dto)
         {
             var tokens = await _authorizeService.VerifyOtpAsync(dto.Email, dto.OTP);
             return Ok(tokens);

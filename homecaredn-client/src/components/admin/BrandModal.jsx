@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 
 export default function BrandModal({ isOpen, onClose, onSave, brand }) {
   const { t } = useTranslation();
@@ -57,9 +58,9 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
 
     const data = {
       BrandName: brandName,
-      BrandDescription: brandDescription,
-      BrandNameEN: brandNameEN,
-      brandDescription: brandDescriptionEN,
+      BrandDescription: brandDescription || null,
+      BrandNameEN: brandNameEN || null,
+      BrandDescriptionEN: brandDescriptionEN || null,
     };
 
     // Nếu edit thì giữ brandID
@@ -210,3 +211,21 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
     </div>
   );
 }
+// PropTypes
+BrandModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  brand: PropTypes.shape({
+    brandID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    brandName: PropTypes.string,
+    brandDescription: PropTypes.string,
+    brandNameEN: PropTypes.string,
+    brandDescriptionEN: PropTypes.string,
+    brandLogo: PropTypes.string,
+  }),
+};
+// Default props
+BrandModal.defaultProps = {
+  brand: null,
+};

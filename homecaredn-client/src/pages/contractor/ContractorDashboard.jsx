@@ -17,7 +17,7 @@ function formatVND(n) {
 }
 function formatDate(iso, lng) {
   const d = new Date(iso);
-  const locale = lng && lng.startsWith('vi') ? 'vi-VN' : 'en-US';
+  const locale = lng?.startsWith('vi') ? 'vi-VN' : 'en-US';
   return d.toLocaleDateString(locale, {
     day: '2-digit',
     month: 'short',
@@ -99,9 +99,8 @@ function BellIcon() {
 function LanguageSwitch() {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
-  const current = (i18n.language || 'en').startsWith('vi') ? 'vi' : 'en';
-  const flagCode = current === 'vi' ? 'VN' : 'US';
-  const label = current.toUpperCase();
+  const flagCode = i18n.language === 'vi' ? 'VN' : 'US';
+  const label = i18n.language.toUpperCase();
 
   const setLang = (lng) => {
     if (i18n.language !== lng) i18n.changeLanguage(lng);

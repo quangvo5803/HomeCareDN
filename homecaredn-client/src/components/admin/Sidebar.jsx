@@ -9,7 +9,7 @@ export default function Sidebar() {
   const handleLogout = () => {
     logout();
   };
-  var menuList = [
+  const menuList = [
     {
       icon: 'text-blue-500 fa-solid fa-tv',
       title: 'dashboard',
@@ -43,10 +43,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside
-      className="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl max-w-64 ease-nav-brand z-990 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0"
-      aria-expanded="false"
-    >
+    <aside className="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl max-w-64 ease-nav-brand z-990 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0">
       <div className="h-20 flex items-center justify-center">
         <a
           className="block m-0 text-sm whitespace-nowrap text-slate-700"
@@ -97,9 +94,8 @@ export default function Sidebar() {
             );
           })}
           <li className="mt-0.5 w-full">
-            <a
+            <button
               className="py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold text-slate-700 hover:bg-blue-100 transition-colors"
-              href=""
               onClick={handleLogout}
             >
               <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
@@ -110,7 +106,7 @@ export default function Sidebar() {
               <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">
                 {t('adminNavbar.logout')}
               </span>
-            </a>
+            </button>
           </li>
         </ul>
       </div>

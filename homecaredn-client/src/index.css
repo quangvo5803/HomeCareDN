@@ -35,7 +35,6 @@ body { font-family: var(--font-body); }
   font-family: var(--font-heading);
   color: transparent;
   -webkit-text-stroke: 2px var(--primary);
-  text-stroke: 2px var(--primary);
   line-height: .85;
 }
 

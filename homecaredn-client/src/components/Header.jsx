@@ -133,14 +133,14 @@ export default function Header() {
                         onClick={handleProfile}
                         className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                       >
-                        <i class="fa-solid fa-user me-2"></i>
+                        <i className="fa-solid fa-user me-2"></i>
                         {t('header.profile')}
                       </button>
                       <button
                         onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
                       >
-                        <i class="fa-solid fa-right-from-bracket me-2"></i>
+                        <i className="fa-solid fa-right-from-bracket me-2"></i>
                         {t('header.logout')}
                       </button>
                     </div>
@@ -208,6 +208,7 @@ export default function Header() {
             className="lg:hidden cursor-pointer p-3 hover:bg-gray-100 rounded-xl transition-all duration-200 active:scale-95"
           >
             <i className="fas fa-bars text-xl text-gray-700" />
+            <span className="sr-only">Open navigation menu</span>
           </label>
 
           {/* Mobile Menu */}
@@ -277,14 +278,14 @@ export default function Header() {
                       onClick={handleProfile}
                       className="flex-1 py-2 px-3 text-sm text-gray-700 bg-gray-50 border border-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                     >
-                      <i class="fa-solid fa-user me-2"></i>
+                      <i className="fa-solid fa-user me-2"></i>
                       {t('header.profile')}
                     </button>
                     <button
                       onClick={handleLogout}
                       className="flex-1 py-2 px-3 text-sm text-white bg-red-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                     >
-                      <i class="fa-solid fa-right-from-bracket me-2"></i>
+                      <i className="fa-solid fa-right-from-bracket me-2"></i>
                       {t('header.logout')}
                     </button>
                   </div>
