@@ -209,44 +209,45 @@
     },
     "viewAll": "View all"
   },
-  "adminBrandManager":{
-    "title":"Brand Manager",
-    "subtitle" : "Manage brand list",
+  "adminBrandManager": {
+    "title": "Brand Manager",
+    "subtitle": "Manage brand list",
     "brands": "brands",
     "no": "NO",
     "brandName": "Brand name",
     "numberOfMaterial": "Number of Material",
     "action": "Action",
     "materials": "Material(s)",
-    "noBrand" : "No brand yet",
-    "letStart" :"Start by adding your first brand.",
-    "brandModal":{
+    "noBrand": "No brand yet",
+    "letStart": "Start by adding your first brand.",
+    "brandModal": {
       "title": "Add new brand",
       "title2": "Update brand",
       "brandName": "Brand name",
       "brandNamePlaceholder": "Enter brand name...",
-      "brandDescription" : "Brand description",
+      "brandDescription": "Brand description",
       "brandDescriptionPlaceholder": "Enter brand description...",
-      "brandNameEN": "Brand name(English)",
+      "brandNameEN": "Brand name (English)",
       "brandNamePlaceholderEN": "Enter brand name in English...",
-      "brandDescriptionEN" : "Brand description(English)",
+      "brandDescriptionEN": "Brand description (English)",
       "brandDescriptionPlaceholderEN": "Enter brand description in e...",
-      "brandLogo" :"Brand logo",
-      "chooseFile": "Choose file to upload"
+      "brandLogo": "Brand logo",
+      "chooseFile": "Choose file to upload",
+      "multilanguage_for_data": " Multilanguage for data"
     }
   },
-  "adminCategoryManager":{
+  "adminCategoryManager": {
     "title": "Material Category Manager",
-    "subtitle" : "Manage material category list",
-    "categories":"category(es)",
-    "no":"NO",
+    "subtitle": "Manage material category list",
+    "categories": "category(es)",
+    "no": "NO",
     "categoryName": "Category name",
     "numberOfMaterials": "Number of Material",
     "materials": "Material(s)",
-    "action":"Action",
+    "action": "Action",
     "noCategory": "No category yes",
-    "letStart":"Start by adding your first category.",
-    "categoryModal":{
+    "letStart": "Start by adding your first category.",
+    "categoryModal": {
       "title": "Add new category",
       "title2": "Update category",
       "categoryName": "Category name",
@@ -301,24 +302,22 @@
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
     "AddNewCategory": "Add new Category",
-    "UpdateCategory" : "Update Category",
+    "UpdateCategory": "Update Category",
     "View": "View",
-    "Edit" : "Edit",
+    "Edit": "Edit",
     "Delete": "Delete",
     "Cancel": "Cancel"
   },
-  "ModalPopup":{
-    "DeleteBrandModal":{
+  "ModalPopup": {
+    "DeleteBrandModal": {
       "title": "Are you sure?",
-      "text" : "This brand will be deleted and cannot be restored!"
+      "text": "This brand will be deleted and cannot be restored!"
     },
-    "DeleteCategoryModal":
-    {
+    "DeleteCategoryModal": {
       "title": "Are you sure?",
-      "text" : "This category will be deleted and cannot be restored!"
+      "text": "This category will be deleted and cannot be restored!"
     },
-    "DeletingLoadingModal":
-    {
+    "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
     }
@@ -335,7 +334,7 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
-    "NETWORK_ERROR" : "Unable to connect to server, please try again later!",
+    "NETWORK_ERROR": "Unable to connect to server, please try again later!",
 
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",

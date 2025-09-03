@@ -205,44 +205,45 @@
     },
     "viewAll": "Xem tất cả"
   },
-  "adminBrandManager":{
-    "title":"Quản lý thương hiệu",
-    "subtitle" : "Quản lý danh sách các thương hiệu sản phẩm",
+  "adminBrandManager": {
+    "title": "Quản lý thương hiệu",
+    "subtitle": "Quản lý danh sách các thương hiệu sản phẩm",
     "brands": "thương hiệu",
     "no": "STT",
     "brandName": "Tên thương hiệu",
     "numberOfMaterial": "Số lượng sản phẩm",
     "action": "Thao tác",
     "materials": "sản phẩm",
-    "noBrand" : "Chưa có thương hiệu nào",
-    "letStart" :"Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
-    "brandModal":{
+    "noBrand": "Chưa có thương hiệu nào",
+    "letStart": "Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
+    "brandModal": {
       "title": "Thêm thương hiệu mới",
       "title2": "Cập nhật thương hiệu",
       "brandName": "Tên thương hiệu",
       "brandNamePlaceholder": "Nhập tên thương hiệu...",
-      "brandDescription" : "Mô tả thương hiệu",
+      "brandDescription": "Mô tả thương hiệu",
       "brandDescriptionPlaceholder": "Nhập mô tả thương hiệu...",
-      "brandNameEN": "Tên thương hiệu(Tiếng Anh)",
+      "brandNameEN": "Tên thương hiệu (Tiếng Anh)",
       "brandNamePlaceholderEN": "Nhập tên thương hiệu bằng tiếng Anh...",
-      "brandDescriptionEN" : "Mô tả thương hiệu(Tiếng Anh)",
+      "brandDescriptionEN": "Mô tả thương hiệu (Tiếng Anh)",
       "brandDescriptionPlaceholderEN": "Nhập mô tả thương hiệu bằng tiếng Anh...",
-      "brandLogo" :"Logo thương hiệu",
-      "chooseFile": "Chọn tệp tải lên"
+      "brandLogo": "Logo thương hiệu",
+      "chooseFile": "Chọn tệp tải lên",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu"
     }
   },
-  "adminCategoryManager":{
+  "adminCategoryManager": {
     "title": "Quản lí danh mục vật liệu",
-    "subtitle" : "Quản lí danh sác các danh mục vật liệu",
-    "categories":"danh mục",
-    "no":"STT",
+    "subtitle": "Quản lí danh sác các danh mục vật liệu",
+    "categories": "danh mục",
+    "no": "STT",
     "categoryName": "Tên danh mục",
     "numberOfMaterials": "Số lượng sản phẩm",
     "materials": "sản phẩm",
-    "action":"Thao tác",
+    "action": "Thao tác",
     "noCategory": "Chưa có danh mục nào",
-    "letStart":"Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
-    "categoryModal":{
+    "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
+    "categoryModal": {
       "title": "Thêm danh mục mới",
       "title2": "Cập nhật thương hiệu",
       "categoryName": "Tên danh mục",
@@ -296,24 +297,22 @@
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
     "AddNewCategory": "Thêm danh mục mới",
-    "UpdateCategory":"Cập nhật danh mục",
+    "UpdateCategory": "Cập nhật danh mục",
     "View": "Xem",
-    "Edit" : "Sửa",
+    "Edit": "Sửa",
     "Delete": "Xóa",
     "Cancel": "Hủy bỏ"
   },
-  "ModalPopup":{
-    "DeleteBrandModal":{
+  "ModalPopup": {
+    "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
-      "text" : "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
-    },    
-    "DeleteCategoryModal":
-    {
+      "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteCategoryModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Danh mục này sẽ bị xóa và không thể khôi phục!"
     },
-    "DeletingLoadingModal":
-    {
+    "DeletingLoadingModal": {
       "title": "Đang xóa...",
       "text": "Vui lòng chờ trong giây lát."
     }
@@ -330,8 +329,7 @@
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
-    "NETWORK_ERROR" : "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-
+    "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
