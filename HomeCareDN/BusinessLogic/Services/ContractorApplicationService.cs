@@ -20,30 +20,6 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<List<ContractorApplicationDto>> GetAllContractorApplicationsAsync(
-            ContractorApplicationGetAllRequestDto getAllRequestDto
-        )
-        {
-            var applications = await _unitOfWork.ContractorApplicationRepository.GetAllAsync(
-                getAllRequestDto.FilterOn,
-                getAllRequestDto.FilterQuery,
-                getAllRequestDto.SortBy,
-                getAllRequestDto.IsAscending,
-                getAllRequestDto.PageNumber,
-                getAllRequestDto.PageSize,
-                includeProperties: "Images"
-            );
-            if (applications == null || !applications.Any())
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ContractorApplications", new[] { "No contractor applications found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            return _mapper.Map<List<ContractorApplicationDto>>(applications);
-        }
-
         public async Task<ContractorApplicationDto> GetContractorApplicationByIdAsync(
             Guid contractorApplicationId
         )
@@ -107,14 +83,6 @@ namespace BusinessLogic.Services
             ;
             var errors = new Dictionary<string, string[]>();
 
-            if (createRequestDto == null)
-            {
-                errors.Add(
-                    "ContractorApplication",
-                    new[] { "Contractor application creation request cannot be null." }
-                );
-                throw new CustomValidationException(errors);
-            }
             if (createRequestDto.Images != null)
             {
                 if (createRequestDto.Images.Count > 5)
@@ -125,27 +93,12 @@ namespace BusinessLogic.Services
                     );
                 }
 
-                foreach (var image in createRequestDto.Images)
+                if (createRequestDto.Images.Any(image => image.Length > 5 * 1024 * 1024)) // 5 MB
                 {
-                    if (image.Length > 5 * 1024 * 1024) // 5 MB
-                    {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
-                        {
-                            if (errors.ContainsKey(nameof(createRequestDto.Images)))
-                            {
-                                var messages = errors[nameof(createRequestDto.Images)].ToList();
-                                messages.Add("Each image must be less than 5 MB.");
-                                errors[nameof(createRequestDto.Images)] = messages.ToArray();
-                            }
-                            else
-                            {
-                                errors.Add(
-                                    nameof(createRequestDto.Images),
-                                    new[] { "Each image must be less than 5 MB." }
-                                );
-                            }
-                        }
-                    }
+                    errors.Add(
+                        nameof(createRequestDto.Images),
+                        new[] { "Each image must be less than 5 MB." }
+                    );
                 }
             }
             if (errors.Any())
@@ -203,27 +156,12 @@ namespace BusinessLogic.Services
                     );
                 }
 
-                foreach (var image in updateRequestDto.Images)
+                if (updateRequestDto.Images.Any(image => image.Length > 5 * 1024 * 1024)) // 5 MB
                 {
-                    if (image.Length > 5 * 1024 * 1024) // 5 MB
-                    {
-                        if (image.Length > 5 * 1024 * 1024) // 5 MB
-                        {
-                            if (errors.ContainsKey(nameof(updateRequestDto.Images)))
-                            {
-                                var messages = errors[nameof(updateRequestDto.Images)].ToList();
-                                messages.Add("Each image must be less than 5 MB.");
-                                errors[nameof(updateRequestDto.Images)] = messages.ToArray();
-                            }
-                            else
-                            {
-                                errors.Add(
-                                    nameof(updateRequestDto.Images),
-                                    new[] { "Each image must be less than 5 MB." }
-                                );
-                            }
-                        }
-                    }
+                    errors.Add(
+                        nameof(updateRequestDto.Images),
+                        new[] { "Each image must be less than 5 MB." }
+                    );
                 }
             }
             if (errors.Any())

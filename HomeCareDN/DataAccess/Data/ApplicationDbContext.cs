@@ -1,4 +1,5 @@
-﻿using DataAccess.Entities.Application;
+﻿using System.Reflection.Emit;
+using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data
@@ -12,13 +13,13 @@ namespace DataAccess.Data
         public DbSet<ContractorApplication> ContractorApplications { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Material> Materials { get; set; }
-        public DbSet<Cart> Carts { get; set; }
-        public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Service> Services { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<ServiceRequest>(entity =>
+            modelBuilder.Entity<ServiceRequest>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();
 
@@ -31,12 +32,12 @@ namespace DataAccess.Data
                 entity.Property(e => e.DesignStyle).HasConversion<string>();
             });
 
-            builder.Entity<ContractorApplication>(entity =>
+            modelBuilder.Entity<ContractorApplication>(entity =>
             {
                 entity.Property(e => e.Status).HasConversion<string>();
             });
 
-            builder.Entity<Service>(entity =>
+            modelBuilder.Entity<Service>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();
 
@@ -44,7 +45,8 @@ namespace DataAccess.Data
 
                 entity.Property(e => e.BuildingType).HasConversion<string>();
             });
-            base.OnModelCreating(builder);
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

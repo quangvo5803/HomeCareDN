@@ -77,7 +77,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images"
+                includeProperties: "Images,Category"
             );
 
             if (material == null)
@@ -92,36 +92,11 @@ namespace BusinessLogic.Services
             return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<IEnumerable<MaterialDto>> GetAllHardMaterialAsync(
-            MaterialGetAllRequestDto requestDto
-        )
-        {
-            var materials = await _unitOfWork.MaterialRepository.GetAllAsync(
-                requestDto.FilterOn,
-                requestDto.FilterQuery,
-                requestDto.SortBy,
-                requestDto.IsAscending,
-                requestDto.PageNumber,
-                requestDto.PageSize,
-                includeProperties: "Images"
-            );
-            if (materials == null || !materials.Any())
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Material", new[] { "No material found." } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
-            return _mapper.Map<IEnumerable<MaterialDto>>(materials);
-        }
-
         public async Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images"
+                includeProperties: "Images,Category"
             );
 
             var errors = new Dictionary<string, string[]>();

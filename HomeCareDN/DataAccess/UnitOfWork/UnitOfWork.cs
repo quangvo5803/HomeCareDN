@@ -13,14 +13,14 @@ namespace DataAccess.UnitOfWork
         public IImageRepository ImageRepository { get; private set; }
         public IServiceRequestRepository ServiceRequestRepository { get; private set; }
         public IMaterialRepository MaterialRepository { get; private set; }
-        public ICartItemRepository CartItemRepository { get; }
-        public ICartRepository CartRepository { get; }
         public IServiceRepository ServiceRepository { get; private set; }
         public IContractorApplicationRepository ContractorApplicationRepository
         {
             get;
             private set;
         }
+        public ICategoryRepository CategoryRepository { get; private set; }
+        public IBrandRepository BrandRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IConfiguration configuration)
         {
@@ -29,10 +29,10 @@ namespace DataAccess.UnitOfWork
             ImageRepository = new ImageRepository(_db, _configuration);
             ServiceRequestRepository = new ServiceRequestRepository(_db);
             MaterialRepository = new MaterialRepository(_db);
-            CartItemRepository = new CartItemRepository(_db);
-            CartRepository = new CartRepository(_db);
             ServiceRepository = new ServiceRepository(_db);
             ContractorApplicationRepository = new ContractorApplicationRepository(_db);
+            CategoryRepository = new CategoryRepository(_db);
+            BrandRepository = new BrandRepository(_db);
         }
 
         public async Task SaveAsync()

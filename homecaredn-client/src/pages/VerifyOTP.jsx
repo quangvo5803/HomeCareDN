@@ -62,6 +62,7 @@ export default function VerifyOTP() {
       await authService.resendOtp(email);
       toast.success(t('SUCCESS.SEND_OTP'));
     } catch (err) {
+      if (err.handled) return;
       toast.error(handleApiError(err));
     }
   };
@@ -83,14 +84,17 @@ export default function VerifyOTP() {
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
           {/* Logo */}
-          <div className="text-center mb-8">
+          <button
+            onClick={() => navigate('/Home')}
+            className="p-0 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-500 rounded"
+            aria-label="Go to Home"
+          >
             <img
               src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
               alt="HomeCareOn"
-              className="h-16 mx-auto mb-4 cursor-pointer transition-transform duration-300 transform hover:scale-110"
-              onClick={() => navigate('/Home')}
+              className="h-16 mx-auto mb-4 transition-transform duration-300 transform hover:scale-110"
             />
-          </div>
+          </button>
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-gray-800 text-center mb-2">

@@ -6,12 +6,18 @@ import './index.css';
 import './configs/i18n';
 
 import AuthProvider from './context/AuthProvider.jsx';
+import { BrandProvider } from './context/BrandProvider.jsx';
+import { CategoryProvider } from './context/CategoryProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <BrandProvider>
+          <CategoryProvider>
+            <App />
+          </CategoryProvider>
+        </BrandProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
