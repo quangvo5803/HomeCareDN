@@ -45,7 +45,6 @@ namespace WebApi.Repositories
             image.PublicId = result.PublicId;
             image.ImageUrl = result.SecureUrl.ToString();
             _db.Images.Add(image);
-            await _db.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteImageAsync(string publicId)

@@ -22,9 +22,9 @@ namespace Ultitity.Exceptions
             {
                 await HandleValidationExceptionAsync(httpContext, ex);
             }
-            catch (Exception ex)
+            catch
             {
-                await HandleExceptionAsync(httpContext, ex);
+                await HandleExceptionAsync(httpContext);
             }
         }
 
@@ -42,7 +42,7 @@ namespace Ultitity.Exceptions
             await context.Response.WriteAsync(json);
         }
 
-        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleExceptionAsync(HttpContext context)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;

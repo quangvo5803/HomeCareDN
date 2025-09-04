@@ -31,7 +31,7 @@ namespace Ultitity.Email
                 {
                     if (_emailQueue.TryDequeue(out var emailData))
                     {
-                        _logger.LogInformation($"Sending email to {emailData.Email}");
+                        _logger.LogInformation("Sending email to {Email}", emailData.Email);
                         await _emailSender.SendEmailAsync(
                             emailData.Email,
                             emailData.Subject,

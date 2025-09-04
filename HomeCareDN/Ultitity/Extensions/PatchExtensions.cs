@@ -25,10 +25,6 @@ namespace Ultitity.Extensions
 
                 var value = sourceProp.GetValue(source);
 
-                // Nếu giá trị là null thì bỏ qua
-                if (value == null)
-                    continue;
-
                 try
                 {
                     // Nếu kiểu destination có thể nhận trực tiếp
@@ -51,7 +47,6 @@ namespace Ultitity.Extensions
                 catch
                 {
                     // Bỏ qua nếu không convert được (hoặc log nếu muốn)
-                    continue;
                 }
             }
         }

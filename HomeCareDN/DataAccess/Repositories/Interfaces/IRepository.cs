@@ -23,6 +23,7 @@ namespace DataAccess.Repositories.Interfaces
             int pageNumber = 1,
             int pageSize = 10
         );
+        IQueryable<T> GetQueryable(string? includeProperties = null);
         Task AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
         void Remove(T entity);

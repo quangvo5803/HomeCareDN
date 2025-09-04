@@ -25,7 +25,7 @@ namespace Ultitity.Email
             var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Green Closet", smtpUser));
+            message.From.Add(new MailboxAddress("HomeCareDN", smtpUser));
             message.To.Add(MailboxAddress.Parse(email));
             message.Subject = subject;
 
@@ -42,7 +42,7 @@ namespace Ultitity.Email
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Email sending failed: {ex.Message}");
+                _logger.LogError(ex, "Email sending failed: {Message}", ex.Message);
                 throw new InvalidOperationException($"Email sending failed: {ex.Message}", ex);
             }
         }
