@@ -10,22 +10,23 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
+using Ultitity.Options;
 
 namespace BusinessLogic.Services
 {
     public class AuthorizeService : IAuthorizeService
     {
-        private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly JwtOptions _jwtOptions;
 
-        private const int AccessTokenMinutes = 5;
         private const int RefreshTokenDays = 7;
         private const int OtpExpiryMinutes = 5;
         private const int OtpThrottleSeconds = 60;
@@ -35,18 +36,18 @@ namespace BusinessLogic.Services
         private const string LOGIN_TOKEN_EXPIRED_STR = "LOGIN_TOKEN_EXPIRED";
 
         public AuthorizeService(
-            IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             IEmailQueue emailQueue,
             IRefreshTokenRepository refreshTokenRepository,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<JwtOptions> jwtOptions
         )
         {
-            _configuration = configuration;
             _userManager = userManager;
             _emailQueue = emailQueue;
             _refreshTokenRepository = refreshTokenRepository;
             _httpContextAccessor = httpContextAccessor;
+            _jwtOptions = jwtOptions.Value;
         }
 
         #region OTP
@@ -344,15 +345,15 @@ namespace BusinessLogic.Services
         private JwtSecurityToken GenerateTokenOptions(List<Claim> claims)
         {
             var key = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(_configuration["JWT:Key"]) // NOSONAR
+                System.Text.Encoding.UTF8.GetBytes(_jwtOptions.Key) // NOSONAR
             );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             return new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
                 expires: DateTime
-                    .UtcNow.AddMinutes(AccessTokenMinutes)
+                    .UtcNow.AddMinutes(_jwtOptions.AccessTokenMinutes)
                     .AddSeconds(Random.Shared.Next(-30, 31)),
                 signingCredentials: creds
             );

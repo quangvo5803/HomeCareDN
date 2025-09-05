@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
+using Ultitity.Options;
 
 namespace HomeCareDNAPI
 {
@@ -39,6 +40,11 @@ namespace HomeCareDNAPI
                     builder.Configuration.GetConnectionString("AuthorizeConnection")
                 )
             );
+            var key = builder.Configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new InvalidOperationException("JWT:Key is missing in configuration.");
+            }
             builder
                 .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -51,9 +57,7 @@ namespace HomeCareDNAPI
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
-                        ),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     };
                 });
             builder.Services.AddCors(options =>
@@ -71,7 +75,8 @@ namespace HomeCareDNAPI
                 );
             });
             builder.Services.AddHttpContextAccessor();
-
+            /// Register Options
+            builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();

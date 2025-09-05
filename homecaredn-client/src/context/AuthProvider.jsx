@@ -1,5 +1,5 @@
 // AuthProvider.jsx
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import AuthContext from './AuthContext';
@@ -107,20 +107,19 @@ export default function AuthProvider({ children }) {
     };
   }, [parseToken, logout, scheduleRefresh]);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        isAuthenticated: !!user,
-        pendingEmail,
-        setPendingEmail,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({
+      user,
+      login,
+      logout,
+      isAuthenticated: !!user,
+      pendingEmail,
+      setPendingEmail,
+    }),
+    [user, login, logout, pendingEmail, setPendingEmail]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 // PropTypes
 AuthProvider.propTypes = {
