@@ -1,15 +1,14 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import AuthContext from '../context/AuthContext';
-import { authService } from '../services/authService';
+import { useAuth } from '../hook/useAuth';
 
 export default function AvatarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [imgError, setImgError] = useState(false);
-  const { user, logout: ctxLogout } = useContext(AuthContext) || {};
+  const { user, logout } = useAuth();
 
   const name = user?.displayName || user?.email || 'User';
   const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(
@@ -20,8 +19,7 @@ export default function AvatarMenu() {
 
   const handleLogout = () => {
     try {
-      authService.logout();
-      if (typeof ctxLogout === 'function') ctxLogout();
+      logout();
       navigate('/login', { replace: true });
     } finally {
       setOpen(false);
