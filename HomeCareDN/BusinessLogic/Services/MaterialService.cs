@@ -3,6 +3,7 @@ using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
 
@@ -12,13 +13,20 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string ERROR_MAXIMUM_IMAGE = "You can only upload a maximum of 5 images.";
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "Each image must be less than 5 MB.";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
+        public async Task<ICollection<MaterialDto>> GetAllMaterial()
+        {
+            var material = await _unitOfWork.MaterialRepository
+                .GetAllAsync(includeProperties: "Images,Brand");
+            return _mapper.Map<ICollection<MaterialDto>>(material);
+        }
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
             var errors = new Dictionary<string, string[]>();
@@ -29,20 +37,18 @@ namespace BusinessLogic.Services
                 {
                     errors.Add(
                         nameof(requestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
+                        new[] { ERROR_MAXIMUM_IMAGE }
                     );
                 }
 
-                foreach (var image in requestDto.Images)
+                if (requestDto.Images.Any(i => i.Length > 5 * 1024 * 1024)) // 5 MB
                 {
-                    if (image.Length > 5 * 1024 * 1024) // 5 MB
-                    {
-                        errors.Add(
-                            nameof(requestDto.Images),
-                            new[] { "Each image must be less than 5 MB." }
-                        );
-                    }
+                    errors.Add(
+                        nameof(requestDto.Images),
+                        new[] { ERROR_MAXIMUM_IMAGE_SIZE }
+                    );
                 }
+                
             }
             if (errors.Any())
             {
@@ -53,23 +59,22 @@ namespace BusinessLogic.Services
 
             await _unitOfWork.MaterialRepository.AddAsync(material);
             await _unitOfWork.SaveAsync();
-            if (requestDto.Images != null)
+
+            foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
             {
-                foreach (var image in requestDto.Images)
+                var imageUpload = new Image
                 {
-                    Image imageUpload = new Image
-                    {
-                        ImageID = Guid.NewGuid(),
-                        MaterialID = material.MaterialID,
-                        ImageUrl = "",
-                    };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/Material",
-                        imageUpload
-                    );
-                }
+                    ImageID = Guid.NewGuid(),
+                    MaterialID = material.MaterialID,
+                    ImageUrl = "",
+                };
+                await _unitOfWork.ImageRepository.UploadImageAsync(
+                    image,
+                    "HomeCareDN/Material",
+                    imageUpload
+                );
             }
+            await _unitOfWork.SaveAsync();
             return _mapper.Map<MaterialDto>(material);
         }
 
@@ -84,7 +89,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { "No material found." } },
+                    { "Material", new[] { "MATERIAL_NOT_FOUND" } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -105,7 +110,7 @@ namespace BusinessLogic.Services
             {
                 errors.Add(
                     "ServiceID",
-                    new[] { $"Service request with ID {requestDto.MaterialID} not found." }
+                    new[] { "MATERIAL_NOT_FOUND" }
                 );
                 throw new CustomValidationException(errors);
             }
@@ -116,29 +121,17 @@ namespace BusinessLogic.Services
                 {
                     errors.Add(
                         nameof(requestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
+                        new[] { ERROR_MAXIMUM_IMAGE }
                     );
                 }
 
-                foreach (var image in requestDto.Images)
+                if (requestDto.Images.Any(i => i.Length > 5 * 1024 * 1024))
                 {
-                    if (image.Length > 5 * 1024 * 1024)
-                    {
-                        if (errors.ContainsKey(nameof(requestDto.Images)))
-                        {
-                            var messages = errors[nameof(requestDto.Images)].ToList();
-                            messages.Add("Each image must be less than 5 MB.");
-                            errors[nameof(requestDto.Images)] = messages.ToArray();
-                        }
-                        else
-                        {
-                            errors.Add(
-                                nameof(requestDto.Images),
-                                new[] { "Each image must be less than 5 MB." }
-                            );
-                        }
-                    }
-                }
+                    errors.Add(
+                        nameof(requestDto.Images),
+                        new[] { ERROR_MAXIMUM_IMAGE_SIZE }
+                   );
+                }        
             }
 
             if (errors.Any())
@@ -146,35 +139,23 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             material.PatchFrom(requestDto);
+            //await _unitOfWork.SaveAsync();
+
+            foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
+            {
+                var imageUpload = new Image
+                {
+                    ImageID = Guid.NewGuid(),
+                    MaterialID = material.MaterialID,
+                    ImageUrl = "",
+                };
+                await _unitOfWork.ImageRepository.UploadImageAsync(
+                    image,
+                    "HomeCareDN/Material",
+                    imageUpload
+                );
+            }
             await _unitOfWork.SaveAsync();
-            // Delete old images if they exist
-            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.MaterialID == material.MaterialID
-            );
-            if (existingImages != null && existingImages.Any())
-            {
-                foreach (var image in existingImages)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-                }
-            }
-            if (requestDto.Images != null)
-            {
-                foreach (var image in requestDto.Images)
-                {
-                    Image imageUpload = new Image
-                    {
-                        ImageID = Guid.NewGuid(),
-                        MaterialID = material.MaterialID,
-                        ImageUrl = "",
-                    };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/Material",
-                        imageUpload
-                    );
-                }
-            }
 
             return _mapper.Map<MaterialDto>(material);
         }
@@ -187,7 +168,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "MaterailID", new[] { $"Material with ID {id} not found." } },
+                    { "MaterailID", new[] { "MATERIAL_NOT_FOUND" } },
                 };
                 throw new CustomValidationException(errors);
             }

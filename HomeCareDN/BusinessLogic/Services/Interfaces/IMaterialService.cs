@@ -4,6 +4,7 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IMaterialService
     {
+        Task<ICollection<MaterialDto>> GetAllMaterial();
         Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto);
         Task<MaterialDto> GetMaterialByIdAsync(Guid id);
         Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto);
