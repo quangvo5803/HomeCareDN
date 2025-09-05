@@ -77,6 +77,11 @@ namespace HomeCareDNAPI
             builder.Services.AddHttpContextAccessor();
             /// Register Options
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
+            builder.Services.Configure<CloudinaryOptions>(
+                builder.Configuration.GetSection("Cloudinary")
+            );
+            builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
+
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();

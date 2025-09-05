@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 // Public pages
@@ -26,10 +28,12 @@ import Footer from './components/Footer';
 
 function App() {
   return (
-    <AuthProvider>
-      <Layout />
-      <ToastContainer position="top-right" autoClose={3000} />
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthProvider>
+        <Layout />
+        <ToastContainer position="top-right" autoClose={3000} />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   );
 }
 
