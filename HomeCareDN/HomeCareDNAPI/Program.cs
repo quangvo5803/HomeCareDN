@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
@@ -15,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
+using Ultitity.LLM;
 using Ultitity.Options;
 
 namespace HomeCareDNAPI
@@ -74,12 +76,28 @@ namespace HomeCareDNAPI
                     }
                 );
             });
+
             builder.Services.AddHttpContextAccessor();
+
             /// Register Options
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddHttpContextAccessor();
+
+            // LLM client
+            builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>
+            {
+                var baseUrl =
+                    builder.Configuration["Groq:BaseUrl"]
+                    ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
+                client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            });
+
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
@@ -94,7 +112,6 @@ namespace HomeCareDNAPI
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
             var app = builder.Build();
-            app.UseCors("AllowReactApp");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -102,9 +119,16 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseCors("AllowReactApp");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

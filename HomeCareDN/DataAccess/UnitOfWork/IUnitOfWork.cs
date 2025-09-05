@@ -11,6 +11,8 @@ namespace DataAccess.UnitOfWork
         IContractorApplicationRepository ContractorApplicationRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         IBrandRepository BrandRepository { get; }
+        IConversationRepository ConversationRepository { get; }
+        IChatMessageRepository ChatMessageRepository { get; }
         Task SaveAsync();
     }
 }
