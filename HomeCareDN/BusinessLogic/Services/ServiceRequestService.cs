@@ -12,6 +12,11 @@ namespace BusinessLogic.Services.Interfaces
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        private const string ERROR_SERVICE_REQUEST = "Service Request";
+        private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "Service request not found.";
+        private const string ERROR_MAXIMUM_IMAGE = "You can only upload a maximum of 5 images.";
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "Each image must be less than 5 MB.";
+
         public ServiceRequestService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -28,7 +33,7 @@ namespace BusinessLogic.Services.Interfaces
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
+                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -37,46 +42,33 @@ namespace BusinessLogic.Services.Interfaces
         }
 
         public async Task<ServiceRequestDto> CreateServiceRequestAsync(
-            ServiceRequestCreateRequestDto requestDto
+            ServiceRequestCreateRequestDto createRequestDto
         )
         {
             var errors = new Dictionary<string, string[]>();
 
-            if (requestDto.Images != null)
+            if (createRequestDto.Images != null)
             {
-                if (requestDto.Images.Count > 5)
+                if (createRequestDto.Images.Count > 5)
                 {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
-                    );
+                    errors.Add(ERROR_SERVICE_REQUEST, new[] { ERROR_MAXIMUM_IMAGE });
                 }
 
-                foreach (var image in requestDto.Images)
+                if (createRequestDto.Images.Any(i => i.Length > 5 * 1024 * 1024))
                 {
-                    if (image.Length > 5 * 1024 * 1024)
-                    {
-                        if (!errors.ContainsKey(nameof(requestDto.Images)))
-                        {
-                            errors[nameof(requestDto.Images)] = new List<string>().ToArray();
-                        }
-
-                        var messages = errors[nameof(requestDto.Images)].ToList();
-                        messages.Add("Each image must be less than 5 MB.");
-                        errors[nameof(requestDto.Images)] = messages.ToArray();
-                    }
+                    errors.Add(ERROR_SERVICE_REQUEST, new[] { ERROR_MAXIMUM_IMAGE_SIZE });
                 }
             }
             if (errors.Any())
             {
                 throw new CustomValidationException(errors);
             }
-            var serviceRequest = _mapper.Map<ServiceRequest>(requestDto);
+            var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
             await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
             await _unitOfWork.SaveAsync();
-            if (requestDto.Images != null)
+            if (createRequestDto.Images != null)
             {
-                foreach (var image in requestDto.Images)
+                foreach (var image in createRequestDto.Images)
                 {
                     Image imageUpload = new Image
                     {
@@ -95,52 +87,31 @@ namespace BusinessLogic.Services.Interfaces
         }
 
         public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
-            ServiceRequestUpdateRequestDto requestDto
+            ServiceRequestUpdateRequestDto updateRequestDto
         )
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == requestDto.ServiceRequestID,
+                sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
                 includeProperties: "Images"
             );
             var errors = new Dictionary<string, string[]>();
 
             if (serviceRequest == null)
             {
-                errors.Add(
-                    "ServiceRequestID",
-                    new[] { $"Service request with ID {requestDto.ServiceRequestID} not found." }
-                );
+                errors.Add(ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND });
                 throw new CustomValidationException(errors);
             }
 
-            if (requestDto.Images != null)
+            if (updateRequestDto.Images != null)
             {
-                if (requestDto.Images.Count > 5)
+                if (updateRequestDto.Images.Count > 5)
                 {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
-                    );
+                    errors.Add(ERROR_SERVICE_REQUEST, new[] { ERROR_MAXIMUM_IMAGE });
                 }
 
-                foreach (var image in requestDto.Images)
+                if (updateRequestDto.Images.Any(i => i.Length > 5 * 1024 * 1024))
                 {
-                    if (image.Length > 5 * 1024 * 1024)
-                    {
-                        if (errors.ContainsKey(nameof(requestDto.Images)))
-                        {
-                            var messages = errors[nameof(requestDto.Images)].ToList();
-                            messages.Add("Each image must be less than 5 MB.");
-                            errors[nameof(requestDto.Images)] = messages.ToArray();
-                        }
-                        else
-                        {
-                            errors.Add(
-                                nameof(requestDto.Images),
-                                new[] { "Each image must be less than 5 MB." }
-                            );
-                        }
-                    }
+                    errors.Add(nameof(updateRequestDto.Images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
                 }
             }
 
@@ -149,7 +120,7 @@ namespace BusinessLogic.Services.Interfaces
                 throw new CustomValidationException(errors);
             }
 
-            serviceRequest.PatchFrom(requestDto);
+            serviceRequest.PatchFrom(updateRequestDto);
 
             await _unitOfWork.SaveAsync();
             // Delete existing images
@@ -164,9 +135,9 @@ namespace BusinessLogic.Services.Interfaces
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
             }
-            if (requestDto.Images != null)
+            if (updateRequestDto.Images != null)
             {
-                foreach (var image in requestDto.Images)
+                foreach (var image in updateRequestDto.Images)
                 {
                     Image imageUpload = new Image
                     {
@@ -194,7 +165,7 @@ namespace BusinessLogic.Services.Interfaces
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ServiceRequestID", new[] { $"Service request with ID {id} not found." } },
+                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }

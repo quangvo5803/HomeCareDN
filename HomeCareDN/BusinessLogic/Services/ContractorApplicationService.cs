@@ -53,11 +53,7 @@ namespace BusinessLogic.Services
         {
             var applications = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                 ca => ca.ServiceRequestID == requestDto.ServiceRequestID,
-                includeProperties: "Images",
-                requestDto.SortBy,
-                requestDto.IsAscending,
-                requestDto.PageNumber,
-                requestDto.PageSize
+                includeProperties: "Images"
             );
             if (applications == null)
             {
@@ -80,7 +76,6 @@ namespace BusinessLogic.Services
             ContractorApplicationCreateRequestDto createRequestDto
         )
         {
-            ;
             var errors = new Dictionary<string, string[]>();
 
             if (createRequestDto.Images != null)

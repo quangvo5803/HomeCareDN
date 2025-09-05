@@ -187,12 +187,14 @@ const MATERIALS = [
 
 const TESTIMONIALS = [
   {
+    id: '1',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755741028/testimonial-1_umvege.jpg',
     textKey: 'home.testimonial1_text',
     nameKey: 'home.testimonial1_name',
     roleKey: 'home.testimonial1_role',
   },
   {
+    id: '2',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755741031/testimonial-2_o96wyf.jpg',
     textKey: 'home.testimonial2_text',
     nameKey: 'home.testimonial2_name',
@@ -246,16 +248,28 @@ export default function Home() {
   /* ===== Testimonial Slider ===== */
   const baseSlides = TESTIMONIALS;
   const hasMany = baseSlides.length > 1;
+
+  // 👉 tạo extSlides với id mới để tránh trùng key
   const extSlides = hasMany
-    ? [baseSlides[baseSlides.length - 1], ...baseSlides, baseSlides[0]]
-    : baseSlides;
+    ? [
+        { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
+        ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
+        { ...baseSlides[0], cloneId: 'tail' },
+      ]
+    : baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` }));
 
   const [idx, setIdx] = useState(hasMany ? 1 : 0);
   const [anim, setAnim] = useState(true);
   const pausedRef = useRef(false);
 
-  const tNext = useCallback(() => hasMany && setIdx((i) => i + 1), [hasMany]);
-  const tPrev = useCallback(() => hasMany && setIdx((i) => i - 1), [hasMany]);
+  const tNext = useCallback(() => {
+    if (hasMany) setIdx((i) => i + 1);
+  }, [hasMany]);
+
+  const tPrev = useCallback(() => {
+    if (hasMany) setIdx((i) => i - 1);
+  }, [hasMany]);
+
   const handleTransitionEnd = useCallback(() => {
     if (!hasMany) return;
     if (idx === extSlides.length - 1) {
@@ -794,7 +808,7 @@ export default function Home() {
                   >
                     {extSlides.map((it, i) => (
                       <article
-                        key={it.textKey}
+                        key={`${it.id}-${it.cloneId}`}
                         className="min-w-full shrink-0 flex items-center justify-center"
                       >
                         <div className="max-w-2xl text-left bg-white rounded-lg p-6 shadow">

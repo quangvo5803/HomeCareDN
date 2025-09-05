@@ -1,52 +1,12 @@
-import { useMemo, useState, useContext } from 'react';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../../services/authService';
-import AuthContext from '../../context/AuthContext';
-import ReactCountryFlag from 'react-country-flag';
 import MenuList from '../../components/MenuList';
-
-/* ========= Helpers ========= */
-function formatVND(n) {
-  const num = Number.isFinite(n) ? n : 0;
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-    maximumFractionDigits: 0,
-  }).format(num);
-}
-function formatDate(iso, lng) {
-  const d = new Date(iso);
-  const locale = lng?.startsWith('vi') ? 'vi-VN' : 'en-US';
-  return d.toLocaleDateString(locale, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
-function StatusBadge({ status, t }) {
-  const map = {
-    Pending: {
-      text: t('partnerDashboard.pending'),
-      cls: 'bg-yellow-100 text-yellow-700',
-    },
-    Approved: {
-      text: t('partnerDashboard.approved'),
-      cls: 'bg-green-100 text-green-700',
-    },
-    Rejected: {
-      text: t('partnerDashboard.rejected'),
-      cls: 'bg-red-100 text-red-700',
-    },
-  };
-  const cfg = map[status] || { text: status, cls: 'bg-gray-100 text-gray-700' };
-  return (
-    <span className={`px-2 py-1 text-xs rounded-full ${cfg.cls}`}>
-      {cfg.text}
-    </span>
-  );
-}
-
+import AvatarMenu from '../../components/AvatarMenu';
+import LanguageSwitch from '../../components/LanguageSwitch';
+import NotificationBell from '../../components/NotificationBell';
+import StatusBadge from '../../components/StatusBadge';
+import { formatVND, formatDate } from '../../utils/formatters';
 /* ========= Seed data (5 items) ========= */
 const SEED_APPS = [
   {
@@ -91,169 +51,8 @@ const SEED_APPS = [
   },
 ];
 
-/* ========= Small UI parts ========= */
-function BellIcon() {
-  return <i class="fa-solid fa-bell"></i>;
-}
-
-function LanguageSwitch() {
+export default function DistributorDashboard() {
   const { t, i18n } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const flagCode = i18n.language === 'vi' ? 'VN' : 'US';
-  const label = i18n.language.toUpperCase();
-
-  const setLang = (lng) => {
-    if (i18n.language !== lng) i18n.changeLanguage(lng);
-    setOpen(false);
-  };
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 h-9 px-3 rounded-full border border-gray-300 hover:border-blue-500 hover:bg-gray-50 transition-all"
-        title={t('partnerDashboard.change_language')}
-      >
-        <ReactCountryFlag countryCode={flagCode} svg className="text-lg" />
-        <span className="text-sm font-medium hidden md:inline">{label}</span>
-        <i
-          className={`fas fa-chevron-down text-xs ${open ? 'rotate-180' : ''}`}
-        />
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1 z-20">
-          <button
-            onClick={() => setLang('en')}
-            className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
-          >
-            <ReactCountryFlag countryCode="US" svg className="text-lg" />
-            <span>English</span>
-          </button>
-          <button
-            onClick={() => setLang('vi')}
-            className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
-          >
-            <ReactCountryFlag countryCode="VN" svg className="text-lg" />
-            <span>Tiếng Việt</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function NotificationBell({ total }) {
-  const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="relative w-9 h-9 grid place-items-center rounded-full border hover:bg-gray-50"
-        title={t('partnerDashboard.notifications')}
-      >
-        <BellIcon className="w-5 h-5 text-gray-700" />
-        {total > 0 && (
-          <span className="absolute -top-1 -right-1 text-[10px] px-1.5 py-0.5 rounded-full bg-red-500 text-white">
-            {total}
-          </span>
-        )}
-      </button>
-      {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-white border rounded-xl shadow-lg p-2 z-20">
-          <div className="text-sm text-gray-700 px-2 py-1">
-            {t('partnerDashboard.you_have_notifications', { count: total })}
-          </div>
-          <div className="max-h-64 overflow-auto">
-            {[...Array(Math.max(total, 1))].slice(0, 5).map((_, i) => (
-              <div
-                key={i}
-                className="px-2 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg"
-              >
-                {t('partnerDashboard.notification_item', { number: i + 1 })}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ========= Main ========= */
-export default function ContractorDashboard() {
-  const { t, i18n } = useTranslation();
-
-  function AvatarMenu() {
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const [imgError, setImgError] = useState(false);
-
-    // Lấy user từ AuthContext (đa số context sẽ có user + logout)
-    const { user, logout: ctxLogout } = useContext(AuthContext) || {};
-
-    const name = user?.displayName || user?.email || 'User';
-    const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      name
-    )}&background=random&color=fff`;
-    const primary = user?.photoURL || user?.avatarUrl || fallback;
-    const avatarSrc = imgError ? fallback : primary;
-
-    const handleLogout = () => {
-      try {
-        authService.logout();
-        if (typeof ctxLogout === 'function') ctxLogout();
-        navigate('/login', { replace: true });
-      } finally {
-        setOpen(false);
-      }
-    };
-
-    return (
-      <div className="relative">
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="w-9 h-9 rounded-full overflow-hidden
-                    border border-gray-300 hover:border-blue-500 hover:bg-gray-50
-                    inline-flex items-center justify-center align-middle transition"
-          title={t('partnerDashboard.account')}
-          aria-label="Account menu"
-        >
-          <img
-            src={avatarSrc}
-            onError={() => setImgError(true)}
-            alt={name}
-            className="w-full h-full object-cover block" // <-- block để hết lệch baseline
-            loading="lazy"
-          />
-        </button>
-
-        {open && (
-          <div className="absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-lg overflow-hidden z-20">
-            <button
-              onClick={() => {
-                setOpen(false);
-                navigate('/profile');
-              }}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-            >
-              👤 {t('header.profile')}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              {' '}
-              <i class="fa-solid fa-right-from-bracket text-red-500"></i>{' '}
-              {t('header.logout')}
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   const navigate = useNavigate();
 
   const kpis = useMemo(
@@ -294,26 +93,21 @@ export default function ContractorDashboard() {
 
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-gray-50">
-      {/* MenuList */}
       <MenuList serviceRequestsCount={10} />
 
-      {/* Content */}
       <div className="flex flex-col min-w-0">
         {/* Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
           <div className="flex items-center gap-3 p-4">
             <div className="flex-1 flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-gray-500">
-              <i class="fa-solid fa-magnifying-glass"></i>
+              <i className="fa-solid fa-magnifying-glass"></i>
               <input
                 className="flex-1 bg-transparent outline-none text-sm text-gray-700"
                 placeholder={t('partnerDashboard.search_placeholder')}
               />
             </div>
-
             <NotificationBell total={totalNotifications} />
-
             <LanguageSwitch />
-
             <AvatarMenu />
           </div>
         </header>
@@ -335,10 +129,7 @@ export default function ContractorDashboard() {
           </section>
 
           {/* Latest Applications */}
-          <section
-            id="applications"
-            className="bg-white border border-gray-200 rounded-2xl p-4"
-          >
+          <section className="bg-white border border-gray-200 rounded-2xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold">
                 {t('partnerDashboard.latest_applications')}
