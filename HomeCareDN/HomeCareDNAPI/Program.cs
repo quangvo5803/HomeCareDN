@@ -78,6 +78,7 @@ namespace HomeCareDNAPI
             });
 
             builder.Services.AddHttpContextAccessor();
+
             /// Register Options
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
             /// Register services for Application

@@ -15,8 +15,23 @@ namespace Ultitity.LLM
         {
             _http = http;
 
-            _apiKey =
-                cfg["Groq:ApiKey"] ?? throw new InvalidOperationException("Missing Groq:ApiKey");
+            _apiKey = (
+                cfg["Groq:ApiKey"] ?? throw new InvalidOperationException("Missing Groq:ApiKey")
+            ).Trim();
+
+            if (!_apiKey.StartsWith("gsk_"))
+                throw new InvalidOperationException(
+                    "Groq:ApiKey probably wrong (must start with 'gsk_')."
+                );
+
+            var baseUrl = cfg["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+            if (!baseUrl.EndsWith("/"))
+                baseUrl += "/";
+            _http.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+
+            _http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
+            _http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 
             _chatPath = cfg["Groq:ChatPath"] ?? "chat/completions";
         }
@@ -37,7 +52,6 @@ namespace Ultitity.LLM
             };
 
             using var req = new HttpRequestMessage(HttpMethod.Post, _chatPath);
-            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
             req.Content = new StringContent(
                 JsonSerializer.Serialize(payload),
                 Encoding.UTF8,
