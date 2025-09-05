@@ -143,6 +143,33 @@
       "pending_payments": "▼ 1 overdue"
     }
   },
+  "supportChat": {
+  "headerTitle": "Assistant — Support for {{brand}}",
+  "headerStatusReady": "Ready to help",
+  "action": {
+    "minimize": "Minimize",
+    "expand": "Expand",
+    "close": "Close"
+  },
+  "searchPlaceholder": "Search in conversation",
+  "inputPlaceholder": "Type a message...",
+  "send": "Send",
+  "launcherTitle": "Live support",
+  "typing": "Bot is typing…",
+  "demoBadge": "Demo • Version 1.0",
+  "suggestions": [
+    "How to use this website?",
+    "Add rounded avatar",
+    "Suggest modern colors"
+  ],
+  "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
+  "seed": {
+    "user1": "I want a React chat support widget. Please split components.",
+    "bot1": "Sure! I'll design a modern widget with a round launcher button.",
+    "user2": "Prioritize mobile and match the context: 'React support widget'.",
+    "bot2": "Got it! I'll seed sample data and keep components clean."
+  }
+},
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
