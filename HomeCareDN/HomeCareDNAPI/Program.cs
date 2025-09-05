@@ -16,6 +16,7 @@ using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
+using Ultitity.LLM;
 using Ultitity.Options;
 
 namespace HomeCareDNAPI
@@ -83,17 +84,18 @@ namespace HomeCareDNAPI
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
 
-            // Cache (chọn 1)
-            //builder.Services.AddStackExchangeRedisCache(o =>
-            //{
-            //    o.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
-            //    o.InstanceName = "homecaredn:";
-            //});
-            // Hoặc tạm dùng:
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddHttpContextAccessor();
+
             // LLM client
-            builder.Services.AddHttpClient<Ultitity.LLM.IGroqClient, Ultitity.LLM.GroqClient>();
+            builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>
+            {
+                var baseUrl =
+                    builder.Configuration["Groq:BaseUrl"]
+                    ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
+                client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+                client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            });
 
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

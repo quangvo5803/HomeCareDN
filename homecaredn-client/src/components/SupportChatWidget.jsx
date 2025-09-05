@@ -1,5 +1,6 @@
 // src/components/SupportChatWidget.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { aiChatService } from "../services/aiChatService";
 import { getSupportPrompt } from "../prompts/supportPrompt";
@@ -16,9 +17,11 @@ const toUiMessage = (m) => ({
   id: uid(),
   role: m.role === "assistant" ? ROLES.BOT : ROLES.USER,
   text: m.content ?? m.text ?? "",
-  time: m.time
-    ?? (m.timestamp ? new Date(m.timestamp).toTimeString().slice(0, 5)
-                    : new Date().toTimeString().slice(0, 5)),
+  time:
+    m.time ??
+    (m.timestamp
+      ? new Date(m.timestamp).toTimeString().slice(0, 5)
+      : new Date().toTimeString().slice(0, 5)),
 });
 
 function useAutoScroll(dep) {
@@ -46,6 +49,18 @@ function UserAvatar() {
   );
 }
 
+/* ===== Shapes (cho PropTypes) ===== */
+const MessageShape = PropTypes.exact({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  role: PropTypes.oneOf([ROLES.USER, ROLES.BOT]).isRequired,
+  text: PropTypes.string,
+  time: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Date),
+  ]),
+});
+
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
   return (
@@ -55,8 +70,9 @@ function MessageBubble({ message }) {
         <div
           className={cn(
             "rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border",
-            isUser ? "bg-indigo-600 text-white border-indigo-500/30"
-                   : "bg-white text-gray-900 border-gray-200"
+            isUser
+              ? "bg-indigo-600 text-white border-indigo-500/30"
+              : "bg-white text-gray-900 border-gray-200"
           )}
         >
           {message.text}
@@ -74,22 +90,33 @@ function MessageBubble({ message }) {
     </div>
   );
 }
+MessageBubble.propTypes = {
+  message: MessageShape.isRequired,
+};
 
 function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
-    return messages.filter((m) => (m.text || "").toLowerCase().includes(filter.toLowerCase()));
+    return messages.filter((m) =>
+      (m.text || "").toLowerCase().includes(filter.toLowerCase())
+    );
   }, [messages, filter]);
   const ref = useAutoScroll(filtered.length);
 
   return (
     <div className="h-[48vh] md:h-[50vh] overflow-y-auto pr-2" ref={ref}>
       <div className="flex flex-col gap-3 py-2">
-        {filtered.map((m) => <MessageBubble key={m.id} message={m} />)}
+        {filtered.map((m) => (
+          <MessageBubble key={m.id} message={m} />
+        ))}
       </div>
     </div>
   );
 }
+MessageList.propTypes = {
+  messages: PropTypes.arrayOf(MessageShape).isRequired,
+  filter: PropTypes.string,
+};
 
 function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) {
   const { t } = useTranslation();
@@ -106,17 +133,27 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
           <div className="text-sm font-semibold">
             {t("supportChat.headerTitle", { brand })}
           </div>
-          <div className="text-xs text-green-500">{t("supportChat.headerStatusReady")}</div>
+          <div className="text-xs text-green-500">
+            {t("supportChat.headerStatusReady")}
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-1.5">
         <button
           onClick={onMinimize}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
-          title={isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")}
-          aria-label={isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")}
+          title={
+            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+          }
+          aria-label={
+            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+          }
         >
-          {isMinimized ? <i className="fa-regular fa-square" /> : <i className="fa-solid fa-minus" />}
+          {isMinimized ? (
+            <i className="fa-regular fa-square" />
+          ) : (
+            <i className="fa-solid fa-minus" />
+          )}
         </button>
         <button
           onClick={onClose}
@@ -130,6 +167,12 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
     </div>
   );
 }
+ChatHeader.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onMinimize: PropTypes.func.isRequired,
+  isMinimized: PropTypes.bool,
+  brand: PropTypes.string,
+};
 
 function ChatInput({ onSend, disabled }) {
   const { t } = useTranslation();
@@ -160,9 +203,13 @@ function ChatInput({ onSend, disabled }) {
     </form>
   );
 }
+ChatInput.propTypes = {
+  onSend: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};
 
 function ChatWindow({ open, onClose, brand }) {
-  const { t, i18n  } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [filter, setFilter] = useState("");
   const [typing, setTyping] = useState(false);
@@ -174,7 +221,6 @@ function ChatWindow({ open, onClose, brand }) {
       const list = Array.isArray(raw) ? raw.map(toUiMessage) : [];
       setMessages(list);
     } catch (e) {
-      // thất bại thì để yên, tránh chặn UI
       console.warn("Load history failed", e);
     }
   };
@@ -184,17 +230,16 @@ function ChatWindow({ open, onClose, brand }) {
     loadHistory();
   }, [open]);
 
-  const parseErr = (err) =>
-    err?.response?.data ?? err?.message ?? "Bad request";
+  const parseErr = (err) => err?.response?.data ?? err?.message ?? "Bad request";
 
   const send = async (text) => {
     try {
       setTyping(true);
       await aiChatService.send({
-       prompt: text,
-       system: getSupportPrompt(i18n.language), // VI/EN tùy ngôn ngữ hiện tại
-     })
-      await loadHistory(); // luôn hiển thị đúng dữ liệu đã được server + cookie ghi nhận
+        prompt: text,
+        system: getSupportPrompt(i18n.language),
+      });
+      await loadHistory();
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -244,9 +289,10 @@ function ChatWindow({ open, onClose, brand }) {
                   <span className="inline-block h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
                   {t("supportChat.typing")}
                 </div>
-              ) : <span />}
+              ) : (
+                <span />
+              )}
 
-              {/* nhãn nhỏ */}
               <span className="text-[10px] rounded-full border px-2 py-0.5 text-gray-500">
                 Cookie-backed
               </span>
@@ -259,6 +305,11 @@ function ChatWindow({ open, onClose, brand }) {
     </div>
   );
 }
+ChatWindow.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  brand: PropTypes.string,
+};
 
 function ChatLauncherButton({ open, setOpen }) {
   const { t } = useTranslation();
@@ -276,6 +327,10 @@ function ChatLauncherButton({ open, setOpen }) {
     </button>
   );
 }
+ChatLauncherButton.propTypes = {
+  open: PropTypes.bool.isRequired,
+  setOpen: PropTypes.func.isRequired,
+};
 
 /* ===== Default export ===== */
 export default function SupportChatWidget({ brand = "HomeCareDN" }) {
@@ -287,3 +342,6 @@ export default function SupportChatWidget({ brand = "HomeCareDN" }) {
     </>
   );
 }
+SupportChatWidget.propTypes = {
+  brand: PropTypes.string,
+};
