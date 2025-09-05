@@ -37,6 +37,9 @@ Reveal.propTypes = { children: PropTypes.node.isRequired };
 
 export default function Contact() {
   const { t } = useTranslation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); // hoặc 'auto'
+  }, []);
   return (
     <div className="flex flex-col min-h-screen">
       {/* Page Header */}
