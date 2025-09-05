@@ -10,5 +10,8 @@ namespace BusinessLogic.Services.FacadeService
         IContractorApplicationService ContractorApplicationService { get; }
         ICategoryService CategoryService { get; }
         IBrandService BrandService { get; }
+        IAiChatService AiChatService { get; }
+        IConversationService ConversationService { get; }
+
     }
 }

@@ -1,14 +1,25 @@
 // src/components/SupportChatWidget.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { aiChatService } from "../services/aiChatService";
+import { getSupportPrompt } from "../prompts/supportPrompt";
 
-/* ====== Helpers ====== */
+/* ===== Helpers ===== */
 const ROLES = { USER: "user", BOT: "assistant" };
 const cn = (...xs) => xs.filter(Boolean).join(" ");
 const uid = () =>
   (typeof crypto !== "undefined" && crypto.randomUUID)
     ? crypto.randomUUID()
     : Math.random().toString(36).slice(2);
+
+const toUiMessage = (m) => ({
+  id: uid(),
+  role: m.role === "assistant" ? ROLES.BOT : ROLES.USER,
+  text: m.content ?? m.text ?? "",
+  time: m.time
+    ?? (m.timestamp ? new Date(m.timestamp).toTimeString().slice(0, 5)
+                    : new Date().toTimeString().slice(0, 5)),
+});
 
 function useAutoScroll(dep) {
   const ref = useRef(null);
@@ -19,13 +30,11 @@ function useAutoScroll(dep) {
   return ref;
 }
 
-/* ====== Sub components ====== */
+/* ===== Sub components ===== */
 function BotAvatar() {
   return (
     <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
-      <span className="text-xs">
-        <i className="fa-solid fa-robot" />
-      </span>
+      <span className="text-xs"><i className="fa-solid fa-robot" /></span>
     </div>
   );
 }
@@ -46,9 +55,8 @@ function MessageBubble({ message }) {
         <div
           className={cn(
             "rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border",
-            isUser
-              ? "bg-indigo-600 text-white border-indigo-500/30"
-              : "bg-white text-gray-900 border-gray-200"
+            isUser ? "bg-indigo-600 text-white border-indigo-500/30"
+                   : "bg-white text-gray-900 border-gray-200"
           )}
         >
           {message.text}
@@ -70,46 +78,15 @@ function MessageBubble({ message }) {
 function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
-    return messages.filter((m) => m.text.toLowerCase().includes(filter.toLowerCase()));
+    return messages.filter((m) => (m.text || "").toLowerCase().includes(filter.toLowerCase()));
   }, [messages, filter]);
   const ref = useAutoScroll(filtered.length);
 
   return (
     <div className="h-[48vh] md:h-[50vh] overflow-y-auto pr-2" ref={ref}>
       <div className="flex flex-col gap-3 py-2">
-        {filtered.map((m) => (
-          <MessageBubble key={m.id} message={m} />
-        ))}
+        {filtered.map((m) => <MessageBubble key={m.id} message={m} />)}
       </div>
-    </div>
-  );
-}
-
-function TypingIndicator({ visible }) {
-  const { t } = useTranslation();
-  if (!visible) return null;
-  return (
-    <div className="flex items-center gap-2 text-xs text-gray-500">
-      <span className="inline-block h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
-      {t("supportChat.typing")}
-    </div>
-  );
-}
-
-function Suggestions({ onPick }) {
-  const { t } = useTranslation();
-  const items = t("supportChat.suggestions", { returnObjects: true });
-  return (
-    <div className="flex flex-wrap gap-2">
-      {items.map((text) => (
-        <button
-          key={text}
-          onClick={() => onPick(text)}
-          className="rounded-full border px-3 py-1.5 text-xs md:text-sm bg-gray-100 hover:bg-gray-200"
-        >
-          {text}
-        </button>
-      ))}
     </div>
   );
 }
@@ -185,44 +162,52 @@ function ChatInput({ onSend, disabled }) {
 }
 
 function ChatWindow({ open, onClose, brand }) {
-  const { t } = useTranslation();
-
-  // seed theo ngôn ngữ hiện tại (tại thời điểm mount)
-  const seed = useMemo(
-    () => [
-      { id: "m1", role: ROLES.USER, text: t("supportChat.seed.user1"), time: "09:05" },
-      { id: "m2", role: ROLES.BOT, text: t("supportChat.seed.bot1"), time: "09:06" },
-      { id: "m3", role: ROLES.USER, text: t("supportChat.seed.user2"), time: "09:07" },
-      { id: "m4", role: ROLES.BOT, text: t("supportChat.seed.bot2"), time: "09:08" },
-    ],
-    // đổi ngôn ngữ -> seed mới khi component được remount; nếu muốn auto cập nhật,
-    // có thể thêm i18n.language vào deps và reset state nếu chưa chat.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [t]
-  );
-
-  const [messages, setMessages] = useState(seed);
+  const { t, i18n  } = useTranslation();
+  const [messages, setMessages] = useState([]);
   const [filter, setFilter] = useState("");
   const [typing, setTyping] = useState(false);
   const [minimized, setMinimized] = useState(false);
 
-  const send = (text) => {
-    const time = new Date().toTimeString().slice(0, 5);
-    const mUser = { id: uid(), role: ROLES.USER, text, time };
-    setMessages((prev) => [...prev, mUser]);
+  const loadHistory = async () => {
+    try {
+      const raw = await aiChatService.history();
+      const list = Array.isArray(raw) ? raw.map(toUiMessage) : [];
+      setMessages(list);
+    } catch (e) {
+      // thất bại thì để yên, tránh chặn UI
+      console.warn("Load history failed", e);
+    }
+  };
 
-    // reply giả
-    setTyping(true);
-    setTimeout(() => {
-      const reply = {
-        id: uid(),
-        role: ROLES.BOT,
-        text: t("supportChat.fakeReply", { text }),
-        time: new Date().toTimeString().slice(0, 5),
-      };
-      setMessages((prev) => [...prev, reply]);
+  useEffect(() => {
+    if (!open) return;
+    loadHistory();
+  }, [open]);
+
+  const parseErr = (err) =>
+    err?.response?.data ?? err?.message ?? "Bad request";
+
+  const send = async (text) => {
+    try {
+      setTyping(true);
+      await aiChatService.send({
+       prompt: text,
+       system: getSupportPrompt(i18n.language), // VI/EN tùy ngôn ngữ hiện tại
+     })
+      await loadHistory(); // luôn hiển thị đúng dữ liệu đã được server + cookie ghi nhận
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          role: ROLES.BOT,
+          text: `⚠️ ${parseErr(err)}`,
+          time: new Date().toTimeString().slice(0, 5),
+        },
+      ]);
+    } finally {
       setTyping(false);
-    }, 900);
+    }
   };
 
   if (!open) return null;
@@ -241,7 +226,6 @@ function ChatWindow({ open, onClose, brand }) {
 
         {!minimized && (
           <div className="p-4 space-y-3">
-            {/* search/filter */}
             <div className="flex items-center gap-2 rounded-xl border bg-gray-50 px-3 py-2">
               <span className="text-gray-500 text-sm">🔎</span>
               <input
@@ -255,13 +239,19 @@ function ChatWindow({ open, onClose, brand }) {
             <MessageList messages={messages} filter={filter} />
 
             <div className="flex items-center justify-between">
-              <TypingIndicator visible={typing} />
+              {typing ? (
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span className="inline-block h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
+                  {t("supportChat.typing")}
+                </div>
+              ) : <span />}
+
+              {/* nhãn nhỏ */}
               <span className="text-[10px] rounded-full border px-2 py-0.5 text-gray-500">
-                {t("supportChat.demoBadge")}
+                Cookie-backed
               </span>
             </div>
 
-            <Suggestions onPick={(txt) => send(txt)} />
             <ChatInput onSend={send} disabled={typing} />
           </div>
         )}
@@ -287,7 +277,7 @@ function ChatLauncherButton({ open, setOpen }) {
   );
 }
 
-/* ====== Default export ====== */
+/* ===== Default export ===== */
 export default function SupportChatWidget({ brand = "HomeCareDN" }) {
   const [open, setOpen] = useState(false);
   return (

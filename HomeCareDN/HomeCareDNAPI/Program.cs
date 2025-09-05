@@ -1,5 +1,4 @@
-﻿using System.Text;
-using BusinessLogic.Services;
+﻿using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Data;
@@ -12,6 +11,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
@@ -54,6 +55,7 @@ namespace HomeCareDNAPI
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
                         ),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
             builder.Services.AddCors(options =>
@@ -70,11 +72,30 @@ namespace HomeCareDNAPI
                     }
                 );
             });
+
+
+
+
             builder.Services.AddHttpContextAccessor();
 
             /// Register services for Application
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
+
+
+            // Cache (chọn 1)
+            //builder.Services.AddStackExchangeRedisCache(o =>
+            //{
+            //    o.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
+            //    o.InstanceName = "homecaredn:";
+            //});
+            // Hoặc tạm dùng:
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddHttpContextAccessor();
+            // LLM client
+            builder.Services.AddHttpClient<Ultitity.LLM.IGroqClient, Ultitity.LLM.GroqClient>();
+
+
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
@@ -89,7 +110,8 @@ namespace HomeCareDNAPI
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
             var app = builder.Build();
-            app.UseCors("AllowReactApp");
+
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -97,9 +119,16 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseCors("AllowReactApp");
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

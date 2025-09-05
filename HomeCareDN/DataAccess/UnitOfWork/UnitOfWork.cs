@@ -21,7 +21,8 @@ namespace DataAccess.UnitOfWork
         }
         public ICategoryRepository CategoryRepository { get; private set; }
         public IBrandRepository BrandRepository { get; private set; }
-
+        public IConversationRepository ConversationRepository { get; private set; }
+        public IChatMessageRepository ChatMessageRepository { get; private set; }
         public UnitOfWork(ApplicationDbContext db, IConfiguration configuration)
         {
             _db = db;
@@ -33,6 +34,8 @@ namespace DataAccess.UnitOfWork
             ContractorApplicationRepository = new ContractorApplicationRepository(_db);
             CategoryRepository = new CategoryRepository(_db);
             BrandRepository = new BrandRepository(_db);
+            ConversationRepository = new ConversationRepository(_db);
+            ChatMessageRepository = new ChatMessageRepository(_db);
         }
 
         public async Task SaveAsync()
