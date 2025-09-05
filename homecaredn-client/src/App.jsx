@@ -7,6 +7,8 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -52,6 +54,8 @@ function Layout() {
       <Routes>
         {/* Public routes */}
         <Route path="/Home" element={<Home />} />
+        <Route path="/About" element={<About />} />
+        <Route path="/Contact" element={<Contact />} />
         <Route
           path="/Login"
           element={

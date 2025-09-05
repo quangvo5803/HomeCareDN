@@ -74,6 +74,86 @@
     "testimonial2_name": "Client Name",
     "testimonial2_role": "Profession"
   },
+  "about": {
+    "hero_title1": "Crafting Spaces,",
+    "hero_title2": "Shaping Futures",
+    "hero_description": "At HomeCareDN, every project begins with purpose and is driven by passion. We don't just construct buildings we create lasting spaces that reflect our clients' goals and values.",
+    "hero_button": "Our Service",
+    "section_subtitle": "About Our Company",
+    "section_title": "Built on Experience. Driven by Quality.",
+    "section_description": "With over 15 years in the industry, we bring a hands-on, client-first approach to every project. Our team blends craftsmanship, innovation, and trust to deliver excellence.",
+    "stat1_title": "HomeCareDN",
+    "stat1_text": "Proven track record across residential, commercial, and industrial sectors",
+    "stat2_title": "Modern Technology",
+    "stat2_text": "We integrate the latest construction technologies to ensure efficiency and sustainability",
+    "stat3_text": "Project Success rate",
+    "stat4_text": "Client Satisfaction",
+    "stat5_title": "Experience Engineers",
+    "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
+  },
+  "common": {
+    "home": "Home",
+    "about": "About"
+  },
+  "why": {
+  "badge": "Why Choose Us",
+  "title": "Why Builders Trust",
+  "brand": "HomeCareDN",
+  "intro": "At HomeCareDN, we don't just build — we build with purpose, integrity, and precision. Our reputation is grounded in trust, quality, and client satisfaction.",
+  "image_alt": "Why Choose Us illustration",
+  "f1": {
+    "title": "Experienced & Skilled Team",
+    "desc": "Decades of hands-on experience with a team of certified engineers, architects, and project managers who understand every detail of construction."
+  },
+  "f2": {
+    "title": "High-Quality Craftsmanship",
+    "desc": "We combine traditional techniques with modern innovations to deliver long-lasting, precision-built structures — every time."
+  },
+  "f3": {
+    "title": "Client-Centered Approach",
+    "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
+  }
+},
+"process": {
+  "badge": "Our Process",
+  "title": "Our 4-Step Process to a Successful Build.",
+  "intro": "At HomeCareDN, we don't just build — we craft. Every space we deliver is a reflection of thoughtful design, expert planning, and precise execution.",
+  "s1": {
+    "title": "Understanding your needs",
+    "desc": "We listen closely to your goals, challenges, and vision to deliver."
+  },
+  "s2": {
+    "title": "Detailed timeline & quote",
+    "desc": "We provide transparent project timelines and accurate cost estimates."
+  },
+  "s3": {
+    "title": "Expertly Built With Care",
+    "desc": "Every structure we build reflects our commitment to quality craftsmanship."
+  },
+  "s4": {
+    "title": "Final Check & Handover",
+    "desc": "Before delivery, we conduct a thorough final inspection to ensure everything."
+  }
+},
+"contact": {
+  "breadcrumb": "Contact Us",
+  "title": "Contact Us",
+  "map_title": "Google Map",
+  "section_tag": "Contact Us",
+  "section_title": "If You Have Any Query, Please Contact Us",
+  "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
+  "note_link": "Download Now",
+  "form_aria": "Contact form",
+  "form": {
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Message",
+    "submit": "Send Message"
+  }
+}
+,
+
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
