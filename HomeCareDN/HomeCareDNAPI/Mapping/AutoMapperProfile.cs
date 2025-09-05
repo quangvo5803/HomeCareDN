@@ -71,6 +71,10 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.BrandName,
                     opt =>
                         opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
+                )
+                .ForMember(
+                    dest => dest.CategoryName,
+                    opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : string.Empty)
                 );
 
             CreateMap<Category, CategoryDto>().ReverseMap();

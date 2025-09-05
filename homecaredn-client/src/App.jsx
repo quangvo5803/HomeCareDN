@@ -1,28 +1,30 @@
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Public pages
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import VerifyOTP from './pages/VerifyOTP';
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import VerifyOTP from "./pages/VerifyOTP";
 
 //Admin pages
-import AdminLayout from './pages/admin/AdminLayout';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminBrandManager from './pages/admin/AdminBrandManager';
-import AdminCategoryManager from './pages/admin/AdminCategoryManager';
+import AdminLayout from "./pages/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminBrandManager from "./pages/admin/AdminBrandManager";
+import AdminCategoryManager from "./pages/admin/AdminCategoryManager";
 //Contractor pages
-import ContractorDashboard from './pages/contractor/ContractorDashboard';
+import ContractorDashboard from "./pages/contractor/ContractorDashboard";
 //Distributor pages
-import DistributorDashboard from './pages/distributor/DistributorDashboard';
+import DistributorDashboard from "./pages/distributor/DistributorDashboard";
+import DistributorMaterialManager from "./pages/distributor/DistributorMaterialManager";
 
-import AuthProvider from './context/AuthProvider';
-import { useAuth } from './hook/useAuth';
-import ProtectedRoute from './components/ProtectedRoute';
-import Header from './components/Header';
-import Footer from './components/Footer';
+import AuthProvider from "./context/AuthProvider";
+import { useAuth } from "./hook/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import DistributorLayout from "./pages/distributor/DistributorLayout";
 
 function App() {
   return (
@@ -37,14 +39,14 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/login', '/register', '/verifyotp'];
+  const noHeaderFooterPaths = ["/login", "/register", "/verifyotp"];
 
   const showHeaderFooter =
     !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
     (!user ||
-      (user.role !== 'Admin' &&
-        user.role !== 'Contractor' &&
-        user.role !== 'Distributor'));
+      (user.role !== "Admin" &&
+        user.role !== "Contractor" &&
+        user.role !== "Distributor"));
 
   return (
     <>
@@ -83,7 +85,7 @@ function Layout() {
         <Route
           path="/Admin"
           element={
-            <ProtectedRoute allowedRoles={['Admin']}>
+            <ProtectedRoute allowedRoles={["Admin"]}>
               <AdminLayout />
             </ProtectedRoute>
           }
@@ -97,31 +99,53 @@ function Layout() {
         <Route
           path="/ContractorDashboard"
           element={
-            <ProtectedRoute allowedRoles={['Contractor']}>
+            <ProtectedRoute allowedRoles={["Contractor"]}>
               <ContractorDashboard />
             </ProtectedRoute>
           }
         />
         {/* Distributor routes */}
         <Route
+          path="/Distributor"
+          element={
+            <ProtectedRoute allowedRoles={["Distributor"]}>
+              <DistributorLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DistributorDashboard />} />
+          <Route
+            path="material-manager"
+            element={<DistributorMaterialManager />}
+          />
+        </Route>
+        {/* <Route
           path="/DistributorDashboard"
           element={
-            <ProtectedRoute allowedRoles={['Distributor']}>
+            <ProtectedRoute allowedRoles={["Distributor"]}>
               <DistributorDashboard />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/material-manager"
+          element={
+            <ProtectedRoute allowedRoles={["Distributor"]}>
+              <DistributorMaterialManager />
+            </ProtectedRoute>
+          }
+        /> */}
         {/* Redirect root → /home */}
         <Route
           path="/"
           element={
-            <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
+            <Navigate to={user ? getRedirectPath(user) : "/Home"} replace />
           }
         />
         <Route
           path="*"
           element={
-            <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
+            <Navigate to={user ? getRedirectPath(user) : "/Home"} replace />
           }
         />
       </Routes>
@@ -131,14 +155,14 @@ function Layout() {
 }
 function getRedirectPath(user) {
   switch (user?.role) {
-    case 'Admin':
-      return '/Admin';
-    case 'Contractor':
-      return '/ContractorDashboard';
-    case 'Distributor':
-      return '/DistributorDashboard';
+    case "Admin":
+      return "/Admin";
+    case "Contractor":
+      return "/ContractorDashboard";
+    case "Distributor":
+      return "/Distributor";
     default:
-      return '/Home';
+      return "/Home";
   }
 }
 

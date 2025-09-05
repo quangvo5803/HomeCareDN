@@ -4,7 +4,7 @@
     {
         public Guid MaterialID { get; set; }
         public required string UserID { get; set; }
-        public required string CategoryID { get; set; }
+        public required string CategoryName { get; set; }
         public required string Name { get; set; }
 
         public required string BrandName { get; set; }

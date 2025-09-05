@@ -132,6 +132,7 @@
     "view": "View",
     "search_placeholder": "Search applications",
     "service_requests": "Service Requests",
+    "materials": "Materials",
     "you_have_notifications": "You have {{count}} notifications",
     "notification_item": "Notification #{{number}}",
     "change_language": "Change language",
@@ -255,6 +256,18 @@
       "categoryNameEN": "Category name(English)",
       "categoryNamePlaceholderEN": "Enter category name in English..."
     }
+  },
+  "distributorMaterialManager": {
+    "title": "Material Manager",
+    "create_Material": "Add Material",
+    "no": "NO",
+    "materialName": "Material Name",
+    "brand": "Brand",
+    "category": "Category",
+    "unit": "Unit",
+    "unit_Price": "Unit Price",
+    "images": "Images",
+    "action": "Action"
   },
   "roles": {
     "Distributor": "Distributor",

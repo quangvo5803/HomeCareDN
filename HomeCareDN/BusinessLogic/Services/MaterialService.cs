@@ -24,7 +24,7 @@ namespace BusinessLogic.Services
         public async Task<ICollection<MaterialDto>> GetAllMaterial()
         {
             var material = await _unitOfWork.MaterialRepository
-                .GetAllAsync(includeProperties: "Images,Brand");
+                .GetAllAsync(includeProperties: "Images,Brand,Category");
             return _mapper.Map<ICollection<MaterialDto>>(material);
         }
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
@@ -56,9 +56,7 @@ namespace BusinessLogic.Services
             }
 
             var material = _mapper.Map<Material>(requestDto);
-
             await _unitOfWork.MaterialRepository.AddAsync(material);
-            await _unitOfWork.SaveAsync();
 
             foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
             {
@@ -75,6 +73,9 @@ namespace BusinessLogic.Services
                 );
             }
             await _unitOfWork.SaveAsync();
+
+            material = await _unitOfWork.MaterialRepository
+                .GetAsync(m => m.MaterialID == material.MaterialID, includeProperties: "Category,Brand");
             return _mapper.Map<MaterialDto>(material);
         }
 
@@ -82,7 +83,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images,Category"
+                includeProperties: "Images,Category,Brand"
             );
 
             if (material == null)
@@ -101,7 +102,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images,Category"
+                includeProperties: "Images,Category,Brand"
             );
 
             var errors = new Dictionary<string, string[]>();
@@ -139,7 +140,6 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             material.PatchFrom(requestDto);
-            //await _unitOfWork.SaveAsync();
 
             foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
             {
@@ -156,7 +156,6 @@ namespace BusinessLogic.Services
                 );
             }
             await _unitOfWork.SaveAsync();
-
             return _mapper.Map<MaterialDto>(material);
         }
 

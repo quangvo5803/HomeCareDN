@@ -128,6 +128,7 @@
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
     "service_requests": "Yêu cầu dịch vụ",
+    "materials": "Vật liệu",
     "you_have_notifications": "Bạn có {{count}} thông báo",
     "notification_item": "Thông báo #{{number}}",
     "change_language": "Đổi ngôn ngữ",
@@ -251,6 +252,17 @@
       "categoryNameEN": "Tên danh mục(Tiếng Anh)",
       "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh..."
     }
+  },
+  "distributorMaterialManager": {
+    "title": "Quản lý vật liệu",
+    "create_Material": "Thêm vật liệu",
+    "no": "STT",
+    "materialName": "Tên vật liệu",
+    "brand": "Thương hiệu",
+    "category": "Danh mục",
+    "unit_Price": "Giá",
+    "images": "Hình ảnh",
+    "action": "Thao tác"
   },
   "roles": {
     "Distributor": "Nhà phân phối",

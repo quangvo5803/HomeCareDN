@@ -9,7 +9,7 @@ namespace HomeCareDNAPI.Controllers.Distributor
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
     public partial class DistributorController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
