@@ -4,15 +4,15 @@ export const aiChatService = {
   send: async (input) => {
     const body = typeof input === 'string'
       ? { prompt: input }
-      : { prompt: input?.prompt }; // bỏ system phía FE, backend hiện chưa dùng
+      : { prompt: input?.prompt }; 
 
     const res = await api.post('/AiChat/send', body, { withCredentials: true });
-    return res.data; // { reply, history }
+    return res.data; 
   },
 
   history: async () => {
     const res = await api.get('/AiChat/history', { withCredentials: true });
-    return res.data; // [{ role, content, timestampUtc }, ...]
+    return res.data; 
   },
 
   clear: async () => {
