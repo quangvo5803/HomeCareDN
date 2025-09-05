@@ -8,10 +8,32 @@ import { getSupportPrompt } from "../prompts/supportPrompt";
 /* ===== Helpers ===== */
 const ROLES = { USER: "user", BOT: "assistant" };
 const cn = (...xs) => xs.filter(Boolean).join(" ");
-const uid = () =>
-  (typeof crypto !== "undefined" && crypto.randomUUID)
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
+
+const uid = (() => {
+  let seq = 0; // fallback đếm tăng dần để không đụng Math.random
+  return () => {
+    const c = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+
+    // 1) Tốt nhất: UUID v4 native (Node >= 16.15 / Browser hiện đại)
+    if (c?.randomUUID) return c.randomUUID();
+
+    // 2) Tự tạo UUID v4 bằng getRandomValues (crypto-strong)
+    if (c?.getRandomValues) {
+      const bytes = new Uint8Array(16);
+      c.getRandomValues(bytes);
+      // set version & variant cho UUID v4
+      bytes[6] = (bytes[6] & 0x0f) | 0x40;
+      bytes[8] = (bytes[8] & 0x3f) | 0x80;
+      const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
+      return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+    }
+
+    // 3) Fallback cuối (môi trường rất cũ/không có crypto): không ngẫu nhiên,
+    // chỉ cần duy nhất/ổn định để key React hoạt động, tránh dùng PRNG.
+    seq += 1;
+    return `uid-${Date.now()}-${seq}`;
+  };
+})();
 
 const toUiMessage = (m) => ({
   id: uid(),
