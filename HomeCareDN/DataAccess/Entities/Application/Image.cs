@@ -15,6 +15,6 @@ namespace DataAccess.Entities.Application
         public Guid? ServiceID { get; set; }
         public Guid? ContractorApplicationID { get; set; }
         public Guid? BrandID { get; set; }
-        public string PublicId { get; set; }
+        public string PublicId { get; set; } = string.Empty;
     }
 }

@@ -2,6 +2,8 @@
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Ultitity.Options;
 using WebApi.Repositories;
 
 namespace DataAccess.UnitOfWork
@@ -9,7 +11,7 @@ namespace DataAccess.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _db;
-        private readonly IConfiguration _configuration;
+
         public IImageRepository ImageRepository { get; private set; }
         public IServiceRequestRepository ServiceRequestRepository { get; private set; }
         public IMaterialRepository MaterialRepository { get; private set; }
@@ -23,11 +25,11 @@ namespace DataAccess.UnitOfWork
         public IBrandRepository BrandRepository { get; private set; }
         public IConversationRepository ConversationRepository { get; private set; }
         public IChatMessageRepository ChatMessageRepository { get; private set; }
-        public UnitOfWork(ApplicationDbContext db, IConfiguration configuration)
+
+        public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
         {
             _db = db;
-            _configuration = configuration;
-            ImageRepository = new ImageRepository(_db, _configuration);
+            ImageRepository = new ImageRepository(_db, cloudaryOptions);
             ServiceRequestRepository = new ServiceRequestRepository(_db);
             MaterialRepository = new MaterialRepository(_db);
             ServiceRepository = new ServiceRepository(_db);

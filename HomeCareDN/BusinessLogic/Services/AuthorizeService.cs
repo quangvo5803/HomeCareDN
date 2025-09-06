@@ -6,6 +6,7 @@ using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace BusinessLogic.Services
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtOptions _jwtOptions;
+        private readonly GoogleOptions _googleOptions;
 
         private const int RefreshTokenDays = 7;
         private const int OtpExpiryMinutes = 5;
@@ -40,7 +42,8 @@ namespace BusinessLogic.Services
             IEmailQueue emailQueue,
             IRefreshTokenRepository refreshTokenRepository,
             IHttpContextAccessor httpContextAccessor,
-            IOptions<JwtOptions> jwtOptions
+            IOptions<JwtOptions> jwtOptions,
+            IOptions<GoogleOptions> googleOptions
         )
         {
             _userManager = userManager;
@@ -48,6 +51,7 @@ namespace BusinessLogic.Services
             _refreshTokenRepository = refreshTokenRepository;
             _httpContextAccessor = httpContextAccessor;
             _jwtOptions = jwtOptions.Value;
+            _googleOptions = googleOptions.Value;
         }
 
         #region OTP
@@ -285,6 +289,7 @@ namespace BusinessLogic.Services
         }
 
         #endregion
+
         public async Task Logout()
         {
             var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
@@ -317,6 +322,73 @@ namespace BusinessLogic.Services
                     Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
                 }
             );
+        }
+
+        public async Task<TokenResponseDto> GoogleLoginAsync(GoogleLoginRequestDto requestDto)
+        {
+            // Xác thực token Google
+            var payload = await GoogleJsonWebSignature.ValidateAsync(
+                requestDto.Credential,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { _googleOptions.GoogleClientId },
+                }
+            );
+
+            // Tìm user theo email
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = payload.Email,
+                    Email = payload.Email,
+                    FullName = payload.Name,
+                    EmailConfirmed = true,
+                };
+                await _userManager.CreateAsync(user);
+                await _userManager.AddToRoleAsync(user, "Customer"); // default role
+            }
+
+            // Xóa refresh token cũ
+            var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
+            if (oldToken != null)
+                await _refreshTokenRepository.DeleteAsync(oldToken);
+
+            // Sinh access token + refresh token mới
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var refreshToken = GenerateRefreshToken();
+
+            var rt = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddDays(RefreshTokenDays),
+            };
+            await _refreshTokenRepository.AddAsync(rt);
+
+            // Gửi cookie HttpOnly refresh token
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                REFRESH_TOKEN_STR,
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                    Path = "/",
+                }
+            );
+
+            return new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = tokenOptions.ValidTo,
+                UserId = user.Id,
+            };
         }
 
         #region JWT
