@@ -24,7 +24,7 @@ export const MaterialProvider = ({ children }) => {
     }
   }, []);
 
-  // 📌 Public: get brand by id
+  // 📌 Public: get material by id
   const getMaterialById = useCallback(async (id) => {
     try {
       return await materialService.getMaterialById(id);
@@ -33,14 +33,29 @@ export const MaterialProvider = ({ children }) => {
       return null;
     }
   }, []);
-
+  // 📌 Admin-only: get all by id
+  const fetchMaterialsById = useCallback(
+    async (id) => {
+      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      try {
+        setLoading(true);
+        const data = await materialService.getAllMaterialById(id);
+        setMaterials(data);
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [user?.role]
+  );
   // 📌 Admin-only: create
   const createMaterial = useCallback(
     async (materialData) => {
       if (user?.role !== "Distributor") throw new Error("Unauthorized");
       try {
         setLoading(true);
-        const newMaterial = await materialService.createBrand(materialData);
+        const newMaterial = await materialService.createMaterial(materialData);
         setMaterials((prev) => [...prev, newMaterial]);
         return newMaterial;
       } catch (err) {
@@ -61,14 +76,14 @@ export const MaterialProvider = ({ children }) => {
         setLoading(true);
         const updated = await materialService.updateMaterial(materialData);
         setMaterials((prev) =>
-          prev.map((b) =>
-            b.MaterialID === updated.materialID
+          prev.map((m) =>
+            m.materialID === updated.materialID
               ? {
-                  ...b,
+                  ...m,
                   ...updated,
-                  images: updated.images ?? b.images,
+                  images: updated.images ?? m.images,
                 }
-              : b
+              : m
           )
         );
         return updated;
@@ -97,6 +112,31 @@ export const MaterialProvider = ({ children }) => {
     [user?.role]
   );
 
+  const deleteMaterialImage = useCallback(
+    async (materialId, imageId) => {
+      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      try {
+        await materialService.deleteMaterialImage(materialId, imageId);
+
+        // update state: xoá ảnh trong material.images
+        setMaterials((prev) =>
+          prev.map((m) =>
+            m.materialID === materialId
+              ? {
+                  ...m,
+                  images: m.images.filter((img) => img.imageID !== imageId),
+                }
+              : m
+          )
+        );
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      }
+    },
+    [user?.role]
+  );
+
   // 📌 Load brands khi user login, reset khi logout
   useEffect(() => {
     if (user) fetchMaterials();
@@ -108,19 +148,23 @@ export const MaterialProvider = ({ children }) => {
       materials,
       loading,
       fetchMaterials,
+      fetchMaterialsById,
       getMaterialById,
       createMaterial,
       updateMaterial,
       deleteMaterial,
+      deleteMaterialImage,
     }),
     [
       materials,
       loading,
       fetchMaterials,
+      fetchMaterialsById,
       getMaterialById,
       createMaterial,
       updateMaterial,
       deleteMaterial,
+      deleteMaterialImage,
     ]
   );
 

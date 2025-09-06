@@ -13,6 +13,11 @@ export const materialService = {
   },
 
   //Admin-only APIs
+  getAllMaterialById: async (id) => {
+    const response = await api.get(`/Distributor/get-all-material-by-id/${id}`);
+    return response.data;
+  },
+
   createMaterial: async ({
     UserID,
     CategoryID,
@@ -31,7 +36,9 @@ export const materialService = {
     if (Unit) formData.append("Unit", Unit);
     if (Description) formData.append("Description", Description);
     formData.append("UnitPrice", UnitPrice);
-    formData.append("Images", Images);
+    if (Images && Images.length > 0) {
+      Images.forEach((file) => formData.append("Images", file));
+    }
 
     const response = await api.post("/Distributor/create-material", formData, {
       headers: {
@@ -59,7 +66,10 @@ export const materialService = {
     if (Unit) formData.append("Unit", Unit);
     if (Description) formData.append("Description", Description);
     formData.append("UnitPrice", UnitPrice);
-    formData.append("Images", Images);
+
+    if (Images && Images.length > 0) {
+      Images.forEach((file) => formData.append("Images", file));
+    }
 
     const response = await api.put("/Distributor/update-material", formData, {
       headers: {
@@ -71,6 +81,13 @@ export const materialService = {
 
   deleteMaterial: async (id) => {
     const response = await api.delete(`/Distributor/delete-material/${id}`);
+    return response.data;
+  },
+
+  deleteMaterialImage: async (materialId, imageId) => {
+    const response = await api.delete(
+      `/Distributor/delete-material-image/${materialId}/images/${imageId}`
+    );
     return response.data;
   },
 };

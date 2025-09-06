@@ -282,14 +282,27 @@
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
-    "create_Material": "Thêm vật liệu",
     "no": "STT",
     "materialName": "Tên vật liệu",
     "brand": "Thương hiệu",
     "category": "Danh mục",
     "unit_Price": "Giá",
+    "unit_Price1": "Liên hệ để báo giá",
     "images": "Hình ảnh",
-    "action": "Thao tác"
+    "action": "Thao tác",
+    "noMaterial": "Chưa có vật liệu nào",
+    "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn",
+    "materialModal": {
+      "title": "Thêm vật liệu mới",
+      "title2": "Cập nhật vật liệu",
+      "materialName": "Tên vật liệu",
+      "brand": "Thương hiệu",
+      "category": "Danh mục",
+      "unit": "Số lượng",
+      "description": "Mô tả",
+      "unit_Price": "Giá",
+      "images": "Hình ảnh"
+    }
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -337,10 +350,14 @@
     "UpdateBrand": "Cập nhật thương hiệu",
     "AddNewCategory": "Thêm danh mục mới",
     "UpdateCategory": "Cập nhật danh mục",
+    "AddNewMaterial": "Thêm vật liệu",
+    "UpdateMaterial": "Cập nhật vật liệu",
     "View": "Xem",
     "Edit": "Sửa",
     "Delete": "Xóa",
-    "Cancel": "Hủy bỏ"
+    "Cancel": "Hủy bỏ",
+    "Add": "Thêm",
+    "Update": "Cập nhật"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -354,6 +371,14 @@
     "DeletingLoadingModal": {
       "title": "Đang xóa...",
       "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteMaterialModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Vật liệu này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteMaterialImageModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
   },
   "ERROR": {
@@ -369,10 +394,18 @@
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
+    "ERROR_MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh",
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
-    "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục."
+    "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục.",
+    "REQUIRED_MATERIAL_NAME": "Vui lòng nhập tên vật liệu.",
+    "REQUIRED_MATERIAL_IMAGES": "Vui lòng tải lên ảnh vật liệu.",
+    "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập số lượng vật liệu.",
+    "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
+    "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
+
+    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!"
   },
   "SUCCESS": {
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
@@ -381,6 +414,8 @@
     "BRAND_ADD": "Thêm thương hiệu thành công.",
     "BRAND_UPDATE": "Cập nhật thương hiệu thành công.",
     "CATEGORY_ADD": "Thêm danh mục thành công.",
-    "CATEGORY_UPDATE": "Cập nhật danh mục thành công."
+    "CATEGORY_UPDATE": "Cập nhật danh mục thành công.",
+    "MATERIAL_ADD": "Thêm vật liệu thành công.",
+    "MATERIAL_UPDATE": "Cập nhật vật liệu thành công."
   }
 }

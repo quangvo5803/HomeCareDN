@@ -6,7 +6,11 @@ namespace Ultitity.Extensions
 
     public static class PatchExtensions
     {
-        public static void PatchFrom<TSource, TDestination>(this TDestination dest, TSource source)
+        public static void PatchFrom<TSource, TDestination>(
+            this TDestination dest,
+            TSource source,
+            params string[] ignoreProperties
+        )
         {
             var sourceProps = typeof(TSource).GetProperties(
                 BindingFlags.Public | BindingFlags.Instance
@@ -17,6 +21,9 @@ namespace Ultitity.Extensions
 
             foreach (var sourceProp in sourceProps)
             {
+                if (ignoreProperties.Contains(sourceProp.Name))
+                    continue;
+
                 var destProp = destProps.FirstOrDefault(p =>
                     p.Name == sourceProp.Name && p.CanWrite
                 );
@@ -27,28 +34,73 @@ namespace Ultitity.Extensions
 
                 try
                 {
-                    // Nếu kiểu destination có thể nhận trực tiếp
                     if (destProp.PropertyType.IsAssignableFrom(sourceProp.PropertyType))
                     {
                         destProp.SetValue(dest, value);
                     }
                     else
                     {
-                        // Nếu kiểu source là nullable, lấy underlying type
                         var targetType =
                             Nullable.GetUnderlyingType(destProp.PropertyType)
                             ?? destProp.PropertyType;
 
-                        // Convert kiểu và gán giá trị
                         var convertedValue = Convert.ChangeType(value, targetType);
                         destProp.SetValue(dest, convertedValue);
                     }
                 }
                 catch
                 {
-                    // Bỏ qua nếu không convert được (hoặc log nếu muốn)
+                    // log nếu muốn
                 }
             }
         }
     }
+
+    //public static class PatchExtensions
+    //{
+    //    public static void PatchFrom<TSource, TDestination>(this TDestination dest, TSource source)
+    //    {
+    //        var sourceProps = typeof(TSource).GetProperties(
+    //            BindingFlags.Public | BindingFlags.Instance
+    //        );
+    //        var destProps = typeof(TDestination).GetProperties(
+    //            BindingFlags.Public | BindingFlags.Instance
+    //        );
+
+    //        foreach (var sourceProp in sourceProps)
+    //        {
+    //            var destProp = destProps.FirstOrDefault(p =>
+    //                p.Name == sourceProp.Name && p.CanWrite
+    //            );
+    //            if (destProp == null)
+    //                continue;
+
+    //            var value = sourceProp.GetValue(source);
+
+    //            try
+    //            {
+    //                // Nếu kiểu destination có thể nhận trực tiếp
+    //                if (destProp.PropertyType.IsAssignableFrom(sourceProp.PropertyType))
+    //                {
+    //                    destProp.SetValue(dest, value);
+    //                }
+    //                else
+    //                {
+    //                    // Nếu kiểu source là nullable, lấy underlying type
+    //                    var targetType =
+    //                        Nullable.GetUnderlyingType(destProp.PropertyType)
+    //                        ?? destProp.PropertyType;
+
+    //                    // Convert kiểu và gán giá trị
+    //                    var convertedValue = Convert.ChangeType(value, targetType);
+    //                    destProp.SetValue(dest, convertedValue);
+    //                }
+    //            }
+    //            catch
+    //            {
+    //                // Bỏ qua nếu không convert được (hoặc log nếu muốn)
+    //            }
+    //        }
+    //    }
+    //}
 }

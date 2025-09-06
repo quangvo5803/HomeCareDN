@@ -78,6 +78,8 @@ export default function Sidebar({
     [t, serviceRequestsCount, ctxLogout, navigate]
   );
 
+  const handleClick = (it) =>
+    typeof it.onClick === "function" ? it.onClick() : it.to && navigate(it.to);
   return (
     <aside
       className={
@@ -116,7 +118,7 @@ export default function Sidebar({
             <button
               key={it.key}
               type="button"
-              onClick={it.onClick}
+              onClick={() => handleClick(it)}
               className="w-full text-left block px-3 py-2 rounded-xl hover:bg-gray-100 text-red-500"
             >
               <span className="mr-2">{it.icon}</span>

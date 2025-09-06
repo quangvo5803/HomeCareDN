@@ -145,32 +145,32 @@
     }
   },
   "supportChat": {
-  "headerTitle": "Assistant — Support for {{brand}}",
-  "headerStatusReady": "Ready to help",
-  "action": {
-    "minimize": "Minimize",
-    "expand": "Expand",
-    "close": "Close"
+    "headerTitle": "Assistant — Support for {{brand}}",
+    "headerStatusReady": "Ready to help",
+    "action": {
+      "minimize": "Minimize",
+      "expand": "Expand",
+      "close": "Close"
+    },
+    "searchPlaceholder": "Search in conversation",
+    "inputPlaceholder": "Type a message...",
+    "send": "Send",
+    "launcherTitle": "Live support",
+    "typing": "Bot is typing…",
+    "demoBadge": "Demo • Version 1.0",
+    "suggestions": [
+      "How to use this website?",
+      "Add rounded avatar",
+      "Suggest modern colors"
+    ],
+    "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
+    "seed": {
+      "user1": "I want a React chat support widget. Please split components.",
+      "bot1": "Sure! I'll design a modern widget with a round launcher button.",
+      "user2": "Prioritize mobile and match the context: 'React support widget'.",
+      "bot2": "Got it! I'll seed sample data and keep components clean."
+    }
   },
-  "searchPlaceholder": "Search in conversation",
-  "inputPlaceholder": "Type a message...",
-  "send": "Send",
-  "launcherTitle": "Live support",
-  "typing": "Bot is typing…",
-  "demoBadge": "Demo • Version 1.0",
-  "suggestions": [
-    "How to use this website?",
-    "Add rounded avatar",
-    "Suggest modern colors"
-  ],
-  "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
-  "seed": {
-    "user1": "I want a React chat support widget. Please split components.",
-    "bot1": "Sure! I'll design a modern widget with a round launcher button.",
-    "user2": "Prioritize mobile and match the context: 'React support widget'.",
-    "bot2": "Got it! I'll seed sample data and keep components clean."
-  }
-},
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -286,15 +286,28 @@
   },
   "distributorMaterialManager": {
     "title": "Material Manager",
-    "create_Material": "Add Material",
     "no": "NO",
     "materialName": "Material Name",
     "brand": "Brand",
     "category": "Category",
     "unit": "Unit",
     "unit_Price": "Unit Price",
+    "unit_Price1": "Contact for quote",
     "images": "Images",
-    "action": "Action"
+    "action": "Action",
+    "noMaterial": "No material yet",
+    "letStart": "Start by adding your first material.",
+    "materialModal": {
+      "title": "Add new material",
+      "title2": "Update material",
+      "materialName": "Material Name",
+      "brand": "Brand",
+      "category": "Category",
+      "unit": "Unit",
+      "description": "Description",
+      "unit_Price": "Unit Price",
+      "images": "Images"
+    }
   },
   "roles": {
     "Distributor": "Distributor",
@@ -343,10 +356,14 @@
     "UpdateBrand": "Update Brand",
     "AddNewCategory": "Add new Category",
     "UpdateCategory": "Update Category",
+    "AddNewMaterial": "Add new Material",
+    "UpdateMaterial": "Update Material",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "Add": "Add",
+    "Update": "Update"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -360,6 +377,14 @@
     "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
+    },
+    "DeleteMaterialModal": {
+      "title": "Are you sure?",
+      "text": "This material will be deleted and cannot be restored!"
+    },
+    "DeleteMaterialImageModal": {
+      "title": "Are you sure?",
+      "text": "This image will be deleted and cannot be restored!"
     }
   },
   "ERROR": {
@@ -375,10 +400,18 @@
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
     "NETWORK_ERROR": "Unable to connect to server, please try again later!",
+    "ERROR_MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
 
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
-    "REQUIRED_CATEGORYNAME": "Please enter category name."
+    "REQUIRED_CATEGORYNAME": "Please enter category name.",
+    "REQUIRED_MATERIAL_NAME": "Please enter the material name.",
+    "REQUIRED_MATERIAL_IMAGES": "Please upload a material image.",
+    "REQUIRED_MATERIAL_UNIT": "Please enter the material quantity.",
+    "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
+    "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
+
+    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!"
   },
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
@@ -387,6 +420,8 @@
     "BRAND_ADD": "Add brand successfully.",
     "BRAND_UPDATE": "Update brand successfully.",
     "CATEGORY_ADD": "Add category successfully",
-    "CATEGORY_UPDATE": "Update category successfully."
+    "CATEGORY_UPDATE": "Update category successfully.",
+    "MATERIAL_ADD": "Add material successfully",
+    "MATERIAL_UPDATE": "Update material successfully."
   }
 }

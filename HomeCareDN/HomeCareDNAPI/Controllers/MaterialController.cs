@@ -17,7 +17,7 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("get-all-material")]
         public async Task<IActionResult> GetAllMaterial()
         {
-            var rs = await _facadeService.MaterialService.GetAllMaterial();
+            var rs = await _facadeService.MaterialService.GetAllMaterialAsync();
             return Ok(rs);
         }
 

@@ -104,6 +104,7 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+
         {/* Distributor routes */}
         <Route
           path="/Distributor"

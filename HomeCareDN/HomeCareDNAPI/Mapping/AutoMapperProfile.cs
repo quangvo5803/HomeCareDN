@@ -2,6 +2,7 @@
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Image;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
@@ -65,10 +66,6 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<Material, MaterialDto>()
                 .ForMember(
-                    dest => dest.ImageUrls,
-                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
-                )
-                .ForMember(
                     dest => dest.BrandName,
                     opt =>
                         opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
@@ -77,6 +74,10 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.CategoryName,
                     opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : string.Empty)
                 );
+
+            CreateMap<Image, ImageDto>()
+                .ForMember(dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => src.ImageUrl));
 
             CreateMap<Category, CategoryDto>().ReverseMap();
 
@@ -89,6 +90,7 @@ namespace HomeCareDNAPI.Mapping
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+
 
 
             //Chat DTOs

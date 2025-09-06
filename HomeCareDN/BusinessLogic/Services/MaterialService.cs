@@ -21,10 +21,17 @@ namespace BusinessLogic.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ICollection<MaterialDto>> GetAllMaterial()
+        public async Task<ICollection<MaterialDto>> GetAllMaterialAsync()
         {
             var material = await _unitOfWork.MaterialRepository
                 .GetAllAsync(includeProperties: "Images,Brand,Category");
+            return _mapper.Map<ICollection<MaterialDto>>(material);
+        }
+
+        public async Task<ICollection<MaterialDto>> GetAllMaterialByIdAsync(Guid id)
+        {
+            var material = await _unitOfWork.MaterialRepository
+                .GetRangeAsync(m => m.UserID == id.ToString(), includeProperties: "Images,Category,Brand");
             return _mapper.Map<ICollection<MaterialDto>>(material);
         }
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
@@ -60,7 +67,7 @@ namespace BusinessLogic.Services
 
             foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
             {
-                var imageUpload = new Image
+                var imageUpload = new DataAccess.Entities.Application.Image
                 {
                     ImageID = Guid.NewGuid(),
                     MaterialID = material.MaterialID,
@@ -115,7 +122,17 @@ namespace BusinessLogic.Services
                 );
                 throw new CustomValidationException(errors);
             }
+            //check ảnh cũ
+            var existingCount = material.Images?.Count ?? 0;
+            var newCount = requestDto.Images?.Count ?? 0;
 
+            if (existingCount + newCount > 5)
+            {
+                errors.Add(nameof(requestDto.Images),
+                    new[] { ERROR_MAXIMUM_IMAGE });
+            }
+
+            //check khi up ảnh mới
             if (requestDto.Images != null)
             {
                 if (requestDto.Images.Count > 5)
@@ -139,11 +156,11 @@ namespace BusinessLogic.Services
             {
                 throw new CustomValidationException(errors);
             }
-            material.PatchFrom(requestDto);
+            material.PatchFrom(requestDto, nameof(requestDto.Images));
 
             foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
             {
-                var imageUpload = new Image
+                var imageUpload = new DataAccess.Entities.Application.Image
                 {
                     ImageID = Guid.NewGuid(),
                     MaterialID = material.MaterialID,
@@ -181,6 +198,34 @@ namespace BusinessLogic.Services
             }
 
             _unitOfWork.MaterialRepository.Remove(material);
+            await _unitOfWork.SaveAsync();
+        }
+
+        public async Task DeleteMaterialImageAsync(Guid materialId, Guid imageId)
+        {
+            var request = await _unitOfWork.ImageRepository.GetAsync(
+                img => img.ImageID == imageId && img.MaterialID == materialId
+            );
+
+            if (request == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MaterialID", new[] { "MATERIAL_NOT_FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            if (string.IsNullOrEmpty(request.PublicId))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Image", new[] { "PUBLIC_ID_NOT_FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
             await _unitOfWork.SaveAsync();
         }
     }

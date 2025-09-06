@@ -1,4 +1,6 @@
-﻿namespace BusinessLogic.DTOs.Application.Material
+﻿using BusinessLogic.DTOs.Application.Image;
+
+namespace BusinessLogic.DTOs.Application.Material
 {
     public class MaterialDto
     {
@@ -11,6 +13,6 @@
         public string? Unit { get; set; }
         public string? Description { get; set; }
         public double UnitPrice { get; set; }
-        public ICollection<string>? ImageUrls { get; set; }
+        public ICollection<ImageDto>? Images { get; set; }
     }
 }

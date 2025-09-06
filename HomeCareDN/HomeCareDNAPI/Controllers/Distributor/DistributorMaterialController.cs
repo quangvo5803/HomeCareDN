@@ -9,13 +9,20 @@ namespace HomeCareDNAPI.Controllers.Distributor
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
     public partial class DistributorController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
         public DistributorController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
+        }
+
+        [HttpGet("get-all-material-by-id/{id:guid}")]
+        public async Task<IActionResult> GetAllMaterialById(Guid id)
+        {
+            var rs = await _facadeService.MaterialService.GetAllMaterialByIdAsync(id);
+            return Ok(rs);
         }
 
         [HttpPost("create-material")]
@@ -36,6 +43,13 @@ namespace HomeCareDNAPI.Controllers.Distributor
         public async Task<IActionResult> DeleteMaterial(Guid id)
         {
             await _facadeService.MaterialService.DeleteMaterialAsync(id);
+            return NoContent();
+        }
+
+        [HttpDelete("delete-material-image/{materialId:guid}/images/{imageId:guid}")]
+        public async Task<IActionResult> DeleteMaterialImage(Guid materialId, Guid imageId)
+        {
+            await _facadeService.MaterialService.DeleteMaterialImageAsync(materialId, imageId);
             return NoContent();
         }
     }
