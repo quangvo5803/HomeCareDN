@@ -44,6 +44,13 @@ namespace HomeCareDNAPI.Controllers
             return Ok(tokenResponse);
         }
 
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto request)
+        {
+            var tokenResponse = await _authorizeService.GoogleLoginAsync(request);
+            return Ok(tokenResponse);
+        }
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {

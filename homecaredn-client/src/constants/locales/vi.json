@@ -217,6 +217,33 @@
       "pending_payments": "▼ 1 quá hạn"
     }
   },
+  "supportChat": {
+    "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
+    "headerStatusReady": "Sẵn sàng hỗ trợ",
+    "action": {
+      "minimize": "Thu gọn",
+      "expand": "Mở rộng",
+      "close": "Đóng"
+    },
+    "searchPlaceholder": "Tìm trong cuộc trò chuyện",
+    "inputPlaceholder": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "launcherTitle": "Hỗ trợ trực tuyến",
+    "typing": "Bot đang soạn…",
+    "demoBadge": "Demo • Phiên bản 1.0",
+    "suggestions": [
+      "Làm sao để sử dụng website này?",
+      "Thêm avatar hình tròn",
+      "Gợi ý màu sắc hiện đại"
+    ],
+    "fakeReply": "Bạn muốn mình {{text}}? Mình có thể minh họa ngay trên UI này.",
+    "seed": {
+      "user1": "Mình muốn tạo giao diện React cho bot chat hỗ trợ. Tách component nhé.",
+      "bot1": "Được chứ! Mình sẽ thiết kế widget hiện đại, có nút tròn để mở chat.",
+      "user2": "Ưu tiên mobile và khớp ngữ cảnh gần đây: 'Hỗ trợ giao diện React'.",
+      "bot2": "Ok! Mình sẽ seed dữ liệu mẫu và tách component rõ ràng."
+    }
+  },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -369,7 +396,8 @@
     "SendOTP": "Gửi Mã OTP",
     "MoreDetails": "Xem Thêm Chi Tiết",
     "LoginGoogle": "Đăng Nhập với Google",
-    "RegisterGoogle": "Đăng Ký với Google",
+    "CreateAccount": "Tạo tài khoản",
+    "Processing": "Đang xử lí",
     "BackToLogin": "Quay Về Trang Đăng Nhập",
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
@@ -402,6 +430,7 @@
     "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
     "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+    "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
     "NULL_NAME": "Vui lòng nhập họ và tên.",
     "NULL_EMAIL": "Vui lòng nhập email.",
@@ -409,7 +438,6 @@
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
     "NETWORK_ERROR" : "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
@@ -425,3 +453,5 @@
     "CATEGORY_UPDATE": "Cập nhật danh mục thành công."
   }
 }
+
+

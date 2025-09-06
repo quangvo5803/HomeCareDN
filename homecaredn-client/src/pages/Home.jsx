@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
-
+import SupportChatWidget from "../components/SupportChatWidget";
 const slides = [
   {
     id: 1,
@@ -295,6 +295,7 @@ export default function Home() {
   }, [idx, tNext, hasMany]);
 
   return (
+    
     <div>
       {/* Carousel */}
       <div className="relative w-full h-[90vh] overflow-hidden">
@@ -893,13 +894,17 @@ export default function Home() {
         </section>
       </Reveal>
 
+      <div className="fixed bottom-6 right-24 z-[60]">
+        <SupportChatWidget brand="HomeCareDN"/>
+      </div>
+
       {/* Back to Top */}
       <button
         onClick={handleBackTop}
         aria-label="Back to top"
         className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${
+                    ${ 
                       showBackTop
                         ? 'opacity-100 translate-y-0'
                         : 'opacity-0 translate-y-3 pointer-events-none'
