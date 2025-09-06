@@ -6,10 +6,10 @@ import Loading from '../components/Loading';
 import AuthContext from '../context/AuthContext';
 import { handleApiError } from '../utils/handleApiError';
 import { useTranslation } from 'react-i18next';
-import { GoogleLogin } from '@react-oauth/google';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function Login() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -148,25 +148,7 @@ export default function Login() {
 
             {/* Google Login */}
             <div className="flex justify-center mt-4">
-              <GoogleLogin
-                locale={i18n.language === 'vi' ? 'vi' : 'en'}
-                onSuccess={async (credentialResponse) => {
-                  try {
-                    const credential = credentialResponse.credential;
-                    const res = await authService.googleLogin(credential);
-
-                    if (res.data?.accessToken) {
-                      login(res.data.accessToken);
-                      toast.success(t('SUCCESS.LOGIN'));
-                    }
-                  } catch {
-                    toast.error(t('ERROR.LOGIN_GOOGLE'));
-                  }
-                }}
-                onError={() => {
-                  toast.error(t('ERROR.LOGIN_GOOGLE'));
-                }}
-              />
+              <GoogleLoginButton onLoginSuccess={login} />
             </div>
             {/* Register Link */}
             <div className="text-center mt-8">
