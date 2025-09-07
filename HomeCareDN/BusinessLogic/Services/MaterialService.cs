@@ -4,7 +4,6 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
-using System.Net;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
 
@@ -14,29 +13,34 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const string ERROR_MAXIMUM_IMAGE = "You can only upload a maximum of 5 images.";
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "Each image must be less than 5 MB.";
-        private const string ERROR_MATERIAL_FOUND = "MATERIAL_NOT_FOUND";
-        private const string ERROR_IMAGE_FOUND = "IMAGE_NOT_FOUND";
+        private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
+        private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
+        private const string ERROR_IMAGE_NOT_FOUND = "IMAGE_NOT_FOUND";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+
         public async Task<ICollection<MaterialDto>> GetAllMaterialAsync()
         {
-            var material = await _unitOfWork.MaterialRepository
-                .GetAllAsync(includeProperties: "Images,Brand,Category");
+            var material = await _unitOfWork.MaterialRepository.GetAllAsync(
+                includeProperties: "Images,Brand,Category"
+            );
             return _mapper.Map<ICollection<MaterialDto>>(material);
         }
 
         public async Task<ICollection<MaterialDto>> GetAllMaterialByIdAsync(Guid id)
         {
-            var material = await _unitOfWork.MaterialRepository
-                .GetRangeAsync(m => m.UserID == id.ToString(), includeProperties: "Images,Category,Brand");
+            var material = await _unitOfWork.MaterialRepository.GetRangeAsync(
+                m => m.UserID == id.ToString(),
+                includeProperties: "Images,Category,Brand"
+            );
             return _mapper.Map<ICollection<MaterialDto>>(material);
         }
+
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
             //check image
@@ -50,8 +54,10 @@ namespace BusinessLogic.Services
 
             await _unitOfWork.SaveAsync();
 
-            material = await _unitOfWork.MaterialRepository
-                .GetAsync(m => m.MaterialID == material.MaterialID, includeProperties: "Category,Brand");
+            material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == material.MaterialID,
+                includeProperties: "Category,Brand"
+            );
             return _mapper.Map<MaterialDto>(material);
         }
 
@@ -65,12 +71,11 @@ namespace BusinessLogic.Services
             if (material == null)
             {
                 var errors = new Dictionary<string, string[]>
-                    {
-                        { "Material", new[] { ERROR_MATERIAL_FOUND } }
-                    };
+                {
+                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                };
                 throw new CustomValidationException(errors);
             }
-
 
             return _mapper.Map<MaterialDto>(material);
         }
@@ -102,7 +107,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_FOUND } }
+                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -122,15 +127,15 @@ namespace BusinessLogic.Services
 
         public async Task DeleteMaterialImageAsync(string imageUrl)
         {
-            var request = await _unitOfWork.ImageRepository.GetAsync(
-                img => img.ImageUrl == imageUrl
+            var request = await _unitOfWork.ImageRepository.GetAsync(img =>
+                img.ImageUrl == imageUrl
             );
 
             if (request == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ImageUrl", new[] { ERROR_IMAGE_FOUND } },
+                    { "ImageUrl", new[] { ERROR_IMAGE_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -138,11 +143,13 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
             await _unitOfWork.SaveAsync();
         }
+
         private static void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();
 
-            if (images == null) return;
+            if (images == null)
+                return;
 
             var totalCount = existingCount + images.Count;
             if (totalCount > 5)
@@ -161,11 +168,14 @@ namespace BusinessLogic.Services
             }
         }
 
-        private async Task UploadMaterialImagesAsync(Guid materialId, ICollection<IFormFile>? images)
+        private async Task UploadMaterialImagesAsync(
+            Guid materialId,
+            ICollection<IFormFile>? images
+        )
         {
             foreach (var image in images ?? Enumerable.Empty<IFormFile>())
             {
-                var imageUpload = new DataAccess.Entities.Application.Image
+                var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
                     MaterialID = materialId,
@@ -178,8 +188,5 @@ namespace BusinessLogic.Services
                 );
             }
         }
-
-        
-
     }
 }
