@@ -13,24 +13,22 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { deleteMaterialImage } = useMaterial();
-  // lấy danh sách brand & category từ context
   const { brands } = useBrand();
   const { categories } = useCategory();
 
-  const [name, setName] = useState("");
-  const [brandID, setBrandID] = useState("");
-  const [categoryID, setCategoryID] = useState("");
-  const [unit, setUnit] = useState("");
-  const [description, setDescription] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [imageFiles, setImageFiles] = useState([]);
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [dbImagesCount, setDbImagesCount] = useState(
-    material?.images?.length || 0
-  );
-  const [existingImages, setExistingImages] = useState([]);
+  const [name, setName] = useState('');
+  const [brandID, setBrandID] = useState('');
+  const [categoryID, setCategoryID] = useState('');
+  const [unit, setUnit] = useState('');
+  const [description, setDescription] = useState('');
+  const [unitPrice, setUnitPrice] = useState('');
 
-  // Delete Material image
+  // Ảnh DB
+  const [existingImages, setExistingImages] = useState([]);
+  // Ảnh local mới upload
+  const [newImages, setNewImages] = useState([]); // {file, previewUrl}
+
+  // Delete Material image (DB)
   const handleDeleteImage = async (materialID, imageID, onSuccess) => {
     Swal.fire({
       title: t('ModalPopup.DeleteMaterialImageModal.title'),
@@ -52,15 +50,10 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               Swal.showLoading();
             },
           });
-
           await deleteMaterialImage(materialID, imageID);
-
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
-
-          // Gọi callback sau khi xóa
           if (onSuccess) onSuccess();
-          setDbImagesCount((prev) => prev - 1);
         } catch (err) {
           Swal.close();
           if (err.handled) return;
@@ -70,62 +63,55 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     });
   };
 
-  // fill data khi edit
+  // Fill data khi edit
   useEffect(() => {
     if (isOpen) {
       if (material) {
-        //map brandId
         const foundBrand = brands.find(
           (b) => b.brandName === material.brandName
         );
-        //map CateId
         const foundCategory = categories.find(
           (c) => c.categoryName === material.categoryName
         );
-        setName(material.name || "");
-        setBrandID(material.brandID || foundBrand?.brandID || "");
-        setCategoryID(material.categoryID || foundCategory?.categoryID || "");
-        setUnit(material.unit || "");
-        setDescription(material.description || "");
-        setUnitPrice(material.unitPrice || "");
-        setImagePreviews(material.images.map((img) => img.imageUrls) || []);
-        setImageFiles([]);
-        setDbImagesCount(material.images.length);
+        setName(material.name || '');
+        setBrandID(material.brandID || foundBrand?.brandID || '');
+        setCategoryID(material.categoryID || foundCategory?.categoryID || '');
+        setUnit(material.unit || '');
+        setDescription(material.description || '');
+        setUnitPrice(material.unitPrice || '');
         setExistingImages(material.images || []);
+        setNewImages([]);
       } else {
-        setName("");
-        setBrandID("");
-        setCategoryID("");
-        setUnit("");
-        setDescription("");
-        setUnitPrice("");
-        setImagePreviews([]);
-        setImageFiles([]);
+        setName('');
+        setBrandID('');
+        setCategoryID('');
+        setUnit('');
+        setDescription('');
+        setUnitPrice('');
+        setExistingImages([]);
+        setNewImages([]);
       }
     }
   }, [isOpen, material, brands, categories]);
 
-  //chọn và hiển thị ảnh
+  // Chọn và hiển thị ảnh local
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const totalFiles = [...existingImages, ...imageFiles, ...files];
-
-    if (totalFiles.length > 5) {
+    const totalCount = existingImages.length + newImages.length + files.length;
+    if (totalCount > 5) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGE'));
       return;
     }
 
-    const newFiles = [...imageFiles, ...files];
-    setImageFiles(newFiles);
+    const mappedFiles = files.map((f) => ({
+      file: f,
+      previewUrl: URL.createObjectURL(f),
+    }));
 
-    const previews = [
-      ...imagePreviews,
-      ...files.map((f) => URL.createObjectURL(f)),
-    ];
-    setImagePreviews(previews);
+    setNewImages((prev) => [...prev, ...mappedFiles]);
   };
 
-  //Summit update/add
+  // Submit update/add
   const handleSubmit = () => {
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_NAME'));
@@ -143,7 +129,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_CATEGORY'));
       return;
     }
-    if (!material && imageFiles.length === 0) {
+    if (!material && newImages.length === 0) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
       return;
     }
@@ -156,12 +142,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       BrandID: brandID || null,
       CategoryID: categoryID || null,
       Description: description || null,
-      UnitPrice:
-        unitPrice !== undefined && unitPrice !== '' ? Number(unitPrice) : null,
-      Images: imageFiles.length > 0 ? imageFiles : null,
-      // Giữ ảnh cũ nếu không có ảnh mới
+      UnitPrice: unitPrice ? Number(unitPrice) : null,
+      Images: newImages.length > 0 ? newImages.map((x) => x.file) : null,
     };
-
     onSave(data);
   };
 
@@ -179,7 +162,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-lg"
           >
-            <i class="fa-solid fa-xmark"></i>
+            <i className="fa-solid fa-xmark"></i>
           </button>
         </div>
 
@@ -197,24 +180,22 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               onChange={(e) => setName(e.target.value)}
             />
           </div>
-
           {/* Unit */}
           <div>
             <label className="block text-sm font-medium mb-1">
               {t('distributorMaterialManager.materialModal.unit')}
             </label>
             <input
-              type="number"
+              type="text"
               className="w-full px-3 py-2 border rounded-lg"
               value={unit}
               onChange={(e) => setUnit(e.target.value)}
             />
           </div>
-
-          {/* Brand Select */}
+          {/* Brand */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t('distributorMaterialManager.materialModal.brand')}{' '}
+              {t('distributorMaterialManager.materialModal.brand')}
             </label>
             <select
               value={brandID || ''}
@@ -229,11 +210,10 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               ))}
             </select>
           </div>
-
-          {/* Category Select */}
+          {/* Category */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t('distributorMaterialManager.materialModal.category')}{' '}
+              {t('distributorMaterialManager.materialModal.category')}
             </label>
             <select
               value={categoryID || ''}
@@ -248,7 +228,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               ))}
             </select>
           </div>
-
           {/* Unit Price */}
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -258,13 +237,11 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               type="number"
               className="w-full px-3 py-2 border rounded-lg"
               value={unitPrice}
-              onChange={(e) => {
-                const value = e.target.value;
-                setUnitPrice(value === '' ? 0 : Number(value));
-              }}
+              onChange={(e) =>
+                setUnitPrice(e.target.value === '' ? 0 : Number(e.target.value))
+              }
             />
           </div>
-
           {/* Description */}
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">
@@ -277,78 +254,81 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-
           {/* Images */}
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-2">
               {t('distributorMaterialManager.materialModal.images')}
             </label>
-
-            {imagePreviews.length < 5 && (
+            {existingImages.length + newImages.length < 5 && (
               <input
                 type="file"
                 multiple
                 accept="image/*"
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-lg file:border-0
-              file:text-sm file:font-semibold
-              file:bg-blue-50 file:text-blue-600
-              hover:file:bg-blue-100
-              file:cursor-pointer
-              file:content['']"
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-600
+                  hover:file:bg-blue-100
+                  file:cursor-pointer
+                "
               />
             )}
 
             <div className="grid grid-cols-5 gap-3 mt-3">
-              {imagePreviews.map((src, i) => (
+              {/* Existing DB Images */}
+              {existingImages.map((img) => (
                 <div
-                  key={i}
+                  key={img.imageID}
                   className="relative group w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shadow-sm"
                 >
                   <img
-                    src={src}
-                    alt="preview"
+                    src={img.imageUrls}
+                    alt="db"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
-                    {!(dbImagesCount === 1 && material?.images[i]) && (
+                    {!(existingImages.length === 1) && (
                       <button
                         type="button"
-                        onClick={() => {
-                          if (
-                            material &&
-                            material.images &&
-                            material.images[i]
-                          ) {
-                            handleDeleteImage(
-                              material.materialID,
-                              material.images[i].imageID,
-                              () => {
-                                setImageFiles((prev) =>
-                                  prev.filter((_, index) => index !== i)
-                                );
-                                setImagePreviews((prev) =>
-                                  prev.filter((_, index) => index !== i)
-                                );
-                              }
-                            );
-                          } else {
-                            // Nếu là ảnh local thì xoá ngay
-                            setImageFiles((prev) =>
-                              prev.filter((_, index) => index !== i)
-                            );
-                            setImagePreviews((prev) =>
-                              prev.filter((_, index) => index !== i)
-                            );
-                          }
-                        }}
+                        onClick={() =>
+                          handleDeleteImage(material.materialID, img.imageID, () =>
+                            setExistingImages((prev) =>
+                              prev.filter((x) => x.imageID !== img.imageID)
+                            )
+                          )
+                        }
                         className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                       >
                         <i className="fa-solid fa-xmark"></i>
                       </button>
                     )}
+                  </div>
+                </div>
+              ))}
+
+              {/* New Local Images */}
+              {newImages.map((img, idx) => (
+                <div
+                  key={idx}
+                  className="relative group w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shadow-sm"
+                >
+                  <img
+                    src={img.previewUrl}
+                    alt="new"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNewImages((prev) => prev.filter((_, i) => i !== idx))
+                      }
+                      className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
+                    >
+                      <i className="fa-solid fa-xmark"></i>
+                    </button>
                   </div>
                 </div>
               ))}

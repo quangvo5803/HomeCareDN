@@ -38,49 +38,15 @@ namespace BusinessLogic.Services
         }
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
-            var errors = new Dictionary<string, string[]>();
-
-            if (requestDto.Images != null)
-            {
-                if (requestDto.Images.Count > 5)
-                {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { ERROR_MAXIMUM_IMAGE }
-                    );
-                }
-
-                if (requestDto.Images.Any(i => i.Length > 5 * 1024 * 1024)) // 5 MB
-                {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { ERROR_MAXIMUM_IMAGE_SIZE }
-                    );
-                }
-                
-            }
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
-            }
+            //check image
+            ValidateImages(requestDto.Images);
 
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
 
-            foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
-            {
-                var imageUpload = new DataAccess.Entities.Application.Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    MaterialID = material.MaterialID,
-                    ImageUrl = "",
-                };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    image,
-                    "HomeCareDN/Material",
-                    imageUpload
-                );
-            }
+            //upload image
+            await UploadImagesAsync(material.MaterialID, requestDto.Images);
+
             await _unitOfWork.SaveAsync();
 
             material = await _unitOfWork.MaterialRepository
@@ -97,11 +63,7 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Material", new[] { ERROR_MATERIAL_FOUND } },
-                };
-                throw new CustomValidationException(errors);
+                ThrowNotFoundError("Material", ERROR_MATERIAL_FOUND);
             }
 
             return _mapper.Map<MaterialDto>(material);
@@ -114,66 +76,14 @@ namespace BusinessLogic.Services
                 includeProperties: "Images,Category,Brand"
             );
 
-            var errors = new Dictionary<string, string[]>();
+            //check image
+            ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
 
-            if (material == null)
-            {
-                errors.Add(
-                    "ServiceID",
-                    new[] { ERROR_MATERIAL_FOUND }
-                );
-                throw new CustomValidationException(errors);
-            }
-            //check ảnh cũ
-            var existingCount = material.Images?.Count ?? 0;
-            var newCount = requestDto.Images?.Count ?? 0;
-
-            if (existingCount + newCount > 5)
-            {
-                errors.Add(nameof(requestDto.Images),
-                    new[] { ERROR_MAXIMUM_IMAGE });
-            }
-
-            //check khi up ảnh mới
-            if (requestDto.Images != null)
-            {
-                if (requestDto.Images.Count > 5)
-                {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { ERROR_MAXIMUM_IMAGE }
-                    );
-                }
-
-                if (requestDto.Images.Any(i => i.Length > 5 * 1024 * 1024))
-                {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { ERROR_MAXIMUM_IMAGE_SIZE }
-                   );
-                }        
-            }
-
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
-            }
             material.PatchFrom(requestDto, nameof(requestDto.Images));
 
-            foreach (var image in requestDto.Images ?? Enumerable.Empty<IFormFile>())
-            {
-                var imageUpload = new DataAccess.Entities.Application.Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    MaterialID = material.MaterialID,
-                    ImageUrl = "",
-                };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    image,
-                    "HomeCareDN/Material",
-                    imageUpload
-                );
-            }
+            //upload image
+            await UploadImagesAsync(material.MaterialID, requestDto.Images);
+
             await _unitOfWork.SaveAsync();
             return _mapper.Map<MaterialDto>(material);
         }
@@ -184,12 +94,9 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "MaterailID", new[] { ERROR_MATERIAL_FOUND } },
-                };
-                throw new CustomValidationException(errors);
+                ThrowNotFoundError("Material", ERROR_MATERIAL_FOUND);
             }
+
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.MaterialID == id);
             if (images != null && images.Any())
             {
@@ -199,7 +106,7 @@ namespace BusinessLogic.Services
                 }
             }
 
-            _unitOfWork.MaterialRepository.Remove(material);
+            _unitOfWork.MaterialRepository.Remove(material!);
             await _unitOfWork.SaveAsync();
         }
 
@@ -230,5 +137,56 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
             await _unitOfWork.SaveAsync();
         }
+
+        private void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            if (images == null) return;
+
+            var totalCount = existingCount + images.Count;
+            if (totalCount > 5)
+            {
+                errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE });
+            }
+
+            if (images.Any(i => i.Length > 5 * 1024 * 1024))
+            {
+                errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+        }
+
+        private async Task UploadImagesAsync(Guid materialId, ICollection<IFormFile>? images)
+        {
+            foreach (var image in images ?? Enumerable.Empty<IFormFile>())
+            {
+                var imageUpload = new DataAccess.Entities.Application.Image
+                {
+                    ImageID = Guid.NewGuid(),
+                    MaterialID = materialId,
+                    ImageUrl = "",
+                };
+                await _unitOfWork.ImageRepository.UploadImageAsync(
+                    image,
+                    "HomeCareDN/Material",
+                    imageUpload
+                );
+            }
+        }
+
+        private void ThrowNotFoundError(string key, string message)
+        {
+            var errors = new Dictionary<string, string[]>
+            {
+                { key, new[] { message } }
+            };
+            throw new CustomValidationException(errors);
+        }
+
     }
 }

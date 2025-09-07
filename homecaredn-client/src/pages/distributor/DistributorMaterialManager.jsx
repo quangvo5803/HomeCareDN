@@ -98,6 +98,36 @@ export default function MaterialTable() {
     }
   };
 
+  //Acticon
+  function ActionButton({ icon, label, onClick, className }) {
+    return (
+      <button
+        className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition ${className}`}
+        onClick={onClick}
+      >
+        <i className={`fa-solid ${icon}`}></i> {label}
+      </button>
+    );
+  }
+  //AVT
+  function MaterialAvatar({ material }) {
+    if (material.images && material.images.length > 0 && material.images[0].imageUrls) {
+      return (
+        <img
+          src={material.images[0].imageUrls}
+          alt={material.name}
+          className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+        />
+      );
+    }
+    return (
+      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center rounded-lg">
+        <span className="text-white font-bold text-sm">{material.name.charAt(0)}</span>
+      </div>
+    );
+  }
+
+
   if (loading) return <Loading />;
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
@@ -114,7 +144,7 @@ export default function MaterialTable() {
             setIsModalOpen(true);
           }}
         >
-          <i class="fa-solid fa-plus mr-2"></i>
+          <i className="fa-solid fa-plus mr-2"></i>
           {t('BUTTON.AddNewMaterial')}
         </button>
       </div>
@@ -160,9 +190,8 @@ export default function MaterialTable() {
               currentMaterials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                  }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">
@@ -173,25 +202,8 @@ export default function MaterialTable() {
 
                   {/* Material Name + Avatar */}
                   <td className="px-6 py-4 text-left flex items-center gap-3">
-                    {material.images &&
-                    material.images.length > 0 &&
-                    material.images[0].imageUrls ? (
-                      <img
-                        src={material.images[0].imageUrls}
-                        alt={material.name}
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-200"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">
-                          {material.name.charAt(0)}
-                        </span>
-                      </div>
-                    )}
-
-                    <span className="font-medium text-gray-900">
-                      {material.name}
-                    </span>
+                    <MaterialAvatar material={material} />
+                    <span className="font-medium text-gray-900">{material.name}</span>
                   </td>
 
                   {/* Brand */}
@@ -214,28 +226,27 @@ export default function MaterialTable() {
                   {/* Actions */}
                   <td className="px-4 py-4 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                      <ActionButton
+                        icon="fa-eye"
+                        label={t('BUTTON.View')}
+                        className="border border-gray-300 text-gray-700 hover:bg-gray-100"
                         onClick={() => handleView(material)}
-                      >
-                        <i className="fa-solid fa-eye"></i> {t('BUTTON.View')}
-                      </button>
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition"
+                      />
+                      <ActionButton
+                        icon="fa-pen"
+                        label={t('BUTTON.Edit')}
+                        className="border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                         onClick={() => {
                           setEditingMaterial(material);
                           setIsModalOpen(true);
                         }}
-                      >
-                        <i className="fa-solid fa-pen"></i> {t('BUTTON.Edit')}
-                      </button>
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition"
+                      />
+                      <ActionButton
+                        icon="fa-trash"
+                        label={t('BUTTON.Delete')}
+                        className="border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
                         onClick={() => handleDelete(material.materialID)}
-                      >
-                        <i className="fa-solid fa-trash"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
+                      />
                     </div>
                   </td>
                 </tr>

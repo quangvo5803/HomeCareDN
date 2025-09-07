@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo, Children } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { materialService } from '../services/materialService';
 import { useAuth } from '../hook/useAuth';
 import MaterialContext from './MaterialContext';
@@ -33,7 +33,7 @@ export const MaterialProvider = ({ children }) => {
       return null;
     }
   }, []);
-  // 📌 Admin-only: get all by id
+  // 📌 Distributor-only: get all by id
   const fetchMaterialsById = useCallback(
     async (id) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
@@ -49,7 +49,7 @@ export const MaterialProvider = ({ children }) => {
     },
     [user?.role]
   );
-  // 📌 Admin-only: create
+  // 📌 Distributor-only: create
   const createMaterial = useCallback(
     async (materialData) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
@@ -68,7 +68,7 @@ export const MaterialProvider = ({ children }) => {
     [user?.role]
   );
 
-  // 📌 Admin-only: update
+  // 📌 Distributor-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
@@ -97,7 +97,7 @@ export const MaterialProvider = ({ children }) => {
     [user?.role]
   );
 
-  // 📌 Admin-only: delete
+  // 📌 Distributor-only: delete
   const deleteMaterial = useCallback(
     async (id) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
@@ -112,23 +112,23 @@ export const MaterialProvider = ({ children }) => {
     [user?.role]
   );
 
+  // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(
     async (materialId, imageId) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterialImage(materialId, imageId);
 
-        // update state: xoá ảnh trong material.images
-        setMaterials((prev) =>
-          prev.map((m) =>
-            m.materialID === materialId
-              ? {
-                ...m,
-                images: m.images.filter((img) => img.imageID !== imageId),
-              }
-              : m
-          )
-        );
+        // update materials
+        const updateImages = (m) => {
+          if (m.materialID !== materialId) return m;
+          return {
+            ...m,
+            images: m.images.filter((img) => img.imageID !== imageId),
+          };
+        };
+
+        setMaterials((prev) => prev.map(updateImages));
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
@@ -136,6 +136,7 @@ export const MaterialProvider = ({ children }) => {
     },
     [user?.role]
   );
+
 
   // 📌 Load brands khi user login, reset khi logout
   useEffect(() => {
