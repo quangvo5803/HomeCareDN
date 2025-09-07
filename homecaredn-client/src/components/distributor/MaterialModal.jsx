@@ -119,12 +119,15 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     setNewImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  // xóa ảnh khỏi DB và state
-  const handleRemoveExistingImage = (materialId, imageId) => {
-    handleDeleteImage(materialId, imageId, () => {
-      setExistingImages((prev) => prev.filter((x) => x.imageID !== imageId));
-    });
+  // Hàm phụ để update state sau khi xoá ảnh
+  const updateExistingImages = (imageId) => {
+    setExistingImages((prev) => prev.filter((x) => x.imageID !== imageId));
   };
+
+  // Hàm chính để gọi xoá ảnh
+  const handleRemoveExistingImage = (materialId, imageId) => {
+    handleDeleteImage(materialId, imageId, () => updateExistingImages(imageId));
+  };;
 
   // Submit update/add
   const handleSubmit = () => {
