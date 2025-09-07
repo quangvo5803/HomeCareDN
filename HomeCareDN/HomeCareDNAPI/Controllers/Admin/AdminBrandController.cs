@@ -3,6 +3,7 @@ using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ultitity.Email.Interface;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {
@@ -12,10 +13,12 @@ namespace HomeCareDNAPI.Controllers.Admin
     public partial class AdminController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
+        private readonly IEmailQueue _emailQueue;
 
-        public AdminController(IFacadeService facadeService)
+        public AdminController(IFacadeService facadeService, IEmailQueue emailQueue)
         {
             _facadeService = facadeService;
+            _emailQueue = emailQueue;
         }
 
         [HttpPost("create-brand")]

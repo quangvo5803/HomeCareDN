@@ -12,6 +12,7 @@ namespace BusinessLogic.Services.FacadeService
         IBrandService BrandService { get; }
         IAiChatService AiChatService { get; }
         IConversationService ConversationService { get; }
+        IContactSupportService ContactSupportService { get; }
 
     }
 }

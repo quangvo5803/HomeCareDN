@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
+using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
@@ -115,6 +116,10 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
 
+            // ContactSupport 
+            CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
+            CreateMap<ContactSupport, ContactSupportDto>();
+            CreateMap<ContactSupport, ContactSupportDetailDto>();
         }
 
 
