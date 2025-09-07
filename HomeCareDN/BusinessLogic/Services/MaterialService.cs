@@ -47,8 +47,11 @@ namespace BusinessLogic.Services
             ValidateImages(requestDto.Images);
 
             var material = _mapper.Map<Material>(requestDto);
-
             await _unitOfWork.MaterialRepository.AddAsync(material);
+
+            //upload image
+            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+
             await _unitOfWork.SaveAsync();
 
             material = await _unitOfWork.MaterialRepository.GetAsync(
@@ -62,7 +65,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images,Category"
+                includeProperties: "Images,Category,Brand"
             );
 
             if (material == null)
@@ -81,10 +84,24 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images,Category"
+                includeProperties: "Images,Category,Brand"
             );
 
-            var errors = new Dictionary<string, string[]>();
+            //check image
+            ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
+
+            material.PatchFrom(requestDto, nameof(requestDto.Images));
+
+            //upload image
+            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+
+            await _unitOfWork.SaveAsync();
+            return _mapper.Map<MaterialDto>(material);
+        }
+
+        public async Task DeleteMaterialAsync(Guid id)
+        {
+            var material = await _unitOfWork.MaterialRepository.GetAsync(m => m.MaterialID == id);
 
             if (material == null)
             {
@@ -95,21 +112,26 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            if (requestDto.Images != null)
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.MaterialID == id);
+            if (images != null && images.Any())
             {
-                if (requestDto.Images.Count > 5)
+                foreach (var image in images)
                 {
-                    errors.Add(
-                        nameof(requestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
-                    );
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
+            }
+
+            _unitOfWork.MaterialRepository.Remove(material!);
+            await _unitOfWork.SaveAsync();
+        }
 
         public async Task DeleteMaterialImageAsync(string imageUrl)
         {
-            var image = await _unitOfWork.ImageRepository.GetAsync(img => img.ImageUrl == imageUrl);
+            var request = await _unitOfWork.ImageRepository.GetAsync(img =>
+                img.ImageUrl == imageUrl
+            );
 
-            if (image == null)
+            if (request == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
@@ -118,7 +140,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+            await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
             await _unitOfWork.SaveAsync();
         }
 
