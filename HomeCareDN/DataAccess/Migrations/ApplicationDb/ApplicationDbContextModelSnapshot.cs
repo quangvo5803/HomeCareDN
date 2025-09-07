@@ -70,6 +70,40 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
+                {
+                    b.Property<Guid>("ChatMessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ChatMessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("ChatMessages");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Property<Guid>("ContractorApplicationID")
@@ -101,6 +135,34 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.HasIndex("ServiceRequestID");
 
                     b.ToTable("ContractorApplications");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
+                {
+                    b.Property<Guid>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("ClosedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ContractorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LastMessageAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ConversationId");
+
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -160,16 +222,23 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DescriptionEN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("NameEN")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Unit")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("UnitPrice")
-                        .HasColumnType("float");
+                    b.Property<string>("UnitEN")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserID")
                         .IsRequired()
@@ -279,6 +348,17 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.Navigation("LogoImage");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
@@ -339,6 +419,11 @@ namespace DataAccess.Migrations.ApplicationDb
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
                     b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>

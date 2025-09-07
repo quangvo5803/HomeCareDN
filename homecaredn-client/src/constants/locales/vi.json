@@ -128,6 +128,7 @@
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
     "service_requests": "Yêu cầu dịch vụ",
+    "materials": "Quản lý vật liệu",
     "you_have_notifications": "Bạn có {{count}} thông báo",
     "notification_item": "Thông báo #{{number}}",
     "change_language": "Đổi ngôn ngữ",
@@ -137,6 +138,33 @@
       "applied": "↺ 3 đang chờ",
       "won": "▲ Tỉ lệ 36%",
       "pending_payments": "▼ 1 quá hạn"
+    }
+  },
+  "supportChat": {
+    "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
+    "headerStatusReady": "Sẵn sàng hỗ trợ",
+    "action": {
+      "minimize": "Thu gọn",
+      "expand": "Mở rộng",
+      "close": "Đóng"
+    },
+    "searchPlaceholder": "Tìm trong cuộc trò chuyện",
+    "inputPlaceholder": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "launcherTitle": "Hỗ trợ trực tuyến",
+    "typing": "Bot đang soạn…",
+    "demoBadge": "Demo • Phiên bản 1.0",
+    "suggestions": [
+      "Làm sao để sử dụng website này?",
+      "Thêm avatar hình tròn",
+      "Gợi ý màu sắc hiện đại"
+    ],
+    "fakeReply": "Bạn muốn mình {{text}}? Mình có thể minh họa ngay trên UI này.",
+    "seed": {
+      "user1": "Mình muốn tạo giao diện React cho bot chat hỗ trợ. Tách component nhé.",
+      "bot1": "Được chứ! Mình sẽ thiết kế widget hiện đại, có nút tròn để mở chat.",
+      "user2": "Ưu tiên mobile và khớp ngữ cảnh gần đây: 'Hỗ trợ giao diện React'.",
+      "bot2": "Ok! Mình sẽ seed dữ liệu mẫu và tách component rõ ràng."
     }
   },
   "adminNavbar": {
@@ -205,50 +233,86 @@
     },
     "viewAll": "Xem tất cả"
   },
-  "adminBrandManager":{
-    "title":"Quản lý thương hiệu",
-    "subtitle" : "Quản lý danh sách các thương hiệu sản phẩm",
+  "adminBrandManager": {
+    "title": "Quản lý thương hiệu",
+    "subtitle": "Quản lý danh sách các thương hiệu sản phẩm",
     "brands": "thương hiệu",
     "no": "STT",
     "brandName": "Tên thương hiệu",
     "numberOfMaterial": "Số lượng sản phẩm",
     "action": "Thao tác",
     "materials": "sản phẩm",
-    "noBrand" : "Chưa có thương hiệu nào",
-    "letStart" :"Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
-    "brandModal":{
+    "noBrand": "Chưa có thương hiệu nào",
+    "letStart": "Bắt đầu bằng cách thêm thương hiệu đầu tiên của bạn",
+    "brandModal": {
       "title": "Thêm thương hiệu mới",
       "title2": "Cập nhật thương hiệu",
       "brandName": "Tên thương hiệu",
       "brandNamePlaceholder": "Nhập tên thương hiệu...",
-      "brandDescription" : "Mô tả thương hiệu",
+      "brandDescription": "Mô tả thương hiệu",
       "brandDescriptionPlaceholder": "Nhập mô tả thương hiệu...",
-      "brandNameEN": "Tên thương hiệu(Tiếng Anh)",
+      "brandNameEN": "Tên thương hiệu (Tiếng Anh)",
       "brandNamePlaceholderEN": "Nhập tên thương hiệu bằng tiếng Anh...",
-      "brandDescriptionEN" : "Mô tả thương hiệu(Tiếng Anh)",
+      "brandDescriptionEN": "Mô tả thương hiệu (Tiếng Anh)",
       "brandDescriptionPlaceholderEN": "Nhập mô tả thương hiệu bằng tiếng Anh...",
-      "brandLogo" :"Logo thương hiệu",
-      "chooseFile": "Chọn tệp tải lên"
+      "brandLogo": "Logo thương hiệu",
+      "chooseFile": "Chọn tệp tải lên",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu"
     }
   },
-  "adminCategoryManager":{
+  "adminCategoryManager": {
     "title": "Quản lí danh mục vật liệu",
-    "subtitle" : "Quản lí danh sác các danh mục vật liệu",
-    "categories":"danh mục",
-    "no":"STT",
+    "subtitle": "Quản lí danh sác các danh mục vật liệu",
+    "categories": "danh mục",
+    "no": "STT",
     "categoryName": "Tên danh mục",
     "numberOfMaterials": "Số lượng sản phẩm",
     "materials": "sản phẩm",
-    "action":"Thao tác",
+    "action": "Thao tác",
     "noCategory": "Chưa có danh mục nào",
-    "letStart":"Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
-    "categoryModal":{
+    "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
+    "categoryModal": {
       "title": "Thêm danh mục mới",
       "title2": "Cập nhật thương hiệu",
       "categoryName": "Tên danh mục",
       "categoryNamePlaceholder": "Nhập tên danh mục...",
       "categoryNameEN": "Tên danh mục(Tiếng Anh)",
-      "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh..."
+      "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu"
+    }
+  },
+  "distributorMaterialManager": {
+    "title": "Quản lý vật liệu",
+    "no": "STT",
+    "materialName": "Tên vật liệu",
+    "brand": "Thương hiệu",
+    "category": "Danh mục",
+    "unit": "Đơn vị",
+    "images": "Hình ảnh",
+    "action": "Thao tác",
+    "noMaterial": "Chưa có vật liệu nào",
+    "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn",
+    "materialModal": {
+      "title": "Thêm vật liệu mới",
+      "title2": "Cập nhật vật liệu",
+      "materialName": "Tên vật liệu (Tiếng Việt)",
+      "brand": "Thương hiệu",
+      "category": "Danh mục",
+      "unit": "Đơn vị (Tiếng Việt)",
+      "description": "Mô tả (Tiếng Việt)",
+      "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
+      "unit_Price": "Giá",
+      "images": "Hình ảnh",
+      "chooseBrand": "Chọn thương hiệu",
+      "chooseCategory": "Chọn danh mục",
+      "materialNameEN": "Tên vật liệu (Tiếng Anh)",
+      "unitEN": "Đơn vị (Tiếng Anh)",
+      "descriptionEN": "Mô tả (Tiếng Anh)",
+      "descriptionsPlaceholderEN": "Nhập mô tả bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
+      "chooseFile": "Chọn tệp",
+      "noFile": "Không có tệp nào được chọn",
+      "filesSelected": " tệp đã chọn"
     }
   },
   "roles": {
@@ -291,31 +355,42 @@
     "SendOTP": "Gửi Mã OTP",
     "MoreDetails": "Xem Thêm Chi Tiết",
     "LoginGoogle": "Đăng Nhập với Google",
-    "RegisterGoogle": "Đăng Ký với Google",
+    "CreateAccount": "Tạo tài khoản",
+    "Processing": "Đang xử lí",
     "BackToLogin": "Quay Về Trang Đăng Nhập",
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
     "AddNewCategory": "Thêm danh mục mới",
-    "UpdateCategory":"Cập nhật danh mục",
+    "UpdateCategory": "Cập nhật danh mục",
+    "AddNewMaterial": "Thêm vật liệu",
+    "UpdateMaterial": "Cập nhật vật liệu",
     "View": "Xem",
-    "Edit" : "Sửa",
+    "Edit": "Sửa",
     "Delete": "Xóa",
-    "Cancel": "Hủy bỏ"
+    "Cancel": "Hủy bỏ",
+    "Add": "Thêm",
+    "Update": "Cập nhật"
   },
-  "ModalPopup":{
-    "DeleteBrandModal":{
+  "ModalPopup": {
+    "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
-      "text" : "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
-    },    
-    "DeleteCategoryModal":
-    {
+      "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteCategoryModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Danh mục này sẽ bị xóa và không thể khôi phục!"
     },
-    "DeletingLoadingModal":
-    {
+    "DeletingLoadingModal": {
       "title": "Đang xóa...",
       "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteMaterialModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Vật liệu này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteMaterialImageModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
   },
   "ERROR": {
@@ -324,18 +399,31 @@
     "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
     "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
+    "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
     "NULL_NAME": "Vui lòng nhập họ và tên.",
     "NULL_EMAIL": "Vui lòng nhập email.",
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
-    "NETWORK_ERROR" : "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-
+    "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
+    "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
+    "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
+    "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
+    "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
+    "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
+    "IMAGE_NOT_FOUND" : "Không tìm thấy ảnh.",
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
-    "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục."
+    "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục.",
+    "REQUIRED_MATERIAL_NAME": "Vui lòng nhập tên vật liệu.",
+    "REQUIRED_MATERIAL_IMAGES": "Vui lòng tải lên ảnh vật liệu.",
+    "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập đơn vị vật liệu.",
+    "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
+    "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
+
+    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!"
   },
   "SUCCESS": {
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
@@ -344,6 +432,8 @@
     "BRAND_ADD": "Thêm thương hiệu thành công.",
     "BRAND_UPDATE": "Cập nhật thương hiệu thành công.",
     "CATEGORY_ADD": "Thêm danh mục thành công.",
-    "CATEGORY_UPDATE": "Cập nhật danh mục thành công."
+    "CATEGORY_UPDATE": "Cập nhật danh mục thành công.",
+    "MATERIAL_ADD": "Thêm vật liệu thành công.",
+    "MATERIAL_UPDATE": "Cập nhật vật liệu thành công."
   }
 }

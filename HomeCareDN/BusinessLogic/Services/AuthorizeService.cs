@@ -6,26 +6,29 @@ using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
+using Ultitity.Options;
 
 namespace BusinessLogic.Services
 {
     public class AuthorizeService : IAuthorizeService
     {
-        private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly JwtOptions _jwtOptions;
+        private readonly GoogleOptions _googleOptions;
 
-        private const int AccessTokenMinutes = 5;
         private const int RefreshTokenDays = 7;
         private const int OtpExpiryMinutes = 5;
         private const int OtpThrottleSeconds = 60;
@@ -35,18 +38,20 @@ namespace BusinessLogic.Services
         private const string LOGIN_TOKEN_EXPIRED_STR = "LOGIN_TOKEN_EXPIRED";
 
         public AuthorizeService(
-            IConfiguration configuration,
             UserManager<ApplicationUser> userManager,
             IEmailQueue emailQueue,
             IRefreshTokenRepository refreshTokenRepository,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<JwtOptions> jwtOptions,
+            IOptions<GoogleOptions> googleOptions
         )
         {
-            _configuration = configuration;
             _userManager = userManager;
             _emailQueue = emailQueue;
             _refreshTokenRepository = refreshTokenRepository;
             _httpContextAccessor = httpContextAccessor;
+            _jwtOptions = jwtOptions.Value;
+            _googleOptions = googleOptions.Value;
         }
 
         #region OTP
@@ -284,6 +289,7 @@ namespace BusinessLogic.Services
         }
 
         #endregion
+
         public async Task Logout()
         {
             var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
@@ -318,6 +324,73 @@ namespace BusinessLogic.Services
             );
         }
 
+        public async Task<TokenResponseDto> GoogleLoginAsync(GoogleLoginRequestDto requestDto)
+        {
+            // Xác thực token Google
+            var payload = await GoogleJsonWebSignature.ValidateAsync(
+                requestDto.Credential,
+                new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[] { _googleOptions.GoogleClientId },
+                }
+            );
+
+            // Tìm user theo email
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = payload.Email,
+                    Email = payload.Email,
+                    FullName = payload.Name,
+                    EmailConfirmed = true,
+                };
+                await _userManager.CreateAsync(user);
+                await _userManager.AddToRoleAsync(user, "Customer"); // default role
+            }
+
+            // Xóa refresh token cũ
+            var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
+            if (oldToken != null)
+                await _refreshTokenRepository.DeleteAsync(oldToken);
+
+            // Sinh access token + refresh token mới
+            var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+            var refreshToken = GenerateRefreshToken();
+
+            var rt = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.Id,
+                ExpiresAt = DateTime.UtcNow.AddDays(RefreshTokenDays),
+            };
+            await _refreshTokenRepository.AddAsync(rt);
+
+            // Gửi cookie HttpOnly refresh token
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                REFRESH_TOKEN_STR,
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                    Path = "/",
+                }
+            );
+
+            return new TokenResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken,
+                AccessTokenExpiresAt = tokenOptions.ValidTo,
+                UserId = user.Id,
+            };
+        }
+
         #region JWT
 
         public async Task<string> GenerateToken(ApplicationUser user)
@@ -344,15 +417,15 @@ namespace BusinessLogic.Services
         private JwtSecurityToken GenerateTokenOptions(List<Claim> claims)
         {
             var key = new SymmetricSecurityKey(
-                System.Text.Encoding.UTF8.GetBytes(_configuration["JWT:Key"]) // NOSONAR
+                System.Text.Encoding.UTF8.GetBytes(_jwtOptions.Key) // NOSONAR
             );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             return new JwtSecurityToken(
-                issuer: _configuration["JWT:Issuer"],
-                audience: _configuration["JWT:Audience"],
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
                 claims: claims,
                 expires: DateTime
-                    .UtcNow.AddMinutes(AccessTokenMinutes)
+                    .UtcNow.AddMinutes(_jwtOptions.AccessTokenMinutes)
                     .AddSeconds(Random.Shared.Next(-30, 31)),
                 signingCredentials: creds
             );

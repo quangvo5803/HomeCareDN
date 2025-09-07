@@ -12,6 +12,8 @@ export const authService = {
   resentOtp: (email) => api.post('/Authorize/login', { email }),
   refreshToken: () => api.post('/Authorize/refresh-token'),
   logout: () => api.post('/Authorize/logout'),
+  googleLogin: (credential) =>
+    api.post(`/Authorize/google-login`, { credential }),
 };
 
 export default authService;

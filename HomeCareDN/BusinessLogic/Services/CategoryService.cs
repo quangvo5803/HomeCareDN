@@ -36,7 +36,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Category", new[] { "No category found." } },
+                    { "Category", new[] { "CATEGORY_NOT_FOUND" } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -62,10 +62,7 @@ namespace BusinessLogic.Services
 
             if (category == null)
             {
-                errors.Add(
-                    "CategoryID",
-                    new[] { $"Category request with ID {requestDto.CategoryID} not found." }
-                );
+                errors.Add("Category", new[] { "CATEGORY_NOT_FOUND" });
                 throw new CustomValidationException(errors);
             }
             category.PatchFrom(requestDto);
@@ -82,7 +79,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "CategoryID", new[] { $"Category with ID {id} not found." } },
+                    { "Category", new[] { "CATEGORY_NOT_FOUND" } },
                 };
                 throw new CustomValidationException(errors);
             }

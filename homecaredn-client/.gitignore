@@ -39,3 +39,4 @@ coverage/
 
 # Optional: OS trash files
 .trash/
+.vercel
