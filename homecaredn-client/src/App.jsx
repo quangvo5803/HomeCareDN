@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-
 import 'react-toastify/dist/ReactToastify.css';
 
 // Public pages
@@ -19,12 +18,14 @@ import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
+import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import DistributorLayout from './pages/distributor/DistributorLayout';
 
 function App() {
   return (
@@ -106,15 +107,22 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+
         {/* Distributor routes */}
         <Route
-          path="/DistributorDashboard"
+          path="/Distributor"
           element={
             <ProtectedRoute allowedRoles={['Distributor']}>
-              <DistributorDashboard />
+              <DistributorLayout />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<DistributorDashboard />} />
+          <Route
+            path="material-manager"
+            element={<DistributorMaterialManager />}
+          />
+        </Route>
         {/* Redirect root → /home */}
         <Route
           path="/"
@@ -140,7 +148,7 @@ function getRedirectPath(user) {
     case 'Contractor':
       return '/ContractorDashboard';
     case 'Distributor':
-      return '/DistributorDashboard';
+      return '/Distributor';
     default:
       return '/Home';
   }

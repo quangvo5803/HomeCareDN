@@ -64,15 +64,15 @@ namespace HomeCareDNAPI.Mapping
                 );
 
             CreateMap<Material, MaterialDto>()
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
+                .ForMember(dest => dest.BrandNameEN, opt => opt.MapFrom(src => src.Brand!.BrandNameEN))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.CategoryName))
+                .ForMember(dest => dest.CategoryNameEN, opt => opt.MapFrom(src => src.Category!.CategoryNameEN))
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
-                )
-                .ForMember(
-                    dest => dest.BrandName,
-                    opt =>
-                        opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
                 );
+
 
             CreateMap<Category, CategoryDto>().ReverseMap();
 
@@ -85,6 +85,7 @@ namespace HomeCareDNAPI.Mapping
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+
 
 
             //Chat DTOs
