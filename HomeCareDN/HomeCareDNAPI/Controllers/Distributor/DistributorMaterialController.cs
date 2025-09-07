@@ -9,7 +9,7 @@ namespace HomeCareDNAPI.Controllers.Distributor
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
     public partial class DistributorController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -46,8 +46,8 @@ namespace HomeCareDNAPI.Controllers.Distributor
             return NoContent();
         }
 
-        [HttpDelete("delete-material-image/{imageUrl}")]
-        public async Task<IActionResult> DeleteMaterialImage(string imageUrl)
+        [HttpDelete("delete-material-image")]
+        public async Task<IActionResult> DeleteMaterialImage([FromQuery] string imageUrl)
         {
             await _facadeService.MaterialService.DeleteMaterialImageAsync(imageUrl);
             return NoContent();

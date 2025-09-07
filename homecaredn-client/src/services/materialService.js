@@ -71,7 +71,7 @@ export const materialService = {
 
   deleteMaterialImage: async (imageUrl) => {
     const response = await api.delete(
-      `/Distributor/delete-material-image/${imageUrl}`
+      `/Distributor/delete-material-image?imageUrl=${encodeURIComponent(imageUrl)}`
     );
     return response.data;
   },

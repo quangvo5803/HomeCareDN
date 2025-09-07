@@ -122,18 +122,15 @@ namespace BusinessLogic.Services
 
         public async Task DeleteMaterialImageAsync(string imageUrl)
         {
-            // Decode URL để bỏ %2F thành /
-            var decodedUrl = WebUtility.UrlDecode(imageUrl);
-
             var request = await _unitOfWork.ImageRepository.GetAsync(
-                img => img.ImageUrl == decodedUrl
+                img => img.ImageUrl == imageUrl
             );
 
             if (request == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "MaterialID", new[] { ERROR_MATERIAL_FOUND } },
+                    { "ImageUrl", new[] { ERROR_IMAGE_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }

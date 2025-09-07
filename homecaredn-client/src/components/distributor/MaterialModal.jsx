@@ -130,8 +130,12 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
   // Hàm phụ để update state sau khi xoá ảnh
   const updateExistingImages = (imageUrl) => {
-    setExistingImages((prev) => prev.filter((x) => x.imageURL !== imageUrl));
+    setExistingImages((prev) => prev.filter((x) => x !== imageUrl));
+    if (material) {
+      material.imageUrls = material.imageUrls.filter((x) => x !== imageUrl);
+    }
   };
+
 
   // Hàm chính để gọi xoá ảnh
   const handleRemoveExistingImage = (imageUrl) => {
@@ -174,7 +178,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       DescriptionEN: descriptionEN || null,
       Images: newImages.length > 0 ? newImages.map((x) => x.file) : null,
     };
-    console.log("Payload gửi đi:", data);
     onSave(data);
   };
 
