@@ -7,6 +7,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
   const [categoryNameEN, setCategoryNameEN] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Khi mở modal, nếu có category (edit) thì fill dữ liệu
   useEffect(() => {
@@ -42,7 +43,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto transform transition-all duration-300 scale-100">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -78,19 +79,38 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
             />
           </div>
           {/* Category Name English */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminCategoryManager.categoryModal.categoryNameEN')}{' '}
-            </label>
-            <input
-              type="text"
-              placeholder={t(
-                'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
-              )}
-              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={categoryNameEN}
-              onChange={(e) => setCategoryNameEN(e.target.value)}
-            />
+          <div>
+            {/* Nút Expand/Collapse */}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
+            >
+              <i className="fas fa-globe"></i>
+              {t('adminCategoryManager.categoryModal.multilanguage_for_data')}
+              <span>{isExpanded ? '▲' : '▼'}</span>
+            </button>
+
+            {/* Nội dung expand */}
+            {isExpanded && (
+              <div className="p-3 space-y-4">
+                {/* Category Name EN */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('adminCategoryManager.categoryModal.categoryNameEN')}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t(
+                      'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
+                    )}
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={categoryNameEN}
+                    onChange={(e) => setCategoryNameEN(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

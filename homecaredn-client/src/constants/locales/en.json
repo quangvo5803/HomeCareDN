@@ -214,6 +214,7 @@
     "view": "View",
     "search_placeholder": "Search applications",
     "service_requests": "Service Requests",
+    "materials": "Materials Manager",
     "you_have_notifications": "You have {{count}} notifications",
     "notification_item": "Notification #{{number}}",
     "change_language": "Change language",
@@ -223,6 +224,33 @@
       "applied": "↺ 3 pending",
       "won": "▲ 36% rate",
       "pending_payments": "▼ 1 overdue"
+    }
+  },
+  "supportChat": {
+    "headerTitle": "Assistant — Support for {{brand}}",
+    "headerStatusReady": "Ready to help",
+    "action": {
+      "minimize": "Minimize",
+      "expand": "Expand",
+      "close": "Close"
+    },
+    "searchPlaceholder": "Search in conversation",
+    "inputPlaceholder": "Type a message...",
+    "send": "Send",
+    "launcherTitle": "Live support",
+    "typing": "Bot is typing…",
+    "demoBadge": "Demo • Version 1.0",
+    "suggestions": [
+      "How to use this website?",
+      "Add rounded avatar",
+      "Suggest modern colors"
+    ],
+    "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
+    "seed": {
+      "user1": "I want a React chat support widget. Please split components.",
+      "bot1": "Sure! I'll design a modern widget with a round launcher button.",
+      "user2": "Prioritize mobile and match the context: 'React support widget'.",
+      "bot2": "Got it! I'll seed sample data and keep components clean."
     }
   },
   "adminNavbar": {
@@ -292,50 +320,86 @@
     },
     "viewAll": "View all"
   },
-  "adminBrandManager":{
-    "title":"Brand Manager",
-    "subtitle" : "Manage brand list",
+  "adminBrandManager": {
+    "title": "Brand Manager",
+    "subtitle": "Manage brand list",
     "brands": "brands",
     "no": "NO",
     "brandName": "Brand name",
     "numberOfMaterial": "Number of Material",
     "action": "Action",
     "materials": "Material(s)",
-    "noBrand" : "No brand yet",
-    "letStart" :"Start by adding your first brand.",
-    "brandModal":{
+    "noBrand": "No brand yet",
+    "letStart": "Start by adding your first brand.",
+    "brandModal": {
       "title": "Add new brand",
       "title2": "Update brand",
       "brandName": "Brand name",
       "brandNamePlaceholder": "Enter brand name...",
-      "brandDescription" : "Brand description",
+      "brandDescription": "Brand description",
       "brandDescriptionPlaceholder": "Enter brand description...",
-      "brandNameEN": "Brand name(English)",
+      "brandNameEN": "Brand name (English)",
       "brandNamePlaceholderEN": "Enter brand name in English...",
-      "brandDescriptionEN" : "Brand description(English)",
+      "brandDescriptionEN": "Brand description (English)",
       "brandDescriptionPlaceholderEN": "Enter brand description in e...",
-      "brandLogo" :"Brand logo",
-      "chooseFile": "Choose file to upload"
+      "brandLogo": "Brand logo",
+      "chooseFile": "Choose file to upload",
+      "multilanguage_for_data": " Multilanguage for data"
     }
   },
-  "adminCategoryManager":{
+  "adminCategoryManager": {
     "title": "Material Category Manager",
-    "subtitle" : "Manage material category list",
-    "categories":"category(es)",
-    "no":"NO",
+    "subtitle": "Manage material category list",
+    "categories": "category(es)",
+    "no": "NO",
     "categoryName": "Category name",
     "numberOfMaterials": "Number of Material",
     "materials": "Material(s)",
-    "action":"Action",
+    "action": "Action",
     "noCategory": "No category yes",
-    "letStart":"Start by adding your first category.",
-    "categoryModal":{
+    "letStart": "Start by adding your first category.",
+    "categoryModal": {
       "title": "Add new category",
       "title2": "Update category",
       "categoryName": "Category name",
       "categoryNamePlaceholder": "Enter category name...",
       "categoryNameEN": "Category name(English)",
-      "categoryNamePlaceholderEN": "Enter category name in English..."
+      "categoryNamePlaceholderEN": "Enter category name in English...",
+      "multilanguage_for_data": " Multilanguage for data"
+    }
+  },
+  "distributorMaterialManager": {
+    "title": "Material Manager",
+    "no": "NO",
+    "materialName": "Material Name",
+    "brand": "Brand",
+    "category": "Category",
+    "unit": "Unit",
+    "images": "Images",
+    "action": "Action",
+    "noMaterial": "No material yet",
+    "letStart": "Start by adding your first material.",
+    "materialModal": {
+      "title": "Add new material",
+      "title2": "Update material",
+      "materialName": "Material Name (VietNamese)",
+      "brand": "Brand",
+      "category": "Category",
+      "unit": "Unit (VietNamese)",
+      "description": "Descriptions (VietNamese)",
+      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
+      "unit_Price": "Unit Price",
+      "images": "Images",
+      "chooseBrand": "Choose brand",
+      "chooseCategory": "Choose category",
+      "materialNameEN": "Material Name (English)",
+      "unitEN": "Unit (English)",
+      "descriptionEN": "Description (English)",
+      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "multilanguage_for_data": " Multilanguage for data",
+      "chooseFile": "Choose file",
+      "noFile": "No files selected",
+      "filesSelected": " selected file"
     }
   },
   "adminSupportManager": {
@@ -399,31 +463,41 @@
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
     "AddNewCategory": "Add new Category",
-    "UpdateCategory" : "Update Category",
+    "UpdateCategory": "Update Category",
+    "AddNewMaterial": "Add new Material",
+    "UpdateMaterial": "Update Material",
     "View": "View",
-    "Edit" : "Edit",
+    "Edit": "Edit",
     "Delete": "Delete",
     "Cancel": "Cancel",
-    "Reply": "Reply"
+    "Reply": "Reply",
+    "Add": "Add",
+    "Update": "Update"
   },
-  "ModalPopup":{
-    "DeleteBrandModal":{
+  "ModalPopup": {
+    "DeleteBrandModal": {
       "title": "Are you sure?",
-      "text" : "This brand will be deleted and cannot be restored!"
+      "text": "This brand will be deleted and cannot be restored!"
     },
-    "DeleteCategoryModal":
-    {
+    "DeleteCategoryModal": {
       "title": "Are you sure?",
-      "text" : "This category will be deleted and cannot be restored!"
+      "text": "This category will be deleted and cannot be restored!"
     },
-    "DeletingLoadingModal":
-    {
+    "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
     },
     "DeleteSupportModal": {
     "title": "Delete this support request?",
     "text": "This action cannot be undone."
+    },
+    "DeleteMaterialModal": {
+      "title": "Are you sure?",
+      "text": "This material will be deleted and cannot be restored!"
+    },
+    "DeleteMaterialImageModal": {
+      "title": "Are you sure?",
+      "text": "This image will be deleted and cannot be restored!"
     }
   },
   "ERROR": {
@@ -438,11 +512,19 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
-    "NETWORK_ERROR" : "Unable to connect to server, please try again later!",
+    "NETWORK_ERROR": "Unable to connect to server, please try again later!",
+    "ERROR_MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
 
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
-    "REQUIRED_CATEGORYNAME": "Please enter category name."
+    "REQUIRED_CATEGORYNAME": "Please enter category name.",
+    "REQUIRED_MATERIAL_NAME": "Please enter the material name.",
+    "REQUIRED_MATERIAL_IMAGES": "Please upload a material image.",
+    "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
+    "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
+    "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
+
+    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!"
   },
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
@@ -452,6 +534,8 @@
     "BRAND_UPDATE": "Update brand successfully.",
     "CATEGORY_ADD": "Add category successfully",
     "CATEGORY_UPDATE": "Update category successfully.",
-    "REPLY": "Replied successfully."
+    "REPLY": "Replied successfully.",
+    "MATERIAL_ADD": "Add material successfully",
+    "MATERIAL_UPDATE": "Update material successfully."
   }
 }
