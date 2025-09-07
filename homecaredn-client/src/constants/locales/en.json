@@ -281,7 +281,8 @@
       "categoryName": "Category name",
       "categoryNamePlaceholder": "Enter category name...",
       "categoryNameEN": "Category name(English)",
-      "categoryNamePlaceholderEN": "Enter category name in English..."
+      "categoryNamePlaceholderEN": "Enter category name in English...",
+      "multilanguage_for_data": " Multilanguage for data"
     }
   },
   "distributorMaterialManager": {

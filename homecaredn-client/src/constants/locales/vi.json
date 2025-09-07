@@ -277,7 +277,8 @@
       "categoryName": "Tên danh mục",
       "categoryNamePlaceholder": "Nhập tên danh mục...",
       "categoryNameEN": "Tên danh mục(Tiếng Anh)",
-      "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh..."
+      "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu"
     }
   },
   "distributorMaterialManager": {

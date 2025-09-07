@@ -1,9 +1,9 @@
-import api from "../api";
+import api from '../api';
 
 export const materialService = {
   //Public APIs
   getAllMaterial: async () => {
-    const response = await api.get("/Material/get-all-material");
+    const response = await api.get('/Material/get-all-material');
     return response.data;
   },
 
@@ -29,20 +29,20 @@ export const materialService = {
     Images,
   }) => {
     const formData = new FormData();
-    formData.append("UserID", UserID);
-    formData.append("CategoryID", CategoryID);
-    formData.append("Name", Name);
-    if (BrandID) formData.append("BrandID", BrandID);
-    if (Unit) formData.append("Unit", Unit);
-    if (Description) formData.append("Description", Description);
-    formData.append("UnitPrice", UnitPrice);
+    formData.append('UserID', UserID);
+    formData.append('CategoryID', CategoryID);
+    formData.append('Name', Name);
+    if (BrandID) formData.append('BrandID', BrandID);
+    if (Unit) formData.append('Unit', Unit);
+    if (Description) formData.append('Description', Description);
+    formData.append('UnitPrice', UnitPrice);
     if (Images && Images.length > 0) {
-      Images.forEach((file) => formData.append("Images", file));
+      Images.forEach((file) => formData.append('Images', file));
     }
 
-    const response = await api.post("/Distributor/create-material", formData, {
+    const response = await api.post('/Distributor/create-material', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;
@@ -59,21 +59,21 @@ export const materialService = {
     Images,
   }) => {
     const formData = new FormData();
-    formData.append("MaterialID", MaterialID);
-    formData.append("CategoryID", CategoryID);
-    formData.append("Name", Name);
-    if (BrandID) formData.append("BrandID", BrandID);
-    if (Unit) formData.append("Unit", Unit);
-    if (Description) formData.append("Description", Description);
-    formData.append("UnitPrice", UnitPrice);
+    formData.append('MaterialID', MaterialID);
+    formData.append('CategoryID', CategoryID);
+    formData.append('Name', Name);
+    if (BrandID) formData.append('BrandID', BrandID);
+    if (Unit) formData.append('Unit', Unit);
+    if (Description) formData.append('Description', Description);
+    formData.append('UnitPrice', UnitPrice);
 
     if (Images && Images.length > 0) {
-      Images.forEach((file) => formData.append("Images", file));
+      Images.forEach((file) => formData.append('Images', file));
     }
 
-    const response = await api.put("/Distributor/update-material", formData, {
+    const response = await api.put('/Distributor/update-material', formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
     return response.data;

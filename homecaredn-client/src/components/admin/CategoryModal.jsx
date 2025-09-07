@@ -7,6 +7,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
   const [categoryNameEN, setCategoryNameEN] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Khi mở modal, nếu có category (edit) thì fill dữ liệu
   useEffect(() => {
@@ -78,20 +79,39 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
             />
           </div>
           {/* Category Name English */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminCategoryManager.categoryModal.categoryNameEN')}{' '}
-            </label>
-            <input
-              type="text"
-              placeholder={t(
-                'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
-              )}
-              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={categoryNameEN}
-              onChange={(e) => setCategoryNameEN(e.target.value)}
-            />
+          <div>
+            {/* Nút Expand/Collapse */}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
+            >
+              <i className="fas fa-globe"></i>
+              {t("adminCategoryManager.categoryModal.multilanguage_for_data")}
+              <span>{isExpanded ? "▲" : "▼"}</span>
+            </button>
+
+            {/* Nội dung expand */}
+            {isExpanded && (
+              <div className="p-3 space-y-4">
+                {/* Category Name EN */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t('adminCategoryManager.categoryModal.categoryNameEN')}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={t('adminCategoryManager.categoryModal.categoryNamePlaceholderEN')}
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={categoryNameEN}
+                    onChange={(e) => setCategoryNameEN(e.target.value)}
+                  />
+                </div>
+
+              </div>
+            )}
           </div>
+
         </div>
 
         {/* Footer */}

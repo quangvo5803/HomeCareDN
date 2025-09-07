@@ -15,6 +15,8 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private const string ERROR_MAXIMUM_IMAGE = "You can only upload a maximum of 5 images.";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "Each image must be less than 5 MB.";
+        private const string ERROR_MATERIAL_FOUND = "MATERIAL_NOT_FOUND";
+        private const string ERROR_IMAGE_FOUND = "IMAGE_NOT_FOUND";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -97,7 +99,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { "MATERIAL_NOT_FOUND" } },
+                    { "Material", new[] { ERROR_MATERIAL_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -118,7 +120,7 @@ namespace BusinessLogic.Services
             {
                 errors.Add(
                     "ServiceID",
-                    new[] { "MATERIAL_NOT_FOUND" }
+                    new[] { ERROR_MATERIAL_FOUND }
                 );
                 throw new CustomValidationException(errors);
             }
@@ -184,7 +186,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "MaterailID", new[] { "MATERIAL_NOT_FOUND" } },
+                    { "MaterailID", new[] { ERROR_MATERIAL_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -211,7 +213,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "MaterialID", new[] { "MATERIAL_NOT_FOUND" } },
+                    { "MaterialID", new[] { ERROR_MATERIAL_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -220,7 +222,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Image", new[] { "PUBLIC_ID_NOT_FOUND" } },
+                    { "Image", new[] { ERROR_IMAGE_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }

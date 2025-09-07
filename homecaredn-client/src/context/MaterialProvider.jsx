@@ -1,10 +1,10 @@
-import { useEffect, useState, useCallback, useMemo, Children } from "react";
-import { materialService } from "../services/materialService";
-import { useAuth } from "../hook/useAuth";
-import MaterialContext from "./MaterialContext";
-import { toast } from "react-toastify";
-import { handleApiError } from "../utils/handleApiError";
-import PropTypes from "prop-types";
+import { useEffect, useState, useCallback, useMemo, Children } from 'react';
+import { materialService } from '../services/materialService';
+import { useAuth } from '../hook/useAuth';
+import MaterialContext from './MaterialContext';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
+import PropTypes from 'prop-types';
 
 export const MaterialProvider = ({ children }) => {
   const { user } = useAuth();
@@ -36,7 +36,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Admin-only: get all by id
   const fetchMaterialsById = useCallback(
     async (id) => {
-      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         setLoading(true);
         const data = await materialService.getAllMaterialById(id);
@@ -52,7 +52,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Admin-only: create
   const createMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
@@ -71,7 +71,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Admin-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         setLoading(true);
         const updated = await materialService.updateMaterial(materialData);
@@ -79,10 +79,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                  ...m,
-                  ...updated,
-                  images: updated.images ?? m.images,
-                }
+                ...m,
+                ...updated,
+                images: updated.images ?? m.images,
+              }
               : m
           )
         );
@@ -100,7 +100,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Admin-only: delete
   const deleteMaterial = useCallback(
     async (id) => {
-      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
@@ -114,7 +114,7 @@ export const MaterialProvider = ({ children }) => {
 
   const deleteMaterialImage = useCallback(
     async (materialId, imageId) => {
-      if (user?.role !== "Distributor") throw new Error("Unauthorized");
+      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterialImage(materialId, imageId);
 
@@ -123,9 +123,9 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === materialId
               ? {
-                  ...m,
-                  images: m.images.filter((img) => img.imageID !== imageId),
-                }
+                ...m,
+                images: m.images.filter((img) => img.imageID !== imageId),
+              }
               : m
           )
         );
