@@ -150,7 +150,9 @@
     "subject": "Subject",
     "message": "Message",
     "submit": "Send Message"
-  }
+  },
+  "success_message": "Your request has been sent successfully! We will contact you soon.",
+  "error_message": "An error occurred while sending your request. Please try again later."
 }
 ,
 
@@ -223,33 +225,6 @@
       "pending_payments": "▼ 1 overdue"
     }
   },
-  "supportChat": {
-  "headerTitle": "Assistant — Support for {{brand}}",
-  "headerStatusReady": "Ready to help",
-  "action": {
-    "minimize": "Minimize",
-    "expand": "Expand",
-    "close": "Close"
-  },
-  "searchPlaceholder": "Search in conversation",
-  "inputPlaceholder": "Type a message...",
-  "send": "Send",
-  "launcherTitle": "Live support",
-  "typing": "Bot is typing…",
-  "demoBadge": "Demo • Version 1.0",
-  "suggestions": [
-    "How to use this website?",
-    "Add rounded avatar",
-    "Suggest modern colors"
-  ],
-  "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
-  "seed": {
-    "user1": "I want a React chat support widget. Please split components.",
-    "bot1": "Sure! I'll design a modern widget with a round launcher button.",
-    "user2": "Prioritize mobile and match the context: 'React support widget'.",
-    "bot2": "Got it! I'll seed sample data and keep components clean."
-  }
-},
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -265,7 +240,8 @@
       "category": "Material Category",
       "service": "Services",
       "serviceRequest": "Service Request",
-      "material": "Material"
+      "material": "Material",
+      "support": "Support Manager"
     },
     "account": {
       "title": "Account pages",
@@ -362,6 +338,21 @@
       "categoryNamePlaceholderEN": "Enter category name in English..."
     }
   },
+  "adminSupportManager": {
+  "title": "Support Manager",
+  "subtitle": "Customer requests",
+  "fullName": "Full name",
+  "email": "Email",
+  "subject": "Subject",
+  "status": "Status",
+  "processed": "Processed",
+  "pending": "Pending",
+  "action": "Action",
+  "replyTitle": "Reply to request",
+  "replyLabel": "Your reply",
+  "replyPlaceholder": "Type your reply here...",
+  "noSupport": "No support requests yet"
+  },
   "roles": {
     "Distributor": "Distributor",
     "Contractor": "Contractor",
@@ -403,8 +394,7 @@
     "SendOTP": "Send OTP Code",
     "MoreDetails": "More Details",
     "LoginGoogle": "Login with Google",
-    "CreateAccount": "Create Account",
-    "Processing": "Processing",
+    "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page",
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
@@ -413,7 +403,8 @@
     "View": "View",
     "Edit" : "Edit",
     "Delete": "Delete",
-    "Cancel": "Cancel"
+    "Cancel": "Cancel",
+    "Reply": "Reply"
   },
   "ModalPopup":{
     "DeleteBrandModal":{
@@ -429,6 +420,10 @@
     {
       "title": "Deleting...",
       "text": "Please wait a moment."
+    },
+    "DeleteSupportModal": {
+    "title": "Delete this support request?",
+    "text": "This action cannot be undone."
     }
   },
   "ERROR": {
@@ -437,7 +432,6 @@
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
     "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
     "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "LOGIN_GOOGLE": "Google login unsuccessfully",
     "REGISTER_ALREADY_EXISTS": "Email already registered",
     "NULL_NAME": "Please enter your full name.",
     "NULL_EMAIL": "Please enter your email.",
@@ -457,6 +451,7 @@
     "BRAND_ADD": "Add brand successfully.",
     "BRAND_UPDATE": "Update brand successfully.",
     "CATEGORY_ADD": "Add category successfully",
-    "CATEGORY_UPDATE": "Update category successfully."
+    "CATEGORY_UPDATE": "Update category successfully.",
+    "REPLY": "Replied successfully."
   }
 }

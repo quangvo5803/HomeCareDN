@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import { contactService } from '../services/contactService';   
+import { toast } from 'react-toastify';                       
 
 function useInView(options) {
   const ref = useRef(null);
@@ -37,9 +38,38 @@ Reveal.propTypes = { children: PropTypes.node.isRequired };
 
 export default function Contact() {
   const { t } = useTranslation();
+
+  const [form, setForm] = useState({
+    fullName: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); // hoặc 'auto'
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await contactService.create(form); // call API
+      toast.success(t('contact.success_message'));
+      setForm({ fullName: '', email: '', subject: '', message: '' });
+    } catch (err) {
+      toast.error(t('contact.error_message'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Page Header */}
@@ -103,38 +133,55 @@ export default function Contact() {
                 .
               </p>
 
-              <form className="grid gap-4" aria-label={t('contact.form_aria')}>
+              <form className="grid gap-4" aria-label={t('contact.form_aria')} onSubmit={handleSubmit}>
                 <div className="grid md:grid-cols-2 gap-4">
                   <input
+                    name="fullName"
+                    value={form.fullName}
+                    onChange={handleChange}
                     type="text"
                     placeholder={t('contact.form.name')}
                     aria-label={t('contact.form.name')}
                     className="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-400 outline-none"
+                    required
                   />
                   <input
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
                     type="email"
                     placeholder={t('contact.form.email')}
                     aria-label={t('contact.form.email')}
                     className="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-400 outline-none"
+                    required
                   />
                 </div>
                 <input
+                  name="subject"
+                  value={form.subject}
+                  onChange={handleChange}
                   type="text"
                   placeholder={t('contact.form.subject')}
                   aria-label={t('contact.form.subject')}
                   className="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-400 outline-none"
+                  required
                 />
                 <textarea
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
                   placeholder={t('contact.form.message')}
                   aria-label={t('contact.form.message')}
                   rows="5"
                   className="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-400 outline-none"
+                  required
                 ></textarea>
                 <button
                   type="submit"
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium transition"
+                  disabled={loading}
+                  className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white px-6 py-3 rounded-lg font-medium transition"
                 >
-                  {t('contact.form.submit')}
+                  {loading ? t('common.sending') : t('contact.form.submit')}
                 </button>
               </form>
             </div>
