@@ -12,7 +12,6 @@ const buildMaterialFormData = ({
   UnitEN,
   Description,
   DescriptionEN,
-  UnitPrice,
   Images,
 }) => {
   const formData = new FormData();
@@ -26,7 +25,6 @@ const buildMaterialFormData = ({
   if (UnitEN) formData.append('UnitEN', UnitEN);
   if (Description) formData.append('Description', Description);
   if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
-  if (UnitPrice !== undefined) formData.append('UnitPrice', UnitPrice);
   if (Images && Images.length > 0) {
     Images.forEach((file) => formData.append('Images', file));
   }
@@ -71,9 +69,9 @@ export const materialService = {
     return response.data;
   },
 
-  deleteMaterialImage: async (materialId, imageId) => {
+  deleteMaterialImage: async (imageUrl) => {
     const response = await api.delete(
-      `/Distributor/delete-material-image/${materialId}/images/${imageId}`
+      `/Distributor/delete-material-image/${imageUrl}`
     );
     return response.data;
   },

@@ -1,6 +1,6 @@
 ﻿using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
-using BusinessLogic.DTOs.Application.Image;
+
 
 namespace BusinessLogic.DTOs.Application.Material
 {
@@ -24,7 +24,6 @@ namespace BusinessLogic.DTOs.Application.Material
         public string? UnitEN { get; set; }
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
-        public double UnitPrice { get; set; }
-        public ICollection<ImageDto>? Images { get; set; }
+        public ICollection<string>? ImageUrls { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
 
@@ -119,10 +120,13 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task DeleteMaterialImageAsync(Guid materialId, Guid imageId)
+        public async Task DeleteMaterialImageAsync(string imageUrl)
         {
+            // Decode URL để bỏ %2F thành /
+            var decodedUrl = WebUtility.UrlDecode(imageUrl);
+
             var request = await _unitOfWork.ImageRepository.GetAsync(
-                img => img.ImageID == imageId && img.MaterialID == materialId
+                img => img.ImageUrl == decodedUrl
             );
 
             if (request == null)
@@ -134,19 +138,9 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            if (string.IsNullOrEmpty(request.PublicId))
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Image", new[] { ERROR_IMAGE_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
             await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
             await _unitOfWork.SaveAsync();
         }
-
         private static void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();

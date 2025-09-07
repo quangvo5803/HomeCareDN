@@ -20,9 +20,6 @@ namespace BusinessLogic.DTOs.Application.Material
 
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
-
-        [Required]
-        public required double UnitPrice { get; set; }
         public List<IFormFile>? Images { get; set; }
     }
 }

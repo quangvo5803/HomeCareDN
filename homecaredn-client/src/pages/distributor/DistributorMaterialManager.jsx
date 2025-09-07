@@ -149,7 +149,7 @@ export default function MaterialTable() {
                 {t('distributorMaterialManager.category')}
               </th>
               <th className="px-6 py-3 text-center font-semibold uppercase tracking-wide text-xs">
-                {t('distributorMaterialManager.unit_Price')}
+                {t('distributorMaterialManager.unit')}
               </th>
               <th className="px-4 py-3 text-center font-semibold uppercase tracking-wide text-xs">
                 {t('distributorMaterialManager.action')}
@@ -173,9 +173,9 @@ export default function MaterialTable() {
 
                   {/* Material Name + Avatar */}
                   <td className="px-6 py-4 text-left flex items-center gap-3">
-                    {material.images?.length > 0 && material.images[0]?.imageUrls ? (
+                    {material.imageUrls?.length > 0 && material.imageUrls[0] ? (
                       <img
-                        src={material.images[0].imageUrls}
+                        src={material.imageUrls[0]}
                         alt={material.name}
                         className="w-12 h-12 rounded-lg object-cover border border-gray-200"
                       />
@@ -209,11 +209,12 @@ export default function MaterialTable() {
                     }
                   </td>
 
-                  {/* Price */}
+                  {/* Unit */}
                   <td className="px-6 py-4 text-center font-semibold text-emerald-600">
-                    {material.unitPrice && material.unitPrice > 0
-                      ? `${material.unitPrice.toLocaleString()} ₫`
-                      : t('distributorMaterialManager.unit_Price1')}
+                    {i18n.language === 'vi'
+                      ? material.unit
+                      : material.unitEN || material.unit
+                    }
                   </td>
 
                   {/* Actions */}

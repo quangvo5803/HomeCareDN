@@ -24,7 +24,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const [unitEN, setUnitEN] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionEN, setDescriptionEN] = useState('');
-  const [unitPrice, setUnitPrice] = useState('');
+
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -34,7 +34,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const [newImages, setNewImages] = useState([]);
 
   // Delete Material image (DB)
-  const handleDeleteImage = async (materialID, imageID, onSuccess) => {
+  const handleDeleteImage = async (imageUrl, onSuccess) => {
     Swal.fire({
       title: t('ModalPopup.DeleteMaterialImageModal.title'),
       text: t('ModalPopup.DeleteMaterialImageModal.text'),
@@ -55,7 +55,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               Swal.showLoading();
             },
           });
-          await deleteMaterialImage(materialID, imageID);
+          await deleteMaterialImage(imageUrl);
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
           if (onSuccess) onSuccess();
@@ -86,8 +86,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setNameEN(material.nameEN || "");
         setUnitEN(material.unitEN || "");
         setDescriptionEN(material.descriptionEN || "");
-        setUnitPrice(material.unitPrice || '');
-        setExistingImages(material.images || []);
+        setExistingImages(material.imageUrls || []);
         setNewImages([]);
       } else {
         setName('');
@@ -98,7 +97,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setNameEN("");
         setUnitEN("");
         setDescriptionEN("");
-        setUnitPrice('');
         setExistingImages([]);
         setNewImages([]);
       }
@@ -131,13 +129,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   };
 
   // Hàm phụ để update state sau khi xoá ảnh
-  const updateExistingImages = (imageId) => {
-    setExistingImages((prev) => prev.filter((x) => x.imageID !== imageId));
+  const updateExistingImages = (imageUrl) => {
+    setExistingImages((prev) => prev.filter((x) => x.imageURL !== imageUrl));
   };
 
   // Hàm chính để gọi xoá ảnh
-  const handleRemoveExistingImage = (materialId, imageId) => {
-    handleDeleteImage(materialId, imageId, () => updateExistingImages(imageId));
+  const handleRemoveExistingImage = (imageUrl) => {
+    handleDeleteImage(imageUrl, () => updateExistingImages(imageUrl));
   };;
 
   // Submit update/add
@@ -174,7 +172,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       CategoryID: categoryID || null,
       Description: description || null,
       DescriptionEN: descriptionEN || null,
-      UnitPrice: unitPrice ? Number(unitPrice) : null,
       Images: newImages.length > 0 ? newImages.map((x) => x.file) : null,
     };
     console.log("Payload gửi đi:", data);
@@ -280,21 +277,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   </option>
                 ))}
               </select>
-            </div>
-
-            {/* Unit Price */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
-                {t('distributorMaterialManager.materialModal.unit_Price')}
-              </label>
-              <input
-                type="number"
-                className="w-full px-4 py-2.5 border rounded-xl"
-                value={unitPrice}
-                onChange={(e) =>
-                  setUnitPrice(e.target.value === '' ? 0 : Number(e.target.value))
-                }
-              />
             </div>
 
             {/* Description */}
@@ -410,13 +392,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
               <div className="grid grid-cols-5 gap-4 mt-4">
                 {/* Existing Images */}
-                {existingImages.map((img) => (
+                {existingImages.map((imgUrl) => (
                   <div
-                    key={img.imageID}
+                    key={imgUrl}
                     className="relative group w-24 h-24 rounded-lg overflow-hidden border shadow-sm"
                   >
                     <img
-                      src={img.imageUrls}
+                      src={imgUrl}
                       alt="db"
                       className="w-full h-full object-cover"
                     />
@@ -425,7 +407,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                         <button
                           type="button"
                           onClick={() =>
-                            handleRemoveExistingImage(material.materialID, img.imageID)
+                            handleRemoveExistingImage(imgUrl)
                           }
                           className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                         >
@@ -436,7 +418,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   </div>
                 ))}
 
-                {/* New Images */}
+                {/* New Images local */}
                 {newImages.map((img) => (
                   <div
                     key={img.id}

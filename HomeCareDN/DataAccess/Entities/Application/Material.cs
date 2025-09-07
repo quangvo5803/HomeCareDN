@@ -35,7 +35,6 @@ namespace DataAccess.Entities.Application
         public string? UnitEN { get; set; }
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
-        public double UnitPrice { get; set; }
 
         public ICollection<Image>? Images { get; set; }
     }
