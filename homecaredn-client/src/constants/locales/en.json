@@ -364,8 +364,14 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
-    "NETWORK_ERROR" : "Unable to connect to server, please try again later!",
-
+    "NETWORK_ERROR": "Unable to connect to server, please try again later!",
+    "BRAND_NOT_FOUND": "Brand not found.",
+    "CATEGORY_NOT_FOUND": "Category not found.",
+    "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
+    "MAXIMUM_IMAGE_SIZE":"Each image must be less than 5 MB.",
+    "MATERIAL_NOT_FOUND": "Material not found.",
+    "IMAGE_NOT_FOUND" : "Image not found",
+    
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
     "REQUIRED_CATEGORYNAME": "Please enter category name."
