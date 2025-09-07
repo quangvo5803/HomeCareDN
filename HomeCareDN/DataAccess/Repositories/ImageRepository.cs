@@ -6,7 +6,8 @@ using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Ultitity.Options;
 
 namespace WebApi.Repositories
 {
@@ -14,17 +15,16 @@ namespace WebApi.Repositories
     {
         private readonly ApplicationDbContext _db;
         private readonly Cloudinary _cloudinary;
-        private readonly IConfiguration _configuration;
 
-        public ImageRepository(ApplicationDbContext db, IConfiguration configuration)
+        public ImageRepository(ApplicationDbContext db, IOptions<CloudinaryOptions> options)
             : base(db)
         {
             _db = db;
-            _configuration = configuration;
+
             var account = new Account(
-                _configuration["Cloudinary:CloudName"],
-                _configuration["Cloudinary:ApiKey"],
-                _configuration["Cloudinary:ApiSecret"]
+                options.Value.CloudName,
+                options.Value.ApiKey,
+                options.Value.ApiSecret
             );
             _cloudinary = new Cloudinary(account);
         }
@@ -50,17 +50,13 @@ namespace WebApi.Repositories
         public async Task<bool> DeleteImageAsync(string publicId)
         {
             if (string.IsNullOrEmpty(publicId))
-            {
                 return false;
-            }
 
             var deletionParams = new DeletionParams(publicId);
             var result = await _cloudinary.DestroyAsync(deletionParams);
 
             if (result.Error != null)
-            {
                 return false;
-            }
 
             if (result.Result == "ok" || result.Result == "not found")
             {
@@ -70,7 +66,6 @@ namespace WebApi.Repositories
                     _db.Images.Remove(image);
                     await _db.SaveChangesAsync();
                 }
-
                 return true;
             }
 

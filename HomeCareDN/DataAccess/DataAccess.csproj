@@ -26,4 +26,8 @@
     <Folder Include="Migrations\ApplicationDb\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ultitity\Ultitity.csproj" />
+  </ItemGroup>
+
 </Project>
