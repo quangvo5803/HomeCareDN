@@ -26,7 +26,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   // Ảnh DB
   const [existingImages, setExistingImages] = useState([]);
   // Ảnh local mới upload
-  const [newImages, setNewImages] = useState([]); // {file, previewUrl}
+  const [newImages, setNewImages] = useState([]);
 
   // Delete Material image (DB)
   const handleDeleteImage = async (materialID, imageID, onSuccess) => {
@@ -111,6 +111,17 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     setNewImages((prev) => [...prev, ...mappedFiles]);
   };
 
+  // helper để xoá ảnh local theo index
+  const handleRemoveNewImage = (idx) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  // 👉 Định nghĩa hàm riêng trong component
+  const handleRemoveExistingImage = (materialId, imageId) => {
+    handleDeleteImage(materialId, imageId, () => {
+      setExistingImages((prev) => prev.filter((x) => x.imageID !== imageId));
+    });
+  };
   // Submit update/add
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -202,7 +213,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               onChange={(e) => setBrandID(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              {!material && <option value="">{t('Chọn brand')}</option>}
+              {!material && <option value="">{t('distributorMaterialManager.materialModal.chooseBrand')}</option>}
               {brands.map((b) => (
                 <option key={b.brandID} value={b.brandID}>
                   {b.brandName}
@@ -220,7 +231,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               onChange={(e) => setCategoryID(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              {!material && <option value="">{t('Chọn category')}</option>}
+              {!material && <option value="">{t('distributorMaterialManager.materialModal.chooseCategory')}</option>}
               {categories.map((c) => (
                 <option key={c.categoryID} value={c.categoryID}>
                   {c.categoryName}
@@ -289,16 +300,10 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
-                    {!(existingImages.length === 1) && (
+                    {(existingImages.length !== 1) && (
                       <button
                         type="button"
-                        onClick={() =>
-                          handleDeleteImage(material.materialID, img.imageID, () =>
-                            setExistingImages((prev) =>
-                              prev.filter((x) => x.imageID !== img.imageID)
-                            )
-                          )
-                        }
+                        onClick={() => handleRemoveExistingImage(material.materialID, img.imageID)}
                         className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                       >
                         <i className="fa-solid fa-xmark"></i>
@@ -322,9 +327,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
                     <button
                       type="button"
-                      onClick={() =>
-                        setNewImages((prev) => prev.filter((_, i) => i !== idx))
-                      }
+                      onClick={() => handleRemoveNewImage(idx)}
                       className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                     >
                       <i className="fa-solid fa-xmark"></i>

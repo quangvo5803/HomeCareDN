@@ -307,7 +307,9 @@
       "unit": "Unit",
       "description": "Description",
       "unit_Price": "Unit Price",
-      "images": "Images"
+      "images": "Images",
+      "chooseBrand": "Choose brand",
+      "chooseCategory": "Choose category"
     }
   },
   "roles": {

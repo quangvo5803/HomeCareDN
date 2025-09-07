@@ -45,7 +45,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.MaterialRepository.AddAsync(material);
 
             //upload image
-            await UploadImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
 
             await _unitOfWork.SaveAsync();
 
@@ -63,7 +63,14 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                ThrowNotFoundError("Material", ERROR_MATERIAL_FOUND);
+                if (material == null)
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { "Material", new[] { ERROR_MATERIAL_FOUND } }
+                    };
+                    throw new CustomValidationException(errors);
+                }
             }
 
             return _mapper.Map<MaterialDto>(material);
@@ -82,7 +89,7 @@ namespace BusinessLogic.Services
             material.PatchFrom(requestDto, nameof(requestDto.Images));
 
             //upload image
-            await UploadImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
 
             await _unitOfWork.SaveAsync();
             return _mapper.Map<MaterialDto>(material);
@@ -94,7 +101,11 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                ThrowNotFoundError("Material", ERROR_MATERIAL_FOUND);
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Material", new[] { ERROR_MATERIAL_FOUND } }
+                };
+                throw new CustomValidationException(errors);
             }
 
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.MaterialID == id);
@@ -161,7 +172,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        private async Task UploadImagesAsync(Guid materialId, ICollection<IFormFile>? images)
+        private async Task UploadMaterialImagesAsync(Guid materialId, ICollection<IFormFile>? images)
         {
             foreach (var image in images ?? Enumerable.Empty<IFormFile>())
             {
@@ -179,14 +190,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        private void ThrowNotFoundError(string key, string message)
-        {
-            var errors = new Dictionary<string, string[]>
-            {
-                { key, new[] { message } }
-            };
-            throw new CustomValidationException(errors);
-        }
+        
 
     }
 }

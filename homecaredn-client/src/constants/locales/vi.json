@@ -302,7 +302,9 @@
       "unit": "Số lượng",
       "description": "Mô tả",
       "unit_Price": "Giá",
-      "images": "Hình ảnh"
+      "images": "Hình ảnh",
+      "chooseBrand": "Chọn thương hiệu",
+      "chooseCategory": "Chọn danh mục"
     }
   },
   "roles": {
