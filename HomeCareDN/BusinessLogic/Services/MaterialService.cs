@@ -63,15 +63,13 @@ namespace BusinessLogic.Services
 
             if (material == null)
             {
-                if (material == null)
-                {
-                    var errors = new Dictionary<string, string[]>
+                var errors = new Dictionary<string, string[]>
                     {
                         { "Material", new[] { ERROR_MATERIAL_FOUND } }
                     };
-                    throw new CustomValidationException(errors);
-                }
+                throw new CustomValidationException(errors);
             }
+
 
             return _mapper.Map<MaterialDto>(material);
         }
@@ -149,7 +147,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        private void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
+        private static void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();
 

@@ -103,7 +103,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       return;
     }
 
+    // Gán id cho từng ảnh local
     const mappedFiles = files.map((f) => ({
+      id: crypto.randomUUID(),
       file: f,
       previewUrl: URL.createObjectURL(f),
     }));
@@ -111,17 +113,19 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     setNewImages((prev) => [...prev, ...mappedFiles]);
   };
 
-  // helper để xoá ảnh local theo index
-  const handleRemoveNewImage = (idx) => {
-    setNewImages((prev) => prev.filter((_, i) => i !== idx));
+
+  // Xóa ảnh local theo id
+  const handleRemoveNewImage = (id) => {
+    setNewImages((prev) => prev.filter((img) => img.id !== id));
   };
 
-  // 👉 Định nghĩa hàm riêng trong component
+  // xóa ảnh khỏi DB và state
   const handleRemoveExistingImage = (materialId, imageId) => {
     handleDeleteImage(materialId, imageId, () => {
       setExistingImages((prev) => prev.filter((x) => x.imageID !== imageId));
     });
   };
+
   // Submit update/add
   const handleSubmit = () => {
     if (!name.trim()) {
@@ -314,9 +318,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               ))}
 
               {/* New Local Images */}
-              {newImages.map((img, idx) => (
+              {newImages.map((img) => (
                 <div
-                  key={idx}
+                  key={img.id}
                   className="relative group w-24 h-24 rounded-lg overflow-hidden border border-gray-200 shadow-sm"
                 >
                   <img
@@ -327,7 +331,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
                     <button
                       type="button"
-                      onClick={() => handleRemoveNewImage(idx)}
+                      onClick={() => handleRemoveNewImage(img.id)}
                       className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                     >
                       <i className="fa-solid fa-xmark"></i>
