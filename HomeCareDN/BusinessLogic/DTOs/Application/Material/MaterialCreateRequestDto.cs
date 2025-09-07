@@ -12,9 +12,14 @@ namespace BusinessLogic.DTOs.Application.Material
 
         [Required]
         public required string Name { get; set; }
+        public string? NameEN { get; set; }
         public Guid BrandId { get; set; }
+
         public string? Unit { get; set; }
+        public string? UnitEN { get; set; }
+
         public string? Description { get; set; }
+        public string? DescriptionEN { get; set; }
 
         [Required]
         public required double UnitPrice { get; set; }

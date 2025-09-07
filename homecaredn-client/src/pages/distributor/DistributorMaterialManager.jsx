@@ -13,7 +13,7 @@ export default function MaterialTable() {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const {
     materials,
@@ -186,18 +186,27 @@ export default function MaterialTable() {
                         </span>
                       </div>
                     )}
-                    <span className="font-medium text-gray-900">{material.name}</span>
+                    <span className="font-medium text-gray-900">{i18n.language === 'vi'
+                      ? material.name
+                      : material.nameEN || material.name
+                    }</span>
                   </td>
 
 
                   {/* Brand */}
                   <td className="px-6 py-4 text-center">
-                    {material.brandName}
+                    {i18n.language === 'vi'
+                      ? material.brandName
+                      : material.brandNameEN || material.brandName
+                    }
                   </td>
 
                   {/* Category */}
                   <td className="px-6 py-4 text-center">
-                    {material.categoryName}
+                    {i18n.language === 'vi'
+                      ? material.categoryName
+                      : material.categoryNameEN || material.categoryName
+                    }
                   </td>
 
                   {/* Price */}

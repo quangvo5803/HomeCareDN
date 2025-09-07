@@ -128,7 +128,7 @@
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
     "service_requests": "Yêu cầu dịch vụ",
-    "materials": "Vật liệu",
+    "materials": "Quản lý vật liệu",
     "you_have_notifications": "Bạn có {{count}} thông báo",
     "notification_item": "Thông báo #{{number}}",
     "change_language": "Đổi ngôn ngữ",
@@ -296,15 +296,24 @@
     "materialModal": {
       "title": "Thêm vật liệu mới",
       "title2": "Cập nhật vật liệu",
-      "materialName": "Tên vật liệu",
+      "materialName": "Tên vật liệu (Tiếng Việt)",
       "brand": "Thương hiệu",
       "category": "Danh mục",
-      "unit": "Số lượng",
-      "description": "Mô tả",
+      "unit": "Đơn vị (Tiếng Việt)",
+      "description": "Mô tả (Tiếng Việt)",
+      "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
       "unit_Price": "Giá",
       "images": "Hình ảnh",
       "chooseBrand": "Chọn thương hiệu",
-      "chooseCategory": "Chọn danh mục"
+      "chooseCategory": "Chọn danh mục",
+      "materialNameEN": "Tên vật liệu (Tiếng Anh)",
+      "unitEN": "Đơn vị (Tiếng Anh)",
+      "descriptionEN": "Mô tả (Tiếng Anh)",
+      "descriptionsPlaceholderEN": "Nhập mô tả bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
+      "chooseFile": "Chọn tệp",
+      "noFile": "Không có tệp nào được chọn",
+      "filesSelected": " tệp đã chọn"
     }
   },
   "roles": {
@@ -406,7 +415,7 @@
     "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục.",
     "REQUIRED_MATERIAL_NAME": "Vui lòng nhập tên vật liệu.",
     "REQUIRED_MATERIAL_IMAGES": "Vui lòng tải lên ảnh vật liệu.",
-    "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập số lượng vật liệu.",
+    "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập đơn vị vật liệu.",
     "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
     "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
 

@@ -65,15 +65,11 @@ namespace HomeCareDNAPI.Mapping
                 );
 
             CreateMap<Material, MaterialDto>()
-                .ForMember(
-                    dest => dest.BrandName,
-                    opt =>
-                        opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : string.Empty)
-                )
-                .ForMember(
-                    dest => dest.CategoryName,
-                    opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : string.Empty)
-                );
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
+                .ForMember(dest => dest.BrandNameEN, opt => opt.MapFrom(src => src.Brand!.BrandNameEN))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.CategoryName))
+                .ForMember(dest => dest.CategoryNameEN, opt => opt.MapFrom(src => src.Category!.CategoryNameEN));
+
 
             CreateMap<Image, ImageDto>()
                 .ForMember(dest => dest.ImageUrls,

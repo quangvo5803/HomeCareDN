@@ -132,7 +132,7 @@
     "view": "View",
     "search_placeholder": "Search applications",
     "service_requests": "Service Requests",
-    "materials": "Materials",
+    "materials": "Materials Manager",
     "you_have_notifications": "You have {{count}} notifications",
     "notification_item": "Notification #{{number}}",
     "change_language": "Change language",
@@ -301,15 +301,24 @@
     "materialModal": {
       "title": "Add new material",
       "title2": "Update material",
-      "materialName": "Material Name",
+      "materialName": "Material Name (VietNamese)",
       "brand": "Brand",
       "category": "Category",
-      "unit": "Unit",
-      "description": "Description",
+      "unit": "Unit (VietNamese)",
+      "description": "Descriptions (VietNamese)",
+      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
       "unit_Price": "Unit Price",
       "images": "Images",
       "chooseBrand": "Choose brand",
-      "chooseCategory": "Choose category"
+      "chooseCategory": "Choose category",
+      "materialNameEN": "Material Name (English)",
+      "unitEN": "Unit (English)",
+      "descriptionEN": "Description (English)",
+      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "multilanguage_for_data": " Multilanguage for data",
+      "chooseFile": "Choose file",
+      "noFile": "No files selected",
+      "filesSelected": " selected file"
     }
   },
   "roles": {
@@ -412,7 +421,7 @@
     "REQUIRED_CATEGORYNAME": "Please enter category name.",
     "REQUIRED_MATERIAL_NAME": "Please enter the material name.",
     "REQUIRED_MATERIAL_IMAGES": "Please upload a material image.",
-    "REQUIRED_MATERIAL_UNIT": "Please enter the material quantity.",
+    "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
 

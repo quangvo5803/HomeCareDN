@@ -15,6 +15,9 @@ namespace DataAccess.Entities.Application
         [MaxLength(150)]
         public required string Name { get; set; }
 
+        [MaxLength(150)]
+        public string? NameEN { get; set; }
+
         // Quan hệ với Brand
         public Guid BrandID { get; set; }
 
@@ -29,7 +32,9 @@ namespace DataAccess.Entities.Application
         public Category? Category { get; set; }
 
         public string? Unit { get; set; }
+        public string? UnitEN { get; set; }
         public string? Description { get; set; }
+        public string? DescriptionEN { get; set; }
         public double UnitPrice { get; set; }
 
         public ICollection<Image>? Images { get; set; }

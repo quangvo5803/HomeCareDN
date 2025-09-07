@@ -22,9 +22,12 @@ export const materialService = {
     UserID,
     CategoryID,
     Name,
+    NameEN,
     BrandID,
     Unit,
+    UnitEN,
     Description,
+    DescriptionEN,
     UnitPrice,
     Images,
   }) => {
@@ -32,9 +35,12 @@ export const materialService = {
     formData.append('UserID', UserID);
     formData.append('CategoryID', CategoryID);
     formData.append('Name', Name);
+    if (NameEN) formData.append('NameEN', NameEN);
     if (BrandID) formData.append('BrandID', BrandID);
     if (Unit) formData.append('Unit', Unit);
+    if (UnitEN) formData.append('UnitEN', UnitEN);
     if (Description) formData.append('Description', Description);
+    if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
     formData.append('UnitPrice', UnitPrice);
     if (Images && Images.length > 0) {
       Images.forEach((file) => formData.append('Images', file));
@@ -52,9 +58,12 @@ export const materialService = {
     MaterialID,
     CategoryID,
     Name,
+    NameEN,
     BrandID,
     Unit,
+    UnitEN,
     Description,
+    DescriptionEN,
     UnitPrice,
     Images,
   }) => {
@@ -62,9 +71,12 @@ export const materialService = {
     formData.append('MaterialID', MaterialID);
     formData.append('CategoryID', CategoryID);
     formData.append('Name', Name);
+    if (NameEN) formData.append('NameEN', NameEN);
     if (BrandID) formData.append('BrandID', BrandID);
     if (Unit) formData.append('Unit', Unit);
+    if (UnitEN) formData.append('UnitEN', UnitEN);
     if (Description) formData.append('Description', Description);
+    if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
     formData.append('UnitPrice', UnitPrice);
 
     if (Images && Images.length > 0) {

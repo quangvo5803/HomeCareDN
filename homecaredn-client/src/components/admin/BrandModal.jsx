@@ -79,8 +79,10 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto transform transition-all duration-300 scale-100">
+    <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto 
+                  transform transition-all duration-300 scale-100 
+                  max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">
@@ -96,8 +98,8 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6">
+        {/* Body (cuộn ở đây) */}
+        <div className="p-6 space-y-6 flex-1 overflow-y-auto">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               {t("adminBrandManager.brandModal.brandName")}{" "}
@@ -231,6 +233,7 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
         </div>
       </div>
     </div>
+
   );
 }
 // PropTypes
