@@ -87,8 +87,8 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
               className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
             >
               <i className="fas fa-globe"></i>
-              {t("adminCategoryManager.categoryModal.multilanguage_for_data")}
-              <span>{isExpanded ? "▲" : "▼"}</span>
+              {t('adminCategoryManager.categoryModal.multilanguage_for_data')}
+              <span>{isExpanded ? '▲' : '▼'}</span>
             </button>
 
             {/* Nội dung expand */}
@@ -101,17 +101,17 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
                   </label>
                   <input
                     type="text"
-                    placeholder={t('adminCategoryManager.categoryModal.categoryNamePlaceholderEN')}
+                    placeholder={t(
+                      'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
+                    )}
                     className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={categoryNameEN}
                     onChange={(e) => setCategoryNameEN(e.target.value)}
                   />
                 </div>
-
               </div>
             )}
           </div>
-
         </div>
 
         {/* Footer */}

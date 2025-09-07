@@ -1,25 +1,25 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import StatusBadge from "../../components/StatusBadge";
-import { formatVND, formatDate } from "../../utils/formatters";
+import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import StatusBadge from '../../components/StatusBadge';
+import { formatVND, formatDate } from '../../utils/formatters';
 
 /* Seed data */
 const SEED_APPS = [
   {
-    id: "APP-2025-0001",
-    description: "Electrical repair — replace breaker",
+    id: 'APP-2025-0001',
+    description: 'Electrical repair — replace breaker',
     estimatePrice: 1800000,
     createdAt: new Date().toISOString(),
-    status: "Pending",
+    status: 'Pending',
     notifications: 2,
   },
   {
-    id: "APP-2025-0002",
-    description: "Paint 60m² apartment",
+    id: 'APP-2025-0002',
+    description: 'Paint 60m² apartment',
     estimatePrice: 9200000,
     createdAt: new Date().toISOString(),
-    status: "Approved",
+    status: 'Approved',
     notifications: 0,
   },
 ];
@@ -31,28 +31,28 @@ export default function DistributorDashboard() {
   const kpis = useMemo(
     () => [
       {
-        label: t("partnerDashboard.kpi.open_requests"),
+        label: t('partnerDashboard.kpi.open_requests'),
         value: 8,
-        meta: t("partnerDashboard.kpi_meta.open_requests"),
-        cls: "text-green-600",
+        meta: t('partnerDashboard.kpi_meta.open_requests'),
+        cls: 'text-green-600',
       },
       {
-        label: t("partnerDashboard.kpi.applied"),
+        label: t('partnerDashboard.kpi.applied'),
         value: 14,
-        meta: t("partnerDashboard.kpi_meta.applied"),
-        cls: "text-gray-600",
+        meta: t('partnerDashboard.kpi_meta.applied'),
+        cls: 'text-gray-600',
       },
       {
-        label: t("partnerDashboard.kpi.won"),
+        label: t('partnerDashboard.kpi.won'),
         value: 5,
-        meta: t("partnerDashboard.kpi_meta.won"),
-        cls: "text-green-600",
+        meta: t('partnerDashboard.kpi_meta.won'),
+        cls: 'text-green-600',
       },
       {
-        label: t("partnerDashboard.kpi.pending_payments"),
+        label: t('partnerDashboard.kpi.pending_payments'),
         value: 3,
-        meta: t("partnerDashboard.kpi_meta.pending_payments"),
-        cls: "text-red-600",
+        meta: t('partnerDashboard.kpi_meta.pending_payments'),
+        cls: 'text-red-600',
       },
     ],
     [t]
@@ -78,13 +78,13 @@ export default function DistributorDashboard() {
       <section className="bg-white border border-gray-200 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold">
-            {t("partnerDashboard.latest_applications")}
+            {t('partnerDashboard.latest_applications')}
           </h3>
           <button
-            onClick={() => navigate("/applications")}
+            onClick={() => navigate('/applications')}
             className="text-sm px-3 py-1.5 rounded-lg border border-emerald-500 text-emerald-600 hover:bg-emerald-50"
           >
-            {t("partnerDashboard.view_all")}
+            {t('partnerDashboard.view_all')}
           </button>
         </div>
 
@@ -93,25 +93,25 @@ export default function DistributorDashboard() {
             <thead className="text-xs text-gray-500">
               <tr className="border-b">
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.id")}
+                  {t('partnerDashboard.id')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.description")}
+                  {t('partnerDashboard.description')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.estimate")}
+                  {t('partnerDashboard.estimate')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.last_update")}
+                  {t('partnerDashboard.last_update')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.notifications")}
+                  {t('partnerDashboard.notifications')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.status")}
+                  {t('partnerDashboard.status')}
                 </th>
                 <th className="py-2 px-3 text-left">
-                  {t("partnerDashboard.action")}
+                  {t('partnerDashboard.action')}
                 </th>
               </tr>
             </thead>
@@ -143,7 +143,7 @@ export default function DistributorDashboard() {
                       onClick={() => navigate(`/applications/${app.id}`)}
                       className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
                     >
-                      {t("partnerDashboard.view")}
+                      {t('partnerDashboard.view')}
                     </button>
                   </td>
                 </tr>

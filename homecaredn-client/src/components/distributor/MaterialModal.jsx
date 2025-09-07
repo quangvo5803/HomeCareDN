@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import { toast } from "react-toastify";
-import { useTranslation } from "react-i18next";
-import { useBrand } from "../../hook/useBrand";
-import { useCategory } from "../../hook/useCategory";
-import Swal from "sweetalert2";
-import { handleApiError } from "../../utils/handleApiError";
-import { useMaterial } from "../../hook/useMaterial";
-import { useAuth } from "../../hook/useAuth";
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { useBrand } from '../../hook/useBrand';
+import { useCategory } from '../../hook/useCategory';
+import Swal from 'sweetalert2';
+import { handleApiError } from '../../utils/handleApiError';
+import { useMaterial } from '../../hook/useMaterial';
+import { useAuth } from '../../hook/useAuth';
 
 export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const { user } = useAuth();
@@ -33,20 +33,20 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   // Delete Material image
   const handleDeleteImage = async (materialID, imageID, onSuccess) => {
     Swal.fire({
-      title: t("ModalPopup.DeleteMaterialImageModal.title"),
-      text: t("ModalPopup.DeleteMaterialImageModal.text"),
-      icon: "warning",
+      title: t('ModalPopup.DeleteMaterialImageModal.title'),
+      text: t('ModalPopup.DeleteMaterialImageModal.text'),
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: t("BUTTON.Delete"),
-      cancelButtonText: t("BUTTON.Cancel"),
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: t('BUTTON.Delete'),
+      cancelButtonText: t('BUTTON.Cancel'),
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           Swal.fire({
-            title: t("ModalPopup.DeletingLoadingModal.title"),
-            text: t("ModalPopup.DeletingLoadingModal.text"),
+            title: t('ModalPopup.DeletingLoadingModal.title'),
+            text: t('ModalPopup.DeletingLoadingModal.text'),
             allowOutsideClick: false,
             didOpen: () => {
               Swal.showLoading();
@@ -56,7 +56,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           await deleteMaterialImage(materialID, imageID);
 
           Swal.close();
-          toast.success(t("SUCCESS.DELETE"));
+          toast.success(t('SUCCESS.DELETE'));
 
           // Gọi callback sau khi xóa
           if (onSuccess) onSuccess();
@@ -111,7 +111,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     const totalFiles = [...existingImages, ...imageFiles, ...files];
 
     if (totalFiles.length > 5) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_IMAGE"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGE'));
       return;
     }
 
@@ -128,23 +128,23 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   //Summit update/add
   const handleSubmit = () => {
     if (!name.trim()) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_NAME"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_NAME'));
       return;
     }
     if (!unit.trim()) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_UNIT"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_UNIT'));
       return;
     }
     if (!brandID.trim()) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_BRAND"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_BRAND'));
       return;
     }
     if (!categoryID.trim()) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_CATEGORY"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_CATEGORY'));
       return;
     }
     if (!material && imageFiles.length === 0) {
-      toast.error(t("ERROR.REQUIRED_MATERIAL_IMAGES"));
+      toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
       return;
     }
 
@@ -157,7 +157,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       CategoryID: categoryID || null,
       Description: description || null,
       UnitPrice:
-        unitPrice !== undefined && unitPrice !== "" ? Number(unitPrice) : null,
+        unitPrice !== undefined && unitPrice !== '' ? Number(unitPrice) : null,
       Images: imageFiles.length > 0 ? imageFiles : null,
       // Giữ ảnh cũ nếu không có ảnh mới
     };
@@ -173,7 +173,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         {/* Header */}
         <div className="flex items-center justify-between border-b pb-3">
           <h3 className="text-xl font-semibold text-gray-900">
-            {material ? t("BUTTON.UpdateMaterial") : t("BUTTON.AddNewMaterial")}
+            {material ? t('BUTTON.UpdateMaterial') : t('BUTTON.AddNewMaterial')}
           </h3>
           <button
             onClick={onClose}
@@ -188,7 +188,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Material Name */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.materialName")}
+              {t('distributorMaterialManager.materialModal.materialName')}
             </label>
             <input
               type="text"
@@ -201,7 +201,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Unit */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.unit")}
+              {t('distributorMaterialManager.materialModal.unit')}
             </label>
             <input
               type="number"
@@ -214,14 +214,14 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Brand Select */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.brand")}{" "}
+              {t('distributorMaterialManager.materialModal.brand')}{' '}
             </label>
             <select
-              value={brandID || ""}
+              value={brandID || ''}
               onChange={(e) => setBrandID(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              {!material && <option value="">{t("Chọn brand")}</option>}
+              {!material && <option value="">{t('Chọn brand')}</option>}
               {brands.map((b) => (
                 <option key={b.brandID} value={b.brandID}>
                   {b.brandName}
@@ -233,14 +233,14 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Category Select */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.category")}{" "}
+              {t('distributorMaterialManager.materialModal.category')}{' '}
             </label>
             <select
-              value={categoryID || ""}
+              value={categoryID || ''}
               onChange={(e) => setCategoryID(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              {!material && <option value="">{t("Chọn category")}</option>}
+              {!material && <option value="">{t('Chọn category')}</option>}
               {categories.map((c) => (
                 <option key={c.categoryID} value={c.categoryID}>
                   {c.categoryName}
@@ -252,7 +252,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Unit Price */}
           <div>
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.unit_Price")}
+              {t('distributorMaterialManager.materialModal.unit_Price')}
             </label>
             <input
               type="number"
@@ -260,7 +260,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               value={unitPrice}
               onChange={(e) => {
                 const value = e.target.value;
-                setUnitPrice(value === "" ? 0 : Number(value));
+                setUnitPrice(value === '' ? 0 : Number(value));
               }}
             />
           </div>
@@ -268,7 +268,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Description */}
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">
-              {t("distributorMaterialManager.materialModal.description")}
+              {t('distributorMaterialManager.materialModal.description')}
             </label>
             <textarea
               className="w-full px-3 py-2 border rounded-lg"
@@ -281,7 +281,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           {/* Images */}
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-2">
-              {t("distributorMaterialManager.materialModal.images")}
+              {t('distributorMaterialManager.materialModal.images')}
             </label>
 
             {imagePreviews.length < 5 && (
@@ -362,13 +362,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
             onClick={onClose}
             className="px-4 py-2 border rounded-lg hover:bg-gray-50"
           >
-            {t("BUTTON.Cancel")}
+            {t('BUTTON.Cancel')}
           </button>
           <button
             onClick={handleSubmit}
             className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
           >
-            {material ? t("BUTTON.Update") : t("BUTTON.Add")}
+            {material ? t('BUTTON.Update') : t('BUTTON.Add')}
           </button>
         </div>
       </div>
