@@ -31,7 +31,6 @@ namespace HomeCareDNAPI.Controllers.Admin
             var safeEmail = HtmlEncoder.Default.Encode(updated.Email);
             var safeCustomerMsg = HtmlEncoder.Default.Encode(detail.Message);
             var safeAdminReply = HtmlEncoder.Default.Encode(dto.ReplyContent);
-            var safeAdmin = HtmlEncoder.Default.Encode(adminName);
 
             var htmlMessage =
                 $"<table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse: collapse; width: 100%; font-family: sans-serif; background-color: #fff5f0; padding: 20px;\">"

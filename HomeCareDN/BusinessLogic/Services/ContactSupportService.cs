@@ -12,6 +12,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string ContactSupportIdKey = "ContactSupportId";
 
         public ContactSupportService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -40,7 +41,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ContactSupportId", new[] { $"ContactSupport with ID {id} not found." } },
+                    { ContactSupportIdKey, new[] { $"ContactSupport with ID {id} not found." } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -67,7 +68,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ContactSupportId", new[] { $"ContactSupport with ID {id} not found." } },
+                    { ContactSupportIdKey, new[] { $"ContactSupport with ID {id} not found." } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -86,7 +87,7 @@ namespace BusinessLogic.Services
             if (entity == null)
                 throw new CustomValidationException(new Dictionary<string, string[]>
                 {
-                    { "ContactSupportId", new[] { $"ContactSupport with ID {id} not found." } }
+                    { ContactSupportIdKey, new[] { $"ContactSupport with ID {id} not found." } },
                 });
             return _mapper.Map<ContactSupportDetailDto>(entity);
         }
@@ -99,7 +100,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "ContactSupportId", new[] { $"ContactSupport with ID {id} not found." } },
+                    { ContactSupportIdKey, new[] { $"ContactSupport with ID {id} not found." } },
                 };
                 throw new CustomValidationException(errors);
             }
