@@ -34,7 +34,7 @@ function Reveal({ children }) {
 }
 Reveal.propTypes = { children: PropTypes.node.isRequired };
 
-// ---- Chỉ phần VIDEO CENTER cần thay ----
+// ---- Video modal (validated props) ----
 function AutoPlayVideoModal({ src, className }) {
   const [open, setOpen] = useState(false);
   const modalVideoRef = useRef(null);
@@ -102,7 +102,7 @@ function AutoPlayVideoModal({ src, className }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-fadeIn">
           <div
             ref={modalContainerRef}
-            className="relative w-full max-w-7xl" /* to hơn */
+            className="relative w-full max-w-7xl"
           >
             {/* Nút đóng */}
             <button
@@ -146,30 +146,24 @@ function AutoPlayVideoModal({ src, className }) {
     </>
   );
 }
-function StepCard({ n, title, desc }) {
-  return (
-    <div className="step-card rounded-[24px] bg-white border border-gray-100 shadow-sm p-6 md:p-8 overflow-hidden transition-transform hover:-translate-y-1">
-      {/* Số lớn góc phải */}
-      <div className="absolute top-4 right-5 text-5xl md:text-6xl font-extrabold text-gray-200 select-none">
-        {n}
-      </div>
-
-      {/* Nội dung */}
-      <div className="mt-16">
-        <h4 className="text-xl md:text-2xl font-extrabold text-gray-900">
-          {title}
-        </h4>
-        <p className="text-sm text-gray-600 mt-2">{desc}</p>
-      </div>
-    </div>
-  );
-}
+AutoPlayVideoModal.propTypes = {
+  src: PropTypes.string.isRequired,
+  className: PropTypes.string,
+};
+AutoPlayVideoModal.defaultProps = {
+  className: '',
+};
 
 export default function About() {
   const { t } = useTranslation();
+
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); // hoặc 'auto'
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
+
+  // Dùng key ổn định (không dùng index)
+  const stepKeys = ['s1', 's2', 's3', 's4'];
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Page Header */}
@@ -233,11 +227,11 @@ export default function About() {
           </div>
         </section>
       </Reveal>
+
       {/* Company Info */}
       <Reveal>
         <section className="bg-gray-50 py-20 px-6">
           <div className="max-w-6xl mx-auto text-center">
-            {/* Subtitle + Title */}
             <p className="text-sm text-orange-500 font-semibold uppercase tracking-wide mb-2">
               {t('about.section_subtitle')}
             </p>
@@ -250,7 +244,6 @@ export default function About() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-12 gap-8">
-              {/* Stat 1 – chiếm 5/12 */}
               <div className="col-span-12 md:col-span-5">
                 <div className="stat-card bg-gray-100 p-8 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 h-full">
                   <div className="flex items-center space-x-2 mb-4">
@@ -272,7 +265,6 @@ export default function About() {
                 </div>
               </div>
 
-              {/* Cột 2 – Stat 2 + Stat 4 (chiếm 3/12) */}
               <div className="col-span-12 md:col-span-3 flex flex-col gap-8">
                 <div className="stat-card bg-gray-100 p-8 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 flex-1">
                   <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4">
@@ -309,9 +301,7 @@ export default function About() {
                 </div>
               </div>
 
-              {/* Cột 3 – Stat 3 + Last row (chiếm 4/12) */}
               <div className="col-span-12 md:col-span-4 flex flex-col gap-8 h-full">
-                {/* Stat 3 */}
                 <div className="stat-card bg-gray-100 p-8 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 flex-1">
                   <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mb-4">
                     <i className="fa-solid fa-check text-orange-600"></i>
@@ -322,7 +312,6 @@ export default function About() {
                   </p>
                 </div>
 
-                {/* Last Row */}
                 <div className="stat-card bg-gray-100 p-8 rounded-xl shadow-md hover:shadow-xl transition transform hover:-translate-y-2 flex-1">
                   <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-4">
                     <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center">
@@ -348,9 +337,7 @@ export default function About() {
       <Reveal>
         <section className="py-20 px-6 bg-white">
           <div className="max-w-6xl mx-auto flex flex-col gap-12">
-            {/* Row 1: heading */}
             <div className="grid md:grid-cols-2 gap-8 items-start">
-              {/* Left: tiny badge + title */}
               <div>
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                   <span className="inline-block w-2.5 h-2.5 rounded-sm bg-orange-400" />
@@ -361,16 +348,12 @@ export default function About() {
                   <span className="block md:inline">{t('why.brand')}</span>
                 </h2>
               </div>
-
-              {/* Right: intro */}
               <div className="flex items-center">
                 <p className="text-gray-600 max-w-prose">{t('why.intro')}</p>
               </div>
             </div>
 
-            {/* Row 2: image + cards */}
             <div className="grid md:grid-cols-2 gap-12 items-stretch">
-              {/* Left: image */}
               <div className="relative">
                 <img
                   src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1755740416/feature_x63wto.jpg"
@@ -380,7 +363,6 @@ export default function About() {
                 />
               </div>
 
-              {/* Right: cards */}
               <div className="flex flex-col gap-6 h-full">
                 <div className="flex-1 rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
                   <h3 className="font-semibold text-gray-900">
@@ -418,7 +400,6 @@ export default function About() {
       <Reveal>
         <section className="py-20 px-6 bg-white">
           <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-start">
-            {/* Left: heading */}
             <div>
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                 <span className="inline-block w-2.5 h-2.5 rounded-sm bg-orange-400" />
@@ -432,16 +413,15 @@ export default function About() {
               <p className="text-gray-600 max-w-prose">{t('process.intro')}</p>
             </div>
 
-            {/* Steps */}
+            {/* Steps (key ổn định) */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 md:col-span-2">
-              {['s1', 's2', 's3', 's4'].map((key, i) => (
+              {['s1', 's2', 's3', 's4'].map((key, idx) => (
                 <div
-                  key={i}
+                  key={key}
                   className="relative rounded-[28px] border border-gray-100 bg-gray-50 p-6 md:p-7 shadow-sm"
                 >
-                  {/* big number */}
                   <div className="absolute top-4 left-5 text-4xl md:text-5xl font-extrabold text-orange-400 select-none">
-                    {`0${i + 1}`}
+                    {`0${idx + 1}`}
                   </div>
                   <div className="mt-16">
                     <h4 className="font-semibold text-gray-900 text-lg">

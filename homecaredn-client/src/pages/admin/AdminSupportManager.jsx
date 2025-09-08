@@ -66,17 +66,6 @@ function ReplyModal({ open, onClose, item, onSubmit }) {
             />
           </div>
 
-          {/* <div>
-            <label className="block text-sm text-gray-600 mb-1">
-              {t("adminSupportManager.pending")} / {t("adminSupportManager.status")}
-            </label>
-            <input
-              className="w-full border rounded-lg px-3 py-2 bg-gray-100"
-              value={item.isProcessed ? t("adminSupportManager.processed") : t("adminSupportManager.pending")}
-              readOnly
-            />
-          </div> */}
-
           <div>
             <label className="block text-sm text-gray-600 mb-1">
               {t("adminSupportManager.subtitle")}
@@ -121,6 +110,19 @@ function ReplyModal({ open, onClose, item, onSubmit }) {
     </div>
   );
 }
+ReplyModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  item: PropTypes.shape({
+    id: PropTypes.string,
+    fullName: PropTypes.string,
+    email: PropTypes.string,
+    subject: PropTypes.string,
+    message: PropTypes.string,
+    isProcessed: PropTypes.bool,
+  }),
+};
 
 export default function AdminSupportManager() {
   const { t } = useTranslation();
@@ -130,14 +132,15 @@ export default function AdminSupportManager() {
 
   // modal state
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(null); // { id, fullName, email, subject, isProcessed, message }
+  const [selected, setSelected] = useState(null); 
 
   const fetchSupports = async () => {
     try {
       setLoading(true);
       // filter server-side theo isProcessed 
       const isProcessedParam =
-        filter === "all" ? undefined : filter === "processed" ? true : false;
+        filter === "all" ? undefined : filter === "processed";
+
 
       const res = await contactService.listAll(isProcessedParam);
       setSupports(res.data || []);

@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
-import { contactService } from '../services/contactService';   
-import { toast } from 'react-toastify';                       
+import { contactService } from '../services/contactService';
+import { toast } from 'react-toastify';
 
 function useInView(options) {
   const ref = useRef(null);
@@ -60,11 +60,22 @@ export default function Contact() {
     e.preventDefault();
     try {
       setLoading(true);
-      await contactService.create(form); // call API
+      await contactService.create(form);
       toast.success(t('contact.success_message'));
       setForm({ fullName: '', email: '', subject: '', message: '' });
-    } catch (err) {
-      toast.error(t('contact.error_message'));
+    } catch (error) {
+      
+      console.error('Contact create failed:', {
+        message: error?.message,
+        response: error?.response,
+      });
+
+      const apiMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        null;
+
+      toast.error(apiMsg || t('contact.error_message'));
     } finally {
       setLoading(false);
     }
@@ -130,10 +141,15 @@ export default function Contact() {
                 >
                   {t('contact.note_link')}
                 </a>
-                .
+                {' '}
+                <span aria-hidden="true">.</span>
               </p>
 
-              <form className="grid gap-4" aria-label={t('contact.form_aria')} onSubmit={handleSubmit}>
+              <form
+                className="grid gap-4"
+                aria-label={t('contact.form_aria')}
+                onSubmit={handleSubmit}
+              >
                 <div className="grid md:grid-cols-2 gap-4">
                   <input
                     name="fullName"
