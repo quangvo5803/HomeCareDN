@@ -146,7 +146,10 @@
     "subject": "Chủ đề",
     "message": "Nội dung",
     "submit": "Gửi tin nhắn"
-  }
+  },
+  "success_message": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.",
+  "error_message": "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau."
+
 },
   "login": {
     "title": "Đăng Nhập",
@@ -260,7 +263,8 @@
       "category": "Danh mục vật liệu",
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
-      "material": "Vật liệu"
+      "material": "Vật liệu",
+      "support": "Quản lý hỗ trợ"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -359,6 +363,23 @@
       "multilanguage_for_data": "Đa ngôn cho dữ liệu"
     }
   },
+  "adminSupportManager": {
+  "title": "Quản lý hỗ trợ",
+  "subtitle": "Yêu cầu từ khách hàng",
+  "fullName": "Họ và tên",
+  "email": "Email",
+  "subject": "Chủ đề",
+  "status": "Trạng thái",
+  "processed": "Đã xử lý",
+  "pending": "Đang chờ",
+  "action": "Thao tác",
+  "replyTitle": "Phản hồi yêu cầu",
+  "replyLabel": "Nội dung phản hồi",
+  "replyPlaceholder": "Nhập nội dung phản hồi...",
+  "noSupport": "Chưa có yêu cầu hỗ trợ nào",
+  "all": "Tất cả",
+  "itemsCount": "{{count}} mục"
+},
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
     "no": "STT",
@@ -446,6 +467,7 @@
     "Edit": "Sửa",
     "Delete": "Xóa",
     "Cancel": "Hủy bỏ",
+    "Reply": "Trả lời",
     "Add": "Thêm",
     "Update": "Cập nhật"
   },
@@ -461,6 +483,10 @@
     "DeletingLoadingModal": {
       "title": "Đang xóa...",
       "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteSupportModal": {
+      "title": "Xóa yêu cầu hỗ trợ này?",
+      "text": "Hành động này không thể hoàn tác."
     },
     "DeleteMaterialModal": {
       "title": "Bạn có chắc chắn?",
@@ -506,6 +532,7 @@
     "BRAND_UPDATE": "Cập nhật thương hiệu thành công.",
     "CATEGORY_ADD": "Thêm danh mục thành công.",
     "CATEGORY_UPDATE": "Cập nhật danh mục thành công.",
+    "REPLY": "Phản hồi thành công.",
     "MATERIAL_ADD": "Thêm vật liệu thành công.",
     "MATERIAL_UPDATE": "Cập nhật vật liệu thành công."
   }

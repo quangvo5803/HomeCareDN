@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import PropTypes from "prop-types";
 
 import Loading from "../../components/Loading";
 import { handleApiError } from "../../utils/handleApiError";
@@ -241,7 +242,7 @@ export default function AdminSupportManager() {
             }`}
             onClick={() => setFilter("all")}
           >
-            All
+            {t("adminSupportManager.all")}
           </button>
           <button
             className={`px-3 py-1.5 rounded-full text-sm border ${
@@ -264,9 +265,9 @@ export default function AdminSupportManager() {
             {t("adminSupportManager.processed")}
           </button>
 
-          <div className="ml-auto text-sm text-gray-500">
-            {filteredCount} item(s)
-          </div>
+         <div className="ml-auto text-sm text-gray-500">
+          {t("adminSupportManager.itemsCount", { count: filteredCount })}
+        </div>
         </div>
 
         {/* Table */}

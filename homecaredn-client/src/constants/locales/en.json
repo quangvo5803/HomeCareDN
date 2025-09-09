@@ -415,7 +415,9 @@
   "replyTitle": "Reply to request",
   "replyLabel": "Your reply",
   "replyPlaceholder": "Type your reply here...",
-  "noSupport": "No support requests yet"
+  "noSupport": "No support requests yet",
+  "all": "All",
+  "itemsCount": "{{count}} item(s)"
   },
   "roles": {
     "Distributor": "Distributor",
