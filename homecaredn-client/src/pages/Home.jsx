@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import SupportChatWidget from "../components/SupportChatWidget";
+import Reveal from '../components/Reveal';
+
 const slides = [
   {
     id: 1,
@@ -201,25 +203,6 @@ const TESTIMONIALS = [
     roleKey: 'home.testimonial2_role',
   },
 ];
-function useInView(options) {
-  const ref = useRef(null);
-  const [isVisible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      // chỉ trigger khi phần tử đi từ dưới lên (boundingClientRect.top > 0)
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.unobserve(entry.target);
-      }
-    }, options);
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [options]);
-
-  return [ref, isVisible];
-}
 
 export default function Home() {
   const { t } = useTranslation();
@@ -923,17 +906,3 @@ export default function Home() {
     </div>
   );
 }
-function Reveal({ children }) {
-  const [ref, visible] = useInView({
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
-  });
-  return (
-    <div ref={ref} className={`reveal-up ${visible ? 'is-visible' : ''}`}>
-      {children}
-    </div>
-  );
-}
-Reveal.propTypes = {
-  children: PropTypes.node.isRequired,
-};

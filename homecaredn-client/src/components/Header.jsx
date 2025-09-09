@@ -6,8 +6,8 @@ import ReactCountryFlag from 'react-country-flag';
 
 // Navigation data
 const navItems = [
-  { label: 'header.home', href: '#', type: 'link' },
-  { label: 'header.about', href: '#about', type: 'link' },
+  { label: 'header.home', href: '/', type: 'link' },
+  { label: 'header.about', href: '/about', type: 'link' },
   {
     label: 'header.services',
     href: '#',
@@ -18,7 +18,7 @@ const navItems = [
       { label: 'header.material', href: '#services' },
     ],
   },
-  { label: 'header.contact', href: '#footer', type: 'link' },
+  { label: 'header.contact', href: '/contact', type: 'link' },
 ];
 
 export default function Header() {
@@ -81,13 +81,13 @@ export default function Header() {
               {navItems.map((item) => (
                 <li key={item.label} className="relative group">
                   {item.type === 'link' ? (
-                    <a
-                      href={item.href}
+                    <Link
+                      to={item.href}
                       className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative"
                     >
                       {t(item.label)}
                       <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 group-hover:w-full transition-all duration-300" />
-                    </a>
+                    </Link>
                   ) : (
                     <>
                       <button className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none">

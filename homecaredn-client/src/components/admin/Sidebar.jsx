@@ -11,34 +11,38 @@ export default function Sidebar() {
   };
   const menuList = [
     {
-      icon: 'text-blue-500 fa-solid fa-tv',
+      icon: 'text-indigo-600 fa-solid fa-tv',
       title: 'dashboard',
       link: '/Admin',
     },
     {
-      icon: 'text-blue-500 fa-solid fa-globe',
+      icon: 'text-sky-600 fa-solid fa-globe',
       title: 'brand',
       link: '/Admin/BrandManager',
     },
     {
-      icon: 'text-blue-500 fa-solid fa-layer-group',
+      icon: 'text-violet-600 fa-solid fa-layer-group',
       title: 'category',
       link: '/Admin/CategoryManager',
     },
     {
-      icon: 'text-red-500 fa-solid fa-code-pull-request',
+      icon: 'text-rose-600 fa-solid fa-code-pull-request',
       title: 'service',
       link: '/Admin/Service',
     },
     {
-      icon: 'text-yellow-500 fa-solid fa-truck',
+      icon: 'text-amber-600 fa-solid fa-truck',
       title: 'serviceRequest',
       link: '/Admin/ServiceRequest',
     },
     {
-      icon: 'text-yellow-500 fa-solid fa-suitcase',
+      icon: 'text-orange-600 fa-solid fa-suitcase',
       title: 'material',
       link: '/Admin/Material',
+    },{
+      icon: 'text-emerald-600 fa-solid fa-headset',
+      title: 'support',
+      link: '/Admin/SupportManager',
     },
   ];
 

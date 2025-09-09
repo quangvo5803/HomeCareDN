@@ -51,7 +51,35 @@ body { font-family: var(--font-body); }
   opacity: 1;
   transform: translateY(0);
 }
+/* ================= IMAGE ABOUT US ================ */
+.clip-slant {
+  clip-path: polygon(12% 0, 100% 0, 100% 85%, 88% 100%, 0 100%, 0 15%);
+}
+/* Smooth fade-in for the modal backdrop */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.animate-fadeIn { animation: fadeIn 180ms ease-out both; }
 
+.stat-card {
+  position: relative;
+  overflow: hidden;         
+  border-radius: 0.75rem;   
+}
+
+.stat-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  transform: translate(10px, -10px) rotate(45deg);
+  transition: transform 180ms ease;
+  pointer-events: none;
+}
+
+.stat-card:hover::after {
+  transform: translate(12px, -12px) rotate(45deg);
+}
 /* ================= ANIMATION TIỆN DỤNG ================ */
 @keyframes fadeInUp {
   0% { opacity: 0; transform: translate3d(0, 30px, 0); }

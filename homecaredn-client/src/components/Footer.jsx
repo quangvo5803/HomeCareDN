@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function Footer() {
   const { t } = useTranslation();
@@ -51,21 +52,21 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
-                <a
-                  href="https://github.com/"
+                <Link
+                  to="/about"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.about')}
-                </a>
+                </Link>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
-                <a
-                  href="https://github.com/"
+                <Link
+                  to="/contact"
                   className="hover:text-white transition-colors duration-300"
                 >
                   {t('footer.quickLinks.contact')}
-                </a>
+                </Link>
               </li>
               <li className="flex items-center">
                 <i className="fas fa-chevron-right mr-3 text-orange-500" />
