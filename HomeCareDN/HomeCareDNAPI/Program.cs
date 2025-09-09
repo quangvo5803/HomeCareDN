@@ -69,7 +69,7 @@ namespace HomeCareDNAPI
                     policy =>
                     {
                         policy
-                            .WithOrigins("http://localhost:5173") // domain React
+                            .WithOrigins("http://localhost:5173", "https://home-care-dn.vercel.app") // domain React
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // nếu dùng cookie/session
