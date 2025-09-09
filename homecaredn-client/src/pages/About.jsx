@@ -161,8 +161,6 @@ export default function About() {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
 
-  // Dùng key ổn định (không dùng index)
-  const stepKeys = ['s1', 's2', 's3', 's4'];
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
