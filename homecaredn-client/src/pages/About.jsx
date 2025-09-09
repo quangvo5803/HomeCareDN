@@ -1,38 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import Reveal from '../components/Reveal';
 
-function useInView(options) {
-  const ref = useRef(null);
-  const [isVisible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.unobserve(entry.target);
-      }
-    }, options);
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [options]);
-
-  return [ref, isVisible];
-}
-
-function Reveal({ children }) {
-  const [ref, visible] = useInView({
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
-  });
-  return (
-    <div ref={ref} className={`reveal-up ${visible ? 'is-visible' : ''}`}>
-      {children}
-    </div>
-  );
-}
-Reveal.propTypes = { children: PropTypes.node.isRequired };
 
 // ---- Video modal (validated props) ----
 function AutoPlayVideoModal({ src, className }) {

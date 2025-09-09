@@ -1,40 +1,8 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import PropTypes from 'prop-types';
 import { contactService } from '../services/contactService';
 import { toast } from 'react-toastify';
-
-function useInView(options) {
-  const ref = useRef(null);
-  const [isVisible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.unobserve(entry.target);
-      }
-    }, options);
-
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [options]);
-
-  return [ref, isVisible];
-}
-
-function Reveal({ children }) {
-  const [ref, visible] = useInView({
-    threshold: 0.15,
-    rootMargin: '0px 0px -50px 0px',
-  });
-  return (
-    <div ref={ref} className={`reveal-up ${visible ? 'is-visible' : ''}`}>
-      {children}
-    </div>
-  );
-}
-Reveal.propTypes = { children: PropTypes.node.isRequired };
+import Reveal from '../components/Reveal';
 
 export default function Contact() {
   const { t } = useTranslation();
@@ -48,7 +16,8 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    // 'instant' không nằm trong spec; dùng 'auto' để an toàn
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
   }, []);
 
   const handleChange = (e) => {
@@ -58,22 +27,20 @@ export default function Contact() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     try {
       setLoading(true);
-      await contactService.create(form);
+      await contactService.create(form); // service trả thẳng data
       toast.success(t('contact.success_message'));
       setForm({ fullName: '', email: '', subject: '', message: '' });
     } catch (error) {
-      
       console.error('Contact create failed:', {
         message: error?.message,
         response: error?.response,
       });
 
       const apiMsg =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        null;
+        error?.response?.data?.message || error?.response?.data?.error || null;
 
       toast.error(apiMsg || t('contact.error_message'));
     } finally {
@@ -113,11 +80,11 @@ export default function Contact() {
               <iframe
                 className="w-full h-full"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d51607.267535206294!2d108.22371327808423!3d15.975308097363925!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3142116949840599%3A0x365b35580f52e8d5!2sFPT%20University%20Danang!5e0!3m2!1sen!2s!4v1756972436573!5m2!1sen!2s"
-                allowFullScreen=""
+                allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title={t('contact.map_title')}
-              ></iframe>
+              />
             </div>
           </Reveal>
 
@@ -140,8 +107,7 @@ export default function Contact() {
                   className="text-orange-500 underline hover:text-orange-600"
                 >
                   {t('contact.note_link')}
-                </a>
-                {' '}
+                </a>{' '}
                 <span aria-hidden="true">.</span>
               </p>
 
@@ -191,13 +157,13 @@ export default function Contact() {
                   rows="5"
                   className="w-full border border-gray-300 bg-gray-50 rounded-lg px-4 py-3 focus:ring-2 focus:ring-orange-400 outline-none"
                   required
-                ></textarea>
+                />
                 <button
                   type="submit"
                   disabled={loading}
                   className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white px-6 py-3 rounded-lg font-medium transition"
                 >
-                  {loading ? t('common.sending') : t('contact.form.submit')}
+                  {loading ? t('BUTTON.Sending') : t('BUTTON.Send')}
                 </button>
               </form>
             </div>

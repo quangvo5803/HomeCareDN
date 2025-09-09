@@ -144,8 +144,7 @@
     "name": "Họ và tên",
     "email": "Email",
     "subject": "Chủ đề",
-    "message": "Nội dung",
-    "submit": "Gửi tin nhắn"
+    "message": "Nội dung"
   },
   "success_message": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.",
   "error_message": "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau."
@@ -469,7 +468,10 @@
     "Cancel": "Hủy bỏ",
     "Reply": "Trả lời",
     "Add": "Thêm",
-    "Update": "Cập nhật"
+    "Update": "Cập nhật",
+    "Send": "Gửi",
+    "Sending": "Đang gửi...",
+    "Close": "Đóng"
   },
   "ModalPopup": {
     "DeleteBrandModal": {

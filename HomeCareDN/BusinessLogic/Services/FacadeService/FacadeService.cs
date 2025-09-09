@@ -39,7 +39,7 @@ namespace BusinessLogic.Services.FacadeService
             BrandService = new BrandService(unitOfWork, mapper);
             AiChatService = new AiChatService(cache, groqClient, http);
             ConversationService = new ConversationService(unitOfWork, mapper);
-            ContactSupportService = new ContactSupportService(unitOfWork, mapper);
+            ContactSupportService = new ContactSupportService(unitOfWork, mapper,emailQueue);
         }
     }
 }

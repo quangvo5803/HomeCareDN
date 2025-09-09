@@ -13,12 +13,10 @@ namespace HomeCareDNAPI.Controllers.Admin
     public partial class AdminController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
-        private readonly IEmailQueue _emailQueue;
 
-        public AdminController(IFacadeService facadeService, IEmailQueue emailQueue)
+        public AdminController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
-            _emailQueue = emailQueue;
         }
 
         [HttpPost("create-brand")]

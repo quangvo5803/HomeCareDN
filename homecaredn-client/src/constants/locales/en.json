@@ -148,9 +148,8 @@
     "name": "Your Name",
     "email": "Your Email",
     "subject": "Subject",
-    "message": "Message",
-    "submit": "Send Message"
-  },
+    "message": "Message"
+    },
   "success_message": "Your request has been sent successfully! We will contact you soon.",
   "error_message": "An error occurred while sending your request. Please try again later."
 }
@@ -474,7 +473,10 @@
     "Cancel": "Cancel",
     "Reply": "Reply",
     "Add": "Add",
-    "Update": "Update"
+    "Update": "Update",
+    "Send": "Send",
+    "Sending": "Sending...",
+    "Close": "Close"
   },
   "ModalPopup": {
     "DeleteBrandModal": {

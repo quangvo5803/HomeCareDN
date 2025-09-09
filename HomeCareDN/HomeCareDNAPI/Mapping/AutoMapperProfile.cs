@@ -120,7 +120,6 @@ namespace HomeCareDNAPI.Mapping
             // ContactSupport 
             CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
-            CreateMap<ContactSupport, ContactSupportDetailDto>();
         }
 
 

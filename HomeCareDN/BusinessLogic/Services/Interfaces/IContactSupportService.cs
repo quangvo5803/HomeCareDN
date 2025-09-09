@@ -7,8 +7,7 @@ namespace BusinessLogic.Services.Interfaces
         Task<ICollection<ContactSupportDto>> ListAllAsync(bool? isProcessed = null);
         Task<ContactSupportDto> GetByIdAsync(Guid id);
         Task<ContactSupportDto> CreateAsync(ContactSupportCreateRequestDto dto);
-        Task<ContactSupportDto> ReplyAsync(Guid id, ContactSupportReplyRequestDto dto, string adminName);
-        Task<ContactSupportDetailDto> GetDetailByIdAsync(Guid id);
+        Task<ContactSupportDto> ReplyAsync( ContactSupportReplyRequestDto dto);
         Task DeleteAsync(Guid id);
     }
 }
