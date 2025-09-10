@@ -65,7 +65,7 @@ namespace BusinessLogic.Services
                 errors.Add("Category", new[] { "CATEGORY_NOT_FOUND" });
                 throw new CustomValidationException(errors);
             }
-            category.PatchFrom(requestDto);
+            _mapper.Map(category, requestDto);
 
             await _unitOfWork.SaveAsync();
 

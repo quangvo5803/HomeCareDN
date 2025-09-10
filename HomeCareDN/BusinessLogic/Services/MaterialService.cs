@@ -90,7 +90,7 @@ namespace BusinessLogic.Services
             //check image
             ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
 
-            material.PatchFrom(requestDto, nameof(requestDto.Images));
+            _mapper.Map(material, requestDto);
 
             //upload image
             await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);

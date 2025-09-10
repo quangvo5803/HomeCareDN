@@ -97,7 +97,7 @@ namespace BusinessLogic.Services
                 errors.Add("BrandID", new[] { "BRAND_NOT_FOUND" });
                 throw new CustomValidationException(errors);
             }
-            brand.PatchFrom(requestDto);
+            _mapper.Map(brand, requestDto);
             if (requestDto.LogoFile != null)
             {
                 var existingImage = await _unitOfWork.ImageRepository.GetAsync(img =>
