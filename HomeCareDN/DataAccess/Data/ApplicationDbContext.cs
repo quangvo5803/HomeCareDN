@@ -18,6 +18,7 @@ namespace DataAccess.Data
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<ContactSupport> ContactSupports { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ServiceRequest>(entity =>

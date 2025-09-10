@@ -19,6 +19,7 @@ namespace BusinessLogic.Services.FacadeService
         public IBrandService BrandService { get; }
         public IAiChatService AiChatService { get; }
         public IConversationService ConversationService { get; }
+        public IContactSupportService ContactSupportService { get; }
 
         public FacadeService(
             IUnitOfWork unitOfWork,
@@ -38,6 +39,7 @@ namespace BusinessLogic.Services.FacadeService
             BrandService = new BrandService(unitOfWork, mapper);
             AiChatService = new AiChatService(cache, groqClient, http);
             ConversationService = new ConversationService(unitOfWork, mapper);
+            ContactSupportService = new ContactSupportService(unitOfWork, mapper,emailQueue);
         }
     }
 }

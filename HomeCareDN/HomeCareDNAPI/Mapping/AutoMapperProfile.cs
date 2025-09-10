@@ -3,6 +3,7 @@ using System.Linq;
 using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
+using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
@@ -60,6 +61,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+            CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -153,6 +155,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
+            CreateMap<ContactSupport, ContactSupportDto>();
         }
 
         // ------------------------
