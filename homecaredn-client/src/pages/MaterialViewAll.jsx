@@ -47,24 +47,25 @@ export default function MaterialViewAll() {
                             <div className="w-12 mb-4 border-b border-gray-300"></div>
                             <ul className="space-y-2 text-sm font-semibold md:text-base">
                                 <li className="flex justify-between">
-                                    <a className="hover:underline" href="#">
+                                    <a className="hover:underline" href="/category/floor-tiles">
                                         Gạch lát nền
                                     </a>
                                     <span className="text-gray-500">(527)</span>
                                 </li>
                                 <li className="flex justify-between">
-                                    <a className="hover:underline" href="#">
+                                    <a className="hover:underline" href="/category/wall-tiles">
                                         Gạch ốp tường
                                     </a>
                                     <span className="text-gray-500">(278)</span>
                                 </li>
                                 <li className="flex justify-between">
-                                    <a className="hover:underline" href="#">
+                                    <a className="hover:underline" href="/category/decor-tiles">
                                         Gạch trang trí
                                     </a>
                                     <span className="text-gray-500">(7)</span>
                                 </li>
                             </ul>
+
                         </div>
                         <div className="space-y-4">
                             <select

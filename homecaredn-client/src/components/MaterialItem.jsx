@@ -19,25 +19,35 @@ export default function MaterialItem({ item }) {
             </div>
 
             {/* Nội dung */}
+            {/* Nội dung */}
             <div className="flex flex-col flex-grow p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
                 <h5 className="mb-2 text-lg font-semibold">
                     {i18n.language === "vi" ? item.name : item.nameEN || item.name}
                 </h5>
 
-                <p className="mb-4 text-gray-600 group-hover:text-white min-h-[3rem]">
-                    {i18n.language === "vi"
-                        ? item.description
-                            ? `${item.description.slice(0, 100)}...`
-                            : null
-                        : item.descriptionEN || item.description
-                            ? `${(item.descriptionEN || item.description).slice(0, 100)}...`
-                            : null}
-                </p>
+                {(() => {
+                    let desc = null;
+                    if (i18n.language === "vi") {
+                        if (item.description) {
+                            desc = `${item.description.slice(0, 100)}...`;
+                        }
+                    } else {
+                        const descEN = item.descriptionEN || item.description;
+                        if (descEN) {
+                            desc = `${descEN.slice(0, 100)}...`;
+                        }
+                    }
+                    return (
+                        <p className="mb-4 text-gray-600 group-hover:text-white min-h-[3rem]">
+                            {desc}
+                        </p>
+                    );
+                })()}
 
                 {/* Đẩy nút xuống cuối để các card ngang bằng */}
                 <div className="mt-auto">
                     <a
-                        href="#"
+                        href={`/materials/${item.materialID}`}
                         className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
                         aria-label={`${t("home.fact_read_more")} ${item.materialID}`}
                     >
@@ -52,8 +62,10 @@ export default function MaterialItem({ item }) {
                             <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
                         </svg>
                     </a>
+
                 </div>
             </div>
+
         </article>
 
     );

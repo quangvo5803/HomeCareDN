@@ -523,7 +523,7 @@ export default function Home() {
                   className="inline-flex items-center justify-center px-6 py-3 font-medium text-white transition bg-orange-400 rounded-lg shadow bg-primary hover:bg-orange-500 "
                 >
                   {t('home.services_more')}
-                  <i class="fa-solid fa-arrow-right ms-2"></i>
+                  <i className="fa-solid fa-arrow-right ms-2"></i>
                 </a>
               </div>
             </div>
@@ -601,7 +601,7 @@ export default function Home() {
                   className="inline-flex items-center justify-center px-6 py-3 font-medium text-white transition bg-orange-400 rounded-lg shadow bg-primary hover:bg-orange-500"
                 >
                   {t('home.material_more')}
-                  <i class="fa-solid fa-arrow-right ms-2"></i>
+                  <i className="fa-solid fa-arrow-right ms-2"></i>
                 </a>
               </div>
             </div>
