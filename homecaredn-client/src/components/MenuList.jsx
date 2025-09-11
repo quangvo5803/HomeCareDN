@@ -38,7 +38,7 @@ export default function Sidebar({
         key: "materials",
         label: t("partnerDashboard.materials"),
         icon: <i className="fa-solid fa-box"></i>,
-        to: "/Distributor/material-manager",
+        to: "/Distributor/MaterialManager",
       },
       {
         key: "applications",

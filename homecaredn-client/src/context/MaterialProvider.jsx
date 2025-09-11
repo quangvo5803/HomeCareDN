@@ -138,11 +138,10 @@ export const MaterialProvider = ({ children }) => {
   );
 
 
-  // 📌 Load brands khi user login, reset khi logout
+  // 📌 Luôn load cho cả guest và user
   useEffect(() => {
-    if (user) fetchMaterials();
-    else setMaterials([]);
-  }, [user, fetchMaterials]);
+    fetchMaterials();
+  }, [fetchMaterials]);
 
   const contextValue = useMemo(
     () => ({

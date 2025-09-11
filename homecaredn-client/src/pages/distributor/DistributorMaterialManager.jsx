@@ -210,7 +210,7 @@ export default function MaterialTable() {
                   </td>
 
                   {/* Unit */}
-                  <td className="px-6 py-4 text-center font-semibold text-emerald-600">
+                  <td className="px-6 py-4 text-center">
                     {i18n.language === 'vi'
                       ? material.unit
                       : material.unitEN || material.unit

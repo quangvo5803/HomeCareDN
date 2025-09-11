@@ -19,6 +19,8 @@ import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Home Page
+import MaterialViewAll from './pages/MaterialViewAll';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -119,7 +121,7 @@ function Layout() {
         >
           <Route index element={<DistributorDashboard />} />
           <Route
-            path="material-manager"
+            path="MaterialManager"
             element={<DistributorMaterialManager />}
           />
         </Route>
@@ -135,6 +137,10 @@ function Layout() {
           element={
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
+        />
+        <Route
+          path="MaterialViewAll"
+          element={<MaterialViewAll />}
         />
       </Routes>
       {showHeaderFooter && <Footer />}
