@@ -74,6 +74,87 @@
     "testimonial2_name": "Client Name",
     "testimonial2_role": "Profession"
   },
+  "about": {
+    "hero_title1": "Crafting Spaces,",
+    "hero_title2": "Shaping Futures",
+    "hero_description": "At HomeCareDN, every project begins with purpose and is driven by passion. We don't just construct buildings we create lasting spaces that reflect our clients' goals and values.",
+    "hero_button": "Our Service",
+    "section_subtitle": "About Our Company",
+    "section_title": "Built on Experience. Driven by Quality.",
+    "section_description": "With over 15 years in the industry, we bring a hands-on, client-first approach to every project. Our team blends craftsmanship, innovation, and trust to deliver excellence.",
+    "stat1_title": "HomeCareDN",
+    "stat1_text": "Proven track record across residential, commercial, and industrial sectors",
+    "stat2_title": "Modern Technology",
+    "stat2_text": "We integrate the latest construction technologies to ensure efficiency and sustainability",
+    "stat3_text": "Project Success rate",
+    "stat4_text": "Client Satisfaction",
+    "stat5_title": "Experience Engineers",
+    "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
+  },
+  "common": {
+    "home": "Home",
+    "about": "About"
+  },
+  "why": {
+  "badge": "Why Choose Us",
+  "title": "Why Builders Trust",
+  "brand": "HomeCareDN",
+  "intro": "At HomeCareDN, we don't just build — we build with purpose, integrity, and precision. Our reputation is grounded in trust, quality, and client satisfaction.",
+  "image_alt": "Why Choose Us illustration",
+  "f1": {
+    "title": "Experienced & Skilled Team",
+    "desc": "Decades of hands-on experience with a team of certified engineers, architects, and project managers who understand every detail of construction."
+  },
+  "f2": {
+    "title": "High-Quality Craftsmanship",
+    "desc": "We combine traditional techniques with modern innovations to deliver long-lasting, precision-built structures — every time."
+  },
+  "f3": {
+    "title": "Client-Centered Approach",
+    "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
+  }
+},
+"process": {
+  "badge": "Our Process",
+  "title": "Our 4-Step Process to a Successful Build.",
+  "intro": "At HomeCareDN, we don't just build — we craft. Every space we deliver is a reflection of thoughtful design, expert planning, and precise execution.",
+  "s1": {
+    "title": "Understanding your needs",
+    "desc": "We listen closely to your goals, challenges, and vision to deliver."
+  },
+  "s2": {
+    "title": "Detailed timeline & quote",
+    "desc": "We provide transparent project timelines and accurate cost estimates."
+  },
+  "s3": {
+    "title": "Expertly Built With Care",
+    "desc": "Every structure we build reflects our commitment to quality craftsmanship."
+  },
+  "s4": {
+    "title": "Final Check & Handover",
+    "desc": "Before delivery, we conduct a thorough final inspection to ensure everything."
+  }
+},
+"contact": {
+  "breadcrumb": "Contact Us",
+  "title": "Contact Us",
+  "map_title": "Google Map",
+  "section_tag": "Contact Us",
+  "section_title": "If You Have Any Query, Please Contact Us",
+  "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
+  "note_link": "Download Now",
+  "form_aria": "Contact form",
+  "form": {
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Message"
+    },
+  "success_message": "Your request has been sent successfully! We will contact you soon.",
+  "error_message": "An error occurred while sending your request. Please try again later."
+}
+,
+
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -186,7 +267,8 @@
       "category": "Material Category",
       "service": "Services",
       "serviceRequest": "Service Request",
-      "material": "Material"
+      "material": "Material",
+      "support": "Support Manager"
     },
     "account": {
       "title": "Account pages",
@@ -319,6 +401,23 @@
       "filesSelected": " selected file"
     }
   },
+  "adminSupportManager": {
+  "title": "Support Manager",
+  "subtitle": "Customer requests",
+  "fullName": "Full name",
+  "email": "Email",
+  "subject": "Subject",
+  "status": "Status",
+  "processed": "Processed",
+  "pending": "Pending",
+  "action": "Action",
+  "replyTitle": "Reply to request",
+  "replyLabel": "Your reply",
+  "replyPlaceholder": "Type your reply here...",
+  "noSupport": "No support requests yet",
+  "all": "All",
+  "itemsCount": "{{count}} item(s)"
+  },
   "roles": {
     "Distributor": "Distributor",
     "Contractor": "Contractor",
@@ -360,8 +459,7 @@
     "SendOTP": "Send OTP Code",
     "MoreDetails": "More Details",
     "LoginGoogle": "Login with Google",
-    "CreateAccount": "Create Account",
-    "Processing": "Processing",
+    "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page",
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
@@ -373,8 +471,12 @@
     "Edit": "Edit",
     "Delete": "Delete",
     "Cancel": "Cancel",
+    "Reply": "Reply",
     "Add": "Add",
-    "Update": "Update"
+    "Update": "Update",
+    "Send": "Send",
+    "Sending": "Sending...",
+    "Close": "Close"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -388,6 +490,10 @@
     "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
+    },
+    "DeleteSupportModal": {
+    "title": "Delete this support request?",
+    "text": "This action cannot be undone."
     },
     "DeleteMaterialModal": {
       "title": "Are you sure?",
@@ -404,7 +510,6 @@
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
     "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
     "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "LOGIN_GOOGLE": "Google login unsuccessfully",
     "REGISTER_ALREADY_EXISTS": "Email already registered",
     "NULL_NAME": "Please enter your full name.",
     "NULL_EMAIL": "Please enter your email.",
@@ -412,8 +517,13 @@
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
     "NETWORK_ERROR": "Unable to connect to server, please try again later!",
-    "ERROR_MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
-
+    "BRAND_NOT_FOUND": "Brand not found.",
+    "CATEGORY_NOT_FOUND": "Category not found.",
+    "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
+    "MAXIMUM_IMAGE_SIZE":"Each image must be less than 5 MB.",
+    "MATERIAL_NOT_FOUND": "Material not found.",
+    "IMAGE_NOT_FOUND" : "Image not found",
+    
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
     "REQUIRED_CATEGORYNAME": "Please enter category name.",
@@ -433,6 +543,7 @@
     "BRAND_UPDATE": "Update brand successfully.",
     "CATEGORY_ADD": "Add category successfully",
     "CATEGORY_UPDATE": "Update category successfully.",
+    "REPLY": "Replied successfully.",
     "MATERIAL_ADD": "Add material successfully",
     "MATERIAL_UPDATE": "Update material successfully."
   }

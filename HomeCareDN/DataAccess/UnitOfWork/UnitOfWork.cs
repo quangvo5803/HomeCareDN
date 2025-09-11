@@ -25,6 +25,8 @@ namespace DataAccess.UnitOfWork
         public IBrandRepository BrandRepository { get; private set; }
         public IConversationRepository ConversationRepository { get; private set; }
         public IChatMessageRepository ChatMessageRepository { get; private set; }
+        public IContactSupportRepository ContactSupportRepository { get; private set; }
+
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
         {
@@ -38,6 +40,7 @@ namespace DataAccess.UnitOfWork
             BrandRepository = new BrandRepository(_db);
             ConversationRepository = new ConversationRepository(_db);
             ChatMessageRepository = new ChatMessageRepository(_db);
+            ContactSupportRepository = new ContactSupportRepository(_db);
         }
 
         public async Task SaveAsync()

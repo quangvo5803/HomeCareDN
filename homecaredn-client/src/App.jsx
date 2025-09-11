@@ -8,12 +8,15 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
+import AdminSupportManager from './pages/admin/AdminSupportManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -59,6 +62,8 @@ function Layout() {
       <Routes>
         {/* Public routes */}
         <Route path="/Home" element={<Home />} />
+        <Route path="/About" element={<About />} />
+        <Route path="/Contact" element={<Contact />} />
         <Route
           path="/Login"
           element={
@@ -98,6 +103,7 @@ function Layout() {
           <Route index element={<AdminDashboard />} />
           <Route path="BrandManager" element={<AdminBrandManager />} />
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
+          <Route path="SupportManager" element={<AdminSupportManager />} />
         </Route>
 
         {/* Contractor routes */}

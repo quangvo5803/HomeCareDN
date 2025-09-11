@@ -13,6 +13,7 @@ namespace DataAccess.UnitOfWork
         IBrandRepository BrandRepository { get; }
         IConversationRepository ConversationRepository { get; }
         IChatMessageRepository ChatMessageRepository { get; }
+        IContactSupportRepository ContactSupportRepository { get; }
         Task SaveAsync();
     }
 }
