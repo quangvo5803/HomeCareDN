@@ -158,13 +158,18 @@ export default function Home() {
   const [randomMaterials, setRandomMaterials] = useState([]);
   const { materials } = useMaterial();
 
-  //Random lấy 6 Material khi reload
+  // Random lấy 6 Material khi reload
   useEffect(() => {
     if (materials.length > 0) {
-      const shuffled = [...materials].sort(() => 0.5 - Math.random());
+      const shuffled = [...materials];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1)); // hoán đổi ngẫu nhiên
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
       setRandomMaterials(shuffled.slice(0, 6));
     }
   }, [materials]);
+
 
   // Carousel state
   const [current, setCurrent] = useState(0);

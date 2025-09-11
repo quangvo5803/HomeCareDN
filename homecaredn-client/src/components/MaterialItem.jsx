@@ -19,7 +19,6 @@ export default function MaterialItem({ item }) {
             </div>
 
             {/* Nội dung */}
-            {/* Nội dung */}
             <div className="flex flex-col flex-grow p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
                 <h5 className="mb-2 text-lg font-semibold">
                     {i18n.language === "vi" ? item.name : item.nameEN || item.name}
@@ -29,12 +28,12 @@ export default function MaterialItem({ item }) {
                     let desc = null;
                     if (i18n.language === "vi") {
                         if (item.description) {
-                            desc = `${item.description.slice(0, 100)}...`;
+                            desc = `${item.description.slice(0, 50)}...`;
                         }
                     } else {
                         const descEN = item.descriptionEN || item.description;
                         if (descEN) {
-                            desc = `${descEN.slice(0, 100)}...`;
+                            desc = `${descEN.slice(0, 50)}...`;
                         }
                     }
                     return (
