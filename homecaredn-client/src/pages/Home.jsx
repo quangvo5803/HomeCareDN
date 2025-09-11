@@ -158,20 +158,32 @@ export default function Home() {
   const [randomMaterials, setRandomMaterials] = useState([]);
   const { materials } = useMaterial();
 
-  // helper function đặt ngay trong component file
-  const getRandomItems = (array, n) => {
-    if (!Array.isArray(array)) return [];
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  // Ramdom Materials
+  const getRandomInt = (max) => {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return array[0] % max;
+  };
+
+  const getRandomItemsFast = (array, n) => {
+    if (!Array.isArray(array) || array.length === 0) return [];
+    const result = [];
+    const used = new Set();
+
+    while (result.length < n && result.length < array.length) {
+      const index = getRandomInt(array.length);
+      if (!used.has(index)) {
+        used.add(index);
+        result.push(array[index]);
+      }
     }
-    return shuffled.slice(0, n);
+
+    return result;
   };
 
   useEffect(() => {
     if (materials.length > 0) {
-      setRandomMaterials(getRandomItems(materials, 6));
+      setRandomMaterials(getRandomItemsFast(materials, 6));
     }
   }, [materials]);
 
