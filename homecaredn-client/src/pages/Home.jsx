@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SupportChatWidget from "../components/SupportChatWidget";
 import { useMaterial } from '../hook/useMaterial';
 import Reveal from '../components/Reveal';
-
+import MaterialItem from '../components/MaterialItem';
 const slides = [
   {
     id: 1,
@@ -154,7 +154,7 @@ const TESTIMONIALS = [
 ];
 
 export default function Home() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
   const { materials } = useMaterial();
 
@@ -523,6 +523,7 @@ export default function Home() {
                   className="inline-flex items-center justify-center px-6 py-3 font-medium text-white transition bg-orange-400 rounded-lg shadow bg-primary hover:bg-orange-500 "
                 >
                   {t('home.services_more')}
+                  <i class="fa-solid fa-arrow-right ms-2"></i>
                 </a>
               </div>
             </div>
@@ -600,6 +601,7 @@ export default function Home() {
                   className="inline-flex items-center justify-center px-6 py-3 font-medium text-white transition bg-orange-400 rounded-lg shadow bg-primary hover:bg-orange-500"
                 >
                   {t('home.material_more')}
+                  <i class="fa-solid fa-arrow-right ms-2"></i>
                 </a>
               </div>
             </div>
@@ -607,47 +609,10 @@ export default function Home() {
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {materials.length === 0 ? (
-                <p className="text-gray-500">{t('common.no_data')}</p>
+                <p className="text-gray-500">{t("common.no_data")}</p>
               ) : (
                 randomMaterials.map((item) => (
-                  <article
-                    key={item.materialID}
-                    className="h-full overflow-hidden transition shadow-sm group bg-gray-50 rounded-xl hover:shadow-md"
-                  >
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={item.imageUrls}
-                        alt={item.name}
-                        className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-
-                    <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                      <h5 className="mb-2 text-lg font-semibold">{i18n.language === 'vi' ? item.name : item.nameEN || item.name}</h5>
-                      <p className="mb-4 text-gray-600 group-hover:text-white">
-                        {i18n.language === 'vi' ? item.description : item.descriptionEN || item.descriptionEN}
-                      </p>
-
-                      <a
-                        href="#"
-                        className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                        aria-label={`${t('home.fact_read_more')} ${item.materialID}`}
-                      >
-                        {t('home.fact_read_more')}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-4 h-4"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-                        </svg>
-                      </a>
-                    </div>
-                  </article>
+                  <MaterialItem key={item.materialID} item={item} />
                 ))
               )}
             </div>

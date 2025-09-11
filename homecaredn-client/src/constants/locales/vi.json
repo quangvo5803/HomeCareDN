@@ -59,7 +59,7 @@
 
     "material_subtitle": "Vật liệu của chúng tôi",
     "material_title": "Vật liệu xây dựng và cải tạo",
-    "material_more": "Nhiều vật liệu hơn",
+    "material_more": "Xem thêm",
 
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
@@ -75,85 +75,84 @@
     "testimonial2_role": "Nghề nghiệp"
   },
   "about": {
-  "hero_title1": "Kiến tạo không gian,",
-  "hero_title2": "Định hình tương lai",
-  "hero_description": "Tại HomeCareDN, mọi dự án đều bắt đầu với mục tiêu rõ ràng và được thúc đẩy bởi niềm đam mê. Chúng tôi không chỉ xây dựng công trình, chúng tôi tạo ra những không gian bền vững phản ánh mục tiêu và giá trị của khách hàng.",
-  "hero_button": "Dịch vụ của chúng tôi",
-  "section_subtitle": "Về công ty chúng tôi",
-  "section_title": "Dựa trên kinh nghiệm. Hướng đến chất lượng.",
-  "section_description": "Với hơn 15 năm trong ngành, chúng tôi mang đến cách tiếp cận thực tiễn, đặt khách hàng làm trung tâm trong từng dự án. Đội ngũ của chúng tôi kết hợp tay nghề, sự sáng tạo và niềm tin để mang lại sự xuất sắc.",
-  "stat1_title": "HomeCareDN",
-  "stat1_text": "Thành tích đã được chứng minh trong các lĩnh vực dân dụng, thương mại và công nghiệp",
-  "stat2_title": "Công nghệ hiện đại",
-  "stat2_text": "Chúng tôi tích hợp các công nghệ xây dựng mới nhất để đảm bảo hiệu quả và tính bền vững",
-  "stat3_text": "Tỷ lệ dự án thành công",
-  "stat4_text": "Sự hài lòng của khách hàng",
-  "stat5_title": "Kỹ sư giàu kinh nghiệm",
-  "stat5_text": "Đội ngũ kỹ sư dày dạn kinh nghiệm mang đến hàng thập kỷ chuyên môn cho mỗi dự án, đảm bảo tiêu chuẩn chất lượng và an toàn cao nhất."
-},
-"common": {
-  "home": "Trang chủ",
-  "about": "Giới thiệu"
-},
-"why": {
-  "badge": "Vì sao chọn chúng tôi",
-  "title": "Vì sao các nhà thầu tin tưởng",
-  "brand": "HomeCareDN",
-  "intro": "Tại HomeCareDN, chúng tôi không chỉ xây dựng — chúng tôi xây dựng với mục tiêu, sự liêm chính và độ chính xác. Danh tiếng của chúng tôi được xây dựng dựa trên niềm tin, chất lượng và sự hài lòng của khách hàng.",
-  "image_alt": "Minh hoạ lý do chọn chúng tôi",
-  "f1": {
-    "title": "Đội ngũ giàu kinh nghiệm & kỹ năng",
-    "desc": "Nhiều thập kỷ kinh nghiệm thực tiễn với đội ngũ kỹ sư, kiến trúc sư và quản lý dự án được chứng nhận, am hiểu từng chi tiết trong xây dựng."
+    "hero_title1": "Kiến tạo không gian,",
+    "hero_title2": "Định hình tương lai",
+    "hero_description": "Tại HomeCareDN, mọi dự án đều bắt đầu với mục tiêu rõ ràng và được thúc đẩy bởi niềm đam mê. Chúng tôi không chỉ xây dựng công trình, chúng tôi tạo ra những không gian bền vững phản ánh mục tiêu và giá trị của khách hàng.",
+    "hero_button": "Dịch vụ của chúng tôi",
+    "section_subtitle": "Về công ty chúng tôi",
+    "section_title": "Dựa trên kinh nghiệm. Hướng đến chất lượng.",
+    "section_description": "Với hơn 15 năm trong ngành, chúng tôi mang đến cách tiếp cận thực tiễn, đặt khách hàng làm trung tâm trong từng dự án. Đội ngũ của chúng tôi kết hợp tay nghề, sự sáng tạo và niềm tin để mang lại sự xuất sắc.",
+    "stat1_title": "HomeCareDN",
+    "stat1_text": "Thành tích đã được chứng minh trong các lĩnh vực dân dụng, thương mại và công nghiệp",
+    "stat2_title": "Công nghệ hiện đại",
+    "stat2_text": "Chúng tôi tích hợp các công nghệ xây dựng mới nhất để đảm bảo hiệu quả và tính bền vững",
+    "stat3_text": "Tỷ lệ dự án thành công",
+    "stat4_text": "Sự hài lòng của khách hàng",
+    "stat5_title": "Kỹ sư giàu kinh nghiệm",
+    "stat5_text": "Đội ngũ kỹ sư dày dạn kinh nghiệm mang đến hàng thập kỷ chuyên môn cho mỗi dự án, đảm bảo tiêu chuẩn chất lượng và an toàn cao nhất."
   },
-  "f2": {
-    "title": "Tay nghề chất lượng cao",
-    "desc": "Chúng tôi kết hợp kỹ thuật truyền thống với đổi mới hiện đại để mang lại các công trình bền vững, chính xác — mọi lúc."
+  "common": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu"
   },
-  "f3": {
-    "title": "Lấy khách hàng làm trung tâm",
-    "desc": "Chúng tôi lắng nghe, lập kế hoạch và phối hợp chặt chẽ với khách hàng để đảm bảo mọi dự án đều phù hợp với tầm nhìn và kỳ vọng của họ."
-  }
-},
-"process": {
-  "badge": "Quy trình",
-  "title": "Quy trình 4 bước để xây dựng thành công.",
-  "intro": "Tại HomeCareDN, chúng tôi không chỉ xây — chúng tôi chế tác. Mỗi không gian được bàn giao đều phản ánh thiết kế chu đáo, kế hoạch chuẩn xác và thi công tỉ mỉ.",
-  "s1": {
-    "title": "Thấu hiểu nhu cầu",
-    "desc": "Chúng tôi lắng nghe kỹ lưỡng mục tiêu, thách thức và tầm nhìn của bạn để triển khai."
+  "why": {
+    "badge": "Vì sao chọn chúng tôi",
+    "title": "Vì sao các nhà thầu tin tưởng",
+    "brand": "HomeCareDN",
+    "intro": "Tại HomeCareDN, chúng tôi không chỉ xây dựng — chúng tôi xây dựng với mục tiêu, sự liêm chính và độ chính xác. Danh tiếng của chúng tôi được xây dựng dựa trên niềm tin, chất lượng và sự hài lòng của khách hàng.",
+    "image_alt": "Minh hoạ lý do chọn chúng tôi",
+    "f1": {
+      "title": "Đội ngũ giàu kinh nghiệm & kỹ năng",
+      "desc": "Nhiều thập kỷ kinh nghiệm thực tiễn với đội ngũ kỹ sư, kiến trúc sư và quản lý dự án được chứng nhận, am hiểu từng chi tiết trong xây dựng."
+    },
+    "f2": {
+      "title": "Tay nghề chất lượng cao",
+      "desc": "Chúng tôi kết hợp kỹ thuật truyền thống với đổi mới hiện đại để mang lại các công trình bền vững, chính xác — mọi lúc."
+    },
+    "f3": {
+      "title": "Lấy khách hàng làm trung tâm",
+      "desc": "Chúng tôi lắng nghe, lập kế hoạch và phối hợp chặt chẽ với khách hàng để đảm bảo mọi dự án đều phù hợp với tầm nhìn và kỳ vọng của họ."
+    }
   },
-  "s2": {
-    "title": "Tiến độ & báo giá chi tiết",
-    "desc": "Chúng tôi cung cấp tiến độ dự án minh bạch và ước tính chi phí chính xác."
+  "process": {
+    "badge": "Quy trình",
+    "title": "Quy trình 4 bước để xây dựng thành công.",
+    "intro": "Tại HomeCareDN, chúng tôi không chỉ xây — chúng tôi chế tác. Mỗi không gian được bàn giao đều phản ánh thiết kế chu đáo, kế hoạch chuẩn xác và thi công tỉ mỉ.",
+    "s1": {
+      "title": "Thấu hiểu nhu cầu",
+      "desc": "Chúng tôi lắng nghe kỹ lưỡng mục tiêu, thách thức và tầm nhìn của bạn để triển khai."
+    },
+    "s2": {
+      "title": "Tiến độ & báo giá chi tiết",
+      "desc": "Chúng tôi cung cấp tiến độ dự án minh bạch và ước tính chi phí chính xác."
+    },
+    "s3": {
+      "title": "Thi công tận tâm",
+      "desc": "Mỗi công trình chúng tôi xây dựng đều phản ánh cam kết về tay nghề chất lượng."
+    },
+    "s4": {
+      "title": "Kiểm tra & bàn giao cuối cùng",
+      "desc": "Trước khi bàn giao, chúng tôi tiến hành kiểm tra kỹ lưỡng để đảm bảo mọi thứ hoàn hảo."
+    }
   },
-  "s3": {
-    "title": "Thi công tận tâm",
-    "desc": "Mỗi công trình chúng tôi xây dựng đều phản ánh cam kết về tay nghề chất lượng."
+  "contact": {
+    "breadcrumb": "Liên hệ",
+    "title": "Liên hệ",
+    "map_title": "Bản đồ Google",
+    "section_tag": "Liên hệ",
+    "section_title": "Nếu bạn có thắc mắc, hãy liên hệ với chúng tôi",
+    "note_prefix": "Biểu mẫu liên hệ hiện chưa kích hoạt. Bạn có thể dùng form hoạt động với Ajax & PHP chỉ trong vài phút.",
+    "note_link": "Tải ngay",
+    "form_aria": "Biểu mẫu liên hệ",
+    "form": {
+      "name": "Họ và tên",
+      "email": "Email",
+      "subject": "Chủ đề",
+      "message": "Nội dung"
+    },
+    "success_message": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.",
+    "error_message": "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau."
   },
-  "s4": {
-    "title": "Kiểm tra & bàn giao cuối cùng",
-    "desc": "Trước khi bàn giao, chúng tôi tiến hành kiểm tra kỹ lưỡng để đảm bảo mọi thứ hoàn hảo."
-  }
-},
-"contact": {
-  "breadcrumb": "Liên hệ",
-  "title": "Liên hệ",
-  "map_title": "Bản đồ Google",
-  "section_tag": "Liên hệ",
-  "section_title": "Nếu bạn có thắc mắc, hãy liên hệ với chúng tôi",
-  "note_prefix": "Biểu mẫu liên hệ hiện chưa kích hoạt. Bạn có thể dùng form hoạt động với Ajax & PHP chỉ trong vài phút.",
-  "note_link": "Tải ngay",
-  "form_aria": "Biểu mẫu liên hệ",
-  "form": {
-    "name": "Họ và tên",
-    "email": "Email",
-    "subject": "Chủ đề",
-    "message": "Nội dung"
-  },
-  "success_message": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.",
-  "error_message": "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau."
-
-},
   "login": {
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",
@@ -367,22 +366,22 @@
     }
   },
   "adminSupportManager": {
-  "title": "Quản lý hỗ trợ",
-  "subtitle": "Yêu cầu từ khách hàng",
-  "fullName": "Họ và tên",
-  "email": "Email",
-  "subject": "Chủ đề",
-  "status": "Trạng thái",
-  "processed": "Đã xử lý",
-  "pending": "Đang chờ",
-  "action": "Thao tác",
-  "replyTitle": "Phản hồi yêu cầu",
-  "replyLabel": "Nội dung phản hồi",
-  "replyPlaceholder": "Nhập nội dung phản hồi...",
-  "noSupport": "Chưa có yêu cầu hỗ trợ nào",
-  "all": "Tất cả",
-  "itemsCount": "{{count}} mục"
-},
+    "title": "Quản lý hỗ trợ",
+    "subtitle": "Yêu cầu từ khách hàng",
+    "fullName": "Họ và tên",
+    "email": "Email",
+    "subject": "Chủ đề",
+    "status": "Trạng thái",
+    "processed": "Đã xử lý",
+    "pending": "Đang chờ",
+    "action": "Thao tác",
+    "replyTitle": "Phản hồi yêu cầu",
+    "replyLabel": "Nội dung phản hồi",
+    "replyPlaceholder": "Nhập nội dung phản hồi...",
+    "noSupport": "Chưa có yêu cầu hỗ trợ nào",
+    "all": "Tất cả",
+    "itemsCount": "{{count}} mục"
+  },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
     "no": "STT",
@@ -522,7 +521,7 @@
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
-    "IMAGE_NOT_FOUND" : "Không tìm thấy ảnh.",
+    "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",

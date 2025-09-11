@@ -2,10 +2,11 @@ import { useMaterial } from '../hook/useMaterial';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Pagination } from 'antd';
+import MaterialItem from '../components/MaterialItem';
 export default function MaterialViewAll() {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 3;
+    const pageSize = 5;
     const {
         materials,
     } = useMaterial();
@@ -113,32 +114,7 @@ export default function MaterialViewAll() {
                         {materials && materials.length > 0 ? (
                             currentMaterials.map((item, index) => (
                                 <>
-                                    <article
-                                        key={item.MaterialID}
-                                        className="relative border border-transparent"
-                                    >
-                                        <div className="w-[200px] h-[200px] mx-auto flex items-center justify-center overflow-hidden">
-                                            <img
-                                                src={item.imageUrls}
-                                                alt={item.name}
-                                                className="object-contain w-full h-full"
-                                            />
-                                        </div>
-                                        <div className="mt-2 text-xs text-gray-500 uppercase">
-                                            {i18n.language === 'vi'
-                                                ? item.categoryName
-                                                : item.categoryNameEN || item.categoryName}
-                                        </div>
-                                        <div className="text-sm font-bold leading-tight">
-                                            {i18n.language === 'vi'
-                                                ? item.name
-                                                : item.nameEN || item.name}
-                                        </div>
-                                        <div className="mt-1 text-sm font-bold">Liên hệ</div>
-                                        <button className="px-4 py-1 mt-2 text-xs font-semibold text-white bg-orange-400 rounded hover:bg-orange-500">
-                                            XEM LỰA CHỌN
-                                        </button>
-                                    </article>
+                                    <MaterialItem key={item.MaterialID} item={item} />
 
                                     {/*  pagination*/}
                                     {index === currentMaterials.length - 1 && (
