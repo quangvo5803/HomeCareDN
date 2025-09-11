@@ -158,15 +158,20 @@ export default function Home() {
   const [randomMaterials, setRandomMaterials] = useState([]);
   const { materials } = useMaterial();
 
-  // Random lấy 6 Material khi reload
+  // helper function đặt ngay trong component file
+  const getRandomItems = (array, n) => {
+    if (!Array.isArray(array)) return [];
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, n);
+  };
+
   useEffect(() => {
     if (materials.length > 0) {
-      const shuffled = [...materials];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1)); // hoán đổi ngẫu nhiên
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      setRandomMaterials(shuffled.slice(0, 6));
+      setRandomMaterials(getRandomItems(materials, 6));
     }
   }, [materials]);
 
