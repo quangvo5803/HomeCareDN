@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Chat.Ai;
+﻿using BusinessLogic.DTOs.Application.Chat.Ai;
 
 namespace BusinessLogic.Services.Interfaces
 {

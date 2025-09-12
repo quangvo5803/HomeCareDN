@@ -419,6 +419,57 @@
     "Admin": "Quản trị viên",
     "Customer": "Khách hàng"
   },
+  "profile": {
+    "tabs": { "profile": "Hồ sơ", "partner": "Đăng ký trở thành đối tác" },
+    "title": "Hồ sơ của bạn",
+    "form": {
+      "full_name": "Họ và tên",
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu..."
+    },
+    "gender": { "none": "—", "male": "Nam", "female": "Nữ", "other": "Khác" },
+    "update_success": "Cập nhật hồ sơ thành công",
+    "update_error": "Cập nhật hồ sơ thất bại",
+    "partner": {
+      "title": "Đăng ký trở thành đối tác",
+      "placeholder": "Nhúng form đăng ký của bạn ở đây…"
+    },
+    "common": {
+      "back": "Quay lại"
+    }
+  },
+  "address": {
+    "title": "Địa chỉ của tôi",
+    "loading": "Đang tải…",
+    "empty": "Chưa có địa chỉ",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "confirm_delete": "Xoá địa chỉ này?",
+    "delete_success": "Đã xoá địa chỉ",
+    "delete_error": "Xoá địa chỉ thất bại",
+    "load_error": "Không tải được địa chỉ",
+    "add_success": "Đã thêm địa chỉ",
+    "update_success": "Đã cập nhật địa chỉ",
+    "save_error": "Lưu địa chỉ thất bại",
+    "saving": "Đang lưu…",
+    "cancel": "Huỷ",
+    "add_button": "Thêm địa chỉ",
+    "update_button": "Cập nhật địa chỉ",
+    "detail_placeholder": "Địa chỉ chi tiết (số nhà, đường…)",
+    "select": {
+      "province": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "ward": "Phường/Xã",
+      "choose": "— Chọn —"
+    },
+    "preview": {
+      "city": "Thành phố",
+      "district": "Quận/Huyện",
+      "ward": "Phường/Xã"
+    }
+  },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
     "address": {

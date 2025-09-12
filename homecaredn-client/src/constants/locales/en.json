@@ -424,7 +424,57 @@
     "Admin": "Admin",
     "Customer": "Customer"
   },
-
+  "profile": {
+    "tabs": { "profile": "Profile", "partner": "Register to become partner" },
+    "title": "Your profile",
+    "form": {
+      "full_name": "Full name",
+      "phone": "Phone number",
+      "gender": "Gender",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "gender": { "none": "—", "male": "Male", "female": "Female", "other": "Other" },
+    "update_success": "Profile updated successfully",
+    "update_error": "Profile update failed",
+    "partner": {
+      "title": "Register to become a partner",
+      "placeholder": "Embed your partner registration form here…"
+    },
+    "common": {
+      "back": "Back"
+    }
+  },
+  "address": {
+    "title": "My addresses",
+    "loading": "Loading…",
+    "empty": "No address yet",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm_delete": "Delete this address?",
+    "delete_success": "Address deleted",
+    "delete_error": "Failed to delete address",
+    "load_error": "Failed to load addresses",
+    "add_success": "Address added",
+    "update_success": "Address updated",
+    "save_error": "Failed to save address",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "add_button": "Add address",
+    "update_button": "Update address",
+    "detail_placeholder": "Detailed address (house no., street…)",
+    "select": {
+      "province": "Province/City",
+      "district": "District",
+      "ward": "Ward",
+      "choose": "— Select —"
+    },
+    "preview": {
+      "city": "City",
+      "district": "District",
+      "ward": "Ward"
+    }
+  },
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
@@ -456,6 +506,7 @@
   "BUTTON": {
     "Login": "Login",
     "Register": "Register",
+    "CreateAccount": "Create Account",
     "SendOTP": "Send OTP Code",
     "MoreDetails": "More Details",
     "LoginGoogle": "Login with Google",

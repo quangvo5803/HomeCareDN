@@ -290,40 +290,7 @@ namespace BusinessLogic.Services
 
         #endregion
 
-        public async Task Logout()
-        {
-            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
-            if (string.IsNullOrEmpty(cookieToken))
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
-                    }
-                );
-
-            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
-            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
-                    }
-                );
-
-            await _refreshTokenRepository.DeleteAsync(refreshToken);
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(
-                REFRESH_TOKEN_STR,
-                "",
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true, // bắt buộc khi HTTPS
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
-                }
-            );
-        }
-
+        #region Login with Googe
         public async Task<TokenResponseDto> GoogleLoginAsync(GoogleLoginRequestDto requestDto)
         {
             // Xác thực token Google
@@ -390,6 +357,7 @@ namespace BusinessLogic.Services
                 UserId = user.Id,
             };
         }
+        #endregion
 
         #region JWT
 
@@ -440,5 +408,39 @@ namespace BusinessLogic.Services
         }
 
         #endregion
+
+        public async Task Logout()
+        {
+            var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
+            if (string.IsNullOrEmpty(cookieToken))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                    }
+                );
+
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
+            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                    }
+                );
+
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                REFRESH_TOKEN_STR,
+                "",
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true, // bắt buộc khi HTTPS
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
+                }
+            );
+        }
     }
 }

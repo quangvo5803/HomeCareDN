@@ -62,7 +62,7 @@ export default function Sidebar({
         key: "profile",
         label: t("partnerDashboard.profile_management"),
         icon: <i className="fa-solid fa-user-tie"></i>,
-        to: "/Distributor/profile",
+        to: "/profile",
       },
       {
         key: "logout",

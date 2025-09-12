@@ -11,6 +11,7 @@ namespace DataAccess.Data
             : base(options) { }
 
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Address> Addresses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -43,6 +44,28 @@ namespace DataAccess.Data
                         NormalizedName = "DISTRIBUTOR",
                     }
                 );
+            builder.Entity<Address>(e =>
+            {
+                e.HasKey(a => a.Id);
+                e.Property(a => a.City).HasMaxLength(100).IsRequired();
+                e.Property(a => a.District).HasMaxLength(100).IsRequired();
+                e.Property(a => a.Ward).HasMaxLength(100).IsRequired();
+                e.Property(a => a.Detail).HasMaxLength(255).IsRequired();
+
+                e.HasOne(a => a.User)
+                    .WithMany(u => u.Addresses)
+                    .HasForeignKey(a => a.UserId)
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasIndex(a => new
+                {
+                    a.UserId,
+                    a.City,
+                    a.District,
+                    a.Ward,
+                });
+            });
         }
     }
 }

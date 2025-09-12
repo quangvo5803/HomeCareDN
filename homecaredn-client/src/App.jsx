@@ -29,7 +29,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
-
+import Profile from './pages/Profile';
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -140,6 +140,15 @@ function Layout() {
           path="*"
           element={
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
+          }
+        />
+          {/* Profile route */}
+         <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
           }
         />
       </Routes>

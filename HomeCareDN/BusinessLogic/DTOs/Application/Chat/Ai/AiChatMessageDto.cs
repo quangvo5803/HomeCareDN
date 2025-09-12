@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessLogic.DTOs.Chat.Ai
+﻿namespace BusinessLogic.DTOs.Application.Chat.Ai
 {
     public class AiChatMessageDto
     {
