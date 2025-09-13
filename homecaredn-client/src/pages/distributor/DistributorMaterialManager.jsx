@@ -10,15 +10,16 @@ import MaterialModal from '../../components/distributor/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
 
 export default function MaterialTable() {
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { t, i18n } = useTranslation();
 
   const {
     materials,
+    totalMaterials,
     loading,
-    fetchMaterialsById,
+    fetchMaterialsByUserId,
     createMaterial,
     updateMaterial,
     deleteMaterial,
@@ -28,21 +29,12 @@ export default function MaterialTable() {
   const [editingMaterial, setEditingMaterial] = useState(null);
 
   useEffect(() => {
-    fetchMaterialsById(user.id);
-  }, [fetchMaterialsById, user.id]);
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentMaterials = materials.slice(indexOfFirstItem, indexOfLastItem);
-
-  if (currentPage > 1 && currentMaterials.length === 0) {
-    setCurrentPage(currentPage - 1);
-  }
-
-  const handleView = (material) => {
-    alert(`Xem thông tin material: ${material.name}`);
-  };
+    fetchMaterialsByUserId({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      FilterID: user.id,
+    });
+  }, [fetchMaterialsByUserId, currentPage, pageSize, user.id]);
 
   // Delete Material
   const handleDelete = async (materialID) => {
@@ -97,7 +89,6 @@ export default function MaterialTable() {
       toast.error(handleApiError(err));
     }
   };
-
 
   if (loading) return <Loading />;
   return (
@@ -158,16 +149,17 @@ export default function MaterialTable() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {materials && materials.length > 0 ? (
-              currentMaterials.map((material, index) => (
+              materials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                    }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                  }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">
                     <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
-                      {indexOfFirstItem + index + 1}
+                      {(currentPage - 1) * pageSize + index + 1}
                     </span>
                   </td>
 
@@ -186,47 +178,37 @@ export default function MaterialTable() {
                         </span>
                       </div>
                     )}
-                    <span className="font-medium text-gray-900">{i18n.language === 'vi'
-                      ? material.name
-                      : material.nameEN || material.name
-                    }</span>
+                    <span className="font-medium text-gray-900">
+                      {i18n.language === 'vi'
+                        ? material.name
+                        : material.nameEN || material.name}
+                    </span>
                   </td>
-
 
                   {/* Brand */}
                   <td className="px-6 py-4 text-center">
                     {i18n.language === 'vi'
                       ? material.brandName
-                      : material.brandNameEN || material.brandName
-                    }
+                      : material.brandNameEN || material.brandName}
                   </td>
 
                   {/* Category */}
                   <td className="px-6 py-4 text-center">
                     {i18n.language === 'vi'
                       ? material.categoryName
-                      : material.categoryNameEN || material.categoryName
-                    }
+                      : material.categoryNameEN || material.categoryName}
                   </td>
 
                   {/* Unit */}
                   <td className="px-6 py-4 text-center font-semibold text-emerald-600">
                     {i18n.language === 'vi'
                       ? material.unit
-                      : material.unitEN || material.unit
-                    }
+                      : material.unitEN || material.unit}
                   </td>
 
                   {/* Actions */}
                   <td className="px-4 py-4 text-center">
                     <div className="flex justify-center gap-2">
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-gray-300 text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleView(material)}
-                      >
-                        <i className="fa-solid fa-eye"></i> {t('BUTTON.View')}
-                      </button>
-
                       <button
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                         onClick={() => {
@@ -241,11 +223,11 @@ export default function MaterialTable() {
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
                         onClick={() => handleDelete(material.materialID)}
                       >
-                        <i className="fa-solid fa-trash"></i> {t('BUTTON.Delete')}
+                        <i className="fa-solid fa-trash"></i>{' '}
+                        {t('BUTTON.Delete')}
                       </button>
                     </div>
                   </td>
-
                 </tr>
               ))
             ) : (
@@ -289,7 +271,7 @@ export default function MaterialTable() {
           <Pagination
             current={currentPage}
             pageSize={pageSize}
-            total={materials.length}
+            total={totalMaterials}
             onChange={(page) => setCurrentPage(page)}
             showSizeChanger={false}
             size="small"

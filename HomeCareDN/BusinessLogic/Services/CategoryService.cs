@@ -1,10 +1,11 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -19,13 +20,32 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<ICollection<CategoryDto>> GetAllCategories()
+        public async Task<PagedResultDto<CategoryDto>> GetAllCategories(QueryParameters parameters)
         {
-            var categories = await _unitOfWork.CategoryRepository.GetAllAsync(
-                includeProperties: "Materials"
-            );
-            var categoiresDtos = _mapper.Map<ICollection<CategoryDto>>(categories);
-            return categoiresDtos;
+            var query = _unitOfWork.CategoryRepository.GetQueryable(includeProperties: "Materials");
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "categoryname" => query.OrderBy(c => c.CategoryName),
+                "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
+                "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
+                "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
+                "random" => query.OrderBy(c => Guid.NewGuid()),
+                _ => query.OrderBy(c => c.CategoryID),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+
+            var dtos = _mapper.Map<IEnumerable<CategoryDto>>(items);
+            return new PagedResultDto<CategoryDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
         public async Task<CategoryDto> GetCategoryByIdAsync(Guid id)

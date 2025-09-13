@@ -4,7 +4,7 @@ import api from '../api';
 export const contactService = {
   // ===== Public APIs =====
   create: async ({ fullName, email, subject, message }) => {
-    const response = await api.post('/Support/create', {
+    const response = await api.post('/Support/create-support', {
       fullName,
       email,
       subject,
@@ -14,20 +14,18 @@ export const contactService = {
   },
 
   getById: async (id) => {
-    const response = await api.get(`/Support/${id}`);
+    const response = await api.get(`/Support/get-support/${id}`);
     return response.data;
   },
 
   // ===== Admin APIs =====
-  listAll: async (isProcessed) => {
-    const query =
-      isProcessed === undefined ? '' : `?isProcessed=${isProcessed}`;
-    const response = await api.get(`/Admin/support/list${query}`);
+  listAll: async (params = {}) => {
+    const response = await api.get(`/Admin/get-all-support/`, params);
     return response.data;
   },
 
   reply: async ({ id, replyContent }) => {
-    const response = await api.post('/Admin/support/reply', {
+    const response = await api.post('/Admin/reply-support', {
       id,
       replyContent,
     });
@@ -35,7 +33,7 @@ export const contactService = {
   },
 
   delete: async (id) => {
-    const response = await api.delete(`/Admin/support/delete/${id}`);
+    const response = await api.delete(`/Admin/delete-support/${id}`);
     return response.data;
   },
 };

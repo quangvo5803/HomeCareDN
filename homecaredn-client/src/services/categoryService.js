@@ -2,8 +2,10 @@ import api from '../api';
 
 export const categoryService = {
   // Public APIs
-  getAllCategories: async () => {
-    const response = await api.get('/Categories/get-all-categories');
+  getAllCategories: async (params = {}) => {
+    const response = await api.get('/Categories/get-all-categories', {
+      params,
+    });
     return response.data;
   },
 

@@ -9,30 +9,55 @@ import PropTypes from 'prop-types';
 export const CategoryProvider = ({ children }) => {
   const { user } = useAuth();
   const [categories, setCategories] = useState([]);
+  const [totalCategories, setTotalCategories] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all categories
-  const fetchCategories = useCallback(async () => {
+  // 📌 Public: fetch all categories pagination
+  const fetchCategories = useCallback(
+    async ({ PageNumber = 1, PageSize = 10 } = {}) => {
+      try {
+        setLoading(true);
+        const data = await categoryService.getAllCategories({
+          PageNumber,
+          PageSize,
+        });
+        setCategories(data.items || []);
+        setTotalCategories(data.totalCount || 0);
+        return data;
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+  const fetchAllCategories = useCallback(async () => {
     try {
-      setLoading(true);
-      const data = await categoryService.getAllCategories();
-      setCategories(data);
+      const data = await categoryService.getAllCategories({
+        PageNumber: 1,
+        PageSize: 9999,
+      });
+      return data.items || [];
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
+      return [];
     }
   }, []);
-
   // 📌 Public: get category by id
-  const getCategoryById = useCallback(async (id) => {
-    try {
-      return await categoryService.getCategoryById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
-  }, []);
+  const getCategoryById = useCallback(
+    async (id) => {
+      try {
+        var local = categories.find((c) => c.categoryID === id);
+        if (local) return local;
+        return await categoryService.getCategoryById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    },
+    [categories]
+  );
 
   // 📌 Admin-only: create
   const createCategory = useCallback(
@@ -98,8 +123,10 @@ export const CategoryProvider = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       categories,
+      totalCategories,
       loading,
       fetchCategories,
+      fetchAllCategories,
       getCategoryById,
       createCategory,
       updateCategory,
@@ -107,8 +134,10 @@ export const CategoryProvider = ({ children }) => {
     }),
     [
       categories,
+      totalCategories,
       loading,
       fetchCategories,
+      fetchAllCategories,
       getCategoryById,
       createCategory,
       updateCategory,

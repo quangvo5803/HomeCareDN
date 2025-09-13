@@ -9,12 +9,14 @@ import { Pagination } from 'antd';
 import CategoryModal from '../../components/admin/CategoryModal';
 
 export default function AdminCategoryManager() {
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { t, i18n } = useTranslation();
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
   const {
     categories,
+    totalCategories,
     loading,
     fetchCategories,
     createCategory,
@@ -22,27 +24,10 @@ export default function AdminCategoryManager() {
     deleteCategory,
   } = useCategory();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-
   // Fetch categories khi vào trang
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
-
-  if (currentPage > 1 && currentCategories.length === 0) {
-    setCurrentPage(currentPage - 1);
-  }
-
-  // View Category
-  const handleView = (category) => {
-    alert(`Xem thông tin category: ${category.categoryName}`);
-  };
+    fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
+  }, [currentPage, fetchCategories]);
 
   // Delete Category
   const handleDelete = async (categoryId) => {
@@ -165,7 +150,7 @@ export default function AdminCategoryManager() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {categories && categories.length > 0 ? (
-                    currentCategories.map((cat, index) => (
+                    categories.map((cat, index) => (
                       <tr
                         key={cat.categoryID}
                         className={`hover:bg-gray-50 transition-colors duration-150 ${
@@ -174,7 +159,7 @@ export default function AdminCategoryManager() {
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
@@ -193,12 +178,6 @@ export default function AdminCategoryManager() {
                         </td>
                         <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">
-                            <button
-                              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                              onClick={() => handleView(cat)}
-                            >
-                              {t('BUTTON.View')}
-                            </button>
                             <button
                               className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
@@ -260,7 +239,7 @@ export default function AdminCategoryManager() {
             <div className="lg:hidden">
               <div className="space-y-4 p-4">
                 {categories && categories.length > 0 ? (
-                  currentCategories.map((cat, index) => (
+                  categories.map((cat, index) => (
                     <div
                       key={cat.categoryID}
                       className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
@@ -268,7 +247,7 @@ export default function AdminCategoryManager() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                           <div>
                             <h3 className="font-medium text-gray-900 text-sm">
@@ -300,12 +279,6 @@ export default function AdminCategoryManager() {
                       </div>
 
                       <div className="flex space-x-2">
-                        <button
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
-                          onClick={() => handleView(cat)}
-                        >
-                          {t('BUTTON.View')}
-                        </button>
                         <button
                           className="flex-1 px-3 py-2 border border-amber-300 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
@@ -362,7 +335,7 @@ export default function AdminCategoryManager() {
               <Pagination
                 current={currentPage}
                 pageSize={pageSize}
-                total={categories.length}
+                total={totalCategories}
                 onChange={(page) => setCurrentPage(page)}
                 showSizeChanger={false}
                 size="small"

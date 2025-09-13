@@ -1,27 +1,33 @@
-﻿using BusinessLogic.DTOs.Application.Material;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers.Distributor
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Distributor")]
+    [Authorize(
+        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+        Roles = "Distributor"
+    )]
     public partial class DistributorController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
+
         public DistributorController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-material-by-id/{id:guid}")]
-        public async Task<IActionResult> GetAllMaterialById(Guid id)
+        [HttpGet("get-all-material-by-userid")]
+        public async Task<IActionResult> GetAllMaterialByUserId(
+            [FromQuery] QueryParameters parameters
+        )
         {
-            var rs = await _facadeService.MaterialService.GetAllMaterialByIdAsync(id);
+            var rs = await _facadeService.MaterialService.GetAllMaterialByUserIdAsync(parameters);
             return Ok(rs);
         }
 

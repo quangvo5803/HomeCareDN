@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Text.Encodings.Web;
+using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContactSupport;
-using BusinessLogic.Services.Interfaces;               
+using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Encodings.Web;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 
@@ -18,24 +20,40 @@ namespace BusinessLogic.Services
 
         private const string ContactSupportIdKey = "ContactSupportId";
 
-        public ContactSupportService(IUnitOfWork unitOfWork, IMapper mapper,IEmailQueue emailQueue)
+        public ContactSupportService(IUnitOfWork unitOfWork, IMapper mapper, IEmailQueue emailQueue)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _emailQueue = emailQueue;
         }
 
-        public async Task<ICollection<ContactSupportDto>> ListAllAsync(bool? isProcessed = null)
+        public async Task<PagedResultDto<ContactSupportDto>> ListAllAsync(
+            QueryParameters parameters
+        )
         {
             var query = _unitOfWork.ContactSupportRepository.GetQueryable();
 
-            if (isProcessed.HasValue)
-                query = query.Where(x => x.IsProcessed == isProcessed.Value);
+            var totalCount = await query.CountAsync();
 
-            var entities = await query
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "isprocess" => query.OrderBy(m => m.IsProcessed),
+                "isprocess_desc" => query.OrderByDescending(m => m.IsProcessed),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.Id),
+            };
+            var items = await query
+                .Where(s => parameters.FilterBool != null && parameters.FilterBool == s.IsProcessed)
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
                 .ToListAsync();
-
-            return _mapper.Map<ICollection<ContactSupportDto>>(entities);
+            return new PagedResultDto<ContactSupportDto>
+            {
+                Items = _mapper.Map<IEnumerable<ContactSupportDto>>(items),
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
         public async Task<ContactSupportDto> GetByIdAsync(Guid id)
@@ -66,17 +84,21 @@ namespace BusinessLogic.Services
 
         public async Task<ContactSupportDto> ReplyAsync(ContactSupportReplyRequestDto dto)
         {
-            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(x => x.Id == dto.ID);
+            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(x =>
+                x.Id == dto.ID
+            );
 
             if (customerSupportRequest == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { ContactSupportIdKey, new[] { $"ContactSupport with ID {dto.ID} not found." } },
+                    {
+                        ContactSupportIdKey,
+                        new[] { $"ContactSupport with ID {dto.ID} not found." }
+                    },
                 };
                 throw new CustomValidationException(errors);
             }
-
 
             // Gửi Email (template đẹp – nội dung giữ nguyên)
             var subject = $"[Phản hồi hỗ trợ] {customerSupportRequest.Subject}";
@@ -94,36 +116,32 @@ namespace BusinessLogic.Services
                 + $"<div style=\"text-align: left;\">"
                 + $"<img src=\"https://res.cloudinary.com/dl4idg6ey/image/upload/v1749266020/logoh_enlx7y.png\" alt=\"HomeCareDN\" style=\"height: 32px; filter: brightness(0) invert(1);\">"
                 + $"</div>"
-                + $"</td></tr>" +
-                $"    <tr><td style=\"padding:24px 32px 0 32px;\">" +
-                $"      <p style=\"font-size:18px;color:#2d2d2d;margin:0 0 6px 0;font-weight:600;\">Chào {safeName}!</p>" +
-                $"      <p style=\"font-size:14px;color:#666;margin:0 0 16px 0;\">Email: <strong>{safeEmail}</strong></p>" +
-                $"    </td></tr>" +
-                $"    <tr><td style=\"padding:0 32px 8px 32px;\">" +
-                $"      <div style=\"border-left:4px solid #ff8c00;background:#fff5f0;border-radius:0 8px 8px 0;padding:12px 16px;\">" +
-                $"        <div style=\"font-size:13px;color:#ff6600;font-weight:600;margin-bottom:6px;\">Nội dung hỗ trợ</div>" +
-                $"        <div style=\"font-size:15px;color:#4a4a4a;line-height:1.6;white-space:pre-wrap;\">{safeCustomerMsg}</div>" +
-                $"      </div>" +
-                $"    </td></tr>" +
-
-                $"    <tr><td style=\"padding:8px 32px;\"><hr style=\"border:none;border-top:1px solid #eee;margin:16px 0;\"/></td></tr>" +
-
-                $"    <tr><td style=\"padding:0 32px 24px 32px;\">" +
-                $"      <div style=\"background:linear-gradient(135deg,#fff5f0 0%,#ffe8d6 100%);border:2px solid #ff8c00;border-radius:12px;padding:16px;\">" +
-                $"        <div style=\"font-size:13px;color:#ff6600;font-weight:600;margin-bottom:6px;\">Phản hồi từ HomeCareDN</div>" +
-                $"        <div style=\"font-size:15px;color:#808080;line-height:1.6;white-space:pre-wrap;\">{safeAdminReply}</div>" +
-                $"      </div>" +
-                $"      <p style=\"font-size:13px;color:#777;margin:16px 0 0 0;\">Nếu cần hỗ trợ thêm, vui lòng trả lời email này.</p>" +
-                $"      <p style=\"font-size:14px;color:#333;margin:4px 0 0 0;\"><strong>homecaredn43@gmail.com</strong></p>" +
-                $"    </td></tr>" +
-
-                $"    <tr><td style=\"padding:16px 32px;background:linear-gradient(135deg,#ff8c00 0%,#ff7700 100%);font-size:12px;color:white;text-align:center;\">" +
-                $"      <p style=\"margin:0;opacity:.9;\">📍 Người gửi: HomeCareDN</p>" +
-                $"      <p style=\"margin:4px 0 0 0;opacity:.8;\">Khu đô thị FPT City, Ngũ Hành Sơn, Đà Nẵng 550000</p>" +
-                $"    </td></tr>" +
-
-                $"  </table>" +
-                $"</td></tr></table>";
+                + $"</td></tr>"
+                + $"    <tr><td style=\"padding:24px 32px 0 32px;\">"
+                + $"      <p style=\"font-size:18px;color:#2d2d2d;margin:0 0 6px 0;font-weight:600;\">Chào {safeName}!</p>"
+                + $"      <p style=\"font-size:14px;color:#666;margin:0 0 16px 0;\">Email: <strong>{safeEmail}</strong></p>"
+                + $"    </td></tr>"
+                + $"    <tr><td style=\"padding:0 32px 8px 32px;\">"
+                + $"      <div style=\"border-left:4px solid #ff8c00;background:#fff5f0;border-radius:0 8px 8px 0;padding:12px 16px;\">"
+                + $"        <div style=\"font-size:13px;color:#ff6600;font-weight:600;margin-bottom:6px;\">Nội dung hỗ trợ</div>"
+                + $"        <div style=\"font-size:15px;color:#4a4a4a;line-height:1.6;white-space:pre-wrap;\">{safeCustomerMsg}</div>"
+                + $"      </div>"
+                + $"    </td></tr>"
+                + $"    <tr><td style=\"padding:8px 32px;\"><hr style=\"border:none;border-top:1px solid #eee;margin:16px 0;\"/></td></tr>"
+                + $"    <tr><td style=\"padding:0 32px 24px 32px;\">"
+                + $"      <div style=\"background:linear-gradient(135deg,#fff5f0 0%,#ffe8d6 100%);border:2px solid #ff8c00;border-radius:12px;padding:16px;\">"
+                + $"        <div style=\"font-size:13px;color:#ff6600;font-weight:600;margin-bottom:6px;\">Phản hồi từ HomeCareDN</div>"
+                + $"        <div style=\"font-size:15px;color:#808080;line-height:1.6;white-space:pre-wrap;\">{safeAdminReply}</div>"
+                + $"      </div>"
+                + $"      <p style=\"font-size:13px;color:#777;margin:16px 0 0 0;\">Nếu cần hỗ trợ thêm, vui lòng trả lời email này.</p>"
+                + $"      <p style=\"font-size:14px;color:#333;margin:4px 0 0 0;\"><strong>homecaredn43@gmail.com</strong></p>"
+                + $"    </td></tr>"
+                + $"    <tr><td style=\"padding:16px 32px;background:linear-gradient(135deg,#ff8c00 0%,#ff7700 100%);font-size:12px;color:white;text-align:center;\">"
+                + $"      <p style=\"margin:0;opacity:.9;\">📍 Người gửi: HomeCareDN</p>"
+                + $"      <p style=\"margin:4px 0 0 0;opacity:.8;\">Khu đô thị FPT City, Ngũ Hành Sơn, Đà Nẵng 550000</p>"
+                + $"    </td></tr>"
+                + $"  </table>"
+                + $"</td></tr></table>";
 
             _emailQueue.QueueEmail(customerSupportRequest.Email, subject, htmlMessage);
             customerSupportRequest.ReplyContent = dto.ReplyContent;

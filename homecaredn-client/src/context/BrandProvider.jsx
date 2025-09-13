@@ -9,40 +9,47 @@ import PropTypes from 'prop-types';
 export const BrandProvider = ({ children }) => {
   const { user } = useAuth();
   const [brands, setBrands] = useState([]);
+  const [totalBrands, setTotalBrands] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all brands
-  const fetchBrands = useCallback(async () => {
+  // 📌 Public: fetch all brands pagination
+  const fetchBrands = useCallback(
+    async ({ PageNumber = 1, PageSize = 10 } = {}) => {
+      try {
+        setLoading(true);
+        const data = await brandService.getAllBrands({ PageNumber, PageSize });
+        setBrands(data.items || []);
+        setTotalBrands(data.totalCount || 0);
+        return data;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return { items: [], totalCount: 0 };
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+  //Fetch all brands (dùng cho filter dropdown, ko phân trang)
+  const fetchAllBrands = useCallback(async () => {
     try {
-      setLoading(true);
-      const data = await brandService.getAllBrands();
-      setBrands(data);
+      const data = await brandService.getAllBrands({
+        PageNumber: 1,
+        PageSize: 9999,
+      });
+      return data.items || [];
     } catch (err) {
       toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
+      return [];
     }
   }, []);
-
-  // 📌 Public: get brand by id
-  const getBrandById = useCallback(async (id) => {
-    try {
-      return await brandService.getBrandById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
-  }, []);
-
-  // 📌 Admin-only: create
   const createBrand = useCallback(
-    async (brandData) => {
+    async (dto, pageParams) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const newBrand = await brandService.createBrand(brandData);
-        setBrands((prev) => [...prev, newBrand]);
-        return newBrand;
+        await brandService.createBrand(dto);
+        await fetchBrands(pageParams);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
@@ -50,74 +57,65 @@ export const BrandProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, fetchBrands]
   );
 
-  // 📌 Admin-only: update
   const updateBrand = useCallback(
-    async (brandData) => {
+    async (dto, pageParams) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
-        setLoading(true);
-        const updated = await brandService.updateBrand(brandData);
+        // Optimistic update
         setBrands((prev) =>
-          prev.map((b) =>
-            b.brandID === updated.brandID
-              ? {
-                  ...b,
-                  ...updated,
-                  brandLogo: updated.brandLogo ?? b.brandLogo,
-                }
-              : b
-          )
+          prev.map((b) => (b.brandID === dto.BrandID ? { ...b, ...dto } : b))
         );
-        return updated;
+        await brandService.updateBrand(dto);
+        await fetchBrands(pageParams);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, fetchBrands]
   );
 
-  // 📌 Admin-only: delete
   const deleteBrand = useCallback(
-    async (id) => {
+    async (id, pageParams) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
-        await brandService.deleteBrand(id);
+        // Optimistic update: remove ngay
         setBrands((prev) => prev.filter((b) => b.brandID !== id));
+        await brandService.deleteBrand(id);
+        await fetchBrands(pageParams);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
       }
     },
-    [user?.role]
+    [user?.role, fetchBrands]
   );
 
-  // 📌 Load brands khi user login, reset khi logout
+  // Load brands
   useEffect(() => {
-    if (user) fetchBrands();
-    else setBrands([]);
-  }, [user, fetchBrands]);
+    fetchBrands({ PageNumber: 1, PageSize: 10 });
+  }, [fetchBrands]);
 
   const contextValue = useMemo(
     () => ({
       brands,
+      totalBrands,
       loading,
       fetchBrands,
-      getBrandById,
+      fetchAllBrands,
       createBrand,
       updateBrand,
       deleteBrand,
     }),
     [
       brands,
+      totalBrands,
       loading,
       fetchBrands,
-      getBrandById,
+      fetchAllBrands,
       createBrand,
       updateBrand,
       deleteBrand,
@@ -131,6 +129,4 @@ export const BrandProvider = ({ children }) => {
   );
 };
 
-BrandProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+BrandProvider.propTypes = { children: PropTypes.node.isRequired };
