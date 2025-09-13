@@ -25,7 +25,6 @@ namespace Ultitity.Clients.Groqs
 
             var baseUrl =
                 cfg["Groq:BaseUrl"] ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
-            ;
             if (!baseUrl.EndsWith('/'))
                 baseUrl += '/';
 
