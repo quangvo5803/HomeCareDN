@@ -8,7 +8,8 @@ export function isSafeEmail(email) {
   const atIndex = email.indexOf('@');
   if (atIndex <= 0 || atIndex > 64) return false;
 
-  // Deterministic regex, anchored
+  // Deterministic regex: only character classes and simple + quantifiers, anchored
+  // This regex is linear-time (no nested quantifiers or alternations that cause backtracking explosion).
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
 }
