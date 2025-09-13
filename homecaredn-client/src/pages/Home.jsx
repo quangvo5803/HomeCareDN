@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
-import SupportChatWidget from '../components/SupportChatWidget';
+import SupportChatWidget from "../components/SupportChatWidget";
 import Reveal from '../components/Reveal';
-import { Link, useNavigate } from 'react-router-dom';
-import { MATERIALS } from '../data/materials';
 
 const slides = [
   {
@@ -138,56 +136,56 @@ const SERVICE_ITEMS = [
   },
 ];
 
-// const MATERIALS = [
-//   {
-//     id: 'Cement',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830746/28b970d7-6ada-4c01-a83e-17e4e068537a.png',
-//     titleKey: 'Cement',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Wood',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830852/ac2be91c-2038-41ac-8878-0759bd25a803.png',
-//     titleKey: 'Wood',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Iron',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830632/978e5e3d-3d50-4949-b2d2-fbb93a3ae22a.png',
-//     titleKey: 'Iron',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'ceramic tiles',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830684/81028f90-f24c-480f-a510-6c4c45d8c708.png',
-//     titleKey: 'Ceramic tiles',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Tools',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830818/0722b748-038c-45de-8132-d65d36433d9b.png',
-//     titleKey: 'Tools',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'water pipe',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830902/6e964ad1-e1d8-43c7-bed2-aff7be26fdd7.png',
-//     titleKey: 'Water pipe',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-// ];
+const MATERIALS = [
+  {
+    id: 'Cement',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830746/28b970d7-6ada-4c01-a83e-17e4e068537a.png',
+    titleKey: 'Cement',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Wood',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830852/ac2be91c-2038-41ac-8878-0759bd25a803.png',
+    titleKey: 'Wood',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Iron',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830632/978e5e3d-3d50-4949-b2d2-fbb93a3ae22a.png',
+    titleKey: 'Iron',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'ceramic tiles',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830684/81028f90-f24c-480f-a510-6c4c45d8c708.png',
+    titleKey: 'Ceramic tiles',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'Tools',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830818/0722b748-038c-45de-8132-d65d36433d9b.png',
+    titleKey: 'Tools',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+  {
+    id: 'water pipe',
+    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830902/6e964ad1-e1d8-43c7-bed2-aff7be26fdd7.png',
+    titleKey: 'Water pipe',
+    descKey:
+      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
+    href: '#',
+  },
+];
 
 const TESTIMONIALS = [
   {
@@ -205,9 +203,9 @@ const TESTIMONIALS = [
     roleKey: 'home.testimonial2_role',
   },
 ];
+
 export default function Home() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   // Carousel state
   const [current, setCurrent] = useState(0);
@@ -280,6 +278,7 @@ export default function Home() {
   }, [idx, tNext, hasMany]);
 
   return (
+    
     <div>
       {/* Carousel */}
       <div className="relative w-full h-[90vh] overflow-hidden">
@@ -622,7 +621,7 @@ export default function Home() {
         </section>
       </Reveal>
 
-      {/* Material */}
+      {/*Material  */}
       <Reveal>
         <section className="py-12">
           <div className="container mx-auto max-w-7xl px-6">
@@ -639,29 +638,26 @@ export default function Home() {
                 </div>
               </div>
               <div className="w-full lg:w-auto text-left lg:text-right">
-                <Link
-                  to="/materials"
-                  className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition"
+                <a
+                  href="https://github.com/"
+                  className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition  "
                 >
                   {t('home.material_more')}
-                </Link>
+                </a>
               </div>
             </div>
 
-            {/* Grid */}
+            {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {MATERIALS.map((it) => (
                 <article
                   key={it.id}
-                  onClick={() => navigate(`/materials/${it.slug}`)}
-                  role="button"
-                  tabIndex={0}
-                  className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full cursor-pointer"
+                  className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full  "
                 >
                   <div className="relative overflow-hidden">
                     <img
                       src={it.img}
-                      alt={it.title}
+                      alt={t(it.titleKey)}
                       className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                       loading="lazy"
                       decoding="async"
@@ -669,16 +665,19 @@ export default function Home() {
                   </div>
 
                   <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                    <h5 className="text-lg font-semibold mb-2">{it.title}</h5>
+                    <h5 className="text-lg font-semibold mb-2">
+                      {t(it.titleKey)}
+                    </h5>
                     <p className="text-gray-600 mb-4 group-hover:text-white">
-                      {it.desc}
+                      {t(it.descKey)}
                     </p>
 
-                    <Link
-                      to={`/materials/${it.slug}`}
-                      onClick={(e) => e.stopPropagation()}
+                    <a
+                      href={it.href}
                       className="inline-flex items-center gap-2 text-orange-500 text-sm font-medium underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('home.fact_read_more')} ${it.title}`}
+                      aria-label={`${t('home.fact_read_more')} ${t(
+                        it.titleKey
+                      )}`}
                     >
                       {t('home.fact_read_more')}
                       <svg
@@ -690,7 +689,7 @@ export default function Home() {
                       >
                         <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
                       </svg>
-                    </Link>
+                    </a>
                   </div>
                 </article>
               ))}
@@ -879,7 +878,7 @@ export default function Home() {
       </Reveal>
 
       <div className="fixed bottom-6 right-24 z-[60]">
-        <SupportChatWidget brand="HomeCareDN" />
+        <SupportChatWidget brand="HomeCareDN"/>
       </div>
 
       {/* Back to Top */}
@@ -888,7 +887,7 @@ export default function Home() {
         aria-label="Back to top"
         className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${
+                    ${ 
                       showBackTop
                         ? 'opacity-100 translate-y-0'
                         : 'opacity-0 translate-y-3 pointer-events-none'

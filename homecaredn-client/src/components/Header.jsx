@@ -15,7 +15,7 @@ const navItems = [
     submenu: [
       { label: 'header.construction', href: '#services' },
       { label: 'header.repair', href: '#services' },
-      { label: 'header.material', href: '/Materials' },
+      { label: 'header.material', href: '#services' },
     ],
   },
   { label: 'header.contact', href: '/contact', type: 'link' },
