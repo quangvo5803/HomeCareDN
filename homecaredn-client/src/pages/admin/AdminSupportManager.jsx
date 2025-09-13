@@ -45,7 +45,7 @@ export default function AdminSupportManager() {
   };
 
   useEffect(() => {
-    fetchSupports('all');
+    fetchSupports();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
@@ -88,7 +88,7 @@ export default function AdminSupportManager() {
       toast.success(t('SUCCESS.REPLY'));
       setOpen(false);
       setSelected(null);
-      fetchSupports('all');
+      fetchSupports();
     } catch (err) {
       toast.error(handleApiError(err));
     }
@@ -120,7 +120,7 @@ export default function AdminSupportManager() {
     try {
       await contactService.delete(id);
       toast.success(t('SUCCESS.DELETE'));
-      fetchSupports('all');
+      fetchSupports();
     } catch (err) {
       toast.error(handleApiError(err));
     }

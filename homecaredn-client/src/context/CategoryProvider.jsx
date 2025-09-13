@@ -48,7 +48,7 @@ export const CategoryProvider = ({ children }) => {
   const getCategoryById = useCallback(
     async (id) => {
       try {
-        var local = categories.find((c) => c.categoryID === id);
+        const local = categories.find((c) => c.categoryID === id);
         if (local) return local;
         return await categoryService.getCategoryById(id);
       } catch (err) {
