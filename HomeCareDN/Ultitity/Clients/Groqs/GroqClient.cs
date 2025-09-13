@@ -8,14 +8,13 @@ namespace Ultitity.Clients.Groqs
     public class GroqClient : IGroqClient
     {
         private readonly HttpClient _http;
-        private readonly string _apiKey;
         private readonly string _chatPath;
 
         public GroqClient(HttpClient http, IConfiguration cfg)
         {
             _http = http;
 
-            _apiKey = (
+            var _apiKey = (
                 cfg["Groq:ApiKey"] ?? throw new InvalidOperationException("Missing Groq:ApiKey")
             ).Trim();
 
@@ -24,9 +23,12 @@ namespace Ultitity.Clients.Groqs
                     "Groq:ApiKey probably wrong (must start with 'gsk_')."
                 );
 
-            var baseUrl = cfg["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
-            if (!baseUrl.EndsWith("/"))
-                baseUrl += "/";
+            var baseUrl =
+                cfg["Groq:BaseUrl"] ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
+            ;
+            if (!baseUrl.EndsWith('/'))
+                baseUrl += '/';
+
             _http.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
 
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(

@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../hook/useAuth';
 import { profileService } from '../services/profileService';
 import { addressService } from '../services/addressService';
 import { geoService } from '../services/geoService';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-
+import PropTypes from 'prop-types';
 /* -------------------------------------------------------------------------- */
 /*                                 Constants                                  */
 /* -------------------------------------------------------------------------- */
@@ -118,6 +118,16 @@ export default function ProfilePage() {
 
 
   /* ------------------------------- Address CRUD ------------------------------ */
+  const isEditingAddr = Boolean(addrForm.id);
+
+let addrSubmitText;
+if (addrSubmitting) {
+  addrSubmitText = t('address.saving');
+} else if (isEditingAddr) {
+  addrSubmitText = t('address.update_button');
+} else {
+  addrSubmitText = t('address.add_button');
+}
   const addrHandleSubmit = async (e) => {
     e.preventDefault();
     if (addrSubmitting) return;
@@ -133,10 +143,10 @@ export default function ProfilePage() {
     try {
       if (addrForm.id) {
         await addressService.update(addrForm.id, payload);
-        toast.success(t('address.update_success', 'Đã cập nhật địa chỉ'));
+        toast.success(t('address.update_success'));
       } else {
         await addressService.create(payload);
-        toast.success(t('address.add_success', 'Đã thêm địa chỉ'));
+        toast.success(t('address.add_success'));
       }
 
       // reset
@@ -148,7 +158,7 @@ export default function ProfilePage() {
       const firstError =
         (data?.errors && Object.values(data.errors)[0]?.[0]) ||
         data?.message ||
-        t('address.save_error', 'Lưu địa chỉ thất bại');
+        t('address.save_error');
       toast.error(firstError);
     } finally {
       setAddrSubmitting(false);
@@ -200,13 +210,13 @@ export default function ProfilePage() {
   };
 
   const deleteAddrItem = async (id) => {
-    if (!confirm(t('address.confirm_delete', 'Xoá địa chỉ này?'))) return;
+    if (!confirm(t('address.confirm_delete'))) return;
     try {
       await addressService.remove(id);
-      toast.success(t('address.delete_success', 'Đã xoá địa chỉ'));
+      toast.success(t('address.delete_success'));
       await loadAddresses();
     } catch {
-      toast.error(t('address.delete_error', 'Xoá địa chỉ thất bại'));
+      toast.error(t('address.delete_error'));
     }
   };
 
@@ -298,11 +308,10 @@ export default function ProfilePage() {
             <aside className="col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-3">
               <nav
                 className="sticky top-24 rounded-2xl border border-white/60 bg-white/70 backdrop-blur-xl ring-1 ring-gray-100 p-0 overflow-visible"
-                role="tablist"
                 aria-label={t('profile.tabs.nav_label')}
               >
                 {/* inner padding giữ khoảng cách, tabs sẽ chiếm 100% vùng này */}
-                <div className="p-3 space-y-2">
+                <div className="p-3 space-y-2" role="tablist">
                   <TabButton
                     id="tab-profile"
                     aria-controls="panel-profile"
@@ -311,7 +320,7 @@ export default function ProfilePage() {
                     onClick={() => setActive('profile')}
                     icon={UserCircleIcon}
                   >
-                    {t('profile.tabs.profile', 'Hồ sơ')}
+                    {t('profile.tabs.profile')}
                   </TabButton>
 
                   <TabButton
@@ -322,7 +331,7 @@ export default function ProfilePage() {
                     onClick={() => setActive('service_requests')}
                     icon={ClipboardIcon}
                   >
-                    {t('profile.tabs.service_requests', 'Yêu cầu dịch vụ')}
+                    {t('profile.tabs.service_requests')}
                   </TabButton>
                 </div>
               </nav>
@@ -341,7 +350,7 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <div className="font-semibold leading-tight text-gray-900">
-                        {form.fullName || t('profile.form.full_name', 'Họ và tên')}
+                        {form.fullName || t('profile.form.full_name')}
                       </div>
                       <div className="text-sm text-gray-500">{form.email || '—'}</div>
                     </div>
@@ -349,43 +358,43 @@ export default function ProfilePage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label={t('profile.form.full_name', 'Họ và tên')}
+                      label={t('profile.form.full_name')}
                       name="fullName"
                       value={form.fullName}
                       onChange={onChange}
                       required
                     />
                     <Input
-                      label={t('profile.form.phone', 'Số điện thoại')}
+                      label={t('profile.form.phone')}
                       name="phoneNumber"
                       value={form.phoneNumber}
                       onChange={onChange}
                       inputMode="tel"
                     />
                     <Input
-                      label={t('profile.form.email', 'Email')}
+                      label={t('profile.form.email')}
                       name="email"
                       type="email"
                       value={form.email}
                       disabled
                       readOnly
                       iconLock
-                      title={t('profile.form.email_readonly', 'Email không thể thay đổi')}
+                      title={t('profile.form.email_readonly')}
                     />
                     <div>
-                      <Label>{t('profile.form.gender', 'Giới tính')}</Label>
+                      <Label>{t('profile.form.gender')}</Label>
                       <div className="relative">
                         <select
                           name="gender"
                           className="w-full rounded-xl border border-gray-200 bg-white p-3 pr-9 text-gray-900 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200 hover:border-gray-300"
                           value={form.gender ?? ''}
                           onChange={onChange}
-                          aria-label={t('profile.form.gender', 'Giới tính')}
+                          aria-label={t('profile.form.gender')}
                         >
-                          <option value="">{t('profile.gender.none', 'Không chọn')}</option>
-                          <option value="0">{t('profile.gender.male', 'Nam')}</option>
-                          <option value="1">{t('profile.gender.female', 'Nữ')}</option>
-                          <option value="2">{t('profile.gender.other', 'Khác')}</option>
+                          <option value="">{t('profile.gender.none')}</option>
+                          <option value="0">{t('profile.gender.male')}</option>
+                          <option value="1">{t('profile.gender.female')}</option>
+                          <option value="2">{t('profile.gender.other')}</option>
                         </select>
                       </div>
                     </div>
@@ -393,7 +402,7 @@ export default function ProfilePage() {
 
                   <div className="mt-6 flex gap-3 justify-end">
                     <Button type="submit" loading={saving}>
-                      {saving ? t('profile.form.saving', 'Đang lưu...') : t('profile.form.save', 'Lưu thay đổi')}
+                      {saving ? t('profile.form.saving') : t('profile.form.save')}
                     </Button>
                   </div>
                 </SectionCard>
@@ -401,18 +410,18 @@ export default function ProfilePage() {
                 {/* Address block (merged) */}
                 <SectionCard>
                   <div className="mb-4">
-                    <h2 className="text-lg font-semibold">{t('profile.addresses', 'Địa chỉ của bạn')}</h2>
-                    <p className="text-sm text-gray-600">{t('address.subtitle', 'Quản lý & thêm địa chỉ nhận hàng')}</p>
+                    <h2 className="text-lg font-semibold">{t('profile.addresses')}</h2>
+                    <p className="text-sm text-gray-600">{t('address.subtitle')}</p>
                   </div>
 
                   {/* List */}
                   <div className="mb-6 space-y-3">
                     {addrLoading && (
-                      <div className="space-y-2" role="status" aria-live="polite">
+                      <output className="space-y-2" role="status" aria-live="polite">
                         <SkeletonRow />
                         <SkeletonRow />
                         <SkeletonRow />
-                      </div>
+                      </output>
                     )}
 
                     {!addrLoading && addrItems.length === 0 && (
@@ -435,14 +444,14 @@ export default function ProfilePage() {
                   <form onSubmit={addrHandleSubmit} className="grid grid-cols-1 gap-4" aria-busy={addrSubmitting}>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       <SelectField
-                        label={t('address.select.province', 'Tỉnh / Thành phố')}
+                        label={t('address.select.province')}
                         value={selectedProvinceCode}
                         onChange={onProvinceChange}
                         options={provinces}
                       />
 
                       <SelectField
-                        label={t('address.select.district', 'Quận / Huyện')}
+                        label={t('address.select.district')}
                         value={selectedDistrictCode}
                         onChange={onDistrictChange}
                         options={districts}
@@ -450,7 +459,7 @@ export default function ProfilePage() {
                       />
 
                       <SelectField
-                        label={t('address.select.ward', 'Phường / Xã')}
+                        label={t('address.select.ward')}
                         value={selectedWardCode}
                         onChange={onWardChange}
                         options={wards}
@@ -467,12 +476,12 @@ export default function ProfilePage() {
 
                     {/* Detail */}
                     <div>
-                      <Label>{t('address.detail_placeholder', 'Địa chỉ chi tiết (số nhà, đường,...)')}</Label>
+                      <Label>{t('address.detail_placeholder')}</Label>
                       <input
                         name="detail"
                         value={addrForm.detail}
                         onChange={addrHandleChange}
-                        placeholder={t('address.detail_placeholder', 'Địa chỉ chi tiết (số nhà, đường,...)')}
+                        placeholder={t('address.detail_placeholder')}
                         className="w-full rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition placeholder:text-gray-400 hover:border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200"
                         required
                         aria-describedby="addr-preview"
@@ -486,25 +495,22 @@ export default function ProfilePage() {
                       )}
                     </div>
 
-                    <div className="flex flex-wrap gap-3 justify-end">
+                   <div className="flex flex-wrap gap-3 justify-end">
                       <Button type="submit" loading={addrSubmitting}>
-                        {addrSubmitting
-                          ? t('address.saving', 'Đang lưu...')
-                          : addrForm.id
-                          ? t('address.update_button', 'Cập nhật địa chỉ')
-                          : t('address.add_button', 'Thêm địa chỉ')}
+                        {addrSubmitText}
                       </Button>
 
-                      {addrForm.id && (
+                      {isEditingAddr && (
                         <Button
                           type="button"
                           variant="secondary"
                           onClick={resetAddressForm}
+                          disabled={addrSubmitting}
                         >
-                          {t('address.cancel', 'Huỷ chỉnh sửa')}
+                          {t('address.cancel')}
                         </Button>
                       )}
-                    </div>
+                   </div>
                   </form>
                 </SectionCard>
               </div>
@@ -513,8 +519,8 @@ export default function ProfilePage() {
             {active === 'service_requests' && (
               <SectionCard>
                 <div role="tabpanel" id="panel-requests" aria-labelledby="tab-requests">
-                  <h2 className="text-xl font-semibold mb-4">{t('profile.service_requests.title', 'Yêu cầu dịch vụ')}</h2>
-                  <p className="text-gray-700">{t('profile.service_requests.placeholder', 'Tính năng đang được phát triển.')}</p>
+                  <h2 className="text-xl font-semibold mb-4">{t('profile.service_requests.title')}</h2>
+                  <p className="text-gray-700">{t('profile.service_requests.placeholder')}</p>
                 </div>
               </SectionCard>
             )}
@@ -528,37 +534,86 @@ export default function ProfilePage() {
 /* -------------------------------------------------------------------------- */
 /*                                   Atoms                                    */
 /* -------------------------------------------------------------------------- */
-function SectionCard({ as, children, onSubmit, ariaBusy }) {
-  // Fix ESLint no-unused-vars by aliasing tag locally
-  const Tag = as || 'section';
-  return (
-    <Tag
-      onSubmit={onSubmit}
-      aria-busy={ariaBusy || undefined}
-      className="relative p-6 rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl ring-1 ring-gray-100 overflow-hidden focus-within:ring-2 focus-within:ring-orange-200"
-    >
+function SectionCard({
+  as: Tag = 'section',
+  children,
+  onSubmit,
+  ariaBusy = false,
+  className = '',
+  ...rest
+}) {
+  const classes = `
+    relative p-6 rounded-2xl border border-white/60 bg-white/80 backdrop-blur-xl
+    ring-1 ring-gray-100 overflow-hidden
+    focus-within:ring-2 focus-within:ring-orange-200
+  `.replace(/\s+/g, ' ').trim() + (className ? ` ${className}` : '');
+
+  const props = {
+    onSubmit,
+    'aria-busy': ariaBusy || undefined,
+    className: classes,
+    ...rest,
+  };
+
+  return React.createElement(
+    Tag,
+    props,
+    <>
       {/* Side glows instead of bottom shadow */}
       <div aria-hidden className="pointer-events-none absolute inset-y-4 -left-6 w-12 rounded-full bg-gradient-to-r from-gray-300/40 to-transparent blur-2xl" />
       <div aria-hidden className="pointer-events-none absolute inset-y-4 -right-6 w-12 rounded-full bg-gradient-to-l from-gray-300/40 to-transparent blur-2xl" />
       {children}
-    </Tag>
+    </>
   );
 }
 
+SectionCard.propTypes = {
+  as: PropTypes.elementType,
+  children: PropTypes.node,
+  onSubmit: PropTypes.func,
+  ariaBusy: PropTypes.bool,
+  className: PropTypes.string,
+};
+
+SectionCard.defaultProps = {
+  as: 'section',
+  children: null,
+  onSubmit: undefined,
+  ariaBusy: false,
+  className: '',
+};
+
+
 function Button({ children, variant = 'primary', loading = false, ...rest }) {
+  const { className, disabled: disabledProp, ...btnRest } = rest;
   const base =
     'inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition disabled:opacity-60 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-orange-300';
   const styles =
     variant === 'secondary'
       ? 'border border-gray-200 bg-white/80 hover:bg-gray-50 ring-1 ring-inset ring-white/60'
       : 'bg-gradient-to-r from-orange-600 to-amber-600 text-white hover:brightness-105 active:brightness-95 ring-1 ring-orange-500/20';
+
   return (
-    <button {...rest} className={`${base} ${styles}`} disabled={loading || rest.disabled}>
+    <button
+      {...btnRest}
+      className={`${base} ${styles} ${className || ''}`}
+      disabled={loading || disabledProp}
+    >
       {loading && <Spinner className="h-4 w-4" />}
       <span>{children}</span>
     </button>
   );
 }
+Button.propTypes = {
+  children: PropTypes.node,
+  variant: PropTypes.oneOf(['primary', 'secondary']),
+  loading: PropTypes.bool,
+  // các props HTML phổ biến trên button
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  type: PropTypes.string,
+};
 
 function SelectField({ label, value, onChange, options, disabled }) {
   const { t } = useTranslation();
@@ -583,31 +638,67 @@ function SelectField({ label, value, onChange, options, disabled }) {
     </div>
   );
 }
+SelectField.propTypes = {
+  label: PropTypes.node,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      code: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};
 
 function Label({ children }) {
   return (
     <label className="block text-sm font-medium mb-1 text-gray-800">
-      <span className="inline-flex items-center gap-1">
-        {children}
-      </span>
+      <span className="inline-flex items-center gap-1">{children}</span>
     </label>
   );
 }
+Label.propTypes = {
+  children: PropTypes.node,
+};
 
 function FieldHint({ children }) {
   return <p className="mt-1.5 text-xs text-gray-500">{children}</p>;
 }
+FieldHint.propTypes = {
+  children: PropTypes.node,
+};
 
 function Spinner({ className = 'h-4 w-4' }) {
   return (
-    <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/>
+    <svg
+      className={`animate-spin ${className}`}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
     </svg>
   );
 }
+Spinner.propTypes = {
+  className: PropTypes.string,
+};
 
 function Input({ label, iconLock = false, disabled = false, readOnly = false, ...props }) {
+  const { className, ...inputRest } = props;
   const readonlyLike = disabled || readOnly;
   return (
     <div>
@@ -615,7 +706,10 @@ function Input({ label, iconLock = false, disabled = false, readOnly = false, ..
         <span className="inline-flex items-center gap-1">
           {label}
           {readonlyLike && (
-            <span className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600" title={props.title}>
+            <span
+              className="inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600"
+              title={props.title}
+            >
               <LockIcon className="h-3 w-3" />
             </span>
           )}
@@ -623,7 +717,7 @@ function Input({ label, iconLock = false, disabled = false, readOnly = false, ..
       </Label>
       <div className="relative">
         <input
-          {...props}
+          {...inputRest}
           disabled={disabled}
           readOnly={readOnly}
           aria-readonly={readOnly || undefined}
@@ -632,11 +726,15 @@ function Input({ label, iconLock = false, disabled = false, readOnly = false, ..
             'w-full rounded-xl border p-3 shadow-sm transition placeholder:text-gray-400 ' +
             (readonlyLike
               ? 'bg-gray-50 text-gray-600 border-gray-200 cursor-not-allowed'
-              : 'bg-white border-gray-200 hover:border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200')
+              : 'bg-white border-gray-200 hover:border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200') +
+            (className ? ` ${className}` : '')
           }
         />
         {iconLock && readonlyLike && (
-          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden>
+          <span
+            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+            aria-hidden="true"
+          >
             <LockIcon className="h-4 w-4" />
           </span>
         )}
@@ -644,19 +742,33 @@ function Input({ label, iconLock = false, disabled = false, readOnly = false, ..
     </div>
   );
 }
+Input.propTypes = {
+  label: PropTypes.node,
+  iconLock: PropTypes.bool,
+  disabled: PropTypes.bool,
+  readOnly: PropTypes.bool,
+  name: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  onChange: PropTypes.func,
+  placeholder: PropTypes.string,
+  type: PropTypes.string,
+  className: PropTypes.string,
+  title: PropTypes.string,
+};
 
 function TabButton({ active, children, icon: Icon, ...rest }) {
+  const { className, ...btnRest } = rest;
   return (
     <button
-      {...rest}
+      {...btnRest}
       aria-current={active ? 'page' : undefined}
       className={
-        'group relative w-full text-left rounded-2xl border transition overflow-hidden ' +
-        'flex items-center gap-3 px-5 py-4 min-h-[56px] ' +
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200 ' +
-        (active
-          ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-300 shadow-sm'
-          : 'border-gray-200 hover:bg-gray-50')
+        ('group relative w-full text-left rounded-2xl border transition overflow-hidden ' +
+          'flex items-center gap-3 px-5 py-4 min-h-[56px] ' +
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200 ' +
+          (active
+            ? 'bg-gradient-to-r from-orange-50 to-amber-50 border-orange-300 shadow-sm'
+            : 'border-gray-200 hover:bg-gray-50')) + (className ? ` ${className}` : '')
       }
     >
       <span
@@ -664,37 +776,59 @@ function TabButton({ active, children, icon: Icon, ...rest }) {
           'absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl transition ' +
           (active ? 'bg-orange-500' : 'bg-transparent group-hover:bg-gray-200')
         }
-        aria-hidden
+        aria-hidden="true"
       />
       {Icon && (
         <span
-          className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center
-                     rounded-full bg-orange-50 text-orange-600 ring-1 ring-orange-100"
-          aria-hidden
+          className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-50 text-orange-600 ring-1 ring-orange-100"
+          aria-hidden="true"
         >
           <Icon className="h-5 w-5" />
         </span>
       )}
-      <span className={'relative z-10 font-medium leading-6 ' + (active ? 'text-gray-900' : 'text-gray-700')}>
+      <span
+        className={
+          'relative z-10 font-medium leading-6 ' +
+          (active ? 'text-gray-900' : 'text-gray-700')
+        }
+      >
         {children}
       </span>
     </button>
   );
 }
-
+TabButton.propTypes = {
+  active: PropTypes.bool,
+  children: PropTypes.node,
+  icon: PropTypes.elementType, // truyền component icon
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  type: PropTypes.string,
+};
 
 function AddressRow({ it, onEdit, onDelete, t }) {
   return (
     <div className="relative group border rounded-xl p-4 flex items-start justify-between bg-white/80 transition">
       {/* side glow */}
-      <div aria-hidden className="pointer-events-none absolute inset-y-2 -left-3 w-8 bg-gradient-to-r from-orange-200/30 to-transparent blur-xl opacity-0 group-hover:opacity-100" />
-      <div aria-hidden className="pointer-events-none absolute inset-y-2 -right-3 w-8 bg-gradient-to-l from-orange-200/30 to-transparent blur-xl opacity-0 group-hover:opacity-100" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-2 -left-3 w-8 bg-gradient-to-r from-orange-200/30 to-transparent blur-xl opacity-0 group-hover:opacity-100"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-2 -right-3 w-8 bg-gradient-to-l from-orange-200/30 to-transparent blur-xl opacity-0 group-hover:opacity-100"
+      />
       <div className="flex items-start gap-3">
-        <div className="mt-1 h-9 w-9 shrink-0 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center" aria-hidden>
+        <div
+          className="mt-1 h-9 w-9 shrink-0 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center"
+          aria-hidden="true"
+        >
           <MapPinIcon className="h-5 w-5 text-orange-600" />
         </div>
         <div>
-          <div className="font-medium text-gray-900 break-words max-w-[60ch]">{it.detail}</div>
+          <div className="font-medium text-gray-900 break-words max-w-[60ch]">
+            {it.detail}
+          </div>
           <div className="text-sm text-gray-500">
             {it.ward}, {it.district}, {it.city}
           </div>
@@ -704,36 +838,78 @@ function AddressRow({ it, onEdit, onDelete, t }) {
         <button
           onClick={onEdit}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-orange-200 text-orange-700 bg-orange-50/50 hover:bg-orange-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-200"
+          type="button"
         >
-          <PencilIcon className="h-4 w-4" aria-hidden />
-          <span className="text-sm font-medium">{t('address.edit', 'Sửa')}</span>
+          <PencilIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="text-sm font-medium">
+            {t('address.edit', 'Sửa')}
+          </span>
         </button>
         <button
           onClick={onDelete}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 text-red-700 bg-red-50/50 hover:bg-red-50 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200"
+          type="button"
         >
-          <TrashIcon className="h-4 w-4" aria-hidden />
-          <span className="text-sm font-medium">{t('address.delete', 'Xoá')}</span>
+          <TrashIcon className="h-4 w-4" aria-hidden="true" />
+          <span className="text-sm font-medium">
+            {t('address.delete', 'Xoá')}
+          </span>
         </button>
       </div>
     </div>
   );
 }
+AddressRow.propTypes = {
+  it: PropTypes.shape({
+    detail: PropTypes.string,
+    ward: PropTypes.string,
+    district: PropTypes.string,
+    city: PropTypes.string,
+  }).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  t: PropTypes.func.isRequired,
+};
 
 function EmptyAddressHint({ t }) {
   return (
     <div className="relative rounded-xl border border-dashed border-gray-300 bg-white/80 p-6 text-center overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute inset-y-3 -left-6 w-12 rounded-full bg-gradient-to-r from-gray-300/30 to-transparent blur-2xl" />
-      <div aria-hidden className="pointer-events-none absolute inset-y-3 -right-6 w-12 rounded-full bg-gradient-to-l from-gray-300/30 to-transparent blur-2xl" />
-      <div className="mx-auto mb-2 w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center" aria-hidden>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-3 -left-6 w-12 rounded-full bg-gradient-to-r from-gray-300/30 to-transparent blur-2xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-3 -right-6 w-12 rounded-full bg-gradient-to-l from-gray-300/30 to-transparent blur-2xl"
+      />
+      <div
+        className="mx-auto mb-2 w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center"
+        aria-hidden="true"
+      >
         <MapPinIcon className="h-5 w-5 text-orange-600" />
       </div>
       <div className="font-medium">{t('address.empty', 'Chưa có địa chỉ')}</div>
-      <div className="text-sm text-gray-500">{t('address.empty_hint', 'Hãy thêm địa chỉ mới bên dưới.')}</div>
+      <div className="text-sm text-gray-500">
+        {t('address.empty_hint', 'Hãy thêm địa chỉ mới bên dưới.')}
+      </div>
     </div>
   );
 }
+EmptyAddressHint.propTypes = {
+  t: PropTypes.func.isRequired,
+};
 
+export {
+  Button,
+  SelectField,
+  Label,
+  FieldHint,
+  Spinner,
+  Input,
+  TabButton,
+  AddressRow,
+  EmptyAddressHint,
+};
 /* -------------------------------- Icons (SVG) ------------------------------- */
 function LockIcon({ className = 'h-4 w-4' }) {
   return (
