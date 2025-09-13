@@ -37,7 +37,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Public: get material by id
   const getMaterialById = useCallback(
     async (id) => {
-      var local = materials.find((m) => m.materialID === id);
+      const local = materials.find((m) => m.materialID === id);
       if (local) return local;
       try {
         return await materialService.getMaterialById(id);
