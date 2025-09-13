@@ -10,7 +10,7 @@ import BrandModal from '../../components/admin/BrandModal';
 export default function AdminBrandManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 2;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
@@ -48,10 +48,13 @@ export default function AdminBrandManager() {
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading(),
           });
-          await deleteBrand(brandId, {
-            PageNumber: currentPage,
-            PageSize: pageSize,
-          });
+          await deleteBrand(brandId);
+          const lastPage = Math.ceil((totalBrands - 1) / pageSize);
+          if (currentPage > lastPage) {
+            setCurrentPage(lastPage || 1);
+          } else {
+            fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
+          }
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
         } catch {
@@ -62,22 +65,22 @@ export default function AdminBrandManager() {
   };
 
   const handleSave = async (brandData) => {
-    try {
-      if (brandData.BrandID)
-        await updateBrand(brandData, {
-          PageNumber: currentPage,
-          PageSize: pageSize,
-        });
-      else await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
-      setIsModalOpen(false);
-      setEditingBrand(null);
-      setCurrentPage(brandData.BrandID ? currentPage : 1); // reset page if create
-      toast.success(
-        brandData.BrandID ? t('SUCCESS.BRAND_UPDATE') : t('SUCCESS.BRAND_ADD')
-      );
-    } catch {
-      return;
+    if (brandData.BrandID) {
+      await updateBrand(brandData, {
+        PageNumber: currentPage,
+        PageSize: pageSize,
+      });
+      toast.success(t('SUCCESS.BRAND_UPDATE'));
+      setCurrentPage(currentPage);
+    } else {
+      await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
+      toast.success(t('SUCCESS.BRAND_ADD'));
+      const lastPage = Math.ceil((totalBrands + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
+
+    setIsModalOpen(false);
+    setEditingBrand(null);
   };
 
   if (loading) return <Loading />;

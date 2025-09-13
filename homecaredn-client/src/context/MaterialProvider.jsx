@@ -78,7 +78,8 @@ export const MaterialProvider = ({ children }) => {
       try {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
-        setMaterials((prev) => [...prev, newMaterial]);
+        // Tăng tổng số material
+        setTotalMaterials((prev) => prev + 1);
         return newMaterial;
       } catch (err) {
         toast.error(handleApiError(err));

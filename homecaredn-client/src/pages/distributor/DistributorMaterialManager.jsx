@@ -59,6 +59,16 @@ export default function MaterialTable() {
             },
           });
           await deleteMaterial(materialID);
+          const lastPage = Math.ceil((totalMaterials - 1) / pageSize);
+          if (currentPage > lastPage) {
+            setCurrentPage(lastPage || 1);
+          } else {
+            fetchMaterialsByUserId({
+              PageNumber: currentPage,
+              PageSize: pageSize,
+              FilterID: user.id,
+            });
+          }
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
         } catch (err) {
@@ -72,22 +82,19 @@ export default function MaterialTable() {
 
   // Save Material (Create / Update)
   const handleSave = async (materialData) => {
-    try {
-      if (materialData.MaterialID) {
-        await updateMaterial(materialData);
-        toast.success(t('SUCCESS.MATERIAL_UPDATE'));
-      } else {
-        await createMaterial(materialData);
-        setCurrentPage(1);
-        toast.success(t('SUCCESS.MATERIAL_ADD'));
-      }
-
-      setIsModalOpen(false);
-      setEditingMaterial(null);
-    } catch (err) {
-      if (err.handled) return;
-      toast.error(handleApiError(err));
+    if (materialData.MaterialID) {
+      await updateMaterial(materialData);
+      toast.success(t('SUCCESS.MATERIAL_UPDATE'));
+      setCurrentPage(currentPage);
+    } else {
+      await createMaterial(materialData);
+      toast.success(t('SUCCESS.MATERIAL_ADD'));
+      const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
+
+    setIsModalOpen(false);
+    setEditingMaterial(null);
   };
 
   if (loading) return <Loading />;

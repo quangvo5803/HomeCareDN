@@ -66,7 +66,9 @@ export const CategoryProvider = ({ children }) => {
       try {
         setLoading(true);
         const newCategory = await categoryService.createCategory(categoryData);
-        setCategories((prev) => [...prev, newCategory]);
+
+        // Tăng tổng số category
+        setTotalCategories((prev) => prev + 1);
         return newCategory;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -105,7 +107,6 @@ export const CategoryProvider = ({ children }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         await categoryService.deleteCategory(id);
-        setCategories((prev) => prev.filter((c) => c.categoryID !== id));
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

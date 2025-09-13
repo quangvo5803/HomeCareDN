@@ -44,12 +44,14 @@ export const BrandProvider = ({ children }) => {
     }
   }, []);
   const createBrand = useCallback(
-    async (dto, pageParams) => {
+    async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        await brandService.createBrand(dto);
-        await fetchBrands(pageParams);
+        const newBrand = await brandService.createBrand(dto);
+        // Tăng tổng số brand
+        setTotalBrands((prev) => prev + 1);
+        return newBrand;
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
@@ -57,7 +59,7 @@ export const BrandProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role, fetchBrands]
+    [user?.role]
   );
 
   const updateBrand = useCallback(
@@ -79,19 +81,16 @@ export const BrandProvider = ({ children }) => {
   );
 
   const deleteBrand = useCallback(
-    async (id, pageParams) => {
+    async (id) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
-        // Optimistic update: remove ngay
-        setBrands((prev) => prev.filter((b) => b.brandID !== id));
         await brandService.deleteBrand(id);
-        await fetchBrands(pageParams);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
       }
     },
-    [user?.role, fetchBrands]
+    [user?.role]
   );
 
   // Load brands

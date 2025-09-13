@@ -52,6 +52,12 @@ export default function AdminCategoryManager() {
             },
           });
           await deleteCategory(categoryId);
+          const lastPage = Math.ceil((totalCategories - 1) / pageSize);
+          if (currentPage > lastPage) {
+            setCurrentPage(lastPage || 1);
+          } else {
+            fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
+          }
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
         } catch (err) {
@@ -65,23 +71,20 @@ export default function AdminCategoryManager() {
 
   // Save Category (Create / Update)
   const handleSave = async (categoryData) => {
-    try {
-      if (categoryData.CategoryID) {
-        await updateCategory(categoryData);
-        toast.success(t('SUCCESS.CATEGORY_UPDATE'));
-      } else {
-        await createCategory(categoryData);
-        setCurrentPage(1);
-        toast.success(t('SUCCESS.CATEGORY_ADD'));
-      }
-      setIsModalOpen(false);
-      setEditingCategory(null);
-    } catch (err) {
-      if (err.handled) return;
-      toast.error(handleApiError(err));
+    if (categoryData.CategoryID) {
+      await updateCategory(categoryData);
+      toast.success(t('SUCCESS.CATEGORY_UPDATE'));
+      setCurrentPage(currentPage);
+    } else {
+      await createCategory(categoryData);
+      toast.success(t('SUCCESS.CATEGORY_ADD'));
+      const lastPage = Math.ceil((totalCategories + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
-  };
 
+    setIsModalOpen(false);
+    setEditingCategory(null);
+  };
   if (loading) return <Loading />;
 
   return (
