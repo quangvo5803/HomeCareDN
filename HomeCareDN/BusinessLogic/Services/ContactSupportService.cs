@@ -32,7 +32,10 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.ContactSupportRepository.GetQueryable();
-
+            if (parameters.FilterBool != null)
+            {
+                query = query.Where(s => s.IsProcessed == parameters.FilterBool);
+            }
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
@@ -43,7 +46,6 @@ namespace BusinessLogic.Services
                 _ => query.OrderBy(b => b.Id),
             };
             var items = await query
-                .Where(s => parameters.FilterBool != null && parameters.FilterBool == s.IsProcessed)
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
                 .ToListAsync();

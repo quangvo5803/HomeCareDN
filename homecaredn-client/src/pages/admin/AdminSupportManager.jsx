@@ -7,13 +7,17 @@ import Loading from '../../components/Loading';
 import { handleApiError } from '../../utils/handleApiError';
 import { contactService } from '../../services/contactService';
 import ReplyModal from '../../components/admin/ReplyModal';
+import { Pagination } from 'antd';
 
 export default function AdminSupportManager() {
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [supports, setSupports] = useState([]);
-  const [filter, setFilter] = useState('all'); // all | pending | processed
+  const [filter, setFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [total, setTotal] = useState(0);
 
+  const pageSize = 10;
   // modal state
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
@@ -26,8 +30,13 @@ export default function AdminSupportManager() {
         filter === 'all' ? undefined : filter === 'processed';
 
       // service trả thẳng data (array)
-      const list = await contactService.listAll(isProcessedParam);
-      setSupports(list || []);
+      const res = await contactService.listAll({
+        PageNumber: currentPage,
+        PageSize: pageSize,
+        FilterBool: isProcessedParam,
+      });
+      setSupports(res.items || []);
+      setTotal(res.totalItems || 0);
     } catch (err) {
       toast.error(handleApiError(err));
     } finally {
@@ -36,7 +45,7 @@ export default function AdminSupportManager() {
   };
 
   useEffect(() => {
-    fetchSupports();
+    fetchSupports('all');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
@@ -79,7 +88,7 @@ export default function AdminSupportManager() {
       toast.success(t('SUCCESS.REPLY'));
       setOpen(false);
       setSelected(null);
-      fetchSupports();
+      fetchSupports('all');
     } catch (err) {
       toast.error(handleApiError(err));
     }
@@ -111,7 +120,7 @@ export default function AdminSupportManager() {
     try {
       await contactService.delete(id);
       toast.success(t('SUCCESS.DELETE'));
-      fetchSupports();
+      fetchSupports('all');
     } catch (err) {
       toast.error(handleApiError(err));
     }
@@ -256,16 +265,44 @@ export default function AdminSupportManager() {
                   ))
                 ) : (
                   <tr>
-                    <td
-                      colSpan="6"
-                      className="px-6 py-12 text-center text-gray-500 text-sm"
-                    >
-                      {t('adminSupportManager.noSupport')}
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center justify-center text-gray-500">
+                        {/* Icon */}
+                        <svg
+                          className="w-12 h-12 text-gray-400 mb-4 mx-auto"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1"
+                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                          />
+                        </svg>
+
+                        {/* Text */}
+                        <p className="text-sm mb-2">
+                          {t('adminSupportManager.noSupport')}
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+          {/* Pagination */}
+          <div className="flex justify-center py-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={total}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+              size="small"
+            />
           </div>
         </div>
 

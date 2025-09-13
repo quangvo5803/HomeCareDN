@@ -20,7 +20,7 @@ export const contactService = {
 
   // ===== Admin APIs =====
   listAll: async (params = {}) => {
-    const response = await api.get(`/Admin/get-all-support/`, params);
+    const response = await api.get(`/Admin/get-all-support`, { params });
     return response.data;
   },
 
