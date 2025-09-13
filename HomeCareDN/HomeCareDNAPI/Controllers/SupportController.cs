@@ -15,18 +15,18 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpPost("create")]
+        [HttpPost("create-support")]
         public async Task<IActionResult> Create([FromBody] ContactSupportCreateRequestDto dto)
         {
             var created = await _facadeService.ContactSupportService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet("get-support/{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var item = await _facadeService.ContactSupportService.GetByIdAsync(id);
-            return Ok(item); 
+            return Ok(item);
         }
     }
 }

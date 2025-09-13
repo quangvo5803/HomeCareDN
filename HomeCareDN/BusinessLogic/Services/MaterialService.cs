@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -24,21 +25,65 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<ICollection<MaterialDto>> GetAllMaterialAsync()
+        public async Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(
+            QueryParameters parameters
+        )
         {
-            var material = await _unitOfWork.MaterialRepository.GetAllAsync(
+            var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: "Images,Brand,Category"
             );
-            return _mapper.Map<ICollection<MaterialDto>>(material);
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "materialname" => query.OrderBy(m => m.Name),
+                "materialname_desc" => query.OrderByDescending(m => m.Name),
+                "materialnameen" => query.OrderBy(m => m.NameEN),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.NameEN),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            return new PagedResultDto<MaterialDto>
+            {
+                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
-        public async Task<ICollection<MaterialDto>> GetAllMaterialByIdAsync(Guid id)
+        public async Task<PagedResultDto<MaterialDto>> GetAllMaterialByUserIdAsync(
+            QueryParameters parameters
+        )
         {
-            var material = await _unitOfWork.MaterialRepository.GetRangeAsync(
-                m => m.UserID == id.ToString(),
-                includeProperties: "Images,Category,Brand"
+            var query = _unitOfWork.MaterialRepository.GetQueryable(
+                includeProperties: "Images,Brand,Category"
             );
-            return _mapper.Map<ICollection<MaterialDto>>(material);
+            query = query.Where(m => m.UserID == parameters.FilterID.ToString());
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "materialname" => query.OrderBy(m => m.Name),
+                "materialname_desc" => query.OrderByDescending(m => m.Name),
+                "materialnameen" => query.OrderBy(m => m.NameEN),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.MaterialID),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            return new PagedResultDto<MaterialDto>
+            {
+                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
@@ -90,7 +135,7 @@ namespace BusinessLogic.Services
             //check image
             ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
 
-            material.PatchFrom(requestDto, nameof(requestDto.Images));
+            _mapper.Map(requestDto, material);
 
             //upload image
             await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);

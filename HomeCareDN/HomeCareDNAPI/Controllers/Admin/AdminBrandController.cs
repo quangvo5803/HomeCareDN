@@ -3,7 +3,6 @@ using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ultitity.Email.Interface;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {

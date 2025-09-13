@@ -13,18 +13,17 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const { deleteMaterialImage } = useMaterial();
-  const { brands } = useBrand();
-  const { categories } = useCategory();
+  const { fetchAllBrands } = useBrand();
+  const { fetchAllCategories } = useCategory();
 
   const [name, setName] = useState('');
-  const [nameEN, setNameEN] = useState('')
+  const [nameEN, setNameEN] = useState('');
   const [brandID, setBrandID] = useState('');
   const [categoryID, setCategoryID] = useState('');
   const [unit, setUnit] = useState('');
   const [unitEN, setUnitEN] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionEN, setDescriptionEN] = useState('');
-
 
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -33,6 +32,25 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   // Ảnh local mới upload
   const [newImages, setNewImages] = useState([]);
 
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
+  // Load brands & categories cho dropdown
+  useEffect(() => {
+    if (isOpen) {
+      (async () => {
+        try {
+          const [brandList, categoryList] = await Promise.all([
+            fetchAllBrands(),
+            fetchAllCategories(),
+          ]);
+          setBrands(brandList);
+          setCategories(categoryList);
+        } catch (err) {
+          toast.error(handleApiError(err));
+        }
+      })();
+    }
+  }, [isOpen, fetchAllBrands, fetchAllCategories]);
   // Delete Material image (DB)
   const handleDeleteImage = async (imageUrl, onSuccess) => {
     Swal.fire({
@@ -83,9 +101,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setCategoryID(material.categoryID || foundCategory?.categoryID || '');
         setUnit(material.unit || '');
         setDescription(material.description || '');
-        setNameEN(material.nameEN || "");
-        setUnitEN(material.unitEN || "");
-        setDescriptionEN(material.descriptionEN || "");
+        setNameEN(material.nameEN || '');
+        setUnitEN(material.unitEN || '');
+        setDescriptionEN(material.descriptionEN || '');
         setExistingImages(material.imageUrls || []);
         setNewImages([]);
       } else {
@@ -94,9 +112,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setCategoryID('');
         setUnit('');
         setDescription('');
-        setNameEN("");
-        setUnitEN("");
-        setDescriptionEN("");
+        setNameEN('');
+        setUnitEN('');
+        setDescriptionEN('');
         setExistingImages([]);
         setNewImages([]);
       }
@@ -122,7 +140,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     setNewImages((prev) => [...prev, ...mappedFiles]);
   };
 
-
   // Xóa ảnh local theo id
   const handleRemoveNewImage = (id) => {
     setNewImages((prev) => prev.filter((img) => img.id !== id));
@@ -136,11 +153,10 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     }
   };
 
-
   // Hàm chính để gọi xoá ảnh
   const handleRemoveExistingImage = (imageUrl) => {
     handleDeleteImage(imageUrl, () => updateExistingImages(imageUrl));
-  };;
+  };
 
   // Submit update/add
   const handleSubmit = () => {
@@ -186,7 +202,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto p-8 flex flex-col max-h-[90vh]">
-
         {/* Header */}
         <div className="flex items-center justify-between border-b pb-4">
           <h3 className="text-2xl font-semibold text-gray-900">
@@ -202,7 +217,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
         {/* Body (scrollable) */}
         <div className="flex-1 overflow-y-auto pr-2 mt-4 space-y-6">
-
           {/* Form */}
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             {/* Material Name */}
@@ -250,8 +264,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   <option key={b.brandID} value={b.brandID}>
                     {i18n.language === 'vi'
                       ? b.brandName
-                      : b.brandNameEN || b.brandName
-                    }
+                      : b.brandNameEN || b.brandName}
                   </option>
                 ))}
               </select>
@@ -269,7 +282,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               >
                 {!material && (
                   <option value="">
-                    {t('distributorMaterialManager.materialModal.chooseCategory')}
+                    {t(
+                      'distributorMaterialManager.materialModal.chooseCategory'
+                    )}
                   </option>
                 )}
                 {categories.map((c) => (
@@ -288,7 +303,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                 {t('distributorMaterialManager.materialModal.description')}
               </label>
               <textarea
-                placeholder={t('distributorMaterialManager.materialModal.descriptionsPlaceholder')}
+                placeholder={t(
+                  'distributorMaterialManager.materialModal.descriptionsPlaceholder'
+                )}
                 className="w-full px-4 py-2.5 border rounded-xl"
                 rows="3"
                 value={description}
@@ -304,7 +321,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                 className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3"
               >
                 <i className="fas fa-globe text-emerald-500"></i>
-                {t('distributorMaterialManager.materialModal.multilanguage_for_data')}
+                {t(
+                  'distributorMaterialManager.materialModal.multilanguage_for_data'
+                )}
                 <span className="ml-auto">{isExpanded ? '▲' : '▼'}</span>
               </button>
 
@@ -314,7 +333,9 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                     {/* Material Name EN */}
                     <div>
                       <label className="block text-sm font-medium mb-2 text-gray-700">
-                        {t('distributorMaterialManager.materialModal.materialNameEN')}
+                        {t(
+                          'distributorMaterialManager.materialModal.materialNameEN'
+                        )}
                       </label>
                       <input
                         type="text"
@@ -341,10 +362,14 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   {/* Description EN */}
                   <div>
                     <label className="block text-sm font-medium mb-2 text-gray-700">
-                      {t('distributorMaterialManager.materialModal.descriptionEN')}
+                      {t(
+                        'distributorMaterialManager.materialModal.descriptionEN'
+                      )}
                     </label>
                     <textarea
-                      placeholder={t('distributorMaterialManager.materialModal.descriptionsPlaceholderEN')}
+                      placeholder={t(
+                        'distributorMaterialManager.materialModal.descriptionsPlaceholderEN'
+                      )}
                       className="w-full px-4 py-2.5 border rounded-xl"
                       rows="3"
                       value={descriptionEN}
@@ -386,12 +411,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   {/* Hiển thị số file đã chọn */}
                   <span className="ml-3 text-sm text-gray-500">
                     {newImages.length > 0
-                      ? `${newImages.length} ${t('distributorMaterialManager.materialModal.filesSelected')}`
+                      ? `${newImages.length} ${t(
+                          'distributorMaterialManager.materialModal.filesSelected'
+                        )}`
                       : t('distributorMaterialManager.materialModal.noFile')}
                   </span>
                 </div>
               )}
-
 
               <div className="grid grid-cols-5 gap-4 mt-4">
                 {/* Existing Images */}
@@ -409,9 +435,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                       {existingImages.length !== 1 && (
                         <button
                           type="button"
-                          onClick={() =>
-                            handleRemoveExistingImage(imgUrl)
-                          }
+                          onClick={() => handleRemoveExistingImage(imgUrl)}
                           className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
                         >
                           <i className="fa-solid fa-xmark"></i>
@@ -446,7 +470,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Footer */}
@@ -466,8 +489,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         </div>
       </div>
     </div>
-
-
   );
 }
 

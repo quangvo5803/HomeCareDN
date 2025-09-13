@@ -1,10 +1,11 @@
-﻿using BusinessLogic.DTOs.Application.Category;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Category;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface ICategoryService
     {
-        Task<ICollection<CategoryDto>> GetAllCategories();
+        Task<PagedResultDto<CategoryDto>> GetAllCategories(QueryParameters parameters);
         Task<CategoryDto> GetCategoryByIdAsync(Guid id);
         Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto);
         Task<CategoryDto> UpdateCategoryAsync(CategoryUpdateRequestDto requestDto);
