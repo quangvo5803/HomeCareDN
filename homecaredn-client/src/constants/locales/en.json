@@ -425,25 +425,27 @@
     "Customer": "Customer"
   },
   "profile": {
-    "tabs": { "profile": "Profile", "partner": "Register to become partner" },
+    "tabs": { "profile": "Profile", "service_requests": "Service Request Management" },
     "title": "Your profile",
+    "addresses": "Your addresses",
+    "subtitle": "Profile and services",
     "form": {
       "full_name": "Full name",
       "phone": "Phone number",
       "gender": "Gender",
+      "email" : "Email",
+      "email_readonly": "Email (cannot be changed)",
       "save": "Save changes",
       "saving": "Saving..."
     },
     "gender": { "none": "—", "male": "Male", "female": "Female", "other": "Other" },
     "update_success": "Profile updated successfully",
     "update_error": "Profile update failed",
-    "partner": {
-      "title": "Register to become a partner",
-      "placeholder": "Embed your partner registration form here…"
+    "service_requests": {
+      "title": "Service Request Management",
+      "placeholder": "Embed your service request form here…"
     },
-    "common": {
       "back": "Back"
-    }
   },
   "address": {
     "title": "My addresses",
@@ -463,6 +465,8 @@
     "add_button": "Add address",
     "update_button": "Update address",
     "detail_placeholder": "Detailed address (house no., street…)",
+    "subtitle": "Addresses",
+    "preview_label": "Preview",
     "select": {
       "province": "Province/City",
       "district": "District",
