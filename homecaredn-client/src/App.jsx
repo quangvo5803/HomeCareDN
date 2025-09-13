@@ -29,6 +29,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
+import Materials from './pages/Materials';
+import MaterialDetail from './pages/MaterialDetail';
 
 function App() {
   return (
@@ -62,6 +64,8 @@ function Layout() {
         <Route path="/Home" element={<Home />} />
         <Route path="/About" element={<About />} />
         <Route path="/Contact" element={<Contact />} />
+        <Route path="/Materials" element={<Materials />} />
+        <Route path="/Materials/:slug" element={<MaterialDetail />} />
         <Route
           path="/Login"
           element={
@@ -88,7 +92,6 @@ function Layout() {
             )
           }
         />
-
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -103,7 +106,6 @@ function Layout() {
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
         </Route>
-
         {/* Contractor routes */}
         <Route
           path="/ContractorDashboard"
@@ -113,7 +115,6 @@ function Layout() {
             </ProtectedRoute>
           }
         />
-
         {/* Distributor routes */}
         <Route
           path="/Distributor"
