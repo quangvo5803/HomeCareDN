@@ -74,7 +74,6 @@ export default function AdminCategoryManager() {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
       toast.success(t('SUCCESS.CATEGORY_UPDATE'));
-      setCurrentPage(currentPage);
     } else {
       await createCategory(categoryData);
       toast.success(t('SUCCESS.CATEGORY_ADD'));

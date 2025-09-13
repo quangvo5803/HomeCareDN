@@ -85,7 +85,6 @@ export default function MaterialTable() {
     if (materialData.MaterialID) {
       await updateMaterial(materialData);
       toast.success(t('SUCCESS.MATERIAL_UPDATE'));
-      setCurrentPage(currentPage);
     } else {
       await createMaterial(materialData);
       toast.success(t('SUCCESS.MATERIAL_ADD'));

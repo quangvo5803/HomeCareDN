@@ -71,7 +71,6 @@ export default function AdminBrandManager() {
         PageSize: pageSize,
       });
       toast.success(t('SUCCESS.BRAND_UPDATE'));
-      setCurrentPage(currentPage);
     } else {
       await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
       toast.success(t('SUCCESS.BRAND_ADD'));
