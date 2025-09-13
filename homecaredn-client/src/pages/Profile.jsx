@@ -417,7 +417,7 @@ if (addrSubmitting) {
                   {/* List */}
                   <div className="mb-6 space-y-3">
                     {addrLoading && (
-                      <output className="space-y-2" role="status" aria-live="polite">
+                      <output className="space-y-2" aria-live="polite">
                         <SkeletonRow />
                         <SkeletonRow />
                         <SkeletonRow />
@@ -911,6 +911,7 @@ export {
   EmptyAddressHint,
 };
 /* -------------------------------- Icons (SVG) ------------------------------- */
+
 function LockIcon({ className = 'h-4 w-4' }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -918,6 +919,9 @@ function LockIcon({ className = 'h-4 w-4' }) {
     </svg>
   );
 }
+LockIcon.propTypes = {
+  className: PropTypes.string,
+};
 function ArrowLeftIcon({ className = 'h-4 w-4' }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -925,6 +929,9 @@ function ArrowLeftIcon({ className = 'h-4 w-4' }) {
     </svg>
   );
 }
+ArrowLeftIcon.propTypes = {
+  className: PropTypes.string,
+};
 function MapPinIcon({ className = 'h-5 w-5' }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -932,6 +939,9 @@ function MapPinIcon({ className = 'h-5 w-5' }) {
     </svg>
   );
 }
+MapPinIcon.propTypes = {
+  className: PropTypes.string,
+};
 function PencilIcon({ className = 'h-4 w-4' }) {
   return (
     <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -939,6 +949,9 @@ function PencilIcon({ className = 'h-4 w-4' }) {
     </svg>
   );
 }
+PencilIcon.propTypes = {
+  className: PropTypes.string,
+};
 function TrashIcon({ className = 'h-4 w-4' }) {
   return (
     <svg className={className} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -946,6 +959,9 @@ function TrashIcon({ className = 'h-4 w-4' }) {
     </svg>
   );
 }
+TrashIcon.propTypes = {
+  className: PropTypes.string,
+};
 function UserCircleIcon({ className = 'h-5 w-5', strokeWidth = 1.75 }) {
   return (
     <svg
@@ -965,7 +981,10 @@ function UserCircleIcon({ className = 'h-5 w-5', strokeWidth = 1.75 }) {
     </svg>
   );
 }
-
+UserCircleIcon.propTypes = {
+  className: PropTypes.string,
+  strokeWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+};
 function ClipboardIcon({ className = 'h-5 w-5' }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -973,7 +992,9 @@ function ClipboardIcon({ className = 'h-5 w-5' }) {
     </svg>
   );
 }
-
+ClipboardIcon.propTypes = {
+  className: PropTypes.string,
+};
 function SkeletonRow() {
   return (
     <div className="relative rounded-xl border border-gray-200 bg-white p-4 flex items-center justify-between overflow-hidden">
