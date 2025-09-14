@@ -1,24 +1,35 @@
 // src/components/ProtectedRoute.js
-import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
-import AuthContext from '../context/AuthContext';
+import { useAuth } from '../hook/useAuth';
 import PropTypes from 'prop-types';
+import Loading from '../components/Loading';
 
-export default function ProtectedRoute({ children, roles }) {
-  const { user } = useContext(AuthContext);
-
-  // Chưa login
+export default function ProtectedRoute({ children, allowedRoles }) {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading />;
   if (!user) {
     return <Navigate to="/Login" replace />;
   }
 
-  // Nếu có roles yêu cầu nhưng user không có quyền
-  if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/Home" replace />;
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to={getRedirectPath(user)} replace />;
   }
 
   return children;
 }
+function getRedirectPath(user) {
+  switch (user?.role) {
+    case 'Admin':
+      return '/Admin';
+    case 'Contractor':
+      return '/ContractorDashboard';
+    case 'Distributor':
+      return '/Distributor';
+    default:
+      return '/Home';
+  }
+}
+
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   roles: PropTypes.arrayOf(PropTypes.string),
