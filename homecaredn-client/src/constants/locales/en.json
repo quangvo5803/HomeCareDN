@@ -114,6 +114,37 @@
     "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
   }
 },
+"materials": {
+    "catalog": {
+      "title": "Materials Catalog",
+      "search_placeholder": "Search materials...",
+      "tag_all": "All",
+      "tag_category": "Category",
+      "tag_brand": "Brand",
+      "sort_relevant": "Relevant (default)",
+      "sort_az": "Name A → Z",
+      "sort_za": "Name Z → A",
+      "result_showing": "Showing",
+      "result_items": "item(s)",
+      "result_for": "for",
+      "result_in": "in",
+      "empty_title": "No materials found",
+      "empty_desc": "Try changing filters or clearing your search.",
+      "reset_filters": "Reset filters",
+      "read_more": "Read more",
+      "details": "Details",
+      "breadcrumbs_home": "Home",
+      "breadcrumbs_materials": "Materials"
+    },
+    "detail": {
+      "not_found": "Material not found.",
+      "back_to_list": "Back to list",
+      "description_tab": "Description",
+      "related_title": "Related materials",
+      "cta_add_new_request": "Add and create a new request",
+      "cta_add_to_existing": "Add to an existing request"
+    }
+  },
 "process": {
   "badge": "Our Process",
   "title": "Our 4-Step Process to a Successful Build.",
