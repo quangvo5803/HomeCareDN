@@ -32,5 +32,5 @@ function getRedirectPath(user) {
 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
-  roles: PropTypes.arrayOf(PropTypes.string),
+  allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };

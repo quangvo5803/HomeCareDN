@@ -1,9 +1,12 @@
 // src/components/PublicOnlyRoute.js
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hook/useAuth';
+import PropTypes from 'prop-types';
+import Loading from '../components/Loading';
 
-export default function PublicOnlyRoute({ children }) {
-  const { user } = useAuth();
+export default function PublicRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <Loading />;
 
   if (!user) {
     return children;
@@ -28,3 +31,6 @@ function getRedirectPath(user) {
       return '/Home';
   }
 }
+PublicRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
