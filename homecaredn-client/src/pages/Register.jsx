@@ -7,7 +7,7 @@ import AuthContext from '../context/AuthContext';
 import { handleApiError } from '../utils/handleApiError';
 import { useTranslation } from 'react-i18next';
 import GoogleLoginButton from '../components/GoogleLoginButton';
-import { isSafeEmail } from './utils/validateEmail.js';
+import { isSafeEmail } from '../utils/validateEmail';
 
 export default function Register() {
   const { t } = useTranslation();

@@ -189,12 +189,14 @@ export default function AdminCategoryManager() {
                             >
                               {t('BUTTON.Edit')}
                             </button>
-                            <button
-                              className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                              onClick={() => handleDelete(cat.categoryID)}
-                            >
-                              {t('BUTTON.Delete')}
-                            </button>
+                            {cat.materials.length === 0 && (
+                              <button
+                                className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                                onClick={() => handleDelete(cat.categoryID)}
+                              >
+                                {t('BUTTON.Delete')}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -290,7 +292,7 @@ export default function AdminCategoryManager() {
                         >
                           {t('BUTTON.Edit')}
                         </button>
-                        {cat.materials === 0 && (
+                        {cat.materials.length === 0 && (
                           <button
                             className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(cat.categoryID)}
