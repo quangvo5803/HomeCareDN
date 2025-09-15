@@ -1,9 +1,9 @@
-import { useTranslation } from "react-i18next";
-import MenuList from "../../components/MenuList";
-import AvatarMenu from "../../components/AvatarMenu";
-import LanguageSwitch from "../../components/LanguageSwitch";
-import NotificationBell from "../../components/NotificationBell";
-import { Outlet } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
+import MenuList from '../../components/partner/MenuList';
+import AvatarMenu from '../../components/AvatarMenu';
+import LanguageSwitch from '../../components/LanguageSwitch';
+import NotificationBell from '../../components/NotificationBell';
+import { Outlet } from 'react-router-dom';
 
 export default function DistributorLayout() {
   const { t } = useTranslation();
@@ -20,7 +20,7 @@ export default function DistributorLayout() {
               <i className="fa-solid fa-magnifying-glass"></i>
               <input
                 className="flex-1 bg-transparent outline-none text-sm text-gray-700"
-                placeholder={t("partnerDashboard.search_placeholder")}
+                placeholder={t('partnerDashboard.search_placeholder')}
               />
             </div>
             <NotificationBell total={3} />

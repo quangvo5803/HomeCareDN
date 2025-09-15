@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import MaterialCatalog from './pages/MaterialCatalog';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -22,6 +23,7 @@ import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+import DistributorCategoryManager from './pages/distributor/DistributoreCategoryManager';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -84,6 +86,14 @@ function Layout() {
           element={
             <PublicRoute>
               <Contact />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialCatalog"
+          element={
+            <PublicRoute>
+              <MaterialCatalog />
             </PublicRoute>
           }
         />
@@ -152,6 +162,10 @@ function Layout() {
           <Route
             path="MaterialManager"
             element={<DistributorMaterialManager />}
+          />
+          <Route
+            path="CategoryManager"
+            element={<DistributorCategoryManager />}
           />
         </Route>
 

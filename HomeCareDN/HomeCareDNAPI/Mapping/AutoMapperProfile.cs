@@ -38,7 +38,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            CreateMap<CategoryCreateRequestDto, Category>();
+            CreateMap<CategoryCreateRequestDto, Category>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<BrandCreateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
@@ -57,7 +58,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MaterialUpdateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            CreateMap<CategoryUpdateRequestDto, Category>();
+            CreateMap<CategoryUpdateRequestDto, Category>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
@@ -103,7 +105,11 @@ namespace HomeCareDNAPI.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
 
-            CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Category, CategoryDto>()
+                .ForMember(
+                    dest => dest.CategoryLogo,
+                    opt => opt.MapFrom(src => src.LogoImage!.ImageUrl)
+                );
 
             CreateMap<Brand, BrandDto>()
                 .ForMember(

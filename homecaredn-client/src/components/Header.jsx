@@ -7,7 +7,7 @@ import ReactCountryFlag from 'react-country-flag';
 // Navigation data
 const navItems = [
   { label: 'header.home', href: '/', type: 'link' },
-  { label: 'header.about', href: '/about', type: 'link' },
+  { label: 'header.about', href: '/About', type: 'link' },
   {
     label: 'header.services',
     href: '#',
@@ -16,6 +16,11 @@ const navItems = [
       { label: 'header.construction', href: '#services' },
       { label: 'header.repair', href: '#services' },
       { label: 'header.material', href: '#services' },
+      {
+        label: 'header.materialCatalog',
+        href: '/MaterialCatalog',
+        type: 'link',
+      },
     ],
   },
   { label: 'header.contact', href: '/contact', type: 'link' },

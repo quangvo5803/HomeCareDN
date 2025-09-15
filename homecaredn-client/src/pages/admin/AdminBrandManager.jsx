@@ -5,12 +5,12 @@ import Loading from '../../components/Loading';
 import Swal from 'sweetalert2';
 import { useBrand } from '../../hook/useBrand';
 import { Pagination } from 'antd';
-import BrandModal from '../../components/admin/BrandModal';
+import BrandModal from '../../components/modal/BrandModal';
 
 export default function AdminBrandManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 2;
+  const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
@@ -342,16 +342,18 @@ export default function AdminBrandManager() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center py-4">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalBrands}
-                onChange={(page) => setCurrentPage(page)}
-                showSizeChanger={false}
-                size="small"
-              />
-            </div>
+            {totalBrands > 0 && (
+              <div className="flex justify-center py-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalBrands}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false}
+                  size="small"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

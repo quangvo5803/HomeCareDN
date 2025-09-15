@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { brandService } from '../services/brandService';
 import { useAuth } from '../hook/useAuth';
 import BrandContext from './BrandContext';
@@ -49,6 +49,7 @@ export const BrandProvider = ({ children }) => {
       try {
         setLoading(true);
         const newBrand = await brandService.createBrand(dto);
+        setBrands((prev) => [newBrand, ...prev]);
         // Tăng tổng số brand
         setTotalBrands((prev) => prev + 1);
         return newBrand;
@@ -85,6 +86,8 @@ export const BrandProvider = ({ children }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         await brandService.deleteBrand(id);
+        // Xoá khỏi local
+        setBrands((prev) => prev.filter((b) => b.brandID !== id));
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
@@ -92,11 +95,6 @@ export const BrandProvider = ({ children }) => {
     },
     [user?.role]
   );
-
-  // Load brands
-  useEffect(() => {
-    fetchBrands({ PageNumber: 1, PageSize: 10 });
-  }, [fetchBrands]);
 
   const contextValue = useMemo(
     () => ({
