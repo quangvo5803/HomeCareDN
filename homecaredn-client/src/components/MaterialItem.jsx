@@ -1,12 +1,15 @@
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
+import { Link } from 'react-router-dom';
 
 export default function MaterialItem({ item }) {
     const { t, i18n } = useTranslation();
 
+
     return (
-        <article
+        <Link
             key={item.materialID}
+            to={`/MaterialDetail/${item.materialID}`}
             className="flex flex-col h-full overflow-hidden transition border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-md"
         >
             {/* Ảnh */}
@@ -46,7 +49,7 @@ export default function MaterialItem({ item }) {
                 {/* Đẩy nút xuống cuối để các card ngang bằng */}
                 <div className="mt-auto">
                     <a
-                        href={`/materials/${item.materialID}`}
+                        href={`/MaterialDetail/${item.materialID}`}
                         className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
                         aria-label={`${t("home.fact_read_more")} ${item.materialID}`}
                     >
@@ -65,7 +68,7 @@ export default function MaterialItem({ item }) {
                 </div>
             </div>
 
-        </article>
+        </Link>
 
     );
 }

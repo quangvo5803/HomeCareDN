@@ -91,6 +91,12 @@ export default function MaterialTable() {
       const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
       setCurrentPage(lastPage);
     }
+    // fetch lại
+    fetchMaterialsByUserId({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      FilterID: user.id,
+    });
 
     setIsModalOpen(false);
     setEditingMaterial(null);
@@ -98,21 +104,21 @@ export default function MaterialTable() {
 
   if (loading) return <Loading />;
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+    <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
-        <h3 className="font-semibold text-lg text-gray-800">
-          <i className="fa-solid fa-box mr-2"></i>
+        <h3 className="text-lg font-semibold text-gray-800">
+          <i className="mr-2 fa-solid fa-box"></i>
           {t('distributorMaterialManager.title')}
         </h3>
         <button
-          className="text-sm px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-600 transition"
+          className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
           onClick={() => {
             setEditingMaterial(null);
             setIsModalOpen(true);
           }}
         >
-          <i className="fa-solid fa-plus mr-2"></i>
+          <i className="mr-2 fa-solid fa-plus"></i>
           {t('BUTTON.AddNewMaterial')}
         </button>
       </div>
@@ -132,23 +138,23 @@ export default function MaterialTable() {
       <div className="w-full overflow-x-auto">
         <table className="w-full text-sm text-gray-700">
           <thead>
-            <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-              <th className="px-4 py-3 text-center font-semibold uppercase tracking-wide text-xs">
+            <tr className="border-b border-gray-200 bg-gradient-to-r from-gray-50 to-gray-100">
+              <th className="px-4 py-3 text-xs font-semibold tracking-wide text-center uppercase">
                 {t('distributorMaterialManager.no')}
               </th>
-              <th className="px-6 py-3 text-left font-semibold uppercase tracking-wide text-xs">
+              <th className="px-6 py-3 text-xs font-semibold tracking-wide text-left uppercase">
                 {t('distributorMaterialManager.materialName')}
               </th>
-              <th className="px-6 py-3 text-center font-semibold uppercase tracking-wide text-xs">
+              <th className="px-6 py-3 text-xs font-semibold tracking-wide text-center uppercase">
                 {t('distributorMaterialManager.brand')}
               </th>
-              <th className="px-6 py-3 text-center font-semibold uppercase tracking-wide text-xs">
+              <th className="px-6 py-3 text-xs font-semibold tracking-wide text-center uppercase">
                 {t('distributorMaterialManager.category')}
               </th>
-              <th className="px-6 py-3 text-center font-semibold uppercase tracking-wide text-xs">
+              <th className="px-6 py-3 text-xs font-semibold tracking-wide text-center uppercase">
                 {t('distributorMaterialManager.unit')}
               </th>
-              <th className="px-4 py-3 text-center font-semibold uppercase tracking-wide text-xs">
+              <th className="px-4 py-3 text-xs font-semibold tracking-wide text-center uppercase">
                 {t('distributorMaterialManager.action')}
               </th>
             </tr>
@@ -158,28 +164,27 @@ export default function MaterialTable() {
               materials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                  }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">
-                    <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
+                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
                       {(currentPage - 1) * pageSize + index + 1}
                     </span>
                   </td>
 
                   {/* Material Name + Avatar */}
-                  <td className="px-6 py-4 text-left flex items-center gap-3">
+                  <td className="flex items-center gap-3 px-6 py-4 text-left">
                     {material.imageUrls?.length > 0 && material.imageUrls[0] ? (
                       <img
                         src={material.imageUrls[0]}
                         alt={material.name}
-                        className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                        className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
                       />
                     ) : (
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center rounded-lg">
-                        <span className="text-white font-bold text-sm">
+                      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600">
+                        <span className="text-sm font-bold text-white">
                           {material.name.charAt(0)}
                         </span>
                       </div>
@@ -238,10 +243,10 @@ export default function MaterialTable() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="text-center py-4 text-gray-500">
+                <td colSpan={6} className="py-4 text-center text-gray-500">
                   <div className="flex flex-col items-center">
                     <svg
-                      className="w-12 h-12 text-gray-400 mb-4"
+                      className="w-12 h-12 mb-4 text-gray-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -253,17 +258,17 @@ export default function MaterialTable() {
                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                       />
                     </svg>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    <h3 className="mb-1 text-lg font-medium text-gray-900">
                       {t('distributorMaterialManager.noMaterial')}
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="mb-4 text-gray-500">
                       {t('distributorMaterialManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600"
+                      className="px-4 py-2 text-white rounded-lg bg-emerald-500 hover:bg-emerald-600"
                       onClick={() => setIsModalOpen(true)}
                     >
-                      <i className="fa-solid fa-plus mr-3"></i>
+                      <i className="mr-3 fa-solid fa-plus"></i>
                       {t('BUTTON.AddNewMaterial')}
                     </button>
                   </div>

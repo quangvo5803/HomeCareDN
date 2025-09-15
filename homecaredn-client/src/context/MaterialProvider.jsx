@@ -14,12 +14,14 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Public: fetch all material
   const fetchMaterials = useCallback(
-    async ({ PageNumber = 1, PageSize = 10 } = {}) => {
+    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
       try {
         setLoading(true);
         const data = await materialService.getAllMaterial({
           PageNumber,
           PageSize,
+          SortBy,
+          FilterID
         });
         setMaterials(data.items || []);
         setTotalMaterials(data.totalCount || 0);

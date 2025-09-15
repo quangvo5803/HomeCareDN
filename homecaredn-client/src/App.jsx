@@ -24,6 +24,7 @@ import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
 //Home Page
 import MaterialViewAll from './pages/MaterialViewAll';
+import MaterialDetail from './pages/MaterialDetail';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -51,7 +52,7 @@ function Layout() {
   const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
 
   const showHeaderFooter =
-    !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
+    !noHeaderFooterPaths.includes(location.pathname) &&
     (!user ||
       (user.role !== 'Admin' &&
         user.role !== 'Contractor' &&
@@ -86,6 +87,14 @@ function Layout() {
           element={
             <PublicRoute>
               <Contact />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialDetail/:materialID"
+          element={
+            <PublicRoute>
+              <MaterialDetail />
             </PublicRoute>
           }
         />

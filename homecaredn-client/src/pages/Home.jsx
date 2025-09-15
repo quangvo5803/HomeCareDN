@@ -156,36 +156,21 @@ const TESTIMONIALS = [
 export default function Home() {
   const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
-  const { materials } = useMaterial();
-
-  // Ramdom Materials
-  const getRandomInt = (max) => {
-    const array = new Uint32Array(1);
-    crypto.getRandomValues(array);
-    return array[0] % max;
-  };
-
-  const getRandomItemsFast = (array, n) => {
-    if (!Array.isArray(array) || array.length === 0) return [];
-    const result = [];
-    const used = new Set();
-
-    while (result.length < n && result.length < array.length) {
-      const index = getRandomInt(array.length);
-      if (!used.has(index)) {
-        used.add(index);
-        result.push(array[index]);
-      }
-    }
-
-    return result;
-  };
+  const { fetchMaterials } = useMaterial();
 
   useEffect(() => {
-    if (materials.length > 0) {
-      setRandomMaterials(getRandomItemsFast(materials, 6));
-    }
-  }, [materials]);
+    const loadMaterials = async () => {
+      try {
+        const data = await fetchMaterials({ PageNumber: 1, PageSize: 6, SortBy: "random" });
+        setRandomMaterials(data.items || []);
+      } catch (err) {
+        console.error(err);
+        setRandomMaterials([]);
+      }
+    };
+
+    loadMaterials();
+  }, [fetchMaterials]);
 
 
   // Carousel state
@@ -629,8 +614,8 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {materials.length === 0 ? (
-                <p className="text-gray-500">{t("common.no_data")}</p>
+              {randomMaterials.length === 0 ? (
+                <p></p>
               ) : (
                 randomMaterials.map((item) => (
                   <MaterialItem key={item.materialID} item={item} />

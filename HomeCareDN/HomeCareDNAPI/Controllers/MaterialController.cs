@@ -22,10 +22,24 @@ namespace HomeCareDNAPI.Controllers
             return Ok(rs);
         }
 
-        [HttpGet("get-material{id:guid}")]
+        [HttpGet("get-material/{id:guid}")]
         public async Task<IActionResult> GetMaterialById(Guid id)
         {
             var rs = await _facadeService.MaterialService.GetMaterialByIdAsync(id);
+            return Ok(rs);
+        }
+
+        [HttpGet("get-material-bycategory/{id:guid}")]
+        public async Task<IActionResult> GetMaterialByCategory(Guid id)
+        {
+            var rs = await _facadeService.MaterialService.GetMaterialByCategoryAsync(id);
+            return Ok(rs);
+        }
+
+        [HttpGet("get-material-bybrand/{id:guid}")]
+        public async Task<IActionResult> GetMaterialByBrand(Guid id)
+        {
+            var rs = await _facadeService.MaterialService.GetMaterialByBrandAsync(id);
             return Ok(rs);
         }
     }

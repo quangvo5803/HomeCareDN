@@ -9,6 +9,8 @@ namespace BusinessLogic.Services.Interfaces
         Task<PagedResultDto<MaterialDto>> GetAllMaterialByUserIdAsync(QueryParameters parameters);
         Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto);
         Task<MaterialDto> GetMaterialByIdAsync(Guid id);
+        Task<MaterialDto> GetMaterialByCategoryAsync(Guid id);
+        Task<MaterialDto> GetMaterialByBrandAsync(Guid id);
         Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto);
         Task DeleteMaterialAsync(Guid id);
         Task DeleteMaterialImageAsync(string imageUrl);

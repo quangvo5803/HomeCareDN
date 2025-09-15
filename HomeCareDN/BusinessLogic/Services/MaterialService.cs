@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
@@ -32,13 +33,17 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: "Images,Brand,Category"
             );
+            if (parameters.FilterID.HasValue)
+            {
+                query = query.Where(m => m.CategoryID == parameters.FilterID.Value);
+            }
             var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch
             {
                 "materialname" => query.OrderBy(m => m.Name),
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
-                "materialnameen" => query.OrderBy(m => m.NameEN),
-                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
+                "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
                 "random" => query.OrderBy(b => Guid.NewGuid()),
                 _ => query.OrderBy(b => b.NameEN),
             };
@@ -61,7 +66,7 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: "Images,Brand,Category"
-            );
+            );            
             query = query.Where(m => m.UserID == parameters.FilterID.ToString());
             var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch
@@ -76,7 +81,7 @@ namespace BusinessLogic.Services
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
-                .ToListAsync();
+                .ToListAsync(); 
             return new PagedResultDto<MaterialDto>
             {
                 Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
@@ -122,6 +127,39 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+            return _mapper.Map<MaterialDto>(material);
+        }
+
+        public async Task<MaterialDto> GetMaterialByCategoryAsync(Guid id)
+        {
+            var material = await _unitOfWork
+                .MaterialRepository.GetAsync(m => m.CategoryID == id, 
+                includeProperties: "Images,Category,Brand");
+            if (material == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<MaterialDto>(material);
+        }
+
+        public async Task<MaterialDto> GetMaterialByBrandAsync(Guid id)
+        {
+            var material = await _unitOfWork
+                .MaterialRepository.GetAsync(m => m.BrandID == id, 
+                includeProperties: "Images,Category,Brand");
+            
+            if (material == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
             return _mapper.Map<MaterialDto>(material);
         }
 

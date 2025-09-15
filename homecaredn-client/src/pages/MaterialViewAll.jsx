@@ -1,39 +1,46 @@
 import { useMaterial } from '../hook/useMaterial';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pagination } from 'antd';
 import MaterialItem from '../components/MaterialItem';
+import Loading from '../components/Loading';
 export default function MaterialViewAll() {
-    const { t } = useTranslation();
+    const { i18n } = useTranslation();
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5;
+    const [sortOption, setSortOption] = useState('random');
+
+    const pageSize = 9;
     const {
-        materials,
+        materials, totalMaterials, fetchMaterials, loading
     } = useMaterial();
 
-    // Pagination logic
-    const indexOfLastItem = currentPage * pageSize;
-    const indexOfFirstItem = indexOfLastItem - pageSize;
-    const currentMaterials = materials.slice(indexOfFirstItem, indexOfLastItem);
+    useEffect(() => {
+        fetchMaterials({ PageNumber: currentPage, PageSize: pageSize, SortBy: sortOption });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [currentPage, sortOption, fetchMaterials]);
 
-    //hiển thị kết quả
-    const total = materials.length;
-    const start = (currentPage - 1) * pageSize + 1;
-    const end = Math.min(currentPage * pageSize, total);
-
-
+    const start = totalMaterials > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+    const end = Math.min(currentPage * pageSize, totalMaterials);
+    if (loading) return <Loading />;
     return (
         <body className="font-sans text-black bg-white">
             <div className="max-w-[1200px] mx-auto px-4 py-6">
                 <div className="flex flex-col mb-6 md:flex-row md:justify-between md:items-center">
                     <h1 className="text-lg font-bold text-orange-400 md:text-xl">Gạch ốp lát</h1>
                     <div className="flex items-center mt-4 space-x-4 md:mt-0">
-                        <p className="text-sm md:text-base">Hiển thị {start}–{end} của {total} kết quả</p>
+                        <p className="text-sm md:text-base">Hiển thị {start}–{end} của tổng {totalMaterials} sản phẩm</p>
                         <select
                             aria-label="Sort options"
                             className="px-3 py-1 text-sm border border-gray-300 rounded md:text-base"
+                            value={sortOption}
+                            onChange={(e) => {
+                                setSortOption(e.target.value);
+                                setCurrentPage(1);
+                            }}
                         >
-                            <option>Mặc định</option>
+                            <option value="random">Mặc định</option>
+                            <option value={i18n.language === "vi" ? "materialname" : "materialnameen"}>A-Z</option>
+                            <option value={i18n.language === "vi" ? "materialname_desc" : "materialnameen_desc"}>Z-A</option>
                         </select>
                     </div>
                 </div>
@@ -113,17 +120,17 @@ export default function MaterialViewAll() {
                     {/* Products grid */}
                     <section className="grid grid-cols-1 gap-6 md:w-3/4 sm:grid-cols-2 lg:grid-cols-3">
                         {materials && materials.length > 0 ? (
-                            currentMaterials.map((item, index) => (
+                            materials.map((item, index) => (
                                 <>
                                     <MaterialItem key={item.MaterialID} item={item} />
 
                                     {/*  pagination*/}
-                                    {index === currentMaterials.length - 1 && (
+                                    {index === materials.length - 1 && (
                                         <div className="flex justify-center py-4 col-span-full">
                                             <Pagination
                                                 current={currentPage}
                                                 pageSize={pageSize}
-                                                total={materials.length}
+                                                total={totalMaterials}
                                                 onChange={(page) => setCurrentPage(page)}
                                                 showSizeChanger={false}
                                                 size="small"
@@ -133,11 +140,9 @@ export default function MaterialViewAll() {
                                 </>
                             ))
                         ) : (
-                            <p className="text-gray-500 col-span-full">{t('common.no_data')}</p>
+                            <p></p>
                         )}
                     </section>
-
-
                 </div>
 
             </div >
