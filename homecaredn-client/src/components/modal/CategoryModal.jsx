@@ -55,7 +55,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
 
     if (category?.categoryID) {
       data.CategoryID = category.categoryID;
-      data.IsActive = isActive;
+      data.IsActive = user?.role === 'Admin' ? isActive : false;
     } else {
       data.IsActive = user?.role === 'Admin';
       data.UserID = user?.id;
