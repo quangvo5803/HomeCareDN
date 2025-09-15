@@ -26,6 +26,7 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
@@ -47,7 +48,7 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/login', '/register', '/verifyotp'];
+  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
 
   const showHeaderFooter =
     !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
@@ -61,17 +62,41 @@ function Layout() {
       {showHeaderFooter && <Header />}
       <Routes>
         {/* Public routes */}
-        <Route path="/Home" element={<Home />} />
-        <Route path="/About" element={<About />} />
-        <Route path="/Contact" element={<Contact />} />
-        <Route path="/MaterialsCatalog" element={<Materials />} />
-        <Route path="/Materials/:id" element={<MaterialDetail />} />
+        {/* Home */}
+        <Route
+          path="/Home"
+          element={
+            <PublicRoute>
+              <Home />
+            </PublicRoute>
+          }
+        />
+        {/* About Us */}
+        <Route
+          path="/About"
+          element={
+            <PublicRoute>
+              <About />
+            </PublicRoute>
+          }
+        />
+        {/* Contact Us */}
+        <Route
+          path="/Contact"
+          element={
+            <PublicRoute>
+              <Contact />
+            </PublicRoute>
+          }
+        />
+        {/* Login */}
         <Route
           path="/Login"
           element={
             !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
           }
         />
+        {/* Register */}
         <Route
           path="/Register"
           element={
@@ -82,6 +107,7 @@ function Layout() {
             )
           }
         />
+        {/* Verify OTP */}
         <Route
           path="/VerifyOTP"
           element={
@@ -126,19 +152,14 @@ function Layout() {
         >
           <Route index element={<DistributorDashboard />} />
           <Route
-            path="material-manager"
+            path="MaterialManager"
             element={<DistributorMaterialManager />}
           />
         </Route>
+
         {/* Redirect root → /home */}
         <Route
-          path="/"
-          element={
-            <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
-          }
-        />
-        <Route
-          path="*"
+          index
           element={
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }

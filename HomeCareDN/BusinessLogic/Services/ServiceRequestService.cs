@@ -119,8 +119,7 @@ namespace BusinessLogic.Services.Interfaces
             {
                 throw new CustomValidationException(errors);
             }
-
-            serviceRequest.PatchFrom(updateRequestDto);
+            _mapper.Map(serviceRequest, updateRequestDto);
 
             await _unitOfWork.SaveAsync();
             // Delete existing images

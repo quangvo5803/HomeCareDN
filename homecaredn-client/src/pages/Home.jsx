@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import PropTypes from 'prop-types';
 import SupportChatWidget from '../components/SupportChatWidget';
 import Reveal from '../components/Reveal';
 import { Link, useNavigate } from 'react-router-dom';
@@ -136,57 +135,6 @@ const SERVICE_ITEMS = [
     href: '#',
   },
 ];
-
-// const MATERIALS = [
-//   {
-//     id: 'Cement',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830746/28b970d7-6ada-4c01-a83e-17e4e068537a.png',
-//     titleKey: 'Cement',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Wood',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830852/ac2be91c-2038-41ac-8878-0759bd25a803.png',
-//     titleKey: 'Wood',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Iron',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830632/978e5e3d-3d50-4949-b2d2-fbb93a3ae22a.png',
-//     titleKey: 'Iron',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'ceramic tiles',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830684/81028f90-f24c-480f-a510-6c4c45d8c708.png',
-//     titleKey: 'Ceramic tiles',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'Tools',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830818/0722b748-038c-45de-8132-d65d36433d9b.png',
-//     titleKey: 'Tools',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-//   {
-//     id: 'water pipe',
-//     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1755830902/6e964ad1-e1d8-43c7-bed2-aff7be26fdd7.png',
-//     titleKey: 'Water pipe',
-//     descKey:
-//       'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-//     href: '#',
-//   },
-// ];
 
 const TESTIMONIALS = [
   {

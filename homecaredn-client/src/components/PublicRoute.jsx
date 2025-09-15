@@ -1,22 +1,24 @@
-// src/components/ProtectedRoute.js
+// src/components/PublicOnlyRoute.js
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hook/useAuth';
 import PropTypes from 'prop-types';
 import Loading from '../components/Loading';
 
-export default function ProtectedRoute({ children, allowedRoles }) {
+export default function PublicRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <Loading />;
+
   if (!user) {
-    return <Navigate to="/Login" replace />;
+    return children;
   }
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={getRedirectPath(user)} replace />;
+  if (user.role === 'Customer') {
+    return children;
   }
 
-  return children;
+  return <Navigate to={getRedirectPath(user)} replace />;
 }
+
 function getRedirectPath(user) {
   switch (user?.role) {
     case 'Admin':
@@ -29,8 +31,6 @@ function getRedirectPath(user) {
       return '/Home';
   }
 }
-
-ProtectedRoute.propTypes = {
+PublicRoute.propTypes = {
   children: PropTypes.node.isRequired,
-  allowedRoles: PropTypes.arrayOf(PropTypes.string),
 };

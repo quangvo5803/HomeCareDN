@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Services.FacadeService;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers
@@ -15,9 +16,9 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("get-all-categories")]
-        public async Task<IActionResult> GetAllCategories()
+        public async Task<IActionResult> GetAllCategories([FromQuery] QueryParameters query)
         {
-            var categories = await _facadeService.CategoryService.GetAllCategories();
+            var categories = await _facadeService.CategoryService.GetAllCategories(query);
             return Ok(categories);
         }
 
