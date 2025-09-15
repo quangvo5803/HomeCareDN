@@ -443,6 +443,61 @@
     "Admin": "Quản trị viên",
     "Customer": "Khách hàng"
   },
+  "profile": {
+    "tabs": { "profile": "Hồ sơ", "service_requests": "Quản lý yêu cầu dịch vụ" },
+    "title": "Hồ sơ của bạn",
+    "addresses": "Địa chỉ của bạn",
+    "subtitle": "Quản lý thông tin và dịch vụ",
+    "form": {
+      "full_name": "Họ và tên",
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "email": "Email",
+      "email_readonly": "Email (không thể thay đổi)",
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu..."
+    },
+    "gender": { "none": "—", "male": "Nam", "female": "Nữ", "other": "Khác" },
+    "update_success": "Cập nhật hồ sơ thành công",
+    "update_error": "Cập nhật hồ sơ thất bại",
+    "service_requests": {
+      "title": "Quản lý yêu cầu dịch vụ",
+      "placeholder": "Nhúng form yêu cầu dịch vụ của bạn ở đây…"
+    },
+    "back": "Quay lại"
+  },
+  "address": {
+    "title": "Địa chỉ của tôi",
+    "loading": "Đang tải…",
+    "empty": "Chưa có địa chỉ",
+    "edit": "Sửa",
+    "delete": "Xoá",
+    "confirm_delete": "Xoá địa chỉ này?",
+    "delete_success": "Đã xoá địa chỉ",
+    "delete_error": "Xoá địa chỉ thất bại",
+    "load_error": "Không tải được địa chỉ",
+    "add_success": "Đã thêm địa chỉ",
+    "update_success": "Đã cập nhật địa chỉ",
+    "save_error": "Lưu địa chỉ thất bại",
+    "saving": "Đang lưu…",
+    "cancel": "Huỷ",
+    "add_button": "Thêm địa chỉ",
+    "update_button": "Cập nhật địa chỉ",
+    "detail_placeholder": "Địa chỉ chi tiết (số nhà, đường…)",
+    "subtitle": "Địa chỉ",
+    "preview_label": "Xem trước địa chỉ",
+    "select": {
+      "province": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "ward": "Phường/Xã",
+      "choose": "— Chọn —"
+    },
+    "preview": {
+      "city": "Thành phố",
+      "district": "Quận/Huyện",
+      "ward": "Phường/Xã"
+    }
+  },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
     "address": {

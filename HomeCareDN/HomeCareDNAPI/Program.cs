@@ -13,10 +13,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Ultitity.Clients.Groqs;
+using Ultitity.Clients.Provinces;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
-using Ultitity.LLM;
 using Ultitity.Options;
 
 namespace HomeCareDNAPI
@@ -103,9 +104,20 @@ namespace HomeCareDNAPI
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             });
 
+            //Client VietnamProvinces
+            builder.Services.AddHttpClient<IVietnamProvincesClient, VietnamProvincesClient>();
+
+            builder
+                .Services.AddOptions<VietnamProvincesOptions>()
+                .Bind(builder.Configuration.GetSection("VietnamProvincesApi"))
+                .Validate(o => Uri.TryCreate(o.BaseUrl, UriKind.Absolute, out _), "Invalid BaseUrl")
+                .Validate(o => o.DefaultDepth is 1 or 2, "DefaultDepth must be 1 or 2")
+                .ValidateOnStart();
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
             builder.Services.AddSingleton<EmailSender>();
             builder.Services.AddHostedService<BackgroundEmailSender>();

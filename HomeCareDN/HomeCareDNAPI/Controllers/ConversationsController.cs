@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BusinessLogic.DTOs.Chat.User;
+using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

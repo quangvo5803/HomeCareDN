@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.DTOs.Chat.User
+﻿namespace BusinessLogic.DTOs.Application.Chat.User
 {
     public class SendMessageRequestDto
     {

@@ -1,10 +1,9 @@
 ﻿using System.Text.Json;
-using BusinessLogic.DTOs.Chat;
-using BusinessLogic.DTOs.Chat.Ai;
+using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
-using Ultitity.LLM;
+using Ultitity.Clients.Groqs;
 
 namespace BusinessLogic.Services
 {

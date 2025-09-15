@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hook/useAuth';
 import ReactCountryFlag from 'react-country-flag';
@@ -29,36 +29,60 @@ const navItems = [
 export default function Header() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [openLang, setOpenLang] = useState(false);
   const [openAvatarMenu, setOpenAvatarMenu] = useState(false);
 
-  const toggleServices = () => setIsServicesOpen(!isServicesOpen);
-  const changeLanguage = (lng) => {
-    i18n.changeLanguage(lng);
-    setOpenLang(false);
+  const langRef = useRef(null);
+  const avatarRef = useRef(null);
 
+  const toggleServices = () => setIsServicesOpen((v) => !v);
+
+  const closeMobileNav = () => {
     const navToggle = document.getElementById('nav-toggle');
     if (navToggle) navToggle.checked = false;
   };
-  const handleProfile = () => {
-    setOpenAvatarMenu(false);
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+    setOpenLang(false);
+    closeMobileNav();
   };
 
   const handleLogout = () => {
     logout();
     setOpenAvatarMenu(false);
+    closeMobileNav();
+    navigate('/login', { replace: true });
   };
 
+  // Close popovers when clicking outside / pressing Esc
+  useEffect(() => {
+    const onDown = (e) => {
+      if (openLang && langRef.current && !langRef.current.contains(e.target)) {
+        setOpenLang(false);
+      }
+      if (openAvatarMenu && avatarRef.current && !avatarRef.current.contains(e.target)) {
+        setOpenAvatarMenu(false);
+      }
+    };
+    const onKey = (e) => e.key === 'Escape' && (setOpenLang(false), setOpenAvatarMenu(false));
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [openLang, openAvatarMenu]);
+
   return (
-    <header
-      id="top"
-      className="sticky top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm"
-    >
+    <header id="top" className="sticky top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <nav className="max-w-screen-2xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
-          <a href="/" className="flex items-center group">
+          <Link to="/" className="flex items-center group" aria-label="Home">
             <div className="w-32 h-16 rounded-xl overflow-hidden group-hover:scale-110 transition-transform duration-300">
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
@@ -66,7 +90,7 @@ export default function Header() {
                 className="w-full h-full object-contain"
               />
             </div>
-          </a>
+          </Link>
 
           {/* Search Bar (Desktop) */}
           <div className="hidden lg:flex flex-1">
@@ -95,7 +119,10 @@ export default function Header() {
                     </Link>
                   ) : (
                     <>
-                      <button className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none">
+                      <button
+                        type="button"
+                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none"
+                      >
                         {t(item.label)}
                         <i className="ml-2 fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180" />
                       </button>
@@ -121,29 +148,38 @@ export default function Header() {
             <div className="flex items-center gap-4">
               {/* Avatar */}
               {user ? (
-                <div className="relative">
+                <div className="relative" ref={avatarRef}>
                   <button
-                    onClick={() => setOpenAvatarMenu(!openAvatarMenu)}
+                    type="button"
+                    onClick={() => setOpenAvatarMenu((v) => !v)}
                     className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 hover:border-blue-500 transition-all"
+                    aria-haspopup="menu"
+                    aria-expanded={openAvatarMenu}
+                    title={t('partnerDashboard.account')}
                   >
                     <img
-                      src={`https://ui-avatars.com/api/?name=${user.email}&background=random`}
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || 'User')}&background=random`}
                       alt="avatar"
                       className="w-full h-full object-cover"
                     />
                   </button>
                   {openAvatarMenu && (
-                    <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border z-50">
-                      <button
-                        onClick={handleProfile}
+                    <div role="menu" className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border z-50">
+                      <Link
+                        to="/profile"
+                        relative="path"
+                        onClick={() => setOpenAvatarMenu(false)}
                         className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        role="menuitem"
                       >
                         <i className="fa-solid fa-user me-2"></i>
                         {t('header.profile')}
-                      </button>
+                      </Link>
                       <button
+                        type="button"
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                        role="menuitem"
                       >
                         <i className="fa-solid fa-right-from-bracket me-2"></i>
                         {t('header.logout')}
@@ -153,10 +189,7 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex gap-3">
-                  <Link
-                    to="/Login"
-                    className="text-white bg-blue-700 hover:bg-blue-800 px-5 py-2.5 rounded-lg"
-                  >
+                  <Link to="/Login" className="text-white bg-blue-700 hover:bg-blue-800 px-5 py-2.5 rounded-lg">
                     {t('BUTTON.Login')}
                   </Link>
                   <Link
@@ -169,35 +202,34 @@ export default function Header() {
               )}
 
               {/* 🌐 Language Switcher (Desktop) */}
-              <div className="relative">
+              <div className="relative" ref={langRef}>
                 <button
-                  onClick={() => setOpenLang(!openLang)}
+                  type="button"
+                  onClick={() => setOpenLang((v) => !v)}
                   className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-gray-50 border border-gray-300 hover:border-blue-500 rounded-full transition-all duration-300"
+                  aria-haspopup="menu"
+                  aria-expanded={openLang}
                 >
-                  <i className="fas fa-globe group-hover:scale-110 transition-transform duration-200" />
+                  <i className="fas fa-globe" />
                 </button>
                 {openLang && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1">
+                  <div role="menu" className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1 z-50">
                     <button
+                      type="button"
                       onClick={() => changeLanguage('en')}
                       className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
+                      role="menuitem"
                     >
-                      <ReactCountryFlag
-                        countryCode="US"
-                        svg
-                        className="text-lg"
-                      />
+                      <ReactCountryFlag countryCode="US" svg className="text-lg" />
                       <span>English</span>
                     </button>
                     <button
+                      type="button"
                       onClick={() => changeLanguage('vi')}
                       className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
+                      role="menuitem"
                     >
-                      <ReactCountryFlag
-                        countryCode="VN"
-                        svg
-                        className="text-lg"
-                      />
+                      <ReactCountryFlag countryCode="VN" svg className="text-lg" />
                       <span>Tiếng Việt</span>
                     </button>
                   </div>
@@ -234,17 +266,19 @@ export default function Header() {
                 {navItems.map((item) => (
                   <li key={item.label}>
                     {item.type === 'link' ? (
-                      <a
-                        href={item.href}
+                      <Link
+                        to={item.href}
+                        onClick={closeMobileNav}
                         className="flex items-center py-3 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200 group"
                       >
                         <span className="group-hover:translate-x-1 transition-transform duration-200">
                           {t(item.label)}
                         </span>
-                      </a>
+                      </Link>
                     ) : (
                       <div className="bg-gray-50 rounded-lg overflow-hidden">
                         <button
+                          type="button"
                           onClick={toggleServices}
                           className="w-full flex justify-between items-center py-3 px-3 text-gray-700 hover:text-blue-600 font-medium transition-all duration-200"
                         >
@@ -261,6 +295,7 @@ export default function Header() {
                               <li key={subItem.label}>
                                 <a
                                   href={subItem.href}
+                                  onClick={closeMobileNav}
                                   className="block py-2 px-6 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                                 >
                                   {t(subItem.label)}
@@ -279,16 +314,18 @@ export default function Header() {
               <div className="border-t border-gray-100 pt-4 space-y-2">
                 {user ? (
                   <div className="flex gap-2">
-                    <button
-                      onClick={handleProfile}
-                      className="flex-1 py-2 px-3 text-sm text-gray-700 bg-gray-50 border border-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                    <Link
+                      to="/profile"
+                      onClick={closeMobileNav}
+                      className="flex-1 py-2 px-3 text-sm text-gray-700 bg-gray-50 border border-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-center"
                     >
                       <i className="fa-solid fa-user me-2"></i>
                       {t('header.profile')}
-                    </button>
+                    </Link>
                     <button
+                      type="button"
                       onClick={handleLogout}
-                      className="flex-1 py-2 px-3 text-sm text-white bg-red-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                      className="flex-1 py-2 px-3 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200"
                     >
                       <i className="fa-solid fa-right-from-bracket me-2"></i>
                       {t('header.logout')}
@@ -298,12 +335,14 @@ export default function Header() {
                   <div className="flex gap-2">
                     <Link
                       to="/Login"
+                      onClick={closeMobileNav}
                       className="flex-1 py-2 px-3 text-sm text-center text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                     >
                       {t('BUTTON.Login')}
                     </Link>
                     <Link
                       to="/Register"
+                      onClick={closeMobileNav}
                       className="flex-1 py-2 px-3 text-sm text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                     >
                       {t('BUTTON.Register')}
@@ -314,25 +353,19 @@ export default function Header() {
                 {/* Compact Language Selector */}
                 <div className="flex gap-2 mt-3">
                   <button
+                    type="button"
                     onClick={() => changeLanguage('en')}
                     className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
                   >
-                    <ReactCountryFlag
-                      countryCode="US"
-                      svg
-                      className="text-lg"
-                    />
+                    <ReactCountryFlag countryCode="US" svg className="text-lg" />
                     <span className="text-sm font-medium">EN</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => changeLanguage('vi')}
                     className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
                   >
-                    <ReactCountryFlag
-                      countryCode="VN"
-                      svg
-                      className="text-lg"
-                    />
+                    <ReactCountryFlag countryCode="VN" svg className="text-lg" />
                     <span className="text-sm font-medium">VI</span>
                   </button>
                 </div>

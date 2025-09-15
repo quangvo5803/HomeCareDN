@@ -448,7 +448,61 @@
     "Admin": "Admin",
     "Customer": "Customer"
   },
-
+  "profile": {
+    "tabs": { "profile": "Profile", "service_requests": "Service Request Management" },
+    "title": "Your profile",
+    "addresses": "Your addresses",
+    "subtitle": "Profile and services",
+    "form": {
+      "full_name": "Full name",
+      "phone": "Phone number",
+      "gender": "Gender",
+      "email" : "Email",
+      "email_readonly": "Email (cannot be changed)",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "gender": { "none": "—", "male": "Male", "female": "Female", "other": "Other" },
+    "update_success": "Profile updated successfully",
+    "update_error": "Profile update failed",
+    "service_requests": {
+      "title": "Service Request Management",
+      "placeholder": "Embed your service request form here…"
+    },
+      "back": "Back"
+  },
+  "address": {
+    "title": "My addresses",
+    "loading": "Loading…",
+    "empty": "No address yet",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm_delete": "Delete this address?",
+    "delete_success": "Address deleted",
+    "delete_error": "Failed to delete address",
+    "load_error": "Failed to load addresses",
+    "add_success": "Address added",
+    "update_success": "Address updated",
+    "save_error": "Failed to save address",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "add_button": "Add address",
+    "update_button": "Update address",
+    "detail_placeholder": "Detailed address (house no., street…)",
+    "subtitle": "Addresses",
+    "preview_label": "Preview",
+    "select": {
+      "province": "Province/City",
+      "district": "District",
+      "ward": "Ward",
+      "choose": "— Select —"
+    },
+    "preview": {
+      "city": "City",
+      "district": "District",
+      "ward": "Ward"
+    }
+  },
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
@@ -480,6 +534,7 @@
   "BUTTON": {
     "Login": "Login",
     "Register": "Register",
+    "CreateAccount": "Create Account",
     "SendOTP": "Send OTP Code",
     "MoreDetails": "More Details",
     "LoginGoogle": "Login with Google",

@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.DTOs.Chat.Ai
+﻿namespace BusinessLogic.DTOs.Application.Chat.Ai
 {
     public class AiChatRequestDto
     {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
-using BusinessLogic.DTOs.Chat;
-using BusinessLogic.DTOs.Chat.User;
+using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
