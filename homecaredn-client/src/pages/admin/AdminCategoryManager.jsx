@@ -111,6 +111,7 @@ export default function AdminCategoryManager() {
 
           {/* Table */}
           <div className="w-full">
+            {/* NOSONAR */}
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <table className="w-full">

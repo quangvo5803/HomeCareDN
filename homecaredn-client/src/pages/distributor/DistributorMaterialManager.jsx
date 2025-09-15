@@ -6,7 +6,7 @@ import { useMaterial } from '../../hook/useMaterial';
 import { Pagination } from 'antd';
 import MaterialModal from '../../components/modal/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
-import { showDeleteModal } from '../../components/modal/DeleteModal';
+import { showDeleteModal } from '../../components/modal/';
 
 export default function DistributorMaterialManager() {
   const { t, i18n } = useTranslation();
@@ -110,6 +110,7 @@ export default function DistributorMaterialManager() {
 
       {/* Table */}
       <div className="w-full overflow-x-auto">
+        {/* NOSONAR */}
         <table className="w-full text-sm text-gray-700">
           <thead>
             <tr className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">

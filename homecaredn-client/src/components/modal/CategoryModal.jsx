@@ -51,7 +51,6 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
     const data = {
       CategoryName: categoryName,
       CategoryNameEN: categoryNameEN,
-      UserID: user?.id,
     };
 
     if (category?.categoryID) {
@@ -59,6 +58,7 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
       data.IsActive = isActive;
     } else {
       data.IsActive = user?.role === 'Admin';
+      data.UserID = user?.id;
     }
     if (logoFile) {
       data.LogoFile = logoFile;
@@ -218,6 +218,8 @@ CategoryModal.propTypes = {
     categoryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     categoryName: PropTypes.string,
     categoryNameEN: PropTypes.string,
+    categoryLogo: PropTypes.string,
+    isActive: PropTypes.bool,
   }),
 };
 
