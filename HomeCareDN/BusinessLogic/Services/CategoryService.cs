@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -84,6 +85,12 @@ namespace BusinessLogic.Services
             await _unitOfWork.CategoryRepository.AddAsync(category);
             if (requestDto.LogoFile != null)
             {
+                var errors = new Dictionary<string, string[]>();
+                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                {
+                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+                    throw new CustomValidationException(errors);
+                }
                 Image imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
@@ -118,6 +125,11 @@ namespace BusinessLogic.Services
             _mapper.Map(requestDto, category);
             if (requestDto.LogoFile != null)
             {
+                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                {
+                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+                    throw new CustomValidationException(errors);
+                }
                 var existingImage = await _unitOfWork.ImageRepository.GetAsync(img =>
                     img.CategoryID == category.CategoryID
                 );
