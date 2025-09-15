@@ -4,7 +4,7 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IProfileService
     {
-        Task<ProfileDto> GetMineAsync();
-        Task UpdateAsync(UpdateProfileDto dto);
+        Task<ProfileDto> GetProfileByIdAsync(string userId);
+        Task UpdateProfileByIdAsync(UpdateProfileDto dto);
     }
 }

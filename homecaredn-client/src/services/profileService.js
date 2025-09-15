@@ -1,6 +1,6 @@
 import api from '../api';
 
 export const profileService = {
-  getMine: () => api.get('/Profile'),
-  update: (payload) => api.put('/Profile', payload),
+  getByUser: (userId) => api.get(`/Profile/get-profile/${userId}`),
+  updateByUser: (payload) => api.put(`/Profile/update-profile`, payload),
 };

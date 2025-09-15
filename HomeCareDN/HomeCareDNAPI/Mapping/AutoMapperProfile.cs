@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.Chat.User;
@@ -28,7 +26,7 @@ namespace HomeCareDNAPI.Mapping
             MapEnumsToString();
 
             // ------------------------
-            // Create/Update DTO -> Entity (Write)
+            // Create DTO -> Entity (Write)
             // ------------------------
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -47,17 +45,37 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<BrandCreateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
-            CreateMap<CreateAddressDto, Address>()
-                .ForMember(d => d.Id, opt => opt.Ignore())
-                .ForMember(d => d.UserId, opt => opt.Ignore())
-                .ForMember(d => d.User, opt => opt.Ignore());
+            CreateMap<CreateAddressDto, Address>();
+
+            // ------------------------
+            // Update DTO -> Entity (Write)
+            // ------------------------
+            CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
             CreateMap<UpdateAddressDto, Address>()
-                .ForMember(d => d.Id, opt => opt.Ignore())
-                .ForMember(d => d.UserId, opt => opt.Ignore())
-                .ForMember(d => d.User, opt => opt.Ignore());
+                // Ignore AddressId and UserId to prevent overwriting them
+                .ForMember(d => d.AddressId, opt => opt.Ignore())
+                .ForMember(d => d.UserId, opt => opt.Ignore());
 
             CreateMap<UpdateProfileDto, ApplicationUser>()
+                // Ignore Id to prevent overwriting them
+                .ForMember(d => d.Id, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ServiceUpdateRequestDto, Service>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<MaterialUpdateRequestDto, Material>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+
+            CreateMap<CategoryUpdateRequestDto, Category>();
+
+            CreateMap<BrandUpdateRequestDto, Brand>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+
             // ------------------------
             // Entity -> DTO (Read / Response)
             // ------------------------
@@ -114,7 +132,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<ApplicationUser, ProfileDto>()
                 .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
-                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? ""));
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty));
 
             //Chat DTOs
             CreateMap<StartConversationRequestDto, Conversation>()

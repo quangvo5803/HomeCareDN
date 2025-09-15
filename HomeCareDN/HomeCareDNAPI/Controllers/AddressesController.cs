@@ -1,4 +1,6 @@
-﻿using BusinessLogic.DTOs.Authorize.Address;
+﻿using System;
+using System.Threading.Tasks;
+using BusinessLogic.DTOs.Authorize.Address;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -8,37 +10,41 @@ namespace HomeCareDNAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
 public class AddressesController : ControllerBase
 {
     private readonly IAddressService _addressService;
 
     public AddressesController(IAddressService addressService) => _addressService = addressService;
 
-    [HttpGet]
-    public async Task<IActionResult> GetMine() => Ok(await _addressService.GetMineAsync());
+    // Lấy tất cả địa chỉ theo userId (không dùng claims)
+    // GET: api/addresses/by-user/{userId}
+    [HttpGet("address-by-user/{userId}")]
+    public async Task<IActionResult> GetAddressByUserId([FromRoute] string userId) =>
+        Ok(await _addressService.GetAddressByUserIdAsync(userId));
 
-    [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id) => Ok(await _addressService.GetByIdAsync(id));
-
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateAddressDto dto)
+    [HttpPost("create-address-by-user")]
+    public async Task<IActionResult> CreateAddress([FromBody] CreateAddressDto dto)
     {
-        var created = await _addressService.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        var created = await _addressService.CreateAddressByUserIdAsync(dto);
+        return Ok(created);
     }
 
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateAddressDto dto)
+    // Cập nhật địa chỉ theo AddressId (body phải chứa AddressId trùng route)
+    // PUT: api/addresses/{id}
+    [HttpPut("update-address")]
+    public async Task<IActionResult> UpdateAddress([FromBody] UpdateAddressDto dto)
     {
-        await _addressService.UpdateAsync(id, dto);
-        return NoContent();
+        var updated = await _addressService.UpdateAddressAsync(dto);
+        return Ok(updated);
     }
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    // Xóa địa chỉ theo AddressId
+    // DELETE: api/addresses/{id}
+    [HttpDelete("delete-address/{id:guid}")]
+    public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
-        await _addressService.DeleteAsync(id);
+        await _addressService.DeleteAddressAsync(id);
         return NoContent();
     }
 }

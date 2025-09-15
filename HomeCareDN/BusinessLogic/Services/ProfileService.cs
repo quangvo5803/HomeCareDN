@@ -1,9 +1,9 @@
-﻿using System.Security.Claims;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using BusinessLogic.DTOs.Authorize.Profiles;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
@@ -13,59 +13,74 @@ namespace BusinessLogic.Services
     public class ProfileService : IProfileService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IHttpContextAccessor _http;
         private readonly IMapper _mapper;
 
         private const string ACCOUNT_STR = "Account";
         private const string ERROR_ACCOUNT_NOT_FOUND = "ERROR_ACCOUNT_NOT_FOUND";
+        private const string ERROR_USER_ID_MISMATCH = "USER_ID_MISMATCH";
+        private const string ERROR_UPDATE_FAIL = "UPDATE_FAIL";
 
-        public ProfileService(
-            UserManager<ApplicationUser> userManager,
-            IHttpContextAccessor http,
-            IMapper mapper
-        )
+        public ProfileService(UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _userManager = userManager;
-            _http = http;
             _mapper = mapper;
         }
 
-        private string CurrentUserId =>
-            _http.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)
-            ?? throw new UnauthorizedAccessException();
-
-        public async Task<ProfileDto> GetMineAsync()
+        public async Task<ProfileDto> GetProfileByIdAsync(string userId)
         {
-            var user =
-                await _userManager
-                    .Users.AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.Id == CurrentUserId)
-                ?? throw new UnauthorizedAccessException();
+            var user = await _userManager
+                .Users.AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user is null)
+            {
+                var dict = new Dictionary<string, string[]>
+                {
+                    { ACCOUNT_STR, new[] { ERROR_ACCOUNT_NOT_FOUND } },
+                };
+                throw new CustomValidationException(dict);
+            }
 
             var dto = _mapper.Map<ProfileDto>(user);
-            dto.Roles = (await _userManager.GetRolesAsync(user)).ToList(); // Roles không ProjectTo được
+            dto.Roles = (await _userManager.GetRolesAsync(user)).ToList(); // take role
             return dto;
         }
 
-        public async Task UpdateAsync(UpdateProfileDto dto)
+        public async Task UpdateProfileByIdAsync(UpdateProfileDto dto)
         {
-            var user =
-                await _userManager.FindByIdAsync(CurrentUserId)
-                ?? throw new UnauthorizedAccessException();
+            // indentify user
+            if (string.IsNullOrWhiteSpace(dto.UserId))
+            {
+                var dict = new Dictionary<string, string[]>
+                {
+                    { ACCOUNT_STR, new[] { ERROR_USER_ID_MISMATCH } },
+                };
+                throw new CustomValidationException(dict);
+            }
 
-            _mapper.Map(dto, user);
+            var user = await _userManager.FindByIdAsync(dto.UserId);
+            if (user is null)
+            {
+                var dict = new Dictionary<string, string[]>
+                {
+                    { ACCOUNT_STR, new[] { ERROR_ACCOUNT_NOT_FOUND } },
+                };
+                throw new CustomValidationException(dict);
+            }
 
+            _mapper.Map(dto, user); // AutoMapper already ignores overwrite
             var result = await _userManager.UpdateAsync(user);
+
             if (!result.Succeeded)
             {
-                var dict = result
-                    .Errors.GroupBy(e => e.Code ?? "Account")
+                var errors = result
+                    .Errors.GroupBy(e => e.Code ?? ACCOUNT_STR)
                     .ToDictionary(
                         g => g.Key,
-                        g => g.Select(e => e.Description ?? "Update failed").ToArray()
+                        g => g.Select(e => e.Description ?? ERROR_UPDATE_FAIL).ToArray()
                     );
 
-                throw new CustomValidationException(dict);
+                throw new CustomValidationException(errors);
             }
         }
     }

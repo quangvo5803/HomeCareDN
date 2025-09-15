@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
 import Swal from 'sweetalert2';
 import { useBrand } from '../../hook/useBrand';
@@ -9,12 +8,15 @@ import { Pagination } from 'antd';
 import BrandModal from '../../components/admin/BrandModal';
 
 export default function AdminBrandManager() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
   const { t, i18n } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 2;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingBrand, setEditingBrand] = useState(null);
 
   const {
     brands,
+    totalBrands,
     loading,
     fetchBrands,
     createBrand,
@@ -22,29 +24,11 @@ export default function AdminBrandManager() {
     deleteBrand,
   } = useBrand();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
-
-  // Fetch brands khi vào trang
+  // Load brands khi page change
   useEffect(() => {
-    fetchBrands();
-  }, [fetchBrands]);
+    fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
+  }, [currentPage, fetchBrands]);
 
-  // Pagination logic
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentBrands = brands.slice(indexOfFirstItem, indexOfLastItem);
-
-  if (currentPage > 1 && currentBrands.length === 0) {
-    setCurrentPage(currentPage - 1);
-  }
-
-  // View Brand
-  const handleView = (brand) => {
-    alert(`Xem thông tin brand: ${brand.brandName}`);
-  };
-
-  // Delete Brand
   const handleDelete = async (brandId) => {
     Swal.fire({
       title: t('ModalPopup.DeleteBrandModal.title'),
@@ -62,39 +46,40 @@ export default function AdminBrandManager() {
             title: t('ModalPopup.DeletingLoadingModal.title'),
             text: t('ModalPopup.DeletingLoadingModal.text'),
             allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
+            didOpen: () => Swal.showLoading(),
           });
           await deleteBrand(brandId);
+          const lastPage = Math.ceil((totalBrands - 1) / pageSize);
+          if (currentPage > lastPage) {
+            setCurrentPage(lastPage || 1);
+          } else {
+            fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
+          }
           Swal.close();
           toast.success(t('SUCCESS.DELETE'));
-        } catch (err) {
+        } catch {
           Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
         }
       }
     });
   };
 
-  // Save Brand (Create / Update)
   const handleSave = async (brandData) => {
-    try {
-      if (brandData.BrandID) {
-        await updateBrand(brandData);
-        toast.success(t('SUCCESS.BRAND_UPDATE'));
-      } else {
-        await createBrand(brandData);
-        setCurrentPage(1);
-        toast.success(t('SUCCESS.BRAND_ADD'));
-      }
-      setIsModalOpen(false);
-      setEditingBrand(null);
-    } catch (err) {
-      if (err.handled) return;
-      toast.error(handleApiError(err));
+    if (brandData.BrandID) {
+      await updateBrand(brandData, {
+        PageNumber: currentPage,
+        PageSize: pageSize,
+      });
+      toast.success(t('SUCCESS.BRAND_UPDATE'));
+    } else {
+      await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
+      toast.success(t('SUCCESS.BRAND_ADD'));
+      const lastPage = Math.ceil((totalBrands + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
+
+    setIsModalOpen(false);
+    setEditingBrand(null);
   };
 
   if (loading) return <Loading />;
@@ -118,7 +103,7 @@ export default function AdminBrandManager() {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">
-                {brands?.length || 0} {t('adminBrandManager.brands')}
+                {totalBrands || 0} {t('adminBrandManager.brands')}
               </span>
             </div>
             <button
@@ -164,7 +149,7 @@ export default function AdminBrandManager() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {brands && brands.length > 0 ? (
-                    currentBrands.map((brand, index) => (
+                    brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
                         className={`hover:bg-gray-50 transition-colors duration-150 ${
@@ -173,7 +158,7 @@ export default function AdminBrandManager() {
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
@@ -209,12 +194,6 @@ export default function AdminBrandManager() {
                         <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">
                             <button
-                              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                              onClick={() => handleView(brand)}
-                            >
-                              {t('BUTTON.View')}
-                            </button>
-                            <button
                               className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
                                 setEditingBrand(brand);
@@ -223,12 +202,14 @@ export default function AdminBrandManager() {
                             >
                               {t('BUTTON.Edit')}
                             </button>
-                            <button
-                              className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                              onClick={() => handleDelete(brand.brandID)}
-                            >
-                              {t('BUTTON.Delete')}
-                            </button>
+                            {brand.materials.length === 0 && (
+                              <button
+                                className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                                onClick={() => handleDelete(brand.brandID)}
+                              >
+                                {t('BUTTON.Delete')}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -275,7 +256,7 @@ export default function AdminBrandManager() {
             <div className="lg:hidden">
               <div className="space-y-4 p-4">
                 {brands && brands.length > 0 ? (
-                  currentBrands.map((brand, index) => (
+                  brands.map((brand, index) => (
                     <div
                       key={brand.brandID}
                       className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
@@ -283,7 +264,7 @@ export default function AdminBrandManager() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                           <div>
                             <h3 className="font-medium text-gray-900 text-sm">
@@ -308,12 +289,6 @@ export default function AdminBrandManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
-                          onClick={() => handleView(brand)}
-                        >
-                          {t('BUTTON.View')}
-                        </button>
-                        <button
                           className="flex-1 px-3 py-2 border border-amber-300 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
                             setEditingBrand(brand);
@@ -322,12 +297,14 @@ export default function AdminBrandManager() {
                         >
                           {t('BUTTON.Edit')}
                         </button>
-                        <button
-                          className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                          onClick={() => handleDelete(brand.brandID)}
-                        >
-                          {t('BUTTON.Delete')}
-                        </button>
+                        {brand.materials.length === 0 && (
+                          <button
+                            className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                            onClick={() => handleDelete(brand.brandID)}
+                          >
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))
@@ -369,7 +346,7 @@ export default function AdminBrandManager() {
               <Pagination
                 current={currentPage}
                 pageSize={pageSize}
-                total={brands.length}
+                total={totalBrands}
                 onChange={(page) => setCurrentPage(page)}
                 showSizeChanger={false}
                 size="small"

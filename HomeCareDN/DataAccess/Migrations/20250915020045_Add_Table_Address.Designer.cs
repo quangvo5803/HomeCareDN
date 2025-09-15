@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(AuthorizeDbContext))]
-    [Migration("20250912091111_Add_table_Address")]
-    partial class Add_table_Address
+    [Migration("20250915020045_Add_Table_Address")]
+    partial class Add_Table_Address
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,7 +27,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("AddressId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -55,9 +55,9 @@ namespace DataAccess.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                    b.HasKey("AddressId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "City", "District", "Ward");
 
                     b.ToTable("Addresses");
                 });

@@ -33,8 +33,8 @@ const buildMaterialFormData = ({
 
 export const materialService = {
   //Public APIs
-  getAllMaterial: async () => {
-    const response = await api.get('/Material/get-all-material');
+  getAllMaterial: async (params = {}) => {
+    const response = await api.get('/Material/get-all-material', { params });
     return response.data;
   },
   getMaterialById: async (id) => {
@@ -43,8 +43,10 @@ export const materialService = {
   },
 
   //Admin-only APIs
-  getAllMaterialById: async (id) => {
-    const response = await api.get(`/Distributor/get-all-material-by-id/${id}`);
+  getAllMaterialByUserId: async (params = {}) => {
+    const response = await api.get(`/Distributor/get-all-material-by-userid`, {
+      params,
+    });
     return response.data;
   },
 
@@ -71,7 +73,9 @@ export const materialService = {
 
   deleteMaterialImage: async (imageUrl) => {
     const response = await api.delete(
-      `/Distributor/delete-material-image?imageUrl=${encodeURIComponent(imageUrl)}`
+      `/Distributor/delete-material-image?imageUrl=${encodeURIComponent(
+        imageUrl
+      )}`
     );
     return response.data;
   },

@@ -2,6 +2,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { authService } from '../services/authService';
+import PropTypes from 'prop-types';
 
 export default function GoogleLoginButton({ onLoginSuccess }) {
   const { t, i18n } = useTranslation();
@@ -28,3 +29,6 @@ export default function GoogleLoginButton({ onLoginSuccess }) {
     />
   );
 }
+GoogleLoginButton.propTypes = {
+  onLoginSuccess: PropTypes.func.isRequired,
+};

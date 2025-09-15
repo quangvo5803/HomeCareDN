@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Azure;
+using AutoMapper;
 using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
@@ -10,12 +10,10 @@ using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 using Ultitity.Options;
 
 namespace BusinessLogic.Services
@@ -262,7 +260,7 @@ namespace BusinessLogic.Services
             if ((refreshToken.ExpiresAt - DateTime.UtcNow).TotalDays < 1)
             {
                 var newRefreshToken = GenerateRefreshToken();
-                refreshToken.PatchFrom(newRefreshToken);
+                refreshToken.Token = newRefreshToken;
                 await _refreshTokenRepository.UpdateAsync(refreshToken);
 
                 _httpContextAccessor.HttpContext.Response.Cookies.Append(

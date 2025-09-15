@@ -1,10 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
 
 namespace BusinessLogic.DTOs.Authorize.Address
 {
     public class UpdateAddressDto
     {
+        [Required(ErrorMessage = "REQUIRED_USER_ID")]
+        public string UserId { get; set; } = default!;
+
+        [Required(ErrorMessage = "REQUIRED_ADDRESS_ID")]
+        public Guid AddressId { get; set; }
+
         [Required, MaxLength(100)]
         public string City { get; set; } = default!;
 

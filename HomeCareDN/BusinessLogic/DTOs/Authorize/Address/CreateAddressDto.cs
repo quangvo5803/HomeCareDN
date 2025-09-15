@@ -4,7 +4,10 @@ namespace BusinessLogic.DTOs.Authorize.Address
 {
     public class CreateAddressDto
     {
-        [Required, MaxLength(100)]
+        [Required(ErrorMessage = "REQUIRED_USER_ID")]
+        public string UserId { get; set; } = default!;
+
+        [Required(), MaxLength(100)]
         public string City { get; set; } = default!;
 
         [Required, MaxLength(100)]

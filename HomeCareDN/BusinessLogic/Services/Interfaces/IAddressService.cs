@@ -5,10 +5,9 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IAddressService
     {
-        Task<IReadOnlyList<AddressDto>> GetMineAsync();
-        Task<AddressDto> GetByIdAsync(Guid id);
-        Task<AddressDto> CreateAsync(CreateAddressDto dto);
-        Task UpdateAsync(Guid id, UpdateAddressDto dto);
-        Task DeleteAsync(Guid id);
+        Task<ICollection<AddressDto>> GetAddressByUserIdAsync(string userId);
+        Task<AddressDto> CreateAddressByUserIdAsync(CreateAddressDto dto);
+        Task<AddressDto> UpdateAddressAsync(UpdateAddressDto dto);
+        Task DeleteAddressAsync(Guid addressId);
     }
 }

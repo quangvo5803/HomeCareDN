@@ -15,7 +15,7 @@ const emptyAddrForm = { id: null, city: '', district: '', ward: '', detail: '' }
 /*                                Main Screen                                  */
 /* -------------------------------------------------------------------------- */
 export default function ProfilePage() {
-  const { reload } = useAuth();
+  const { reload, user, loading: authLoading } = useAuth();
   const { t } = useTranslation();
 
   // Tabs
@@ -43,9 +43,10 @@ export default function ProfilePage() {
 
   /* --------------------------------- Loaders -------------------------------- */
   useEffect(() => {
+    if (authLoading || !user?.id) return;
     (async () => {
       try {
-        const { data } = await profileService.getMine();
+        const { data } = await profileService.getByUser(user.id);
         setForm({
           fullName: data.fullName || '',
           phoneNumber: data.phoneNumber || '',
@@ -56,21 +57,23 @@ export default function ProfilePage() {
         console.error('Failed to fetch profile data:', error);
       }
     })();
-  }, []);
+  } , [authLoading, user?.id]);
 
   const loadAddresses = useCallback(async () => {
+    if (authLoading || !user?.id) return;
     setAddrLoading(true);
     try {
-      const { data } = await addressService.getAll();
+      const { data } = await addressService.getAddressByUser(user.id);
       setAddrItems(Array.isArray(data) ? data : []);
     } catch {
-      toast.error(t('address.load_error', 'Tải địa chỉ thất bại'));
+      toast.error(t('address.load_error'));
     } finally {
       setAddrLoading(false);
     }
-  }, [t]);
+  }, [t, authLoading, user?.id]);
 
   useEffect(() => {
+    if (authLoading || !user?.id) return;
     (async () => {
       try {
         const { data } = await geoService.getProvinces(1);
@@ -80,7 +83,7 @@ export default function ProfilePage() {
       }
       await loadAddresses();
     })();
-  }, [loadAddresses]);
+  }, [authLoading, user?.id, loadAddresses]);
 
   /* ------------------------------- Profile save ------------------------------ */
   const onChange = (e) => setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
@@ -90,7 +93,8 @@ export default function ProfilePage() {
     if (saving) return;
     setSaving(true);
     try {
-      await profileService.update({
+      await profileService.updateByUser({
+        userId: user.id,
         fullName: form.fullName,
         phoneNumber: form.phoneNumber || null,
         gender: form.gender === '' ? null : Number(form.gender),
@@ -102,14 +106,14 @@ export default function ProfilePage() {
         console.warn('Reload profile failed:', re);
       }
 
-      toast.success(t('profile.update_success', 'Cập nhật hồ sơ thành công'));
+      toast.success(t('profile.update_success'));
     } catch (err) {
       const data = err?.response?.data;
       const firstError =
         (data?.errors && Object.values(data.errors)[0]?.[0]) ||
         data?.title ||
         data?.message ||
-        t('profile.update_error', 'Cập nhật hồ sơ thất bại');
+        t('profile.update_error');
       toast.error(firstError);
     } finally {
       setSaving(false);
@@ -134,6 +138,8 @@ if (addrSubmitting) {
     setAddrSubmitting(true);
 
     const payload = {
+      UserId: addrForm.userId.trim(),
+      AddressId : addrForm.AddressId.trim(),
       city: addrForm.city.trim(),
       district: addrForm.district.trim(),
       ward: addrForm.ward.trim(),
@@ -142,10 +148,10 @@ if (addrSubmitting) {
 
     try {
       if (addrForm.id) {
-        await addressService.update(addrForm.id, payload);
+        await addressService.updateAddress(payload);
         toast.success(t('address.update_success'));
       } else {
-        await addressService.create(payload);
+        await addressService.createAddressByUser(payload);
         toast.success(t('address.add_success'));
       }
 
@@ -212,7 +218,7 @@ if (addrSubmitting) {
   const deleteAddrItem = async (id) => {
     if (!confirm(t('address.confirm_delete'))) return;
     try {
-      await addressService.remove(id);
+      await addressService.removeAddress(id);
       toast.success(t('address.delete_success'));
       await loadAddresses();
     } catch {

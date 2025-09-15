@@ -8,20 +8,23 @@ namespace HomeCareDNAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
 public class ProfileController : ControllerBase
 {
-    private readonly IProfileService _svc;
+    private readonly IProfileService _profileService;
 
-    public ProfileController(IProfileService svc) => _svc = svc;
+    public ProfileController(IProfileService profileService) => _profileService = profileService;
 
-    [HttpGet]
-    public async Task<IActionResult> GetMine() => Ok(await _svc.GetMineAsync());
+    // GET: api/profile/{userId}
+    [HttpGet("get-profile/{userId}")]
+    public async Task<IActionResult> GetProfileById([FromRoute] string userId) =>
+        Ok(await _profileService.GetProfileByIdAsync(userId));
 
-    [HttpPut]
-    public async Task<IActionResult> Update([FromBody] UpdateProfileDto dto)
+    // PUT: api/profile/{userId}
+    [HttpPut("update-profile")]
+    public async Task<IActionResult> UpdateProfileById([FromBody] UpdateProfileDto dto)
     {
-        await _svc.UpdateAsync(dto);
+        await _profileService.UpdateProfileByIdAsync(dto);
         return NoContent();
     }
 }
