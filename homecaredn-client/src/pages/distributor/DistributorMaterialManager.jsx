@@ -6,7 +6,7 @@ import { useMaterial } from '../../hook/useMaterial';
 import { Pagination } from 'antd';
 import MaterialModal from '../../components/modal/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
-import { showDeleteModal } from '../../components/modal/';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function DistributorMaterialManager() {
   const { t, i18n } = useTranslation();

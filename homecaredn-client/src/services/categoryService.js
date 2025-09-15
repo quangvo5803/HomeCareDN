@@ -34,7 +34,6 @@ export const categoryService = {
     const formData = new FormData();
     formData.append('CategoryID', dto.CategoryID);
     formData.append('CategoryName', dto.CategoryName);
-    formData.append('UserID', dto.UserID);
     if (dto.CategoryNameEN)
       formData.append('CategoryNameEN', dto.CategoryNameEN);
 

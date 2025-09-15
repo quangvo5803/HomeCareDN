@@ -23,7 +23,7 @@ import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
-import DistributorCategoryManager from './pages/distributor/DistributoreCategoryManager';
+import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';

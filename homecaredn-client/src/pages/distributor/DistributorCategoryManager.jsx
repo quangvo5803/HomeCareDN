@@ -61,7 +61,6 @@ export default function DistributorCategoryManager() {
   };
   // Save Category (Create / Update)
   const handleSave = async (categoryData) => {
-    console.log(user.role);
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
       toast.success(t('SUCCESS.CATEGORY_UPDATE'));
