@@ -1,31 +1,78 @@
-import { useMemo, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { MATERIALS } from '../data/materials';
 import { useTranslation } from 'react-i18next';
+import { materialService } from '../services/materialService';
 
 export default function MaterialDetail() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const [material, setMaterial] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [slug]);
+  }, [id]);
 
-  const material = useMemo(
-    () => MATERIALS.find((m) => m.slug === slug),
-    [slug]
-  );
-  const related = useMemo(
-    () => MATERIALS.filter((m) => m.slug !== slug).slice(0, 4),
-    [slug]
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        if (!id) throw new Error('Missing id');
+
+        const res = await materialService.getMaterialById(id);
+        const data = res?.data ?? res;
+        const nm = normalizeMaterial(data);
+        if (mounted) setMaterial(nm);
+
+        const listRes = await materialService.getAllMaterial();
+        const list = Array.isArray(listRes) ? listRes : listRes?.data ?? [];
+        const relatedNm = list
+          .map(normalizeMaterial)
+          .filter((x) => x.id != null && String(x.id) !== String(id))
+          .slice(0, 4);
+        if (mounted) setRelated(relatedNm);
+      } catch (e) {
+        console.error(e);
+        if (mounted) setError('Failed to load material');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="max-w-7xl mx-auto px-6 py-16">
+        <p className="text-gray-600">Loading...</p>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="max-w-7xl mx-auto px-6 py-16">
+        <p className="text-red-600">{error}</p>
+        <Link to="/MaterialsCatalog" className="text-orange-600 font-medium">
+          {t('materials.detail.back_to_list')}
+        </Link>
+      </main>
+    );
+  }
 
   if (!material) {
     return (
       <main className="max-w-7xl mx-auto px-6 py-16">
         <p className="text-gray-600">{t('materials.detail.not_found')}</p>
-        <Link to="/materials" className="text-orange-600 font-medium">
+        <Link to="/MaterialsCatalog" className="text-orange-600 font-medium">
           {t('materials.detail.back_to_list')}
         </Link>
       </main>
@@ -48,7 +95,7 @@ export default function MaterialDetail() {
               {t('materials.catalog.breadcrumbs_home')}
             </Link>
             <span className="mx-2">/</span>
-            <Link to="/materials" className="hover:text-white">
+            <Link to="/MaterialsCatalog" className="hover:text-white">
               {t('materials.catalog.breadcrumbs_materials')}
             </Link>
             <span className="mx-2">/</span>
@@ -67,13 +114,14 @@ export default function MaterialDetail() {
             />
           </div>
 
-          <div className="mt-3 grid grid-cols-4 gap-2">
-            {[material.img, material.img, material.img, material.img].map(
-              (src, i) => (
+          {material.images?.length > 1 && (
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {material.images.slice(0, 4).map((src, i) => (
                 <button
                   key={i}
                   className="rounded-xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-orange-500"
                   aria-label={`${material.title} thumbnail ${i + 1}`}
+                  onClick={() => setMaterial((prev) => ({ ...prev, img: src }))}
                 >
                   <img
                     src={src}
@@ -81,9 +129,9 @@ export default function MaterialDetail() {
                     className="w-full aspect-square object-cover"
                   />
                 </button>
-              )
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <aside className="lg:col-span-7 lg:pl-4 self-start">
@@ -120,7 +168,6 @@ export default function MaterialDetail() {
                 <p>
                   {t('materials.detail.description_tab')} —{' '}
                   <strong>{material.title}</strong>.
-                  {/* thay thế bằng dữ liệu API sau này */}
                 </p>
               </div>
             </div>
@@ -134,7 +181,7 @@ export default function MaterialDetail() {
             {t('materials.detail.related_title')}
           </h3>
           <Link
-            to="/materials"
+            to="/MaterialsCatalog"
             className="text-orange-600 hover:text-orange-700 font-medium"
           >
             {t('home.material_more', 'More Materials')} →
@@ -144,7 +191,7 @@ export default function MaterialDetail() {
           {related.map((m) => (
             <article
               key={m.id}
-              onClick={() => navigate(`/materials/${m.slug}`)}
+              onClick={() => navigate(`/Materials/${m.id}`)}
               className="group cursor-pointer bg-white rounded-2xl shadow-sm ring-1 ring-black/5 hover:ring-orange-500 hover:shadow-md transition overflow-hidden"
             >
               <div className="relative overflow-hidden">

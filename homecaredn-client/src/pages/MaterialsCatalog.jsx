@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MATERIALS } from '../data/materials';
 import { useTranslation } from 'react-i18next';
+import { materialService } from '../services/materialService';
 
 const TAGS = [
   { id: 'all', i18n: 'materials.catalog.tag_all' },
@@ -14,47 +14,91 @@ const SORTS = [
   { id: 'az', i18n: 'materials.catalog.sort_az' },
   { id: 'za', i18n: 'materials.catalog.sort_za' },
 ];
-
+function normalizeMaterial(raw) {
+  const id = raw?.MaterialID ?? raw?.materialId ?? raw?.id;
+  const title =
+    raw?.Name ?? raw?.name ?? raw?.Title ?? raw?.title ?? `#${id ?? ''}`;
+  const desc = raw?.Description ?? raw?.description ?? '';
+  const images =
+    raw?.Images ?? raw?.images ?? raw?.ImageUrls ?? raw?.imageUrls ?? [];
+  const img =
+    raw?.ImageUrl ??
+    raw?.imageUrl ??
+    (Array.isArray(images) ? images[0] : undefined);
+  return {
+    id,
+    title,
+    desc,
+    img,
+    categoryId: raw?.CategoryID ?? raw?.categoryId,
+    brandId: raw?.BrandID ?? raw?.brandId,
+  };
+}
 export default function Materials() {
-  const { t } = useTranslation(); // dùng chung hoặc useTranslation('materials') nếu tách namespace
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const [items, setItems] = useState([]);
   const [q, setQ] = useState('');
   const [tag, setTag] = useState('all');
   const [sort, setSort] = useState('relevant');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [loadingGrid, setLoadingGrid] = useState(false);
+  const [error, setError] = useState('');
 
+  // Load danh sách từ API
   useEffect(() => {
-    setLoading(true);
-    const tmo = setTimeout(() => setLoading(false), 400);
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const res = await materialService.getAllMaterial();
+        const list = Array.isArray(res) ? res : res?.data ?? [];
+        const normalized = list
+          .map(normalizeMaterial)
+          .filter((x) => x.id != null);
+        if (mounted) setItems(normalized);
+      } catch (e) {
+        console.error(e);
+        if (mounted) setError('Failed to load materials');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Hiệu ứng skeleton khi đổi filter/search
+  useEffect(() => {
+    if (loading) return;
+    setLoadingGrid(true);
+    const tmo = setTimeout(() => setLoadingGrid(false), 300);
     return () => clearTimeout(tmo);
-  }, [q, tag, sort]);
+  }, [q, tag, sort, loading]);
 
   const filtered = useMemo(() => {
-    let list = [...MATERIALS];
-    if (tag !== 'all') {
-      list = list.filter((m) => {
-        const s = m.slug;
-        switch (tag) {
-          case 'category':
-            return s.includes('category');
-          case 'brand':
-            return s.includes('brand');
-          default:
-            return true;
-        }
-      });
-    }
+    let list = [...items];
+
+    if (tag === 'category') list = list.filter((m) => !!m.categoryId);
+    if (tag === 'brand') list = list.filter((m) => !!m.brandId);
+
     if (q.trim()) {
       const s = q.toLowerCase();
       list = list.filter(
         (m) =>
-          m.title.toLowerCase().includes(s) || m.desc.toLowerCase().includes(s)
+          m.title.toLowerCase().includes(s) ||
+          (m.desc ?? '').toLowerCase().includes(s)
       );
     }
+
     if (sort === 'az') list.sort((a, b) => a.title.localeCompare(b.title));
     if (sort === 'za') list.sort((a, b) => b.title.localeCompare(a.title));
+
     return list;
-  }, [q, tag, sort]);
+  }, [items, q, tag, sort]);
 
   return (
     <main className="min-h-[70vh] bg-gradient-to-b from-white to-gray-50">
@@ -66,6 +110,7 @@ export default function Materials() {
               <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">
                 {t('materials.catalog.title')}
               </h1>
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
             </div>
 
             {/* Controls */}
@@ -130,7 +175,7 @@ export default function Materials() {
 
       {/* Result info */}
       <div className="max-w-7xl mx-auto px-6 pt-6 text-sm text-gray-500">
-        {!loading && (
+        {!loading && !loadingGrid && (
           <p>
             {t('materials.catalog.result_showing')}{' '}
             <span className="font-medium text-gray-700">{filtered.length}</span>{' '}
@@ -158,7 +203,7 @@ export default function Materials() {
 
       {/* Grid */}
       <section className="max-w-7xl mx-auto px-6 py-6">
-        {loading ? (
+        {loading || loadingGrid ? (
           <SkeletonGrid />
         ) : filtered.length === 0 ? (
           <EmptyState
@@ -173,7 +218,7 @@ export default function Materials() {
             {filtered.map((m) => (
               <article
                 key={m.id}
-                onClick={() => navigate(`/materials/${m.slug}`)}
+                onClick={() => navigate(`/Materials/${m.id}`)}
                 className="group cursor-pointer bg-white rounded-2xl overflow-hidden ring-1 ring-black/5 hover:shadow-md transition"
               >
                 <div className="relative overflow-hidden">
@@ -203,7 +248,7 @@ export default function Materials() {
                       className="text-orange-600 group-hover:text-orange-700 font-medium inline-flex items-center gap-2"
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/materials/${m.slug}`);
+                        navigate(`/Materials/${m.id}`);
                       }}
                       aria-label={`${t('materials.catalog.read_more')} ${
                         m.title
@@ -221,7 +266,7 @@ export default function Materials() {
                     </button>
 
                     <Link
-                      to={`/materials/${m.slug}`}
+                      to={`/Materials/${m.id}`}
                       onClick={(e) => e.stopPropagation()}
                       className="px-3 py-1.5 rounded-lg text-sm bg-orange-50 text-orange-700 hover:bg-orange-100"
                     >
@@ -238,7 +283,7 @@ export default function Materials() {
   );
 }
 
-/* Sub components giữ nguyên, chỉ i18n hóa text */
+/* Sub components giữ nguyên, không đổi class */
 function SkeletonGrid() {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -256,6 +301,24 @@ function SkeletonGrid() {
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+function EmptyState({ onReset }) {
+  const { t } = useTranslation();
+  return (
+    <div className="rounded-2xl bg-white ring-1 ring-black/5 p-10 text-center">
+      <h3 className="mt-4 text-lg font-semibold text-gray-900">
+        {t('materials.catalog.empty_title')}
+      </h3>
+      <p className="mt-2 text-gray-600">{t('materials.catalog.empty_desc')}</p>
+      <button
+        onClick={onReset}
+        className="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-medium"
+      >
+        {t('materials.catalog.reset_filters')}
+      </button>
     </div>
   );
 }

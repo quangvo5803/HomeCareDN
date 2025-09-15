@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import SupportChatWidget from '../components/SupportChatWidget';
 import Reveal from '../components/Reveal';
 import { Link, useNavigate } from 'react-router-dom';
-import { MATERIALS } from '../data/materials';
 
 const slides = [
   {

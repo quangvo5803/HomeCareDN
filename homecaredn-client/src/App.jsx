@@ -64,8 +64,8 @@ function Layout() {
         <Route path="/Home" element={<Home />} />
         <Route path="/About" element={<About />} />
         <Route path="/Contact" element={<Contact />} />
-        <Route path="/Materials" element={<Materials />} />
-        <Route path="/Materials/:slug" element={<MaterialDetail />} />
+        <Route path="/MaterialsCatalog" element={<Materials />} />
+        <Route path="/Materials/:id" element={<MaterialDetail />} />
         <Route
           path="/Login"
           element={
