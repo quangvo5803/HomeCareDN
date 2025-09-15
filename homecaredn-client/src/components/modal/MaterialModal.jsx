@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { handleApiError } from '../../utils/handleApiError';
 import { useMaterial } from '../../hook/useMaterial';
 import { useAuth } from '../../hook/useAuth';
+import { Editor } from '@tinymce/tinymce-react';
 
 export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const { user } = useAuth();
@@ -41,7 +42,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         try {
           const [brandList, categoryList] = await Promise.all([
             fetchAllBrands(),
-            fetchAllCategories(),
+            fetchAllCategories({ FilterBool: true }),
           ]);
           setBrands(brandList);
           setCategories(categoryList);
@@ -302,14 +303,17 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               <label className="block text-sm font-medium mb-2 text-gray-700">
                 {t('distributorMaterialManager.materialModal.description')}
               </label>
-              <textarea
-                placeholder={t(
-                  'distributorMaterialManager.materialModal.descriptionsPlaceholder'
-                )}
-                className="w-full px-4 py-2.5 border rounded-xl"
-                rows="3"
+              <Editor
+                apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                init={{
+                  height: 300,
+                  menubar: false,
+                  plugins: 'lists link image code',
+                  toolbar:
+                    'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                }}
+                onEditorChange={(content) => setDescription(content)}
               />
             </div>
 
@@ -366,14 +370,17 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                         'distributorMaterialManager.materialModal.descriptionEN'
                       )}
                     </label>
-                    <textarea
-                      placeholder={t(
-                        'distributorMaterialManager.materialModal.descriptionsPlaceholderEN'
-                      )}
-                      className="w-full px-4 py-2.5 border rounded-xl"
-                      rows="3"
+                    <Editor
+                      apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
                       value={descriptionEN}
-                      onChange={(e) => setDescriptionEN(e.target.value)}
+                      init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: 'lists link image code',
+                        toolbar:
+                          'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                      }}
+                      onEditorChange={(content) => setDescriptionEN(content)}
                     />
                   </div>
                 </div>
