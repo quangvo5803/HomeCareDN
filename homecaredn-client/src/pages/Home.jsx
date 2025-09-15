@@ -259,7 +259,6 @@ export default function Home() {
   }, [idx, tNext, hasMany]);
 
   return (
-
     <div>
       {/* Carousel */}
       <div className="relative w-full h-[90vh] overflow-hidden">

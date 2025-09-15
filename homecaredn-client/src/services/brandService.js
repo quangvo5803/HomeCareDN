@@ -1,9 +1,10 @@
 import api from '../api';
 
 export const brandService = {
-  //Public APIs
-  getAllBrands: async () => {
-    const response = await api.get('/Brands/get-all-brands');
+  // Public APIs
+  getAllBrands: async (params = {}) => {
+    // Hỗ trợ query params cho pagination/search
+    const response = await api.get('/Brands/get-all-brands', { params });
     return response.data;
   },
 
@@ -12,51 +13,36 @@ export const brandService = {
     return response.data;
   },
 
-  //Admin-only APIs
-  createBrand: async ({
-    BrandName,
-    BrandDescription,
-    BrandNameEN,
-    BrandDescriptionEN,
-    LogoFile,
-  }) => {
+  // Admin-only APIs
+  createBrand: async (dto) => {
     const formData = new FormData();
-    formData.append('BrandName', BrandName);
-    if (BrandDescription) formData.append('BrandDescription', BrandDescription);
-    if (BrandNameEN) formData.append('BrandNameEN', BrandNameEN);
-    if (BrandDescriptionEN)
-      formData.append('BrandDescriptionEN', BrandDescriptionEN);
-    formData.append('LogoFile', LogoFile);
+    formData.append('BrandName', dto.BrandName);
+    if (dto.BrandDescription)
+      formData.append('BrandDescription', dto.BrandDescription);
+    if (dto.BrandNameEN) formData.append('BrandNameEN', dto.BrandNameEN);
+    if (dto.BrandDescriptionEN)
+      formData.append('BrandDescriptionEN', dto.BrandDescriptionEN);
+    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
 
     const response = await api.post('/Admin/create-brand', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
 
-  updateBrand: async ({
-    BrandID,
-    BrandName,
-    BrandDescription,
-    BrandNameEN,
-    BrandDescriptionEN,
-    LogoFile,
-  }) => {
+  updateBrand: async (dto) => {
     const formData = new FormData();
-    formData.append('BrandID', BrandID);
-    formData.append('BrandName', BrandName);
-    if (BrandDescription) formData.append('BrandDescription', BrandDescription);
-    if (BrandNameEN) formData.append('BrandNameEN', BrandNameEN);
-    if (BrandDescriptionEN)
-      formData.append('BrandDescriptionEN', BrandDescriptionEN);
-    if (LogoFile) formData.append('LogoFile', LogoFile);
+    formData.append('BrandID', dto.BrandID);
+    formData.append('BrandName', dto.BrandName);
+    if (dto.BrandDescription)
+      formData.append('BrandDescription', dto.BrandDescription);
+    if (dto.BrandNameEN) formData.append('BrandNameEN', dto.BrandNameEN);
+    if (dto.BrandDescriptionEN)
+      formData.append('BrandDescriptionEN', dto.BrandDescriptionEN);
+    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
 
     const response = await api.put('/Admin/update-brand', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },

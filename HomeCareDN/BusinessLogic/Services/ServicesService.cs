@@ -155,7 +155,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            service.PatchFrom(serviceUpdateDto);
+            _mapper.Map(service, serviceUpdateDto);
             await _unitOfWork.SaveAsync();
             // Delete old images
             var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>

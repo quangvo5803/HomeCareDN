@@ -10,6 +10,7 @@ export default function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [pendingEmail, setPendingEmail] = useState(null);
+  const [loading, setLoading] = useState(true); // 👈 thêm loading
   const refreshTimeoutRef = useRef(null);
 
   const parseToken = useCallback((token) => {
@@ -74,6 +75,7 @@ export default function AuthProvider({ children }) {
     },
     [parseToken, logout]
   );
+
   const login = useCallback(
     (token) => {
       localStorage.setItem('accessToken', token);
@@ -100,8 +102,11 @@ export default function AuthProvider({ children }) {
       if (parsed) {
         setUser(parsed);
         scheduleRefresh(parsed.exp);
-      } else logout();
+      } else {
+        logout();
+      }
     }
+    setLoading(false); // 👈 chỉ set sau khi check token
     return () => {
       if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
     };
@@ -115,13 +120,14 @@ export default function AuthProvider({ children }) {
       isAuthenticated: !!user,
       pendingEmail,
       setPendingEmail,
+      loading,
     }),
-    [user, login, logout, pendingEmail, setPendingEmail]
+    [user, login, logout, pendingEmail, setPendingEmail, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-// PropTypes
+
 AuthProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

@@ -1,5 +1,5 @@
-﻿using BusinessLogic.Services.FacadeService;
-using Microsoft.AspNetCore.Http;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers
@@ -16,9 +16,9 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("get-all-brands")]
-        public async Task<IActionResult> GetAllBrands()
+        public async Task<IActionResult> GetAllBrands([FromQuery] QueryParameters parameters)
         {
-            var brands = await _facadeService.BrandService.GetAllBrands();
+            var brands = await _facadeService.BrandService.GetAllBrands(parameters);
             return Ok(brands);
         }
 
