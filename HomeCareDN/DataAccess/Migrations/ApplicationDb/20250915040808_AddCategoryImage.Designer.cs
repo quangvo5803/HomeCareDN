@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250915040808_AddCategoryImage")]
+    partial class AddCategoryImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,39 +51,32 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("BrandLogoID");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
-            {
-                b.Property<Guid>("CategoryID")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("uniqueidentifier");
+                {
+                    b.Property<Guid>("CategoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<Guid?>("CategoryLogoID")
-                    .HasColumnType("uniqueidentifier");
+                    b.Property<Guid?>("CategoryLogoID")
+                        .HasColumnType("uniqueidentifier");
 
-                b.Property<string>("CategoryName")
-                    .IsRequired()
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                b.Property<string>("CategoryNameEN")
-                    .HasColumnType("nvarchar(max)");
+                    b.Property<string>("CategoryNameEN")
+                        .HasColumnType("nvarchar(max)");
 
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
+                    b.HasKey("CategoryID");
 
-                b.Property<Guid>("UserID")
-                    .HasColumnType("uniqueidentifier");
+                    b.HasIndex("CategoryLogoID");
 
-                b.HasKey("CategoryID");
-
-                b.HasIndex("CategoryLogoID");
-
-                b.ToTable("Categories", (string)null);
-            });
-
+                    b.ToTable("Categories");
+                });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
                 {
@@ -113,7 +109,43 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ConversationId");
 
-                    b.ToTable("ChatMessages", (string)null);
+                    b.ToTable("ChatMessages");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.ContactSupport", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsProcessed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReplyBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReplyContent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactSupports");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
@@ -146,7 +178,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("ContractorApplications", (string)null);
+                    b.ToTable("ContractorApplications");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
@@ -174,7 +206,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ConversationId");
 
-                    b.ToTable("Conversations", (string)null);
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -184,9 +216,6 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("BrandID")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CategoryID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ContractorApplicationID")
@@ -219,7 +248,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("Images", (string)null);
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -265,7 +294,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Materials", (string)null);
+                    b.ToTable("Materials");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
@@ -297,7 +326,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
@@ -351,7 +380,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceRequestID");
 
-                    b.ToTable("ServiceRequests", (string)null);
+                    b.ToTable("ServiceRequests");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>

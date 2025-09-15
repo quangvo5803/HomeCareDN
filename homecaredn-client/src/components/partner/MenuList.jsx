@@ -1,8 +1,8 @@
 import { useMemo, useContext } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../services/authService';
-import AuthContext from '../context/AuthContext';
+import { authService } from '../../services/authService';
+import AuthContext from '../../context/AuthContext';
 import PropTypes from 'prop-types';
 
 export default function Sidebar({
@@ -35,35 +35,18 @@ export default function Sidebar({
         badge: serviceRequestsCount,
       },
       {
+        key: 'categories',
+        label: t('partnerDashboard.category'),
+        icon: <i className="fa-solid fa-tags"></i>,
+        to: '/Distributor/CategoryManager',
+      },
+      {
         key: 'materials',
         label: t('partnerDashboard.materials'),
         icon: <i className="fa-solid fa-box"></i>,
         to: '/Distributor/MaterialManager',
       },
-      {
-        key: 'applications',
-        label: t('partnerDashboard.my_applications'),
-        icon: <i className="fa-solid fa-calendar-check"></i>,
-        to: '/Distributor/applications',
-      },
-      {
-        key: 'payments',
-        label: t('partnerDashboard.commission_payments'),
-        icon: <i className="fa-solid fa-money-bill"></i>,
-        to: '/Distributor/payments',
-      },
-      {
-        key: 'reviews',
-        label: t('partnerDashboard.reviews'),
-        icon: <i className="fa-solid fa-star"></i>,
-        to: '/Distributor/reviews',
-      },
-      {
-        key: 'profile',
-        label: t('partnerDashboard.profile_management'),
-        icon: <i className="fa-solid fa-user-tie"></i>,
-        to: '/Distributor/profile',
-      },
+
       {
         key: 'logout',
         label: t('header.logout'),

@@ -6,6 +6,7 @@
     "construction": "Xây Nhà",
     "repair": "Sửa Chữa",
     "material": "Vật Liệu",
+    "materialCatalog": "Mục Lục Vật Liệu",
     "contact": "Liên Hệ",
     "login": "Đăng nhập",
     "register": "Đăng ký",
@@ -148,7 +149,17 @@
   },
   "success_message": "Yêu cầu của bạn đã được gửi thành công! Chúng tôi sẽ liên hệ sớm.",
   "error_message": "Có lỗi xảy ra khi gửi yêu cầu. Vui lòng thử lại sau."
-
+},
+"materialsCatalog": {
+  "title": "Mục Lục Vật Liệu",
+  "subtitle": "Khám phá danh mục và thương hiệu của chúng tôi",
+  "noCategory": "Chưa có danh mục nào",
+  "search_placeholder": "Tìm kiếm danh mục...",
+  "tag_all": "Tất cả",
+  "tag_category": "Danh mục",
+  "tag_brand": "Thương hiệu",
+  "sort_label": "Sắp xếp theo:",
+  "read_more": "Xem thêm"
 },
   "login": {
     "title": "Đăng Nhập",
@@ -195,11 +206,7 @@
     "approved": "Đã Phê Duyệt",
     "rejected": "Đã Từ Chối",
     "dashboard": "Bảng Điều Khiển",
-    "my_applications": "Các Đơn Của Tôi",
-    "commission_payments": "Thanh Toán Hoa Hồng",
-    "reviews": "Đánh Giá",
-    "profile_management": "Quản Lý Hồ Sơ",
-    "settings": "Cài Đặt",
+    "category": "Danh Mục Vật Liệu",
     "UI sample for": "Mẫu Giao Diện Cho",
     "latest_applications": "Các Đơn Mới Nhất",
     "view_all": "Xem Tất Cả",
@@ -349,17 +356,21 @@
     "categoryName": "Tên danh mục",
     "numberOfMaterials": "Số lượng sản phẩm",
     "materials": "sản phẩm",
+    "status": "Trạng thái",
     "action": "Thao tác",
     "noCategory": "Chưa có danh mục nào",
     "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn",
     "categoryModal": {
       "title": "Thêm danh mục mới",
-      "title2": "Cập nhật thương hiệu",
+      "title2": "Cập nhật danh mục",
       "categoryName": "Tên danh mục",
       "categoryNamePlaceholder": "Nhập tên danh mục...",
       "categoryNameEN": "Tên danh mục(Tiếng Anh)",
       "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh...",
-      "multilanguage_for_data": "Đa ngôn cho dữ liệu"
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
+      "categoryLogo": "Logo danh mục",
+      "chooseFile": "Chọn tệp tải lên",
+      "isActive": "Kích hoạt danh mục"
     }
   },
   "adminSupportManager": {
@@ -412,6 +423,19 @@
       "noFile": "Không có tệp nào được chọn",
       "filesSelected": " tệp đã chọn"
     }
+  },
+   "distributorCategoryManager": {
+    "title": "Quản lí danh mục vật liệu",
+    "subtitle": "Quản lí danh sác các danh mục vật liệu",
+    "categories": "danh mục",
+    "no": "STT",
+    "categoryName": "Tên danh mục",
+    "numberOfMaterials": "Số lượng sản phẩm",
+    "materials": "sản phẩm",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noCategory": "Chưa có danh mục nào",
+    "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -526,7 +550,9 @@
     "Update": "Cập nhật",
     "Send": "Gửi",
     "Sending": "Đang gửi...",
-    "Close": "Đóng"
+    "Close": "Đóng",
+    "Activate": "Kích hoạt",
+    "Deactivate": "Hủy kích hoạt"
   },
   "ModalPopup": {
     "DeleteBrandModal": {

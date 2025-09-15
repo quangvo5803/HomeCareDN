@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useBrand } from '../../hook/useBrand';
 import { Pagination } from 'antd';
-import BrandModal from '../../components/admin/BrandModal';
+import BrandModal from '../../components/modal/BrandModal';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function AdminBrandManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 2;
+  const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
@@ -30,37 +30,22 @@ export default function AdminBrandManager() {
   }, [currentPage, fetchBrands]);
 
   const handleDelete = async (brandId) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteBrandModal.title'),
-      text: t('ModalPopup.DeleteBrandModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-          });
-          await deleteBrand(brandId);
-          const lastPage = Math.ceil((totalBrands - 1) / pageSize);
-          if (currentPage > lastPage) {
-            setCurrentPage(lastPage || 1);
-          } else {
-            fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
-          }
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch {
-          Swal.close();
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteBrandModal.title',
+      textKey: 'ModalPopup.DeleteBrandModal.text',
+      onConfirm: async () => {
+        await deleteBrand(brandId);
+
+        const lastPage = Math.ceil((totalBrands - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
 
@@ -72,7 +57,7 @@ export default function AdminBrandManager() {
       });
       toast.success(t('SUCCESS.BRAND_UPDATE'));
     } else {
-      await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
+      await createBrand(brandData);
       toast.success(t('SUCCESS.BRAND_ADD'));
       const lastPage = Math.ceil((totalBrands + 1) / pageSize);
       setCurrentPage(lastPage);
@@ -128,6 +113,7 @@ export default function AdminBrandManager() {
 
           {/* Table */}
           <div className="w-full">
+            {/* NOSONAR */}
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <table className="w-full">
@@ -342,16 +328,18 @@ export default function AdminBrandManager() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center py-4">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalBrands}
-                onChange={(page) => setCurrentPage(page)}
-                showSizeChanger={false}
-                size="small"
-              />
-            </div>
+            {totalBrands > 0 && (
+              <div className="flex justify-center py-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalBrands}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false}
+                  size="small"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

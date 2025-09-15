@@ -6,6 +6,7 @@
     "construction": "Construction Home",
     "repair": "Repair Home",
     "material": "Material",
+    "materialCatalog": "Material Catalog",
     "contact": "Contact Us",
     "login": "Login",
     "register": "Register",
@@ -154,7 +155,17 @@
   "error_message": "An error occurred while sending your request. Please try again later."
 }
 ,
-
+"materialsCatalog": {
+  "title": "Material Catalog",
+  "subtitle": "Explore our categories and brands",
+  "noCategory": "No categories yet",
+  "search_placeholder": "Search for categories...",
+  "tag_all": "All",
+  "tag_category": "Category",
+  "tag_brand": "Brand",
+  "sort_label": "Sort by:",
+  "read_more": "Read More"
+},
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -200,11 +211,7 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "dashboard": "Dashboard",
-    "my_applications": "My Applications",
-    "commission_payments": "Commission Payments",
-    "reviews": "Reviews",
-    "profile_management": "Profile Management",
-    "settings": "Settings",
+    "category": "Material Category",
     "UI sample for": "UI Sample For",
     "latest_applications": "Latest Applications",
     "view_all": "View All",
@@ -354,8 +361,9 @@
     "categoryName": "Category name",
     "numberOfMaterials": "Number of Material",
     "materials": "Material(s)",
+    "status": "Status",
     "action": "Action",
-    "noCategory": "No category yes",
+    "noCategory": "No category yet",
     "letStart": "Start by adding your first category.",
     "categoryModal": {
       "title": "Add new category",
@@ -364,7 +372,10 @@
       "categoryNamePlaceholder": "Enter category name...",
       "categoryNameEN": "Category name(English)",
       "categoryNamePlaceholderEN": "Enter category name in English...",
-      "multilanguage_for_data": " Multilanguage for data"
+      "multilanguage_for_data": " Multilanguage for data",
+      "categoryLogo": "Category logo",
+      "chooseFile": "Choose file to upload",
+      "isActive": "Activate category" 
     }
   },
   "distributorMaterialManager": {
@@ -400,6 +411,19 @@
       "noFile": "No files selected",
       "filesSelected": " selected file"
     }
+  },
+  "distributorCategoryManager": {
+    "title": "Material Category Manager",
+    "subtitle": "Manage material category list",
+    "categories": "category(es)",
+    "no": "NO",
+    "categoryName": "Category name",
+    "numberOfMaterials": "Number of Material",
+    "materials": "Material(s)",
+    "status": "Status",
+    "action": "Action",
+    "noCategory": "No category yet",
+    "letStart": "Start by adding your first category."
   },
   "adminSupportManager": {
   "title": "Support Manager",
@@ -531,7 +555,9 @@
     "Update": "Update",
     "Send": "Send",
     "Sending": "Sending...",
-    "Close": "Close"
+    "Close": "Close",
+    "Activate": "Activate",
+    "Deactivate": "Deactivate"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
