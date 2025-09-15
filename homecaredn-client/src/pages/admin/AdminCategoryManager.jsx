@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useCategory } from '../../hook/useCategory';
 import { Pagination } from 'antd';
 import CategoryModal from '../../components/modal/CategoryModal';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function AdminCategoryManager() {
   const { t, i18n } = useTranslation();
@@ -32,41 +31,22 @@ export default function AdminCategoryManager() {
 
   // Delete Category
   const handleDelete = async (categoryId) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteCategoryModal.title'),
-      text: t('ModalPopup.DeleteCategoryModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-          await deleteCategory(categoryId);
-          const lastPage = Math.ceil((totalCategories - 1) / pageSize);
-          if (currentPage > lastPage) {
-            setCurrentPage(lastPage || 1);
-          } else {
-            fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
-          }
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteCategoryModal.title',
+      textKey: 'ModalPopup.DeleteCategoryModal.text',
+      onConfirm: async () => {
+        await deleteCategory(categoryId);
+
+        const lastPage = Math.ceil((totalCategories - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
 
@@ -221,7 +201,7 @@ export default function AdminCategoryManager() {
                             >
                               {t('BUTTON.Edit')}
                             </button>
-                            {cat.materials.length === 0 && (
+                            {cat.materials?.length === 0 && !cat.isActive && (
                               <button
                                 className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
                                 onClick={() => handleDelete(cat.categoryID)}
@@ -339,7 +319,7 @@ export default function AdminCategoryManager() {
                         >
                           {t('BUTTON.Edit')}
                         </button>
-                        {cat.materials.length === 0 && (
+                        {cat.materials.length === 0 && !cat.isActive && (
                           <button
                             className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(cat.categoryID)}

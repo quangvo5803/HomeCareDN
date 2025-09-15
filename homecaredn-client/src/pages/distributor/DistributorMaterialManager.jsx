@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useMaterial } from '../../hook/useMaterial';
 import { Pagination } from 'antd';
 import MaterialModal from '../../components/modal/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function DistributorMaterialManager() {
   const { t, i18n } = useTranslation();
@@ -38,45 +37,26 @@ export default function DistributorMaterialManager() {
 
   // Delete Material
   const handleDelete = async (materialID) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteMaterialModal.title'),
-      text: t('ModalPopup.DeleteMaterialModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteMaterialModal.title',
+      textKey: 'ModalPopup.DeleteMaterialModal.text',
+      onConfirm: async () => {
+        await deleteMaterial(materialID);
+
+        const lastPage = Math.ceil((totalMaterials - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          await fetchMaterialsByUserId({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            FilterID: user.id,
           });
-          await deleteMaterial(materialID);
-          const lastPage = Math.ceil((totalMaterials - 1) / pageSize);
-          if (currentPage > lastPage) {
-            setCurrentPage(lastPage || 1);
-          } else {
-            fetchMaterialsByUserId({
-              PageNumber: currentPage,
-              PageSize: pageSize,
-              FilterID: user.id,
-            });
-          }
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
 

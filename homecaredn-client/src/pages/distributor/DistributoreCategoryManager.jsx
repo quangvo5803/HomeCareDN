@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useCategory } from '../../hook/useCategory';
 import { Pagination } from 'antd';
 import CategoryModal from '../../components/modal/CategoryModal';
 import { useAuth } from '../../hook/useAuth';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function DistributorCategoryManager() {
   const { t, i18n } = useTranslation();
@@ -36,51 +35,31 @@ export default function DistributorCategoryManager() {
     });
   }, [fetchCategories, currentPage, pageSize, user]);
 
-  // Delete Material
+  // Delete Category
   const handleDelete = async (categoryID) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteMaterialModal.title'),
-      text: t('ModalPopup.DeleteMaterialModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteCategoryModal.title',
+      textKey: 'ModalPopup.DeleteCategoryModal.text',
+      onConfirm: async () => {
+        await deleteCategory(categoryID);
+
+        const lastPage = Math.ceil((totalCategories - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          await fetchCategories({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            FilterID: user?.id,
           });
-          await deleteCategory(categoryID);
-          const lastPage = Math.ceil((totalCategories - 1) / pageSize);
-          if (currentPage > lastPage) {
-            setCurrentPage(lastPage || 1);
-          } else {
-            fetchCategories({
-              PageNumber: currentPage,
-              PageSize: pageSize,
-              UserID: user?.userID,
-            });
-          }
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
-
-  // Save Material (Create / Update)
+  // Save Category (Create / Update)
   const handleSave = async (categoryData) => {
     console.log(user.role);
     if (categoryData.CategoryID) {
@@ -208,7 +187,7 @@ export default function DistributorCategoryManager() {
 
                   {/* Actions */}
                   <td className="px-4 py-4 text-center">
-                    {!category.isActive && (
+                    {category.materials?.length === 0 && !category.isActive && (
                       <div className="flex justify-center gap-2">
                         <button
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
@@ -222,7 +201,7 @@ export default function DistributorCategoryManager() {
 
                         <button
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
-                          onClick={() => handleDelete(category.materialID)}
+                          onClick={() => handleDelete(category.categoryID)}
                         >
                           <i className="fa-solid fa-trash"></i>{' '}
                           {t('BUTTON.Delete')}
@@ -269,16 +248,18 @@ export default function DistributorCategoryManager() {
           </tbody>
         </table>
         {/* Pagination */}
-        <div className="flex justify-center py-4">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={totalCategories}
-            onChange={(page) => setCurrentPage(page)}
-            showSizeChanger={false}
-            size="small"
-          />
-        </div>
+        {totalCategories.length > 0 && (
+          <div className="flex justify-center py-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalCategories}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+              size="small"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

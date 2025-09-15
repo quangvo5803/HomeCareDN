@@ -43,7 +43,6 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
   };
 
   const handleSubmit = () => {
-    console.log(user.id);
     if (!categoryName.trim()) {
       toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
       return;

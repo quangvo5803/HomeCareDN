@@ -15,7 +15,7 @@ namespace DataAccess.Entities.Application
 
         //EN
         public string? CategoryNameEN { get; set; }
-        public Guid CategoryLogoID { get; set; }
+        public Guid? CategoryLogoID { get; set; }
         public bool IsActive { get; set; }
         public Guid UserID { get; set; }
 
