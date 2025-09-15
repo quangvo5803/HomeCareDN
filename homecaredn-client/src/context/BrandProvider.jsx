@@ -64,21 +64,23 @@ export const BrandProvider = ({ children }) => {
   );
 
   const updateBrand = useCallback(
-    async (dto, pageParams) => {
+    async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
+        setLoading(true);
+        const updated = await brandService.updateBrand(dto);
         // Optimistic update
         setBrands((prev) =>
-          prev.map((b) => (b.brandID === dto.BrandID ? { ...b, ...dto } : b))
+          prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
         );
-        await brandService.updateBrand(dto);
-        await fetchBrands(pageParams);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
+      } finally {
+        setLoading(false);
       }
     },
-    [user?.role, fetchBrands]
+    [user?.role]
   );
 
   const deleteBrand = useCallback(
