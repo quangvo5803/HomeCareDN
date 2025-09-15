@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import MaterialCatalog from './pages/MaterialCatalog';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -25,6 +26,7 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 //Home Page
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
+import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -33,7 +35,7 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
-
+import Profile from './pages/Profile';
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -95,6 +97,14 @@ function Layout() {
           element={
             <PublicRoute>
               <MaterialDetail />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialCatalog"
+          element={
+            <PublicRoute>
+              <MaterialCatalog />
             </PublicRoute>
           }
         />
@@ -164,6 +174,10 @@ function Layout() {
             path="MaterialManager"
             element={<DistributorMaterialManager />}
           />
+          <Route
+            path="CategoryManager"
+            element={<DistributorCategoryManager />}
+          />
         </Route>
 
         {/* Redirect root → /home */}
@@ -176,6 +190,15 @@ function Layout() {
         <Route
           path="MaterialViewAll"
           element={<MaterialViewAll />}
+        />
+        {/* Profile route */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
         />
       </Routes>
       {showHeaderFooter && <Footer />}

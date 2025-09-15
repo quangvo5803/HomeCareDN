@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
+using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Chat.User;
+using BusinessLogic.DTOs.Authorize.Address;
+using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.Profiles;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using Ultitity.Extensions;
 
 namespace HomeCareDNAPI.Mapping
@@ -38,16 +40,29 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            CreateMap<CategoryCreateRequestDto, Category>();
+            CreateMap<CategoryCreateRequestDto, Category>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<BrandCreateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+
+            CreateMap<CreateAddressDto, Address>();
+
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
             CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
+            CreateMap<UpdateAddressDto, Address>()
+                // Ignore AddressId and UserId to prevent overwriting them
+                .ForMember(d => d.AddressId, opt => opt.Ignore())
+                .ForMember(d => d.UserId, opt => opt.Ignore());
+
+            CreateMap<UpdateProfileDto, ApplicationUser>()
+                // Ignore Id to prevent overwriting them
+                .ForMember(d => d.Id, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -57,11 +72,11 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MaterialUpdateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            CreateMap<CategoryUpdateRequestDto, Category>();
+            CreateMap<CategoryUpdateRequestDto, Category>()
+                .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
-            CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -106,7 +121,11 @@ namespace HomeCareDNAPI.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
 
-            CreateMap<Category, CategoryDto>().ReverseMap();
+            CreateMap<Category, CategoryDto>()
+                .ForMember(
+                    dest => dest.CategoryLogo,
+                    opt => opt.MapFrom(src => src.LogoImage!.ImageUrl)
+                );
 
             CreateMap<Brand, BrandDto>()
                 .ForMember(
@@ -117,6 +136,12 @@ namespace HomeCareDNAPI.Mapping
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+
+            CreateMap<Address, AddressDto>();
+
+            CreateMap<ApplicationUser, ProfileDto>()
+                .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
+                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty));
 
             //Chat DTOs
             CreateMap<StartConversationRequestDto, Conversation>()
@@ -158,6 +183,9 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
+
+            // ContactSupport
+            CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
         }
 

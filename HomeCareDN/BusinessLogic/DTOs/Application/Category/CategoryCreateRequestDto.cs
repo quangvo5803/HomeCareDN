@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.Category
 {
@@ -7,5 +8,10 @@ namespace BusinessLogic.DTOs.Application.Category
         [Required(ErrorMessage = "REQUIRED_CATEGORYNAME")]
         public required string CategoryName { get; set; }
         public string? CategoryNameEN { get; set; }
+        public bool IsActive { get; set; }
+        public required Guid UserID { get; set; }
+
+        [Required(ErrorMessage = "REQUIRED_CATEGORYLOGO")]
+        public required IFormFile LogoFile { get; set; }
     }
 }

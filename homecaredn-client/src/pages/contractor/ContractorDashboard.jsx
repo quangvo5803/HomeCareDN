@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import MenuList from '../../components/MenuList';
+import MenuList from '../../components/partner/MenuList';
 import AvatarMenu from '../../components/AvatarMenu';
 import LanguageSwitch from '../../components/LanguageSwitch';
 import NotificationBell from '../../components/NotificationBell';
