@@ -49,7 +49,7 @@ const FACT_ITEMS = [
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-1_gdm2t1.jpg',
     titleKey: 'home.fact_step1_title',
     descKey: 'home.fact_step1_desc',
-    ctaKey: 'home.fact_read_more',
+    ctaKey: 'BUTTON.ReadMore',
     href: '#',
   },
   {
@@ -57,7 +57,7 @@ const FACT_ITEMS = [
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-4_jhvrtl.jpg',
     titleKey: 'home.fact_step2_title',
     descKey: 'home.fact_step2_desc',
-    ctaKey: 'home.fact_read_more',
+    ctaKey: 'BUTTON.ReadMore',
     href: '#',
   },
   {
@@ -65,7 +65,7 @@ const FACT_ITEMS = [
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286667/fact-3_ag7tin.jpg',
     titleKey: 'home.fact_step3_title',
     descKey: 'home.fact_step3_desc',
-    ctaKey: 'home.fact_read_more',
+    ctaKey: 'BUTTON.ReadMore',
     href: '#',
   },
   {
@@ -73,7 +73,7 @@ const FACT_ITEMS = [
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-2_fxjryy.jpg',
     titleKey: 'home.fact_step4_title',
     descKey: 'home.fact_step4_desc',
-    ctaKey: 'home.fact_read_more',
+    ctaKey: 'BUTTON.ReadMore',
     href: '#',
   },
 ];
@@ -418,7 +418,7 @@ export default function Home() {
                         window.location.reload();
                       }}
                       className="inline-flex items-center gap-2 mt-6 text-sm font-semibold tracking-wide text-white transition-colors hover:text-primary "
-                      aria-label={`${t('home.fact_read_more')} ${t(
+                      aria-label={`${t('BUTTON.ReadMore')} ${t(
                         it.titleKey
                       )}`}
                     >
@@ -562,11 +562,11 @@ export default function Home() {
                     <a
                       href={it.href}
                       className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('home.fact_read_more')} ${t(
+                      aria-label={`${t('BUTTON.ReadMore')} ${t(
                         it.titleKey
                       )}`}
                     >
-                      {t('home.fact_read_more')}
+                      {t('BUTTON.ReadMore')}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="w-4 h-4"

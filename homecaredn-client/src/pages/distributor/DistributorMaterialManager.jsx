@@ -87,10 +87,20 @@ export default function DistributorMaterialManager() {
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800">
-          <i className="mr-2 fa-solid fa-box"></i>
-          {t('distributorMaterialManager.title')}
-        </h3>
+        <div className="flex flex-col space-y-1">
+          <h3 className="flex items-center text-lg font-semibold text-gray-800">
+            <i className="mr-2 fa-solid fa-box"></i>
+            {t('distributorMaterialManager.title')}
+          </h3>
+
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span className="text-sm font-medium text-gray-700">
+              {totalMaterials || 0} {t('distributorMaterialManager.material')}
+            </span>
+          </div>
+        </div>
+
         <button
           className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
           onClick={() => {

@@ -34,7 +34,6 @@
     "about_experience1": "Kinh nghiệm",
 
     "facts_aria": "Quy trình làm việc",
-    "fact_read_more": "Đọc thêm",
     "fact_step1_title": "Tìm nhà thầu/nhà phân phối phù hợp",
     "fact_step1_desc": "Cung cấp yêu cầu, phạm vi và ngân sách để hệ thống đề xuất đối tác phù hợp.",
     "fact_step2_title": "Các nhà thầu/nhà phân phối ",
@@ -115,42 +114,6 @@
       "desc": "Chúng tôi lắng nghe, lập kế hoạch và phối hợp chặt chẽ với khách hàng để đảm bảo mọi dự án đều phù hợp với tầm nhìn và kỳ vọng của họ."
     }
   },
-  "materials": {
-    "catalog": {
-      "title": "Danh mục Vật liệu",
-      "search_placeholder": "Tìm kiếm vật liệu...",
-      "tag_all": "Tất cả",
-      "tag_category": "Danh mục",
-      "tag_brand": "Thương hiệu",
-      "sort_relevant": "Liên quan (mặc định)",
-      "sort_az": "Tên A → Z",
-      "sort_za": "Tên Z → A",
-      "result_showing": "Hiển thị",
-      "result_items": "mục",
-      "result_for": "cho",
-      "result_in": "trong",
-      "empty_title": "Không tìm thấy vật liệu",
-      "empty_desc": "Hãy thay đổi bộ lọc hoặc xóa ô tìm kiếm.",
-      "reset_filters": "Đặt lại bộ lọc",
-      "read_more": "Xem thêm",
-      "details": "Chi tiết",
-      "breadcrumbs_home": "Trang chủ",
-      "breadcrumbs_materials": "Vật liệu"
-    },
-    "detail": {
-      "category": "Danh mục",
-      "brand": "Thương hiệu",
-      "unit": "Đơn vị",
-      "not_found": "Không tìm thấy vật liệu.",
-      "back_to_list": "Quay lại danh sách",
-      "description_tab": "Mô tả",
-      "description_button": "Đọc thêm",
-      "description_button1": "Thu gọn",
-      "related_title": "Vật liệu liên quan",
-      "cta_add_new_request": "Thêm và tạo yêu cầu mới",
-      "cta_add_to_existing": "Thêm vào yêu cầu có sẵn"
-    }
-  },
   "process": {
     "badge": "Quy trình",
     "title": "Quy trình 4 bước để xây dựng thành công.",
@@ -198,8 +161,20 @@
     "tag_all": "Tất cả",
     "tag_category": "Danh mục",
     "tag_brand": "Thương hiệu",
-    "sort_label": "Sắp xếp theo:",
-    "read_more": "Xem thêm"
+    "sort_label": "Sắp xếp theo:"
+  },
+  "materialDetail": {
+    "breadcrumb_home": "Trang chủ",
+    "breadcrumb_material": "Vật liệu",
+    "category": "Danh mục",
+    "brand": "Thương hiệu",
+    "unit": "Đơn vị",
+    "description": "Mô tả",
+    "relatedMaterial": "Vật liệu liên quan"
+  },
+  "materialViewAll": {
+    "default": "Mặc định",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
   },
   "login": {
     "title": "Đăng Nhập",
@@ -432,6 +407,7 @@
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
+    "material": "vật liệu",
     "no": "STT",
     "materialName": "Tên vật liệu",
     "brand": "Thương hiệu",
@@ -584,6 +560,8 @@
     "UpdateCategory": "Cập nhật danh mục",
     "AddNewMaterial": "Thêm vật liệu",
     "UpdateMaterial": "Cập nhật vật liệu",
+    "AddNewRequest": "Tạo và thêm yêu cầu mới",
+    "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
     "Edit": "Sửa",
     "Delete": "Xóa",
@@ -595,7 +573,9 @@
     "Sending": "Đang gửi...",
     "Close": "Đóng",
     "Activate": "Kích hoạt",
-    "Deactivate": "Hủy kích hoạt"
+    "Deactivate": "Hủy kích hoạt",
+    "ReadMore": "Xem thêm",
+    "Reduce": "Thu gọn"
   },
   "ModalPopup": {
     "DeleteBrandModal": {

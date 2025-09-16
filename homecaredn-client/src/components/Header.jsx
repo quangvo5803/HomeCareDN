@@ -16,7 +16,6 @@ const navItems = [
       { label: 'header.construction', href: '#services' },
       { label: 'header.repair', href: '#services' },
       { label: 'header.material', href: '/MaterialViewAll', type: 'link' },
-      { label: 'header.material', href: '#services' },
       {
         label: 'header.materialCatalog',
         href: '/MaterialCatalog',
@@ -79,12 +78,12 @@ export default function Header() {
   }, [openLang, openAvatarMenu]);
 
   return (
-    <header id="top" className="sticky top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
-      <nav className="max-w-screen-2xl mx-auto px-6 py-4">
+    <header id="top" className="sticky top-0 left-0 z-50 w-full border-b border-gray-100 shadow-sm bg-white/95 backdrop-blur-md">
+      <nav className="px-6 py-4 mx-auto max-w-screen-2xl">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
           <Link to="/" className="flex items-center group" aria-label="Home">
-            <div className="w-32 h-16 rounded-xl overflow-hidden group-hover:scale-110 transition-transform duration-300">
+            <div className="w-32 h-16 overflow-hidden transition-transform duration-300 rounded-xl group-hover:scale-110">
               <img
                 src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"
                 alt="HomeCareDN Logo"
@@ -122,7 +121,7 @@ export default function Header() {
                     <>
                       <button
                         type="button"
-                        className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-300 relative focus:outline-none"
+                        className="relative font-medium text-gray-700 transition-colors duration-300 hover:text-blue-600 focus:outline-none"
                       >
                         {t(item.label)}
                         <i className="ml-2 text-xs transition-transform duration-300 fas fa-chevron-down group-hover:rotate-180" />
@@ -153,7 +152,7 @@ export default function Header() {
                   <button
                     type="button"
                     onClick={() => setOpenAvatarMenu((v) => !v)}
-                    className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300 hover:border-blue-500 transition-all"
+                    className="w-10 h-10 overflow-hidden transition-all border-2 border-gray-300 rounded-full hover:border-blue-500"
                     aria-haspopup="menu"
                     aria-expanded={openAvatarMenu}
                     title={t('partnerDashboard.account')}
@@ -165,12 +164,12 @@ export default function Header() {
                     />
                   </button>
                   {openAvatarMenu && (
-                    <div role="menu" className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-lg border z-50">
+                    <div role="menu" className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44">
                       <Link
                         to="/profile"
                         relative="path"
                         onClick={() => setOpenAvatarMenu(false)}
-                        className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
                         role="menuitem"
                       >
                         <i className="fa-solid fa-user me-2"></i>
@@ -179,7 +178,7 @@ export default function Header() {
                       <button
                         type="button"
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
+                        className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
                         role="menuitem"
                       >
                         <i className="fa-solid fa-right-from-bracket me-2"></i>
@@ -207,18 +206,18 @@ export default function Header() {
                 <button
                   type="button"
                   onClick={() => setOpenLang((v) => !v)}
-                  className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-gray-50 border border-gray-300 hover:border-blue-500 rounded-full transition-all duration-300"
+                  className="flex items-center justify-center w-10 h-10 text-gray-600 transition-all duration-300 border border-gray-300 rounded-full hover:text-blue-600 hover:bg-gray-50 hover:border-blue-500"
                   aria-haspopup="menu"
                   aria-expanded={openLang}
                 >
                   <i className="fas fa-globe" />
                 </button>
                 {openLang && (
-                  <div role="menu" className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1 z-50">
+                  <div role="menu" className="absolute right-0 z-50 w-40 p-2 mt-2 space-y-1 bg-white border rounded-lg shadow-lg">
                     <button
                       type="button"
                       onClick={() => changeLanguage('en')}
-                      className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
+                      className="flex items-center w-full gap-2 px-3 py-2 rounded-md hover:bg-gray-100"
                       role="menuitem"
                     >
                       <ReactCountryFlag countryCode="US" svg className="text-lg" />
@@ -227,7 +226,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={() => changeLanguage('vi')}
-                      className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
+                      className="flex items-center w-full gap-2 px-3 py-2 rounded-md hover:bg-gray-100"
                       role="menuitem"
                     >
                       <ReactCountryFlag countryCode="VN" svg className="text-lg" />
@@ -270,7 +269,7 @@ export default function Header() {
                       <Link
                         to={item.href}
                         onClick={closeMobileNav}
-                        className="flex items-center py-3 px-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 rounded-lg font-medium transition-all duration-200 group"
+                        className="flex items-center px-3 py-3 font-medium text-gray-700 transition-all duration-200 rounded-lg hover:text-blue-600 hover:bg-blue-50 group"
                       >
                         <span className="transition-transform duration-200 group-hover:translate-x-1">
                           {t(item.label)}
@@ -296,7 +295,7 @@ export default function Header() {
                                 <a
                                   href={subItem.href}
                                   onClick={closeMobileNav}
-                                  className="block py-2 px-6 text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200"
+                                  className="block px-6 py-2 text-gray-600 transition-all duration-200 hover:text-blue-600 hover:bg-blue-50"
                                 >
                                   {t(subItem.label)}
                                 </a>
@@ -317,7 +316,7 @@ export default function Header() {
                     <Link
                       to="/profile"
                       onClick={closeMobileNav}
-                      className="flex-1 py-2 px-3 text-sm text-gray-700 bg-gray-50 border border-gray-600 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-center"
+                      className="flex-1 px-3 py-2 text-sm text-center text-gray-700 transition-colors duration-200 border border-gray-600 rounded-lg bg-gray-50 hover:bg-gray-100"
                     >
                       <i className="fa-solid fa-user me-2"></i>
                       {t('header.profile')}
@@ -325,7 +324,7 @@ export default function Header() {
                     <button
                       type="button"
                       onClick={handleLogout}
-                      className="flex-1 py-2 px-3 text-sm text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors duration-200"
+                      className="flex-1 px-3 py-2 text-sm text-white transition-colors duration-200 bg-red-600 rounded-lg hover:bg-red-700"
                     >
                       <i className="fa-solid fa-right-from-bracket me-2"></i>
                       {t('header.logout')}
@@ -336,14 +335,14 @@ export default function Header() {
                     <Link
                       to="/Login"
                       onClick={closeMobileNav}
-                      className="flex-1 py-2 px-3 text-sm text-center text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                      className="flex-1 px-3 py-2 text-sm text-center text-gray-700 transition-colors duration-200 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100"
                     >
                       {t('BUTTON.Login')}
                     </Link>
                     <Link
                       to="/Register"
                       onClick={closeMobileNav}
-                      className="flex-1 py-2 px-3 text-sm text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                      className="flex-1 px-3 py-2 text-sm text-center text-white transition-colors duration-200 bg-blue-600 rounded-lg hover:bg-blue-700"
                     >
                       {t('BUTTON.Register')}
                     </Link>

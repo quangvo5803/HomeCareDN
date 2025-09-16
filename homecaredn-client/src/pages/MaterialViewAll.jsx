@@ -5,7 +5,7 @@ import { Pagination } from 'antd';
 import MaterialItem from '../components/MaterialItem';
 import Loading from '../components/Loading';
 export default function MaterialViewAll() {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [currentPage, setCurrentPage] = useState(1);
     const [sortOption, setSortOption] = useState('random');
 
@@ -28,7 +28,13 @@ export default function MaterialViewAll() {
                 <div className="flex flex-col mb-6 md:flex-row md:justify-between md:items-center">
                     <h1 className="text-lg font-bold text-orange-400 md:text-xl">Gạch ốp lát</h1>
                     <div className="flex items-center mt-4 space-x-4 md:mt-0">
-                        <p className="text-sm md:text-base">Hiển thị {start}–{end} của tổng {totalMaterials} sản phẩm</p>
+                        <p className="text-sm md:text-base">
+                            {t('materialViewAll.pagination', {
+                                start,
+                                end,
+                                totalMaterials
+                            })}
+                        </p>
                         <select
                             aria-label="Sort options"
                             className="px-3 py-1 text-sm border border-gray-300 rounded md:text-base"
@@ -38,7 +44,7 @@ export default function MaterialViewAll() {
                                 setCurrentPage(1);
                             }}
                         >
-                            <option value="random">Mặc định</option>
+                            <option value="random">{t('materialViewAll.default')}</option>
                             <option value={i18n.language === "vi" ? "materialname" : "materialnameen"}>A-Z</option>
                             <option value={i18n.language === "vi" ? "materialname_desc" : "materialnameen_desc"}>Z-A</option>
                         </select>
@@ -46,7 +52,7 @@ export default function MaterialViewAll() {
                 </div>
                 <div className="flex flex-col gap-6 md:flex-row">
                     {/* Left sidebar */}
-                    <aside className="md:w-1/4">
+                    <aside className="md:w-1/5">
                         <div className="mb-6">
                             <h2 className="mb-2 text-sm font-bold uppercase md:text-base">
                                 Danh mục sản phẩm
@@ -118,31 +124,30 @@ export default function MaterialViewAll() {
                         </div>
                     </aside>
                     {/* Products grid */}
-                    <section className="grid grid-cols-1 gap-6 md:w-3/4 sm:grid-cols-2 lg:grid-cols-3">
+                    <section className="grid grid-cols-1 gap-6 md:w-4/5 sm:grid-cols-2 lg:grid-cols-3">
                         {materials && materials.length > 0 ? (
-                            materials.map((item, index) => (
-                                <>
+                            <>
+                                {materials.map((item) => (
                                     <MaterialItem key={item.MaterialID} item={item} />
+                                ))}
 
-                                    {/*  pagination*/}
-                                    {index === materials.length - 1 && (
-                                        <div className="flex justify-center py-4 col-span-full">
-                                            <Pagination
-                                                current={currentPage}
-                                                pageSize={pageSize}
-                                                total={totalMaterials}
-                                                onChange={(page) => setCurrentPage(page)}
-                                                showSizeChanger={false}
-                                                size="small"
-                                            />
-                                        </div>
-                                    )}
-                                </>
-                            ))
+                                <div className="flex justify-center py-4 col-span-full">
+                                    <Pagination
+                                        current={currentPage}
+                                        pageSize={pageSize}
+                                        total={totalMaterials}
+                                        onChange={(page) => setCurrentPage(page)}
+                                        showSizeChanger={false}
+                                        size="small"
+                                    />
+                                </div>
+                            </>
                         ) : (
                             <p></p>
                         )}
                     </section>
+
+
                 </div>
 
             </div >

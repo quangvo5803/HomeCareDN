@@ -1,8 +1,10 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useMaterial } from "../hook/useMaterial"
 import { useTranslation } from "react-i18next";
 import Loading from '../components/Loading';
+import DOMPurify from "dompurify";
+import he from "he";
 
 export default function MaterialDetail() {
     const { materialID } = useParams();
@@ -11,10 +13,16 @@ export default function MaterialDetail() {
     const [mainImage, setMainImage] = useState();
     const { getMaterialById, loading, fetchMaterials } = useMaterial();
     const [randomMaterials, setRandomMaterials] = useState([]);
+    const location = useLocation();
 
     // đóng mở mô tả
     const [showFullDesc, setShowFullDesc] = useState(false);
-    const MAX_LENGTH = 250;
+    //mô tả
+    const MAX_LENGTH = 500;
+    const description =
+        i18n.language === "vi"
+            ? material.description
+            : material.descriptionEN || material.description;
 
     //get by id
     useEffect(() => {
@@ -22,22 +30,25 @@ export default function MaterialDetail() {
             const data = await getMaterialById(materialID);
             setMaterial(data || {});
             setMainImage(data.imageUrls?.[0]);
-            window.scrollTo({ top: 0, behavior: "smooth" });
         };
         fetchMaterial();
+    }, [materialID, getMaterialById, location.key]);
 
-    }, [materialID, getMaterialById]);
+    // luôn nhảy lên đầu 
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }, [location.key]);
 
     //lọc theo cate
     useEffect(() => {
-
+        if (!material.categoryID) return
         const loadMaterials = async () => {
             try {
                 const data = await fetchMaterials({
                     PageNumber: 1,
                     PageSize: 8,
                     SortBy: "random",
-                    FilterID: material.categoryID
+                    FilterID: material.categoryID || null
                 });
                 setRandomMaterials(data.items || []);
             } catch (err) {
@@ -47,7 +58,7 @@ export default function MaterialDetail() {
         };
 
         loadMaterials();
-    }, [fetchMaterials]);
+    }, [fetchMaterials, material.categoryID]);
 
 
 
@@ -69,11 +80,11 @@ export default function MaterialDetail() {
                         <nav className="flex items-center mb-4 space-x-2 text-sm" aria-label="Breadcrumb">
                             <Link to="/" className="flex items-center transition-colors text-white/70 hover:text-white">
                                 <i className="mr-1 fa-solid fa-house"></i>
-                                {t('materials.catalog.breadcrumbs_home')}
+                                {t('materialDetail.breadcrumb_home')}
                             </Link>
                             <span className="text-white/40">/</span>
                             <Link to="/MaterialViewAll" className="transition-colors text-white/70 hover:text-white">
-                                {t('materials.catalog.breadcrumbs_materials')}
+                                {t('materialDetail.breadcrumb_material')}
                             </Link>
                             <span className="text-white/40">/</span>
                             <span className="font-medium text-white">
@@ -155,11 +166,13 @@ export default function MaterialDetail() {
                                 <div className="grid gap-6 md:grid-cols-3">
                                     <div className="group">
                                         <div className="flex items-center mb-2">
-                                            <div className="flex items-center justify-center w-10 h-10 mr-3 transition-colors bg-orange-100 rounded-lg group-hover:bg-orange-200">
-                                                <i className="text-lg text-orange-600 fa-solid fa-tag"></i>
+                                            <div className="flex items-center justify-center w-10 h-10 mr-3 transition-colors bg-blue-100 rounded-lg group-hover:bg-blue-200">
+                                                <i className="text-lg text-blue-600 fa-solid fa-tag"></i>
                                             </div>
                                             <div>
-                                                <p className="text-xs tracking-wider text-gray-500 uppercase">{t('materials.detail.category')}</p>
+                                                <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                    {t('materialDetail.category')}
+                                                </p>
                                                 <p className="font-semibold text-gray-900">
                                                     {i18n.language === 'vi' ? material.categoryName : material.categoryNameEN || material.categoryName}
                                                 </p>
@@ -169,11 +182,13 @@ export default function MaterialDetail() {
 
                                     <div className="group">
                                         <div className="flex items-center mb-2">
-                                            <div className="flex items-center justify-center w-10 h-10 mr-3 transition-colors bg-blue-100 rounded-lg group-hover:bg-blue-200">
-                                                <i className="text-lg text-blue-600 fa-brands fa-font-awesome"></i>
+                                            <div className="flex items-center justify-center w-10 h-10 mr-3 transition-colors bg-orange-100 rounded-lg group-hover:bg-orange-200">
+                                                <i className="text-lg text-orange-600 fa-solid fa-star"></i>
                                             </div>
                                             <div>
-                                                <p className="text-xs tracking-wider text-gray-500 uppercase">{t('materials.detail.brand')}</p>
+                                                <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                    {t('materialDetail.brand')}
+                                                </p>
                                                 <p className="font-semibold text-gray-900">
                                                     {i18n.language === 'vi' ? material.brandName : material.brandNameEN || material.brandName}
                                                 </p>
@@ -187,7 +202,9 @@ export default function MaterialDetail() {
                                                 <i className="text-lg text-green-600 fa-solid fa-scale-balanced"></i>
                                             </div>
                                             <div>
-                                                <p className="text-xs tracking-wider text-gray-500 uppercase">{t('materials.detail.unit')}</p>
+                                                <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                    {t('materialDetail.unit')}
+                                                </p>
                                                 <p className="font-semibold text-gray-900">
                                                     {i18n.language === 'vi' ? material.unit : material.unitEN || material.unit}
                                                 </p>
@@ -201,7 +218,7 @@ export default function MaterialDetail() {
                                     <button className="flex-1 group relative px-6 py-3 bg-orange-500 text-white font-medium rounded-xl  transition-all  hover:scale-[1.02]">
                                         <span className="relative z-10 flex items-center justify-center">
                                             <i className="mr-2 fa-solid fa-plus"></i>
-                                            {t('materials.detail.cta_add_new_request')}
+                                            {t('BUTTON.AddNewRequest')}
                                         </span>
 
                                     </button>
@@ -209,7 +226,7 @@ export default function MaterialDetail() {
                                     <button className="flex-1 group relative px-6 py-3 bg-white text-gray-700 font-semibold rounded-xl border-2  transition-all  hover:border-orange-500 hover:text-orange-600  hover:scale-[1.02]">
                                         <span className="relative z-10 flex items-center justify-center">
                                             <i className="mr-2 fa-solid fa-clipboard"></i>
-                                            {t('materials.detail.cta_add_to_existing')}
+                                            {t('BUTTON.AddToExisting')}
                                         </span>
                                     </button>
                                 </div>
@@ -221,26 +238,33 @@ export default function MaterialDetail() {
                             <div className="border-b border-gray-200">
                                 <nav className="flex -mb-px">
                                     <button className="relative px-6 py-4 text-sm font-medium text-orange-600 border-b-2 border-orange-500 bg-orange-50">
-                                        {t('materials.detail.description_tab')}
+                                        {t('materialDetail.description')}
                                         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-500"></div>
                                     </button>
                                 </nav>
                             </div>
 
                             <div className="p-6 lg:p-8">
-                                <p className="leading-relaxed text-gray-700 whitespace-pre-line">
-                                    {showFullDesc || material.description?.length <= MAX_LENGTH
-                                        ? material.description
-                                        : material.description?.slice(0, MAX_LENGTH) + '...'}
-                                </p>
+                                <div
+                                    className="leading-relaxed text-gray-700"
+                                    dangerouslySetInnerHTML={{
+                                        __html: DOMPurify.sanitize(
+                                            he.decode(
+                                                showFullDesc || description?.length <= MAX_LENGTH
+                                                    ? description
+                                                    : description?.slice(0, MAX_LENGTH) + "..."
+                                            )
+                                        ),
+                                    }}
+                                />
 
                                 {/* Nút toggle */}
-                                {material.description?.length > MAX_LENGTH && (
+                                {description?.length > MAX_LENGTH && (
                                     <button
                                         onClick={() => setShowFullDesc(!showFullDesc)}
-                                        className="mt-3 font-medium text-orange-600 hover:underline"
+                                        className="mt-3 font-medium text-orange-600 cursor-pointer hover:underline"
                                     >
-                                        {showFullDesc ? t('common.show_less', t('materials.detail.description_button1')) : t('common.show_more', t('materials.detail.description_button'))}
+                                        {showFullDesc ? t('BUTTON.Reduce') : t('BUTTON.ReadMore')}
                                     </button>
                                 )}
                             </div>
@@ -254,7 +278,7 @@ export default function MaterialDetail() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h3 className="text-2xl font-bold text-gray-900">
-                            {t('materials.detail.related_title')}
+                            {t('materialDetail.relatedMaterial')}
                         </h3>
                     </div>
                     <Link
@@ -262,7 +286,7 @@ export default function MaterialDetail() {
                         className="flex items-center font-medium text-orange-600 transition-colors group hover:text-orange-700"
                     >
                         {t('home.material_more', 'More Materials')}
-                        <i class="fa-solid fa-arrow-right ms-2"></i>
+                        <i className="fa-solid fa-arrow-right ms-2"></i>
                     </Link>
                 </div>
 
@@ -275,7 +299,7 @@ export default function MaterialDetail() {
                         >
                             <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">
                                 <img
-                                    src={m.imageUrls}
+                                    src={m.imageUrls?.[0]}
                                     alt={m.name}
                                     className="object-contain w-full h-full transition-transform duration-500 group-hover:scale-110"
                                 />
@@ -285,9 +309,16 @@ export default function MaterialDetail() {
                                 <h4 className="mb-2 font-semibold text-gray-900 transition-colors group-hover:text-orange-600">
                                     {i18n.language === 'vi' ? m.name : m.nameEN || m.name}
                                 </h4>
-                                <p className="text-sm text-gray-600 line-clamp-2">
-                                    {i18n.language === 'vi' ? m.description : m.descriptionEN || m.description}
-                                </p>
+                                <p
+                                    className="text-sm text-gray-600 line-clamp-2"
+                                    dangerouslySetInnerHTML={{
+                                        __html: DOMPurify.sanitize(
+                                            i18n.language === "vi" ? m.description : m.descriptionEN || m.description,
+                                            { FORBID_TAGS: ["img"] }   // loại bỏ ảnh
+                                        ),
+                                    }}
+                                ></p>
+
                             </div>
                         </Link>
                     ))}

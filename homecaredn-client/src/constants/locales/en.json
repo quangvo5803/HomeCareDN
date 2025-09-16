@@ -34,7 +34,6 @@
     "about_experience1": "Experience",
 
     "facts_aria": "Workflow",
-    "fact_read_more": "READ MORE",
     "fact_step1_title": "Find suitable contractors/distributors",
     "fact_step1_desc": "Provide requirements, scope and budget for the system to suggest suitable partners.",
     "fact_step2_title": "Applying contractors/distributors",
@@ -115,42 +114,6 @@
       "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
     }
   },
-  "materials": {
-    "catalog": {
-      "title": "Materials Catalog",
-      "search_placeholder": "Search materials...",
-      "tag_all": "All",
-      "tag_category": "Category",
-      "tag_brand": "Brand",
-      "sort_relevant": "Relevant (default)",
-      "sort_az": "Name A → Z",
-      "sort_za": "Name Z → A",
-      "result_showing": "Showing",
-      "result_items": "item(s)",
-      "result_for": "for",
-      "result_in": "in",
-      "empty_title": "No materials found",
-      "empty_desc": "Try changing filters or clearing your search.",
-      "reset_filters": "Reset filters",
-      "read_more": "Read more",
-      "details": "Details",
-      "breadcrumbs_home": "Home",
-      "breadcrumbs_materials": "Materials"
-    },
-    "detail": {
-      "category": "Category",
-      "brand": "Brand",
-      "unit": "Unit",
-      "not_found": "Material not found.",
-      "back_to_list": "Back to list",
-      "description_tab": "Descriptions",
-      "description_button": "Read more",
-      "description_button1": "Reduce",
-      "related_title": "Related materials",
-      "cta_add_new_request": "Add and create a new request",
-      "cta_add_to_existing": "Add to an existing request"
-    }
-  },
   "process": {
     "badge": "Our Process",
     "title": "Our 4-Step Process to a Successful Build.",
@@ -198,8 +161,20 @@
     "tag_all": "All",
     "tag_category": "Category",
     "tag_brand": "Brand",
-    "sort_label": "Sort by:",
-    "read_more": "Read More"
+    "sort_label": "Sort by:"
+  },
+  "materialDetail": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_material": "Material",
+    "category": "Category",
+    "brand": "Brand",
+    "unit": "Unit",
+    "description": "Descriptions",
+    "relatedMaterial": "Related Materials"
+  },
+  "materialViewAll": {
+    "default": "Default",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
   },
   "login": {
     "title": "Login",
@@ -415,6 +390,7 @@
   },
   "distributorMaterialManager": {
     "title": "Material Manager",
+    "material": "materials",
     "no": "NO",
     "materialName": "Material Name",
     "brand": "Brand",
@@ -589,6 +565,8 @@
     "UpdateCategory": "Update Category",
     "AddNewMaterial": "Add new Material",
     "UpdateMaterial": "Update Material",
+    "AddNewRequest": "Create and add a new request",
+    "AddToExisting": "Add to an existing request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -600,7 +578,9 @@
     "Sending": "Sending...",
     "Close": "Close",
     "Activate": "Activate",
-    "Deactivate": "Deactivate"
+    "Deactivate": "Deactivate",
+    "ReadMore": "Read more",
+    "Reduce": "Reduce"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
