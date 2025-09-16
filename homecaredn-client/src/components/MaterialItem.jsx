@@ -11,7 +11,7 @@ export default function MaterialItem({ item }) {
             to={`/MaterialDetail/${item.materialID}`}
             className="flex flex-col h-full overflow-hidden transition border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-md"
         >
-            {/* Ảnh (cố định chiều cao) */}
+            {/* Ảnh  */}
             <div className="relative flex items-center justify-center overflow-hidden bg-gray-100 h-72">
                 <img
                     src={item.imageUrls?.[0]}
@@ -22,12 +22,11 @@ export default function MaterialItem({ item }) {
 
             {/* Nội dung */}
             <div className="flex flex-col flex-grow p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                {/* Tên (chiều cao cố định để cân bằng) */}
+
                 <h5 className="mb-2 text-lg font-semibold line-clamp-2 min-h-[56px] flex items-center justify-center">
                     {i18n.language === "vi" ? item.name : item.nameEN || item.name}
                 </h5>
 
-                {/* Category & Brand (luôn chiếm 1 hàng) */}
                 <div className="flex items-center justify-center gap-3 mt-2">
                     <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-xs font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
                         <i className="fas fa-tags"></i>
@@ -49,8 +48,6 @@ export default function MaterialItem({ item }) {
                 </div>
 
 
-
-                {/* Nút luôn ở cuối */}
                 <div className="mt-3">
                     <div
                         className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
@@ -81,5 +78,9 @@ MaterialItem.propTypes = {
         description: PropTypes.string,
         descriptionEN: PropTypes.string,
         imageUrls: PropTypes.string,
+        categoryName: PropTypes.string.isRequired,
+        categoryNameEN: PropTypes.string,
+        brandName: PropTypes.string.isRequired,
+        brandNameEN: PropTypes.string,
     }).isRequired,
 };

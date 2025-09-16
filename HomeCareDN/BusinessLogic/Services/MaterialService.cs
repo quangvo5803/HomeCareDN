@@ -15,6 +15,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string MATERIAL = "Material";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
@@ -123,7 +124,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -140,7 +141,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -157,7 +158,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -191,7 +192,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
