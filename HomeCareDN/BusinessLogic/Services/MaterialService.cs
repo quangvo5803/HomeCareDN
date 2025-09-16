@@ -19,6 +19,7 @@ namespace BusinessLogic.Services
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string ERROR_IMAGE_NOT_FOUND = "IMAGE_NOT_FOUND";
+        private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -31,7 +32,7 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.MaterialRepository.GetQueryable(
-                includeProperties: "Images,Brand,Category"
+                includeProperties: MATERIAL_INCLUDE
             );
             if (parameters.FilterID.HasValue)
             {
@@ -65,7 +66,7 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.MaterialRepository.GetQueryable(
-                includeProperties: "Images,Brand,Category"
+                includeProperties: MATERIAL_INCLUDE
             );            
             query = query.Where(m => m.UserID == parameters.FilterID.ToString());
             var totalCount = await query.CountAsync();
@@ -106,7 +107,7 @@ namespace BusinessLogic.Services
 
             material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == material.MaterialID,
-                includeProperties: "Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
             return _mapper.Map<MaterialDto>(material);
         }
@@ -115,7 +116,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images,Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
 
             if (material == null)
@@ -134,7 +135,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork
                 .MaterialRepository.GetAsync(m => m.CategoryID == id, 
-                includeProperties: "Images,Category,Brand");
+                includeProperties: MATERIAL_INCLUDE);
             if (material == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -150,7 +151,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork
                 .MaterialRepository.GetAsync(m => m.BrandID == id, 
-                includeProperties: "Images,Category,Brand");
+                includeProperties: MATERIAL_INCLUDE);
             
             if (material == null)
             {
@@ -167,7 +168,7 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images,Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
 
             //check image

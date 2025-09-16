@@ -123,22 +123,26 @@ export default function MaterialDetail() {
                                 <div className="grid grid-cols-4 gap-3">
                                     {material.imageUrls.slice(0, 4).map((src, i) => (
                                         <button
-                                            key={i}
+                                            key={src}
                                             onClick={() => setMainImage(src)}
                                             className={`
-                                        relative bg-white rounded-xl overflow-hidden aspect-square
-                                        transition-all duration-300 hover:shadow-lg
-                                        ${mainImage === src
+                                                relative 
+                                                bg-white 
+                                                rounded-xl 
+                                                overflow-hidden 
+                                                aspect-square 
+                                                flex items-center justify-center
+                                                transition-all duration-300 hover:shadow-lg
+                                                ${mainImage === src
                                                     ? 'ring-2 ring-orange-500 shadow-md scale-105'
-                                                    : 'hover:scale-105 shadow-sm'
-                                                }
-                                    `}
+                                                    : 'hover:scale-105 shadow-sm'}
+                                                `}
                                             aria-label={`${material.name} thumbnail ${i + 1}`}
                                         >
                                             <img
                                                 src={src}
                                                 alt={`${material.name} thumbnail ${i + 1}`}
-                                                className="object-cover w-full h-full"
+                                                className="object-contain w-[95px] h-[95px]"
                                             />
                                             {mainImage === src && (
                                                 <div className="absolute inset-0 bg-orange-500/10" />
@@ -147,6 +151,7 @@ export default function MaterialDetail() {
                                     ))}
                                 </div>
                             )}
+
                         </div>
                     </div>
 

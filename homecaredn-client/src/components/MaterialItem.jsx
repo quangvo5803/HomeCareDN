@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useTranslation } from "react-i18next";
 import { Link } from 'react-router-dom';
-import DOMPurify from "dompurify";
 
 export default function MaterialItem({ item }) {
     const { t, i18n } = useTranslation();
@@ -29,20 +28,27 @@ export default function MaterialItem({ item }) {
                 </h5>
 
                 {/* Category & Brand (luôn chiếm 1 hàng) */}
-                <div className="flex justify-center gap-3 mt-2 min-h-[40px] items-center">
-                    {item.categoryName && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg bg-blue-600">
-                            <i className="fas fa-tags"></i>
-                            {i18n.language === 'vi' ? item.categoryName : item.categoryNameEN || item.categoryName}
+                <div className="flex items-center justify-center gap-3 mt-2">
+                    <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-xs font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
+                        <i className="fas fa-tags"></i>
+                        <span className="truncate">
+                            {i18n.language === "vi"
+                                ? item.categoryName
+                                : item.categoryNameEN || item.categoryName}
                         </span>
-                    )}
-                    {item.brandName && (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg bg-orange-600">
-                            <i className="fas fa-star"></i>
-                            {i18n.language === 'vi' ? item.brandName : item.brandNameEN || item.brandName}
+                    </span>
+
+                    <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-xs font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
+                        <i className="fas fa-star"></i>
+                        <span className="truncate">
+                            {i18n.language === "vi"
+                                ? item.brandName
+                                : item.brandNameEN || item.brandName}
                         </span>
-                    )}
+                    </span>
                 </div>
+
+
 
                 {/* Nút luôn ở cuối */}
                 <div className="mt-3">

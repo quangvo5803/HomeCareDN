@@ -201,28 +201,28 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto p-8 flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b pb-4">
+        <div className="flex items-center justify-between pb-4 border-b">
           <h3 className="text-2xl font-semibold text-gray-900">
             {material ? t('BUTTON.UpdateMaterial') : t('BUTTON.AddNewMaterial')}
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-2 hover:bg-gray-100 rounded-full"
+            className="p-2 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100"
           >
-            <i className="fa-solid fa-xmark text-lg"></i>
+            <i className="text-lg fa-solid fa-xmark"></i>
           </button>
         </div>
 
         {/* Body (scrollable) */}
-        <div className="flex-1 overflow-y-auto pr-2 mt-4 space-y-6">
+        <div className="flex-1 pr-2 mt-4 space-y-6 overflow-y-auto">
           {/* Form */}
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             {/* Material Name */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.materialName')}
               </label>
               <input
@@ -235,7 +235,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
             {/* Unit */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.unit')}
               </label>
               <input
@@ -248,7 +248,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
             {/* Brand */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.brand')}
               </label>
               <select
@@ -273,7 +273,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
             {/* Category */}
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.category')}
               </label>
               <select
@@ -300,7 +300,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
             {/* Description */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.description')}
               </label>
               <Editor
@@ -322,7 +322,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3"
+                className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700"
               >
                 <i className="fas fa-globe text-emerald-500"></i>
                 {t(
@@ -332,11 +332,11 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               </button>
 
               {isExpanded && (
-                <div className="p-5 rounded-xl bg-gray-50 space-y-4">
+                <div className="p-5 space-y-4 rounded-xl bg-gray-50">
                   <div className="grid grid-cols-2 gap-6">
                     {/* Material Name EN */}
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700">
+                      <label className="block mb-2 text-sm font-medium text-gray-700">
                         {t(
                           'distributorMaterialManager.materialModal.materialNameEN'
                         )}
@@ -351,7 +351,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
                     {/* Unit EN */}
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700">
+                      <label className="block mb-2 text-sm font-medium text-gray-700">
                         {t('distributorMaterialManager.materialModal.unitEN')}
                       </label>
                       <input
@@ -365,7 +365,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
                   {/* Description EN */}
                   <div>
-                    <label className="block text-sm font-medium mb-2 text-gray-700">
+                    <label className="block mb-2 text-sm font-medium text-gray-700">
                       {t(
                         'distributorMaterialManager.materialModal.descriptionEN'
                       )}
@@ -389,7 +389,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
 
             {/* Images */}
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-2 text-gray-700">
+              <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.images')}
               </label>
 
@@ -408,9 +408,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   {/* Custom button */}
                   <label
                     htmlFor="fileUpload"
-                    className="inline-block px-4 py-2 rounded-lg cursor-pointer 
-                    bg-emerald-50 text-emerald-600 font-medium 
-                    hover:bg-emerald-100 border border-emerald-200"
+                    className="inline-block px-4 py-2 font-medium border rounded-lg cursor-pointer bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200"
                   >
                     {t('distributorMaterialManager.materialModal.chooseFile')}
                   </label>
@@ -419,8 +417,8 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   <span className="ml-3 text-sm text-gray-500">
                     {newImages.length > 0
                       ? `${newImages.length} ${t(
-                          'distributorMaterialManager.materialModal.filesSelected'
-                        )}`
+                        'distributorMaterialManager.materialModal.filesSelected'
+                      )}`
                       : t('distributorMaterialManager.materialModal.noFile')}
                   </span>
                 </div>
@@ -431,19 +429,19 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                 {existingImages.map((imgUrl) => (
                   <div
                     key={imgUrl}
-                    className="relative group w-24 h-24 rounded-lg overflow-hidden border shadow-sm"
+                    className="relative flex items-center justify-center w-24 h-24 overflow-hidden bg-white border rounded-lg shadow-sm group"
                   >
                     <img
                       src={imgUrl}
                       alt="db"
-                      className="w-full h-full object-cover"
+                      className="max-w-[83px] max-h-[83px] object-contain"
                     />
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
                       {existingImages.length !== 1 && (
                         <button
                           type="button"
                           onClick={() => handleRemoveExistingImage(imgUrl)}
-                          className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
+                          className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
                         >
                           <i className="fa-solid fa-xmark"></i>
                         </button>
@@ -456,18 +454,18 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                 {newImages.map((img) => (
                   <div
                     key={img.id}
-                    className="relative group w-24 h-24 rounded-lg overflow-hidden border shadow-sm"
+                    className="relative flex items-center justify-center w-24 h-24 overflow-hidden bg-white border rounded-lg shadow-sm group"
                   >
                     <img
                       src={img.previewUrl}
                       alt="new"
-                      className="w-full h-full object-cover"
+                      className="max-w-[83px] max-h-[83px] object-contain"
                     />
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition">
+                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
                       <button
                         type="button"
                         onClick={() => handleRemoveNewImage(img.id)}
-                        className="absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs shadow hover:bg-red-700"
+                        className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
                       >
                         <i className="fa-solid fa-xmark"></i>
                       </button>
@@ -475,12 +473,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                   </div>
                 ))}
               </div>
+
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t pt-4 mt-4">
+        <div className="flex justify-end gap-3 pt-4 mt-4 border-t">
           <button
             onClick={onClose}
             className="px-5 py-2 border rounded-xl hover:bg-gray-50"
@@ -489,7 +488,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           </button>
           <button
             onClick={handleSubmit}
-            className="px-5 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 shadow"
+            className="px-5 py-2 text-white shadow bg-emerald-500 rounded-xl hover:bg-emerald-600"
           >
             {material ? t('BUTTON.Update') : t('BUTTON.Add')}
           </button>
