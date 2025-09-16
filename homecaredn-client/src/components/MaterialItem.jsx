@@ -9,14 +9,14 @@ export default function MaterialItem({ item }) {
     return (
         <Link
             to={`/MaterialDetail/${item.materialID}`}
-            className="flex flex-col h-full overflow-hidden transition border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-md"
+            className="flex flex-col h-full overflow-hidden transition-all duration-300 border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-2xl hover:-translate-y-1"
         >
             {/* Ảnh  */}
             <div className="relative flex items-center justify-center overflow-hidden bg-gray-100 h-72">
                 <img
                     src={item.imageUrls?.[0]}
                     alt={item.name}
-                    className="object-contain max-w-full max-h-full"
+                    className="object-contain max-w-[250px] max-h-[250px] duration-300 group-hover:scale-110"
                 />
             </div>
 
