@@ -50,7 +50,7 @@ export default function Sidebar({
       {
         key: 'logout',
         label: t('header.logout'),
-        icon: <i className="fa-solid fa-right-from-bracket text-red-500"></i>,
+        icon: <i className="text-red-500 fa-solid fa-right-from-bracket"></i>,
         onClick: () => {
           if (typeof ctxLogout === 'function') ctxLogout();
           authService.logout();
@@ -71,7 +71,7 @@ export default function Sidebar({
       }
     >
       {/* Brand */}
-      <div className="p-5 border-b border-gray-200 flex items-center gap-3">
+      <div className="flex items-center gap-3 p-5 border-b border-gray-200">
         <Link
           to="/"
           aria-label={brand.title || 'HomeCareDN'}
@@ -80,7 +80,7 @@ export default function Sidebar({
           <img
             src={brand.logoUrl}
             alt="Logo"
-            className="h-10 w-auto object-contain"
+            className="object-contain w-auto h-10"
           />
         </Link>
         <div className="min-w-0 leading-tight">
@@ -95,14 +95,14 @@ export default function Sidebar({
       </div>
 
       {/* Menu */}
-      <nav className="p-3 text-gray-600 space-y-1">
+      <nav className="p-3 space-y-1 text-gray-600">
         {menu.map((it) =>
           it.onClick ? (
             <button
               key={it.key}
               type="button"
               onClick={() => handleClick(it)}
-              className="w-full text-left block px-3 py-2 rounded-xl hover:bg-gray-100 text-red-500"
+              className="block w-full px-3 py-2 text-left text-red-500 rounded-xl hover:bg-gray-100"
             >
               <span className="mr-2">{it.icon}</span>
               <span>{it.label}</span>
@@ -131,7 +131,7 @@ export default function Sidebar({
         )}
       </nav>
 
-      <div className="mt-auto p-4 text-xs text-gray-500 border-t border-gray-200">
+      <div className="p-4 mt-auto text-xs text-gray-500 border-t border-gray-200">
         © {new Date().getFullYear()} {brand.title || 'HomeCareDN'}
       </div>
     </aside>

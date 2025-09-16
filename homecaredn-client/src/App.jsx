@@ -23,6 +23,9 @@ import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Home Page
+import MaterialViewAll from './pages/MaterialViewAll';
+import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 
 import AuthProvider from './context/AuthProvider';
@@ -51,7 +54,7 @@ function Layout() {
   const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
 
   const showHeaderFooter =
-    !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
+    !noHeaderFooterPaths.includes(location.pathname) &&
     (!user ||
       (user.role !== 'Admin' &&
         user.role !== 'Contractor' &&
@@ -86,6 +89,14 @@ function Layout() {
           element={
             <PublicRoute>
               <Contact />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialDetail/:materialID"
+          element={
+            <PublicRoute>
+              <MaterialDetail />
             </PublicRoute>
           }
         />
@@ -176,8 +187,12 @@ function Layout() {
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
-          {/* Profile route */}
-         <Route
+        <Route
+          path="MaterialViewAll"
+          element={<MaterialViewAll />}
+        />
+        {/* Profile route */}
+        <Route
           path="/profile"
           element={
             <ProtectedRoute>

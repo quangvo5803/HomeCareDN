@@ -102,6 +102,9 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(
+                    dest => dest.CategoryID, 
+                    otp => otp.MapFrom(src => src.Category!.CategoryID))
+                .ForMember(
                     dest => dest.BrandNameEN,
                     opt => opt.MapFrom(src => src.Brand!.BrandNameEN)
                 )

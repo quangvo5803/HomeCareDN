@@ -77,39 +77,39 @@ export default function MaterialCatalog() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <section className="bg-white shadow-lg border-b">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl shadow-lg mb-4">
-              <i className="fas fa-cube text-white text-xl"></i>
+      <section className="bg-white border-b shadow-lg">
+        <div className="px-6 py-12 mx-auto max-w-7xl">
+          <div className="mb-10 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4 shadow-lg bg-gradient-to-r from-blue-600 to-orange-600 rounded-2xl">
+              <i className="text-xl text-white fas fa-cube"></i>
             </div>
-            <h1 className="text-5xl font-bold text-gray-800 mb-3">
+            <h1 className="mb-3 text-5xl font-bold text-gray-800">
               {t('materialsCatalog.title')}
             </h1>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="max-w-2xl mx-auto text-lg text-gray-600">
               {t('materialsCatalog.subtitle')}
             </p>
           </div>
 
           {/* Controls */}
-          <div className="flex flex-col md:flex-row gap-6 justify-center items-center mb-8">
+          <div className="flex flex-col items-center justify-center gap-6 mb-8 md:flex-row">
             {/* Search */}
             <div className="relative w-full max-w-md">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <i className="fas fa-search text-blue-600"></i>
+              <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                <i className="text-blue-600 fas fa-search"></i>
               </div>
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder={t('materialsCatalog.search_placeholder')}
-                className="w-full pl-12 pr-12 py-3 bg-white border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none shadow-sm transition-all"
+                className="w-full py-3 pl-12 pr-12 transition-all bg-white border-2 border-gray-200 shadow-sm outline-none rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
               />
               {q && (
                 <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gray-100 hover:bg-red-100 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-600 transition-all"
+                  className="absolute flex items-center justify-center text-gray-500 transition-all -translate-y-1/2 bg-gray-100 rounded-lg right-3 top-1/2 w-7 h-7 hover:bg-red-100 hover:text-red-600"
                   onClick={() => setQ('')}
                 >
-                  <i className="fas fa-times text-sm"></i>
+                  <i className="text-sm fas fa-times"></i>
                 </button>
               )}
             </div>
@@ -119,12 +119,12 @@ export default function MaterialCatalog() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="appearance-none px-6 py-3 pr-10 bg-white border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600 outline-none shadow-sm font-medium transition-all"
+                className="px-6 py-3 pr-10 font-medium transition-all bg-white border-2 border-gray-200 shadow-sm outline-none appearance-none rounded-xl focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
               >
                 <option value="asc"> A → Z</option>
                 <option value="desc"> Z → A</option>
               </select>
-              <i className="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-blue-600 pointer-events-none"></i>
+              <i className="absolute text-blue-600 -translate-y-1/2 pointer-events-none fas fa-chevron-down right-3 top-1/2"></i>
             </div>
           </div>
 
@@ -136,16 +136,14 @@ export default function MaterialCatalog() {
                 <button
                   key={tg.id}
                   onClick={() => setTag(tg.id)}
-                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
-                    active
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-600'
-                  }`}
+                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${active
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-600'
+                    }`}
                 >
                   <i
-                    className={`fas ${tg.icon} mr-2 ${
-                      active ? 'text-white' : 'text-blue-600'
-                    }`}
+                    className={`fas ${tg.icon} mr-2 ${active ? 'text-white' : 'text-blue-600'
+                      }`}
                   ></i>
                   {t(tg.i18n)}
                 </button>
@@ -156,14 +154,14 @@ export default function MaterialCatalog() {
       </section>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      <div className="px-6 py-10 mx-auto max-w-7xl">
         {sortedItems.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-2xl shadow-lg mb-4">
-              <i className="fas fa-search-minus text-3xl text-gray-400"></i>
+          <div className="py-20 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gray-100 shadow-lg rounded-2xl">
+              <i className="text-3xl text-gray-400 fas fa-search-minus"></i>
             </div>
-            <h3 className="text-xl font-bold text-gray-400 mb-2">
-              Không tìm thấy kết quả
+            <h3 className="mb-2 text-xl font-bold text-gray-400">
+              {t('materialsCatalog.noCategory')}
             </h3>
             <p className="text-gray-500">{t('materialsCatalog.noCategory')}</p>
           </div>
@@ -176,28 +174,26 @@ export default function MaterialCatalog() {
                 // thêm delay cho từng card
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer h-full">
+                <div className="h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-lg cursor-pointer group rounded-2xl hover:shadow-xl hover:-translate-y-1">
                   {/* Image */}
                   <div className="relative h-52 bg-gradient-to-br from-gray-50 to-white">
                     <img
                       src={m.img}
                       alt={m.title}
-                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 p-3"
+                      className="object-contain w-full h-full p-3 transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                     />
                     {/* Badge */}
                     <div className="absolute top-3 left-3">
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${
-                          m.type === 'category'
-                            ? 'bg-blue-600'
-                            : 'bg-orange-600'
-                        }`}
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${m.type === 'category'
+                          ? 'bg-blue-600'
+                          : 'bg-orange-600'
+                          }`}
                       >
                         <i
-                          className={`fas ${
-                            m.type === 'category' ? 'fa-tags' : 'fa-star'
-                          }`}
+                          className={`fas ${m.type === 'category' ? 'fa-tags' : 'fa-star'
+                            }`}
                         ></i>
                         {m.type === 'category' ? 'Danh mục' : 'Thương hiệu'}
                       </span>
@@ -206,14 +202,14 @@ export default function MaterialCatalog() {
 
                   {/* Content */}
                   <div className="p-5">
-                    <h3 className="font-bold text-lg text-center text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                    <h3 className="mb-2 text-lg font-bold text-center text-gray-900 transition-colors group-hover:text-blue-600">
                       {i18n.language === 'vi' ? m.title : m.titleEN || m.title}
                     </h3>
 
-                    <button className="flex items-center justify-center gap-2 text-orange-600 hover:text-orange-700 font-semibold text-sm transition-all group-hover:gap-3 mx-auto">
-                      {t('materialsCatalog.read_more')}
-                      <div className="w-6 h-6 bg-orange-600/10 rounded-lg flex items-center justify-center group-hover:bg-orange-600 transition-all">
-                        <i className="fas fa-arrow-right text-xs group-hover:text-white transition-colors"></i>
+                    <button className="flex items-center justify-center gap-2 mx-auto text-sm font-semibold text-orange-600 transition-all hover:text-orange-700 group-hover:gap-3">
+                      {t('BUTTON.ReadMore')}
+                      <div className="flex items-center justify-center w-6 h-6 transition-all rounded-lg bg-orange-600/10 group-hover:bg-orange-600">
+                        <i className="text-xs transition-colors fas fa-arrow-right group-hover:text-white"></i>
                       </div>
                     </button>
                   </div>

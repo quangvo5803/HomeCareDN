@@ -34,7 +34,6 @@
     "about_experience1": "Experience",
 
     "facts_aria": "Workflow",
-    "fact_read_more": "READ MORE",
     "fact_step1_title": "Find suitable contractors/distributors",
     "fact_step1_desc": "Provide requirements, scope and budget for the system to suggest suitable partners.",
     "fact_step2_title": "Applying contractors/distributors",
@@ -97,75 +96,86 @@
     "about": "About"
   },
   "why": {
-  "badge": "Why Choose Us",
-  "title": "Why Builders Trust",
-  "brand": "HomeCareDN",
-  "intro": "At HomeCareDN, we don't just build — we build with purpose, integrity, and precision. Our reputation is grounded in trust, quality, and client satisfaction.",
-  "image_alt": "Why Choose Us illustration",
-  "f1": {
-    "title": "Experienced & Skilled Team",
-    "desc": "Decades of hands-on experience with a team of certified engineers, architects, and project managers who understand every detail of construction."
-  },
-  "f2": {
-    "title": "High-Quality Craftsmanship",
-    "desc": "We combine traditional techniques with modern innovations to deliver long-lasting, precision-built structures — every time."
-  },
-  "f3": {
-    "title": "Client-Centered Approach",
-    "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
-  }
-},
-"process": {
-  "badge": "Our Process",
-  "title": "Our 4-Step Process to a Successful Build.",
-  "intro": "At HomeCareDN, we don't just build — we craft. Every space we deliver is a reflection of thoughtful design, expert planning, and precise execution.",
-  "s1": {
-    "title": "Understanding your needs",
-    "desc": "We listen closely to your goals, challenges, and vision to deliver."
-  },
-  "s2": {
-    "title": "Detailed timeline & quote",
-    "desc": "We provide transparent project timelines and accurate cost estimates."
-  },
-  "s3": {
-    "title": "Expertly Built With Care",
-    "desc": "Every structure we build reflects our commitment to quality craftsmanship."
-  },
-  "s4": {
-    "title": "Final Check & Handover",
-    "desc": "Before delivery, we conduct a thorough final inspection to ensure everything."
-  }
-},
-"contact": {
-  "breadcrumb": "Contact Us",
-  "title": "Contact Us",
-  "map_title": "Google Map",
-  "section_tag": "Contact Us",
-  "section_title": "If You Have Any Query, Please Contact Us",
-  "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
-  "note_link": "Download Now",
-  "form_aria": "Contact form",
-  "form": {
-    "name": "Your Name",
-    "email": "Your Email",
-    "subject": "Subject",
-    "message": "Message"
+    "badge": "Why Choose Us",
+    "title": "Why Builders Trust",
+    "brand": "HomeCareDN",
+    "intro": "At HomeCareDN, we don't just build — we build with purpose, integrity, and precision. Our reputation is grounded in trust, quality, and client satisfaction.",
+    "image_alt": "Why Choose Us illustration",
+    "f1": {
+      "title": "Experienced & Skilled Team",
+      "desc": "Decades of hands-on experience with a team of certified engineers, architects, and project managers who understand every detail of construction."
     },
-  "success_message": "Your request has been sent successfully! We will contact you soon.",
-  "error_message": "An error occurred while sending your request. Please try again later."
-}
-,
-"materialsCatalog": {
-  "title": "Material Catalog",
-  "subtitle": "Explore our categories and brands",
-  "noCategory": "No categories yet",
-  "search_placeholder": "Search for categories...",
-  "tag_all": "All",
-  "tag_category": "Category",
-  "tag_brand": "Brand",
-  "sort_label": "Sort by:",
-  "read_more": "Read More"
-},
+    "f2": {
+      "title": "High-Quality Craftsmanship",
+      "desc": "We combine traditional techniques with modern innovations to deliver long-lasting, precision-built structures — every time."
+    },
+    "f3": {
+      "title": "Client-Centered Approach",
+      "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
+    }
+  },
+  "process": {
+    "badge": "Our Process",
+    "title": "Our 4-Step Process to a Successful Build.",
+    "intro": "At HomeCareDN, we don't just build — we craft. Every space we deliver is a reflection of thoughtful design, expert planning, and precise execution.",
+    "s1": {
+      "title": "Understanding your needs",
+      "desc": "We listen closely to your goals, challenges, and vision to deliver."
+    },
+    "s2": {
+      "title": "Detailed timeline & quote",
+      "desc": "We provide transparent project timelines and accurate cost estimates."
+    },
+    "s3": {
+      "title": "Expertly Built With Care",
+      "desc": "Every structure we build reflects our commitment to quality craftsmanship."
+    },
+    "s4": {
+      "title": "Final Check & Handover",
+      "desc": "Before delivery, we conduct a thorough final inspection to ensure everything."
+    }
+  },
+  "contact": {
+    "breadcrumb": "Contact Us",
+    "title": "Contact Us",
+    "map_title": "Google Map",
+    "section_tag": "Contact Us",
+    "section_title": "If You Have Any Query, Please Contact Us",
+    "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
+    "note_link": "Download Now",
+    "form_aria": "Contact form",
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "success_message": "Your request has been sent successfully! We will contact you soon.",
+    "error_message": "An error occurred while sending your request. Please try again later."
+  },
+  "materialsCatalog": {
+    "title": "Material Catalog",
+    "subtitle": "Explore our categories and brands",
+    "noCategory": "No categories yet",
+    "search_placeholder": "Search for categories...",
+    "tag_all": "All",
+    "tag_category": "Category",
+    "tag_brand": "Brand",
+    "sort_label": "Sort by:"
+  },
+  "materialDetail": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_material": "Material",
+    "category": "Category",
+    "brand": "Brand",
+    "unit": "Unit",
+    "description": "Descriptions",
+    "relatedMaterial": "Related Materials"
+  },
+  "materialViewAll": {
+    "default": "Default",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
+  },
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -375,11 +385,12 @@
       "multilanguage_for_data": " Multilanguage for data",
       "categoryLogo": "Category logo",
       "chooseFile": "Choose file to upload",
-      "isActive": "Activate category" 
+      "isActive": "Activate category"
     }
   },
   "distributorMaterialManager": {
     "title": "Material Manager",
+    "material": "materials",
     "no": "NO",
     "materialName": "Material Name",
     "brand": "Brand",
@@ -426,21 +437,21 @@
     "letStart": "Start by adding your first category."
   },
   "adminSupportManager": {
-  "title": "Support Manager",
-  "subtitle": "Customer requests",
-  "fullName": "Full name",
-  "email": "Email",
-  "subject": "Subject",
-  "status": "Status",
-  "processed": "Processed",
-  "pending": "Pending",
-  "action": "Action",
-  "replyTitle": "Reply to request",
-  "replyLabel": "Your reply",
-  "replyPlaceholder": "Type your reply here...",
-  "noSupport": "No support requests yet",
-  "all": "All",
-  "itemsCount": "{{count}} item(s)"
+    "title": "Support Manager",
+    "subtitle": "Customer requests",
+    "fullName": "Full name",
+    "email": "Email",
+    "subject": "Subject",
+    "status": "Status",
+    "processed": "Processed",
+    "pending": "Pending",
+    "action": "Action",
+    "replyTitle": "Reply to request",
+    "replyLabel": "Your reply",
+    "replyPlaceholder": "Type your reply here...",
+    "noSupport": "No support requests yet",
+    "all": "All",
+    "itemsCount": "{{count}} item(s)"
   },
   "roles": {
     "Distributor": "Distributor",
@@ -449,7 +460,10 @@
     "Customer": "Customer"
   },
   "profile": {
-    "tabs": { "profile": "Profile", "service_requests": "Service Request Management" },
+    "tabs": {
+      "profile": "Profile",
+      "service_requests": "Service Request Management"
+    },
     "title": "Your profile",
     "addresses": "Your addresses",
     "subtitle": "Profile and services",
@@ -457,19 +471,24 @@
       "full_name": "Full name",
       "phone": "Phone number",
       "gender": "Gender",
-      "email" : "Email",
+      "email": "Email",
       "email_readonly": "Email (cannot be changed)",
       "save": "Save changes",
       "saving": "Saving..."
     },
-    "gender": { "none": "—", "male": "Male", "female": "Female", "other": "Other" },
+    "gender": {
+      "none": "—",
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
     "update_success": "Profile updated successfully",
     "update_error": "Profile update failed",
     "service_requests": {
       "title": "Service Request Management",
       "placeholder": "Embed your service request form here…"
     },
-      "back": "Back"
+    "back": "Back"
   },
   "address": {
     "title": "My addresses",
@@ -546,6 +565,8 @@
     "UpdateCategory": "Update Category",
     "AddNewMaterial": "Add new Material",
     "UpdateMaterial": "Update Material",
+    "AddNewRequest": "Create and add a new request",
+    "AddToExisting": "Add to an existing request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -557,7 +578,9 @@
     "Sending": "Sending...",
     "Close": "Close",
     "Activate": "Activate",
-    "Deactivate": "Deactivate"
+    "Deactivate": "Deactivate",
+    "ReadMore": "Read more",
+    "Reduce": "Reduce"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -573,8 +596,8 @@
       "text": "Please wait a moment."
     },
     "DeleteSupportModal": {
-    "title": "Delete this support request?",
-    "text": "This action cannot be undone."
+      "title": "Delete this support request?",
+      "text": "This action cannot be undone."
     },
     "DeleteMaterialModal": {
       "title": "Are you sure?",
@@ -601,10 +624,10 @@
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
     "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
-    "MAXIMUM_IMAGE_SIZE":"Each image must be less than 5 MB.",
+    "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
     "MATERIAL_NOT_FOUND": "Material not found.",
-    "IMAGE_NOT_FOUND" : "Image not found",
-    
+    "IMAGE_NOT_FOUND": "Image not found",
+
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
     "REQUIRED_CATEGORYNAME": "Please enter category name.",
