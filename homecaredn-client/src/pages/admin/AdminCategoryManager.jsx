@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { handleApiError } from '../../utils/handleApiError';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useCategory } from '../../hook/useCategory';
 import { Pagination } from 'antd';
-import CategoryModal from '../../components/admin/CategoryModal';
+import CategoryModal from '../../components/modal/CategoryModal';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function AdminCategoryManager() {
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { t, i18n } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
 
   const {
     categories,
+    totalCategories,
     loading,
     fetchCategories,
     createCategory,
@@ -22,81 +24,47 @@ export default function AdminCategoryManager() {
     deleteCategory,
   } = useCategory();
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-
   // Fetch categories khi vào trang
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * pageSize;
-  const indexOfFirstItem = indexOfLastItem - pageSize;
-  const currentCategories = categories.slice(indexOfFirstItem, indexOfLastItem);
-
-  if (currentPage > 1 && currentCategories.length === 0) {
-    setCurrentPage(currentPage - 1);
-  }
-
-  // View Category
-  const handleView = (category) => {
-    alert(`Xem thông tin category: ${category.categoryName}`);
-  };
+    fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
+  }, [currentPage, fetchCategories]);
 
   // Delete Category
   const handleDelete = async (categoryId) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteCategoryModal.title'),
-      text: t('ModalPopup.DeleteCategoryModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-          await deleteCategory(categoryId);
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteCategoryModal.title',
+      textKey: 'ModalPopup.DeleteCategoryModal.text',
+      onConfirm: async () => {
+        await deleteCategory(categoryId);
+
+        const lastPage = Math.ceil((totalCategories - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
 
   // Save Category (Create / Update)
   const handleSave = async (categoryData) => {
-    try {
-      if (categoryData.CategoryID) {
-        await updateCategory(categoryData);
-        toast.success(t('SUCCESS.CATEGORY_UPDATE'));
-      } else {
-        await createCategory(categoryData);
-        setCurrentPage(1);
-        toast.success(t('SUCCESS.CATEGORY_ADD'));
-      }
-      setIsModalOpen(false);
-      setEditingCategory(null);
-    } catch (err) {
-      if (err.handled) return;
-      toast.error(handleApiError(err));
+    if (categoryData.CategoryID) {
+      await updateCategory(categoryData);
+      toast.success(t('SUCCESS.CATEGORY_UPDATE'));
+    } else {
+      await createCategory(categoryData);
+      toast.success(t('SUCCESS.CATEGORY_ADD'));
+      const lastPage = Math.ceil((totalCategories + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
-  };
 
+    setIsModalOpen(false);
+    setEditingCategory(null);
+  };
   if (loading) return <Loading />;
 
   return (
@@ -139,11 +107,11 @@ export default function AdminCategoryManager() {
             }}
             onSave={handleSave}
             category={editingCategory}
-            categories={categories}
           />
 
           {/* Table */}
           <div className="w-full">
+            {/* NOSONAR */}
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <table className="w-full">
@@ -158,6 +126,10 @@ export default function AdminCategoryManager() {
                     <th className=" px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       {t('adminCategoryManager.numberOfMaterials')}
                     </th>
+                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('adminCategoryManager.status')}
+                    </th>
+
                     <th className=" px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       {t('adminCategoryManager.action')}
                     </th>
@@ -165,7 +137,7 @@ export default function AdminCategoryManager() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {categories && categories.length > 0 ? (
-                    currentCategories.map((cat, index) => (
+                    categories.map((cat, index) => (
                       <tr
                         key={cat.categoryID}
                         className={`hover:bg-gray-50 transition-colors duration-150 ${
@@ -174,14 +146,31 @@ export default function AdminCategoryManager() {
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm font-medium text-gray-900 break-words">
-                            {i18n.language === 'vi'
-                              ? cat.categoryName
-                              : cat.categoryNameEN || cat.categoryName}
+                          <div className="flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+                              {cat.categoryLogo ? (
+                                <img
+                                  src={cat.categoryLogo}
+                                  alt={cat.categoryName}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                                  <span className="text-white font-bold text-sm">
+                                    {cat.categoryName.charAt(0)}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {i18n.language === 'vi'
+                                ? cat.categoryName
+                                : cat.categoryNameEN || cat.categoryName}
+                            </div>
                           </div>
                         </td>
 
@@ -192,13 +181,18 @@ export default function AdminCategoryManager() {
                           </span>
                         </td>
                         <td className="px-4 py-4 text-center align-middle">
+                          {cat.isActive ? (
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              {t('BUTTON.Activate')}
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                              {t('BUTTON.Deactivate')}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">
-                            <button
-                              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                              onClick={() => handleView(cat)}
-                            >
-                              {t('BUTTON.View')}
-                            </button>
                             <button
                               className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
@@ -208,12 +202,14 @@ export default function AdminCategoryManager() {
                             >
                               {t('BUTTON.Edit')}
                             </button>
-                            <button
-                              className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                              onClick={() => handleDelete(cat.categoryID)}
-                            >
-                              {t('BUTTON.Delete')}
-                            </button>
+                            {cat.materials?.length === 0 && !cat.isActive && (
+                              <button
+                                className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                                onClick={() => handleDelete(cat.categoryID)}
+                              >
+                                {t('BUTTON.Delete')}
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -260,7 +256,7 @@ export default function AdminCategoryManager() {
             <div className="lg:hidden">
               <div className="space-y-4 p-4">
                 {categories && categories.length > 0 ? (
-                  currentCategories.map((cat, index) => (
+                  categories.map((cat, index) => (
                     <div
                       key={cat.categoryID}
                       className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
@@ -268,7 +264,7 @@ export default function AdminCategoryManager() {
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
                           <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                            {indexOfFirstItem + index + 1}
+                            {(currentPage - 1) * pageSize + index + 1}
                           </span>
                           <div>
                             <h3 className="font-medium text-gray-900 text-sm">
@@ -298,14 +294,23 @@ export default function AdminCategoryManager() {
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex space-x-2">
-                        <button
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50"
-                          onClick={() => handleView(cat)}
+                      <div className="text-center">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            cat.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
                         >
-                          {t('BUTTON.View')}
-                        </button>
+                          {cat.isActive
+                            ? t('BUTTON.Activate')
+                            : t('BUTTON.Deactivate')}
+                        </span>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {t('adminCategoryManager.status')}
+                        </p>
+                      </div>
+                      <div className="flex space-x-2">
                         <button
                           className="flex-1 px-3 py-2 border border-amber-300 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
@@ -315,12 +320,14 @@ export default function AdminCategoryManager() {
                         >
                           {t('BUTTON.Edit')}
                         </button>
-                        <button
-                          className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
-                          onClick={() => handleDelete(cat.categoryID)}
-                        >
-                          {t('BUTTON.Delete')}
-                        </button>
+                        {cat.materials.length === 0 && !cat.isActive && (
+                          <button
+                            className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                            onClick={() => handleDelete(cat.categoryID)}
+                          >
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))
@@ -358,16 +365,18 @@ export default function AdminCategoryManager() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center py-4">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={categories.length}
-                onChange={(page) => setCurrentPage(page)}
-                showSizeChanger={false}
-                size="small"
-              />
-            </div>
+            {totalCategories.length > 0 && (
+              <div className="flex justify-center py-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalCategories}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false}
+                  size="small"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

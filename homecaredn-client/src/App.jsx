@@ -8,25 +8,35 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import MaterialCatalog from './pages/MaterialCatalog';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
+import AdminSupportManager from './pages/admin/AdminSupportManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Home Page
+import MaterialViewAll from './pages/MaterialViewAll';
+import MaterialDetail from './pages/MaterialDetail';
+import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+// Customer pages
+import Profile from './pages/customer/Profile';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
 import ProtectedRoute from './components/ProtectedRoute';
+import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
-
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -42,10 +52,10 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/login', '/register', '/verifyotp'];
+  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
 
   const showHeaderFooter =
-    !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
+    !noHeaderFooterPaths.includes(location.pathname) &&
     (!user ||
       (user.role !== 'Admin' &&
         user.role !== 'Contractor' &&
@@ -56,13 +66,57 @@ function Layout() {
       {showHeaderFooter && <Header />}
       <Routes>
         {/* Public routes */}
-        <Route path="/Home" element={<Home />} />
+        {/* Home */}
+        <Route
+          path="/Home"
+          element={
+            <PublicRoute>
+              <Home />
+            </PublicRoute>
+          }
+        />
+        {/* About Us */}
+        <Route
+          path="/About"
+          element={
+            <PublicRoute>
+              <About />
+            </PublicRoute>
+          }
+        />
+        {/* Contact Us */}
+        <Route
+          path="/Contact"
+          element={
+            <PublicRoute>
+              <Contact />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialDetail/:materialID"
+          element={
+            <PublicRoute>
+              <MaterialDetail />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialCatalog"
+          element={
+            <PublicRoute>
+              <MaterialCatalog />
+            </PublicRoute>
+          }
+        />
+        {/* Login */}
         <Route
           path="/Login"
           element={
             !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
           }
         />
+        {/* Register */}
         <Route
           path="/Register"
           element={
@@ -73,6 +127,7 @@ function Layout() {
             )
           }
         />
+        {/* Verify OTP */}
         <Route
           path="/VerifyOTP"
           element={
@@ -83,7 +138,15 @@ function Layout() {
             )
           }
         />
-
+        {/* Customer routes */}
+        <Route
+          path="/Customer/Profile"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        ></Route>
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -96,8 +159,8 @@ function Layout() {
           <Route index element={<AdminDashboard />} />
           <Route path="BrandManager" element={<AdminBrandManager />} />
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
+          <Route path="SupportManager" element={<AdminSupportManager />} />
         </Route>
-
         {/* Contractor routes */}
         <Route
           path="/ContractorDashboard"
@@ -107,7 +170,6 @@ function Layout() {
             </ProtectedRoute>
           }
         />
-
         {/* Distributor routes */}
         <Route
           path="/Distributor"
@@ -119,23 +181,24 @@ function Layout() {
         >
           <Route index element={<DistributorDashboard />} />
           <Route
-            path="material-manager"
+            path="MaterialManager"
             element={<DistributorMaterialManager />}
           />
+          <Route
+            path="CategoryManager"
+            element={<DistributorCategoryManager />}
+          />
         </Route>
+
         {/* Redirect root → /home */}
         <Route
-          path="/"
+          index
           element={
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
-        <Route
-          path="*"
-          element={
-            <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
-          }
-        />
+        <Route path="MaterialViewAll" element={<MaterialViewAll />} />
+        {/* Profile route */}
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

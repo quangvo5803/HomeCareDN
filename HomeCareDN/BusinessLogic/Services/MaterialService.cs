@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -13,10 +15,12 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string MATERIAL = "Material";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string ERROR_IMAGE_NOT_FOUND = "IMAGE_NOT_FOUND";
+        private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -24,21 +28,69 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<ICollection<MaterialDto>> GetAllMaterialAsync()
+        public async Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(
+            QueryParameters parameters
+        )
         {
-            var material = await _unitOfWork.MaterialRepository.GetAllAsync(
-                includeProperties: "Images,Brand,Category"
+            var query = _unitOfWork.MaterialRepository.GetQueryable(
+                includeProperties: MATERIAL_INCLUDE
             );
-            return _mapper.Map<ICollection<MaterialDto>>(material);
+            if (parameters.FilterID.HasValue)
+            {
+                query = query.Where(m => m.CategoryID == parameters.FilterID.Value);
+            }
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "materialname" => query.OrderBy(m => m.Name),
+                "materialname_desc" => query.OrderByDescending(m => m.Name),
+                "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.NameEN),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            return new PagedResultDto<MaterialDto>
+            {
+                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
-        public async Task<ICollection<MaterialDto>> GetAllMaterialByIdAsync(Guid id)
+        public async Task<PagedResultDto<MaterialDto>> GetAllMaterialByUserIdAsync(
+            QueryParameters parameters
+        )
         {
-            var material = await _unitOfWork.MaterialRepository.GetRangeAsync(
-                m => m.UserID == id.ToString(),
-                includeProperties: "Images,Category,Brand"
-            );
-            return _mapper.Map<ICollection<MaterialDto>>(material);
+            var query = _unitOfWork.MaterialRepository.GetQueryable(
+                includeProperties: MATERIAL_INCLUDE
+            );            
+            query = query.Where(m => m.UserID == parameters.FilterID.ToString());
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "materialname" => query.OrderBy(m => m.Name),
+                "materialname_desc" => query.OrderByDescending(m => m.Name),
+                "materialnameen" => query.OrderBy(m => m.NameEN),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.MaterialID),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync(); 
+            return new PagedResultDto<MaterialDto>
+            {
+                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
@@ -56,7 +108,7 @@ namespace BusinessLogic.Services
 
             material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == material.MaterialID,
-                includeProperties: "Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
             return _mapper.Map<MaterialDto>(material);
         }
@@ -65,14 +117,14 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
-                includeProperties: "Images,Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
 
             if (material == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -80,17 +132,50 @@ namespace BusinessLogic.Services
             return _mapper.Map<MaterialDto>(material);
         }
 
+        public async Task<MaterialDto> GetMaterialByCategoryAsync(Guid id)
+        {
+            var material = await _unitOfWork
+                .MaterialRepository.GetAsync(m => m.CategoryID == id, 
+                includeProperties: MATERIAL_INCLUDE);
+            if (material == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<MaterialDto>(material);
+        }
+
+        public async Task<MaterialDto> GetMaterialByBrandAsync(Guid id)
+        {
+            var material = await _unitOfWork
+                .MaterialRepository.GetAsync(m => m.BrandID == id, 
+                includeProperties: MATERIAL_INCLUDE);
+            
+            if (material == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<MaterialDto>(material);
+        }
+
         public async Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: "Images,Category,Brand"
+                includeProperties: MATERIAL_INCLUDE
             );
 
             //check image
             ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
 
-            material.PatchFrom(requestDto, nameof(requestDto.Images));
+            _mapper.Map(requestDto, material);
 
             //upload image
             await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
@@ -107,7 +192,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { "Material", new[] { ERROR_MATERIAL_NOT_FOUND } },
+                    { MATERIAL, new[] { ERROR_MATERIAL_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }

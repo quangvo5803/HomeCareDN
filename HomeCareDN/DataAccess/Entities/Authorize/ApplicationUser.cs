@@ -10,6 +10,7 @@ namespace DataAccess.Entities.Authorize
         public DateTime? OTPExpiresAt { get; set; }
         public DateTime? LastOTPSentAt { get; set; }
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
+        public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
 
     public enum Gender

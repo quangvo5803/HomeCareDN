@@ -13,6 +13,7 @@ namespace BusinessLogic.DTOs.Application.Material
         public required string NameEN { get; set; }
 
         //Category
+        public Guid CategoryID { get; set; }
         public required string CategoryName { get; set; }
         public string? CategoryNameEN { get; set; }
 

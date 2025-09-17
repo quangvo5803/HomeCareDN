@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
 
@@ -12,6 +14,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public BrandService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -25,6 +28,12 @@ namespace BusinessLogic.Services
             await _unitOfWork.BrandRepository.AddAsync(brand);
             if (requestDto.LogoFile != null)
             {
+                var errors = new Dictionary<string, string[]>();
+                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                {
+                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+                    throw new CustomValidationException(errors);
+                }
                 Image imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
@@ -63,13 +72,33 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<ICollection<BrandDto>> GetAllBrands()
+        public async Task<PagedResultDto<BrandDto>> GetAllBrands(QueryParameters parameters)
         {
-            var brands = await _unitOfWork.BrandRepository.GetAllAsync(
+            var query = _unitOfWork.BrandRepository.GetQueryable(
                 includeProperties: "LogoImage,Materials"
             );
-            var brandDtos = _mapper.Map<ICollection<BrandDto>>(brands);
-            return brandDtos;
+            var totalCount = await query.CountAsync();
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "brandname" => query.OrderBy(b => b.BrandName),
+                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
+                "brandnameen" => query.OrderBy(b => b.BrandNameEN),
+                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.BrandID),
+            };
+            var items = await query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize)
+                .ToListAsync();
+            var brandDtos = _mapper.Map<IEnumerable<BrandDto>>(items);
+            return new PagedResultDto<BrandDto>
+            {
+                Items = brandDtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
 
         public async Task<BrandDto> GetBrandByID(Guid id)
@@ -97,9 +126,14 @@ namespace BusinessLogic.Services
                 errors.Add("BrandID", new[] { "BRAND_NOT_FOUND" });
                 throw new CustomValidationException(errors);
             }
-            brand.PatchFrom(requestDto);
+            _mapper.Map(requestDto, brand);
             if (requestDto.LogoFile != null)
             {
+                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                {
+                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+                    throw new CustomValidationException(errors);
+                }
                 var existingImage = await _unitOfWork.ImageRepository.GetAsync(img =>
                     img.BrandID == brand.BrandID
                 );

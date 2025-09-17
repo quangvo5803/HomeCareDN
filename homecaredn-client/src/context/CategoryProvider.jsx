@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { categoryService } from '../services/categoryService';
 import { useAuth } from '../hook/useAuth';
 import CategoryContext from './CategoryContext';
@@ -9,39 +9,74 @@ import PropTypes from 'prop-types';
 export const CategoryProvider = ({ children }) => {
   const { user } = useAuth();
   const [categories, setCategories] = useState([]);
+  const [totalCategories, setTotalCategories] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all categories
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await categoryService.getAllCategories();
-      setCategories(data);
-    } catch (err) {
-      toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+  // 📌 Public: fetch all categories pagination
+  const fetchCategories = useCallback(
+    async ({ PageNumber = 1, PageSize = 10, FilterID, FilterBool } = {}) => {
+      try {
+        setLoading(true);
+        const data = await categoryService.getAllCategories({
+          PageNumber,
+          PageSize,
+          FilterID,
+          FilterBool,
+        });
+        setCategories(data.items || []);
+        setTotalCategories(data.totalCount || 0);
+        return data;
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+  const fetchAllCategories = useCallback(
+    async ({ FilterID, FilterBool } = {}) => {
+      try {
+        const data = await categoryService.getAllCategories({
+          PageNumber: 1,
+          PageSize: 9999,
+          FilterID,
+          FilterBool,
+        });
+        return data.items || [];
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return [];
+      }
+    },
+    []
+  );
   // 📌 Public: get category by id
-  const getCategoryById = useCallback(async (id) => {
-    try {
-      return await categoryService.getCategoryById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
-  }, []);
+  const getCategoryById = useCallback(
+    async (id) => {
+      try {
+        const local = categories.find((c) => c.categoryID === id);
+        if (local) return local;
+        return await categoryService.getCategoryById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    },
+    [categories]
+  );
 
   // 📌 Admin-only: create
   const createCategory = useCallback(
     async (categoryData) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
+      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const newCategory = await categoryService.createCategory(categoryData);
-        setCategories((prev) => [...prev, newCategory]);
+        setCategories((prev) => [newCategory, ...prev]);
+        // Tăng tổng số category
+        setTotalCategories((prev) => prev + 1);
         return newCategory;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -56,7 +91,8 @@ export const CategoryProvider = ({ children }) => {
   // 📌 Admin-only: update
   const updateCategory = useCallback(
     async (categoryData) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
+      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const updated = await categoryService.updateCategory(categoryData);
@@ -77,9 +113,11 @@ export const CategoryProvider = ({ children }) => {
   // 📌 Admin-only: delete
   const deleteCategory = useCallback(
     async (id) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
+      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
+        throw new Error('Unauthorized');
       try {
         await categoryService.deleteCategory(id);
+        // Xoá khỏi local
         setCategories((prev) => prev.filter((c) => c.categoryID !== id));
       } catch (err) {
         toast.error(handleApiError(err));
@@ -89,17 +127,13 @@ export const CategoryProvider = ({ children }) => {
     [user?.role]
   );
 
-  // 📌 Load categories khi user login, reset khi logout
-  useEffect(() => {
-    if (user) fetchCategories();
-    else setCategories([]);
-  }, [user, fetchCategories]);
-
   const contextValue = useMemo(
     () => ({
       categories,
+      totalCategories,
       loading,
       fetchCategories,
+      fetchAllCategories,
       getCategoryById,
       createCategory,
       updateCategory,
@@ -107,8 +141,10 @@ export const CategoryProvider = ({ children }) => {
     }),
     [
       categories,
+      totalCategories,
       loading,
       fetchCategories,
+      fetchAllCategories,
       getCategoryById,
       createCategory,
       updateCategory,

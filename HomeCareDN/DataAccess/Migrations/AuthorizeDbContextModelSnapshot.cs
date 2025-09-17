@@ -22,6 +22,43 @@ namespace DataAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
+                {
+                    b.Property<Guid>("AddressId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Detail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Ward")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("AddressId");
+
+                    b.HasIndex("UserId", "City", "District", "Ward");
+
+                    b.ToTable("Addresses");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Authorize.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -286,6 +323,17 @@ namespace DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Authorize.ApplicationUser", "User")
+                        .WithMany("Addresses")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Authorize.RefreshToken", b =>
                 {
                     b.HasOne("DataAccess.Entities.Authorize.ApplicationUser", "User")
@@ -350,6 +398,8 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.Authorize.ApplicationUser", b =>
                 {
+                    b.Navigation("Addresses");
+
                     b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618

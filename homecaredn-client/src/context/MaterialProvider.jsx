@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { materialService } from '../services/materialService';
 import { useAuth } from '../hook/useAuth';
 import MaterialContext from './MaterialContext';
@@ -9,40 +9,64 @@ import PropTypes from 'prop-types';
 export const MaterialProvider = ({ children }) => {
   const { user } = useAuth();
   const [materials, setMaterials] = useState([]);
+  const [totalMaterials, setTotalMaterials] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // 📌 Public: fetch all material
-  const fetchMaterials = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await materialService.getAllMaterial();
-      setMaterials(data);
-    } catch (err) {
-      toast.error(handleApiError(err));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchMaterials = useCallback(
+    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
+      try {
+        setLoading(true);
+        const data = await materialService.getAllMaterial({
+          PageNumber,
+          PageSize,
+          SortBy,
+          FilterID
+        });
+        setMaterials(data.items || []);
+        setTotalMaterials(data.totalCount || 0);
+        return data;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return { items: [], totalCount: 0 };
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   // 📌 Public: get material by id
-  const getMaterialById = useCallback(async (id) => {
-    try {
-      return await materialService.getMaterialById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
-  }, []);
-  // 📌 Distributor-only: get all by id
-  const fetchMaterialsById = useCallback(
+  const getMaterialById = useCallback(
     async (id) => {
+      const local = materials.find((m) => m.materialID === id);
+      if (local) return local;
+      try {
+        return await materialService.getMaterialById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    },
+    [materials]
+  );
+  // 📌 Distributor-only: get all by user id
+  const fetchMaterialsByUserId = useCallback(
+    async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const data = await materialService.getAllMaterialById(id);
-        setMaterials(data);
+        const data = await materialService.getAllMaterialByUserId({
+          PageNumber,
+          PageSize,
+          FilterID,
+        });
+        setMaterials(data.items || []);
+        setTotalMaterials(data.totalCount || 0);
+        return data;
       } catch (err) {
         toast.error(handleApiError(err));
+        return { items: [], totalCount: 0 };
       } finally {
         setLoading(false);
       }
@@ -56,7 +80,8 @@ export const MaterialProvider = ({ children }) => {
       try {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
-        setMaterials((prev) => [...prev, newMaterial]);
+        // Tăng tổng số material
+        setTotalMaterials((prev) => prev + 1);
         return newMaterial;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -137,19 +162,13 @@ export const MaterialProvider = ({ children }) => {
     [user?.role]
   );
 
-
-  // 📌 Load brands khi user login, reset khi logout
-  useEffect(() => {
-    if (user) fetchMaterials();
-    else setMaterials([]);
-  }, [user, fetchMaterials]);
-
   const contextValue = useMemo(
     () => ({
       materials,
+      totalMaterials,
       loading,
       fetchMaterials,
-      fetchMaterialsById,
+      fetchMaterialsByUserId,
       getMaterialById,
       createMaterial,
       updateMaterial,
@@ -158,9 +177,10 @@ export const MaterialProvider = ({ children }) => {
     }),
     [
       materials,
+      totalMaterials,
       loading,
       fetchMaterials,
-      fetchMaterialsById,
+      fetchMaterialsByUserId,
       getMaterialById,
       createMaterial,
       updateMaterial,

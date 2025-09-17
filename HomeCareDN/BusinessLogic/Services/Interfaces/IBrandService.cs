@@ -1,10 +1,11 @@
-﻿using BusinessLogic.DTOs.Application.Brand;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Brand;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface IBrandService
     {
-        Task<ICollection<BrandDto>> GetAllBrands();
+        Task<PagedResultDto<BrandDto>> GetAllBrands(QueryParameters parameters);
         Task<BrandDto> GetBrandByID(Guid id);
         Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto);
         Task<BrandDto> UpdateBrandAsync(BrandUpdateRequestDto requestDto);

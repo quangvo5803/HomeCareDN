@@ -48,27 +48,39 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("BrandLogoID");
 
-                    b.ToTable("Brands");
+                    b.ToTable("Brands", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
-                {
-                    b.Property<Guid>("CategoryID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("CategoryID")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CategoryName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<Guid?>("CategoryLogoID")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CategoryNameEN")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CategoryName")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("CategoryID");
+                b.Property<string>("CategoryNameEN")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.ToTable("Categories");
-                });
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
+
+                b.Property<Guid>("UserID")
+                    .HasColumnType("uniqueidentifier");
+
+                b.HasKey("CategoryID");
+
+                b.HasIndex("CategoryLogoID");
+
+                b.ToTable("Categories", (string)null);
+            });
+
 
             modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
                 {
@@ -101,7 +113,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ConversationId");
 
-                    b.ToTable("ChatMessages");
+                    b.ToTable("ChatMessages", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
@@ -134,7 +146,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("ContractorApplications");
+                    b.ToTable("ContractorApplications", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
@@ -162,7 +174,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ConversationId");
 
-                    b.ToTable("Conversations");
+                    b.ToTable("Conversations", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -172,6 +184,9 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("BrandID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CategoryID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ContractorApplicationID")
@@ -204,7 +219,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("ServiceRequestID");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -250,7 +265,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasIndex("CategoryID");
 
-                    b.ToTable("Materials");
+                    b.ToTable("Materials", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
@@ -282,7 +297,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
@@ -336,7 +351,7 @@ namespace DataAccess.Migrations.ApplicationDb
 
                     b.HasKey("ServiceRequestID");
 
-                    b.ToTable("ServiceRequests");
+                    b.ToTable("ServiceRequests", (string)null);
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
@@ -344,6 +359,15 @@ namespace DataAccess.Migrations.ApplicationDb
                     b.HasOne("DataAccess.Entities.Application.Image", "LogoImage")
                         .WithMany()
                         .HasForeignKey("BrandLogoID");
+
+                    b.Navigation("LogoImage");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.Image", "LogoImage")
+                        .WithMany()
+                        .HasForeignKey("CategoryLogoID");
 
                     b.Navigation("LogoImage");
                 });
