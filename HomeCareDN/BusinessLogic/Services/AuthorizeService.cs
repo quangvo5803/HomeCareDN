@@ -229,7 +229,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "1" } },
                     }
                 );
 
@@ -238,7 +238,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "2" } },
                     }
                 );
 
@@ -248,7 +248,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "3" } },
                     }
                 );
 
