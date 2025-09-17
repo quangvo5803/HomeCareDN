@@ -121,7 +121,7 @@ namespace BusinessLogic.Services
             user.LastOTPSentAt = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
 
-            // Gửi Email (giữ nguyên code HTML như cũ)
+            // Gửi Email
             var subject =
                 purpose == "Login"
                     ? "Đăng nhập HomeCareDN: Mã xác minh 6 chữ số"
@@ -130,7 +130,6 @@ namespace BusinessLogic.Services
                 purpose == "Login"
                     ? "Bạn đã yêu cầu mã xác minh để đăng nhập vào HomeCareDN. Vui lòng nhập mã dưới đây để tiếp tục."
                     : "Cảm ơn bạn đã đăng ký HomeCareDN! Vui lòng nhập mã xác minh dưới đây để hoàn tất quá trình đăng ký.";
-
             var htmlMessage =
                 $"<table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" style=\"border-collapse: collapse; width: 100%; font-family: sans-serif; background-color: #fff5f0; padding: 20px;\">"
                 + $"<tr><td align=\"center\">"
@@ -158,7 +157,6 @@ namespace BusinessLogic.Services
                 + $"</table>"
                 + $"</td></tr>"
                 + $"</table>";
-            ; // giữ nguyên nội dung HTML như trước
 
             if (!string.IsNullOrEmpty(user.Email))
                 _emailQueue.QueueEmail(user.Email, subject, htmlMessage);
@@ -198,13 +196,24 @@ namespace BusinessLogic.Services
             await _userManager.UpdateAsync(user);
 
             // Gửi cookie HttpOnly
-            SetRefreshTokenCookie(refreshToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                REFRESH_TOKEN_STR,
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                    Path = "/",
+                }
+            );
 
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                AccessTokenExpiresAt = tokenOptions.ValidTo,
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ khớp với JWT
                 UserId = user.Id,
             };
         }
@@ -234,6 +243,7 @@ namespace BusinessLogic.Services
                 );
 
             var user = await _userManager.FindByIdAsync(refreshToken.UserId);
+
             if (user == null || !user.EmailConfirmed)
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
@@ -252,24 +262,36 @@ namespace BusinessLogic.Services
                 var newRefreshToken = GenerateRefreshToken();
                 refreshToken.Token = newRefreshToken;
                 await _refreshTokenRepository.UpdateAsync(refreshToken);
-                SetRefreshTokenCookie(newRefreshToken);
+
+                _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                    REFRESH_TOKEN_STR,
+                    newRefreshToken,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                        Path = "/",
+                    }
+                );
             }
 
             return new TokenResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                AccessTokenExpiresAt = tokenOptions.ValidTo,
+                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ không random nữa
                 UserId = user.Id,
             };
         }
 
         #endregion
 
-        #region Google Login
-
+        #region Login with Googe
         public async Task<TokenResponseDto> GoogleLoginAsync(GoogleLoginRequestDto requestDto)
         {
+            // Xác thực token Google
             var payload = await GoogleJsonWebSignature.ValidateAsync(
                 requestDto.Credential,
                 new GoogleJsonWebSignature.ValidationSettings
@@ -278,6 +300,7 @@ namespace BusinessLogic.Services
                 }
             );
 
+            // Tìm user theo email
             var user = await _userManager.FindByEmailAsync(payload.Email);
             if (user == null)
             {
@@ -289,13 +312,15 @@ namespace BusinessLogic.Services
                     EmailConfirmed = true,
                 };
                 await _userManager.CreateAsync(user);
-                await _userManager.AddToRoleAsync(user, "Customer");
+                await _userManager.AddToRoleAsync(user, "Customer"); // default role
             }
 
+            // Xóa refresh token cũ
             var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
             if (oldToken != null)
                 await _refreshTokenRepository.DeleteAsync(oldToken);
 
+            // Sinh access token + refresh token mới
             var tokenOptions = GenerateTokenOptions(await GetClaims(user));
             var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
             var refreshToken = GenerateRefreshToken();
@@ -308,7 +333,19 @@ namespace BusinessLogic.Services
             };
             await _refreshTokenRepository.AddAsync(rt);
 
-            SetRefreshTokenCookie(refreshToken);
+            // Gửi cookie HttpOnly refresh token
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                REFRESH_TOKEN_STR,
+                refreshToken,
+                new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.None,
+                    Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                    Path = "/",
+                }
+            );
 
             return new TokenResponseDto
             {
@@ -318,10 +355,9 @@ namespace BusinessLogic.Services
                 UserId = user.Id,
             };
         }
-
         #endregion
 
-        #region JWT Helper
+        #region JWT
 
         public async Task<string> GenerateToken(ApplicationUser user)
         {
@@ -346,7 +382,9 @@ namespace BusinessLogic.Services
 
         private JwtSecurityToken GenerateTokenOptions(List<Claim> claims)
         {
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_jwtOptions.Key));
+            var key = new SymmetricSecurityKey(
+                System.Text.Encoding.UTF8.GetBytes(_jwtOptions.Key) // NOSONAR
+            );
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             return new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
@@ -367,60 +405,40 @@ namespace BusinessLogic.Services
             return Convert.ToBase64String(randomNumber);
         }
 
-        private void SetRefreshTokenCookie(string refreshToken)
-        {
-            var isDev = _httpContextAccessor.HttpContext.Request.Host.Host.Contains("localhost");
-
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = !isDev,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
-                Path = "/",
-            };
-
-            if (!isDev)
-            {
-                cookieOptions.Domain = "homecaredn-api.onrender.com";
-            }
-
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(
-                REFRESH_TOKEN_STR,
-                refreshToken,
-                cookieOptions
-            );
-        }
-
         #endregion
-
-        #region Logout
 
         public async Task Logout()
         {
             var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
-            if (!string.IsNullOrEmpty(cookieToken))
-            {
-                var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
-                if (refreshToken != null)
-                    await _refreshTokenRepository.DeleteAsync(refreshToken);
-            }
+            if (string.IsNullOrEmpty(cookieToken))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                    }
+                );
 
-            // Xóa cookie
+            var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
+            if (refreshToken == null || refreshToken.ExpiresAt < DateTime.UtcNow)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                    }
+                );
+
+            await _refreshTokenRepository.DeleteAsync(refreshToken);
             _httpContextAccessor.HttpContext.Response.Cookies.Append(
                 REFRESH_TOKEN_STR,
                 "",
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true,
+                    Secure = true, // bắt buộc khi HTTPS
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(-1),
-                    Path = "/",
+                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
                 }
             );
         }
-
-        #endregion
     }
 }
