@@ -22,6 +22,7 @@ namespace BusinessLogic.Services
         private const string ADDRESS_STR = "Address";
         private const string ERROR_ADDRESS_NOT_FOUND = "ADDRESS_NOT_FOUND";
         private const string ERROR_ADDRESS_ID_MISMATCH = "ADDRESS_ID_MISMATCH";
+        private const string ERROR_MAX_ADDRESS = "ADDRESS_MAX";
 
         public AddressService(AuthorizeDbContext db, IMapper mapper)
         {
@@ -45,6 +46,15 @@ namespace BusinessLogic.Services
         // ===== WRITES =====
         public async Task<AddressDto> CreateAddressByUserIdAsync(CreateAddressDto dto)
         {
+            var userAddress = await _db.Addresses.Where(a => a.UserId == dto.UserId).ToListAsync();
+            if (userAddress?.Count == 5)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { ADDRESS_STR, new[] { ERROR_MAX_ADDRESS } },
+                };
+                throw new CustomValidationException(errors);
+            }
             var entity = _mapper.Map<Address>(dto);
             _db.Addresses.Add(entity);
             await _db.SaveChangesAsync();
@@ -53,7 +63,6 @@ namespace BusinessLogic.Services
 
         public async Task<AddressDto> UpdateAddressAsync(UpdateAddressDto dto)
         {
-            // Xác thực: id trong body phải trùng id trên route
             if (dto.AddressId == Guid.Empty)
             {
                 var errors = new Dictionary<string, string[]>

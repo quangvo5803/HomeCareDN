@@ -602,6 +602,11 @@
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
+
+    "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
+    "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
+    "ADDRESS_MAX": "Bạn chỉ có thể thêm tối đa 5 địa chỉ.",
+
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",

@@ -634,7 +634,9 @@ export default function ProfilePage() {
                                 [e.target.name]: e.target.value,
                               }))
                             }
-                            placeholder="Số nhà, tên đường..."
+                            placeholder={t(
+                              'userPage.profile.addressPlaceholder'
+                            )}
                             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                             required
                           />

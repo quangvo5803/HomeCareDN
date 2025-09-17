@@ -600,6 +600,11 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
+
+    "ADDRESS_NOT_FOUND": "Address not found.",
+    "ADDRESS_ID_MISMATCH": "Address ID does not match.",
+    "ADDRESS_MAX": "You can only add up to 5 addresses.",
+
     "NETWORK_ERROR": "Unable to connect to server, please try again later!",
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
