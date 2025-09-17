@@ -7,6 +7,20 @@ const api = axios.create({
   withCredentials: true,
 });
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
   if (token) config.headers.Authorization = `Bearer ${token}`;
@@ -30,16 +44,38 @@ api.interceptors.response.use(
 
     // 401 Unauthorized → refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              resolve(api(originalRequest));
+            },
+            reject,
+          });
+        });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
+
       try {
         const res = await authService.refreshToken();
-        if (res.data?.accessToken) {
-          localStorage.setItem('accessToken', res.data.accessToken);
-          originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
+        const newAccessToken = res.data?.accessToken;
+        if (newAccessToken) {
+          localStorage.setItem('accessToken', newAccessToken);
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          processQueue(null, newAccessToken);
           return api(originalRequest);
+        } else {
+          throw new Error('Refresh token failed');
         }
-      } catch {
+      } catch (err) {
+        processQueue(err, null);
         authService.logout();
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 
