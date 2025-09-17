@@ -1,15 +1,11 @@
 import api from '../api';
 
 export const addressService = {
-  getAddressByUser: (userId) =>
-    api.get(`/Addresses/address-by-user/${userId}`),
+  getUserAddress: (userId) => api.get(`/Addresses/get-user-address/${userId}`),
 
-  createAddressByUser: (payload) =>
-    api.post(`/Addresses/create-address-by-user`, {payload }),
+  createAddress: (payload) => api.post(`/Addresses/create-address`, payload),
 
-  updateAddress: (payload) =>
-    api.put(`/Addresses/update-address`, { payload }),
+  updateAddress: (payload) => api.put(`/Addresses/update-address`, payload),
 
-  removeAddress: (id) =>
-    api.delete(`/Addresses/delete-address/${id}`),
+  removeAddress: (id) => api.delete(`/Addresses/delete-address/${id}`),
 };
