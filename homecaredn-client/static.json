@@ -1,6 +1,5 @@
 {
-  "root": "dist",
-  "routes": {
-    "/**": "index.html"
-  }
+  "routes": [
+    { "handle": "rewrite", "src": ".*", "dest": "/index.html" }
+  ]
 }
