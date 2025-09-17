@@ -229,7 +229,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "1" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -238,7 +238,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "2" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -248,7 +248,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR + "3" } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
                     }
                 );
 
@@ -281,7 +281,7 @@ namespace BusinessLogic.Services
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken.Token,
-                AccessTokenExpiresAt = tokenOptions.ValidTo, // ✅ không random nữa
+                AccessTokenExpiresAt = tokenOptions.ValidTo,
                 UserId = user.Id,
             };
         }
@@ -434,9 +434,9 @@ namespace BusinessLogic.Services
                 new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = true, // bắt buộc khi HTTPS
+                    Secure = true,
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(-1), // expire ngay
+                    Expires = DateTime.UtcNow.AddDays(-1),
                 }
             );
         }
