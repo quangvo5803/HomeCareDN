@@ -64,11 +64,16 @@ export default function Header() {
       if (openLang && langRef.current && !langRef.current.contains(e.target)) {
         setOpenLang(false);
       }
-      if (openAvatarMenu && avatarRef.current && !avatarRef.current.contains(e.target)) {
+      if (
+        openAvatarMenu &&
+        avatarRef.current &&
+        !avatarRef.current.contains(e.target)
+      ) {
         setOpenAvatarMenu(false);
       }
     };
-    const onKey = (e) => e.key === 'Escape' && (setOpenLang(false), setOpenAvatarMenu(false));
+    const onKey = (e) =>
+      e.key === 'Escape' && (setOpenLang(false), setOpenAvatarMenu(false));
     document.addEventListener('mousedown', onDown);
     document.addEventListener('keydown', onKey);
     return () => {
@@ -78,7 +83,10 @@ export default function Header() {
   }, [openLang, openAvatarMenu]);
 
   return (
-    <header id="top" className="sticky top-0 left-0 z-50 w-full border-b border-gray-100 shadow-sm bg-white/95 backdrop-blur-md">
+    <header
+      id="top"
+      className="sticky top-0 left-0 z-50 w-full border-b border-gray-100 shadow-sm bg-white/95 backdrop-blur-md"
+    >
       <nav className="px-6 py-4 mx-auto max-w-screen-2xl">
         <div className="flex items-center justify-between gap-4">
           {/* Logo */}
@@ -158,15 +166,20 @@ export default function Header() {
                     title={t('partnerDashboard.account')}
                   >
                     <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.email || 'User')}&background=random`}
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                        user.email || 'User'
+                      )}&background=random`}
                       alt="avatar"
                       className="object-cover w-full h-full"
                     />
                   </button>
                   {openAvatarMenu && (
-                    <div role="menu" className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44">
+                    <div
+                      role="menu"
+                      className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44"
+                    >
                       <Link
-                        to="/profile"
+                        to="/Customer/Profile"
                         relative="path"
                         onClick={() => setOpenAvatarMenu(false)}
                         className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
@@ -189,7 +202,10 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex gap-3">
-                  <Link to="/Login" className="text-white bg-blue-700 hover:bg-blue-800 px-5 py-2.5 rounded-lg">
+                  <Link
+                    to="/Login"
+                    className="text-white bg-blue-700 hover:bg-blue-800 px-5 py-2.5 rounded-lg"
+                  >
                     {t('BUTTON.Login')}
                   </Link>
                   <Link
@@ -213,14 +229,21 @@ export default function Header() {
                   <i className="fas fa-globe" />
                 </button>
                 {openLang && (
-                  <div role="menu" className="absolute right-0 z-50 w-40 p-2 mt-2 space-y-1 bg-white border rounded-lg shadow-lg">
+                  <div
+                    role="menu"
+                    className="absolute right-0 z-50 w-40 p-2 mt-2 space-y-1 bg-white border rounded-lg shadow-lg"
+                  >
                     <button
                       type="button"
                       onClick={() => changeLanguage('en')}
                       className="flex items-center w-full gap-2 px-3 py-2 rounded-md hover:bg-gray-100"
                       role="menuitem"
                     >
-                      <ReactCountryFlag countryCode="US" svg className="text-lg" />
+                      <ReactCountryFlag
+                        countryCode="US"
+                        svg
+                        className="text-lg"
+                      />
                       <span>English</span>
                     </button>
                     <button
@@ -229,7 +252,11 @@ export default function Header() {
                       className="flex items-center w-full gap-2 px-3 py-2 rounded-md hover:bg-gray-100"
                       role="menuitem"
                     >
-                      <ReactCountryFlag countryCode="VN" svg className="text-lg" />
+                      <ReactCountryFlag
+                        countryCode="VN"
+                        svg
+                        className="text-lg"
+                      />
                       <span>Tiếng Việt</span>
                     </button>
                   </div>
@@ -284,8 +311,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (
@@ -314,7 +342,7 @@ export default function Header() {
                 {user ? (
                   <div className="flex gap-2">
                     <Link
-                      to="/profile"
+                      to="Customer/Profile"
                       onClick={closeMobileNav}
                       className="flex-1 px-3 py-2 text-sm text-center text-gray-700 transition-colors duration-200 border border-gray-600 rounded-lg bg-gray-50 hover:bg-gray-100"
                     >
@@ -356,7 +384,11 @@ export default function Header() {
                     onClick={() => changeLanguage('en')}
                     className="flex items-center justify-center flex-1 gap-2 px-3 py-2 text-gray-600 transition-all duration-200 border border-gray-200 rounded-lg bg-gray-50 hover:text-blue-600 hover:bg-blue-50"
                   >
-                    <ReactCountryFlag countryCode="US" svg className="text-lg" />
+                    <ReactCountryFlag
+                      countryCode="US"
+                      svg
+                      className="text-lg"
+                    />
                     <span className="text-sm font-medium">EN</span>
                   </button>
                   <button
@@ -364,7 +396,11 @@ export default function Header() {
                     onClick={() => changeLanguage('vi')}
                     className="flex items-center justify-center flex-1 gap-2 px-3 py-2 text-gray-600 transition-all duration-200 border border-gray-200 rounded-lg bg-gray-50 hover:text-red-600 hover:bg-red-50"
                   >
-                    <ReactCountryFlag countryCode="VN" svg className="text-lg" />
+                    <ReactCountryFlag
+                      countryCode="VN"
+                      svg
+                      className="text-lg"
+                    />
                     <span className="text-sm font-medium">VI</span>
                   </button>
                 </div>

@@ -27,6 +27,8 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+// Customer pages
+import Profile from './pages/customer/Profile';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -35,7 +37,6 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
-import Profile from './pages/Profile';
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -137,6 +138,15 @@ function Layout() {
             )
           }
         />
+        {/* Customer routes */}
+        <Route
+          path="/Customer/Profile"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        ></Route>
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -187,19 +197,8 @@ function Layout() {
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
-        <Route
-          path="MaterialViewAll"
-          element={<MaterialViewAll />}
-        />
+        <Route path="MaterialViewAll" element={<MaterialViewAll />} />
         {/* Profile route */}
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

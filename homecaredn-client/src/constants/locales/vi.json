@@ -202,6 +202,45 @@
     "resend_otp": "Gửi lại",
     "not_receive_otp": "Không nhận được mã? "
   },
+
+  "userPage":{
+    "profile": {
+      "title": "Hồ Sơ Của Tôi",
+      "subtitle": "Quản lý thông tin cá nhân và địa chỉ của bạn.",
+      "header_profile":"Thông tin cá nhân",
+      "header_address":"Địa chỉ",
+      "form": {
+        "name": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "gender": "Giới tính",
+        "gender_choice": "Chọn giới tính",
+        "gender_male": "Nam",
+        "gender_female": "Nữ",
+        "gender_other": "Khác"
+      },
+      "noAddress": "Chưa có địa chỉ nào",
+      "addAddress": "Thêm địa chỉ mới",
+      "editAddress": "Chỉnh sửa địa chỉ",
+      "provice": "Tỉnh/Thành phố",
+      "provicePlaceholder": "Chọn Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "districtPlaceholder": "Chọn Quận/Huyện",
+      "ward": "Phường/Xã",
+      "wardPlaceholder": "Chọn Phường/Xã",
+      "addressDetail": "Địa chỉ chi tiết",
+      "preview": "Xem trước: ",
+      "addressPlaceholder": "Số nhà, tên đường, khu vực..."
+    },
+    "service_request": {
+      "title": "Yêu cầu dịch vụ",
+      "subtitle": "Xem và quản lý các yêu cầu dịch vụ của bạn.",
+      "noRequest": "Chưa có yêu cầu dịch vụ nào",
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn"    
+    }
+  },
+
+
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
@@ -269,6 +308,56 @@
       "bot2": "Ok! Mình sẽ seed dữ liệu mẫu và tách component rõ ràng."
     }
   },
+  "distributorMaterialManager": {
+    "title": "Quản lý vật liệu",
+    "material": "vật liệu",
+    "no": "STT",
+    "materialName": "Tên vật liệu",
+    "brand": "Thương hiệu",
+    "category": "Danh mục",
+    "unit": "Đơn vị",
+    "images": "Hình ảnh",
+    "action": "Thao tác",
+    "noMaterial": "Chưa có vật liệu nào",
+    "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn",
+    "materialModal": {
+      "title": "Thêm vật liệu mới",
+      "title2": "Cập nhật vật liệu",
+      "materialName": "Tên vật liệu (Tiếng Việt)",
+      "brand": "Thương hiệu",
+      "category": "Danh mục",
+      "unit": "Đơn vị (Tiếng Việt)",
+      "description": "Mô tả (Tiếng Việt)",
+      "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
+      "unit_Price": "Giá",
+      "images": "Hình ảnh",
+      "chooseBrand": "Chọn thương hiệu",
+      "chooseCategory": "Chọn danh mục",
+      "materialNameEN": "Tên vật liệu (Tiếng Anh)",
+      "unitEN": "Đơn vị (Tiếng Anh)",
+      "descriptionEN": "Mô tả (Tiếng Anh)",
+      "descriptionsPlaceholderEN": "Nhập mô tả bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
+      "chooseFile": "Chọn tệp",
+      "noFile": "Không có tệp nào được chọn",
+      "filesSelected": " tệp đã chọn"
+    }
+  },
+  "distributorCategoryManager": {
+    "title": "Quản lí danh mục vật liệu",
+    "subtitle": "Quản lí danh sác các danh mục vật liệu",
+    "categories": "danh mục",
+    "no": "STT",
+    "categoryName": "Tên danh mục",
+    "numberOfMaterials": "Số lượng sản phẩm",
+    "materials": "sản phẩm",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noCategory": "Chưa có danh mục nào",
+    "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
+  },
+
+
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -405,118 +494,6 @@
     "all": "Tất cả",
     "itemsCount": "{{count}} mục"
   },
-  "distributorMaterialManager": {
-    "title": "Quản lý vật liệu",
-    "material": "vật liệu",
-    "no": "STT",
-    "materialName": "Tên vật liệu",
-    "brand": "Thương hiệu",
-    "category": "Danh mục",
-    "unit": "Đơn vị",
-    "images": "Hình ảnh",
-    "action": "Thao tác",
-    "noMaterial": "Chưa có vật liệu nào",
-    "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn",
-    "materialModal": {
-      "title": "Thêm vật liệu mới",
-      "title2": "Cập nhật vật liệu",
-      "materialName": "Tên vật liệu (Tiếng Việt)",
-      "brand": "Thương hiệu",
-      "category": "Danh mục",
-      "unit": "Đơn vị (Tiếng Việt)",
-      "description": "Mô tả (Tiếng Việt)",
-      "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
-      "unit_Price": "Giá",
-      "images": "Hình ảnh",
-      "chooseBrand": "Chọn thương hiệu",
-      "chooseCategory": "Chọn danh mục",
-      "materialNameEN": "Tên vật liệu (Tiếng Anh)",
-      "unitEN": "Đơn vị (Tiếng Anh)",
-      "descriptionEN": "Mô tả (Tiếng Anh)",
-      "descriptionsPlaceholderEN": "Nhập mô tả bằng tiếng Anh...",
-      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
-      "chooseFile": "Chọn tệp",
-      "noFile": "Không có tệp nào được chọn",
-      "filesSelected": " tệp đã chọn"
-    }
-  },
-  "distributorCategoryManager": {
-    "title": "Quản lí danh mục vật liệu",
-    "subtitle": "Quản lí danh sác các danh mục vật liệu",
-    "categories": "danh mục",
-    "no": "STT",
-    "categoryName": "Tên danh mục",
-    "numberOfMaterials": "Số lượng sản phẩm",
-    "materials": "sản phẩm",
-    "status": "Trạng thái",
-    "action": "Thao tác",
-    "noCategory": "Chưa có danh mục nào",
-    "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
-  },
-  "roles": {
-    "Distributor": "Nhà phân phối",
-    "Contractor": "Nhà thầu",
-    "Admin": "Quản trị viên",
-    "Customer": "Khách hàng"
-  },
-  "profile": {
-    "tabs": {
-      "profile": "Hồ sơ",
-      "service_requests": "Quản lý yêu cầu dịch vụ"
-    },
-    "title": "Hồ sơ của bạn",
-    "addresses": "Địa chỉ của bạn",
-    "subtitle": "Quản lý thông tin và dịch vụ",
-    "form": {
-      "full_name": "Họ và tên",
-      "phone": "Số điện thoại",
-      "gender": "Giới tính",
-      "email": "Email",
-      "email_readonly": "Email (không thể thay đổi)",
-      "save": "Lưu thay đổi",
-      "saving": "Đang lưu..."
-    },
-    "gender": { "none": "—", "male": "Nam", "female": "Nữ", "other": "Khác" },
-    "update_success": "Cập nhật hồ sơ thành công",
-    "update_error": "Cập nhật hồ sơ thất bại",
-    "service_requests": {
-      "title": "Quản lý yêu cầu dịch vụ",
-      "placeholder": "Nhúng form yêu cầu dịch vụ của bạn ở đây…"
-    },
-    "back": "Quay lại"
-  },
-  "address": {
-    "title": "Địa chỉ của tôi",
-    "loading": "Đang tải…",
-    "empty": "Chưa có địa chỉ",
-    "edit": "Sửa",
-    "delete": "Xoá",
-    "confirm_delete": "Xoá địa chỉ này?",
-    "delete_success": "Đã xoá địa chỉ",
-    "delete_error": "Xoá địa chỉ thất bại",
-    "load_error": "Không tải được địa chỉ",
-    "add_success": "Đã thêm địa chỉ",
-    "update_success": "Đã cập nhật địa chỉ",
-    "save_error": "Lưu địa chỉ thất bại",
-    "saving": "Đang lưu…",
-    "cancel": "Huỷ",
-    "add_button": "Thêm địa chỉ",
-    "update_button": "Cập nhật địa chỉ",
-    "detail_placeholder": "Địa chỉ chi tiết (số nhà, đường…)",
-    "subtitle": "Địa chỉ",
-    "preview_label": "Xem trước địa chỉ",
-    "select": {
-      "province": "Tỉnh/Thành phố",
-      "district": "Quận/Huyện",
-      "ward": "Phường/Xã",
-      "choose": "— Chọn —"
-    },
-    "preview": {
-      "city": "Thành phố",
-      "district": "Quận/Huyện",
-      "ward": "Phường/Xã"
-    }
-  },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
     "address": {
@@ -575,7 +552,11 @@
     "Activate": "Kích hoạt",
     "Deactivate": "Hủy kích hoạt",
     "ReadMore": "Xem thêm",
-    "Reduce": "Thu gọn"
+    "Reduce": "Thu gọn",
+    "SaveProfile": "Lưu thông tin",
+    "Save": "Lưu",
+    "Saving": "Đang lưu...",
+    "AddAddress": "Thêm địa chỉ"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -585,10 +566,6 @@
     "DeleteCategoryModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Danh mục này sẽ bị xóa và không thể khôi phục!"
-    },
-    "DeletingLoadingModal": {
-      "title": "Đang xóa...",
-      "text": "Vui lòng chờ trong giây lát."
     },
     "DeleteSupportModal": {
       "title": "Xóa yêu cầu hỗ trợ này?",
@@ -601,7 +578,16 @@
     "DeleteMaterialImageModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
+    },
+        "DeletingLoadingModal": {
+      "title": "Đang xóa...",
+      "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteAddressModal": {
+      "title": "Xóa địa chỉ này?",
+      "text": "Hành động này không thể hoàn tác."
     }
+
   },
   "ERROR": {
     "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
@@ -633,7 +619,12 @@
     "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
     "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
 
-    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!"
+    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!",
+
+    "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
+    "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
+    "DELETE_ERROR": "Đã có lỗi xảy ra khi xóa. Vui lòng thử lại sau.",
+    "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau."
   },
   "SUCCESS": {
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
@@ -645,6 +636,15 @@
     "CATEGORY_UPDATE": "Cập nhật danh mục thành công.",
     "REPLY": "Phản hồi thành công.",
     "MATERIAL_ADD": "Thêm vật liệu thành công.",
-    "MATERIAL_UPDATE": "Cập nhật vật liệu thành công."
+    "MATERIAL_UPDATE": "Cập nhật vật liệu thành công.",
+    "PROFILE_UPDATE": "Cập nhật hồ sơ thành công.",
+    "ADDRESS_ADD": "Thêm địa chỉ thành công.",
+    "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công."
+  },
+  "roles": {
+    "Distributor": "Nhà phân phối",
+    "Contractor": "Nhà thầu",
+    "Admin": "Quản trị viên",
+    "Customer": "Khách hàng"
   }
 }

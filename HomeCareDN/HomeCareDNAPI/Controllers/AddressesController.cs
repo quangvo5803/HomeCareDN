@@ -15,23 +15,25 @@ public class AddressesController : ControllerBase
 {
     private readonly IAddressService _addressService;
 
-    public AddressesController(IAddressService addressService) => _addressService = addressService;
+    public AddressesController(IAddressService addressService)
+    {
+        _addressService = addressService;
+    }
 
-    // Lấy tất cả địa chỉ theo userId (không dùng claims)
-    // GET: api/addresses/by-user/{userId}
-    [HttpGet("address-by-user/{userId}")]
-    public async Task<IActionResult> GetAddressByUserId([FromRoute] string userId) =>
-        Ok(await _addressService.GetAddressByUserIdAsync(userId));
+    [HttpGet("get-user-address/{userId}")]
+    public async Task<IActionResult> GetAddressByUserId([FromRoute] string userId)
+    {
+        var addresses = await _addressService.GetAddressByUserIdAsync(userId);
+        return Ok(addresses);
+    }
 
-    [HttpPost("create-address-by-user")]
+    [HttpPost("create-address")]
     public async Task<IActionResult> CreateAddress([FromBody] CreateAddressDto dto)
     {
         var created = await _addressService.CreateAddressByUserIdAsync(dto);
         return Ok(created);
     }
 
-    // Cập nhật địa chỉ theo AddressId (body phải chứa AddressId trùng route)
-    // PUT: api/addresses/{id}
     [HttpPut("update-address")]
     public async Task<IActionResult> UpdateAddress([FromBody] UpdateAddressDto dto)
     {
@@ -39,8 +41,6 @@ public class AddressesController : ControllerBase
         return Ok(updated);
     }
 
-    // Xóa địa chỉ theo AddressId
-    // DELETE: api/addresses/{id}
     [HttpDelete("delete-address/{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {

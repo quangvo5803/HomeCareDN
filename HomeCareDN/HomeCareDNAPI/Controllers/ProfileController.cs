@@ -13,14 +13,15 @@ public class ProfileController : ControllerBase
 {
     private readonly IProfileService _profileService;
 
-    public ProfileController(IProfileService profileService) => _profileService = profileService;
+    public ProfileController(IProfileService profileService)
+    {
+        _profileService = profileService;
+    }
 
-    // GET: api/profile/{userId}
     [HttpGet("get-profile/{userId}")]
     public async Task<IActionResult> GetProfileById([FromRoute] string userId) =>
         Ok(await _profileService.GetProfileByIdAsync(userId));
 
-    // PUT: api/profile/{userId}
     [HttpPut("update-profile")]
     public async Task<IActionResult> UpdateProfileById([FromBody] UpdateProfileDto dto)
     {
