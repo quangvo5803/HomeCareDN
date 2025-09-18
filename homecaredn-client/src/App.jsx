@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import MaterialCatalog from './pages/MaterialCatalog';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -22,6 +23,12 @@ import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Home Page
+import MaterialViewAll from './pages/MaterialViewAll';
+import MaterialDetail from './pages/MaterialDetail';
+import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+// Customer pages
+import Profile from './pages/customer/Profile';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -30,9 +37,12 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
+<<<<<<< HEAD
 import Materials from './pages/Materials';
 import MaterialDetail from './pages/MaterialDetail';
 
+=======
+>>>>>>> develop
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -51,7 +61,7 @@ function Layout() {
   const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
 
   const showHeaderFooter =
-    !noHeaderFooterPaths.includes(location.pathname.toLowerCase()) &&
+    !noHeaderFooterPaths.includes(location.pathname) &&
     (!user ||
       (user.role !== 'Admin' &&
         user.role !== 'Contractor' &&
@@ -89,6 +99,22 @@ function Layout() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/MaterialDetail/:materialID"
+          element={
+            <PublicRoute>
+              <MaterialDetail />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/MaterialCatalog"
+          element={
+            <PublicRoute>
+              <MaterialCatalog />
+            </PublicRoute>
+          }
+        />
         {/* Login */}
         <Route
           path="/Login"
@@ -118,6 +144,15 @@ function Layout() {
             )
           }
         />
+        {/* Customer routes */}
+        <Route
+          path="/Customer/Profile"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        ></Route>
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -155,6 +190,10 @@ function Layout() {
             path="MaterialManager"
             element={<DistributorMaterialManager />}
           />
+          <Route
+            path="CategoryManager"
+            element={<DistributorCategoryManager />}
+          />
         </Route>
 
         {/* Redirect root → /home */}
@@ -164,6 +203,8 @@ function Layout() {
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
+        <Route path="MaterialViewAll" element={<MaterialViewAll />} />
+        {/* Profile route */}
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

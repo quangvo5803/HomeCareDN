@@ -13,10 +13,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
-using Ultitity.LLM;
 using Ultitity.Options;
 
 namespace HomeCareDNAPI
@@ -69,7 +69,7 @@ namespace HomeCareDNAPI
                     policy =>
                     {
                         policy
-                            .WithOrigins("http://localhost:5173", "https://home-care-dn.vercel.app") // domain React
+                            .WithOrigins("http://localhost:5173", "https://homecaredn.onrender.com") // domain React
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // nếu dùng cookie/session
@@ -106,6 +106,8 @@ namespace HomeCareDNAPI
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+            builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
             builder.Services.AddSingleton<EmailSender>();
             builder.Services.AddHostedService<BackgroundEmailSender>();

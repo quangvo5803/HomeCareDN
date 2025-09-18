@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import Loading from '../../components/Loading';
-import Swal from 'sweetalert2';
 import { useBrand } from '../../hook/useBrand';
 import { Pagination } from 'antd';
-import BrandModal from '../../components/admin/BrandModal';
+import BrandModal from '../../components/modal/BrandModal';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function AdminBrandManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 2;
+  const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
@@ -30,37 +30,22 @@ export default function AdminBrandManager() {
   }, [currentPage, fetchBrands]);
 
   const handleDelete = async (brandId) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteBrandModal.title'),
-      text: t('ModalPopup.DeleteBrandModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading(),
-          });
-          await deleteBrand(brandId);
-          const lastPage = Math.ceil((totalBrands - 1) / pageSize);
-          if (currentPage > lastPage) {
-            setCurrentPage(lastPage || 1);
-          } else {
-            fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
-          }
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-        } catch {
-          Swal.close();
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteBrandModal.title',
+      textKey: 'ModalPopup.DeleteBrandModal.text',
+      onConfirm: async () => {
+        await deleteBrand(brandId);
+
+        const lastPage = Math.ceil((totalBrands - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
         }
-      }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
     });
   };
 
@@ -72,7 +57,7 @@ export default function AdminBrandManager() {
       });
       toast.success(t('SUCCESS.BRAND_UPDATE'));
     } else {
-      await createBrand(brandData, { PageNumber: 1, PageSize: pageSize });
+      await createBrand(brandData);
       toast.success(t('SUCCESS.BRAND_ADD'));
       const lastPage = Math.ceil((totalBrands + 1) / pageSize);
       setCurrentPage(lastPage);
@@ -85,21 +70,21 @@ export default function AdminBrandManager() {
   if (loading) return <Loading />;
 
   return (
-    <div className="p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100 min-h-screen">
+    <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
       <div className="w-full max-w-full mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
-            <i className="fa-solid fa-globe mr-3"></i>
+          <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
+            <i className="mr-3 fa-solid fa-globe"></i>
             {t('adminBrandManager.title')}
           </h2>
           <p className="text-gray-600">{t('adminBrandManager.subtitle')}</p>
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="px-4 lg:px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">
@@ -107,10 +92,10 @@ export default function AdminBrandManager() {
               </span>
             </div>
             <button
-              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm"
+              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="fa-solid fa-plus mr-2"></i>
+              <i className="mr-2 fa-solid fa-plus"></i>
               {t('BUTTON.AddNewBrand')}
             </button>
           </div>
@@ -128,21 +113,22 @@ export default function AdminBrandManager() {
 
           {/* Table */}
           <div className="w-full">
+            {/* NOSONAR */}
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminBrandManager.no')}
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminBrandManager.brandName')}
                     </th>
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminBrandManager.numberOfMaterial')}
                     </th>
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminBrandManager.action')}
                     </th>
                   </tr>
@@ -152,27 +138,26 @@ export default function AdminBrandManager() {
                     brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                        }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
                           <div className="flex items-center justify-center">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+                            <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg">
                               {brand.brandLogo ? (
                                 <img
                                   src={brand.brandLogo}
                                   alt={brand.brandName}
-                                  className="w-full h-full object-cover"
+                                  className="object-cover w-full h-full"
                                 />
                               ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                                  <span className="text-white font-bold text-sm">
+                                <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-purple-400 to-purple-600">
+                                  <span className="text-sm font-bold text-white">
                                     {brand.brandName.charAt(0)}
                                   </span>
                                 </div>
@@ -186,7 +171,7 @@ export default function AdminBrandManager() {
                           </div>
                         </td>
                         <td className="px-4 py-4 text-center align-middle">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                             {brand.materials?.length || 0}{' '}
                             {t('adminBrandManager.materials')}
                           </span>
@@ -194,7 +179,7 @@ export default function AdminBrandManager() {
                         <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">
                             <button
-                              className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
+                              className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
                                 setEditingBrand(brand);
                                 setIsModalOpen(true);
@@ -204,7 +189,7 @@ export default function AdminBrandManager() {
                             </button>
                             {brand.materials.length === 0 && (
                               <button
-                                className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
                                 onClick={() => handleDelete(brand.brandID)}
                               >
                                 {t('BUTTON.Delete')}
@@ -219,7 +204,7 @@ export default function AdminBrandManager() {
                       <td colSpan="4" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center">
                           <svg
-                            className="w-12 h-12 text-gray-400 mb-4"
+                            className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -231,17 +216,17 @@ export default function AdminBrandManager() {
                               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                             />
                           </svg>
-                          <h3 className="text-lg font-medium text-gray-900 mb-1">
+                          <h3 className="mb-1 text-lg font-medium text-gray-900">
                             {t('adminBrandManager.noBrand')}
                           </h3>
-                          <p className="text-gray-500 mb-4">
+                          <p className="mb-4 text-gray-500">
                             {t('adminBrandManager.letStart')}
                           </p>
                           <button
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                             onClick={() => setIsModalOpen(true)}
                           >
-                            <i className="fa-solid fa-plus mr-3"></i>
+                            <i className="mr-3 fa-solid fa-plus"></i>
                             {t('BUTTON.AddNewBrand')}
                           </button>
                         </div>
@@ -254,20 +239,20 @@ export default function AdminBrandManager() {
 
             {/* Mobile/Tablet Card Layout */}
             <div className="lg:hidden">
-              <div className="space-y-4 p-4">
+              <div className="p-4 space-y-4">
                 {brands && brands.length > 0 ? (
                   brands.map((brand, index) => (
                     <div
                       key={brand.brandID}
-                      className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                      className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                           <div>
-                            <h3 className="font-medium text-gray-900 text-sm">
+                            <h3 className="text-sm font-medium text-gray-900">
                               {i18n.language === 'vi'
                                 ? brand.brandName
                                 : brand.brandNameEN || brand.brandName}
@@ -276,12 +261,12 @@ export default function AdminBrandManager() {
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center justify-between mb-3">
                         <div className="text-center">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                             {brand.materials?.length || 0}
                           </span>
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="mt-1 text-xs text-gray-500">
                             {t('adminBrandManager.materials')}
                           </p>
                         </div>
@@ -289,7 +274,7 @@ export default function AdminBrandManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className="flex-1 px-3 py-2 border border-amber-300 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
+                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
                             setEditingBrand(brand);
                             setIsModalOpen(true);
@@ -299,7 +284,7 @@ export default function AdminBrandManager() {
                         </button>
                         {brand.materials.length === 0 && (
                           <button
-                            className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                            className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(brand.brandID)}
                           >
                             {t('BUTTON.Delete')}
@@ -309,9 +294,9 @@ export default function AdminBrandManager() {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="py-12 text-center">
                     <svg
-                      className="w-12 h-12 text-gray-400 mb-4 mx-auto"
+                      className="w-12 h-12 mx-auto mb-4 text-gray-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -323,17 +308,17 @@ export default function AdminBrandManager() {
                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                       />
                     </svg>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    <h3 className="mb-1 text-lg font-medium text-gray-900">
                       {t('adminBrandManager.noBrand')}
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="mb-4 text-gray-500">
                       {t('adminBrandManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                       onClick={() => setIsModalOpen(true)}
                     >
-                      <i className="fa-solid fa-plus mr-3"></i>
+                      <i className="mr-3 fa-solid fa-plus"></i>
                       {t('BUTTON.AddNewBrand')}
                     </button>
                   </div>
@@ -342,16 +327,18 @@ export default function AdminBrandManager() {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center py-4">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={totalBrands}
-                onChange={(page) => setCurrentPage(page)}
-                showSizeChanger={false}
-                size="small"
-              />
-            </div>
+            {totalBrands > 0 && (
+              <div className="flex justify-center py-4">
+                <Pagination
+                  current={currentPage}
+                  pageSize={pageSize}
+                  total={totalBrands}
+                  onChange={(page) => setCurrentPage(page)}
+                  showSizeChanger={false}
+                  size="small"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

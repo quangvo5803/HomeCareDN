@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Chat.Ai;
+﻿using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +11,17 @@ namespace HomeCareDNAPI.Controllers
     {
         private readonly IFacadeService _facade;
 
-        public AiChatController(IFacadeService facade) { _facade = facade; }
+        public AiChatController(IFacadeService facade)
+        {
+            _facade = facade;
+        }
 
         [HttpPost("send")]
         [AllowAnonymous]
         public async Task<IActionResult> Send([FromBody] AiChatRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Prompt)) return BadRequest("PROMPT_REQUIRED");
+            if (string.IsNullOrWhiteSpace(dto.Prompt))
+                return BadRequest("PROMPT_REQUIRED");
             var result = await _facade.AiChatService.SendAsync(dto);
             return Ok(result);
         }

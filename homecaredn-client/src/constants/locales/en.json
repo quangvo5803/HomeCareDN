@@ -6,6 +6,7 @@
     "construction": "Construction Home",
     "repair": "Repair Home",
     "material": "Material",
+    "materialCatalog": "Material Catalog",
     "contact": "Contact Us",
     "login": "Login",
     "register": "Register",
@@ -33,7 +34,6 @@
     "about_experience1": "Experience",
 
     "facts_aria": "Workflow",
-    "fact_read_more": "READ MORE",
     "fact_step1_title": "Find suitable contractors/distributors",
     "fact_step1_desc": "Provide requirements, scope and budget for the system to suggest suitable partners.",
     "fact_step2_title": "Applying contractors/distributors",
@@ -96,6 +96,7 @@
     "about": "About"
   },
   "why": {
+<<<<<<< HEAD
   "badge": "Why Choose Us",
   "title": "Why Builders Trust",
   "brand": "HomeCareDN",
@@ -180,12 +181,88 @@
     "email": "Your Email",
     "subject": "Subject",
     "message": "Message"
+=======
+    "badge": "Why Choose Us",
+    "title": "Why Builders Trust",
+    "brand": "HomeCareDN",
+    "intro": "At HomeCareDN, we don't just build — we build with purpose, integrity, and precision. Our reputation is grounded in trust, quality, and client satisfaction.",
+    "image_alt": "Why Choose Us illustration",
+    "f1": {
+      "title": "Experienced & Skilled Team",
+      "desc": "Decades of hands-on experience with a team of certified engineers, architects, and project managers who understand every detail of construction."
+>>>>>>> develop
     },
-  "success_message": "Your request has been sent successfully! We will contact you soon.",
-  "error_message": "An error occurred while sending your request. Please try again later."
-}
-,
-
+    "f2": {
+      "title": "High-Quality Craftsmanship",
+      "desc": "We combine traditional techniques with modern innovations to deliver long-lasting, precision-built structures — every time."
+    },
+    "f3": {
+      "title": "Client-Centered Approach",
+      "desc": "We listen, plan, and collaborate closely with clients to ensure every project aligns with their vision and expectations."
+    }
+  },
+  "process": {
+    "badge": "Our Process",
+    "title": "Our 4-Step Process to a Successful Build.",
+    "intro": "At HomeCareDN, we don't just build — we craft. Every space we deliver is a reflection of thoughtful design, expert planning, and precise execution.",
+    "s1": {
+      "title": "Understanding your needs",
+      "desc": "We listen closely to your goals, challenges, and vision to deliver."
+    },
+    "s2": {
+      "title": "Detailed timeline & quote",
+      "desc": "We provide transparent project timelines and accurate cost estimates."
+    },
+    "s3": {
+      "title": "Expertly Built With Care",
+      "desc": "Every structure we build reflects our commitment to quality craftsmanship."
+    },
+    "s4": {
+      "title": "Final Check & Handover",
+      "desc": "Before delivery, we conduct a thorough final inspection to ensure everything."
+    }
+  },
+  "contact": {
+    "breadcrumb": "Contact Us",
+    "title": "Contact Us",
+    "map_title": "Google Map",
+    "section_tag": "Contact Us",
+    "section_title": "If You Have Any Query, Please Contact Us",
+    "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
+    "note_link": "Download Now",
+    "form_aria": "Contact form",
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "success_message": "Your request has been sent successfully! We will contact you soon.",
+    "error_message": "An error occurred while sending your request. Please try again later."
+  },
+  "materialsCatalog": {
+    "title": "Material Catalog",
+    "subtitle": "Explore our categories and brands",
+    "noCategory": "No categories yet",
+    "search_placeholder": "Search for categories...",
+    "tag_all": "All",
+    "tag_category": "Category",
+    "tag_brand": "Brand",
+    "sort_label": "Sort by:"
+  },
+  "materialDetail": {
+    "breadcrumb_home": "Home",
+    "breadcrumb_material": "Material",
+    "category": "Category",
+    "brand": "Brand",
+    "unit": "Unit",
+    "description": "Descriptions",
+    "relatedMaterial": "Related Materials"
+  },
+  "materialViewAll": {
+    "default": "Default",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
+  },
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -212,6 +289,44 @@
     "resend_otp": "Resend",
     "not_receive_otp": "Did not receive the code? "
   },
+  "userPage": {
+    "profile": {
+      "title": "My Profile",
+      "subtitle": "Manage your personal information and addresses.",
+      "header_profile": "Personal Information",
+      "header_address": "Address",
+      "form": {
+        "name": "Full Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "gender": "Gender",
+        "gender_choice": "Select Gender",
+        "gender_male": "Male",
+        "gender_female": "Female",
+        "gender_other": "Other"
+      },
+      "noAddress": "No addresses available",
+      "addAddress": "Add New Address",
+      "editAddress": "Edit Address",
+      "provice": "Province/City",
+      "provicePlaceholder": "Select Province/City",
+      "district": "District",
+      "districtPlaceholder": "Select District",
+      "ward": "Ward/Commune",
+      "wardPlaceholder": "Select Ward/Commune",
+      "addressDetail": "Detailed Address",
+      "preview": "Preview: ",
+      "addressPlaceholder": "House number, street name, area..."
+    },
+    "service_request": {
+      "title": "Service Requests",
+      "subtitle": "View and manage your service requests.",
+      "noRequest": "No service requests yet",
+      "letStart": "Start by creating your first service request"
+    }
+  },
+
+
   "partnerDashboard": {
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
@@ -231,11 +346,7 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "dashboard": "Dashboard",
-    "my_applications": "My Applications",
-    "commission_payments": "Commission Payments",
-    "reviews": "Reviews",
-    "profile_management": "Profile Management",
-    "settings": "Settings",
+    "category": "Material Category",
     "UI sample for": "UI Sample For",
     "latest_applications": "Latest Applications",
     "view_all": "View All",
@@ -281,6 +392,55 @@
       "bot1": "Sure! I'll design a modern widget with a round launcher button.",
       "user2": "Prioritize mobile and match the context: 'React support widget'.",
       "bot2": "Got it! I'll seed sample data and keep components clean."
+    }
+  },
+  "distributorCategoryManager": {
+    "title": "Material Category Manager",
+    "subtitle": "Manage material category list",
+    "categories": "category(es)",
+    "no": "NO",
+    "categoryName": "Category name",
+    "numberOfMaterials": "Number of Material",
+    "materials": "Material(s)",
+    "status": "Status",
+    "action": "Action",
+    "noCategory": "No category yet",
+    "letStart": "Start by adding your first category."
+  },
+
+  "distributorMaterialManager": {
+    "title": "Material Manager",
+    "material": "materials",
+    "no": "NO",
+    "materialName": "Material Name",
+    "brand": "Brand",
+    "category": "Category",
+    "unit": "Unit",
+    "images": "Images",
+    "action": "Action",
+    "noMaterial": "No material yet",
+    "letStart": "Start by adding your first material.",
+    "materialModal": {
+      "title": "Add new material",
+      "title2": "Update material",
+      "materialName": "Material Name (VietNamese)",
+      "brand": "Brand",
+      "category": "Category",
+      "unit": "Unit (VietNamese)",
+      "description": "Descriptions (VietNamese)",
+      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
+      "unit_Price": "Unit Price",
+      "images": "Images",
+      "chooseBrand": "Choose brand",
+      "chooseCategory": "Choose category",
+      "materialNameEN": "Material Name (English)",
+      "unitEN": "Unit (English)",
+      "descriptionEN": "Description (English)",
+      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "multilanguage_for_data": " Multilanguage for data",
+      "chooseFile": "Choose file",
+      "noFile": "No files selected",
+      "filesSelected": " selected file"
     }
   },
   "adminNavbar": {
@@ -385,8 +545,9 @@
     "categoryName": "Category name",
     "numberOfMaterials": "Number of Material",
     "materials": "Material(s)",
+    "status": "Status",
     "action": "Action",
-    "noCategory": "No category yes",
+    "noCategory": "No category yet",
     "letStart": "Start by adding your first category.",
     "categoryModal": {
       "title": "Add new category",
@@ -395,66 +556,30 @@
       "categoryNamePlaceholder": "Enter category name...",
       "categoryNameEN": "Category name(English)",
       "categoryNamePlaceholderEN": "Enter category name in English...",
-      "multilanguage_for_data": " Multilanguage for data"
-    }
-  },
-  "distributorMaterialManager": {
-    "title": "Material Manager",
-    "no": "NO",
-    "materialName": "Material Name",
-    "brand": "Brand",
-    "category": "Category",
-    "unit": "Unit",
-    "images": "Images",
-    "action": "Action",
-    "noMaterial": "No material yet",
-    "letStart": "Start by adding your first material.",
-    "materialModal": {
-      "title": "Add new material",
-      "title2": "Update material",
-      "materialName": "Material Name (VietNamese)",
-      "brand": "Brand",
-      "category": "Category",
-      "unit": "Unit (VietNamese)",
-      "description": "Descriptions (VietNamese)",
-      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
-      "unit_Price": "Unit Price",
-      "images": "Images",
-      "chooseBrand": "Choose brand",
-      "chooseCategory": "Choose category",
-      "materialNameEN": "Material Name (English)",
-      "unitEN": "Unit (English)",
-      "descriptionEN": "Description (English)",
-      "descriptionsPlaceholderEN": "Enter descriptions in English...",
       "multilanguage_for_data": " Multilanguage for data",
-      "chooseFile": "Choose file",
-      "noFile": "No files selected",
-      "filesSelected": " selected file"
+      "categoryLogo": "Category logo",
+      "chooseFile": "Choose file to upload",
+      "isActive": "Activate category"
     }
   },
   "adminSupportManager": {
-  "title": "Support Manager",
-  "subtitle": "Customer requests",
-  "fullName": "Full name",
-  "email": "Email",
-  "subject": "Subject",
-  "status": "Status",
-  "processed": "Processed",
-  "pending": "Pending",
-  "action": "Action",
-  "replyTitle": "Reply to request",
-  "replyLabel": "Your reply",
-  "replyPlaceholder": "Type your reply here...",
-  "noSupport": "No support requests yet",
-  "all": "All",
-  "itemsCount": "{{count}} item(s)"
+    "title": "Support Manager",
+    "subtitle": "Customer requests",
+    "fullName": "Full name",
+    "email": "Email",
+    "subject": "Subject",
+    "status": "Status",
+    "processed": "Processed",
+    "pending": "Pending",
+    "action": "Action",
+    "replyTitle": "Reply to request",
+    "replyLabel": "Your reply",
+    "replyPlaceholder": "Type your reply here...",
+    "noSupport": "No support requests yet",
+    "all": "All",
+    "itemsCount": "{{count}} item(s)"
   },
-  "roles": {
-    "Distributor": "Distributor",
-    "Contractor": "Contractor",
-    "Admin": "Admin",
-    "Customer": "Customer"
-  },
+
 
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
@@ -487,6 +612,7 @@
   "BUTTON": {
     "Login": "Login",
     "Register": "Register",
+    "CreateAccount": "Create Account",
     "SendOTP": "Send OTP Code",
     "MoreDetails": "More Details",
     "LoginGoogle": "Login with Google",
@@ -498,6 +624,8 @@
     "UpdateCategory": "Update Category",
     "AddNewMaterial": "Add new Material",
     "UpdateMaterial": "Update Material",
+    "AddNewRequest": "Create and add a new request",
+    "AddToExisting": "Add to an existing request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -507,7 +635,15 @@
     "Update": "Update",
     "Send": "Send",
     "Sending": "Sending...",
-    "Close": "Close"
+    "Close": "Close",
+    "Activate": "Activate",
+    "Deactivate": "Deactivate",
+    "ReadMore": "Read more",
+    "Reduce": "Reduce",
+    "SaveProfile": "Save Profile",
+    "Save": "Save",
+    "Saving": "Saving...",
+    "AddAddress": "Add Address"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -523,8 +659,8 @@
       "text": "Please wait a moment."
     },
     "DeleteSupportModal": {
-    "title": "Delete this support request?",
-    "text": "This action cannot be undone."
+      "title": "Delete this support request?",
+      "text": "This action cannot be undone."
     },
     "DeleteMaterialModal": {
       "title": "Are you sure?",
@@ -533,6 +669,10 @@
     "DeleteMaterialImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
+    },
+    "DeleteAddressModal": {
+      "title": "Delete this address?",
+      "text": "This action cannot be undone."
     }
   },
   "ERROR": {
@@ -547,14 +687,19 @@
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",
     "NULL_OTP": "Please enter OTP code.",
+
+    "ADDRESS_NOT_FOUND": "Address not found.",
+    "ADDRESS_ID_MISMATCH": "Address ID does not match.",
+    "ADDRESS_MAX": "You can only add up to 5 addresses.",
+
     "NETWORK_ERROR": "Unable to connect to server, please try again later!",
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
     "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
-    "MAXIMUM_IMAGE_SIZE":"Each image must be less than 5 MB.",
+    "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
     "MATERIAL_NOT_FOUND": "Material not found.",
-    "IMAGE_NOT_FOUND" : "Image not found",
-    
+    "IMAGE_NOT_FOUND": "Image not found",
+
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
     "REQUIRED_CATEGORYNAME": "Please enter category name.",
@@ -564,7 +709,12 @@
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
 
-    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!"
+    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!",
+
+    "LOAD_ERROR": "Failed to load data, please try again later.",
+    "SUBMIT_ERROR": "Failed to submit data, please try again later.",
+    "DELETE_ERROR": "Failed to delete, please try again later.",
+    "UPDATE_ERROR": "Failed to update, please try again later."
   },
   "SUCCESS": {
     "SEND_OTP": "OTP code sent successfully.",
@@ -576,6 +726,15 @@
     "CATEGORY_UPDATE": "Update category successfully.",
     "REPLY": "Replied successfully.",
     "MATERIAL_ADD": "Add material successfully",
-    "MATERIAL_UPDATE": "Update material successfully."
+    "MATERIAL_UPDATE": "Update material successfully.",   
+    "PROFILE_UPDATE": "Profile updated successfully.",
+    "ADDRESS_ADD": "Add address successfully.",
+    "ADDRESS_UPDATE": "Address updated successfully."
+  }, 
+  "roles": {
+    "Distributor": "Distributor",
+    "Contractor": "Contractor",
+    "Admin": "Admin",
+    "Customer": "Customer"
   }
 }

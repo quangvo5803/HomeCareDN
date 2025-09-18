@@ -42,12 +42,19 @@ export default function AuthProvider({ children }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await authService.logout();
-    localStorage.removeItem('accessToken');
-    setUser(null);
-    setPendingEmail(null);
-    navigate('/Login');
-    if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    try {
+      await authService.logout();
+      setLoading(true);
+    } catch {
+      return;
+    } finally {
+      localStorage.removeItem('accessToken');
+      setUser(null);
+      setPendingEmail(null);
+      navigate('/Login');
+      setLoading(false);
+      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+    }
   }, [navigate]);
 
   const scheduleRefresh = useCallback(
