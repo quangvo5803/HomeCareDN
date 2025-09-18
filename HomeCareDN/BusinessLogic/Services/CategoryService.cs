@@ -36,19 +36,29 @@ namespace BusinessLogic.Services
             }
 
             var totalCount = await query.CountAsync();
-            query = parameters.SortBy?.ToLower() switch
+            if (parameters.SortBy?.ToLower() == "random")
             {
-                "categoryname" => query.OrderBy(c => c.CategoryName),
-                "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
-                "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
-                "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
-                "random" => query.OrderBy(c => Guid.NewGuid()),
-                _ => query.OrderBy(c => c.CategoryID),
-            };
-            var items = await query
-                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize)
-                .ToListAsync();
+                var random = new Random();
+                var skip = random.Next(0, Math.Max(0, totalCount - parameters.PageSize));
+                query = query.OrderBy(c => c.CategoryID).Skip(skip).Take(parameters.PageSize);
+            }
+            else
+            {
+                query = parameters.SortBy?.ToLower() switch
+                {
+                    "categoryname" => query.OrderBy(c => c.CategoryName),
+                    "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
+                    "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
+                    "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
+                    _ => query.OrderBy(c => c.CategoryID),
+                };
+
+                query = query
+                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                    .Take(parameters.PageSize);
+            }
+
+            var items = await query.ToListAsync();
 
             var dtos = _mapper.Map<IEnumerable<CategoryDto>>(items);
             return new PagedResultDto<CategoryDto>

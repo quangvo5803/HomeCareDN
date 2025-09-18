@@ -78,19 +78,31 @@ namespace BusinessLogic.Services
                 includeProperties: "LogoImage,Materials"
             );
             var totalCount = await query.CountAsync();
-            query = parameters.SortBy?.ToLower() switch
+
+            if (parameters.SortBy?.ToLower() == "random")
             {
-                "brandname" => query.OrderBy(b => b.BrandName),
-                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
-                "brandnameen" => query.OrderBy(b => b.BrandNameEN),
-                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
-                _ => query.OrderBy(b => b.BrandID),
-            };
-            var items = await query
-                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize)
-                .ToListAsync();
+                var random = new Random();
+                var skipIndex = random.Next(0, Math.Max(0, totalCount - parameters.PageSize + 1));
+
+                query = query.OrderBy(b => b.BrandID).Skip(skipIndex).Take(parameters.PageSize);
+            }
+            else
+            {
+                query = parameters.SortBy?.ToLower() switch
+                {
+                    "brandname" => query.OrderBy(b => b.BrandName),
+                    "brandname_desc" => query.OrderByDescending(b => b.BrandName),
+                    "brandnameen" => query.OrderBy(b => b.BrandNameEN),
+                    "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                    _ => query.OrderBy(b => b.BrandID),
+                };
+                query = query
+                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                    .Take(parameters.PageSize);
+            }
+
+            var items = await query.ToListAsync();
+
             var brandDtos = _mapper.Map<IEnumerable<BrandDto>>(items);
             return new PagedResultDto<BrandDto>
             {

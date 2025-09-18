@@ -18,7 +18,7 @@ const buildMaterialFormData = ({
   if (MaterialID) formData.append('MaterialID', MaterialID);
   if (UserID) formData.append('UserID', UserID);
   if (CategoryID) formData.append('CategoryID', CategoryID);
-  formData.append('Name', Name);
+  if (Name) formData.append('Name', Name);
   if (NameEN) formData.append('NameEN', NameEN);
   if (BrandID) formData.append('BrandID', BrandID);
   if (Unit) formData.append('Unit', Unit);
@@ -73,9 +73,7 @@ export const materialService = {
 
   deleteMaterialImage: async (imageUrl) => {
     const response = await api.delete(
-      `/Distributor/delete-material-image?imageUrl=${encodeURIComponent(
-        imageUrl
-      )}`
+      `/Images/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`
     );
     return response.data;
   },

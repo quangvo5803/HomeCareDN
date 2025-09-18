@@ -73,7 +73,7 @@ export default function AdminCategoryManager() {
         {/* Header */}
         <div className="mb-8">
           <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
-            <i className="fa-solid fa-layer-group mr-3"></i>
+            <i className="fa-solid fa-tags mr-3"></i>
             {t('adminCategoryManager.title')}
           </h2>
           <p className="text-gray-600">{t('adminCategoryManager.subtitle')}</p>

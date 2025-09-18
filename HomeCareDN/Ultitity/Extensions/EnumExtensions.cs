@@ -17,5 +17,23 @@ namespace Ultitity.Extensions
 
             return enumValue.ToString();
         }
+
+        public static List<EnumDto> GetEnumList<T>()
+            where T : Enum
+        {
+            return Enum.GetValues(typeof(T))
+                .Cast<T>()
+                .Select(e => new EnumDto
+                {
+                    Value = e.ToString(),
+                    DisplayName =
+                        e.GetType()
+                            .GetMember(e.ToString())
+                            .First()
+                            .GetCustomAttribute<DisplayAttribute>()
+                            ?.Name ?? e.ToString(),
+                })
+                .ToList();
+        }
     }
 }

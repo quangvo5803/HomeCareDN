@@ -14,7 +14,6 @@ namespace BusinessLogic.DTOs.Application.Service
         public required string BuildingType { get; set; }
 
         public string? Description { get; set; }
-        public double PriceEsstimate { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
     }
 }

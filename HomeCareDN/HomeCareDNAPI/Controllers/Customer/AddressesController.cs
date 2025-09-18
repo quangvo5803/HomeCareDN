@@ -1,12 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using BusinessLogic.DTOs.Authorize.Address;
+﻿using BusinessLogic.DTOs.Authorize.Address;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HomeCareDNAPI.Controllers;
+namespace HomeCareDNAPI.Controllers.Customer;
 
 [ApiController]
 [Route("api/[controller]")]

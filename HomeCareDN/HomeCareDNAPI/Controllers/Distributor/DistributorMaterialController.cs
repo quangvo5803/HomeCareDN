@@ -51,12 +51,5 @@ namespace HomeCareDNAPI.Controllers.Distributor
             await _facadeService.MaterialService.DeleteMaterialAsync(id);
             return NoContent();
         }
-
-        [HttpDelete("delete-material-image")]
-        public async Task<IActionResult> DeleteMaterialImage([FromQuery] string imageUrl)
-        {
-            await _facadeService.MaterialService.DeleteMaterialImageAsync(imageUrl);
-            return NoContent();
-        }
     }
 }
