@@ -37,12 +37,6 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
-<<<<<<< HEAD
-import Materials from './pages/Materials';
-import MaterialDetail from './pages/MaterialDetail';
-
-=======
->>>>>>> develop
 function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>

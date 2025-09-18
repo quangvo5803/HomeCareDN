@@ -1,14 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import SupportChatWidget from "../components/SupportChatWidget";
+import SupportChatWidget from '../components/SupportChatWidget';
 import { useMaterial } from '../hook/useMaterial';
 import Reveal from '../components/Reveal';
-<<<<<<< HEAD
-import { Link, useNavigate } from 'react-router-dom';
-
-=======
 import MaterialItem from '../components/MaterialItem';
->>>>>>> develop
 const slides = [
   {
     id: 1,
@@ -159,16 +154,17 @@ const TESTIMONIALS = [
 ];
 export default function Home() {
   const { t } = useTranslation();
-<<<<<<< HEAD
-  const navigate = useNavigate();
-=======
   const [randomMaterials, setRandomMaterials] = useState([]);
   const { fetchMaterials } = useMaterial();
 
   useEffect(() => {
     const loadMaterials = async () => {
       try {
-        const data = await fetchMaterials({ PageNumber: 1, PageSize: 6, SortBy: "random" });
+        const data = await fetchMaterials({
+          PageNumber: 1,
+          PageSize: 6,
+          SortBy: 'random',
+        });
         setRandomMaterials(data.items || []);
       } catch (err) {
         console.error(err);
@@ -178,8 +174,6 @@ export default function Home() {
 
     loadMaterials();
   }, [fetchMaterials]);
-
->>>>>>> develop
 
   // Carousel state
   const [current, setCurrent] = useState(0);
@@ -209,10 +203,10 @@ export default function Home() {
   // 👉 tạo extSlides với id mới để tránh trùng key
   const extSlides = hasMany
     ? [
-      { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
-      ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
-      { ...baseSlides[0], cloneId: 'tail' },
-    ]
+        { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
+        ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
+        { ...baseSlides[0], cloneId: 'tail' },
+      ]
     : baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` }));
 
   const [idx, setIdx] = useState(hasMany ? 1 : 0);
@@ -273,14 +267,16 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center bg-gradient-to-t from-black/70 via-black/40 to-black/10">
                 <div className="container px-6 mx-auto text-left md:px-20">
                   <h5
-                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.subtitle)}
                   </h5>
                   <h1
-                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.title)}
                   </h1>
@@ -426,9 +422,7 @@ export default function Home() {
                         window.location.reload();
                       }}
                       className="inline-flex items-center gap-2 mt-6 text-sm font-semibold tracking-wide text-white transition-colors hover:text-primary "
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(
-                        it.titleKey
-                      )}`}
+                      aria-label={`${t('BUTTON.ReadMore')} ${t(it.titleKey)}`}
                     >
                       {t(it.ctaKey)}
                       <svg
@@ -570,9 +564,7 @@ export default function Home() {
                     <a
                       href={it.href}
                       className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(
-                        it.titleKey
-                      )}`}
+                      aria-label={`${t('BUTTON.ReadMore')} ${t(it.titleKey)}`}
                     >
                       {t('BUTTON.ReadMore')}
                       <svg
@@ -609,15 +601,6 @@ export default function Home() {
                   </h2>
                 </div>
               </div>
-<<<<<<< HEAD
-              <div className="w-full lg:w-auto text-left lg:text-right">
-                <Link
-                  to="/materials"
-                  className="inline-flex items-center justify-center bg-primary text-white font-medium px-6 py-3 rounded-lg shadow bg-orange-400 hover:bg-orange-500 transition"
-                >
-                  {t('home.material_more')}
-                </Link>
-=======
               <div className="w-full text-left lg:w-auto lg:text-right">
                 <a
                   href="/MaterialViewAll"
@@ -626,58 +609,11 @@ export default function Home() {
                   {t('home.material_more')}
                   <i className="fa-solid fa-arrow-right ms-2"></i>
                 </a>
->>>>>>> develop
               </div>
             </div>
 
             {/* Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-<<<<<<< HEAD
-              {MATERIALS.map((it) => (
-                <article
-                  key={it.id}
-                  onClick={() => navigate(`/materials/${it.slug}`)}
-                  role="button"
-                  tabIndex={0}
-                  className="group bg-gray-50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition h-full cursor-pointer"
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={it.img}
-                      alt={it.title}
-                      className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-
-                  <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                    <h5 className="text-lg font-semibold mb-2">{it.title}</h5>
-                    <p className="text-gray-600 mb-4 group-hover:text-white">
-                      {it.desc}
-                    </p>
-
-                    <Link
-                      to={`/materials/${it.slug}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-2 text-orange-500 text-sm font-medium underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('home.fact_read_more')} ${it.title}`}
-                    >
-                      {t('home.fact_read_more')}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-                      </svg>
-                    </Link>
-                  </div>
-                </article>
-              ))}
-=======
               {randomMaterials.length === 0 ? (
                 <p></p>
               ) : (
@@ -685,7 +621,6 @@ export default function Home() {
                   <MaterialItem key={item.materialID} item={item} />
                 ))
               )}
->>>>>>> develop
             </div>
           </div>
         </section>
@@ -777,8 +712,9 @@ export default function Home() {
               >
                 <div className="relative overflow-hidden">
                   <div
-                    className={`flex ${anim ? 'transition-transform duration-700 ease-out' : ''
-                      }`}
+                    className={`flex ${
+                      anim ? 'transition-transform duration-700 ease-out' : ''
+                    }`}
                     style={{ transform: `translateX(-${idx * 100}%)` }}
                     onTransitionEnd={handleTransitionEnd}
                   >
@@ -875,10 +811,11 @@ export default function Home() {
         aria-label="Back to top"
         className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${showBackTop
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-3 pointer-events-none'
-          }`}
+                    ${
+                      showBackTop
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-3 pointer-events-none'
+                    }`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

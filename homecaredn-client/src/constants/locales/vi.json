@@ -95,51 +95,6 @@
     "home": "Trang chủ",
     "about": "Giới thiệu"
   },
-<<<<<<< HEAD
-  "f3": {
-    "title": "Lấy khách hàng làm trung tâm",
-    "desc": "Chúng tôi lắng nghe, lập kế hoạch và phối hợp chặt chẽ với khách hàng để đảm bảo mọi dự án đều phù hợp với tầm nhìn và kỳ vọng của họ."
-  }
-},
-"materials": {
-    "catalog": {
-      "title": "Danh mục Vật liệu",
-      "search_placeholder": "Tìm kiếm vật liệu...",
-      "tag_all": "Tất cả",
-      "tag_category": "Danh mục",
-      "tag_brand": "Thương hiệu",
-      "sort_relevant": "Liên quan (mặc định)",
-      "sort_az": "Tên A → Z",
-      "sort_za": "Tên Z → A",
-      "result_showing": "Hiển thị",
-      "result_items": "mục",
-      "result_for": "cho",
-      "result_in": "trong",
-      "empty_title": "Không tìm thấy vật liệu",
-      "empty_desc": "Hãy thay đổi bộ lọc hoặc xóa ô tìm kiếm.",
-      "reset_filters": "Đặt lại bộ lọc",
-      "read_more": "Xem thêm",
-      "details": "Chi tiết",
-      "breadcrumbs_home": "Trang chủ",
-      "breadcrumbs_materials": "Vật liệu"
-    },
-    "detail": {
-      "not_found": "Không tìm thấy vật liệu.",
-      "back_to_list": "Quay lại danh sách",
-      "description_tab": "Mô tả",
-      "related_title": "Vật liệu liên quan",
-      "cta_add_new_request": "Thêm và tạo yêu cầu mới",
-      "cta_add_to_existing": "Thêm vào yêu cầu có sẵn"
-    }
-  },
-"process": {
-  "badge": "Quy trình",
-  "title": "Quy trình 4 bước để xây dựng thành công.",
-  "intro": "Tại HomeCareDN, chúng tôi không chỉ xây — chúng tôi chế tác. Mỗi không gian được bàn giao đều phản ánh thiết kế chu đáo, kế hoạch chuẩn xác và thi công tỉ mỉ.",
-  "s1": {
-    "title": "Thấu hiểu nhu cầu",
-    "desc": "Chúng tôi lắng nghe kỹ lưỡng mục tiêu, thách thức và tầm nhìn của bạn để triển khai."
-=======
   "why": {
     "badge": "Vì sao chọn chúng tôi",
     "title": "Vì sao các nhà thầu tin tưởng",
@@ -158,7 +113,6 @@
       "title": "Lấy khách hàng làm trung tâm",
       "desc": "Chúng tôi lắng nghe, lập kế hoạch và phối hợp chặt chẽ với khách hàng để đảm bảo mọi dự án đều phù hợp với tầm nhìn và kỳ vọng của họ."
     }
->>>>>>> develop
   },
   "process": {
     "badge": "Quy trình",
