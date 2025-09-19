@@ -118,12 +118,8 @@ export default function Home() {
           PageSize: 6,
           SortBy: 'random',
         });
-        const materialsWithType = (data.items || []).map((item) => ({
-          ...item,
-          type: 'material',
-        }));
 
-        setRandomMaterials(materialsWithType || []);
+        setRandomMaterials(data || []);
       } catch (err) {
         console.error(err);
         setRandomMaterials([]);
@@ -136,11 +132,7 @@ export default function Home() {
           PageSize: 6,
           SortBy: 'random',
         });
-        const servicesWithType = (data.items || []).map((item) => ({
-          ...item,
-          type: 'service',
-        }));
-        setRandomServices(servicesWithType || []);
+        setRandomServices(data || []);
       } catch (err) {
         console.error(err);
         setRandomServices([]);

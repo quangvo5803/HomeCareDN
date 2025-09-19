@@ -146,15 +146,15 @@ export default function AdminServiceManager() {
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
+                        <td className="px-6 py-4 text-center align-middle text-black">
                           {i18n.language === 'vi'
                             ? svc.name
                             : svc.nameEN || svc.name}
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
+                        <td className="px-6 py-4 text-center align-middle text-black">
                           {t(`Enums.ServiceType.${svc.serviceType}`)}
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
+                        <td className="px-6 py-4 text-center align-middle text-black">
                           {t(`Enums.BuildingType.${svc.buildingType}`)}
                         </td>
                         <td className="px-4 py-4 text-center align-middle">

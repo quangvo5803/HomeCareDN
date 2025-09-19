@@ -23,9 +23,13 @@ export const MaterialProvider = ({ children }) => {
           SortBy,
           FilterID,
         });
-        setMaterials(data.items || []);
+        const itemsWithType = (data.items || []).map((m) => ({
+          ...m,
+          type: 'material',
+        }));
+        setMaterials(itemsWithType);
         setTotalMaterials(data.totalCount || 0);
-        return data;
+        return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
         return { items: [], totalCount: 0 };

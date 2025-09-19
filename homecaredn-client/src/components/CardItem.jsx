@@ -7,7 +7,13 @@ export default function CardItem({ item }) {
 
   return (
     <Link
-      to={item.type === 'material' ? `/MaterialDetail/${item.materialID}` : '#'}
+      to={
+        item.type === 'material'
+          ? `/MaterialDetail/${item.materialID}`
+          : item.type === 'service'
+          ? `/ServiceDetail/${item.serviceID}`
+          : '#'
+      }
       className="flex flex-col h-full overflow-hidden transition-all duration-300 border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-2xl hover:-translate-y-1"
     >
       {/* Ảnh  */}
@@ -24,9 +30,10 @@ export default function CardItem({ item }) {
         <h5 className="mb-2 text-lg font-semibold line-clamp-2 min-h-[56px] flex items-center justify-center">
           {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
         </h5>
+
         {item.type === 'material' && (
           <div className="flex items-center justify-center gap-3 mt-2">
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-xs font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
+            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
               <i className="fas fa-tags"></i>
               <span className="truncate">
                 {i18n.language === 'vi'
@@ -35,7 +42,7 @@ export default function CardItem({ item }) {
               </span>
             </span>
 
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-xs font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
+            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
               <i className="fas fa-star"></i>
               <span className="truncate">
                 {i18n.language === 'vi'
@@ -45,6 +52,25 @@ export default function CardItem({ item }) {
             </span>
           </div>
         )}
+
+        {item.type === 'service' && (
+          <div className="flex items-center justify-center gap-3 mt-2">
+            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
+              <i className="fas fa-tools"></i>
+              <span className="truncate">
+                {t(`Enums.ServiceType.${item.serviceType}`)}
+              </span>
+            </span>
+
+            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
+              <i className="fas fa-building"></i>
+              <span className="truncate">
+                {t(`Enums.BuildingType.${item.buildingType}`)}
+              </span>
+            </span>
+          </div>
+        )}
+
         <div className="mt-3">
           <div className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white">
             {t('BUTTON.ReadMore')}
@@ -65,16 +91,19 @@ export default function CardItem({ item }) {
 
 CardItem.propTypes = {
   item: PropTypes.shape({
-    materialID: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    // Material
+    materialID: PropTypes.string,
     name: PropTypes.string.isRequired,
     nameEN: PropTypes.string,
-    description: PropTypes.string,
-    descriptionEN: PropTypes.string,
-    imageUrls: PropTypes.string,
-    categoryName: PropTypes.string.isRequired,
+    categoryName: PropTypes.string,
     categoryNameEN: PropTypes.string,
-    brandName: PropTypes.string.isRequired,
+    brandName: PropTypes.string,
     brandNameEN: PropTypes.string,
-    type: PropTypes.string,
+    // Service
+    serviceID: PropTypes.string,
+    serviceType: PropTypes.string,
+    buildingType: PropTypes.string,
+    imageUrls: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
 };

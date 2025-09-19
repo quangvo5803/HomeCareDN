@@ -22,9 +22,13 @@ export const ServiceProvider = ({ children }) => {
           SortBy,
           FilterID,
         });
-        setServices(data.items || []);
+        const itemsWithType = (data.items || []).map((m) => ({
+          ...m,
+          type: 'service',
+        }));
+        setServices(itemsWithType || []);
         setTotalServices(data.totalCount || 0);
-        return data;
+        return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
         return { items: [], totalCount: 0 };
