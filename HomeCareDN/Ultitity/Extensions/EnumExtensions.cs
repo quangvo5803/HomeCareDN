@@ -28,8 +28,7 @@ namespace Ultitity.Extensions
                     Value = e.ToString(),
                     DisplayName =
                         e.GetType()
-                            .GetMember(e.ToString())
-                            .First()
+                            .GetMember(e.ToString())[0]
                             .GetCustomAttribute<DisplayAttribute>()
                             ?.Name ?? e.ToString(),
                 })

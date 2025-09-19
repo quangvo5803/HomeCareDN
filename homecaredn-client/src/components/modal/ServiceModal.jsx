@@ -86,7 +86,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
       titleKey: t('ModalPopup.DeleteImageModal.title'),
       textKey: t('ModalPopup.DeleteImageModal.text'),
       onConfirm: async () => {
-        await deleteServiceImage(service.ServiceID, imageUrl);
+        await deleteServiceImage(service.serviceID, imageUrl);
         Swal.close();
         toast.success(t('SUCCESS.DELETE'));
         if (onSuccess) onSuccess();
@@ -100,13 +100,19 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   };
 
   // Xoá ảnh chung (local hoặc DB)
+  const removeImageFromState = (img) => {
+    setImages((prev) => prev.filter((i) => i.id !== img.id));
+  };
+
+  const handleDeleteImage = (img) => {
+    handleDeleteImageFromDb(img.url, () => removeImageFromState(img));
+  };
+
   const handleRemoveImage = (img) => {
     if (img.isNew) {
-      setImages((prev) => prev.filter((i) => i.id !== img.id));
+      removeImageFromState(img);
     } else {
-      handleDeleteImageFromDb(img.url, () => {
-        setImages((prev) => prev.filter((i) => i.id !== img.id));
-      });
+      handleDeleteImage(img);
     }
   };
 
@@ -447,7 +453,12 @@ ServiceModal.propTypes = {
     serviceType: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     packageOption: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     buildingType: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    images: PropTypes.array,
+    mainStructureType: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+    designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    imageUrls: PropTypes.array,
   }),
 };
 

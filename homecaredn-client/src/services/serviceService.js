@@ -1,51 +1,43 @@
 import api from '../api';
 
 // 🔹 Hàm dùng chung để build FormData cho Service
-const buildServiceFormData = ({
-  ServiceID,
-  Name,
-  NameEN,
-  ServiceType,
-  PackageOption,
-  BuildingType,
-  MainStructureType,
-  DesignStyle,
-  Description,
-  DescriptionEN,
-  Images,
-}) => {
+const buildServiceFormData = (service) => {
   const formData = new FormData();
 
-  if (ServiceID) formData.append('ServiceID', ServiceID);
+  // Những field string/optional
+  const stringFields = [
+    'ServiceID',
+    'Name',
+    'NameEN',
+    'Description',
+    'DescriptionEN',
+  ];
+  stringFields.forEach((key) => {
+    if (service[key]) formData.append(key, service[key]);
+  });
 
-  if (Name) formData.append('Name', Name);
-  if (NameEN) formData.append('NameEN', NameEN);
+  // Những field có thể là number / enum, cần check null/undefined
+  const enumFields = [
+    'ServiceType',
+    'PackageOption',
+    'BuildingType',
+    'MainStructureType',
+    'DesignStyle',
+  ];
+  enumFields.forEach((key) => {
+    if (service[key] !== undefined && service[key] !== null) {
+      formData.append(key, service[key]);
+    }
+  });
 
-  if (ServiceType !== undefined && ServiceType !== null) {
-    formData.append('ServiceType', ServiceType);
-  }
-  if (PackageOption !== undefined && PackageOption !== null) {
-    formData.append('PackageOption', PackageOption);
-  }
-  if (BuildingType !== undefined && BuildingType !== null) {
-    formData.append('BuildingType', BuildingType);
-  }
-  if (MainStructureType !== undefined && MainStructureType !== null) {
-    formData.append('MainStructureType', MainStructureType);
-  }
-  if (DesignStyle !== undefined && DesignStyle !== null) {
-    formData.append('DesignStyle', DesignStyle);
-  }
-
-  if (Description) formData.append('Description', Description);
-  if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
-
-  if (Images && Images.length > 0) {
-    Images.forEach((file) => formData.append('Images', file));
+  // Images
+  if (service.Images?.length > 0) {
+    service.Images.forEach((file) => formData.append('Images', file));
   }
 
   return formData;
 };
+
 export const serviceService = {
   // 🔹 Public APIs
   getAllService: async (params = {}) => {

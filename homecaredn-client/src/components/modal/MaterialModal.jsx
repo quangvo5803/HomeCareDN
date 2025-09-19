@@ -91,25 +91,34 @@ export default function MaterialModal({
   };
 
   // Xóa ảnh local hoặc DB
+  const removeImageFromState = (img) => {
+    setImages((prev) => prev.filter((i) => i.id !== img.id));
+    if (material) {
+      material.imageUrls = material.imageUrls.filter((url) => url !== img.url);
+    }
+  };
+
+  const confirmDeleteImage = async (img) => {
+    try {
+      await deleteMaterialImage(material.MaterialID, img.url);
+      Swal.close();
+      toast.success(t('SUCCESS.DELETE'));
+      removeImageFromState(img);
+    } catch (error) {
+      console.error(error);
+      toast.error(t('ERROR.DELETE'));
+    }
+  };
+
   const handleRemoveImage = (img) => {
     if (img.isNew) {
-      setImages((prev) => prev.filter((i) => i.id !== img.id));
+      removeImageFromState(img);
     } else {
       showDeleteModal({
         t,
         titleKey: t('ModalPopup.DeleteImageModal.title'),
         textKey: t('ModalPopup.DeleteImageModal.text'),
-        onConfirm: async () => {
-          await deleteMaterialImage(material.MaterialID, img.url);
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-          setImages((prev) => prev.filter((i) => i.id !== img.id));
-          if (material) {
-            material.imageUrls = material.imageUrls.filter(
-              (url) => url !== img.url
-            );
-          }
-        },
+        onConfirm: () => confirmDeleteImage(img),
       });
     }
   };
@@ -416,4 +425,6 @@ MaterialModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   material: PropTypes.object,
+  brands: PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
 };
