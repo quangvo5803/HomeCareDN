@@ -7,7 +7,7 @@ import { Pagination } from 'antd';
 import MaterialModal from '../../components/modal/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
-import { useBrand } from '../..hook/useBrand';
+import { useBrand } from '../../hook/useBrand';
 import { useCategory } from '../../hook/useCategory';
 import { handleApiError } from '../../utils/handleApiError';
 
