@@ -41,7 +41,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
         setDesignStyle(service.designStyle ?? '');
         setImages(
           (service.imageUrls || []).map((url) => ({
-            id: url,
             url,
             isNew: false,
           }))
@@ -70,7 +69,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
       return;
     }
     const mappedFiles = files.map((f) => ({
-      id: crypto.randomUUID(),
       file: f,
       url: URL.createObjectURL(f),
       isNew: true,
@@ -101,7 +99,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
 
   // Xoá ảnh chung (local hoặc DB)
   const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.id !== img.id));
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
   const handleDeleteImage = (img) => {
@@ -383,7 +381,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
             <div className="flex flex-wrap gap-3">
               {images.map((img) => (
                 <div
-                  key={img.id}
+                  key={img.url}
                   className="relative w-28 h-28 border rounded-xl overflow-hidden group"
                 >
                   <img

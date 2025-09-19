@@ -52,7 +52,6 @@ export default function MaterialModal({
         setDescriptionEN(material.descriptionEN || '');
         setImages(
           (material.imageUrls || []).map((url) => ({
-            id: url,
             url,
             isNew: false,
           }))
@@ -81,7 +80,6 @@ export default function MaterialModal({
     }
 
     const mappedFiles = files.map((f) => ({
-      id: crypto.randomUUID(),
       url: URL.createObjectURL(f),
       file: f,
       isNew: true,
@@ -92,7 +90,7 @@ export default function MaterialModal({
 
   // Xóa ảnh local hoặc DB
   const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.id !== img.id));
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
     if (material) {
       material.imageUrls = material.imageUrls.filter((url) => url !== img.url);
     }
@@ -351,7 +349,7 @@ export default function MaterialModal({
             <div className="col-span-2 flex flex-wrap gap-3">
               {images.map((img) => (
                 <div
-                  key={img.id}
+                  key={img.url}
                   className="relative w-28 h-28 border rounded-xl overflow-hidden group"
                 >
                   <img

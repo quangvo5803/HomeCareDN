@@ -79,7 +79,13 @@ export const ServiceProvider = ({ children }) => {
         const updated = await serviceService.updateService(serviceData);
         setServices((prev) =>
           prev.map((s) =>
-            s.serviceID === updated.serviceID ? { ...s, ...updated } : s
+            s.serviceID === updated.serviceID
+              ? {
+                  ...s,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? s.imageUrls,
+                }
+              : s
           )
         );
         return updated;
@@ -108,16 +114,16 @@ export const ServiceProvider = ({ children }) => {
     },
     [user?.role]
   );
-  const deleteServiceImage = useCallback(async (serviceID, imageId) => {
+  const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
     try {
-      await serviceService.deleteServiceImage(imageId);
+      await serviceService.deleteServiceImage(imageUrl);
 
       // update materials
       const updateImages = (s) => {
         if (s.serviceID !== serviceID) return s;
         return {
           ...s,
-          images: s.images.filter((img) => img.imageID !== imageId),
+          imageUrls: s.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
         };
       };
 

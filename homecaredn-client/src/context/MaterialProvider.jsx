@@ -107,7 +107,7 @@ export const MaterialProvider = ({ children }) => {
               ? {
                   ...m,
                   ...updated,
-                  images: updated.images ?? m.images,
+                  imageUrls: updated.imageUrls ?? m.imageUrls,
                 }
               : m
           )
@@ -140,17 +140,17 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(
-    async (materialId, imageId) => {
+    async (materialId, imageUrl) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
-        await materialService.deleteMaterialImage(imageId);
+        await materialService.deleteMaterialImage(imageUrl);
 
         // update materials
         const updateImages = (m) => {
           if (m.materialID !== materialId) return m;
           return {
             ...m,
-            images: m.images.filter((img) => img.imageID !== imageId),
+            imageUrls: m.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
           };
         };
 
