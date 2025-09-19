@@ -9,6 +9,7 @@ import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
 import { handleApiError } from '../../utils/handleApiError';
 import { Editor } from '@tinymce/tinymce-react';
+import { showDeleteModal } from './DeleteModal';
 
 export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const { user } = useAuth();
@@ -106,39 +107,21 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
     if (img.isNew) {
       setImages((prev) => prev.filter((i) => i.id !== img.id));
     } else {
-      Swal.fire({
-        title: t('ModalPopup.DeleteImageModal.title'),
-        text: t('ModalPopup.DeleteImageModal.text'),
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: t('BUTTON.Delete'),
-        cancelButtonText: t('BUTTON.Cancel'),
-      }).then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            Swal.fire({
-              title: t('ModalPopup.DeletingLoadingModal.title'),
-              text: t('ModalPopup.DeletingLoadingModal.text'),
-              allowOutsideClick: false,
-              didOpen: () => Swal.showLoading(),
-            });
-            await deleteMaterialImage(material.MaterialID, img.url);
-            Swal.close();
-            toast.success(t('SUCCESS.DELETE'));
-            setImages((prev) => prev.filter((i) => i.id !== img.id));
-            if (material) {
-              material.imageUrls = material.imageUrls.filter(
-                (url) => url !== img.url
-              );
-            }
-          } catch (err) {
-            Swal.close();
-            if (err.handled) return;
-            toast.error(handleApiError(err));
+      showDeleteModal({
+        t,
+        titleKey: t('ModalPopup.DeleteImageModal.title'),
+        textKey: t('ModalPopup.DeleteImageModal.text'),
+        onConfirm: async () => {
+          await deleteMaterialImage(material.MaterialID, img.url);
+          Swal.close();
+          toast.success(t('SUCCESS.DELETE'));
+          setImages((prev) => prev.filter((i) => i.id !== img.id));
+          if (material) {
+            material.imageUrls = material.imageUrls.filter(
+              (url) => url !== img.url
+            );
           }
-        }
+        },
       });
     }
   };

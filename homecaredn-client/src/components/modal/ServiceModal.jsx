@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
-import { handleApiError } from '../../utils/handleApiError';
+import { showDeleteModal } from './DeleteModal';
+import { Editor } from '@tinymce/tinymce-react';
 
 export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   const { t } = useTranslation();
@@ -80,41 +81,21 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
 
   // Xoá ảnh DB
   const handleDeleteImageFromDb = async (imageUrl, onSuccess) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteImageModal.title'),
-      text: t('ModalPopup.DeleteImageModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-          await deleteServiceImage(service.ServiceID, imageUrl);
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-          if (onSuccess) onSuccess();
-          if (service) {
-            service.imageUrls = service.imageUrls.filter(
-              (url) => url !== imageUrl
-            );
-          }
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
+    showDeleteModal({
+      t,
+      titleKey: t('ModalPopup.DeleteImageModal.title'),
+      textKey: t('ModalPopup.DeleteImageModal.text'),
+      onConfirm: async () => {
+        await deleteServiceImage(service.ServiceID, imageUrl);
+        Swal.close();
+        toast.success(t('SUCCESS.DELETE'));
+        if (onSuccess) onSuccess();
+        if (service) {
+          service.imageUrls = service.imageUrls.filter(
+            (url) => url !== imageUrl
+          );
         }
-      }
+      },
     });
   };
 
@@ -173,7 +154,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[1050] p-4 bg-black/40">
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto 
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl mx-auto 
                   transform transition-all duration-300 scale-100 
                   max-h-[90vh] flex flex-col"
       >
@@ -213,11 +194,17 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
             <label className="block text-sm font-medium text-gray-700">
               {t('adminServiceManager.serviceModal.description')}
             </label>
-            <textarea
-              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-              rows="3"
+            <Editor
+              apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              init={{
+                height: 300,
+                menubar: false,
+                plugins: 'lists link image code',
+                toolbar:
+                  'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+              }}
+              onEditorChange={(content) => setDescription(content)}
             />
           </div>
 
@@ -365,11 +352,17 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t('adminServiceManager.serviceModal.descriptionEN')}
                   </label>
-                  <textarea
-                    className="w-full px-4 py-3 border rounded-xl resize-none"
-                    rows="3"
+                  <Editor
+                    apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
                     value={descriptionEN}
-                    onChange={(e) => setDescriptionEN(e.target.value)}
+                    init={{
+                      height: 300,
+                      menubar: false,
+                      plugins: 'lists link image code',
+                      toolbar:
+                        'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                    }}
+                    onEditorChange={(content) => setDescriptionEN(content)}
                   />
                 </div>
               </div>
