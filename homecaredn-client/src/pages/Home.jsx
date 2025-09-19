@@ -558,7 +558,7 @@ export default function Home() {
                 <p></p>
               ) : (
                 randomMaterials.map((item) => (
-                  <MaterialItem key={item.materialID} item={item} />
+                  <CardItem key={item.materialID} item={item} />
                 ))
               )}
             </div>
