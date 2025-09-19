@@ -4,10 +4,10 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useBrand } from '../../hook/useBrand';
 import { useCategory } from '../../hook/useCategory';
-import Swal from 'sweetalert2';
-import { handleApiError } from '../../utils/handleApiError';
 import { useMaterial } from '../../hook/useMaterial';
 import { useAuth } from '../../hook/useAuth';
+import Swal from 'sweetalert2';
+import { handleApiError } from '../../utils/handleApiError';
 import { Editor } from '@tinymce/tinymce-react';
 
 export default function MaterialModal({ isOpen, onClose, onSave, material }) {
@@ -25,17 +25,13 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const [unitEN, setUnitEN] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionEN, setDescriptionEN] = useState('');
-
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Ảnh DB
-  const [existingImages, setExistingImages] = useState([]);
-  // Ảnh local mới upload
-  const [newImages, setNewImages] = useState([]);
-
+  const [images, setImages] = useState([]);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
-  // Load brands & categories cho dropdown
+
+  // Load brands & categories
   useEffect(() => {
     if (isOpen) {
       (async () => {
@@ -52,114 +48,102 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       })();
     }
   }, [isOpen, fetchAllBrands, fetchAllCategories]);
-  // Delete Material image (DB)
-  const handleDeleteImage = async (imageUrl, onSuccess) => {
-    Swal.fire({
-      title: t('ModalPopup.DeleteMaterialImageModal.title'),
-      text: t('ModalPopup.DeleteMaterialImageModal.text'),
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: t('BUTTON.Delete'),
-      cancelButtonText: t('BUTTON.Cancel'),
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          Swal.fire({
-            title: t('ModalPopup.DeletingLoadingModal.title'),
-            text: t('ModalPopup.DeletingLoadingModal.text'),
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            },
-          });
-          await deleteMaterialImage(imageUrl);
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE'));
-          if (onSuccess) onSuccess();
-        } catch (err) {
-          Swal.close();
-          if (err.handled) return;
-          toast.error(handleApiError(err));
-        }
-      }
-    });
-  };
 
   // Fill data khi edit
   useEffect(() => {
     if (isOpen) {
       if (material) {
-        const foundBrand = brands.find(
-          (b) => b.brandName === material.brandName
-        );
-        const foundCategory = categories.find(
-          (c) => c.categoryName === material.categoryName
-        );
         setName(material.name || '');
-        setBrandID(material.brandID || foundBrand?.brandID || '');
-        setCategoryID(material.categoryID || foundCategory?.categoryID || '');
-        setUnit(material.unit || '');
-        setDescription(material.description || '');
         setNameEN(material.nameEN || '');
+        setUnit(material.unit || '');
         setUnitEN(material.unitEN || '');
+        setBrandID(material.brandID || '');
+        setCategoryID(material.categoryID || '');
+        setDescription(material.description || '');
         setDescriptionEN(material.descriptionEN || '');
-        setExistingImages(material.imageUrls || []);
-        setNewImages([]);
+        setImages(
+          (material.imageUrls || []).map((url) => ({
+            id: url,
+            url,
+            isNew: false,
+          }))
+        );
       } else {
         setName('');
+        setNameEN('');
+        setUnit('');
+        setUnitEN('');
         setBrandID('');
         setCategoryID('');
-        setUnit('');
         setDescription('');
-        setNameEN('');
-        setUnitEN('');
         setDescriptionEN('');
-        setExistingImages([]);
-        setNewImages([]);
+        setImages([]);
       }
     }
-  }, [isOpen, material, brands, categories]);
+  }, [isOpen, material]);
 
-  // Chọn và hiển thị ảnh local
+  // Chọn ảnh local
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const totalCount = existingImages.length + newImages.length + files.length;
+    const totalCount = images.length + files.length;
     if (totalCount > 5) {
-      toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGE'));
+      toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
 
-    // Gán id cho từng ảnh local
     const mappedFiles = files.map((f) => ({
       id: crypto.randomUUID(),
+      url: URL.createObjectURL(f),
       file: f,
-      previewUrl: URL.createObjectURL(f),
+      isNew: true,
     }));
 
-    setNewImages((prev) => [...prev, ...mappedFiles]);
+    setImages((prev) => [...prev, ...mappedFiles]);
   };
 
-  // Xóa ảnh local theo id
-  const handleRemoveNewImage = (id) => {
-    setNewImages((prev) => prev.filter((img) => img.id !== id));
-  };
-
-  // Hàm phụ để update state sau khi xoá ảnh
-  const updateExistingImages = (imageUrl) => {
-    setExistingImages((prev) => prev.filter((x) => x !== imageUrl));
-    if (material) {
-      material.imageUrls = material.imageUrls.filter((x) => x !== imageUrl);
+  // Xóa ảnh local hoặc DB
+  const handleRemoveImage = (img) => {
+    if (img.isNew) {
+      setImages((prev) => prev.filter((i) => i.id !== img.id));
+    } else {
+      Swal.fire({
+        title: t('ModalPopup.DeleteImageModal.title'),
+        text: t('ModalPopup.DeleteImageModal.text'),
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: t('BUTTON.Delete'),
+        cancelButtonText: t('BUTTON.Cancel'),
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            Swal.fire({
+              title: t('ModalPopup.DeletingLoadingModal.title'),
+              text: t('ModalPopup.DeletingLoadingModal.text'),
+              allowOutsideClick: false,
+              didOpen: () => Swal.showLoading(),
+            });
+            await deleteMaterialImage(material.MaterialID, img.url);
+            Swal.close();
+            toast.success(t('SUCCESS.DELETE'));
+            setImages((prev) => prev.filter((i) => i.id !== img.id));
+            if (material) {
+              material.imageUrls = material.imageUrls.filter(
+                (url) => url !== img.url
+              );
+            }
+          } catch (err) {
+            Swal.close();
+            if (err.handled) return;
+            toast.error(handleApiError(err));
+          }
+        }
+      });
     }
   };
 
-  // Hàm chính để gọi xoá ảnh
-  const handleRemoveExistingImage = (imageUrl) => {
-    handleDeleteImage(imageUrl, () => updateExistingImages(imageUrl));
-  };
-
-  // Submit update/add
+  // Submit
   const handleSubmit = () => {
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_NAME'));
@@ -177,7 +161,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_CATEGORY'));
       return;
     }
-    if (!material && newImages.length === 0) {
+    if (!material && images.filter((i) => i.isNew).length === 0) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
       return;
     }
@@ -193,7 +177,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
       CategoryID: categoryID || null,
       Description: description || null,
       DescriptionEN: descriptionEN || null,
-      Images: newImages.length > 0 ? newImages.map((x) => x.file) : null,
+      Images: images.filter((i) => i.isNew).map((i) => i.file),
     };
     onSave(data);
   };
@@ -216,9 +200,8 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
           </button>
         </div>
 
-        {/* Body (scrollable) */}
+        {/* Body */}
         <div className="flex-1 pr-2 mt-4 space-y-6 overflow-y-auto">
-          {/* Form */}
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             {/* Material Name */}
             <div>
@@ -317,7 +300,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               />
             </div>
 
-            {/* Expand */}
+            {/* Multilanguage */}
             <div className="col-span-2">
               <button
                 type="button"
@@ -334,7 +317,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
               {isExpanded && (
                 <div className="p-5 space-y-4 rounded-xl bg-gray-50">
                   <div className="grid grid-cols-2 gap-6">
-                    {/* Material Name EN */}
                     <div>
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         {t(
@@ -349,7 +331,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                       />
                     </div>
 
-                    {/* Unit EN */}
                     <div>
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         {t('distributorMaterialManager.materialModal.unitEN')}
@@ -363,7 +344,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
                     </div>
                   </div>
 
-                  {/* Description EN */}
                   <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">
                       {t(
@@ -388,107 +368,69 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
             </div>
 
             {/* Images */}
-            <div className="col-span-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.images')}
-              </label>
-
-              {existingImages.length + newImages.length < 5 && (
-                <div>
-                  {/* Hidden file input */}
-                  <input
-                    id="fileUpload"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden"
+            <div className="col-span-2 flex flex-wrap gap-3">
+              {images.map((img) => (
+                <div
+                  key={img.id}
+                  className="relative w-28 h-28 border rounded-xl overflow-hidden group"
+                >
+                  <img
+                    src={img.url}
+                    alt="preview"
+                    className="w-full h-full object-cover"
                   />
-
-                  {/* Custom button */}
-                  <label
-                    htmlFor="fileUpload"
-                    className="inline-block px-4 py-2 font-medium border rounded-lg cursor-pointer bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200"
-                  >
-                    {t('distributorMaterialManager.materialModal.chooseFile')}
-                  </label>
-
-                  {/* Hiển thị số file đã chọn */}
-                  <span className="ml-3 text-sm text-gray-500">
-                    {newImages.length > 0
-                      ? `${newImages.length} ${t(
-                        'distributorMaterialManager.materialModal.filesSelected'
-                      )}`
-                      : t('distributorMaterialManager.materialModal.noFile')}
-                  </span>
-                </div>
-              )}
-
-              <div className="grid grid-cols-5 gap-4 mt-4">
-                {/* Existing Images */}
-                {existingImages.map((imgUrl) => (
-                  <div
-                    key={imgUrl}
-                    className="relative flex items-center justify-center w-24 h-24 overflow-hidden bg-white border rounded-lg shadow-sm group"
-                  >
-                    <img
-                      src={imgUrl}
-                      alt="db"
-                      className="max-w-[83px] max-h-[83px] object-contain"
-                    />
-                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                      {existingImages.length !== 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveExistingImage(imgUrl)}
-                          className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
-                        >
-                          <i className="fa-solid fa-xmark"></i>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                {/* New Images local */}
-                {newImages.map((img) => (
-                  <div
-                    key={img.id}
-                    className="relative flex items-center justify-center w-24 h-24 overflow-hidden bg-white border rounded-lg shadow-sm group"
-                  >
-                    <img
-                      src={img.previewUrl}
-                      alt="new"
-                      className="max-w-[83px] max-h-[83px] object-contain"
-                    />
-                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                  <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                    {(images.length !== 1 || img.isNew) && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveNewImage(img.id)}
+                        onClick={() => handleRemoveImage(img)}
                         className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
                       >
                         <i className="fa-solid fa-xmark"></i>
                       </button>
-                    </div>
+                    )}
                   </div>
-                ))}
-              </div>
-
+                </div>
+              ))}
             </div>
+
+            {images.length < 5 && (
+              <div className="col-span-2">
+                <label className="cursor-pointer px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl hover:border-emerald-400 hover:bg-emerald-50 inline-block">
+                  {t('distributorMaterialManager.materialModal.chooseFile')}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                </label>
+                <span className="ml-3 text-sm text-gray-500">
+                  {images.filter((i) => i.isNew).length > 0
+                    ? `${images.filter((i) => i.isNew).length} ${t(
+                        'distributorMaterialManager.materialModal.filesSelected'
+                      )}`
+                    : t('distributorMaterialManager.materialModal.noFile')}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 pt-4 mt-4 border-t">
+        <div className="flex items-center justify-end mt-6 gap-4 border-t pt-4">
           <button
+            type="button"
             onClick={onClose}
-            className="px-5 py-2 border rounded-xl hover:bg-gray-50"
+            className="px-6 py-2 font-medium text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300"
           >
             {t('BUTTON.Cancel')}
           </button>
           <button
+            type="button"
             onClick={handleSubmit}
-            className="px-5 py-2 text-white shadow bg-emerald-500 rounded-xl hover:bg-emerald-600"
+            className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600"
           >
             {material ? t('BUTTON.Update') : t('BUTTON.Add')}
           </button>
@@ -503,8 +445,4 @@ MaterialModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   material: PropTypes.object,
-};
-
-MaterialModal.defaultProps = {
-  material: null,
 };

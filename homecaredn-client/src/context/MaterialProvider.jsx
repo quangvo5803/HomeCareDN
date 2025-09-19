@@ -21,7 +21,7 @@ export const MaterialProvider = ({ children }) => {
           PageNumber,
           PageSize,
           SortBy,
-          FilterID
+          FilterID,
         });
         setMaterials(data.items || []);
         setTotalMaterials(data.totalCount || 0);
@@ -104,10 +104,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                ...m,
-                ...updated,
-                images: updated.images ?? m.images,
-              }
+                  ...m,
+                  ...updated,
+                  images: updated.images ?? m.images,
+                }
               : m
           )
         );
@@ -142,7 +142,7 @@ export const MaterialProvider = ({ children }) => {
     async (materialId, imageId) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
-        await materialService.deleteMaterialImage(materialId, imageId);
+        await materialService.deleteMaterialImage(imageId);
 
         // update materials
         const updateImages = (m) => {

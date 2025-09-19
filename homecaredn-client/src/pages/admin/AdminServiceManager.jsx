@@ -51,10 +51,7 @@ export default function AdminServiceManager() {
 
   const handleSave = async (serviceData) => {
     if (serviceData.ServiceID) {
-      await updateService(serviceData, {
-        PageNumber: currentPage,
-        PageSize: pageSize,
-      });
+      await updateService(serviceData);
       toast.success(t('SUCCESS.SERVICE_UPDATE'));
     } else {
       await createService(serviceData);
@@ -155,10 +152,10 @@ export default function AdminServiceManager() {
                             : svc.nameEN || svc.name}
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
-                          {svc.serviceTypeDisplayName}
+                          {t(`Enums.ServiceType.${svc.serviceType}`)}
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
-                          {svc.buildingTypeDisplayName}
+                          {t(`Enums.BuildingType.${svc.buildingType}`)}
                         </td>
                         <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">

@@ -49,12 +49,12 @@ const buildServiceFormData = ({
 export const serviceService = {
   // 🔹 Public APIs
   getAllService: async (params = {}) => {
-    const response = await api.get('/Service/get-all-service', { params });
+    const response = await api.get('/Services/get-all-services', { params });
     return response.data;
   },
 
   getServiceById: async (id) => {
-    const response = await api.get(`/Service/get-service/${id}`);
+    const response = await api.get(`/Services/get-service/${id}`);
     return response.data;
   },
 

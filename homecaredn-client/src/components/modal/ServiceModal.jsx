@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import { useEnums } from '@/hooks/useEnums';
+import { useEnums } from '../../hook/useEnums';
+import { useService } from '../../hook/useService';
+import Swal from 'sweetalert2';
+import { handleApiError } from '../../utils/handleApiError';
 
 export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   const { t } = useTranslation();
   const enums = useEnums();
+  const { deleteServiceImage } = useService();
 
   const [name, setName] = useState('');
   const [nameEN, setNameEN] = useState('');
@@ -17,9 +21,9 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   const [buildingType, setBuildingType] = useState('');
   const [mainStructureType, setMainStructureType] = useState('');
   const [designStyle, setDesignStyle] = useState('');
-  const [images, setImages] = useState([]);
-  const [previewImages, setPreviewImages] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const [images, setImages] = useState([]);
 
   // Fill dữ liệu khi mở modal
   useEffect(() => {
@@ -32,8 +36,15 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
         setServiceType(service.serviceType ?? '');
         setPackageOption(service.packageOption ?? '');
         setBuildingType(service.buildingType ?? '');
-        setPreviewImages(service.images || []);
-        setImages([]);
+        setMainStructureType(service.mainStructureType ?? '');
+        setDesignStyle(service.designStyle ?? '');
+        setImages(
+          (service.imageUrls || []).map((url) => ({
+            id: url,
+            url,
+            isNew: false,
+          }))
+        );
       } else {
         setName('');
         setNameEN('');
@@ -42,7 +53,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
         setServiceType('');
         setPackageOption('');
         setBuildingType('');
-        setPreviewImages([]);
+        setMainStructureType('');
+        setDesignStyle('');
         setImages([]);
       }
     }
@@ -51,8 +63,70 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   // Xử lý chọn file
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files);
-    setPreviewImages(files.map((f) => URL.createObjectURL(f)));
+    const totalCount = images.length + files.length;
+    if (totalCount > 5) {
+      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+      return;
+    }
+    const mappedFiles = files.map((f) => ({
+      id: crypto.randomUUID(),
+      file: f,
+      url: URL.createObjectURL(f),
+      isNew: true,
+    }));
+
+    setImages((prev) => [...prev, ...mappedFiles]);
+  };
+
+  // Xoá ảnh DB
+  const handleDeleteImageFromDb = async (imageUrl, onSuccess) => {
+    Swal.fire({
+      title: t('ModalPopup.DeleteImageModal.title'),
+      text: t('ModalPopup.DeleteImageModal.text'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: t('BUTTON.Delete'),
+      cancelButtonText: t('BUTTON.Cancel'),
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          Swal.fire({
+            title: t('ModalPopup.DeletingLoadingModal.title'),
+            text: t('ModalPopup.DeletingLoadingModal.text'),
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+          await deleteServiceImage(service.ServiceID, imageUrl);
+          Swal.close();
+          toast.success(t('SUCCESS.DELETE'));
+          if (onSuccess) onSuccess();
+          if (service) {
+            service.imageUrls = service.imageUrls.filter(
+              (url) => url !== imageUrl
+            );
+          }
+        } catch (err) {
+          Swal.close();
+          if (err.handled) return;
+          toast.error(handleApiError(err));
+        }
+      }
+    });
+  };
+
+  // Xoá ảnh chung (local hoặc DB)
+  const handleRemoveImage = (img) => {
+    if (img.isNew) {
+      setImages((prev) => prev.filter((i) => i.id !== img.id));
+    } else {
+      handleDeleteImageFromDb(img.url, () => {
+        setImages((prev) => prev.filter((i) => i.id !== img.id));
+      });
+    }
   };
 
   const handleSubmit = () => {
@@ -77,14 +151,18 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
       ServiceType: serviceType,
       PackageOption: packageOption || null,
       BuildingType: buildingType,
+      MainStructureType: mainStructureType || null,
+      DesignStyle: designStyle || null,
     };
 
     if (service?.serviceID) {
       data.ServiceID = service.serviceID;
     }
 
-    if (images.length > 0) {
-      data.Images = images;
+    // chỉ gửi ảnh local
+    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
+    if (newFiles.length > 0) {
+      data.Images = newFiles;
     }
 
     onSave(data);
@@ -93,7 +171,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
+    <div className="fixed inset-0 flex items-center justify-center z-[1050] p-4 bg-black/40">
       <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto 
                   transform transition-all duration-300 scale-100 
@@ -216,7 +294,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 {t('adminServiceManager.serviceModal.mainStructureType')}{' '}
-                <span className="text-red-500">*</span>
               </label>
               <select
                 className="w-full px-4 py-3 border rounded-xl"
@@ -305,16 +382,27 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
               {t('adminServiceManager.serviceModal.images')}
             </label>
             <div className="flex flex-wrap gap-3">
-              {previewImages.map((src, idx) => (
+              {images.map((img) => (
                 <div
-                  key={idx}
-                  className="w-28 h-28 border rounded-xl overflow-hidden relative"
+                  key={img.id}
+                  className="relative w-28 h-28 border rounded-xl overflow-hidden group"
                 >
                   <img
-                    src={src}
+                    src={img.url}
                     alt="preview"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                    {(images.length !== 1 || img.isNew) && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(img)}
+                        className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                      >
+                        <i className="fa-solid fa-xmark"></i>
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

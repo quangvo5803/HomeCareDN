@@ -509,6 +509,11 @@
       "packageOptionPlaceholder": "Choose package option",
       "buildType": "Building type",
       "buildTypePlaceholder": "Choose building type",
+      "mainStructureType": "Main structure type",
+      "mainStructureTypePlaceholder": "Choose main structure type",
+      "designStyle": "Design style",
+      "designStylePlaceholder": "Choose design style",
+      "images": "Service images",
       "chooseFiles": "Choose files to upload"
     }
   },
@@ -574,6 +579,8 @@
     "UpdateCategory": "Update Category",
     "AddNewMaterial": "Add new Material",
     "UpdateMaterial": "Update Material",
+    "AddNewService": "Add new Service",
+    "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
     "View": "View",
@@ -613,7 +620,7 @@
       "title": "Are you sure?",
       "text": "This material will be deleted and cannot be restored!"
     },
-    "DeleteMaterialImageModal": {
+    "DeleteImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
     },
@@ -665,7 +672,6 @@
     "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
-    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!",
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
@@ -689,7 +695,9 @@
     "MATERIAL_UPDATE": "Update material successfully.",   
     "PROFILE_UPDATE": "Profile updated successfully.",
     "ADDRESS_ADD": "Add address successfully.",
-    "ADDRESS_UPDATE": "Address updated successfully."
+    "ADDRESS_UPDATE": "Address updated successfully.",
+    "SERVICE_ADD": "Add service successfully.",
+    "SERVICE_UPDATE": "Service updated successfully."
   }, 
   "roles": {
     "Distributor": "Distributor",

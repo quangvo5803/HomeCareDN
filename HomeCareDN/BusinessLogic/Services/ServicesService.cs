@@ -161,8 +161,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            _mapper.Map(service, serviceUpdateDto);
-            await _unitOfWork.SaveAsync();
+            _mapper.Map(serviceUpdateDto, service);
             // Delete old images
             if (serviceUpdateDto.Images != null)
             {
@@ -181,6 +180,7 @@ namespace BusinessLogic.Services
                     );
                 }
             }
+            await _unitOfWork.SaveAsync();
             var serviceDto = _mapper.Map<ServiceDto>(service);
             return serviceDto;
         }

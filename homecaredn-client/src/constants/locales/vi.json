@@ -505,8 +505,13 @@
       "serviceTypePlaceholder": "Chọn loại dịch vụ",
       "packageOption": "Gói dịch vụ",
       "packageOptionPlaceholder": "Chọn gói dịch vụ",
+      "mainStructureType": "Loại kết cấu chính",
+      "mainStructureTypePlaceholder": "Chọn loại kết cấu chính",
+      "designStyle": "Phong cách thiết kế",
+      "designStylePlaceholder": "Chọn phong cách thiết kế",
       "buildType": "Loại xây dựng",
       "buildTypePlaceholder": "Chọn loại xây dựng",
+      "serviceImage": "Hình ảnh dịch vụ",
       "chooseFiles": "Chọn tệp tải lên"
     }
   },
@@ -570,6 +575,8 @@
     "UpdateCategory": "Cập nhật danh mục",
     "AddNewMaterial": "Thêm vật liệu",
     "UpdateMaterial": "Cập nhật vật liệu",
+    "AddNewService": "Thêm dịch vụ",
+    "UpdateService": "Cập nhật dịch vụ",
     "AddNewRequest": "Tạo và thêm yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
@@ -663,7 +670,6 @@
     "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập đơn vị vật liệu.",
     "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
     "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
-    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!",
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
@@ -687,7 +693,9 @@
     "MATERIAL_UPDATE": "Cập nhật vật liệu thành công.",
     "PROFILE_UPDATE": "Cập nhật hồ sơ thành công.",
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
-    "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công."
+    "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
+        "SERVICE_ADD": "Thêm dịch vụ thành công.",
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",
