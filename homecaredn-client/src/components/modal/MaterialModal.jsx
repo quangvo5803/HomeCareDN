@@ -2,21 +2,23 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { useBrand } from '../../hook/useBrand';
-import { useCategory } from '../../hook/useCategory';
 import { useMaterial } from '../../hook/useMaterial';
 import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
-import { handleApiError } from '../../utils/handleApiError';
 import { Editor } from '@tinymce/tinymce-react';
 import { showDeleteModal } from './DeleteModal';
 
-export default function MaterialModal({ isOpen, onClose, onSave, material }) {
+export default function MaterialModal({
+  isOpen,
+  onClose,
+  onSave,
+  material,
+  brands,
+  categories,
+}) {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const { deleteMaterialImage } = useMaterial();
-  const { fetchAllBrands } = useBrand();
-  const { fetchAllCategories } = useCategory();
 
   const [name, setName] = useState('');
   const [nameEN, setNameEN] = useState('');
@@ -29,26 +31,6 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [images, setImages] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [categories, setCategories] = useState([]);
-
-  // Load brands & categories
-  useEffect(() => {
-    if (isOpen) {
-      (async () => {
-        try {
-          const [brandList, categoryList] = await Promise.all([
-            fetchAllBrands(),
-            fetchAllCategories({ FilterBool: true }),
-          ]);
-          setBrands(brandList);
-          setCategories(categoryList);
-        } catch (err) {
-          toast.error(handleApiError(err));
-        }
-      })();
-    }
-  }, [isOpen, fetchAllBrands, fetchAllCategories]);
 
   // Fill data khi edit
   useEffect(() => {
@@ -64,8 +46,8 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setNameEN(material.nameEN || '');
         setUnit(material.unit || '');
         setUnitEN(material.unitEN || '');
-        setBrandID(foundBrand.brandID || '');
-        setCategoryID(foundCategory.categoryID || '');
+        setBrandID(foundBrand?.brandID || '');
+        setCategoryID(foundCategory?.categoryID || '');
         setDescription(material.description || '');
         setDescriptionEN(material.descriptionEN || '');
         setImages(

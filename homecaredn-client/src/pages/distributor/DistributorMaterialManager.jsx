@@ -7,13 +7,17 @@ import { Pagination } from 'antd';
 import MaterialModal from '../../components/modal/MaterialModal';
 import { useAuth } from '../../hook/useAuth';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
+import { useBrand } from '../..hook/useBrand';
+import { useCategory } from '../../hook/useCategory';
+import { handleApiError } from '../../utils/handleApiError';
 
 export default function DistributorMaterialManager() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-
+  const { fetchAllBrands } = useBrand();
+  const { fetchAllCategories } = useCategory();
   const {
     materials,
     totalMaterials,
@@ -23,9 +27,25 @@ export default function DistributorMaterialManager() {
     updateMaterial,
     deleteMaterial,
   } = useMaterial();
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState(null);
+  useEffect(() => {
+    (async () => {
+      try {
+        const [brandList, categoryList] = await Promise.all([
+          fetchAllBrands(),
+          fetchAllCategories({ FilterBool: true }),
+        ]);
+        setBrands(brandList);
+        setCategories(categoryList);
+      } catch (err) {
+        toast.error(handleApiError(err));
+      }
+    })();
+  }, [fetchAllBrands, fetchAllCategories]);
 
   useEffect(() => {
     fetchMaterialsByUserId({
@@ -115,6 +135,8 @@ export default function DistributorMaterialManager() {
         }}
         onSave={handleSave}
         material={editingMaterial}
+        brands={brands}
+        categories={categories}
       />
 
       {/* Table */}

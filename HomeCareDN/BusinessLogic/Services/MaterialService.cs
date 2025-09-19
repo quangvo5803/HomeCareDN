@@ -104,11 +104,10 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
-            //check image
-            ValidateImages(requestDto.Images);
-
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
+            //check image
+            ValidateImages(requestDto.Images);
 
             //upload image
             await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
@@ -192,6 +191,10 @@ namespace BusinessLogic.Services
             await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
 
             await _unitOfWork.SaveAsync();
+            material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == requestDto.MaterialID,
+                includeProperties: MATERIAL_INCLUDE
+            );
             return _mapper.Map<MaterialDto>(material);
         }
 
