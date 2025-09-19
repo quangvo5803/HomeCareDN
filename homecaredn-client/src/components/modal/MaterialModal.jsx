@@ -54,12 +54,18 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
   useEffect(() => {
     if (isOpen) {
       if (material) {
+        const foundBrand = brands.find(
+          (b) => b.brandName === material.brandName
+        );
+        const foundCategory = categories.find(
+          (c) => c.categoryName === material.categoryName
+        );
         setName(material.name || '');
         setNameEN(material.nameEN || '');
         setUnit(material.unit || '');
         setUnitEN(material.unitEN || '');
-        setBrandID(material.brandID || '');
-        setCategoryID(material.categoryID || '');
+        setBrandID(foundBrand.brandID || '');
+        setCategoryID(foundCategory.categoryID || '');
         setDescription(material.description || '');
         setDescriptionEN(material.descriptionEN || '');
         setImages(
@@ -81,7 +87,7 @@ export default function MaterialModal({ isOpen, onClose, onSave, material }) {
         setImages([]);
       }
     }
-  }, [isOpen, material]);
+  }, [isOpen, material, brands, categories]);
 
   // Chọn ảnh local
   const handleFileChange = (e) => {

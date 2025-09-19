@@ -90,7 +90,6 @@ namespace BusinessLogic.Services
             }
             var rsServiceCreate = _mapper.Map<Service>(serviceCreateDto);
             await _unitOfWork.ServiceRepository.AddAsync(rsServiceCreate);
-            await _unitOfWork.SaveAsync();
 
             if (serviceCreateDto.Images != null)
             {
@@ -109,6 +108,8 @@ namespace BusinessLogic.Services
                     );
                 }
             }
+            await _unitOfWork.SaveAsync();
+
             return _mapper.Map<ServiceDto>(rsServiceCreate);
         }
 

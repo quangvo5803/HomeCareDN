@@ -615,10 +615,7 @@
       "title": "Bạn có chắc chắn?",
       "text": "Vật liệu này sẽ bị xóa và không thể khôi phục!"
     },
-    "DeleteMaterialImageModal": {
-      "title": "Bạn có chắc chắn?",
-      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
-    },
+
     "DeleteServiceModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Dịch vụ này sẽ bị xóa và không thể khôi phục!"
@@ -631,6 +628,10 @@
     "DeletingLoadingModal": {
       "title": "Đang xóa...",
       "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteImageModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
 
   },
@@ -694,7 +695,7 @@
     "PROFILE_UPDATE": "Cập nhật hồ sơ thành công.",
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
     "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
-        "SERVICE_ADD": "Thêm dịch vụ thành công.",
+    "SERVICE_ADD": "Thêm dịch vụ thành công.",
     "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
   },
   "roles": {
@@ -728,7 +729,7 @@
       "Warehouse": "Kho xưởng",
       "Other": "Khác"
     },
-    "MainStructureType": {
+    "MainStructure": {
       "ReinforcedConcrete": "Bê tông cốt thép",
       "PreEngineeredSteel": "Thép tiền chế",
       "NaturalWood": "Gỗ tự nhiên",

@@ -71,13 +71,6 @@ export default function DistributorMaterialManager() {
       const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
       setCurrentPage(lastPage);
     }
-    // fetch lại
-    fetchMaterialsByUserId({
-      PageNumber: currentPage,
-      PageSize: pageSize,
-      FilterID: user.id,
-    });
-
     setIsModalOpen(false);
     setEditingMaterial(null);
   };
@@ -155,8 +148,9 @@ export default function DistributorMaterialManager() {
               materials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                    }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                  }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">

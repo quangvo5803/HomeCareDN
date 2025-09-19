@@ -57,6 +57,7 @@ export const ServiceProvider = ({ children }) => {
       try {
         setLoading(true);
         const newService = await serviceService.createService(serviceData);
+        setServices((prev) => [newService, ...prev]);
         setTotalServices((prev) => prev + 1);
         return newService;
       } catch (err) {

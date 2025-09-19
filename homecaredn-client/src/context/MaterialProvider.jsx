@@ -81,6 +81,7 @@ export const MaterialProvider = ({ children }) => {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
         // Tăng tổng số material
+        setMaterials((prev) => [newMaterial, ...prev]);
         setTotalMaterials((prev) => prev + 1);
         return newMaterial;
       } catch (err) {

@@ -730,7 +730,7 @@
       "Warehouse": "Warehouse",
       "Other": "Other"
     },
-    "MainStructureType": {
+    "MainStructure": {
       "ReinforcedConcrete": "Reinforced Concrete",
       "PreEngineeredSteel": "Pre-engineered Steel",
       "NaturalWood": "Natural Wood",
