@@ -33,27 +33,18 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.ServiceRepository.GetQueryable(includeProperties: "Images");
             var totalCount = await query.CountAsync();
 
-            if (parameters.SortBy?.ToLower() == "random")
+            query = parameters.SortBy?.ToLower() switch
             {
-                var random = new Random();
-                var skipIndex = random.Next(0, Math.Max(0, totalCount - parameters.PageSize + 1));
-
-                query = query.OrderBy(b => b.ServiceID).Skip(skipIndex).Take(parameters.PageSize);
-            }
-            else
-            {
-                query = parameters.SortBy?.ToLower() switch
-                {
-                    "servicename" => query.OrderBy(s => s.Name),
-                    "servicename_desc" => query.OrderByDescending(s => s.Name),
-                    "servicenameen" => query.OrderBy(s => s.NameEN),
-                    "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
-                    _ => query.OrderBy(b => b.ServiceID),
-                };
-                query = query
-                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                    .Take(parameters.PageSize);
-            }
+                "servicename" => query.OrderBy(s => s.Name),
+                "servicename_desc" => query.OrderByDescending(s => s.Name),
+                "servicenameen" => query.OrderBy(s => s.NameEN),
+                "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
+                "random" => query.OrderBy(s => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.ServiceID),
+            };
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
 

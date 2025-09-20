@@ -16,35 +16,42 @@ export default function CardItem({ item }) {
       }
       className="flex flex-col h-full overflow-hidden transition-all duration-300 border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-2xl hover:-translate-y-1"
     >
-      {/* Ảnh  */}
-      <div className="relative flex items-center justify-center overflow-hidden bg-gray-100 h-72">
+      {/* Ảnh */}
+      <div className="relative flex items-center justify-center overflow-hidden bg-gray-100 h-72 flex-shrink-0">
         <img
           src={item.imageUrls?.[0]}
           alt={item.name}
-          className="object-contain max-w-[350px] max-h-[200px] duration-300 group-hover:scale-110"
+          className="object-contain max-w-[450px] max-h-[300px] duration-300 group-hover:scale-110"
         />
       </div>
 
       {/* Nội dung */}
       <div className="flex flex-col flex-grow p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-        <h5 className="mb-2 text-lg font-semibold line-clamp-2 min-h-[56px] flex items-center justify-center">
-          {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
-        </h5>
+        {/* Tiêu đề với chiều cao cố định */}
+        <div className="mb-2">
+          <h5 className="text-lg font-semibold text-center leading-tight break-words hyphens-auto">
+            {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+          </h5>
+        </div>
 
+        {/* Spacer để đẩy buttons xuống dưới */}
+        <div className="flex-grow"></div>
+
+        {/* Nếu là Material */}
         {item.type === 'material' && (
           <div className="flex items-center justify-center gap-3 mt-2">
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
-              <i className="fas fa-tags"></i>
-              <span className="truncate">
+            <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-2">
+              <i className="fas fa-tags flex-shrink-0"></i>
+              <span className="truncate text-xs">
                 {i18n.language === 'vi'
                   ? item.categoryName
                   : item.categoryNameEN || item.categoryName}
               </span>
             </span>
 
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
-              <i className="fas fa-star"></i>
-              <span className="truncate">
+            <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-2">
+              <i className="fas fa-star flex-shrink-0"></i>
+              <span className="truncate text-xs">
                 {i18n.language === 'vi'
                   ? item.brandName
                   : item.brandNameEN || item.brandName}
@@ -53,35 +60,30 @@ export default function CardItem({ item }) {
           </div>
         )}
 
+        {/* Nếu là Service */}
         {item.type === 'service' && (
           <div className="flex items-center justify-center gap-3 mt-2">
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-3 truncate">
-              <i className="fas fa-tools"></i>
-              <span className="truncate">
+            <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-2">
+              <i className="fas fa-tools flex-shrink-0"></i>
+              <span className="truncate text-xs">
                 {t(`Enums.ServiceType.${item.serviceType}`)}
               </span>
             </span>
 
-            <span className="inline-flex items-center gap-1 min-w-[110px] h-[35px] justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-3 truncate">
-              <i className="fas fa-building"></i>
-              <span className="truncate">
+            <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-2">
+              <i className="fas fa-building flex-shrink-0"></i>
+              <span className="truncate text-xs">
                 {t(`Enums.BuildingType.${item.buildingType}`)}
               </span>
             </span>
           </div>
         )}
 
-        <div className="mt-3">
+        {/* Read More Button với chiều cao cố định */}
+        <div className="mt-3 h-8 flex items-center justify-center">
           <div className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white">
             {t('BUTTON.ReadMore')}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-            </svg>
+            <i class="mr-2 fa-solid fa-arrow-right"></i>
           </div>
         </div>
       </div>

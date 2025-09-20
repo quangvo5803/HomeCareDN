@@ -52,7 +52,7 @@ export default function Sidebar() {
       <div className="h-20 flex items-center justify-center">
         <a
           className="block m-0 text-sm whitespace-nowrap text-slate-700"
-          href="/AdminDashboard"
+          href="/Admin"
         >
           <img
             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"

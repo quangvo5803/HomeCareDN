@@ -147,10 +147,13 @@ export default function AdminServiceManager() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle text-black">
-                          {i18n.language === 'vi'
-                            ? svc.name
-                            : svc.nameEN || svc.name}
+                          <div className="whitespace-normal break-words max-w-[500px] mx-auto">
+                            {i18n.language === 'vi'
+                              ? svc.name
+                              : svc.nameEN || svc.name}
+                          </div>
                         </td>
+
                         <td className="px-6 py-4 text-center align-middle text-black">
                           {t(`Enums.ServiceType.${svc.serviceType}`)}
                         </td>

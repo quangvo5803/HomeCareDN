@@ -79,27 +79,18 @@ namespace BusinessLogic.Services
             );
             var totalCount = await query.CountAsync();
 
-            if (parameters.SortBy?.ToLower() == "random")
+            query = parameters.SortBy?.ToLower() switch
             {
-                var random = new Random();
-                var skipIndex = random.Next(0, Math.Max(0, totalCount - parameters.PageSize + 1));
-
-                query = query.OrderBy(b => b.BrandID).Skip(skipIndex).Take(parameters.PageSize);
-            }
-            else
-            {
-                query = parameters.SortBy?.ToLower() switch
-                {
-                    "brandname" => query.OrderBy(b => b.BrandName),
-                    "brandname_desc" => query.OrderByDescending(b => b.BrandName),
-                    "brandnameen" => query.OrderBy(b => b.BrandNameEN),
-                    "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                    _ => query.OrderBy(b => b.BrandID),
-                };
-                query = query
-                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                    .Take(parameters.PageSize);
-            }
+                "brandname" => query.OrderBy(b => b.BrandName),
+                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
+                "brandnameen" => query.OrderBy(b => b.BrandNameEN),
+                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                "random" => query.OrderBy(s => Guid.NewGuid()),
+                _ => query.OrderBy(b => b.BrandID),
+            };
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
 

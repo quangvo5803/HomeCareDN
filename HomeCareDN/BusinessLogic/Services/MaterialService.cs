@@ -39,27 +39,18 @@ namespace BusinessLogic.Services
             }
             var totalCount = await query.CountAsync();
 
-            if (parameters.SortBy?.ToLower() == "random")
+            query = parameters.SortBy?.ToLower() switch
             {
-                var random = new Random();
-                var skipIndex = random.Next(0, Math.Max(0, totalCount - parameters.PageSize + 1));
-
-                query = query.OrderBy(m => m.MaterialID).Skip(skipIndex).Take(parameters.PageSize);
-            }
-            else
-            {
-                query = parameters.SortBy?.ToLower() switch
-                {
-                    "materialname" => query.OrderBy(m => m.Name),
-                    "materialname_desc" => query.OrderByDescending(m => m.Name),
-                    "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
-                    "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
-                    _ => query.OrderBy(m => m.NameEN ?? m.Name),
-                };
-                query = query
-                    .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                    .Take(parameters.PageSize);
-            }
+                "materialname" => query.OrderBy(m => m.Name),
+                "materialname_desc" => query.OrderByDescending(m => m.Name),
+                "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
+                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
+                "random" => query.OrderBy(b => Guid.NewGuid()),
+                _ => query.OrderBy(m => m.NameEN ?? m.Name),
+            };
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
             return new PagedResultDto<MaterialDto>
