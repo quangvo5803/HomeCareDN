@@ -50,7 +50,7 @@ export default function MaterialDetail() {
           SortBy: 'random',
           FilterID: material.categoryID || null,
         });
-        setRandomMaterials(data.items || []);
+        setRandomMaterials(data || []);
       } catch (err) {
         console.error(err);
         setRandomMaterials([]);

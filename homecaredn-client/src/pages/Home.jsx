@@ -2,8 +2,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import SupportChatWidget from '../components/SupportChatWidget';
 import { useMaterial } from '../hook/useMaterial';
+import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
-import MaterialItem from '../components/MaterialItem';
+import CardItem from '../components/CardItem';
 const slides = [
   {
     id: 1,
@@ -85,57 +86,6 @@ const ITEMS = [
   { title: 'home.features_item4_title', desc: 'home.features_item_desc' },
 ];
 
-const SERVICE_ITEMS = [
-  {
-    id: 'build',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-1_dswhst.jpg',
-    titleKey: 'Building Construction',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'maintain',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-2_tmscpu.jpg',
-    titleKey: 'Home Maintainance',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'reno-paint',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-3_sqc14e.jpg',
-    titleKey: 'Renovation and Painting',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'wiring',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-4_swwy8b.jpg',
-    titleKey: 'Wiring and installation',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'tiling-paint',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-5_hxqszr.jpg',
-    titleKey: 'Tiling and Painting',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'interior',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-6_lyqrs4.jpg',
-    titleKey: 'Interior Design',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-];
-
 const TESTIMONIALS = [
   {
     id: '1',
@@ -155,7 +105,9 @@ const TESTIMONIALS = [
 export default function Home() {
   const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
+  const [randomServices, setRandomServices] = useState([]);
   const { fetchMaterials } = useMaterial();
+  const { fetchServices } = useService();
 
   useEffect(() => {
     const loadMaterials = async () => {
@@ -165,15 +117,29 @@ export default function Home() {
           PageSize: 6,
           SortBy: 'random',
         });
-        setRandomMaterials(data.items || []);
+
+        setRandomMaterials(data || []);
       } catch (err) {
         console.error(err);
         setRandomMaterials([]);
       }
     };
-
+    const loadServices = async () => {
+      try {
+        const data = await fetchServices({
+          PageNumber: 1,
+          PageSize: 6,
+          SortBy: 'random',
+        });
+        setRandomServices(data || []);
+      } catch (err) {
+        console.error(err);
+        setRandomServices([]);
+      }
+    };
     loadMaterials();
-  }, [fetchMaterials]);
+    loadServices();
+  }, [fetchMaterials, fetchServices]);
 
   // Carousel state
   const [current, setCurrent] = useState(0);
@@ -538,48 +504,13 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {SERVICE_ITEMS.map((it) => (
-                <article
-                  key={it.id}
-                  className="h-full overflow-hidden transition shadow-sm group bg-gray-50 rounded-xl hover:shadow-md "
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={it.img}
-                      alt={t(it.titleKey)}
-                      className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-
-                  <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                    <h5 className="mb-2 text-lg font-semibold">
-                      {t(it.titleKey)}
-                    </h5>
-                    <p className="mb-4 text-gray-600 group-hover:text-white">
-                      {t(it.descKey)}
-                    </p>
-
-                    <a
-                      href={it.href}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(it.titleKey)}`}
-                    >
-                      {t('BUTTON.ReadMore')}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-                      </svg>
-                    </a>
-                  </div>
-                </article>
-              ))}
+              {randomServices.length === 0 ? (
+                <p></p>
+              ) : (
+                randomServices.map((item) => (
+                  <CardItem key={item.serviceID} item={item} />
+                ))
+              )}
             </div>
           </div>
         </section>
@@ -618,7 +549,7 @@ export default function Home() {
                 <p></p>
               ) : (
                 randomMaterials.map((item) => (
-                  <MaterialItem key={item.materialID} item={item} />
+                  <CardItem key={item.materialID} item={item} />
                 ))
               )}
             </div>

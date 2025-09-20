@@ -2,155 +2,169 @@ import { useMaterial } from '../hook/useMaterial';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { Pagination } from 'antd';
-import MaterialItem from '../components/MaterialItem';
+import CardItem from '../components/CardItem';
 import Loading from '../components/Loading';
 export default function MaterialViewAll() {
-    const { t, i18n } = useTranslation();
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortOption, setSortOption] = useState('random');
+  const { t, i18n } = useTranslation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortOption, setSortOption] = useState('random');
 
-    const pageSize = 9;
-    const {
-        materials, totalMaterials, fetchMaterials, loading
-    } = useMaterial();
+  const pageSize = 9;
+  const { materials, totalMaterials, fetchMaterials, loading } = useMaterial();
 
-    useEffect(() => {
-        fetchMaterials({ PageNumber: currentPage, PageSize: pageSize, SortBy: sortOption });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [currentPage, sortOption, fetchMaterials]);
+  useEffect(() => {
+    fetchMaterials({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: sortOption,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage, sortOption, fetchMaterials]);
 
-    const start = totalMaterials > 0 ? (currentPage - 1) * pageSize + 1 : 0;
-    const end = Math.min(currentPage * pageSize, totalMaterials);
-    if (loading) return <Loading />;
-    return (
-        <body className="font-sans text-black bg-white">
-            <div className="max-w-[1200px] mx-auto px-4 py-6">
-                <div className="flex flex-col mb-6 md:flex-row md:justify-between md:items-center">
-                    <h1 className="text-lg font-bold text-orange-400 md:text-xl">Gạch ốp lát</h1>
-                    <div className="flex items-center mt-4 space-x-4 md:mt-0">
-                        <p className="text-sm md:text-base">
-                            {t('materialViewAll.pagination', {
-                                start,
-                                end,
-                                totalMaterials
-                            })}
-                        </p>
-                        <select
-                            aria-label="Sort options"
-                            className="px-3 py-1 text-sm border border-gray-300 rounded md:text-base"
-                            value={sortOption}
-                            onChange={(e) => {
-                                setSortOption(e.target.value);
-                                setCurrentPage(1);
-                            }}
-                        >
-                            <option value="random">{t('materialViewAll.default')}</option>
-                            <option value={i18n.language === "vi" ? "materialname" : "materialnameen"}>A-Z</option>
-                            <option value={i18n.language === "vi" ? "materialname_desc" : "materialnameen_desc"}>Z-A</option>
-                        </select>
-                    </div>
+  const start = totalMaterials > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const end = Math.min(currentPage * pageSize, totalMaterials);
+  if (loading) return <Loading />;
+  return (
+    <body className="font-sans text-black bg-white">
+      <div className="max-w-[1200px] mx-auto px-4 py-6">
+        <div className="flex flex-col mb-6 md:flex-row md:justify-between md:items-center">
+          <h1 className="text-lg font-bold text-orange-400 md:text-xl">
+            Gạch ốp lát
+          </h1>
+          <div className="flex items-center mt-4 space-x-4 md:mt-0">
+            <p className="text-sm md:text-base">
+              {t('materialViewAll.pagination', {
+                start,
+                end,
+                totalMaterials,
+              })}
+            </p>
+            <select
+              aria-label="Sort options"
+              className="px-3 py-1 text-sm border border-gray-300 rounded md:text-base"
+              value={sortOption}
+              onChange={(e) => {
+                setSortOption(e.target.value);
+                setCurrentPage(1);
+              }}
+            >
+              <option value="random">{t('materialViewAll.default')}</option>
+              <option
+                value={
+                  i18n.language === 'vi' ? 'materialname' : 'materialnameen'
+                }
+              >
+                A-Z
+              </option>
+              <option
+                value={
+                  i18n.language === 'vi'
+                    ? 'materialname_desc'
+                    : 'materialnameen_desc'
+                }
+              >
+                Z-A
+              </option>
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-col gap-6 md:flex-row">
+          {/* Left sidebar */}
+          <aside className="md:w-1/5">
+            <div className="mb-6">
+              <h2 className="mb-2 text-sm font-bold uppercase md:text-base">
+                Danh mục sản phẩm
+              </h2>
+              <div className="w-12 mb-4 border-b border-gray-300"></div>
+              <ul className="space-y-2 text-sm font-semibold md:text-base">
+                <li className="flex justify-between">
+                  <a className="hover:underline" href="/category/floor-tiles">
+                    Gạch lát nền
+                  </a>
+                  <span className="text-gray-500">(527)</span>
+                </li>
+                <li className="flex justify-between">
+                  <a className="hover:underline" href="/category/wall-tiles">
+                    Gạch ốp tường
+                  </a>
+                  <span className="text-gray-500">(278)</span>
+                </li>
+                <li className="flex justify-between">
+                  <a className="hover:underline" href="/category/decor-tiles">
+                    Gạch trang trí
+                  </a>
+                  <span className="text-gray-500">(7)</span>
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-4">
+              <select
+                aria-label="Brand filter"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
+              >
+                <option>Bất kỳ Thương Hiệu</option>
+              </select>
+              <select
+                aria-label="Surface filter"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
+              >
+                <option>Bất kỳ Bề Mặt</option>
+              </select>
+              <select
+                aria-label="Size filter"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
+              >
+                <option>Bất kỳ Kích Thước</option>
+              </select>
+              <select
+                aria-label="Color filter"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
+              >
+                <option>Bất kỳ Màu Sắc</option>
+              </select>
+            </div>
+            <div className="mt-8">
+              <h3 className="mb-2 text-sm font-bold uppercase md:text-base">
+                Lọc theo giá
+              </h3>
+              <input
+                type="range"
+                min="0"
+                max="2329200"
+                step="10000"
+                defaultValue="2329200"
+                className="w-full h-1 mt-2 mb-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-orange-400"
+              />
+              <p className="text-xs md:text-sm">
+                Giá: <span>0₫</span> — <span>2.329.200₫</span>
+              </p>
+            </div>
+          </aside>
+          {/* Products grid */}
+          <section className="grid grid-cols-1 gap-6 md:w-4/5 sm:grid-cols-2 lg:grid-cols-3">
+            {materials && materials.length > 0 ? (
+              <>
+                {materials.map((item) => (
+                  <CardItem key={item.MaterialID} item={item} />
+                ))}
+
+                <div className="flex justify-center py-4 col-span-full">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalMaterials}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    size="small"
+                  />
                 </div>
-                <div className="flex flex-col gap-6 md:flex-row">
-                    {/* Left sidebar */}
-                    <aside className="md:w-1/5">
-                        <div className="mb-6">
-                            <h2 className="mb-2 text-sm font-bold uppercase md:text-base">
-                                Danh mục sản phẩm
-                            </h2>
-                            <div className="w-12 mb-4 border-b border-gray-300"></div>
-                            <ul className="space-y-2 text-sm font-semibold md:text-base">
-                                <li className="flex justify-between">
-                                    <a className="hover:underline" href="/category/floor-tiles">
-                                        Gạch lát nền
-                                    </a>
-                                    <span className="text-gray-500">(527)</span>
-                                </li>
-                                <li className="flex justify-between">
-                                    <a className="hover:underline" href="/category/wall-tiles">
-                                        Gạch ốp tường
-                                    </a>
-                                    <span className="text-gray-500">(278)</span>
-                                </li>
-                                <li className="flex justify-between">
-                                    <a className="hover:underline" href="/category/decor-tiles">
-                                        Gạch trang trí
-                                    </a>
-                                    <span className="text-gray-500">(7)</span>
-                                </li>
-                            </ul>
-
-                        </div>
-                        <div className="space-y-4">
-                            <select
-                                aria-label="Brand filter"
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
-                            >
-                                <option>Bất kỳ Thương Hiệu</option>
-                            </select>
-                            <select
-                                aria-label="Surface filter"
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
-                            >
-                                <option>Bất kỳ Bề Mặt</option>
-                            </select>
-                            <select
-                                aria-label="Size filter"
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
-                            >
-                                <option>Bất kỳ Kích Thước</option>
-                            </select>
-                            <select
-                                aria-label="Color filter"
-                                className="w-full px-3 py-2 text-sm border border-gray-300 rounded md:text-base"
-                            >
-                                <option>Bất kỳ Màu Sắc</option>
-                            </select>
-                        </div>
-                        <div className="mt-8">
-                            <h3 className="mb-2 text-sm font-bold uppercase md:text-base">
-                                Lọc theo giá
-                            </h3>
-                            <input
-                                type="range"
-                                min="0"
-                                max="2329200"
-                                step="10000"
-                                defaultValue="2329200"
-                                className="w-full h-1 mt-2 mb-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-orange-400"
-                            />
-                            <p className="text-xs md:text-sm">
-                                Giá: <span>0₫</span> — <span>2.329.200₫</span>
-                            </p>
-                        </div>
-                    </aside>
-                    {/* Products grid */}
-                    <section className="grid grid-cols-1 gap-6 md:w-4/5 sm:grid-cols-2 lg:grid-cols-3">
-                        {materials && materials.length > 0 ? (
-                            <>
-                                {materials.map((item) => (
-                                    <MaterialItem key={item.MaterialID} item={item} />
-                                ))}
-
-                                <div className="flex justify-center py-4 col-span-full">
-                                    <Pagination
-                                        current={currentPage}
-                                        pageSize={pageSize}
-                                        total={totalMaterials}
-                                        onChange={(page) => setCurrentPage(page)}
-                                        showSizeChanger={false}
-                                        size="small"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <p></p>
-                        )}
-                    </section>
-
-
-                </div>
-
-            </div >
-        </body >
-    )
+              </>
+            ) : (
+              <p></p>
+            )}
+          </section>
+        </div>
+      </div>
+    </body>
+  );
 }

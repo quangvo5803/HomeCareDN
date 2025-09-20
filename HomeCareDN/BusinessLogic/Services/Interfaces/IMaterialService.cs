@@ -13,6 +13,5 @@ namespace BusinessLogic.Services.Interfaces
         Task<MaterialDto> GetMaterialByBrandAsync(Guid id);
         Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto);
         Task DeleteMaterialAsync(Guid id);
-        Task DeleteMaterialImageAsync(string imageUrl);
     }
 }

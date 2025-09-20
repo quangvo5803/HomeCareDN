@@ -63,8 +63,6 @@ namespace HomeCareDNAPI.Mapping
                 // Ignore Id to prevent overwriting them
                 .ForMember(d => d.Id, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<ServiceUpdateRequestDto, Service>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -77,6 +75,8 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+            CreateMap<ServiceUpdateRequestDto, Service>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -102,8 +102,9 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(
-                    dest => dest.CategoryID, 
-                    otp => otp.MapFrom(src => src.Category!.CategoryID))
+                    dest => dest.CategoryID,
+                    otp => otp.MapFrom(src => src.Category!.CategoryID)
+                )
                 .ForMember(
                     dest => dest.BrandNameEN,
                     opt => opt.MapFrom(src => src.Brand!.BrandNameEN)

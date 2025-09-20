@@ -9,12 +9,12 @@ namespace BusinessLogic.Services
 {
     public class ConversationService : IConversationService
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ConversationService(IUnitOfWork uow, IMapper mapper)
+        public ConversationService(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
 
@@ -23,8 +23,8 @@ namespace BusinessLogic.Services
             // Map DTO -> Conversation
             var conv = _mapper.Map<Conversation>(dto);
 
-            await _uow.ConversationRepository.AddAsync(conv);
-            await _uow.SaveAsync();
+            await _unitOfWork.ConversationRepository.AddAsync(conv);
+            await _unitOfWork.SaveAsync();
 
             // Nếu có tin nhắn mở đầu, map tiếp DTO -> ChatMessage
             if (!string.IsNullOrWhiteSpace(dto.FirstMessage))
@@ -37,9 +37,9 @@ namespace BusinessLogic.Services
                     }
                 );
 
-                await _uow.ChatMessageRepository.AddAsync(msg);
+                await _unitOfWork.ChatMessageRepository.AddAsync(msg);
                 conv.LastMessageAt = msg.SentAt;
-                await _uow.SaveAsync();
+                await _unitOfWork.SaveAsync();
             }
 
             return _mapper.Map<ConversationDto>(conv);
@@ -47,7 +47,7 @@ namespace BusinessLogic.Services
 
         public async Task<IEnumerable<ConversationDto>> GetMyConversationsAsync(string userId)
         {
-            var list = await _uow.ConversationRepository.GetRangeAsync(
+            var list = await _unitOfWork.ConversationRepository.GetRangeAsync(
                 c => c.CustomerId == userId || c.ContractorId == userId,
                 includeProperties: null
             );
@@ -60,7 +60,7 @@ namespace BusinessLogic.Services
             int pageSize = 50
         )
         {
-            var conv = await _uow.ConversationRepository.GetAsync(c =>
+            var conv = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationId == conversationId
             );
             if (conv == null)
@@ -71,7 +71,7 @@ namespace BusinessLogic.Services
                     }
                 );
 
-            var items = await _uow.ChatMessageRepository.GetRangeAsync(m =>
+            var items = await _unitOfWork.ChatMessageRepository.GetRangeAsync(m =>
                 m.ConversationId == conversationId
             );
 
@@ -83,7 +83,7 @@ namespace BusinessLogic.Services
             SendMessageRequestDto dto
         )
         {
-            var conv = await _uow.ConversationRepository.GetAsync(c =>
+            var conv = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationId == dto.ConversationId
             );
             if (conv == null)
@@ -103,32 +103,32 @@ namespace BusinessLogic.Services
                 }
             );
 
-            await _uow.ChatMessageRepository.AddAsync(msg);
+            await _unitOfWork.ChatMessageRepository.AddAsync(msg);
             conv.LastMessageAt = msg.SentAt;
-            await _uow.SaveAsync();
+            await _unitOfWork.SaveAsync();
 
             return _mapper.Map<ChatMessageDto>(msg);
         }
 
         public async Task MarkAsReadAsync(Guid conversationId, string userId)
         {
-            var msgs = await _uow.ChatMessageRepository.GetRangeAsync(m =>
+            var msgs = await _unitOfWork.ChatMessageRepository.GetRangeAsync(m =>
                 m.ConversationId == conversationId && m.ReceiverId == userId && !m.IsRead
             );
             foreach (var m in msgs)
                 m.IsRead = true;
-            await _uow.SaveAsync();
+            await _unitOfWork.SaveAsync();
         }
 
         public async Task CloseConversationAsync(Guid conversationId, string userId)
         {
-            var conv = await _uow.ConversationRepository.GetAsync(c =>
+            var conv = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationId == conversationId
             );
             if (conv == null)
                 return;
             conv.ClosedAt = DateTime.UtcNow;
-            await _uow.SaveAsync();
+            await _unitOfWork.SaveAsync();
         }
     }
 }

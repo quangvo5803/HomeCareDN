@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Authorize.Address;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using BusinessLogic.Services.Interfaces;

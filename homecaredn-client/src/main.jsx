@@ -9,6 +9,7 @@ import AuthProvider from './context/AuthProvider.jsx';
 import { BrandProvider } from './context/BrandProvider.jsx';
 import { CategoryProvider } from './context/CategoryProvider.jsx';
 import { MaterialProvider } from './context/MaterialProvider.jsx';
+import { ServiceProvider } from './context/ServiceProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <BrandProvider>
           <CategoryProvider>
             <MaterialProvider>
-              <App />
+              <ServiceProvider>
+                <App />
+              </ServiceProvider>
             </MaterialProvider>
           </CategoryProvider>
         </BrandProvider>
