@@ -3,7 +3,6 @@ using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services.Interfaces
 {
@@ -13,9 +12,9 @@ namespace BusinessLogic.Services.Interfaces
         private readonly IMapper _mapper;
 
         private const string ERROR_SERVICE_REQUEST = "Service Request";
-        private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "Service request not found.";
-        private const string ERROR_MAXIMUM_IMAGE = "You can only upload a maximum of 5 images.";
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "Each image must be less than 5 MB.";
+        private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
+        private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
+        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public ServiceRequestService(IUnitOfWork unitOfWork, IMapper mapper)
         {

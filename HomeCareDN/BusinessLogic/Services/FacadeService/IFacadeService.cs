@@ -6,13 +6,13 @@ namespace BusinessLogic.Services.FacadeService
     {
         IServiceRequestService ServiceRequestService { get; }
         IMaterialService MaterialService { get; }
-        IServicesService ServicesService { get; }
+        IServicesService ServiceService { get; }
         IContractorApplicationService ContractorApplicationService { get; }
         ICategoryService CategoryService { get; }
         IBrandService BrandService { get; }
         IAiChatService AiChatService { get; }
         IConversationService ConversationService { get; }
         IContactSupportService ContactSupportService { get; }
-
+        IImageService ImageService { get; }
     }
 }

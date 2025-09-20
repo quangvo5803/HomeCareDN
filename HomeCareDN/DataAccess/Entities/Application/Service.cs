@@ -9,119 +9,123 @@ namespace DataAccess.Entities.Application
 
         [Required]
         public required string Name { get; set; }
+        public string? NameEN { get; set; }
         public ServiceType ServiceType { get; set; }
         public PackageOption? PackageOption { get; set; }
         public BuildingType BuildingType { get; set; }
+        public MainStructureType? MainStructureType { get; set; }
+        public DesignStyle? DesignStyle { get; set; }
         public string? Description { get; set; }
-        public double PriceEsstimate { get; set; }
+        public string? DescriptionEN { get; set; }
+
         public ICollection<Image>? Images { get; set; } = new List<Image>();
     }
 
     public enum ServiceType
     {
-        [Display(Name = "Thi công xây dựng")]
-        Construction, // Thi công xây dựng
+        [Display(Name = "Construction")]
+        Construction,
 
-        [Display(Name = "Cải tạo sửa chửa")]
-        Repair, // Sửa chữa
+        [Display(Name = "Repair")]
+        Repair,
 
-        [Display(Name = "Mua vật liệu xây dựng")]
-        MaterialOrder // Mua vật liệu xây dựng
-        ,
+        [Display(Name = "MaterialOrder")]
+        MaterialOrder,
     }
 
     public enum PackageOption
     {
-        [Display(Name = "Trọn gói phần thô")]
-        StructureOnly, // Trọn gói phần thô
+        [Display(Name = "StructureOnly")]
+        StructureOnly,
 
-        [Display(Name = "Trọn gói hoàn thiện cơ bản")]
-        BasicFinish, // Trọn gói hoàn thiện cơ bản
+        [Display(Name = "BasicFinish")]
+        BasicFinish,
 
-        [Display(Name = "Khác")]
-        Other // Gói khác / yêu cầu đặc biệt
-        ,
+        [Display(Name = "FullFinish")]
+        FullFinish,
+
+        [Display(Name = "Other")]
+        Other,
     }
 
     public enum BuildingType
     {
-        [Display(Name = "Nhà cấp 4")]
-        Level4House,
+        [Display(Name = "SingleStoryHouse")]
+        SingleStoryHouse,
 
-        [Display(Name = "Nhà phố")]
+        [Display(Name = "Townhouse")]
         Townhouse,
 
-        [Display(Name = "Nhà trọ")]
+        [Display(Name = "RentalHouse")]
         RentalHouse,
 
-        [Display(Name = "Căn hộ")]
+        [Display(Name = "Apartment")]
         Apartment,
 
-        [Display(Name = "Biệt thự")]
+        [Display(Name = "Villa")]
         Villa,
 
-        [Display(Name = "Khách sạn")]
+        [Display(Name = "Hotel")]
         Hotel,
 
         [Display(Name = "Showroom")]
         Showroom,
 
-        [Display(Name = "Trường học")]
+        [Display(Name = "School")]
         School,
 
-        [Display(Name = "Bệnh viện")]
+        [Display(Name = "Hospital")]
         Hospital,
 
-        [Display(Name = "Kho xưởng")]
+        [Display(Name = "Warehouse")]
         Warehouse,
 
-        [Display(Name = "Khác")]
+        [Display(Name = "Other")]
         Other,
     }
 
     public enum MainStructureType
     {
-        [Display(Name = "Bê tông cốt thép")]
+        [Display(Name = "ReinforcedConcrete")]
         ReinforcedConcrete,
 
-        [Display(Name = "Nhà thép tiền chế")]
+        [Display(Name = "PreEngineeredSteel")]
         PreEngineeredSteel,
 
-        [Display(Name = "Gỗ tự nhiên")]
+        [Display(Name = "NaturalWood")]
         NaturalWood,
 
-        [Display(Name = "Nhà lắp ghép")]
+        [Display(Name = "Prefabricated")]
         Prefabricated,
 
-        [Display(Name = "Khác")]
-        Other // Gói khác / yêu cầu đặc biệt
-        ,
+        [Display(Name = "Other")]
+        Other,
     }
 
     public enum DesignStyle
     {
-        [Display(Name = "Hiện đại")]
+        [Display(Name = "Modern")]
         Modern,
 
-        [Display(Name = "Đương đại")]
+        [Display(Name = "Contemporary")]
         Contemporary,
 
-        [Display(Name = "Tối giản")]
+        [Display(Name = "Minimalist")]
         Minimalist,
 
-        [Display(Name = "Cổ điển")]
+        [Display(Name = "Classic")]
         Classic,
 
-        [Display(Name = "Tân cổ điển")]
+        [Display(Name = "NeoClassic")]
         NeoClassic,
 
         [Display(Name = "Indochine")]
         Indochine,
 
-        [Display(Name = "Mộc mạc")]
+        [Display(Name = "Rustic")]
         Rustic,
 
-        [Display(Name = "Khác")]
+        [Display(Name = "Other")]
         Other,
     }
 }

@@ -75,7 +75,7 @@ export default function AdminBrandManager() {
         {/* Header */}
         <div className="mb-8">
           <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
-            <i className="mr-3 fa-solid fa-globe"></i>
+            <i className="mr-3 fa-solid fa-star"></i>
             {t('adminBrandManager.title')}
           </h2>
           <p className="text-gray-600">{t('adminBrandManager.subtitle')}</p>
@@ -138,8 +138,9 @@ export default function AdminBrandManager() {
                     brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">

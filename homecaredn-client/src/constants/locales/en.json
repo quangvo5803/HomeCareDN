@@ -475,6 +475,48 @@
       "isActive": "Activate category"
     }
   },
+  "adminServiceManager": {
+    "title": "Service Manager",
+    "subtitle": "Manage service list",
+    "services": "service(s)",
+    "no": "NO",
+    "serviceName": "Service name",
+    "serviceType": "Service type",
+    "buildingType": "Building type",
+    "numberOfRequest": "Number of Request",
+    "requests": "Request(s)",
+    "status": "Status",
+    "action": "Action",
+    "noService": "No service yet",
+    "letStart": "Start by adding your first service.",
+    "serviceModal": {
+      "title": "Add new service",
+      "title2": "Update service",
+      "serviceName": "Service name (VietNamese)",
+      "serviceNamePlaceholder": "Enter service name...",
+      "serviceNameEN": "Service name (English)",
+      "serviceNamePlaceholderEN": "Enter service name in English...",
+      "buildingType": "Building type",
+      "chooseBuildingType": "Choose building type",
+      "description": "Descriptions (VietNamese)",
+      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
+      "descriptionEN": "Descriptions (English)",
+      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "multilanguage_for_data": " Multilanguage for data",
+      "serviceType": "Service type",
+      "serviceTypePlaceholder": "Choose service type",
+      "packageOption": "Package option",
+      "packageOptionPlaceholder": "Choose package option",
+      "buildType": "Building type",
+      "buildTypePlaceholder": "Choose building type",
+      "mainStructureType": "Main structure type",
+      "mainStructureTypePlaceholder": "Choose main structure type",
+      "designStyle": "Design style",
+      "designStylePlaceholder": "Choose design style",
+      "images": "Service images",
+      "chooseFiles": "Choose files to upload"
+    }
+  },
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
@@ -537,6 +579,8 @@
     "UpdateCategory": "Update Category",
     "AddNewMaterial": "Add new Material",
     "UpdateMaterial": "Update Material",
+    "AddNewService": "Add new Service",
+    "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
     "View": "View",
@@ -567,10 +611,7 @@
       "title": "Are you sure?",
       "text": "This category will be deleted and cannot be restored!"
     },
-    "DeletingLoadingModal": {
-      "title": "Deleting...",
-      "text": "Please wait a moment."
-    },
+
     "DeleteSupportModal": {
       "title": "Delete this support request?",
       "text": "This action cannot be undone."
@@ -579,13 +620,21 @@
       "title": "Are you sure?",
       "text": "This material will be deleted and cannot be restored!"
     },
-    "DeleteMaterialImageModal": {
+    "DeleteImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
+    },
+    "DeleteServiceModal": {
+      "title": "Are you sure?",
+      "text": "This service will be deleted and cannot be restored!"
     },
     "DeleteAddressModal": {
       "title": "Delete this address?",
       "text": "This action cannot be undone."
+    },
+    "DeletingLoadingModal": {
+      "title": "Deleting...",
+      "text": "Please wait a moment."
     }
   },
   "ERROR": {
@@ -604,14 +653,16 @@
     "ADDRESS_NOT_FOUND": "Address not found.",
     "ADDRESS_ID_MISMATCH": "Address ID does not match.",
     "ADDRESS_MAX": "You can only add up to 5 addresses.",
-
     "NETWORK_ERROR": "Unable to connect to server, please try again later!",
-    "BRAND_NOT_FOUND": "Brand not found.",
-    "CATEGORY_NOT_FOUND": "Category not found.",
+
     "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+
+    "BRAND_NOT_FOUND": "Brand not found.",
+    "CATEGORY_NOT_FOUND": "Category not found.",
     "MATERIAL_NOT_FOUND": "Material not found.",
     "IMAGE_NOT_FOUND": "Image not found",
+    "SERVICE_NOT_FOUND": "Service not found.",
 
     "REQUIRED_BRANDNAME": "Please enter brand name.",
     "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
@@ -621,9 +672,11 @@
     "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
+    "REQUIRED_SERVICENAME": "Please enter the service name.",
+    "REQUIRED_SERVICETYPE": "Please select the service type.",
+    "REQUIRED_BUILDINGTYPE": "Please select the building type.",
 
-    "REQUIRED_MATERIAL_IMAGE": "You can only upload a maximum of 5 images!",
-
+    "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "Failed to load data, please try again later.",
     "SUBMIT_ERROR": "Failed to submit data, please try again later.",
     "DELETE_ERROR": "Failed to delete, please try again later.",
@@ -642,12 +695,57 @@
     "MATERIAL_UPDATE": "Update material successfully.",   
     "PROFILE_UPDATE": "Profile updated successfully.",
     "ADDRESS_ADD": "Add address successfully.",
-    "ADDRESS_UPDATE": "Address updated successfully."
+    "ADDRESS_UPDATE": "Address updated successfully.",
+    "SERVICE_ADD": "Add service successfully.",
+    "SERVICE_UPDATE": "Service updated successfully."
   }, 
   "roles": {
     "Distributor": "Distributor",
     "Contractor": "Contractor",
     "Admin": "Admin",
     "Customer": "Customer"
+  },
+  "Enums": {
+    "ServiceType": {
+      "Construction": "Construction",
+      "Repair": "Repair",
+      "MaterialOrder": "Material Order"
+    },
+    "PackageOption": {
+      "StructureOnly": "Structure Only",
+      "BasicFinish": "Basic Finish",
+      "FullFinish": "Full Finish",
+      "Other": "Other"
+    },
+    "BuildingType": {
+      "SingleStoryHouse": "Single-story House",
+      "Townhouse": "Townhouse",
+      "RentalHouse": "Rental House",
+      "Apartment": "Apartment",
+      "Villa": "Villa",
+      "Hotel": "Hotel",
+      "Showroom": "Showroom",
+      "School": "School",
+      "Hospital": "Hospital",
+      "Warehouse": "Warehouse",
+      "Other": "Other"
+    },
+    "MainStructure": {
+      "ReinforcedConcrete": "Reinforced Concrete",
+      "PreEngineeredSteel": "Pre-engineered Steel",
+      "NaturalWood": "Natural Wood",
+      "Prefabricated": "Prefabricated",
+      "Other": "Other"
+    },
+    "DesignStyle": {
+      "Modern": "Modern",
+      "Contemporary": "Contemporary",
+      "Minimalist": "Minimalist",
+      "Classic": "Classic",
+      "NeoClassic": "Neo-classic",
+      "Indochine": "Indochine",
+      "Rustic": "Rustic",
+      "Other": "Other"
+    }
   }
 }

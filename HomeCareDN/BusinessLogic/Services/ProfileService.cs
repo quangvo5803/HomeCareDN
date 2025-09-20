@@ -16,7 +16,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
 
         private const string ACCOUNT_STR = "Account";
-        private const string ERROR_ACCOUNT_NOT_FOUND = "ERROR_ACCOUNT_NOT_FOUND";
+        private const string ERROR_ACCOUNT_NOT_FOUND = "ACCOUNT_NOT_FOUND";
         private const string ERROR_USER_ID_MISMATCH = "USER_ID_MISMATCH";
         private const string ERROR_UPDATE_FAIL = "UPDATE_FAIL";
 
