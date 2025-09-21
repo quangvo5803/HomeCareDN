@@ -6,7 +6,21 @@ import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
+
+//For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
+import 'tinymce/tinymce';
+
+import 'tinymce/icons/default';
+import 'tinymce/themes/silver';
+import 'tinymce/models/dom';
+import 'tinymce/skins/ui/oxide/skin.min.css';
+import 'tinymce/skins/content/default/content.min.css';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/image';
+import 'tinymce/plugins/code';
+//For TINY MCE
 
 export default function ServiceModal({ isOpen, onClose, onSave, service }) {
   const { t } = useTranslation();
@@ -199,14 +213,16 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
               {t('adminServiceManager.serviceModal.description')}
             </label>
             <Editor
-              apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
               value={description}
               init={{
+                license_key: 'gpl',
                 height: 300,
                 menubar: false,
                 plugins: 'lists link image code',
                 toolbar:
                   'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                skin: 'oxide',
+                content_css: 'default',
               }}
               onEditorChange={(content) => setDescription(content)}
             />
@@ -357,14 +373,16 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
                     {t('adminServiceManager.serviceModal.descriptionEN')}
                   </label>
                   <Editor
-                    apiKey="txa9frhpdx819f6c5lzpoon7cldog6r6cjn578dgp43cfi7x"
                     value={descriptionEN}
                     init={{
+                      license_key: 'gpl',
                       height: 300,
                       menubar: false,
                       plugins: 'lists link image code',
                       toolbar:
                         'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                      skin: 'oxide',
+                      content_css: 'default',
                     }}
                     onEditorChange={(content) => setDescriptionEN(content)}
                   />
