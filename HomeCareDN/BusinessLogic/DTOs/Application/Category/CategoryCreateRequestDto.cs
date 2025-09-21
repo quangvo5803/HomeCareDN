@@ -12,6 +12,7 @@ namespace BusinessLogic.DTOs.Application.Category
         public required Guid UserID { get; set; }
 
         [Required(ErrorMessage = "REQUIRED_CATEGORYLOGO")]
-        public required IFormFile LogoFile { get; set; }
+        public required string CategoryLogoUrl { get; set; }
+        public required string CategoryLogoPublicId { get; set; }
     }
 }

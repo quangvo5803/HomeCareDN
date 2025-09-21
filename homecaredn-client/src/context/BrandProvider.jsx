@@ -49,7 +49,7 @@ export const BrandProvider = ({ children }) => {
       try {
         setLoading(true);
         const newBrand = await brandService.createBrand(dto);
-        setBrands((prev) => [newBrand, ...prev]);
+        setBrands((prev) => [...prev, newBrand]);
         // Tăng tổng số brand
         setTotalBrands((prev) => prev + 1);
         return newBrand;
@@ -90,6 +90,7 @@ export const BrandProvider = ({ children }) => {
         await brandService.deleteBrand(id);
         // Xoá khỏi local
         setBrands((prev) => prev.filter((b) => b.brandID !== id));
+        setTotalBrands((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

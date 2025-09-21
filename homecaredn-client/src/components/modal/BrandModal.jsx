@@ -1,37 +1,48 @@
-import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
-import PropTypes from "prop-types";
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+import { handleApiError } from '../../utils/handleApiError';
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 
-export default function BrandModal({ isOpen, onClose, onSave, brand }) {
+export default function BrandModal({
+  isOpen,
+  onClose,
+  onSave,
+  brand,
+  setUploadProgress,
+}) {
   const { t } = useTranslation();
-  const [brandName, setBrandName] = useState("");
-  const [brandDescription, setBrandDescription] = useState("");
-  const [brandNameEN, setBrandNameEN] = useState("");
-  const [brandDescriptionEN, setBrandDescriptionEN] = useState("");
+  const [brandName, setBrandName] = useState('');
+  const [brandDescription, setBrandDescription] = useState('');
+  const [brandNameEN, setBrandNameEN] = useState('');
+  const [brandDescriptionEN, setBrandDescriptionEN] = useState('');
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+
   // Khi mở modal, nếu có brand (chế độ edit) thì fill dữ liệu
   useEffect(() => {
     if (isOpen) {
       if (brand) {
-        setBrandName(brand.brandName || "");
-        setBrandDescription(brand.brandDescription || "");
-        setBrandNameEN(brand.brandNameEN || "");
-        setBrandDescriptionEN(brand.brandDescriptionEN || "");
+        setBrandName(brand.brandName || '');
+        setBrandDescription(brand.brandDescription || '');
+        setBrandNameEN(brand.brandNameEN || '');
+        setBrandDescriptionEN(brand.brandDescriptionEN || '');
         setLogoPreview(brand.brandLogo || null);
-        setLogoFile(null); // reset file mới
+        setLogoFile(null);
+        setUploadProgress(0);
       } else {
-        setBrandName("");
-        setBrandDescription("");
-        setBrandNameEN("");
-        setBrandDescriptionEN("");
+        setBrandName('');
+        setBrandDescription('');
+        setBrandNameEN('');
+        setBrandDescriptionEN('');
         setLogoFile(null);
         setLogoPreview(null);
+        setUploadProgress(0);
       }
     }
-  }, [isOpen, brand]);
+  }, [isOpen, brand, setUploadProgress]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -45,50 +56,60 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
     }
   };
 
-  const handleSubmit = () => {
-    if (!brandName.trim()) {
-      toast.error(t("ERROR.REQUIRED_BRANDNAME"));
-      return;
+  const handleSubmit = async () => {
+    if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
+    if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
+
+    try {
+      let logoUrl = brand?.brandLogo || null;
+      let publicId = brand?.brandLogoPublicId || null;
+
+      if (logoFile) {
+        const data = await uploadImageToCloudinary(
+          logoFile,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => {
+            setUploadProgress(percent);
+          },
+          'HomeCareDN/BrandLogo'
+        );
+        logoUrl = data.url;
+        publicId = data.publicId;
+        onClose();
+        setUploadProgress(0);
+      }
+
+      const data = {
+        BrandName: brandName,
+        BrandDescription: brandDescription || null,
+        BrandNameEN: brandNameEN || null,
+        BrandDescriptionEN: brandDescriptionEN || null,
+        BrandLogoUrl: logoUrl || null,
+        BrandLogoPublicId: publicId || null,
+        ...(brand?.brandID && { BrandID: brand.brandID }),
+      };
+
+      await onSave(data);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
     }
-
-    if (!brand && !logoFile) {
-      toast.error(t("REQUIRED_REQUIRED__BRANDLOGO"));
-      return;
-    }
-
-    const data = {
-      BrandName: brandName,
-      BrandDescription: brandDescription || null,
-      BrandNameEN: brandNameEN || null,
-      BrandDescriptionEN: brandDescriptionEN || null,
-    };
-
-    // Nếu edit thì giữ brandID
-    if (brand?.brandID) {
-      data.BrandID = brand.brandID;
-    }
-
-    // Nếu có logo mới thì gửi lên, nếu không thì bỏ qua
-    if (logoFile) {
-      data.LogoFile = logoFile;
-    }
-
-    onSave(data);
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto 
+      <div
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto 
                   transform transition-all duration-300 scale-100 
-                  max-h-[90vh] flex flex-col">
+                  max-h-[90vh] flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">
             {brand
-              ? t("adminBrandManager.brandModal.title2")
-              : t("adminBrandManager.brandModal.title")}
+              ? t('adminBrandManager.brandModal.title2')
+              : t('adminBrandManager.brandModal.title')}
           </h3>
           <button
             onClick={onClose}
@@ -102,13 +123,13 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
         <div className="p-6 space-y-6 flex-1 overflow-y-auto">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              {t("adminBrandManager.brandModal.brandName")}{" "}
+              {t('adminBrandManager.brandModal.brandName')}{' '}
               <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               placeholder={t(
-                "adminBrandManager.brandModal.brandNamePlaceholder"
+                'adminBrandManager.brandModal.brandNamePlaceholder'
               )}
               className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={brandName}
@@ -118,11 +139,11 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              {t("adminBrandManager.brandModal.brandDescription")}
+              {t('adminBrandManager.brandModal.brandDescription')}
             </label>
             <textarea
               placeholder={t(
-                "adminBrandManager.brandModal.brandDescriptionPlaceholder"
+                'adminBrandManager.brandModal.brandDescriptionPlaceholder'
               )}
               className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               rows="3"
@@ -139,8 +160,8 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
               className="flex items-center gap-1 text-sm font-medium text-gray-700"
             >
               <i className="fas fa-globe"></i>
-              {t("adminBrandManager.brandModal.multilanguage_for_data")}
-              <span>{isExpanded ? "▲" : "▼"}</span>
+              {t('adminBrandManager.brandModal.multilanguage_for_data')}
+              <span>{isExpanded ? '▲' : '▼'}</span>
             </button>
 
             {/* Nội dung expand */}
@@ -149,12 +170,12 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
                 {/* Brand Name EN */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("adminBrandManager.brandModal.brandNameEN")}
+                    {t('adminBrandManager.brandModal.brandNameEN')}
                   </label>
                   <input
                     type="text"
                     placeholder={t(
-                      "adminBrandManager.brandModal.brandNamePlaceholderEN"
+                      'adminBrandManager.brandModal.brandNamePlaceholderEN'
                     )}
                     className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={brandNameEN}
@@ -165,11 +186,11 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
                 {/* Brand Description EN */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("adminBrandManager.brandModal.brandDescriptionEN")}
+                    {t('adminBrandManager.brandModal.brandDescriptionEN')}
                   </label>
                   <textarea
                     placeholder={t(
-                      "adminBrandManager.brandModal.brandDescriptionPlaceholderEN"
+                      'adminBrandManager.brandModal.brandDescriptionPlaceholderEN'
                     )}
                     className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows="3"
@@ -183,8 +204,8 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              {t("adminBrandManager.brandModal.brandLogo")}{" "}
-              {brand ? "" : <span className="text-red-500">*</span>}
+              {t('adminBrandManager.brandModal.brandLogo')}{' '}
+              {brand ? '' : <span className="text-red-500">*</span>}
             </label>
             <div className="flex items-center space-x-4">
               {logoPreview ? (
@@ -203,7 +224,7 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
               <label className="cursor-pointer px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50">
                 {logoFile
                   ? logoFile.name
-                  : t("adminBrandManager.brandModal.chooseFile")}
+                  : t('adminBrandManager.brandModal.chooseFile')}
                 <input
                   type="file"
                   className="hidden"
@@ -221,19 +242,18 @@ export default function BrandModal({ isOpen, onClose, onSave, brand }) {
             className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
             onClick={onClose}
           >
-            {t("BUTTON.Cancel")}
+            {t('BUTTON.Cancel')}
           </button>
           <button
             className={`px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed`}
             onClick={handleSubmit}
             disabled={!brandName.trim() || (!brand && !logoFile)}
           >
-            {brand ? t("BUTTON.UpdateBrand") : t("BUTTON.AddNewBrand")}
+            {brand ? t('BUTTON.UpdateBrand') : t('BUTTON.AddNewBrand')}
           </button>
         </div>
       </div>
     </div>
-
   );
 }
 // PropTypes
@@ -248,7 +268,9 @@ BrandModal.propTypes = {
     brandNameEN: PropTypes.string,
     brandDescriptionEN: PropTypes.string,
     brandLogo: PropTypes.string,
+    brandLogoPublicId: PropTypes.string,
   }),
+  setUploadProgress: PropTypes.func.isRequired,
 };
 // Default props
 BrandModal.defaultProps = {

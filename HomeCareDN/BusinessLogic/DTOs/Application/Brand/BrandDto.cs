@@ -10,6 +10,7 @@ namespace BusinessLogic.DTOs.Application.Brand
         public string? BrandNameEN { get; set; }
         public string? BrandDescriptionEN { get; set; }
         public required string BrandLogo { get; set; }
+        public required string BrandLogoPublicId { get; set; }
 
         // Danh sách Material đi kèm
         public ICollection<MaterialDto>? Materials { get; set; }

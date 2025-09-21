@@ -126,6 +126,13 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(
                     dest => dest.CategoryLogo,
                     opt => opt.MapFrom(src => src.LogoImage!.ImageUrl)
+                )
+                .ForMember(
+                    dest => dest.CategoryLogoPublicId,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
+                        )
                 );
 
             CreateMap<Brand, BrandDto>()
@@ -134,6 +141,13 @@ namespace HomeCareDNAPI.Mapping
                     opt =>
                         opt.MapFrom(src =>
                             src.LogoImage != null ? src.LogoImage.ImageUrl : string.Empty
+                        )
+                )
+                .ForMember(
+                    dest => dest.BrandLogoPublicId,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
