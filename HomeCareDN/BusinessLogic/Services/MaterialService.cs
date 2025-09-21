@@ -253,9 +253,9 @@ namespace BusinessLogic.Services
             ICollection<string>? publicIds
         )
         {
-            if (imageUrls == null || !imageUrls.Any()) return;
-
             var urls = imageUrls?.ToList() ?? new List<string>();
+            if (!urls.Any()) return;
+
             var ids = publicIds?.ToList() ?? new List<string>();
 
             for (int i = 0; i < urls.Count; i++)

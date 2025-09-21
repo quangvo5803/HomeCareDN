@@ -455,4 +455,5 @@ MaterialModal.propTypes = {
   material: PropTypes.object,
   brands: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
+  setUploadProgress: PropTypes.func.isRequired,
 };
