@@ -98,10 +98,14 @@ namespace BusinessLogic.Services
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
             //check image
-            ValidateImages(requestDto.Images);
+            ValidateImages(requestDto.ImageUrls);
 
             //upload image
-            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(
+                material.MaterialID, 
+                requestDto.ImageUrls, 
+                requestDto.ImagePublicIds
+            );
 
             await _unitOfWork.SaveAsync();
 
@@ -174,12 +178,16 @@ namespace BusinessLogic.Services
             );
 
             //check image
-            ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
+            ValidateImages(requestDto.ImageUrls, material!.Images?.Count ?? 0);
 
             _mapper.Map(requestDto, material);
 
             //upload image
-            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(
+                material.MaterialID, 
+                requestDto.ImageUrls, 
+                requestDto.ImagePublicIds
+            );
 
             await _unitOfWork.SaveAsync();
             material = await _unitOfWork.MaterialRepository.GetAsync(
@@ -215,7 +223,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        private static void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
+        private static void ValidateImages(ICollection<string>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();
 
@@ -241,23 +249,28 @@ namespace BusinessLogic.Services
 
         private async Task UploadMaterialImagesAsync(
             Guid materialId,
-            ICollection<IFormFile>? images
+            ICollection<string>? imageUrls,
+            ICollection<string>? publicIds
         )
         {
-            foreach (var image in images ?? Enumerable.Empty<IFormFile>())
+            if (imageUrls == null || !imageUrls.Any()) return;
+
+            var urls = imageUrls?.ToList() ?? new List<string>();
+            var ids = publicIds?.ToList() ?? new List<string>();
+
+            for (int i = 0; i < urls.Count; i++)
             {
                 var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
                     MaterialID = materialId,
-                    ImageUrl = "",
+                    ImageUrl = urls[i],
+                    PublicId = i < ids.Count ? ids[i] : string.Empty
                 };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    image,
-                    "HomeCareDN/Material",
-                    imageUpload
-                );
+
+                await _unitOfWork.ImageRepository.AddAsync(imageUpload);
             }
         }
+
     }
 }

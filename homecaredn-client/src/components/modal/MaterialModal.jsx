@@ -7,6 +7,8 @@ import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
 import { Editor } from '@tinymce/tinymce-react';
 import { showDeleteModal } from './DeleteModal';
+import { handleApiError } from '../../utils/handleApiError';
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 
 export default function MaterialModal({
   isOpen,
@@ -15,6 +17,7 @@ export default function MaterialModal({
   material,
   brands,
   categories,
+  setUploadProgress
 }) {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
@@ -31,6 +34,7 @@ export default function MaterialModal({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [images, setImages] = useState([]);
+
 
   // Fill data khi edit
   useEffect(() => {
@@ -56,6 +60,7 @@ export default function MaterialModal({
             isNew: false,
           }))
         );
+        setUploadProgress(0);
       } else {
         setName('');
         setNameEN('');
@@ -66,35 +71,38 @@ export default function MaterialModal({
         setDescription('');
         setDescriptionEN('');
         setImages([]);
+        setUploadProgress(0);
       }
     }
-  }, [isOpen, material, brands, categories]);
+  }, [isOpen, material, brands, categories, setUploadProgress]);
 
   // Chọn ảnh local
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const totalCount = images.length + files.length;
-    if (totalCount > 5) {
+
+    const totalImages = images.length + files.length;
+    if (totalImages > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
 
-    const mappedFiles = files.map((f) => ({
+    const mappedFiles = files.map(f => ({
       url: URL.createObjectURL(f),
       file: f,
       isNew: true,
     }));
 
-    setImages((prev) => [...prev, ...mappedFiles]);
+    setImages(prev => [...prev, ...mappedFiles]);
   };
 
   // Xóa ảnh local hoặc DB
   const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.url !== img.url));
-    if (material) {
-      material.imageUrls = material.imageUrls.filter((url) => url !== img.url);
+    setImages(prev => prev.filter(i => i.url !== img.url));
+
+    if (!img.isNew && material) {
+      material.imageUrls = material.imageUrls.filter(url => url !== img.url);
     }
-  };
+  }
 
   const confirmDeleteImage = async (img) => {
     try {
@@ -122,7 +130,7 @@ export default function MaterialModal({
   };
 
   // Submit
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_NAME'));
       return;
@@ -144,20 +152,42 @@ export default function MaterialModal({
       return;
     }
 
-    const data = {
-      MaterialID: material?.materialID,
-      UserID: user?.id || null,
-      Name: name || null,
-      NameEN: nameEN || null,
-      Unit: unit || null,
-      UnitEN: unitEN || null,
-      BrandID: brandID || null,
-      CategoryID: categoryID || null,
-      Description: description || null,
-      DescriptionEN: descriptionEN || null,
-      Images: images.filter((i) => i.isNew).map((i) => i.file),
-    };
-    onSave(data);
+    try {
+      const newFiles = images.filter(i => i.isNew).map(i => i.file);
+
+      const data = {
+        MaterialID: material?.materialID,
+        UserID: user?.id || null,
+        Name: name || null,
+        NameEN: nameEN || null,
+        Unit: unit || null,
+        UnitEN: unitEN || null,
+        BrandID: brandID || null,
+        CategoryID: categoryID || null,
+        Description: description || null,
+        DescriptionEN: descriptionEN || null,
+      };
+
+      if (newFiles.length > 0) {
+        const uploaded = await uploadImageToCloudinary(
+          newFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => setUploadProgress(percent),
+          'HomeCareDN/Material'
+        );
+        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
+        data.ImageUrls = uploadedArray.map(u => u.url);
+        data.ImagePublicIds = uploadedArray.map(u => u.publicId);
+
+        onClose();
+        setUploadProgress(0);
+      }
+
+      await onSave(data);
+
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
+    }
   };
 
   if (!isOpen) return null;
@@ -346,16 +376,16 @@ export default function MaterialModal({
             </div>
 
             {/* Images */}
-            <div className="col-span-2 flex flex-wrap gap-3">
+            <div className="flex flex-wrap col-span-2 gap-3">
               {images.map((img) => (
                 <div
                   key={img.url}
-                  className="relative w-28 h-28 border rounded-xl overflow-hidden group"
+                  className="relative overflow-hidden border w-28 h-28 rounded-xl group"
                 >
                   <img
                     src={img.url}
                     alt="preview"
-                    className="w-full h-full object-cover"
+                    className="object-cover w-full h-full"
                   />
                   <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
                     {(images.length !== 1 || img.isNew) && (
@@ -374,7 +404,7 @@ export default function MaterialModal({
 
             {images.length < 5 && (
               <div className="col-span-2">
-                <label className="cursor-pointer px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl hover:border-emerald-400 hover:bg-emerald-50 inline-block">
+                <label className="inline-block px-4 py-2 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-emerald-400 hover:bg-emerald-50">
                   {t('distributorMaterialManager.materialModal.chooseFile')}
                   <input
                     type="file"
@@ -387,8 +417,8 @@ export default function MaterialModal({
                 <span className="ml-3 text-sm text-gray-500">
                   {images.filter((i) => i.isNew).length > 0
                     ? `${images.filter((i) => i.isNew).length} ${t(
-                        'distributorMaterialManager.materialModal.filesSelected'
-                      )}`
+                      'distributorMaterialManager.materialModal.filesSelected'
+                    )}`
                     : t('distributorMaterialManager.materialModal.noFile')}
                 </span>
               </div>
@@ -397,7 +427,7 @@ export default function MaterialModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end mt-6 gap-4 border-t pt-4">
+        <div className="flex items-center justify-end gap-4 pt-4 mt-6 border-t">
           <button
             type="button"
             onClick={onClose}
