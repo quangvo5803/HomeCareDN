@@ -61,11 +61,17 @@ export default function BrandModal({
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
 
     try {
-      let logoUrl = brand?.brandLogo || null;
-      let publicId = brand?.brandLogoPublicId || null;
+      const data = {
+        BrandName: brandName,
+        BrandDescription: brandDescription || null,
+        BrandNameEN: brandNameEN || null,
+        BrandDescriptionEN: brandDescriptionEN || null,
+
+        ...(brand?.brandID && { BrandID: brand.brandID }),
+      };
 
       if (logoFile) {
-        const data = await uploadImageToCloudinary(
+        const result = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => {
@@ -73,21 +79,11 @@ export default function BrandModal({
           },
           'HomeCareDN/BrandLogo'
         );
-        logoUrl = data.url;
-        publicId = data.publicId;
+        data.BrandLogoUrl = result.url;
+        data.BrandLogoPublicId = result.publicId;
         onClose();
         setUploadProgress(0);
       }
-
-      const data = {
-        BrandName: brandName,
-        BrandDescription: brandDescription || null,
-        BrandNameEN: brandNameEN || null,
-        BrandDescriptionEN: brandDescriptionEN || null,
-        BrandLogoUrl: logoUrl || null,
-        BrandLogoPublicId: publicId || null,
-        ...(brand?.brandID && { BrandID: brand.brandID }),
-      };
 
       await onSave(data);
     } catch (err) {
