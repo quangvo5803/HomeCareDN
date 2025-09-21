@@ -253,23 +253,19 @@ namespace BusinessLogic.Services
             ICollection<string>? publicIds
         )
         {
-            var urls = imageUrls?.ToList() ?? new List<string>();
-            if (!urls.Any()) return;
+            if (imageUrls == null || !imageUrls.Any()) return;
 
             var ids = publicIds?.ToList() ?? new List<string>();
 
-            for (int i = 0; i < urls.Count; i++)
+            var images = imageUrls.Select((url, i) => new Image
             {
-                var imageUpload = new Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    MaterialID = materialId,
-                    ImageUrl = urls[i],
-                    PublicId = i < ids.Count ? ids[i] : string.Empty
-                };
+                ImageID = Guid.NewGuid(),
+                MaterialID = materialId,
+                ImageUrl = url,
+                PublicId = i < ids.Count ? ids[i] : string.Empty
+            }).ToList();
 
-                await _unitOfWork.ImageRepository.AddAsync(imageUpload);
-            }
+            await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
     }
