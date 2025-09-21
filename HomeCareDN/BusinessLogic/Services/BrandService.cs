@@ -14,7 +14,6 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public BrandService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -25,28 +24,20 @@ namespace BusinessLogic.Services
         public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
         {
             var brand = _mapper.Map<Brand>(requestDto);
-            await _unitOfWork.BrandRepository.AddAsync(brand);
-            if (requestDto.LogoFile != null)
+            brand.BrandID = Guid.NewGuid();
+
+            Image imageUpload = new Image
             {
-                var errors = new Dictionary<string, string[]>();
-                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
-                {
-                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-                    throw new CustomValidationException(errors);
-                }
-                Image imageUpload = new Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    BrandID = brand.BrandID,
-                    ImageUrl = "",
-                };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    requestDto.LogoFile,
-                    "HomeCareDN/BrandLogo",
-                    imageUpload
-                );
-                brand.BrandLogoID = imageUpload.ImageID;
-            }
+                ImageID = Guid.NewGuid(),
+                BrandID = brand.BrandID,
+                ImageUrl = requestDto.BrandLogoUrl,
+                PublicId = requestDto.BrandLogoPublicId,
+            };
+            brand.BrandLogoID = imageUpload.ImageID;
+
+            await _unitOfWork.ImageRepository.AddAsync(imageUpload);
+            await _unitOfWork.BrandRepository.AddAsync(brand);
+
             await _unitOfWork.SaveAsync();
             var brandDto = _mapper.Map<BrandDto>(brand);
             return brandDto;
@@ -124,42 +115,45 @@ namespace BusinessLogic.Services
                 b => b.BrandID == requestDto.BrandID,
                 includeProperties: "LogoImage,Materials"
             );
+
             if (brand == null)
             {
                 errors.Add("BrandID", new[] { "BRAND_NOT_FOUND" });
                 throw new CustomValidationException(errors);
             }
+
             _mapper.Map(requestDto, brand);
-            if (requestDto.LogoFile != null)
+
+            if (
+                !string.IsNullOrEmpty(requestDto.BrandLogoUrl)
+                && !string.IsNullOrEmpty(requestDto.BrandLogoPublicId)
+            )
             {
-                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                if (brand.BrandLogoID.HasValue)
                 {
-                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-                    throw new CustomValidationException(errors);
+                    var oldImage = await _unitOfWork.ImageRepository.GetAsync(i =>
+                        i.ImageID == brand.BrandLogoID.Value
+                    );
+                    if (oldImage != null)
+                    {
+                        await _unitOfWork.ImageRepository.DeleteImageAsync(oldImage.PublicId);
+                    }
                 }
-                var existingImage = await _unitOfWork.ImageRepository.GetAsync(img =>
-                    img.BrandID == brand.BrandID
-                );
-                if (existingImage != null)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(existingImage.PublicId);
-                }
-                Image imageUpload = new Image
+                var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
                     BrandID = brand.BrandID,
-                    ImageUrl = "",
+                    ImageUrl = requestDto.BrandLogoUrl,
+                    PublicId = requestDto.BrandLogoPublicId,
                 };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    requestDto.LogoFile,
-                    "HomeCareDN/BrandLogo",
-                    imageUpload
-                );
+
+                await _unitOfWork.ImageRepository.AddAsync(imageUpload);
                 brand.BrandLogoID = imageUpload.ImageID;
             }
+
             await _unitOfWork.SaveAsync();
-            var brandDto = _mapper.Map<BrandDto>(brand);
-            return brandDto;
+
+            return _mapper.Map<BrandDto>(brand);
         }
     }
 }

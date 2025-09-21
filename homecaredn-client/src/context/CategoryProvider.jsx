@@ -74,7 +74,7 @@ export const CategoryProvider = ({ children }) => {
       try {
         setLoading(true);
         const newCategory = await categoryService.createCategory(categoryData);
-        setCategories((prev) => [newCategory, ...prev]);
+        setCategories((prev) => [...prev, newCategory]);
         // Tăng tổng số category
         setTotalCategories((prev) => prev + 1);
         return newCategory;

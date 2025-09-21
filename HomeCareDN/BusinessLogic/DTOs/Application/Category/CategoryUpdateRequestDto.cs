@@ -10,6 +10,7 @@ namespace BusinessLogic.DTOs.Application.Category
         public string? CategoryName { get; set; }
         public string? CategoryNameEN { get; set; }
         public bool IsActive { get; set; }
-        public IFormFile? LogoFile { get; set; }
+        public string? CategoryLogoUrl { get; set; }
+        public string? CategoryLogoPublicId { get; set; }
     }
 }

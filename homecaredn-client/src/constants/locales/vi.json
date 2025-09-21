@@ -746,5 +746,8 @@
       "Rustic": "Mộc mạc",
       "Other": "Khác"
     }
+  },
+  "toast":{
+      "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   }
 }
