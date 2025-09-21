@@ -3,8 +3,8 @@ import axios from 'axios';
 export const uploadImageToCloudinary = async (
   files,
   uploadPreset,
-  folder = 'HomeCareDN/BrandLogo',
-  onProgress
+  onProgress,
+  folder = 'HomeCareDN'
 ) => {
   if (!files) throw new Error('No file provided');
 

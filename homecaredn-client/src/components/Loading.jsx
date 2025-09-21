@@ -1,6 +1,7 @@
 // src/components/Loading.jsx
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 const Loading = ({ progress }) => {
   const { t } = useTranslation();
@@ -31,5 +32,7 @@ const Loading = ({ progress }) => {
     </div>
   );
 };
-
+Loading.propTypes = {
+  progress: PropTypes.number.isRequired,
+};
 export default Loading;

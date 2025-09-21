@@ -68,10 +68,10 @@ export default function BrandModal({
         const data = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          'HomeCareDN/BrandLogo',
           (percent) => {
             setUploadProgress(percent);
-          }
+          },
+          'HomeCareDN/BrandLogo'
         );
         logoUrl = data.url;
         publicId = data.publicId;
@@ -268,7 +268,9 @@ BrandModal.propTypes = {
     brandNameEN: PropTypes.string,
     brandDescriptionEN: PropTypes.string,
     brandLogo: PropTypes.string,
+    brandLogoPublicId: PropTypes.string,
   }),
+  setUploadProgress: PropTypes.func.isRequired,
 };
 // Default props
 BrandModal.defaultProps = {
