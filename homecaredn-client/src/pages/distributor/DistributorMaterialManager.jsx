@@ -18,6 +18,7 @@ export default function DistributorMaterialManager() {
   const pageSize = 10;
   const { fetchAllBrands } = useBrand();
   const { fetchAllCategories } = useCategory();
+  const [uploadProgress, setUploadProgress] = useState(0);
   const {
     materials,
     totalMaterials,
@@ -96,6 +97,7 @@ export default function DistributorMaterialManager() {
   };
 
   if (loading) return <Loading />;
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
   return (
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
       {/* Header */}
@@ -137,6 +139,7 @@ export default function DistributorMaterialManager() {
         material={editingMaterial}
         brands={brands}
         categories={categories}
+        setUploadProgress={setUploadProgress}
       />
 
       {/* Table */}
@@ -170,9 +173,8 @@ export default function DistributorMaterialManager() {
               materials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                  }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">
