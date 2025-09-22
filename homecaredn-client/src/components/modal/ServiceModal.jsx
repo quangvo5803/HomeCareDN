@@ -80,9 +80,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   // Xử lý chọn file
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const keptCount = images.filter(i => !i.isNew).length;
 
-    const totalCount = keptCount + files.length;
+    const totalCount = images.length + files.length;
     if (totalCount > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
@@ -159,6 +158,10 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       MainStructureType: mainStructureType || null,
       DesignStyle: designStyle || null,
     };
+      if (images.length > 5) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+      return;
+    }
 
     if (service?.serviceID) {
       data.ServiceID = service.serviceID;
@@ -180,7 +183,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
     await onSave(data);
   } catch (err) {
           toast.error(t(handleApiError(err)));
-        } 
+  } 
   };
 
   if (!isOpen) return null;
