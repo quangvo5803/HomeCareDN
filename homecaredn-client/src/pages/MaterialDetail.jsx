@@ -136,19 +136,18 @@ export default function MaterialDetail() {
                       key={src}
                       onClick={() => setMainImage(src)}
                       className={`
-                                                relative 
-                                                bg-white 
-                                                rounded-xl 
-                                                overflow-hidden 
-                                                aspect-square 
-                                                flex items-center justify-center
-                                                transition-all duration-300 hover:shadow-lg
-                                                ${
-                                                  mainImage === src
-                                                    ? 'ring-2 ring-orange-500 shadow-md scale-105'
-                                                    : 'hover:scale-105 shadow-sm'
-                                                }
-                                                `}
+                        relative 
+                       bg-white 
+                        rounded-xl 
+                        overflow-hidden 
+                        aspect-square 
+                        flex items-center justify-center
+                        transition-all duration-300 hover:shadow-lg
+                        ${mainImage === src
+                          ? 'ring-2 ring-orange-500 shadow-md scale-105'
+                          : 'hover:scale-105 shadow-sm'
+                        }
+                      `}
                       aria-label={`${material.name} thumbnail ${i + 1}`}
                     >
                       <img
@@ -321,8 +320,11 @@ export default function MaterialDetail() {
             >
               <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">
                 <img
-                  src={m.imageUrls?.[0]}
-                  alt={m.name}
+                  src={
+                    m.imageUrls?.[0]
+                    || "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                  }
+                  alt={m.name || "No image"}
                   className="object-contain w-full h-full transition-transform duration-500 group-hover:scale-110"
                 />
               </div>

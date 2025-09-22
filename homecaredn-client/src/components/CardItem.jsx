@@ -19,14 +19,16 @@ export default function CardItem({ item }) {
       {/* Ảnh */}
       <div className="relative flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-100 h-72">
         <img
-          src={item.imageUrls?.[0]}
-          alt={item.name}
+          src={
+            item.imageUrls?.[0]
+            || "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+          }
+          alt={item.name || "No image"}
           className={`object-contain duration-300 group-hover:scale-110
-            ${item.type === 'material' ? 'max-w-[250px] max-h-[250px]' : ''}
-            ${item.type === 'service' ? 'max-w-[350px] max-h-[360px]' : ''}
+            ${item.type === "material" ? "max-w-[250px] max-h-[250px]" : ""}
+            ${item.type === "service" ? "max-w-[350px] max-h-[360px]" : ""}
           `}
         />
-
       </div>
 
       {/* Nội dung */}
