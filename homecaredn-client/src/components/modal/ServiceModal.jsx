@@ -6,6 +6,7 @@ import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
+import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -145,7 +146,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
       return;
     }
-
+    try {
+    const newFiles = images.filter(i => i.isNew).map(i => i.file);
     const data = {
       Name: name,
       NameEN: nameEN || null,
@@ -162,18 +164,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       data.ServiceID = service.serviceID;
     }
 
-    // chỉ gửi ảnh local
-    const keptOld = images.filter(i => !i.isNew);
-    const newFiles = images.filter(i => i.isNew).map(i => i.file);
-
-
-    const keptOldImageUrls = keptOld.map(i => i.url);
-    const keptOldImagePublicIds = keptOld.map(i => i.publicId || '');
-
-    
-    let newImageUrls = [];
-    let newImagePublicIds = [];
-
     if (newFiles.length > 0) {
         const uploaded = await uploadImageToCloudinary(
           newFiles,
@@ -182,22 +172,15 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        newImageUrls = uploadedArray.map(u => u.url);
-        newImagePublicIds = uploadedArray.map(u => u.publicId);
-    }
-      data.ImageUrls = [...keptOldImageUrls, ...newImageUrls];
-      data.ImagePublicIds = [...keptOldImagePublicIds, ...newImagePublicIds];
-      if (data.ImageUrls.length > 5) {
-        toast.error(t('ERROR.MAXIMUM_IMAGE'));
-        return;
-      }
-      if (data.ImageUrls.length !== data.ImagePublicIds.length) {
-        toast.error(t('ERROR.IMAGE_URLS_PUBLICIDS_MISMATCH'));
-        return;
-      }
+        data.ImageUrls     = uploadedArray.map(u => u.url);
+        data.ImagePublicIds= uploadedArray.map(u => u.publicId);
+        onClose();
+        setUploadProgress(0);
+    } 
     await onSave(data);
-    onClose();
-    setUploadProgress(0);
+  } catch (err) {
+          toast.error(t(handleApiError(err)));
+        } 
   };
 
   if (!isOpen) return null;
