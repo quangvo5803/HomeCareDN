@@ -12,7 +12,9 @@ const buildMaterialFormData = ({
   UnitEN,
   Description,
   DescriptionEN,
-  Images,
+  ImageUrls,
+  ImagePublicIds,
+
 }) => {
   const formData = new FormData();
   if (MaterialID) formData.append('MaterialID', MaterialID);
@@ -25,8 +27,11 @@ const buildMaterialFormData = ({
   if (UnitEN) formData.append('UnitEN', UnitEN);
   if (Description) formData.append('Description', Description);
   if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
-  if (Images && Images.length > 0) {
-    Images.forEach((file) => formData.append('Images', file));
+  if (ImageUrls && ImageUrls.length > 0) {
+    ImageUrls.forEach((file) => formData.append('ImageUrls', file));
+  }
+  if (ImagePublicIds && ImagePublicIds.length > 0) {
+    ImagePublicIds.forEach((id) => formData.append('ImagePublicIds', id))
   }
   return formData;
 };

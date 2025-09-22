@@ -1,22 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  --font-body: 'Roboto', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
-  --font-heading: 'Poppins', var(--font-body);
+  --font-body: "Roboto", system-ui, -apple-system, Segoe UI, Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+  --font-heading: "Poppins", var(--font-body);
   --primary: #f97316;
 }
 
-body { font-family: var(--font-body); }
-.h-heading { font-family: var(--font-heading); }
+body {
+  font-family: var(--font-body);
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.h-heading {
+  font-family: var(--font-heading);
+}
 
 /* ================= HERO ================ */
 
 /* Kenburns nhẹ cho ảnh hero */
 @keyframes kenburns {
-  0%   { transform: scale(1) translateZ(0); }
-  100% { transform: scale(1.12) translateZ(0); }
+  0% {
+    transform: scale(1) translateZ(0);
+  }
+  100% {
+    transform: scale(1.12) translateZ(0);
+  }
 }
-.motion-reduce .animate-kenburns { animation: none !important; }
+.motion-reduce .animate-kenburns {
+  animation: none !important;
+}
 .animate-kenburns {
   animation: kenburns 12s ease-in-out both;
   will-change: transform;
@@ -25,8 +38,13 @@ body { font-family: var(--font-body); }
 /* Vignette nhẹ cho hero */
 .hero-vignette::after {
   content: "";
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,.55) 100%);
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 40%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
   pointer-events: none;
 }
 
@@ -35,7 +53,7 @@ body { font-family: var(--font-body); }
   font-family: var(--font-heading);
   color: transparent;
   -webkit-text-stroke: 2px var(--primary);
-  line-height: .85;
+  line-height: 0.85;
 }
 
 /* ================= REVEAL ON SCROLL ================ */
@@ -56,13 +74,22 @@ body { font-family: var(--font-body); }
   clip-path: polygon(12% 0, 100% 0, 100% 85%, 88% 100%, 0 100%, 0 15%);
 }
 /* Smooth fade-in for the modal backdrop */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.animate-fadeIn { animation: fadeIn 180ms ease-out both; }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 180ms ease-out both;
+}
 
 .stat-card {
   position: relative;
-  overflow: hidden;         
-  border-radius: 0.75rem;   
+  overflow: hidden;
+  border-radius: 0.75rem;
 }
 
 .stat-card::after {
@@ -82,20 +109,41 @@ body { font-family: var(--font-body); }
 }
 /* ================= ANIMATION TIỆN DỤNG ================ */
 @keyframes fadeInUp {
-  0% { opacity: 0; transform: translate3d(0, 30px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 @keyframes slideInDown {
-  0% { transform: translate3d(0, -40px, 0); opacity: 0; }
-  100% { transform: translate3d(0, 0, 0); opacity: 1; }
+  0% {
+    transform: translate3d(0, -40px, 0);
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
 }
-.animated { animation-duration: .9s; animation-fill-mode: both; }
-.fadeInUp { animation-name: fadeInUp; }
-.slideInDown { animation-name: slideInDown; }
+.animated {
+  animation-duration: 0.9s;
+  animation-fill-mode: both;
+}
+.fadeInUp {
+  animation-name: fadeInUp;
+}
+.slideInDown {
+  animation-name: slideInDown;
+}
 
 /* ================= ACCESSIBILITY ================ */
 @media (prefers-reduced-motion: reduce) {
-  .animate-kenburns, .animated, .reveal-up {
+  .animate-kenburns,
+  .animated,
+  .reveal-up {
     animation: none !important;
     transition: none !important;
     transform: none !important;
