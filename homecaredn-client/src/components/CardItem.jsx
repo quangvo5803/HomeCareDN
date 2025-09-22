@@ -11,25 +11,29 @@ export default function CardItem({ item }) {
         item.type === 'material'
           ? `/MaterialDetail/${item.materialID}`
           : item.type === 'service'
-          ? `/ServiceDetail/${item.serviceID}`
-          : '#'
+            ? `/ServiceDetail/${item.serviceID}`
+            : '#'
       }
       className="flex flex-col h-full overflow-hidden transition-all duration-300 border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-2xl hover:-translate-y-1"
     >
       {/* Ảnh */}
-      <div className="relative flex items-center justify-center overflow-hidden bg-gray-100 h-72 flex-shrink-0">
+      <div className="relative flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-100 h-72">
         <img
           src={item.imageUrls?.[0]}
           alt={item.name}
-          className="object-contain max-w-[450px] max-h-[300px] duration-300 group-hover:scale-110"
+          className={`object-contain duration-300 group-hover:scale-110
+            ${item.type === 'material' ? 'max-w-[250px] max-h-[250px]' : ''}
+            ${item.type === 'service' ? 'max-w-[350px] max-h-[360px]' : ''}
+          `}
         />
+
       </div>
 
       {/* Nội dung */}
       <div className="flex flex-col flex-grow p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
         {/* Tiêu đề với chiều cao cố định */}
         <div className="mb-2">
-          <h5 className="text-lg font-semibold text-center leading-tight break-words hyphens-auto">
+          <h5 className="text-lg font-semibold leading-tight text-center break-words hyphens-auto">
             {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
           </h5>
         </div>
@@ -41,8 +45,8 @@ export default function CardItem({ item }) {
         {item.type === 'material' && (
           <div className="flex items-center justify-center gap-3 mt-2">
             <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-2">
-              <i className="fas fa-tags flex-shrink-0"></i>
-              <span className="truncate text-xs">
+              <i className="flex-shrink-0 fas fa-tags"></i>
+              <span className="text-xs truncate">
                 {i18n.language === 'vi'
                   ? item.categoryName
                   : item.categoryNameEN || item.categoryName}
@@ -50,8 +54,8 @@ export default function CardItem({ item }) {
             </span>
 
             <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-2">
-              <i className="fas fa-star flex-shrink-0"></i>
-              <span className="truncate text-xs">
+              <i className="flex-shrink-0 fas fa-star"></i>
+              <span className="text-xs truncate">
                 {i18n.language === 'vi'
                   ? item.brandName
                   : item.brandNameEN || item.brandName}
@@ -64,15 +68,15 @@ export default function CardItem({ item }) {
         {item.type === 'service' && (
           <div className="flex items-center justify-center gap-3 mt-2">
             <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-blue-600 px-2">
-              <i className="fas fa-tools flex-shrink-0"></i>
-              <span className="truncate text-xs">
+              <i className="flex-shrink-0 fas fa-tools"></i>
+              <span className="text-xs truncate">
                 {t(`Enums.ServiceType.${item.serviceType}`)}
               </span>
             </span>
 
             <span className="flex items-center gap-1 w-[110px] h-10 justify-center rounded-xl text-sm font-bold text-white shadow-lg bg-orange-600 px-2">
-              <i className="fas fa-building flex-shrink-0"></i>
-              <span className="truncate text-xs">
+              <i className="flex-shrink-0 fas fa-building"></i>
+              <span className="text-xs truncate">
                 {t(`Enums.BuildingType.${item.buildingType}`)}
               </span>
             </span>
@@ -80,7 +84,7 @@ export default function CardItem({ item }) {
         )}
 
         {/* Read More Button với chiều cao cố định */}
-        <div className="mt-3 h-8 flex items-center justify-center">
+        <div className="flex items-center justify-center h-8 mt-3">
           <div className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white">
             {t('BUTTON.ReadMore')}
             <i class="mr-2 fa-solid fa-arrow-right"></i>
