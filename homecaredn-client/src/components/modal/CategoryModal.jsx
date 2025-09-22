@@ -3,8 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
+import { handleApiError } from '../../utils/handleApiError';
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 
-export default function CategoryModal({ isOpen, onClose, onSave, category }) {
+export default function CategoryModal({
+  isOpen,
+  onClose,
+  onSave,
+  category,
+  setUploadProgress,
+}) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
   const [categoryNameEN, setCategoryNameEN] = useState('');
@@ -22,14 +30,16 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
         setLogoPreview(category.categoryLogo || null);
         setLogoFile(null);
         setIsActive(category.isActive ?? true);
+        setUploadProgress(0);
       } else {
         setCategoryName('');
         setCategoryNameEN('');
         setLogoFile(null);
         setLogoPreview(null);
+        setUploadProgress(0);
       }
     }
-  }, [isOpen, category]);
+  }, [isOpen, category, setUploadProgress]);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -42,15 +52,16 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!categoryName.trim()) {
-      toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
-      return;
+      return toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
     }
+    if (!category && !logoFile)
+      return toast.error(t('ERROR.REQUIRED_CATEGORYLOGO'));
 
     const data = {
       CategoryName: categoryName,
-      CategoryNameEN: categoryNameEN,
+      CategoryNameEN: categoryNameEN || null,
     };
 
     if (category?.categoryID) {
@@ -60,10 +71,22 @@ export default function CategoryModal({ isOpen, onClose, onSave, category }) {
       data.IsActive = user?.role === 'Admin';
       data.UserID = user?.id;
     }
-    if (logoFile) {
-      data.LogoFile = logoFile;
+    try {
+      if (logoFile) {
+        const result = await uploadImageToCloudinary(
+          logoFile,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          () => {},
+          'HomeCareDN/CategoryLogo'
+        );
+        data.CategoryLogoUrl = result.url;
+        data.CategoryLogoPublicId = result.publicId;
+      }
+
+      await onSave(data);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
     }
-    onSave(data);
   };
 
   if (!isOpen) return null;
