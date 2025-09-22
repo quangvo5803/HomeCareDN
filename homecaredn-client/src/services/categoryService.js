@@ -22,7 +22,10 @@ export const categoryService = {
     if (dto.CategoryNameEN)
       formData.append('CategoryNameEN', dto.CategoryNameEN);
 
-    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
+    if (dto.CategoryLogoUrl)
+      formData.append('CategoryLogoUrl', dto.CategoryLogoUrl);
+    if (dto.CategoryLogoPublicId)
+      formData.append('CategoryLogoPublicId', dto.CategoryLogoPublicId);
     if (dto.IsActive !== undefined) formData.append('IsActive', dto.IsActive);
     const response = await api.post('/Categories/create-category', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -37,7 +40,10 @@ export const categoryService = {
     if (dto.CategoryNameEN)
       formData.append('CategoryNameEN', dto.CategoryNameEN);
 
-    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
+    if (dto.CategoryLogoUrl)
+      formData.append('CategoryLogoUrl', dto.CategoryLogoUrl);
+    if (dto.CategoryLogoPublicId)
+      formData.append('CategoryLogoPublicId', dto.CategoryLogoPublicId);
     if (dto.IsActive !== undefined) formData.append('IsActive', dto.IsActive);
     const response = await api.put('/Categories/update-category', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

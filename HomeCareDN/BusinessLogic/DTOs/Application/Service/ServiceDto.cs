@@ -19,5 +19,6 @@ namespace BusinessLogic.DTOs.Application.Service
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
+        public ICollection<string>? ImagePublicIds { get; set; }
     }
 }

@@ -102,7 +102,6 @@ const TESTIMONIALS = [
     roleKey: 'home.testimonial2_role',
   },
 ];
-
 export default function Home() {
   const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
@@ -517,7 +516,7 @@ export default function Home() {
         </section>
       </Reveal>
 
-      {/*Material  */}
+      {/* Material */}
       <Reveal>
         <section className="py-12">
           <div className="container px-6 mx-auto max-w-7xl">
@@ -544,7 +543,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* grid */}
+            {/* Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {randomMaterials.length === 0 ? (
                 <p></p>
