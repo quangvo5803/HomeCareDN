@@ -20,6 +20,7 @@ namespace BusinessLogic.DTOs.Application.Service
         public DesignStyle? DesignStyle { get; set; }
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
-        public List<IFormFile>? Images { get; set; }
+        public required List<string> ImageUrls { get; set; }
+        public required List<string> ImagePublicIds { get; set; }
     }
 }

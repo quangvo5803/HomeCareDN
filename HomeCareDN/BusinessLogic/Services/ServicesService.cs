@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Cryptography;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Service;
@@ -18,7 +19,7 @@ namespace BusinessLogic.Services
         private const string ERROR_SERVICE = "Service";
         private const string ERROR_SERVICE_NOT_FOUND = "SERVICE_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
+        private const string ERROR_URL_MISMATCH = "IMAGE_URLS_PUBLICIDS_MISMATCH";
 
         public ServicesService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -62,16 +63,17 @@ namespace BusinessLogic.Services
         {
             var errors = new Dictionary<string, string[]>();
 
-            if (serviceCreateDto.Images != null)
+            int urlCount = serviceCreateDto.ImageUrls?.Count ?? 0;
+            int urlPublicIdCount = serviceCreateDto.ImagePublicIds?.Count ?? 0;
+
+            if (urlCount != urlPublicIdCount)
+                errors.Add(ERROR_SERVICE, new[] { ERROR_URL_MISMATCH });
+
+            if (serviceCreateDto.ImageUrls != null)
             {
-                if (serviceCreateDto.Images.Count > 5)
+                if (serviceCreateDto.ImageUrls.Count > 5)
                 {
                     errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE });
-                }
-
-                if (serviceCreateDto.Images.Any(i => i.Length > 5 * 1024 * 1024)) // 5 MB
-                {
-                    errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE_SIZE });
                 }
             }
 
@@ -79,29 +81,27 @@ namespace BusinessLogic.Services
             {
                 throw new CustomValidationException(errors);
             }
+
             var rsServiceCreate = _mapper.Map<Service>(serviceCreateDto);
             await _unitOfWork.ServiceRepository.AddAsync(rsServiceCreate);
 
-            if (serviceCreateDto.Images != null)
+            if (urlCount > 0)
             {
-                foreach (var image in serviceCreateDto.Images)
+                for (int i = 0; i < urlCount; i++)
                 {
                     Image imageUpload = new Image
                     {
                         ImageID = Guid.NewGuid(),
                         ServiceID = rsServiceCreate.ServiceID,
-                        ImageUrl = "",
+                        ImageUrl = serviceCreateDto.ImageUrls![i],
+                        PublicId = serviceCreateDto.ImagePublicIds![i],
                     };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/Service",
-                        imageUpload
-                    );
+                    await _unitOfWork.ImageRepository.AddAsync(imageUpload);
                 }
             }
             await _unitOfWork.SaveAsync();
-
-            return _mapper.Map<ServiceDto>(rsServiceCreate);
+            var serviceDto = _mapper.Map<ServiceDto>(rsServiceCreate);
+            return serviceDto;
         }
 
         public async Task<ServiceDto> GetServiceByIdAsync(Guid id)
@@ -130,46 +130,69 @@ namespace BusinessLogic.Services
             );
             var errors = new Dictionary<string, string[]>();
 
+            int newUrlCount = serviceUpdateDto.ImageUrls?.Count ?? 0;
+            int newUrlPublicIdCount = serviceUpdateDto.ImagePublicIds?.Count ?? 0;
+
             if (service == null)
             {
                 errors.Add(ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND });
                 throw new CustomValidationException(errors);
             }
-
-            if (serviceUpdateDto.Images != null)
+            if (newUrlCount != newUrlPublicIdCount)
             {
-                if (serviceUpdateDto.Images.Count > 5 - service.Images?.Count)
-                {
-                    errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE });
-                }
-                if (serviceUpdateDto.Images.Any(i => i.Length > 5 * 1024 * 1024))
-                {
-                    errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-                }
+                errors.Add(ERROR_SERVICE, new[] { ERROR_URL_MISMATCH });
             }
-
+            if (newUrlCount > 5)
+            {
+                errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE });
+            }
             if (errors.Any())
             {
                 throw new CustomValidationException(errors);
             }
 
             _mapper.Map(serviceUpdateDto, service);
+
+            //Vars Handle delete images
+            var existingImages = service.Images?.ToList() ?? new List<Image>();
+            var existingPublicImageIds = existingImages
+                .Select(i => i.PublicId)
+                .Where(p => p != null)
+                .ToHashSet();
+
+            var incomingPublicIds = (
+                serviceUpdateDto.ImagePublicIds ?? new List<string>()
+            ).ToHashSet();
+
+            var incomingDelete = existingImages
+                .Where(i => i.PublicId != null && !incomingPublicIds.Contains(i.PublicId))
+                .ToList();
+
             // Delete old images
-            if (serviceUpdateDto.Images != null)
+            foreach (var image in incomingDelete)
             {
-                foreach (var image in serviceUpdateDto.Images)
+                if (image.PublicId != null)
                 {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+                _unitOfWork.ImageRepository.Remove(image);
+            }
+            //Add new images
+            if (newUrlCount > 0)
+            {
+                for (int i = 0; i < newUrlPublicIdCount; i++)
+                {
+                    if (existingPublicImageIds.Contains(serviceUpdateDto.ImagePublicIds![i]))
+                        continue;
+
                     Image imageUpload = new Image
                     {
                         ImageID = Guid.NewGuid(),
                         ServiceID = service.ServiceID,
-                        ImageUrl = "",
+                        ImageUrl = serviceUpdateDto.ImageUrls![i],
+                        PublicId = serviceUpdateDto.ImagePublicIds![i],
                     };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/Service",
-                        imageUpload
-                    );
+                    await _unitOfWork.ImageRepository.AddAsync(imageUpload);
                 }
             }
             await _unitOfWork.SaveAsync();

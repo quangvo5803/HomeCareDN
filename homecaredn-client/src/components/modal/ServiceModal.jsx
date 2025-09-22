@@ -6,7 +6,7 @@ import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
-
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
 import 'tinymce/tinymce';
@@ -22,7 +22,7 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
 //For TINY MCE
 
-export default function ServiceModal({ isOpen, onClose, onSave, service }) {
+export default function ServiceModal({ isOpen, onClose, onSave, service, setUploadProgress, }) {
   const { t } = useTranslation();
   const enums = useEnums();
   const { deleteServiceImage } = useService();
@@ -57,8 +57,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
           (service.imageUrls || []).map((url) => ({
             url,
             isNew: false,
-          }))
-        );
+          })))
+        setUploadProgress(0);
       } else {
         setName('');
         setNameEN('');
@@ -70,9 +70,10 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
         setMainStructureType('');
         setDesignStyle('');
         setImages([]);
+        setUploadProgress(0);
       }
     }
-  }, [isOpen, service]);
+  }, [isOpen, service, setUploadProgress]);
 
   // Xử lý chọn file
   const handleFileChange = (e) => {
@@ -82,13 +83,13 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
-    const mappedFiles = files.map((f) => ({
+    const mappedFiles = files.map(f => ({
       file: f,
       url: URL.createObjectURL(f),
       isNew: true,
     }));
 
-    setImages((prev) => [...prev, ...mappedFiles]);
+    setImages(prev => [...prev, ...mappedFiles]);
   };
 
   // Xoá ảnh DB
@@ -104,7 +105,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
         if (onSuccess) onSuccess();
         if (service) {
           service.imageUrls = service.imageUrls.filter(
-            (url) => url !== imageUrl
+            url => url !== imageUrl
           );
         }
       },
@@ -113,7 +114,10 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
 
   // Xoá ảnh chung (local hoặc DB)
   const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.url !== img.url));
+    setImages(prev => prev.filter(i  => i.url !== img.url));
+    if (!img.isNew && service) {
+      service.imageUrls = service.imageUrls.filter(url => url !== img.url);
+    }
   };
 
   const handleDeleteImage = (img) => {
@@ -128,7 +132,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_SERVICENAME'));
       return;
@@ -159,12 +163,43 @@ export default function ServiceModal({ isOpen, onClose, onSave, service }) {
     }
 
     // chỉ gửi ảnh local
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
-    if (newFiles.length > 0) {
-      data.Images = newFiles;
-    }
 
+    const keptOldImageUrls = images.filter(i => !i.isNew).map(i => i.url);
+    const keptOldImagePublicIds = images.filter(i => !i.isNew).map(i => i.publicId).filter(Boolean);
+
+    const newFiles = images.filter(i => i.isNew).map((i) => i.file);
+
+    
+    let newImageUrls = [];
+    let newImagePublicIds = [];
+
+    if (newFiles.length > 0) {
+        const uploaded = await uploadImageToCloudinary(
+          newFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => setUploadProgress(percent),
+          'HomeCareDN/Service'
+        );
+        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
+        newImageUrls = uploadedArray.map(u => u.url);
+        newImagePublicIds = uploadedArray.map(u => u.publicId);
+
+        onClose();
+        setUploadProgress(0);
+    }
+      data.ImageUrls = [...keptOldImageUrls, ...newImageUrls];
+      data.ImagePublicIds = [...keptOldImagePublicIds, ...newImagePublicIds];
+      if (data.ImageUrls.length > 5) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      if (data.ImageUrls.length !== data.ImagePublicIds.length) {
+        toast.error(t('ERROR.IMAGE_URLS_PUBLICIDS_MISMATCH'));
+        return;
+      }
     onSave(data);
+    onClose();
+    setUploadProgress(0);
   };
 
   if (!isOpen) return null;
@@ -476,6 +511,7 @@ ServiceModal.propTypes = {
     designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     imageUrls: PropTypes.array,
   }),
+    setUploadProgress: PropTypes.func.isRequired,
 };
 
 // Default props
