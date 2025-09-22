@@ -244,6 +244,7 @@ CategoryModal.propTypes = {
     categoryLogo: PropTypes.string,
     isActive: PropTypes.bool,
   }),
+  setUploadProgress: PropTypes.func.isRequired,
 };
 
 // Default props
