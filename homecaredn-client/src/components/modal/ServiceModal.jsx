@@ -37,7 +37,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   const [mainStructureType, setMainStructureType] = useState('');
   const [designStyle, setDesignStyle] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-
   const [images, setImages] = useState([]);
 
   // Fill dữ liệu khi mở modal
@@ -54,8 +53,9 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setMainStructureType(service.mainStructureType ?? '');
         setDesignStyle(service.designStyle ?? '');
         setImages(
-          (service.imageUrls || []).map((url) => ({
+          (service.imageUrls || []).map((url, idx) => ({
             url,
+            publicId: service.imagePublicIds?.[idx] || '',
             isNew: false,
           })))
         setUploadProgress(0);
@@ -71,6 +71,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setDesignStyle('');
         setImages([]);
         setUploadProgress(0);
+
       }
     }
   }, [isOpen, service, setUploadProgress]);
@@ -78,7 +79,9 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   // Xử lý chọn file
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    const totalCount = images.length + files.length;
+    const keptCount = images.filter(i => !i.isNew).length;
+
+    const totalCount = keptCount + files.length;
     if (totalCount > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
@@ -88,7 +91,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       url: URL.createObjectURL(f),
       isNew: true,
     }));
-
     setImages(prev => [...prev, ...mappedFiles]);
   };
 
@@ -103,11 +105,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         Swal.close();
         toast.success(t('SUCCESS.DELETE'));
         if (onSuccess) onSuccess();
-        if (service) {
-          service.imageUrls = service.imageUrls.filter(
-            url => url !== imageUrl
-          );
-        }
+        removeImageFromState({url: imageUrl, isNew: false});
       },
     });
   };
@@ -116,7 +114,9 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   const removeImageFromState = (img) => {
     setImages(prev => prev.filter(i  => i.url !== img.url));
     if (!img.isNew && service) {
-      service.imageUrls = service.imageUrls.filter(url => url !== img.url);
+      const idx = service.imageUrls.indexOf(img.url);
+      service.imageUrls.splice(idx, 1);
+      service.imagePublicIds.splice(idx, 1);
     }
   };
 
@@ -163,11 +163,12 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
     }
 
     // chỉ gửi ảnh local
+    const keptOld = images.filter(i => !i.isNew);
+    const newFiles = images.filter(i => i.isNew).map(i => i.file);
 
-    const keptOldImageUrls = images.filter(i => !i.isNew).map(i => i.url);
-    const keptOldImagePublicIds = images.filter(i => !i.isNew).map(i => i.publicId).filter(Boolean);
 
-    const newFiles = images.filter(i => i.isNew).map((i) => i.file);
+    const keptOldImageUrls = keptOld.map(i => i.url);
+    const keptOldImagePublicIds = keptOld.map(i => i.publicId || '');
 
     
     let newImageUrls = [];
@@ -183,9 +184,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         newImageUrls = uploadedArray.map(u => u.url);
         newImagePublicIds = uploadedArray.map(u => u.publicId);
-
-        onClose();
-        setUploadProgress(0);
     }
       data.ImageUrls = [...keptOldImageUrls, ...newImageUrls];
       data.ImagePublicIds = [...keptOldImagePublicIds, ...newImagePublicIds];
@@ -197,7 +195,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         toast.error(t('ERROR.IMAGE_URLS_PUBLICIDS_MISMATCH'));
         return;
       }
-    onSave(data);
+    await onSave(data);
     onClose();
     setUploadProgress(0);
   };
@@ -509,7 +507,8 @@ ServiceModal.propTypes = {
       PropTypes.number,
     ]),
     designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    imageUrls: PropTypes.array,
+    imageUrls: PropTypes.array.isRequired,
+    imagePublicIds: PropTypes.array.isRequired,
   }),
     setUploadProgress: PropTypes.func.isRequired,
 };
