@@ -10,6 +10,8 @@ namespace BusinessLogic.DTOs.Application.Category
         public required string CategoryLogo { get; set; }
         public required Guid UserID { get; set; }
         public bool IsActive { get; set; }
+        public required string CategoryLogoUrl { get; set; }
+        public required string CategoryLogoPublicId { get; set; }
 
         // Danh sách materials thuộc category này
         public ICollection<MaterialDto>? Materials { get; set; }

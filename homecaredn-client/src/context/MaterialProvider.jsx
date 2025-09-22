@@ -21,11 +21,15 @@ export const MaterialProvider = ({ children }) => {
           PageNumber,
           PageSize,
           SortBy,
-          FilterID
+          FilterID,
         });
-        setMaterials(data.items || []);
+        const itemsWithType = (data.items || []).map((m) => ({
+          ...m,
+          type: 'material',
+        }));
+        setMaterials(itemsWithType);
         setTotalMaterials(data.totalCount || 0);
-        return data;
+        return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
         return { items: [], totalCount: 0 };
@@ -81,6 +85,7 @@ export const MaterialProvider = ({ children }) => {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
         // Tăng tổng số material
+        setMaterials((prev) => [...prev, newMaterial]);
         setTotalMaterials((prev) => prev + 1);
         return newMaterial;
       } catch (err) {
@@ -104,10 +109,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                ...m,
-                ...updated,
-                images: updated.images ?? m.images,
-              }
+                  ...m,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? m.imageUrls,
+                }
               : m
           )
         );
@@ -139,17 +144,17 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(
-    async (materialId, imageId) => {
+    async (materialId, imageUrl) => {
       if (user?.role !== 'Distributor') throw new Error('Unauthorized');
       try {
-        await materialService.deleteMaterialImage(materialId, imageId);
+        await materialService.deleteMaterialImage(imageUrl);
 
         // update materials
         const updateImages = (m) => {
           if (m.materialID !== materialId) return m;
           return {
             ...m,
-            images: m.images.filter((img) => img.imageID !== imageId),
+            imageUrls: m.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
           };
         };
 

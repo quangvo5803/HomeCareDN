@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
@@ -19,7 +18,6 @@ namespace BusinessLogic.Services
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
-        private const string ERROR_IMAGE_NOT_FOUND = "IMAGE_NOT_FOUND";
         private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
         public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
@@ -40,6 +38,7 @@ namespace BusinessLogic.Services
                 query = query.Where(m => m.CategoryID == parameters.FilterID.Value);
             }
             var totalCount = await query.CountAsync();
+
             query = parameters.SortBy?.ToLower() switch
             {
                 "materialname" => query.OrderBy(m => m.Name),
@@ -47,12 +46,13 @@ namespace BusinessLogic.Services
                 "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
                 "random" => query.OrderBy(b => Guid.NewGuid()),
-                _ => query.OrderBy(b => b.NameEN),
+                _ => query.OrderBy(m => m.NameEN ?? m.Name),
             };
-            var items = await query
+            query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize)
-                .ToListAsync();
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
             return new PagedResultDto<MaterialDto>
             {
                 Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
@@ -68,7 +68,7 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
-            );            
+            );
             query = query.Where(m => m.UserID == parameters.FilterID.ToString());
             var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch
@@ -83,7 +83,7 @@ namespace BusinessLogic.Services
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
-                .ToListAsync(); 
+                .ToListAsync();
             return new PagedResultDto<MaterialDto>
             {
                 Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
@@ -95,14 +95,17 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
-            //check image
-            ValidateImages(requestDto.Images);
-
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
+            //check image
+            ValidateImages(requestDto.ImageUrls);
 
             //upload image
-            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(
+                material.MaterialID, 
+                requestDto.ImageUrls, 
+                requestDto.ImagePublicIds
+            );
 
             await _unitOfWork.SaveAsync();
 
@@ -134,9 +137,10 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> GetMaterialByCategoryAsync(Guid id)
         {
-            var material = await _unitOfWork
-                .MaterialRepository.GetAsync(m => m.CategoryID == id, 
-                includeProperties: MATERIAL_INCLUDE);
+            var material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.CategoryID == id,
+                includeProperties: MATERIAL_INCLUDE
+            );
             if (material == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -150,10 +154,11 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> GetMaterialByBrandAsync(Guid id)
         {
-            var material = await _unitOfWork
-                .MaterialRepository.GetAsync(m => m.BrandID == id, 
-                includeProperties: MATERIAL_INCLUDE);
-            
+            var material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.BrandID == id,
+                includeProperties: MATERIAL_INCLUDE
+            );
+
             if (material == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -173,14 +178,22 @@ namespace BusinessLogic.Services
             );
 
             //check image
-            ValidateImages(requestDto.Images, material!.Images?.Count ?? 0);
+            ValidateImages(requestDto.ImageUrls, material!.Images?.Count ?? 0);
 
             _mapper.Map(requestDto, material);
 
             //upload image
-            await UploadMaterialImagesAsync(material.MaterialID, requestDto.Images);
+            await UploadMaterialImagesAsync(
+                material.MaterialID, 
+                requestDto.ImageUrls, 
+                requestDto.ImagePublicIds
+            );
 
             await _unitOfWork.SaveAsync();
+            material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == requestDto.MaterialID,
+                includeProperties: MATERIAL_INCLUDE
+            );
             return _mapper.Map<MaterialDto>(material);
         }
 
@@ -210,26 +223,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task DeleteMaterialImageAsync(string imageUrl)
-        {
-            var request = await _unitOfWork.ImageRepository.GetAsync(img =>
-                img.ImageUrl == imageUrl
-            );
-
-            if (request == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ImageUrl", new[] { ERROR_IMAGE_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
-            await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
-            await _unitOfWork.SaveAsync();
-        }
-
-        private static void ValidateImages(ICollection<IFormFile>? images, int existingCount = 0)
+        private static void ValidateImages(ICollection<string>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();
 
@@ -255,23 +249,24 @@ namespace BusinessLogic.Services
 
         private async Task UploadMaterialImagesAsync(
             Guid materialId,
-            ICollection<IFormFile>? images
+            ICollection<string>? imageUrls,
+            ICollection<string>? publicIds
         )
         {
-            foreach (var image in images ?? Enumerable.Empty<IFormFile>())
+            if (imageUrls == null || !imageUrls.Any()) return;
+
+            var ids = publicIds?.ToList() ?? new List<string>();
+
+            var images = imageUrls.Select((url, i) => new Image
             {
-                var imageUpload = new Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    MaterialID = materialId,
-                    ImageUrl = "",
-                };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    image,
-                    "HomeCareDN/Material",
-                    imageUpload
-                );
-            }
+                ImageID = Guid.NewGuid(),
+                MaterialID = materialId,
+                ImageUrl = url,
+                PublicId = i < ids.Count ? ids[i] : string.Empty
+            }).ToList();
+
+            await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
+
     }
 }

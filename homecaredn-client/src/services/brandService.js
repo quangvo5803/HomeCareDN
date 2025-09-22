@@ -22,7 +22,9 @@ export const brandService = {
     if (dto.BrandNameEN) formData.append('BrandNameEN', dto.BrandNameEN);
     if (dto.BrandDescriptionEN)
       formData.append('BrandDescriptionEN', dto.BrandDescriptionEN);
-    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
+    if (dto.BrandLogoUrl) formData.append('BrandLogoUrl', dto.BrandLogoUrl);
+    if (dto.BrandLogoPublicId)
+      formData.append('BrandLogoPublicId', dto.BrandLogoPublicId);
 
     const response = await api.post('/Admin/create-brand', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -39,8 +41,9 @@ export const brandService = {
     if (dto.BrandNameEN) formData.append('BrandNameEN', dto.BrandNameEN);
     if (dto.BrandDescriptionEN)
       formData.append('BrandDescriptionEN', dto.BrandDescriptionEN);
-    if (dto.LogoFile) formData.append('LogoFile', dto.LogoFile);
-
+    if (dto.BrandLogoUrl) formData.append('BrandLogoUrl', dto.BrandLogoUrl);
+    if (dto.BrandLogoPublicId)
+      formData.append('BrandLogoPublicId', dto.BrandLogoPublicId);
     const response = await api.put('/Admin/update-brand', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

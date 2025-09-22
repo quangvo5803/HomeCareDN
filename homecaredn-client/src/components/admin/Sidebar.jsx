@@ -16,19 +16,19 @@ export default function Sidebar() {
       link: '/Admin',
     },
     {
-      icon: 'text-sky-600 fa-solid fa-globe',
+      icon: 'text-orange-600 fa-solid fa-star',
       title: 'brand',
       link: '/Admin/BrandManager',
     },
     {
-      icon: 'text-violet-600 fa-solid fa-layer-group',
+      icon: 'text-blue-600 fa-solid fa-tags',
       title: 'category',
       link: '/Admin/CategoryManager',
     },
     {
-      icon: 'text-rose-600 fa-solid fa-code-pull-request',
+      icon: 'text-rose-600 fa-solid fa-gear',
       title: 'service',
-      link: '/Admin/Service',
+      link: '/Admin/ServiceManager',
     },
     {
       icon: 'text-amber-600 fa-solid fa-truck',
@@ -39,7 +39,8 @@ export default function Sidebar() {
       icon: 'text-orange-600 fa-solid fa-suitcase',
       title: 'material',
       link: '/Admin/Material',
-    },{
+    },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',
@@ -51,7 +52,7 @@ export default function Sidebar() {
       <div className="h-20 flex items-center justify-center">
         <a
           className="block m-0 text-sm whitespace-nowrap text-slate-700"
-          href="/AdminDashboard"
+          href="/Admin"
         >
           <img
             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png"

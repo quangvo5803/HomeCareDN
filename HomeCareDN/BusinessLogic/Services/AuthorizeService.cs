@@ -33,7 +33,8 @@ namespace BusinessLogic.Services
 
         private const string ACCOUNT_STR = "Account";
         private const string REFRESH_TOKEN_STR = "refreshToken";
-        private const string LOGIN_TOKEN_EXPIRED_STR = "LOGIN_TOKEN_EXPIRED";
+        private const string LOGIN_TOKEN_EXPIRED = "LOGIN_TOKEN_EXPIRED";
+        private const string COOKIE_NOT_FOUND = "COOKIE_NOT_FOUND";
 
         public AuthorizeService(
             UserManager<ApplicationUser> userManager,
@@ -227,10 +228,7 @@ namespace BusinessLogic.Services
             var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
             if (string.IsNullOrEmpty(cookieToken))
                 throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
-                    }
+                    new Dictionary<string, string[]> { { ACCOUNT_STR, new[] { COOKIE_NOT_FOUND } } }
                 );
 
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
@@ -238,7 +236,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED } },
                     }
                 );
 
@@ -248,7 +246,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED } },
                     }
                 );
 
@@ -412,10 +410,7 @@ namespace BusinessLogic.Services
             var cookieToken = _httpContextAccessor.HttpContext.Request.Cookies[REFRESH_TOKEN_STR];
             if (string.IsNullOrEmpty(cookieToken))
                 throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
-                    }
+                    new Dictionary<string, string[]> { { ACCOUNT_STR, new[] { COOKIE_NOT_FOUND } } }
                 );
 
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(cookieToken);
@@ -423,7 +418,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED_STR } },
+                        { ACCOUNT_STR, new[] { LOGIN_TOKEN_EXPIRED } },
                     }
                 );
 

@@ -6,6 +6,7 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
+using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace BusinessLogic.Services
 {
@@ -36,6 +37,7 @@ namespace BusinessLogic.Services
             }
 
             var totalCount = await query.CountAsync();
+
             query = parameters.SortBy?.ToLower() switch
             {
                 "categoryname" => query.OrderBy(c => c.CategoryName),
@@ -45,10 +47,12 @@ namespace BusinessLogic.Services
                 "random" => query.OrderBy(c => Guid.NewGuid()),
                 _ => query.OrderBy(c => c.CategoryID),
             };
-            var items = await query
+
+            query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize)
-                .ToListAsync();
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
 
             var dtos = _mapper.Map<IEnumerable<CategoryDto>>(items);
             return new PagedResultDto<CategoryDto>
@@ -81,32 +85,23 @@ namespace BusinessLogic.Services
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
             var category = _mapper.Map<Category>(requestDto);
+            category.CategoryID = Guid.NewGuid();
 
-            await _unitOfWork.CategoryRepository.AddAsync(category);
-            if (requestDto.LogoFile != null)
+            Image imageUpload = new Image
             {
-                var errors = new Dictionary<string, string[]>();
-                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
-                {
-                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-                    throw new CustomValidationException(errors);
-                }
-                Image imageUpload = new Image
-                {
-                    ImageID = Guid.NewGuid(),
-                    CategoryID = category.CategoryID,
-                    ImageUrl = "",
-                };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    requestDto.LogoFile,
-                    "HomeCareDN/CategoryLogo",
-                    imageUpload
-                );
-                category.CategoryLogoID = imageUpload.ImageID;
-            }
-            await _unitOfWork.SaveAsync();
+                ImageID = Guid.NewGuid(),
+                CategoryID = category.CategoryID,
+                ImageUrl = requestDto.CategoryLogoUrl,
+                PublicId = requestDto.CategoryLogoPublicId,
+            };
+            category.CategoryLogoID = imageUpload.ImageID;
 
-            return _mapper.Map<CategoryDto>(category);
+            await _unitOfWork.ImageRepository.AddAsync(imageUpload);
+            await _unitOfWork.CategoryRepository.AddAsync(category);
+
+            await _unitOfWork.SaveAsync();
+            var categoryDto = _mapper.Map<CategoryDto>(category);
+            return categoryDto;
         }
 
         public async Task<CategoryDto> UpdateCategoryAsync(CategoryUpdateRequestDto requestDto)
@@ -123,35 +118,34 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             _mapper.Map(requestDto, category);
-            if (requestDto.LogoFile != null)
+            if (
+                !string.IsNullOrEmpty(requestDto.CategoryLogoUrl)
+                && !string.IsNullOrEmpty(requestDto.CategoryLogoPublicId)
+            )
             {
-                if (requestDto.LogoFile.Length > 5 * 1024 * 1024)
+                if (category.CategoryLogoID.HasValue)
                 {
-                    errors.Add("LogoFile", new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-                    throw new CustomValidationException(errors);
+                    var oldImage = await _unitOfWork.ImageRepository.GetAsync(i =>
+                        i.ImageID == category.CategoryLogoID.Value
+                    );
+                    if (oldImage != null)
+                    {
+                        await _unitOfWork.ImageRepository.DeleteImageAsync(oldImage.PublicId);
+                    }
                 }
-                var existingImage = await _unitOfWork.ImageRepository.GetAsync(img =>
-                    img.CategoryID == category.CategoryID
-                );
-                if (existingImage != null)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(existingImage.PublicId);
-                }
-                Image imageUpload = new Image
+                var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
-                    CategoryID = category.CategoryID,
-                    ImageUrl = "",
+                    CategoryID = category.CategoryLogoID,
+                    ImageUrl = requestDto.CategoryLogoUrl,
+                    PublicId = requestDto.CategoryLogoPublicId,
                 };
-                await _unitOfWork.ImageRepository.UploadImageAsync(
-                    requestDto.LogoFile,
-                    "HomeCareDN/CategoryLogo",
-                    imageUpload
-                );
+
+                await _unitOfWork.ImageRepository.AddAsync(imageUpload);
                 category.CategoryLogoID = imageUpload.ImageID;
             }
-            await _unitOfWork.SaveAsync();
 
+            await _unitOfWork.SaveAsync();
             return _mapper.Map<CategoryDto>(category);
         }
 

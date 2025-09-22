@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import SupportChatWidget from "../components/SupportChatWidget";
+import SupportChatWidget from '../components/SupportChatWidget';
 import { useMaterial } from '../hook/useMaterial';
+import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
-import MaterialItem from '../components/MaterialItem';
+import CardItem from '../components/CardItem';
 const slides = [
   {
     id: 1,
@@ -85,57 +86,6 @@ const ITEMS = [
   { title: 'home.features_item4_title', desc: 'home.features_item_desc' },
 ];
 
-const SERVICE_ITEMS = [
-  {
-    id: 'build',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-1_dswhst.jpg',
-    titleKey: 'Building Construction',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'maintain',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-2_tmscpu.jpg',
-    titleKey: 'Home Maintainance',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'reno-paint',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-3_sqc14e.jpg',
-    titleKey: 'Renovation and Painting',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'wiring',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-4_swwy8b.jpg',
-    titleKey: 'Wiring and installation',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'tiling-paint',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-5_hxqszr.jpg',
-    titleKey: 'Tiling and Painting',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-  {
-    id: 'interior',
-    img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749355179/service-6_lyqrs4.jpg',
-    titleKey: 'Interior Design',
-    descKey:
-      'Tempor erat elitr rebum at clita dolor diam ipsum sit diam amet diam et eos',
-    href: '#',
-  },
-];
-
 const TESTIMONIALS = [
   {
     id: '1',
@@ -152,26 +102,44 @@ const TESTIMONIALS = [
     roleKey: 'home.testimonial2_role',
   },
 ];
-
 export default function Home() {
   const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
+  const [randomServices, setRandomServices] = useState([]);
   const { fetchMaterials } = useMaterial();
+  const { fetchServices } = useService();
 
   useEffect(() => {
     const loadMaterials = async () => {
       try {
-        const data = await fetchMaterials({ PageNumber: 1, PageSize: 6, SortBy: "random" });
-        setRandomMaterials(data.items || []);
+        const data = await fetchMaterials({
+          PageNumber: 1,
+          PageSize: 6,
+          SortBy: 'random',
+        });
+
+        setRandomMaterials(data || []);
       } catch (err) {
         console.error(err);
         setRandomMaterials([]);
       }
     };
-
+    const loadServices = async () => {
+      try {
+        const data = await fetchServices({
+          PageNumber: 1,
+          PageSize: 6,
+          SortBy: 'random',
+        });
+        setRandomServices(data || []);
+      } catch (err) {
+        console.error(err);
+        setRandomServices([]);
+      }
+    };
     loadMaterials();
-  }, [fetchMaterials]);
-
+    loadServices();
+  }, [fetchMaterials, fetchServices]);
 
   // Carousel state
   const [current, setCurrent] = useState(0);
@@ -201,10 +169,10 @@ export default function Home() {
   // 👉 tạo extSlides với id mới để tránh trùng key
   const extSlides = hasMany
     ? [
-      { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
-      ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
-      { ...baseSlides[0], cloneId: 'tail' },
-    ]
+        { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
+        ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
+        { ...baseSlides[0], cloneId: 'tail' },
+      ]
     : baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` }));
 
   const [idx, setIdx] = useState(hasMany ? 1 : 0);
@@ -265,14 +233,16 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center bg-gradient-to-t from-black/70 via-black/40 to-black/10">
                 <div className="container px-6 mx-auto text-left md:px-20">
                   <h5
-                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.subtitle)}
                   </h5>
                   <h1
-                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.title)}
                   </h1>
@@ -418,9 +388,7 @@ export default function Home() {
                         window.location.reload();
                       }}
                       className="inline-flex items-center gap-2 mt-6 text-sm font-semibold tracking-wide text-white transition-colors hover:text-primary "
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(
-                        it.titleKey
-                      )}`}
+                      aria-label={`${t('BUTTON.ReadMore')} ${t(it.titleKey)}`}
                     >
                       {t(it.ctaKey)}
                       <svg
@@ -536,56 +504,19 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {SERVICE_ITEMS.map((it) => (
-                <article
-                  key={it.id}
-                  className="h-full overflow-hidden transition shadow-sm group bg-gray-50 rounded-xl hover:shadow-md "
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={it.img}
-                      alt={t(it.titleKey)}
-                      className="w-full h-56 object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-
-                  <div className="p-5 text-center transition-colors duration-300 group-hover:bg-orange-400 group-hover:text-white">
-                    <h5 className="mb-2 text-lg font-semibold">
-                      {t(it.titleKey)}
-                    </h5>
-                    <p className="mb-4 text-gray-600 group-hover:text-white">
-                      {t(it.descKey)}
-                    </p>
-
-                    <a
-                      href={it.href}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-orange-500 underline-offset-4 decoration-orange-400 hover:decoration-white group-hover:text-white"
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(
-                        it.titleKey
-                      )}`}
-                    >
-                      {t('BUTTON.ReadMore')}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-                      </svg>
-                    </a>
-                  </div>
-                </article>
-              ))}
+              {randomServices.length === 0 ? (
+                <p></p>
+              ) : (
+                randomServices.map((item) => (
+                  <CardItem key={item.serviceID} item={item} />
+                ))
+              )}
             </div>
           </div>
         </section>
       </Reveal>
 
-      {/*Material  */}
+      {/* Material */}
       <Reveal>
         <section className="py-12">
           <div className="container px-6 mx-auto max-w-7xl">
@@ -612,13 +543,13 @@ export default function Home() {
               </div>
             </div>
 
-            {/* grid */}
+            {/* Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {randomMaterials.length === 0 ? (
                 <p></p>
               ) : (
                 randomMaterials.map((item) => (
-                  <MaterialItem key={item.materialID} item={item} />
+                  <CardItem key={item.materialID} item={item} />
                 ))
               )}
             </div>
@@ -712,8 +643,9 @@ export default function Home() {
               >
                 <div className="relative overflow-hidden">
                   <div
-                    className={`flex ${anim ? 'transition-transform duration-700 ease-out' : ''
-                      }`}
+                    className={`flex ${
+                      anim ? 'transition-transform duration-700 ease-out' : ''
+                    }`}
                     style={{ transform: `translateX(-${idx * 100}%)` }}
                     onTransitionEnd={handleTransitionEnd}
                   >
@@ -810,10 +742,11 @@ export default function Home() {
         aria-label="Back to top"
         className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${showBackTop
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-3 pointer-events-none'
-          }`}
+                    ${
+                      showBackTop
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-3 pointer-events-none'
+                    }`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

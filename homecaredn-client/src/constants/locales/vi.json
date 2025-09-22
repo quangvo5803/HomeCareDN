@@ -477,6 +477,44 @@
       "isActive": "Kích hoạt danh mục"
     }
   },
+  "adminServiceManager": {
+    "title": "Quản lý dịch vụ",
+    "subtitle": "Quản lý danh sách các dịch vụ",
+    "services": "dịch vụ",
+    "no": "STT",
+    "serviceName": "Tên dịch vụ",
+    "numberOfRequest": "Số lượng yêu cầu",
+    "requests": "yêu cầu",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noService": "Chưa có dịch vụ nào",
+    "letStart": "Bắt đầu bằng cách thêm dịch vụ đầu tiên của bạn",
+    "serviceModal": {
+      "title": "Thêm dịch vụ mới",
+      "title2": "Cập nhật dịch vụ",
+      "serviceName": "Tên dịch vụ",
+      "serviceNamePlaceholder": "Nhập tên dịch vụ...",
+      "serviceDescription": "Mô tả dịch vụ",
+      "serviceDescriptionPlaceholder": "Nhập mô tả dịch vụ...",
+      "serviceNameEN": "Tên dịch vụ (Tiếng Anh)",
+      "serviceNamePlaceholderEN": "Nhập tên dịch vụ bằng tiếng Anh...",
+      "serviceDescriptionEN": "Mô tả dịch vụ (Tiếng Anh)",
+      "serviceDescriptionPlaceholderEN": "Nhập mô tả dịch vụ bằng tiếng Anh...",
+      "multilanguage_for_data": "Đa ngôn cho dữ liệu",
+      "serviceType": "Loại dịch vụ",
+      "serviceTypePlaceholder": "Chọn loại dịch vụ",
+      "packageOption": "Gói dịch vụ",
+      "packageOptionPlaceholder": "Chọn gói dịch vụ",
+      "mainStructureType": "Loại kết cấu chính",
+      "mainStructureTypePlaceholder": "Chọn loại kết cấu chính",
+      "designStyle": "Phong cách thiết kế",
+      "designStylePlaceholder": "Chọn phong cách thiết kế",
+      "buildType": "Loại xây dựng",
+      "buildTypePlaceholder": "Chọn loại xây dựng",
+      "serviceImage": "Hình ảnh dịch vụ",
+      "chooseFiles": "Chọn tệp tải lên"
+    }
+  },
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",
     "subtitle": "Yêu cầu từ khách hàng",
@@ -537,6 +575,8 @@
     "UpdateCategory": "Cập nhật danh mục",
     "AddNewMaterial": "Thêm vật liệu",
     "UpdateMaterial": "Cập nhật vật liệu",
+    "AddNewService": "Thêm dịch vụ",
+    "UpdateService": "Cập nhật dịch vụ",
     "AddNewRequest": "Tạo và thêm yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
@@ -575,17 +615,23 @@
       "title": "Bạn có chắc chắn?",
       "text": "Vật liệu này sẽ bị xóa và không thể khôi phục!"
     },
-    "DeleteMaterialImageModal": {
+
+    "DeleteServiceModal": {
       "title": "Bạn có chắc chắn?",
-      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
+      "text": "Dịch vụ này sẽ bị xóa và không thể khôi phục!"
     },
-        "DeletingLoadingModal": {
-      "title": "Đang xóa...",
-      "text": "Vui lòng chờ trong giây lát."
-    },
+
     "DeleteAddressModal": {
       "title": "Xóa địa chỉ này?",
       "text": "Hành động này không thể hoàn tác."
+    },
+    "DeletingLoadingModal": {
+      "title": "Đang xóa...",
+      "text": "Vui lòng chờ trong giây lát."
+    },
+    "DeleteImageModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
 
   },
@@ -606,12 +652,14 @@
     "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
     "ADDRESS_MAX": "Bạn chỉ có thể thêm tối đa 5 địa chỉ.",
-
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-    "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
-    "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
+
+
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
+
+    "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
+    "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
 
@@ -623,9 +671,11 @@
     "REQUIRED_MATERIAL_UNIT": "Vui lòng nhập đơn vị vật liệu.",
     "REQUIRED_MATERIAL_BRAND": "Vui lòng chọn thương hiệu.",
     "REQUIRED_MATERIAL_CATEGORY": "Vui lòng chọn danh mục.",
+    "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
+    "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
+    "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
 
-    "REQUIRED_MATERIAL_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 hình ảnh!",
-
+    "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
     "DELETE_ERROR": "Đã có lỗi xảy ra khi xóa. Vui lòng thử lại sau.",
@@ -644,12 +694,60 @@
     "MATERIAL_UPDATE": "Cập nhật vật liệu thành công.",
     "PROFILE_UPDATE": "Cập nhật hồ sơ thành công.",
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
-    "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công."
+    "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
+    "SERVICE_ADD": "Thêm dịch vụ thành công.",
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",
     "Contractor": "Nhà thầu",
     "Admin": "Quản trị viên",
     "Customer": "Khách hàng"
+  },
+  "Enums": {
+    "ServiceType": {
+      "Construction": "Xây dựng",
+      "Repair": "Sửa chữa",
+      "MaterialOrder": "Đặt vật liệu"
+    },
+    "PackageOption": {
+      "StructureOnly": "Phần thô",
+      "BasicFinish": "Hoàn thiện cơ bản",
+      "FullFinish": "Hoàn thiện đầy đủ",
+      "Other": "Khác"
+    },
+    "BuildingType": {
+      "SingleStoryHouse": "Nhà cấp 4",
+      "Townhouse": "Nhà phố",
+      "RentalHouse": "Nhà cho thuê",
+      "Apartment": "Căn hộ",
+      "Villa": "Biệt thự",
+      "Hotel": "Khách sạn",
+      "Showroom": "Showroom",
+      "School": "Trường học",
+      "Hospital": "Bệnh viện",
+      "Warehouse": "Kho xưởng",
+      "Other": "Khác"
+    },
+    "MainStructure": {
+      "ReinforcedConcrete": "Bê tông cốt thép",
+      "PreEngineeredSteel": "Thép tiền chế",
+      "NaturalWood": "Gỗ tự nhiên",
+      "Prefabricated": "Nhà lắp ghép",
+      "Other": "Khác"
+    },
+    "DesignStyle": {
+      "Modern": "Hiện đại",
+      "Contemporary": "Đương đại",
+      "Minimalist": "Tối giản",
+      "Classic": "Cổ điển",
+      "NeoClassic": "Tân cổ điển",
+      "Indochine": "Đông Dương",
+      "Rustic": "Mộc mạc",
+      "Other": "Khác"
+    }
+  },
+  "toast":{
+      "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   }
 }

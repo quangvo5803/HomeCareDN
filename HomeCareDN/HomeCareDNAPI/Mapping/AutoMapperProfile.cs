@@ -63,8 +63,6 @@ namespace HomeCareDNAPI.Mapping
                 // Ignore Id to prevent overwriting them
                 .ForMember(d => d.Id, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<ServiceUpdateRequestDto, Service>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -77,6 +75,8 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+            CreateMap<ServiceUpdateRequestDto, Service>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -91,6 +91,15 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
                 );
 
             CreateMap<ContractorApplication, ContractorApplicationDto>()
@@ -102,8 +111,9 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(
-                    dest => dest.CategoryID, 
-                    otp => otp.MapFrom(src => src.Category!.CategoryID))
+                    dest => dest.CategoryID,
+                    otp => otp.MapFrom(src => src.Category!.CategoryID)
+                )
                 .ForMember(
                     dest => dest.BrandNameEN,
                     opt => opt.MapFrom(src => src.Brand!.BrandNameEN)
@@ -119,12 +129,28 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt => opt.MapFrom(src =>
+                        src.Images != null
+                            ? src.Images.Select(i => i.PublicId).ToList()
+                            : new List<string>()
+                    )
                 );
+
 
             CreateMap<Category, CategoryDto>()
                 .ForMember(
                     dest => dest.CategoryLogo,
                     opt => opt.MapFrom(src => src.LogoImage!.ImageUrl)
+                )
+                .ForMember(
+                    dest => dest.CategoryLogoPublicId,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
+                        )
                 );
 
             CreateMap<Brand, BrandDto>()
@@ -133,6 +159,13 @@ namespace HomeCareDNAPI.Mapping
                     opt =>
                         opt.MapFrom(src =>
                             src.LogoImage != null ? src.LogoImage.ImageUrl : string.Empty
+                        )
+                )
+                .ForMember(
+                    dest => dest.BrandLogoPublicId,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
                         )
                 )
                 .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
