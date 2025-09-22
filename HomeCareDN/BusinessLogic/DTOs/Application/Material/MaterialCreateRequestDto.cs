@@ -20,7 +20,7 @@ namespace BusinessLogic.DTOs.Application.Material
 
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
-        public List<string>? ImageUrls { get; set; }
-        public List<string>? ImagePublicIds { get; set; }
+        public required List<string> ImageUrls { get; set; }
+        public required List<string> ImagePublicIds { get; set; }
     }
 }
