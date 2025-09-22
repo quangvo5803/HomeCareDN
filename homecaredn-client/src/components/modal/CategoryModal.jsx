@@ -76,11 +76,15 @@ export default function CategoryModal({
         const result = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          () => {},
+          (percent) => {
+            setUploadProgress(percent);
+          },
           'HomeCareDN/CategoryLogo'
         );
         data.CategoryLogoUrl = result.url;
         data.CategoryLogoPublicId = result.publicId;
+        onClose();
+        setUploadProgress(0);
       }
 
       await onSave(data);
