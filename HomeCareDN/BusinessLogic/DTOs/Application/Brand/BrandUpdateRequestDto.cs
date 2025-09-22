@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.Brand
 {
@@ -12,6 +11,7 @@ namespace BusinessLogic.DTOs.Application.Brand
         public string? BrandDescription { get; set; }
         public string? BrandNameEN { get; set; }
         public string? BrandDescriptionEN { get; set; }
-        public IFormFile? LogoFile { get; set; }
+        public string? BrandLogoUrl { get; set; }
+        public string? BrandLogoPublicId { get; set; }
     }
 }

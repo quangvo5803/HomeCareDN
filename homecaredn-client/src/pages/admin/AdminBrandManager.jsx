@@ -13,6 +13,7 @@ export default function AdminBrandManager() {
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const {
     brands,
@@ -51,10 +52,7 @@ export default function AdminBrandManager() {
 
   const handleSave = async (brandData) => {
     if (brandData.BrandID) {
-      await updateBrand(brandData, {
-        PageNumber: currentPage,
-        PageSize: pageSize,
-      });
+      await updateBrand(brandData);
       toast.success(t('SUCCESS.BRAND_UPDATE'));
     } else {
       await createBrand(brandData);
@@ -68,6 +66,7 @@ export default function AdminBrandManager() {
   };
 
   if (loading) return <Loading />;
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
@@ -109,6 +108,7 @@ export default function AdminBrandManager() {
             }}
             onSave={handleSave}
             brand={editingBrand}
+            setUploadProgress={setUploadProgress}
           />
 
           {/* Table */}

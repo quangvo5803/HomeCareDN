@@ -747,5 +747,8 @@
       "Rustic": "Rustic",
       "Other": "Other"
     }
+  },
+  "toast":{
+      "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   }
 }
