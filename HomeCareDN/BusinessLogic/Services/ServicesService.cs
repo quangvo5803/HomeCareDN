@@ -32,8 +32,12 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(includeProperties: "Images");
-            var totalCount = await query.CountAsync();
 
+            query = Enum.TryParse<ServiceType>(parameters.FilterString, true, out var serviceType)
+                    ? query.Where(s => s.ServiceType == serviceType)
+                    : query;
+
+            var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch
             {
                 "servicename" => query.OrderBy(s => s.Name),

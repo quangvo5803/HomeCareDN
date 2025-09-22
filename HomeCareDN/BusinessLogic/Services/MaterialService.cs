@@ -98,7 +98,7 @@ namespace BusinessLogic.Services
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
             //check image
-            ValidateImages(requestDto.ImageUrls);
+            ValidateImages(requestDto.ImageUrls, 0);
 
             //upload image
             await UploadMaterialImagesAsync(
