@@ -13,6 +13,7 @@ export default function AdminServiceManager() {
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const [ uploadProgress, setUploadProgress] = useState(0);
 
   const {
     services,
@@ -62,10 +63,11 @@ export default function AdminServiceManager() {
 
     setIsModalOpen(false);
     setEditingService(null);
+    setUploadProgress(0);
   };
 
   if (loading) return <Loading />;
-
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
       <div className="w-full max-w-full mx-auto">
@@ -106,6 +108,7 @@ export default function AdminServiceManager() {
             }}
             onSave={handleSave}
             service={editingService}
+            setUploadProgress={setUploadProgress}
           />
 
           {/* Table */}

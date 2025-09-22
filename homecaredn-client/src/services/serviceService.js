@@ -1,6 +1,12 @@
 import api from '../api';
 
 // 🔹 Hàm dùng chung để build FormData cho Service
+const appendIf = (fd, key, value) => {
+  if (value !== undefined && value !== null && value !== '') {
+    fd.append(key, value);
+  }
+};
+
 const buildServiceFormData = (service) => {
   const formData = new FormData();
 
@@ -12,8 +18,8 @@ const buildServiceFormData = (service) => {
     'Description',
     'DescriptionEN',
   ];
-  stringFields.forEach((key) => {
-    if (service[key]) formData.append(key, service[key]);
+  stringFields.forEach(key => {
+    appendIf(formData, key, service[key]);
   });
 
   // Những field có thể là number / enum, cần check null/undefined
@@ -25,15 +31,14 @@ const buildServiceFormData = (service) => {
     'DesignStyle',
   ];
   enumFields.forEach((key) => {
-    if (service[key] !== undefined && service[key] !== null) {
+    if (service[key] !== undefined && service[key] !== null && service[key] !== '') {
       formData.append(key, service[key]);
     }
   });
 
   // Images
-  if (service.Images?.length > 0) {
-    service.Images.forEach((file) => formData.append('Images', file));
-  }
+  (service.ImageUrls || []).forEach(ImageUrls => formData.append('ImageUrls', ImageUrls));
+  (service.ImagePublicIds || []).forEach(ImagePublicIds => formData.append('ImagePublicIds', ImagePublicIds));
 
   return formData;
 };

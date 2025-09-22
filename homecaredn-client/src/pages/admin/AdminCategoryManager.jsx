@@ -13,6 +13,7 @@ export default function AdminCategoryManager() {
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const {
     categories,
@@ -54,6 +55,7 @@ export default function AdminCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
+
       toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
@@ -66,6 +68,7 @@ export default function AdminCategoryManager() {
     setEditingCategory(null);
   };
   if (loading) return <Loading />;
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
@@ -107,6 +110,7 @@ export default function AdminCategoryManager() {
             }}
             onSave={handleSave}
             category={editingCategory}
+            setUploadProgress={setUploadProgress}
           />
 
           {/* Table */}
