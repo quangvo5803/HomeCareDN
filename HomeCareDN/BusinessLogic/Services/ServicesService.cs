@@ -69,12 +69,9 @@ namespace BusinessLogic.Services
             if (urlCount != urlPublicIdCount)
                 errors.Add(ERROR_SERVICE, new[] { ERROR_URL_MISMATCH });
 
-            if (serviceCreateDto.ImageUrls != null)
+            if (serviceCreateDto.ImageUrls?.Count > 5)
             {
-                if (serviceCreateDto.ImageUrls.Count > 5)
-                {
-                    errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE });
-                }
+                errors.Add(ERROR_SERVICE, new[] { ERROR_MAXIMUM_IMAGE });
             }
 
             if (errors.Any())
