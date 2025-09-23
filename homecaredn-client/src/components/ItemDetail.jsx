@@ -146,170 +146,184 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             <div className="p-6 space-y-6 lg:p-8">
                                 {/* Nếu là Material */}
                                 {item.type === 'material' && (
-                                    <div className="grid gap-6 md:grid-cols-3">
-                                        {/* Category */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-lg">
-                                                    <i className="text-lg text-blue-600 fa-solid fa-tag"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t(`materialDetail.category`)}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-800">
-                                                        {i18n.language === "vi"
-                                                            ? item.categoryName
-                                                            : item.categoryNameEN || item.categoryName}
-                                                    </p>
+                                    <>
+                                        <div className="grid gap-6 md:grid-cols-3">
+                                            {/* Category */}
+                                            <div className="group">
+                                                <div className="flex items-center mb-2">
+                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-lg">
+                                                        <i className="text-lg text-blue-600 fa-solid fa-tag"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                            {t(`materialDetail.category`)}
+                                                        </p>
+                                                        <p className="font-semibold text-gray-800">
+                                                            {i18n.language === "vi"
+                                                                ? item.categoryName
+                                                                : item.categoryNameEN || item.categoryName}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Brand */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-orange-100 rounded-lg">
-                                                    <i className="text-lg text-orange-600 fa-solid fa-star"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t(`materialDetail.brand`)}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-800">
-                                                        {i18n.language === "vi"
-                                                            ? item.brandName
-                                                            : item.brandNameEN || item.brandName}
-                                                    </p>
+                                            {/* Brand */}
+                                            <div className="group">
+                                                <div className="flex items-center mb-2">
+                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-orange-100 rounded-lg">
+                                                        <i className="text-lg text-orange-600 fa-solid fa-star"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                            {t(`materialDetail.brand`)}
+                                                        </p>
+                                                        <p className="font-semibold text-gray-800">
+                                                            {i18n.language === "vi"
+                                                                ? item.brandName
+                                                                : item.brandNameEN || item.brandName}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        {/* Unit */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                    <i className="text-lg text-green-600 fa-solid fa-scale-balanced"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t(`${item.type}Detail.unit`)}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-900">
-                                                        {i18n.language === "vi"
-                                                            ? item.unit
-                                                            : item.unitEN || item.unit}
-                                                    </p>
+                                            {/* Unit */}
+                                            <div className="group">
+                                                <div className="flex items-center mb-2">
+                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                                                        <i className="text-lg text-green-600 fa-solid fa-scale-balanced"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                            {t(`${item.type}Detail.unit`)}
+                                                        </p>
+                                                        <p className="font-semibold text-gray-900">
+                                                            {i18n.language === "vi"
+                                                                ? item.unit
+                                                                : item.unitEN || item.unit}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
+
                                         </div>
-                                    </div>
+                                        {/* Buttons */}
+                                        <div className="flex flex-col gap-4 mt-10 sm:flex-row">
+                                            <button className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all">
+                                                <i className="mr-2 fa-solid fa-plus"></i>
+                                                {t("BUTTON.AddNewRequest")}
+                                            </button>
+                                            <button className="flex-1 px-6 py-3 bg-white border-2 text-gray-700 font-semibold rounded-xl hover:border-orange-500 hover:text-orange-600 hover:scale-[1.02] transition-all">
+                                                <i className="mr-2 fa-solid fa-clipboard"></i>
+                                                {t("BUTTON.AddToExisting")}
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
 
                                 {/* Nếu là Service */}
                                 {item.type === 'service' && (
-                                    <div className="grid gap-6 md:grid-cols-3">
-                                        {/* Service Type */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-lg">
-                                                    <i className="flex-shrink-0 text-lg text-blue-600 fas fa-tools"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t('serviceDetail.serviceType')}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-800">
-                                                        {t(`Enums.ServiceType.${item.serviceType}`)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Building Type */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-orange-100 rounded-lg">
-                                                    <i className="flex-shrink-0 text-lg text-orange-600 fas fa-building"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t('serviceDetail.buildingType')}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-800">
-                                                        {t(`Enums.BuildingType.${item.buildingType}`)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Package Option */}
-                                        <div className="group">
-                                            <div className="flex items-center mb-2">
-                                                <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                    <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
-                                                </div>
-                                                <div>
-                                                    <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                        {t('serviceDetail.packageOption')}
-                                                    </p>
-                                                    <p className="font-semibold text-gray-800">
-                                                        {t(`Enums.PackageOption.${item.packageOption}`)}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex justify-center gap-6 md:col-span-3">
-
-                                            {/* Design style */}
-                                            <div className="w-50 group">
+                                    <>
+                                        <div className="grid gap-6 md:grid-cols-3">
+                                            {/* Service Type */}
+                                            <div className="group">
                                                 <div className="flex items-center mb-2">
-                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                        <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
-
+                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-blue-100 rounded-lg">
+                                                        <i className="flex-shrink-0 text-lg text-blue-600 fas fa-tools"></i>
                                                     </div>
                                                     <div>
                                                         <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('serviceDetail.designStyle')}
+                                                            {t('serviceDetail.serviceType')}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
-                                                            {t(`Enums.DesignStyle.${item.designStyle}`)}
+                                                            {t(`Enums.ServiceType.${item.serviceType}`)}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Main Structure Type */}
+                                            {/* Building Type */}
+                                            <div className="group">
+                                                <div className="flex items-center mb-2">
+                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-orange-100 rounded-lg">
+                                                        <i className="flex-shrink-0 text-lg text-orange-600 fas fa-building"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                            {t('serviceDetail.buildingType')}
+                                                        </p>
+                                                        <p className="font-semibold text-gray-800">
+                                                            {t(`Enums.BuildingType.${item.buildingType}`)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Package Option */}
                                             <div className="group">
                                                 <div className="flex items-center mb-2">
                                                     <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                        <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
+                                                        <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
                                                     </div>
                                                     <div>
                                                         <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('serviceDetail.mainStructure')}
+                                                            {t('serviceDetail.packageOption')}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
-                                                            {t(`Enums.MainStructure.${item.mainStructureType}`)}
+                                                            {t(`Enums.PackageOption.${item.packageOption}`)}
                                                         </p>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div className="flex justify-center gap-6 md:col-span-3">
+
+                                                {/* Design style */}
+                                                <div className="w-50 group">
+                                                    <div className="flex items-center mb-2">
+                                                        <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                                                            <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
+
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                                {t('serviceDetail.designStyle')}
+                                                            </p>
+                                                            <p className="font-semibold text-gray-800">
+                                                                {t(`Enums.DesignStyle.${item.designStyle}`)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Main Structure Type */}
+                                                <div className="group">
+                                                    <div className="flex items-center mb-2">
+                                                        <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                                                            <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                                {t('serviceDetail.mainStructure')}
+                                                            </p>
+                                                            <p className="font-semibold text-gray-800">
+                                                                {t(`Enums.MainStructure.${item.mainStructureType}`)}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
+
+                                        {/* Buttons */}
+                                        <div className="flex flex-col gap-4 mt-10 sm:flex-row">
+                                            <button className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all">
+                                                <i className="mr-2 fa-solid fa-plus"></i>
+                                                {t("BUTTON.AddNewRequest")}
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
-                                {/* Buttons */}
-                                <div className="flex flex-col gap-4 mt-10 sm:flex-row">
-                                    <button className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all">
-                                        <i className="mr-2 fa-solid fa-plus"></i>
-                                        {t("BUTTON.AddNewRequest")}
-                                    </button>
-                                    <button className="flex-1 px-6 py-3 bg-white border-2 text-gray-700 font-semibold rounded-xl hover:border-orange-500 hover:text-orange-600 hover:scale-[1.02] transition-all">
-                                        <i className="mr-2 fa-solid fa-clipboard"></i>
-                                        {t("BUTTON.AddToExisting")}
-                                    </button>
-                                </div>
+
                             </div>
                         </div>
 
