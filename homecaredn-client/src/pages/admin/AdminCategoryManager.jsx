@@ -55,7 +55,6 @@ export default function AdminCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
-
       toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
