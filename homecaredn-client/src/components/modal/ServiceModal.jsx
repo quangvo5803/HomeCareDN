@@ -6,6 +6,7 @@ import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
+import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -37,7 +38,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   const [mainStructureType, setMainStructureType] = useState('');
   const [designStyle, setDesignStyle] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-
   const [images, setImages] = useState([]);
 
   // Fill dữ liệu khi mở modal
@@ -71,6 +71,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setDesignStyle('');
         setImages([]);
         setUploadProgress(0);
+
       }
     }
   }, [isOpen, service, setUploadProgress]);
@@ -78,6 +79,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   // Xử lý chọn file
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+
     const totalCount = images.length + files.length;
     if (totalCount > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
@@ -88,7 +90,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       url: URL.createObjectURL(f),
       isNew: true,
     }));
-
     setImages(prev => [...prev, ...mappedFiles]);
   };
 
@@ -103,20 +104,18 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         Swal.close();
         toast.success(t('SUCCESS.DELETE'));
         if (onSuccess) onSuccess();
-        if (service) {
-          service.imageUrls = service.imageUrls.filter(
-            url => url !== imageUrl
-          );
-        }
+        removeImageFromState({ url: imageUrl, isNew: false });
       },
     });
   };
 
   // Xoá ảnh chung (local hoặc DB)
   const removeImageFromState = (img) => {
-    setImages(prev => prev.filter(i  => i.url !== img.url));
+    setImages(prev => prev.filter(i => i.url !== img.url));
     if (!img.isNew && service) {
-      service.imageUrls = service.imageUrls.filter(url => url !== img.url);
+      const idx = service.imageUrls.indexOf(img.url);
+      service.imageUrls.splice(idx, 1);
+      service.imagePublicIds.splice(idx, 1);
     }
   };
 
@@ -145,35 +144,28 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
       return;
     }
+    try {
+      const newFiles = images.filter(i => i.isNew).map(i => i.file);
+      const data = {
+        Name: name,
+        NameEN: nameEN || null,
+        Description: description || null,
+        DescriptionEN: descriptionEN || null,
+        ServiceType: serviceType,
+        PackageOption: packageOption || null,
+        BuildingType: buildingType,
+        MainStructureType: mainStructureType || null,
+        DesignStyle: designStyle || null,
+      };
+      if (images.length > 5) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      if (service?.serviceID) {
+        data.ServiceID = service.serviceID;
+      }
 
-    const data = {
-      Name: name,
-      NameEN: nameEN || null,
-      Description: description || null,
-      DescriptionEN: descriptionEN || null,
-      ServiceType: serviceType,
-      PackageOption: packageOption || null,
-      BuildingType: buildingType,
-      MainStructureType: mainStructureType || null,
-      DesignStyle: designStyle || null,
-    };
-
-    if (service?.serviceID) {
-      data.ServiceID = service.serviceID;
-    }
-
-    // chỉ gửi ảnh local
-
-    const keptOldImageUrls = images.filter(i => !i.isNew).map(i => i.url);
-    const keptOldImagePublicIds = images.filter(i => !i.isNew).map(i => i.publicId).filter(Boolean);
-
-    const newFiles = images.filter(i => i.isNew).map((i) => i.file);
-
-    
-    let newImageUrls = [];
-    let newImagePublicIds = [];
-
-    if (newFiles.length > 0) {
+      if (newFiles.length > 0) {
         const uploaded = await uploadImageToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
@@ -181,25 +173,15 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        newImageUrls = uploadedArray.map(u => u.url);
-        newImagePublicIds = uploadedArray.map(u => u.publicId);
-
+        data.ImageUrls = uploadedArray.map(u => u.url);
+        data.ImagePublicIds = uploadedArray.map(u => u.publicId);
         onClose();
         setUploadProgress(0);
+      }
+      await onSave(data);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
     }
-      data.ImageUrls = [...keptOldImageUrls, ...newImageUrls];
-      data.ImagePublicIds = [...keptOldImagePublicIds, ...newImagePublicIds];
-      if (data.ImageUrls.length > 5) {
-        toast.error(t('ERROR.MAXIMUM_IMAGE'));
-        return;
-      }
-      if (data.ImageUrls.length !== data.ImagePublicIds.length) {
-        toast.error(t('ERROR.IMAGE_URLS_PUBLICIDS_MISMATCH'));
-        return;
-      }
-    onSave(data);
-    onClose();
-    setUploadProgress(0);
   };
 
   if (!isOpen) return null;
@@ -220,14 +202,14 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-lg"
+            className="p-1 text-gray-400 transition-colors duration-200 rounded-lg hover:text-gray-600 hover:bg-gray-100"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-6 flex-1 overflow-y-auto">
+        <div className="flex-1 p-6 space-y-6 overflow-y-auto">
           {/* Name */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
@@ -264,7 +246,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           </div>
 
           {/* Enums dropdown */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {/* ServiceType */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
@@ -392,7 +374,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
             {isExpanded && (
               <div className="p-3">
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     {t('adminServiceManager.serviceModal.serviceNameEN')}
                   </label>
                   <input
@@ -404,7 +386,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block mb-2 text-sm font-medium text-gray-700">
                     {t('adminServiceManager.serviceModal.descriptionEN')}
                   </label>
                   <Editor
@@ -435,12 +417,12 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
               {images.map((img) => (
                 <div
                   key={img.url}
-                  className="relative w-28 h-28 border rounded-xl overflow-hidden group"
+                  className="relative overflow-hidden border w-28 h-28 rounded-xl group"
                 >
                   <img
                     src={img.url}
                     alt="preview"
-                    className="w-full h-full object-cover"
+                    className="object-cover w-full h-full"
                   />
                   <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
                     {(images.length !== 1 || img.isNew) && (
@@ -456,7 +438,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
                 </div>
               ))}
             </div>
-            <label className="cursor-pointer px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 inline-block">
+            <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
               {t('adminServiceManager.serviceModal.chooseFiles')}
               <input
                 type="file"
@@ -470,7 +452,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+        <div className="flex items-center justify-end p-6 space-x-3 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <button
             className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
             onClick={onClose}
@@ -480,7 +462,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           <button
             className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
             onClick={handleSubmit}
-            disabled={!name.trim() || !serviceType || !buildingType}
+            disabled={!name.trim() || !serviceType || !buildingType || images.length === 0}
           >
             {service ? t('BUTTON.Update') : t('BUTTON.Add')}
           </button>
@@ -509,9 +491,10 @@ ServiceModal.propTypes = {
       PropTypes.number,
     ]),
     designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    imageUrls: PropTypes.array,
+    imageUrls: PropTypes.array.isRequired,
+    imagePublicIds: PropTypes.array.isRequired,
   }),
-    setUploadProgress: PropTypes.func.isRequired,
+  setUploadProgress: PropTypes.func.isRequired,
 };
 
 // Default props
