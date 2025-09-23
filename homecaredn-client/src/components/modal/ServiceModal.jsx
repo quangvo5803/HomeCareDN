@@ -6,6 +6,7 @@ import { useEnums } from '../../hook/useEnums';
 import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
+import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -37,7 +38,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   const [mainStructureType, setMainStructureType] = useState('');
   const [designStyle, setDesignStyle] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-
   const [images, setImages] = useState([]);
 
   // Fill dữ liệu khi mở modal
@@ -71,6 +71,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setDesignStyle('');
         setImages([]);
         setUploadProgress(0);
+
       }
     }
   }, [isOpen, service, setUploadProgress]);
@@ -78,6 +79,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   // Xử lý chọn file
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+
     const totalCount = images.length + files.length;
     if (totalCount > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
@@ -88,7 +90,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       url: URL.createObjectURL(f),
       isNew: true,
     }));
-
     setImages(prev => [...prev, ...mappedFiles]);
   };
 
@@ -103,11 +104,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         Swal.close();
         toast.success(t('SUCCESS.DELETE'));
         if (onSuccess) onSuccess();
-        if (service) {
-          service.imageUrls = service.imageUrls.filter(
-            url => url !== imageUrl
-          );
-        }
+        removeImageFromState({url: imageUrl, isNew: false});
       },
     });
   };
@@ -116,7 +113,9 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
   const removeImageFromState = (img) => {
     setImages(prev => prev.filter(i  => i.url !== img.url));
     if (!img.isNew && service) {
-      service.imageUrls = service.imageUrls.filter(url => url !== img.url);
+      const idx = service.imageUrls.indexOf(img.url);
+      service.imageUrls.splice(idx, 1);
+      service.imagePublicIds.splice(idx, 1);
     }
   };
 
@@ -145,7 +144,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
       return;
     }
-
+    try {
+    const newFiles = images.filter(i => i.isNew).map(i => i.file);
     const data = {
       Name: name,
       NameEN: nameEN || null,
@@ -157,21 +157,14 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       MainStructureType: mainStructureType || null,
       DesignStyle: designStyle || null,
     };
+      if (images.length > 5) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+      return;
+    }
 
     if (service?.serviceID) {
       data.ServiceID = service.serviceID;
     }
-
-    // chỉ gửi ảnh local
-
-    const keptOldImageUrls = images.filter(i => !i.isNew).map(i => i.url);
-    const keptOldImagePublicIds = images.filter(i => !i.isNew).map(i => i.publicId).filter(Boolean);
-
-    const newFiles = images.filter(i => i.isNew).map((i) => i.file);
-
-    
-    let newImageUrls = [];
-    let newImagePublicIds = [];
 
     if (newFiles.length > 0) {
         const uploaded = await uploadImageToCloudinary(
@@ -181,25 +174,15 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        newImageUrls = uploadedArray.map(u => u.url);
-        newImagePublicIds = uploadedArray.map(u => u.publicId);
-
+        data.ImageUrls     = uploadedArray.map(u => u.url);
+        data.ImagePublicIds= uploadedArray.map(u => u.publicId);
         onClose();
         setUploadProgress(0);
-    }
-      data.ImageUrls = [...keptOldImageUrls, ...newImageUrls];
-      data.ImagePublicIds = [...keptOldImagePublicIds, ...newImagePublicIds];
-      if (data.ImageUrls.length > 5) {
-        toast.error(t('ERROR.MAXIMUM_IMAGE'));
-        return;
-      }
-      if (data.ImageUrls.length !== data.ImagePublicIds.length) {
-        toast.error(t('ERROR.IMAGE_URLS_PUBLICIDS_MISMATCH'));
-        return;
-      }
-    onSave(data);
-    onClose();
-    setUploadProgress(0);
+    } 
+    await onSave(data);
+  } catch (err) {
+          toast.error(t(handleApiError(err)));
+  } 
   };
 
   if (!isOpen) return null;
@@ -509,7 +492,8 @@ ServiceModal.propTypes = {
       PropTypes.number,
     ]),
     designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    imageUrls: PropTypes.array,
+    imageUrls: PropTypes.array.isRequired,
+    imagePublicIds: PropTypes.array.isRequired,
   }),
     setUploadProgress: PropTypes.func.isRequired,
 };
