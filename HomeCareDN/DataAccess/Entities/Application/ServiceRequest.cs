@@ -8,7 +8,7 @@ namespace DataAccess.Entities.Application
         public Guid ServiceRequestID { get; set; }
         public required string UserID { get; set; }
         public ServiceType ServiceType { get; set; }
-        public PackageOption? PackageOption { get; set; }
+        public PackageOption PackageOption { get; set; }
         public BuildingType BuildingType { get; set; }
         public MainStructureType MainStructureType { get; set; }
         public DesignStyle? DesignStyle { get; set; }

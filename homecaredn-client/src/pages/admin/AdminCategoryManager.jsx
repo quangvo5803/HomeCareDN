@@ -70,21 +70,21 @@ export default function AdminCategoryManager() {
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
-    <div className="p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100 min-h-screen">
+    <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
       <div className="w-full max-w-full mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h2 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">
-            <i className="fa-solid fa-tags mr-3"></i>
+          <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
+            <i className="mr-3 fa-solid fa-tags"></i>
             {t('adminCategoryManager.title')}
           </h2>
           <p className="text-gray-600">{t('adminCategoryManager.subtitle')}</p>
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="px-4 lg:px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">
@@ -92,10 +92,10 @@ export default function AdminCategoryManager() {
               </span>
             </div>
             <button
-              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm"
+              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="fa-solid fa-plus mr-2"></i>
+              <i className="mr-2 fa-solid fa-plus"></i>
               {t('BUTTON.AddNewCategory')}
             </button>
           </div>
@@ -119,21 +119,21 @@ export default function AdminCategoryManager() {
             <div className="hidden lg:block">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminCategoryManager.no')}
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminCategoryManager.categoryName')}
                     </th>
-                    <th className=" px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase ">
                       {t('adminCategoryManager.numberOfMaterials')}
                     </th>
-                    <th className="px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminCategoryManager.status')}
                     </th>
 
-                    <th className=" px-4 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase ">
                       {t('adminCategoryManager.action')}
                     </th>
                   </tr>
@@ -143,30 +143,29 @@ export default function AdminCategoryManager() {
                     categories.map((cat, index) => (
                       <tr
                         key={cat.categoryID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                        }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center align-middle">
                           <div className="flex items-center justify-center">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3 overflow-hidden">
+                            <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg">
                               {cat.categoryLogo ? (
                                 <img
                                   src={cat.categoryLogo}
                                   alt={cat.categoryName}
-                                  className="w-full h-full object-cover"
+                                  className="object-cover w-full h-full"
                                 />
                               ) : (
-                                <div className="w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                                  <span className="text-white font-bold text-sm">
-                                    {cat.categoryName.charAt(0)}
-                                  </span>
-                                </div>
+                                <img
+                                  src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                                  alt="No image"
+                                  className="object-cover w-13 h-13"
+                                />
                               )}
                             </div>
                             <div className="text-sm font-medium text-gray-900">
@@ -178,18 +177,18 @@ export default function AdminCategoryManager() {
                         </td>
 
                         <td className="px-4 py-4 text-center align-middle">
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                             {cat.materials?.length || 0}{' '}
                             {t('adminCategoryManager.materials')}
                           </span>
                         </td>
                         <td className="px-4 py-4 text-center align-middle">
                           {cat.isActive ? (
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                               {t('BUTTON.Activate')}
                             </span>
                           ) : (
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            <span className="px-3 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
                               {t('BUTTON.Deactivate')}
                             </span>
                           )}
@@ -197,7 +196,7 @@ export default function AdminCategoryManager() {
                         <td className="px-4 py-4 text-center align-middle">
                           <div className="flex items-center justify-center space-x-1">
                             <button
-                              className="inline-flex items-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
+                              className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
                                 setEditingCategory(cat);
                                 setIsModalOpen(true);
@@ -207,7 +206,7 @@ export default function AdminCategoryManager() {
                             </button>
                             {cat.materials?.length === 0 && !cat.isActive && (
                               <button
-                                className="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
                                 onClick={() => handleDelete(cat.categoryID)}
                               >
                                 {t('BUTTON.Delete')}
@@ -222,7 +221,7 @@ export default function AdminCategoryManager() {
                       <td colSpan="5" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center">
                           <svg
-                            className="w-12 h-12 text-gray-400 mb-4"
+                            className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -234,17 +233,17 @@ export default function AdminCategoryManager() {
                               d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                             />
                           </svg>
-                          <h3 className="text-lg font-medium text-gray-900 mb-1">
+                          <h3 className="mb-1 text-lg font-medium text-gray-900">
                             {t('adminCategoryManager.noCategory')}
                           </h3>
-                          <p className="text-gray-500 mb-4">
+                          <p className="mb-4 text-gray-500">
                             {t('adminCategoryManager.letStart')}
                           </p>
                           <button
-                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                             onClick={() => setIsModalOpen(true)}
                           >
-                            <i className="fa-solid fa-plus mr-3"></i>
+                            <i className="mr-3 fa-solid fa-plus"></i>
                             {t('BUTTON.AddNewCategory')}
                           </button>
                         </div>
@@ -257,41 +256,41 @@ export default function AdminCategoryManager() {
 
             {/* Mobile/Tablet Card Layout */}
             <div className="lg:hidden">
-              <div className="space-y-4 p-4">
+              <div className="p-4 space-y-4">
                 {categories && categories.length > 0 ? (
                   categories.map((cat, index) => (
                     <div
                       key={cat.categoryID}
-                      className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm"
+                      className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-center space-x-3">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                           <div>
-                            <h3 className="font-medium text-gray-900 text-sm">
+                            <h3 className="text-sm font-medium text-gray-900">
                               {cat.categoryName}
                             </h3>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center justify-between mb-3">
                         <div className="flex space-x-4">
                           <div className="text-center">
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            <span className="px-2 py-1 text-xs font-medium text-purple-800 bg-purple-100 rounded-full">
                               {cat.subCategories?.length || 0}
                             </span>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="mt-1 text-xs text-gray-500">
                               Sub Categories
                             </p>
                           </div>
                           <div className="text-center">
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
                               {cat.materials?.length || 0}
                             </span>
-                            <p className="text-xs text-gray-500 mt-1">
+                            <p className="mt-1 text-xs text-gray-500">
                               Materials
                             </p>
                           </div>
@@ -299,23 +298,22 @@ export default function AdminCategoryManager() {
                       </div>
                       <div className="text-center">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            cat.isActive
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-red-100 text-red-800'
+                            }`}
                         >
                           {cat.isActive
                             ? t('BUTTON.Activate')
                             : t('BUTTON.Deactivate')}
                         </span>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="mt-1 text-xs text-gray-500">
                           {t('adminCategoryManager.status')}
                         </p>
                       </div>
                       <div className="flex space-x-2">
                         <button
-                          className="flex-1 px-3 py-2 border border-amber-300 rounded-md text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100"
+                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
                             setEditingCategory(cat);
                             setIsModalOpen(true);
@@ -325,7 +323,7 @@ export default function AdminCategoryManager() {
                         </button>
                         {cat.materials.length === 0 && !cat.isActive && (
                           <button
-                            className="flex-1 px-3 py-2 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100"
+                            className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(cat.categoryID)}
                           >
                             {t('BUTTON.Delete')}
@@ -335,9 +333,9 @@ export default function AdminCategoryManager() {
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-12">
+                  <div className="py-12 text-center">
                     <svg
-                      className="w-12 h-12 text-gray-400 mb-4 mx-auto"
+                      className="w-12 h-12 mx-auto mb-4 text-gray-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -349,17 +347,17 @@ export default function AdminCategoryManager() {
                         d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
                       />
                     </svg>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                    <h3 className="mb-1 text-lg font-medium text-gray-900">
                       {t('adminCategoryManager.noCategory')}
                     </h3>
-                    <p className="text-gray-500 mb-4">
+                    <p className="mb-4 text-gray-500">
                       {t('adminCategoryManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                       onClick={() => setIsModalOpen(true)}
                     >
-                      <i className="fa-solid fa-plus mr-3"></i>
+                      <i className="mr-3 fa-solid fa-plus"></i>
                       {t('BUTTON.AddNewCategory')}
                     </button>
                   </div>

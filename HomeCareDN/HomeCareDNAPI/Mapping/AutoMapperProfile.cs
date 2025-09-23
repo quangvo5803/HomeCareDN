@@ -75,6 +75,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -85,6 +86,14 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt => opt.MapFrom(src =>
+                        src.Images != null
+                            ? src.Images.Select(i => i.PublicId).ToList()
+                            : new List<string>()
+                    )
                 );
 
             CreateMap<Service, ServiceDto>()

@@ -169,11 +169,11 @@ export default function DistributorCategoryManager() {
                         className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
                       />
                     ) : (
-                      <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600">
-                        <span className="text-sm font-bold text-white">
-                          {category.categoryName.charAt(0)}
-                        </span>
-                      </div>
+                      <img
+                        src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                        alt="No image"
+                        className="object-cover border border-gray-200 rounded-lg w-13 h-13"
+                      />
                     )}
                     <span className="font-medium text-gray-900">
                       {i18n.language === 'vi'

@@ -138,9 +138,8 @@ export default function AdminBrandManager() {
                     brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                        }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -157,11 +156,11 @@ export default function AdminBrandManager() {
                                   className="object-cover w-full h-full"
                                 />
                               ) : (
-                                <div className="flex items-center justify-center w-full h-full bg-gradient-to-br from-purple-400 to-purple-600">
-                                  <span className="text-sm font-bold text-white">
-                                    {brand.brandName.charAt(0)}
-                                  </span>
-                                </div>
+                                <img
+                                  src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                                  alt="No image"
+                                  className="object-cover w-13 h-13"
+                                />
                               )}
                             </div>
                             <div className="text-sm font-medium text-gray-900">

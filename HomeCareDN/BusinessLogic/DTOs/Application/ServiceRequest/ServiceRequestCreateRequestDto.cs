@@ -10,31 +10,32 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public required string UserID { get; set; }
 
         [Required]
-        public ServiceType ServiceType { get; set; }
+        public required ServiceType ServiceType { get; set; }
 
-        public PackageOption? PackageOption { get; set; }
-
-        [Required]
-        public BuildingType BuildingType { get; set; }
+        public required PackageOption PackageOption { get; set; }
 
         [Required]
-        public MainStructureType MainStructureType { get; set; }
+        public required BuildingType BuildingType { get; set; }
+
+        [Required]
+        public required MainStructureType MainStructureType { get; set; }
 
         public DesignStyle? DesignStyle { get; set; }
 
         [Required]
-        public double Width { get; set; }
+        public required double Width { get; set; }
 
         [Required]
-        public double Length { get; set; }
+        public required double Length { get; set; }
 
         [Required]
-        public int Floors { get; set; }
+        public required int Floors { get; set; }
 
-        public double? EstimatePrice { get; set; }
+        public required double? EstimatePrice { get; set; }
 
         public string? Description { get; set; }
 
-        public List<IFormFile>? Images { get; set; }
+        public List<string>? ImageUrls { get; set; }
+        public List<string>? ImagePublicIds { get; set; }
     }
 }

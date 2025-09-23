@@ -33,8 +33,12 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
-            var totalCount = await query.CountAsync();
 
+            query = Enum.TryParse<ServiceType>(parameters.FilterString, true, out var serviceType)
+                ? query.Where(s => s.ServiceType == serviceType)
+                : query;
+
+            var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch
             {
                 "servicename" => query.OrderBy(s => s.Name),
@@ -62,7 +66,6 @@ namespace BusinessLogic.Services
 
         public async Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto)
         {
-            var errors = new Dictionary<string, string[]>();
             ValidateImages(serviceCreateDto.ImageUrls);
 
             var rsServiceCreate = _mapper.Map<Service>(serviceCreateDto);
@@ -75,11 +78,6 @@ namespace BusinessLogic.Services
             );
 
             await _unitOfWork.SaveAsync();
-
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
-            }
 
             rsServiceCreate = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == rsServiceCreate.ServiceID,
@@ -114,15 +112,14 @@ namespace BusinessLogic.Services
                 s => s.ServiceID == serviceUpdateDto.ServiceID,
                 includeProperties: SERVICE_INCLUDE
             );
-            var errors = new Dictionary<string, string[]>();
             if (service == null)
             {
-                errors.Add(ERROR_SERVICE, [ERROR_SERVICE_NOT_FOUND]);
-                throw new CustomValidationException(errors);
-            }
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
+                    }
+                );
             }
             ValidateImages(serviceUpdateDto.ImageUrls);
             _mapper.Map(serviceUpdateDto, service);
@@ -148,11 +145,12 @@ namespace BusinessLogic.Services
             var service = await _unitOfWork.ServiceRepository.GetAsync(s => s.ServiceID == id);
             if (service == null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
+                    }
+                );
             }
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.ServiceID == id);
             if (images != null && images.Any())
@@ -168,26 +166,24 @@ namespace BusinessLogic.Services
 
         private static void ValidateImages(ICollection<string>? images, int existingCount = 0)
         {
-            var errors = new Dictionary<string, string[]>();
-
             if (images == null)
                 return;
 
-            var totalCount = existingCount + images.Count;
-            if (totalCount > 5)
-            {
-                errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE });
-            }
+            if (existingCount + images.Count > 5)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { nameof(images), new[] { ERROR_MAXIMUM_IMAGE } },
+                    }
+                );
 
             if (images.Any(i => i.Length > 5 * 1024 * 1024))
-            {
-                errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
-            }
-
-            if (errors.Any())
-            {
-                throw new CustomValidationException(errors);
-            }
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE } },
+                    }
+                );
         }
 
         private async Task UploadServiceImagesAsync(

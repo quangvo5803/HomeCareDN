@@ -28,6 +28,7 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+import ServiceDetail from './pages/ServiceDetail';
 // Customer pages
 import Profile from './pages/customer/Profile';
 
@@ -107,6 +108,14 @@ function Layout() {
           element={
             <PublicRoute>
               <MaterialCatalog />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/ServiceDetail/:serviceID"
+          element={
+            <PublicRoute>
+              <ServiceDetail />
             </PublicRoute>
           }
         />

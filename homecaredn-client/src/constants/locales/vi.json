@@ -61,6 +61,9 @@
     "material_title": "Vật liệu xây dựng và cải tạo",
     "material_more": "Xem thêm",
 
+    "service_construction_more": "Xem thêm",
+    "service_repair_more": "Xem thêm",
+
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -164,18 +167,29 @@
     "sort_label": "Sắp xếp theo:"
   },
   "materialDetail": {
-    "breadcrumb_home": "Trang chủ",
     "breadcrumb_material": "Vật liệu",
     "category": "Danh mục",
     "brand": "Thương hiệu",
     "unit": "Đơn vị",
     "description": "Mô tả",
-    "relatedMaterial": "Vật liệu liên quan"
+    "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
     "default": "Mặc định",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
   },
+  "serviceDetail": {
+    "breadcrumb_construction": "Xây dựng",
+    "breadcrumb_repair": "Sửa chữa",
+    "serviceType": "Loại dịch vụ",
+    "buildingType": "Loại tòa nhà",
+    "packageOption": "Tùy chọn gói",
+    "mainStructure": "Loại cấu trúc chính",
+    "designStyle": "Phong cách thiết kế",
+    "relatedRepair": "Các sửa chữa liên quan",
+    "relatedConstruction": "Các xây dụng liên quan"
+  },
+  "breadcrumb_home": "Trang chủ",
   "login": {
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",
@@ -203,12 +217,12 @@
     "not_receive_otp": "Không nhận được mã? "
   },
 
-  "userPage":{
+  "userPage": {
     "profile": {
       "title": "Hồ Sơ Của Tôi",
       "subtitle": "Quản lý thông tin cá nhân và địa chỉ của bạn.",
-      "header_profile":"Thông tin cá nhân",
-      "header_address":"Địa chỉ",
+      "header_profile": "Thông tin cá nhân",
+      "header_address": "Địa chỉ",
       "form": {
         "name": "Họ và tên",
         "email": "Email",
@@ -236,10 +250,9 @@
       "title": "Yêu cầu dịch vụ",
       "subtitle": "Xem và quản lý các yêu cầu dịch vụ của bạn.",
       "noRequest": "Chưa có yêu cầu dịch vụ nào",
-      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn"    
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn"
     }
   },
-
 
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -356,7 +369,6 @@
     "noCategory": "Chưa có danh mục nào",
     "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
   },
-
 
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
@@ -633,7 +645,6 @@
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
-
   },
   "ERROR": {
     "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
@@ -653,7 +664,6 @@
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
     "ADDRESS_MAX": "Bạn chỉ có thể thêm tối đa 5 địa chỉ.",
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-
 
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
@@ -747,7 +757,7 @@
       "Other": "Khác"
     }
   },
-  "toast":{
-      "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
+  "toast": {
+    "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   }
 }
