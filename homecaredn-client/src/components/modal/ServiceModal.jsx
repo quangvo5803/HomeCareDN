@@ -54,9 +54,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setMainStructureType(service.mainStructureType ?? '');
         setDesignStyle(service.designStyle ?? '');
         setImages(
-          (service.imageUrls || []).map((url, idx) => ({
+          (service.imageUrls || []).map((url) => ({
             url,
-            publicId: service.imagePublicIds?.[idx] || '',
             isNew: false,
           })))
         setUploadProgress(0);

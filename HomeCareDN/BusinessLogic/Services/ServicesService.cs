@@ -20,7 +20,6 @@ namespace BusinessLogic.Services
         private const string ERROR_SERVICE_NOT_FOUND = "SERVICE_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
-        private const string ERROR_URL_MISMATCH = "IMAGE_URLS_PUBLICIDS_MISMATCH";
         private const string SERVICE_INCLUDE = "Images";
 
         public ServicesService(IUnitOfWork unitOfWork, IMapper mapper)
