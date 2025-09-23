@@ -64,6 +64,9 @@
     "service_construction_more": "More Constructions",
     "service_repair_more": "More Repairs",
 
+    "default": "Default",
+    "noDescription": "Description not available",
+
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
     "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
@@ -176,7 +179,6 @@
     "relatedMaterial": "Related Materials"
   },
   "materialViewAll": {
-    "default": "Default",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
   },
   "serviceDetail": {
@@ -189,6 +191,10 @@
     "designStyle": "Design style",
     "relatedRepair": "Related Repairs",
     "relatedConstruction": "Related Constructions"
+  },
+  "serviceViewAll": {
+    "verifiedLicense": "Verified License",
+    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service"
   },
   "breadcrumb_home": "Home",
   "login": {

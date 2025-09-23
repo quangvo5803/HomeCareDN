@@ -338,25 +338,31 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             </div>
 
                             <div className="p-6 lg:p-8">
-                                <div
-                                    className="leading-relaxed text-gray-700"
-                                    dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(
-                                            he.decode(
-                                                showFullDesc || description?.length <= MAX_LENGTH
-                                                    ? description
-                                                    : description?.slice(0, MAX_LENGTH) + "..."
-                                            )
-                                        ),
-                                    }}
-                                />
-                                {description?.length > MAX_LENGTH && (
-                                    <button
-                                        onClick={() => setShowFullDesc(!showFullDesc)}
-                                        className="mt-3 font-medium text-orange-600 hover:underline"
-                                    >
-                                        {showFullDesc ? t("BUTTON.Reduce") : t("BUTTON.ReadMore")}
-                                    </button>
+                                {description && description.trim().length > 0 ? (
+                                    <>
+                                        <div
+                                            className="leading-relaxed text-gray-700"
+                                            dangerouslySetInnerHTML={{
+                                                __html: DOMPurify.sanitize(
+                                                    he.decode(
+                                                        showFullDesc || description.length <= MAX_LENGTH
+                                                            ? description
+                                                            : description.slice(0, MAX_LENGTH) + "..."
+                                                    )
+                                                ),
+                                            }}
+                                        />
+                                        {description.length > MAX_LENGTH && (
+                                            <button
+                                                onClick={() => setShowFullDesc(!showFullDesc)}
+                                                className="mt-3 font-medium text-orange-600 hover:underline"
+                                            >
+                                                {showFullDesc ? t("BUTTON.Reduce") : t("BUTTON.ReadMore")}
+                                            </button>
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="text-gray-400 italic">{t('home.noDescription')}</p>
                                 )}
                             </div>
                         </div>

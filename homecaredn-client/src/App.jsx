@@ -29,6 +29,8 @@ import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 import ServiceDetail from './pages/ServiceDetail';
+import RepairViewAll from './pages/RepairViewAll';
+import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
 import Profile from './pages/customer/Profile';
 
@@ -209,7 +211,9 @@ function Layout() {
           }
         />
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
-        {/* Profile route */}
+        <Route path="RepairViewAll" element={<RepairViewAll />} />
+        <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
+
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

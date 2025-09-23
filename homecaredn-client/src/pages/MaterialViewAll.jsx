@@ -48,7 +48,7 @@ export default function MaterialViewAll() {
                 setCurrentPage(1);
               }}
             >
-              <option value="random">{t('materialViewAll.default')}</option>
+              <option value="random">{t('home.default')}</option>
               <option
                 value={
                   i18n.language === 'vi' ? 'materialname' : 'materialnameen'

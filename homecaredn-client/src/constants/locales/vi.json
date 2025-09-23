@@ -64,6 +64,9 @@
     "service_construction_more": "Xem thêm",
     "service_repair_more": "Xem thêm",
 
+    "default": "Mặc định",
+    "noDescription": "Mô tả không có sẵn",
+
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -175,7 +178,6 @@
     "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
-    "default": "Mặc định",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
   },
   "serviceDetail": {
@@ -188,6 +190,10 @@
     "designStyle": "Phong cách thiết kế",
     "relatedRepair": "Các sửa chữa liên quan",
     "relatedConstruction": "Các xây dụng liên quan"
+  },
+  "serviceViewAll": {
+    "verifiedLicense": "Giấy phép đã được xác minh",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ"
   },
   "breadcrumb_home": "Trang chủ",
   "login": {
