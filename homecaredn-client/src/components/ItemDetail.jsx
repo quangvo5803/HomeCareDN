@@ -10,10 +10,6 @@ export default function ItemDetail({ item, relatedItems = [] }) {
     const [showFullDesc, setShowFullDesc] = useState(false);
 
     const MAX_LENGTH = 500;
-    const description =
-        i18n.language === "vi"
-            ? item.description
-            : item.descriptionEN || item.description;
 
     useEffect(() => {
         if (item?.imageUrls?.length > 0) {
@@ -36,6 +32,13 @@ export default function ItemDetail({ item, relatedItems = [] }) {
         },
     };
 
+    const getText = (vi, en) => (i18n.language === "vi" ? vi : en || vi);
+
+    const showName = getText(item.name, item.nameEN);
+    const showDescription = getText(item.description, item.descriptionEN);
+    const showCategory = getText(item.categoryName, item.categoryNameEN);
+    const showBrand = getText(item.brandName, item.brandNameEN);
+    const showUnit = getText(item.unit, item.unitEN);
 
 
     return (
@@ -77,13 +80,13 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             </Link>
                             <span className="text-white/40">/</span>
                             <span className="font-medium text-white">
-                                {i18n.language === "vi" ? item.name : item.nameEN || item.name}
+                                {showName}
                             </span>
                         </nav>
 
                         {/* Title */}
                         <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">
-                            {i18n.language === "vi" ? item.name : item.nameEN || item.name}
+                            {showName}
                         </h1>
                     </div>
                 </div>
@@ -138,7 +141,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                         <div className="overflow-hidden bg-white shadow-xl rounded-2xl">
                             <div className="p-6 text-white bg-gradient-to-r from-orange-500 to-orange-600">
                                 <h2 className="mb-2 text-2xl font-bold">
-                                    {i18n.language === "vi" ? item.name : item.nameEN || item.name}
+                                    {showName}
                                 </h2>
                             </div>
 
@@ -159,9 +162,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                             {t(`materialDetail.category`)}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
-                                                            {i18n.language === "vi"
-                                                                ? item.categoryName
-                                                                : item.categoryNameEN || item.categoryName}
+                                                            {showCategory}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -178,9 +179,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                             {t(`materialDetail.brand`)}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
-                                                            {i18n.language === "vi"
-                                                                ? item.brandName
-                                                                : item.brandNameEN || item.brandName}
+                                                            {showBrand}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -197,9 +196,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                             {t(`${item.type}Detail.unit`)}
                                                         </p>
                                                         <p className="font-semibold text-gray-900">
-                                                            {i18n.language === "vi"
-                                                                ? item.unit
-                                                                : item.unitEN || item.unit}
+                                                            {showUnit}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -338,21 +335,21 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             </div>
 
                             <div className="p-6 lg:p-8">
-                                {description && description.trim().length > 0 ? (
+                                {showDescription && showDescription.trim().length > 0 ? (
                                     <>
                                         <div
                                             className="leading-relaxed text-gray-700"
                                             dangerouslySetInnerHTML={{
                                                 __html: DOMPurify.sanitize(
                                                     he.decode(
-                                                        showFullDesc || description.length <= MAX_LENGTH
-                                                            ? description
-                                                            : description.slice(0, MAX_LENGTH) + "..."
+                                                        showFullDesc || showDescription.length <= MAX_LENGTH
+                                                            ? showDescription
+                                                            : showDescription.slice(0, MAX_LENGTH) + "..."
                                                     )
                                                 ),
                                             }}
                                         />
-                                        {description.length > MAX_LENGTH && (
+                                        {showDescription.length > MAX_LENGTH && (
                                             <button
                                                 onClick={() => setShowFullDesc(!showFullDesc)}
                                                 className="mt-3 font-medium text-orange-600 hover:underline"
@@ -422,9 +419,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                     className="text-sm text-gray-600 line-clamp-2"
                                     dangerouslySetInnerHTML={{
                                         __html: DOMPurify.sanitize(
-                                            i18n.language === "vi"
-                                                ? m.description
-                                                : m.descriptionEN || m.description,
+                                            i18n.language === "vi" ? m.description : m.descriptionEN || m.description,
                                             { FORBID_TAGS: ["img"] }
                                         ),
                                     }}

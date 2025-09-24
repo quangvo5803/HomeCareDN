@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useEnums } from "../hook/useEnums";
 import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 function FilterSection({ title, options, names, selectedValue, onChange }) {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -8,8 +9,9 @@ function FilterSection({ title, options, names, selectedValue, onChange }) {
 
     return (
         <div className="w-75 border border-gray-200 rounded-lg p-4 mb-4">
-            <div
-                className="relative flex items-center justify-between cursor-pointer"
+            <button
+                type="button"
+                className="w-full text-left p-0 border-none bg-transparent outline-none relative flex items-center justify-between cursor-pointer"
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <h2 className="font-medium text-lg">{title}</h2>
@@ -23,7 +25,7 @@ function FilterSection({ title, options, names, selectedValue, onChange }) {
                                 e.stopPropagation();
                                 onChange(null);
                             }}
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 hover:text-red-800 cursor-pointer"
                         >
                             <i className="fa-solid fa-xmark mr-3"></i>
                         </button>
@@ -41,16 +43,16 @@ function FilterSection({ title, options, names, selectedValue, onChange }) {
                         ></i>
                     </button>
                 </div>
-            </div>
+            </button>
 
             {/* Nội dung */}
             {isExpanded && (
                 <div className="max-h-48 overflow-y-auto pr-2 mt-4">
                     <ul className="space-y-2">
-                        {options.map((item, index) => (
-                            <li key={index} className="flex items-center relative">
+                        {options.map((item) => (
+                            <li key={item.value} className="flex items-center relative">
                                 <input
-                                    id={`${title}-${index}`}
+                                    id={`${title}-${item.value}`}
                                     type="radio"
                                     name={names}
                                     value={item.value}
@@ -59,7 +61,7 @@ function FilterSection({ title, options, names, selectedValue, onChange }) {
                                     className="h-4 w-4 text-indigo-600 focus:ring-indigo-500"
                                 />
                                 <label
-                                    htmlFor={`${title}-${index}`}
+                                    htmlFor={`${title}-${item.value}`}
                                     className="ml-2 text-sm text-gray-700"
                                 >
                                     {t(`Enums.${names}.${item.value}`)}
@@ -72,6 +74,17 @@ function FilterSection({ title, options, names, selectedValue, onChange }) {
         </div>
     );
 }
+FilterSection.propTypes = {
+    title: PropTypes.string.isRequired,
+    options: PropTypes.arrayOf(
+        PropTypes.shape({
+            value: PropTypes.any.isRequired,
+        })
+    ).isRequired,
+    names: PropTypes.string.isRequired,
+    selectedValue: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+};
 
 export default function FilterItem({
     packageOption,
@@ -136,6 +149,15 @@ export default function FilterItem({
         </div>
     );
 }
-
+FilterItem.propTypes = {
+    packageOption: PropTypes.string,
+    buildingType: PropTypes.string,
+    mainStructure: PropTypes.string,
+    designStyle: PropTypes.string,
+    onPackageOptionChange: PropTypes.func.isRequired,
+    onBuildingTypeChange: PropTypes.func.isRequired,
+    onMainStructureTypeChange: PropTypes.func.isRequired,
+    onDesignStyleChange: PropTypes.func.isRequired,
+};
 
 

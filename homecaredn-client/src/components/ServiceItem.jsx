@@ -6,6 +6,7 @@ import { Pagination } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
 import FilterServiceItem from "./FilterServiceItem";
+import PropTypes from 'prop-types';
 
 export default function ServiceItem({ itemServiceType }) {
     const { t, i18n } = useTranslation();
@@ -95,7 +96,7 @@ export default function ServiceItem({ itemServiceType }) {
                         {/* Service Cards List */}
                         <div className="flex flex-col space-y-6">
                             {services && services.length > 0 ? (
-                                services.map((item, index) => {
+                                services.map((item) => {
                                     const description =
                                         i18n.language === "vi"
                                             ? item.description || ""
@@ -104,7 +105,7 @@ export default function ServiceItem({ itemServiceType }) {
                                     return (
                                         <Link
                                             to={`/ServiceDetail/${item.serviceID}`}
-                                            key={index}
+                                            key={item.serviceID}
                                             className="block rounded-lg shadow-sm overflow-hidden transform transition group duration-300 hover:shadow-2xl hover:-translate-y-1"
                                         >
                                             <div className="flex flex-col lg:flex-row">
@@ -212,3 +213,6 @@ export default function ServiceItem({ itemServiceType }) {
 
     );
 }
+ServiceItem.propTypes = {
+    itemServiceType: PropTypes.string.isRequired,
+};

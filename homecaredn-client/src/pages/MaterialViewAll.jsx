@@ -122,7 +122,7 @@ export default function MaterialViewAll() {
                   <button
                     type="button"
                     onClick={() => setSelectedCategoryId("")}
-                    className="absolute left-60 top-1/2 -translate-y-1/2"
+                    className="absolute left-60 top-1/2 -translate-y-1/2 cursor-pointer"
                   >
                     <i className="fa-solid fa-xmark text-red-700"></i>
                   </button>
