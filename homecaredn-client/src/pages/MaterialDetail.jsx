@@ -33,7 +33,7 @@ export default function MaterialDetail() {
           PageNumber: 1,
           PageSize: 8,
           SortBy: 'random',
-          FilterID: material.categoryID || null,
+          FilterCategoryID: material.categoryID || null,
         });
         setRandomMaterials(data || []);
       } catch (err) {

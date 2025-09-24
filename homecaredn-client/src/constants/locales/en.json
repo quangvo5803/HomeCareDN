@@ -179,7 +179,11 @@
     "relatedMaterial": "Related Materials"
   },
   "materialViewAll": {
-    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
+    "listMaterial": "List of materials",
+    "filterCategory": "Material catalog",
+    "filterBrand": "Material brand",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product",
+    "noMaterial": "No corresponding material"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Construction",

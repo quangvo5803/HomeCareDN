@@ -11,14 +11,14 @@ export default function ServiceItem({ serviceType }) {
     const { services, fetchServices, loading, totalServices } = useService();
     const [currentPage, setCurrentPage] = useState(1);
     const [sortOption, setSortOption] = useState('random');
-    const pageSize = 2;
+    const pageSize = 10;
 
     useEffect(() => {
         fetchServices({
             PageNumber: currentPage,
             PageSize: pageSize,
             SortBy: sortOption,
-            FilterString: serviceType || null
+            FilterService: serviceType || null
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [currentPage, sortOption, fetchServices, serviceType]);

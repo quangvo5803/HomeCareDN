@@ -178,7 +178,11 @@
     "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
+    "listMaterial": "Danh sách vật liệu",
+    "filterCategory": "Danh mục vật liệu",
+    "filterBrand": "Thương hiệu vật liệu",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
+    "noMaterial": "Không có vật liệu tương ứng"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",

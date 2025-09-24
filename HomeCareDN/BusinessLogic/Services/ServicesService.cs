@@ -34,7 +34,7 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
 
-            query = Enum.TryParse<ServiceType>(parameters.FilterString, true, out var serviceType)
+            query = Enum.TryParse<ServiceType>(parameters.FilterService, true, out var serviceType)
                 ? query.Where(s => s.ServiceType == serviceType)
                 : query;
 

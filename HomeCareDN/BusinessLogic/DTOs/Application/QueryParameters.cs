@@ -7,7 +7,9 @@
 
         // mở rộng
         public Guid? FilterID { get; set; }
-        public string? FilterString { get; set; }
+        public string? FilterService { get; set; }
+        public Guid? FilterCategoryID { get; set; }
+        public Guid? FilterBrandID { get; set; }
         public bool? FilterBool { get; set; }
         public string? Search { get; set; }
         public string? SortBy { get; set; }

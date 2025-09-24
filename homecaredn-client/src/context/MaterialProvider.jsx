@@ -14,7 +14,7 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Public: fetch all material
   const fetchMaterials = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
+    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID, FilterCategoryID, FilterBrandID } = {}) => {
       try {
         setLoading(true);
         const data = await materialService.getAllMaterial({
@@ -22,6 +22,8 @@ export const MaterialProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
+          FilterCategoryID,
+          FilterBrandID,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -109,10 +111,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                  ...m,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? m.imageUrls,
-                }
+                ...m,
+                ...updated,
+                imageUrls: updated.imageUrls ?? m.imageUrls,
+              }
               : m
           )
         );

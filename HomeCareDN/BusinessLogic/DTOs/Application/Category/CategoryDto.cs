@@ -12,6 +12,7 @@ namespace BusinessLogic.DTOs.Application.Category
         public bool IsActive { get; set; }
         public required string CategoryLogoUrl { get; set; }
         public required string CategoryLogoPublicId { get; set; }
+        public int MaterialCount { get; set; }
 
         // Danh sách materials thuộc category này
         public ICollection<MaterialDto>? Materials { get; set; }
