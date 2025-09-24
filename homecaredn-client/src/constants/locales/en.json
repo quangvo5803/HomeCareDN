@@ -188,19 +188,22 @@
   "serviceDetail": {
     "breadcrumb_construction": "Construction",
     "breadcrumb_repair": "Repair",
-    "serviceType": "Service type",
-    "buildingType": "Building type",
-    "packageOption": "Package option",
-    "mainStructure": "Main structure type",
-    "designStyle": "Design style",
     "relatedRepair": "Related Repairs",
     "relatedConstruction": "Related Constructions"
   },
   "serviceViewAll": {
     "verifiedLicense": "Verified License",
-    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service"
+    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service",
+    "noService": "No corresponding service"
   },
   "breadcrumb_home": "Home",
+  "sharedEnums": {
+    "serviceType": "Service type",
+    "buildingType": "Building type",
+    "packageOption": "Package option",
+    "mainStructure": "Main structure type",
+    "designStyle": "Design style"
+  },
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",

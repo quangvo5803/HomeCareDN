@@ -187,19 +187,22 @@
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",
     "breadcrumb_repair": "Sửa chữa",
-    "serviceType": "Loại dịch vụ",
-    "buildingType": "Loại tòa nhà",
-    "packageOption": "Tùy chọn gói",
-    "mainStructure": "Loại cấu trúc chính",
-    "designStyle": "Phong cách thiết kế",
     "relatedRepair": "Các sửa chữa liên quan",
     "relatedConstruction": "Các xây dụng liên quan"
   },
   "serviceViewAll": {
     "verifiedLicense": "Giấy phép đã được xác minh",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ"
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ",
+    "noService": "Không có dịch vụ tương ứng"
   },
   "breadcrumb_home": "Trang chủ",
+  "sharedEnums": {
+    "serviceType": "Loại dịch vụ",
+    "buildingType": "Loại tòa nhà",
+    "packageOption": "Tùy chọn gói",
+    "mainStructure": "Loại cấu trúc chính",
+    "designStyle": "Phong cách thiết kế"
+  },
   "login": {
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",

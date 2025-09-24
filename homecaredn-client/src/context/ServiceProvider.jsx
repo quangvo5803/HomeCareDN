@@ -13,7 +13,10 @@ export const ServiceProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   // 📌 Public: fetch all
   const fetchServices = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID, FilterService } = {}) => {
+    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID,
+      FilterServiceType, FilterPackageOption, FilterBuildingType,
+      FilterMainStructureType, FilterDesignStyle
+    } = {}) => {
       try {
         setLoading(true);
         const data = await serviceService.getAllService({
@@ -21,7 +24,11 @@ export const ServiceProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
-          FilterService,
+          FilterServiceType,
+          FilterPackageOption,
+          FilterBuildingType,
+          FilterMainStructureType,
+          FilterDesignStyle
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,

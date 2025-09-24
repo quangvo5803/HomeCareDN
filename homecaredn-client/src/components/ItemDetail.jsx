@@ -232,7 +232,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('serviceDetail.serviceType')}
+                                                            {t('sharedEnums.serviceType')}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
                                                             {t(`Enums.ServiceType.${item.serviceType}`)}
@@ -249,7 +249,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('serviceDetail.buildingType')}
+                                                            {t('sharedEnums.buildingType')}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
                                                             {t(`Enums.BuildingType.${item.buildingType}`)}
@@ -266,7 +266,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                     </div>
                                                     <div>
                                                         <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('serviceDetail.packageOption')}
+                                                            {t('sharedEnums.packageOption')}
                                                         </p>
                                                         <p className="font-semibold text-gray-800">
                                                             {t(`Enums.PackageOption.${item.packageOption}`)}
@@ -286,7 +286,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                         </div>
                                                         <div>
                                                             <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                                {t('serviceDetail.designStyle')}
+                                                                {t('sharedEnums.designStyle')}
                                                             </p>
                                                             <p className="font-semibold text-gray-800">
                                                                 {t(`Enums.DesignStyle.${item.designStyle}`)}
@@ -303,7 +303,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                                         </div>
                                                         <div>
                                                             <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                                {t('serviceDetail.mainStructure')}
+                                                                {t('sharedEnums.mainStructure')}
                                                             </p>
                                                             <p className="font-semibold text-gray-800">
                                                                 {t(`Enums.MainStructure.${item.mainStructureType}`)}

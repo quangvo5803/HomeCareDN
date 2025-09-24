@@ -38,7 +38,7 @@ export default function ServiceDetail() {
                     PageNumber: 1,
                     PageSize: 8,
                     SortBy: "random",
-                    FilterService: service.serviceType || null,
+                    FilterServiceType: service.serviceType || null,
                 });
                 setRandomServices(data || []);
             } catch (err) {
