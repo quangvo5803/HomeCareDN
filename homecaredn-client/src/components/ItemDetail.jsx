@@ -3,6 +3,7 @@ import DOMPurify from "dompurify";
 import he from "he";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import PropTypes from 'prop-types';
 
 export default function ItemDetail({ item, relatedItems = [] }) {
     const { t, i18n } = useTranslation();
@@ -432,3 +433,21 @@ export default function ItemDetail({ item, relatedItems = [] }) {
         </div>
     );
 }
+ItemDetail.propTypes = {
+    item: PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        nameEN: PropTypes.string,
+        description: PropTypes.string,
+        descriptionEN: PropTypes.string,
+        categoryName: PropTypes.string,
+        categoryNameEN: PropTypes.string,
+        brandName: PropTypes.string,
+        brandNameEN: PropTypes.string,
+        unit: PropTypes.string,
+        unitEN: PropTypes.string,
+        imageUrls: PropTypes.arrayOf(PropTypes.string),
+        type: PropTypes.string,
+        serviceType: PropTypes.string,
+    }).isRequired,
+    relatedItems: PropTypes.array,
+};
