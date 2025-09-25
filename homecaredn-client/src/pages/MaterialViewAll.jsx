@@ -8,6 +8,7 @@ import CardItem from '../components/CardItem';
 import Loading from '../components/Loading';
 import { handleApiError } from '../utils/handleApiError';
 import { toast } from 'react-toastify';
+import FilterItem from '../components/FilterItem';
 
 export default function MaterialViewAll() {
   const { t, i18n } = useTranslation();
@@ -60,13 +61,10 @@ export default function MaterialViewAll() {
           <h1 className="text-lg font-bold text-orange-400 md:text-xl">
             {t('materialViewAll.listMaterial')}
           </h1>
+          {/* Sort */}
           <div className="flex items-center mt-4 space-x-4 md:mt-0">
             <p className="text-sm md:text-base">
-              {t('materialViewAll.pagination', {
-                start,
-                end,
-                totalMaterials,
-              })}
+              {t('materialViewAll.pagination', { start, end, totalMaterials })}
             </p>
             <select
               aria-label="Sort options"
@@ -87,9 +85,7 @@ export default function MaterialViewAll() {
               </option>
               <option
                 value={
-                  i18n.language === 'vi'
-                    ? 'materialname_desc'
-                    : 'materialnameen_desc'
+                  i18n.language === 'vi' ? 'materialname_desc' : 'materialnameen_desc'
                 }
               >
                 Z-A
@@ -100,64 +96,32 @@ export default function MaterialViewAll() {
         <div className="flex flex-col gap-6 md:flex-row">
           {/* Filter */}
           <aside className="md:w-1/5 -ml-10 mr-16">
-            <div className="mb-6 relative">
-              <div className="w-20 mb-4 border-b border-gray-400"></div>
-              {/* Category select */}
-              <div className="relative">
-                <select
-                  aria-label="Category filter"
-                  className="w-70 border border-gray-300 rounded-md p-2 text-sm font-semibold md:text-base pr-8"
-                  value={selectedCategoryId}
-                  onChange={(e) => setSelectedCategoryId(e.target.value)}
-                >
-                  <option value="">{t('materialViewAll.filterCategory')}</option>
-                  {categories?.map((c) => (
-                    <option key={c.categoryID} value={c.categoryID}>
-                      {i18n.language === 'vi' ? c.categoryName : c.categoryNameEN || c.categoryName} ({c.materialCount})
-                    </option>
-                  ))}
-                </select>
+            <div className="w-20 mb-4 border-b border-gray-400"></div>
+            {/* Category */}
+            <FilterItem
+              itemType={{ type: 'material' }}
+              label={t("materialViewAll.filterCategory")}
+              options={categories}
+              selectedValue={selectedCategoryId}
+              onChange={setSelectedCategoryId}
+              name="categoryName"
+              nameEN="categoryNameEN"
+              valueID="categoryID"
+              countValue="materialCount"
+            />
 
-                {selectedCategoryId && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategoryId("")}
-                    className="absolute left-60 top-1/2 -translate-y-1/2 cursor-pointer"
-                  >
-                    <i className="fa-solid fa-xmark text-red-700"></i>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-4 relative">
-              {/* Brand select */}
-              <div className="relative">
-                <select
-                  aria-label="Brand filter"
-                  className="w-70 border border-gray-300 rounded-md p-2 text-sm font-semibold md:text-base pr-8"
-                  value={selectedBrandId}
-                  onChange={(e) => setSelectedBrandId(e.target.value)}
-                >
-                  <option value="">{t('materialViewAll.filterBrand')}</option>
-                  {brands?.map((brand) => (
-                    <option key={brand.brandID} value={brand.brandID}>
-                      {i18n.language === 'vi' ? brand.brandName : brand.brandNameEN || brand.brandName} ({brand.materialCount})
-                    </option>
-                  ))}
-                </select>
-
-                {selectedBrandId && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBrandId("")}
-                    className="absolute left-60 top-1/2 -translate-y-1/2"
-                  >
-                    <i className="fa-solid fa-xmark text-red-700"></i>
-                  </button>
-                )}
-              </div>
-            </div>
+            {/* Brand */}
+            <FilterItem
+              itemType={{ type: 'material' }}
+              label={t("materialViewAll.filterBrand")}
+              options={brands}
+              selectedValue={selectedBrandId}
+              onChange={setSelectedBrandId}
+              name="brandName"
+              nameEN="brandNameEN"
+              valueID="brandID"
+              countValue="materialCount"
+            />
           </aside>
 
           {/* Products grid */}

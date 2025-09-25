@@ -257,58 +257,62 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                             </div>
 
                                             {/* Package Option */}
-                                            <div className="group">
-                                                <div className="flex items-center mb-2">
-                                                    <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                        <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                            {t('sharedEnums.packageOption')}
-                                                        </p>
-                                                        <p className="font-semibold text-gray-800">
-                                                            {t(`Enums.PackageOption.${item.packageOption}`)}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex justify-center gap-6 md:col-span-3">
-
-                                                {/* Design style */}
-                                                <div className="w-50 group">
-                                                    <div className="flex items-center mb-2">
-                                                        <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                            <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
-
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                                {t('sharedEnums.designStyle')}
-                                                            </p>
-                                                            <p className="font-semibold text-gray-800">
-                                                                {t(`Enums.DesignStyle.${item.designStyle}`)}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {/* Main Structure Type */}
+                                            {item?.packageOption && (
                                                 <div className="group">
                                                     <div className="flex items-center mb-2">
                                                         <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                                            <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
+                                                            <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
                                                         </div>
                                                         <div>
                                                             <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                                                {t('sharedEnums.mainStructure')}
+                                                                {t('sharedEnums.packageOption')}
                                                             </p>
                                                             <p className="font-semibold text-gray-800">
-                                                                {t(`Enums.MainStructure.${item.mainStructureType}`)}
+                                                                {t(`Enums.PackageOption.${item.packageOption}`)}
                                                             </p>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            <div className="flex justify-center gap-6 md:col-span-3">
+                                                {/* Design style */}
+                                                {item?.designStyle && (
+                                                    <div className="w-50 group">
+                                                        <div className="flex items-center mb-2">
+                                                            <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                                                                <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                                    {t('sharedEnums.designStyle')}
+                                                                </p>
+                                                                <p className="font-semibold text-gray-800">
+                                                                    {t(`Enums.DesignStyle.${item.designStyle}`)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Main Structure Type */}
+                                                {item?.mainStructureType && (
+                                                    <div className="group">
+                                                        <div className="flex items-center mb-2">
+                                                            <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                                                                <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                                                    {t('sharedEnums.mainStructure')}
+                                                                </p>
+                                                                <p className="font-semibold text-gray-800">
+                                                                    {t(`Enums.MainStructure.${item.mainStructureType}`)}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 

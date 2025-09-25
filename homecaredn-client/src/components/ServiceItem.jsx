@@ -5,7 +5,7 @@ import Loading from '../components/Loading';
 import { Pagination } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link } from "react-router-dom";
-import FilterServiceItem from "./FilterServiceItem";
+import FilterItem from "./FilterItem";
 import PropTypes from 'prop-types';
 
 export default function ServiceItem({ itemServiceType }) {
@@ -55,7 +55,8 @@ export default function ServiceItem({ itemServiceType }) {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                     {/* Filter Sidebar */}
-                    <FilterServiceItem
+                    <FilterItem
+                        itemType={{ type: 'service' }}
                         packageOption={packageOption}
                         buildingType={buildingType}
                         mainStructure={mainStructureType}
