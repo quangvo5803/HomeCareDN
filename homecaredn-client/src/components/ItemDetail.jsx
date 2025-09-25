@@ -452,6 +452,9 @@ ItemDetail.propTypes = {
         imageUrls: PropTypes.arrayOf(PropTypes.string),
         type: PropTypes.string,
         serviceType: PropTypes.string,
+        designStyle: PropTypes.string,
+        packageOption: PropTypes.string,
+        mainStructureType: PropTypes.string,
     }).isRequired,
     relatedItems: PropTypes.array,
 };
