@@ -100,7 +100,6 @@ export default function FilterItem({
     name,
     nameEN,
     valueID,
-    countValue,
 
 }) {
     const enums = useEnums();
@@ -174,7 +173,7 @@ export default function FilterItem({
                             {i18n.language === 'vi'
                                 ? op[name]
                                 : op[nameEN] || op[name]}{" "}
-                            ({op[countValue]})
+                            ({op.materials?.length || 0})
                         </option>
                     ))}
                 </select>
@@ -209,7 +208,6 @@ FilterItem.propTypes = {
     onChange: PropTypes.func,
     name: PropTypes.string,
     valueID: PropTypes.string,
-    countValue: PropTypes.string,
     nameEN: PropTypes.string,
 };
 

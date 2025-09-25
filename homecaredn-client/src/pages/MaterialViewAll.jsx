@@ -107,7 +107,6 @@ export default function MaterialViewAll() {
               name="categoryName"
               nameEN="categoryNameEN"
               valueID="categoryID"
-              countValue="materialCount"
             />
 
             {/* Brand */}
@@ -120,7 +119,6 @@ export default function MaterialViewAll() {
               name="brandName"
               nameEN="brandNameEN"
               valueID="brandID"
-              countValue="materialCount"
             />
           </aside>
 

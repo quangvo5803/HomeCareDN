@@ -191,6 +191,7 @@
     "relatedConstruction": "Các xây dụng liên quan"
   },
   "serviceViewAll": {
+    "title": "Danh sách dịch vụ",
     "verifiedLicense": "Giấy phép đã được xác minh",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ",
     "noService": "Không có dịch vụ tương ứng"

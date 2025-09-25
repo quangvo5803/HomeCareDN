@@ -192,6 +192,7 @@
     "relatedConstruction": "Related Constructions"
   },
   "serviceViewAll": {
+    "title": "List of services",
     "verifiedLicense": "Verified License",
     "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service",
     "noService": "No corresponding service"

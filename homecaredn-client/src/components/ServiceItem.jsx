@@ -54,18 +54,24 @@ export default function ServiceItem({ itemServiceType }) {
             <div className="max-w-[1440px] mx-auto px-6">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-                    {/* Filter Sidebar */}
-                    <FilterItem
-                        itemType={{ type: 'service' }}
-                        packageOption={packageOption}
-                        buildingType={buildingType}
-                        mainStructure={mainStructureType}
-                        designStyle={designStyle}
-                        onPackageOptionChange={setPackageOption}
-                        onBuildingTypeChange={setBuildingType}
-                        onMainStructureTypeChange={setMainStructureType}
-                        onDesignStyleChange={setDesignStyle}
-                    />
+                    {/* Filter */}
+                    <div className="flex flex-col space-y-4">
+                        <h2 className="text-2xl font-semibold text-orange-400 ms-6">
+                            {t("serviceViewAll.title")}
+                        </h2>
+
+                        <FilterItem
+                            itemType={{ type: 'service' }}
+                            packageOption={packageOption}
+                            buildingType={buildingType}
+                            mainStructure={mainStructureType}
+                            designStyle={designStyle}
+                            onPackageOptionChange={setPackageOption}
+                            onBuildingTypeChange={setBuildingType}
+                            onMainStructureTypeChange={setMainStructureType}
+                            onDesignStyleChange={setDesignStyle}
+                        />
+                    </div>
 
                     {/* Main Content */}
                     <div className="lg:col-span-3 flex flex-col">
