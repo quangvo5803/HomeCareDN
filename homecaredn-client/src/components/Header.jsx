@@ -13,8 +13,8 @@ const navItems = [
     href: '#',
     type: 'dropdown',
     submenu: [
-      { label: 'header.construction', href: '#services' },
-      { label: 'header.repair', href: '#services' },
+      { label: 'header.construction', href: '/ConstructionViewAll' },
+      { label: 'header.repair', href: '/RepairViewAll' },
       { label: 'header.material', href: '/MaterialViewAll', type: 'link' },
       {
         label: 'header.materialCatalog',
@@ -311,9 +311,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (

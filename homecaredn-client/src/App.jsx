@@ -29,6 +29,8 @@ import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 import ServiceDetail from './pages/ServiceDetail';
+import RepairViewAll from './pages/RepairViewAll';
+import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
 import Profile from './pages/customer/Profile';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
@@ -124,17 +126,17 @@ function Layout() {
         <Route
           path="/Login"
           element={
-            !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
+            user ? <Navigate to={getRedirectPath(user)} replace /> : <Login />
           }
         />
         {/* Register */}
         <Route
           path="/Register"
           element={
-            !user ? (
-              <Register />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <Register />
             )
           }
         />
@@ -142,10 +144,10 @@ function Layout() {
         <Route
           path="/VerifyOTP"
           element={
-            !user ? (
-              <VerifyOTP />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <VerifyOTP />
             )
           }
         />
@@ -227,7 +229,9 @@ function Layout() {
           }
         />
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
-        {/* Profile route */}
+        <Route path="RepairViewAll" element={<RepairViewAll />} />
+        <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
+
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

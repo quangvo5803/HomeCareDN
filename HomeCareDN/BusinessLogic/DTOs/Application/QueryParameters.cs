@@ -1,4 +1,6 @@
-﻿namespace BusinessLogic.DTOs.Application
+﻿using DataAccess.Entities.Application;
+
+namespace BusinessLogic.DTOs.Application
 {
     public class QueryParameters
     {
@@ -7,7 +9,16 @@
 
         // mở rộng
         public Guid? FilterID { get; set; }
-        public string? FilterString { get; set; }
+
+        //filter 5 enum
+        public ServiceType? FilterServiceType { get; set; }
+        public PackageOption? FilterPackageOption { get; set; }
+        public BuildingType? FilterBuildingType { get; set; }
+        public MainStructureType? FilterMainStructureType { get; set; }
+        public DesignStyle? FilterDesignStyle { get; set; }
+
+        public Guid? FilterCategoryID { get; set; }
+        public Guid? FilterBrandID { get; set; }
         public bool? FilterBool { get; set; }
         public string? Search { get; set; }
         public string? SortBy { get; set; }

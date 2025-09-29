@@ -1,11 +1,24 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ServiceRequest;
+using BusinessLogic.Services.FacadeService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers.Customer
 {
-    public partial class CustomerController : ControllerBase
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
+    public class CustomerServiceRequestController : ControllerBase
     {
+        private readonly IFacadeService _facadeService;
+
+        public CustomerServiceRequestController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
         [HttpGet("get-all-servicerequest-byuserid")]
         public async Task<IActionResult> GetAllServiceRequestByUserId(
             [FromQuery] QueryParameters parameters

@@ -1,10 +1,23 @@
 ﻿using BusinessLogic.DTOs.Application.Service;
+using BusinessLogic.Services.FacadeService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {
-    public partial class AdminController : ControllerBase
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public class AdminServiceController : ControllerBase
     {
+        private readonly IFacadeService _facadeService;
+
+        public AdminServiceController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
         [HttpPost("create-service")]
         public async Task<IActionResult> CreateService([FromForm] ServiceCreateRequestDto dto)
         {

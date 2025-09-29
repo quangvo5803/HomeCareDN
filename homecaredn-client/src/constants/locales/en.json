@@ -64,6 +64,9 @@
     "service_construction_more": "More Constructions",
     "service_repair_more": "More Repairs",
 
+    "default": "Default",
+    "noDescription": "Description not available",
+
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
     "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
@@ -176,21 +179,32 @@
     "relatedMaterial": "Related Materials"
   },
   "materialViewAll": {
-    "default": "Default",
-    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
+    "listMaterial": "List of materials",
+    "filterCategory": "Material catalog",
+    "filterBrand": "Material brand",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product",
+    "noMaterial": "No corresponding material"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Construction",
     "breadcrumb_repair": "Repair",
+    "relatedRepair": "Related Repairs",
+    "relatedConstruction": "Related Constructions"
+  },
+  "serviceViewAll": {
+    "title": "List of services",
+    "verifiedLicense": "Verified License",
+    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service",
+    "noService": "No corresponding service"
+  },
+  "breadcrumb_home": "Home",
+  "sharedEnums": {
     "serviceType": "Service type",
     "buildingType": "Building type",
     "packageOption": "Package option",
     "mainStructure": "Main structure type",
-    "designStyle": "Design style",
-    "relatedRepair": "Related Repairs",
-    "relatedConstruction": "Related Constructions"
+    "designStyle": "Design style"
   },
-  "breadcrumb_home": "Home",
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -765,7 +779,9 @@
     "ADDRESS_ADD": "Add address successfully.",
     "ADDRESS_UPDATE": "Address updated successfully.",
     "SERVICE_ADD": "Add service successfully.",
-    "SERVICE_UPDATE": "Service updated successfully."
+    "SERVICE_UPDATE": "Service updated successfully.",
+    "SERVICE_REQUEST_ADD": "Add service request successfully.",
+    "SERVICE_REQUEST_UPDATE": "Service request updated successfully."
   },
   "roles": {
     "Distributor": "Distributor",

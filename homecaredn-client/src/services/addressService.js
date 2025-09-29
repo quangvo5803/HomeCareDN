@@ -2,22 +2,32 @@ import api from '../api';
 
 export const addressService = {
   getUserAddress: async (userId) => {
-    const response = await api.get(`/Customer/get-user-address/${userId}`);
+    const response = await api.get(
+      `/CustomerAddresses/get-user-address/${userId}`
+    );
     return response.data;
   },
 
   createAddress: async (payload) => {
-    const response = await api.post(`/Customer/create-address`, payload);
+    const response = await api.post(
+      `/CustomerAddresses/create-address`,
+      payload
+    );
     return response.data;
   },
 
   updateAddress: async (payload) => {
-    const response = await api.put(`/Customer/update-address`, payload);
+    const response = await api.put(
+      `/CustomerAddresses/update-address`,
+      payload
+    );
     return response.data;
   },
 
   deleteAddress: async (id) => {
-    const response = await api.delete(`/Customer/delete-address/${id}`);
+    const response = await api.delete(
+      `/CustomerAddresses/delete-address/${id}`
+    );
     return response.data;
   },
 };

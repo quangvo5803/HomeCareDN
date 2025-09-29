@@ -34,9 +34,20 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
 
-            query = Enum.TryParse<ServiceType>(parameters.FilterString, true, out var serviceType)
-                ? query.Where(s => s.ServiceType == serviceType)
-                : query;
+            if (parameters.FilterServiceType.HasValue)
+                query = query.Where(s => s.ServiceType == parameters.FilterServiceType.Value);
+
+            if (parameters.FilterPackageOption.HasValue)
+                query = query.Where(s => s.PackageOption == parameters.FilterPackageOption.Value);
+
+            if (parameters.FilterBuildingType.HasValue)
+                query = query.Where(s => s.BuildingType == parameters.FilterBuildingType.Value);
+
+            if (parameters.FilterMainStructureType.HasValue)
+                query = query.Where(s => s.MainStructureType == parameters.FilterMainStructureType.Value);
+
+            if (parameters.FilterDesignStyle.HasValue)
+                query = query.Where(s => s.DesignStyle == parameters.FilterDesignStyle.Value);
 
             var totalCount = await query.CountAsync();
             query = parameters.SortBy?.ToLower() switch

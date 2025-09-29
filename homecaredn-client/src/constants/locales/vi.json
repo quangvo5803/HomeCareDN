@@ -64,6 +64,9 @@
     "service_construction_more": "Xem thêm",
     "service_repair_more": "Xem thêm",
 
+    "default": "Mặc định",
+    "noDescription": "Mô tả không có sẵn",
+
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -175,21 +178,32 @@
     "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
-    "default": "Mặc định",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
+    "listMaterial": "Danh sách vật liệu",
+    "filterCategory": "Danh mục vật liệu",
+    "filterBrand": "Thương hiệu vật liệu",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
+    "noMaterial": "Không có vật liệu tương ứng"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",
     "breadcrumb_repair": "Sửa chữa",
+    "relatedRepair": "Các sửa chữa liên quan",
+    "relatedConstruction": "Các xây dụng liên quan"
+  },
+  "serviceViewAll": {
+    "title": "Danh sách dịch vụ",
+    "verifiedLicense": "Giấy phép đã được xác minh",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ",
+    "noService": "Không có dịch vụ tương ứng"
+  },
+  "breadcrumb_home": "Trang chủ",
+  "sharedEnums": {
     "serviceType": "Loại dịch vụ",
     "buildingType": "Loại tòa nhà",
     "packageOption": "Tùy chọn gói",
     "mainStructure": "Loại cấu trúc chính",
-    "designStyle": "Phong cách thiết kế",
-    "relatedRepair": "Các sửa chữa liên quan",
-    "relatedConstruction": "Các xây dụng liên quan"
+    "designStyle": "Phong cách thiết kế"
   },
-  "breadcrumb_home": "Trang chủ",
   "login": {
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",
@@ -760,7 +774,9 @@
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
     "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
     "SERVICE_ADD": "Thêm dịch vụ thành công.",
-    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
+    "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
+    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",

@@ -33,9 +33,13 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
             );
-            if (parameters.FilterID.HasValue)
+            if (parameters.FilterCategoryID.HasValue)
             {
-                query = query.Where(m => m.CategoryID == parameters.FilterID.Value);
+                query = query.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
+            }
+            if (parameters.FilterBrandID.HasValue)
+            {
+                query = query.Where(m => m.BrandID == parameters.FilterBrandID.Value);
             }
             var totalCount = await query.CountAsync();
 
