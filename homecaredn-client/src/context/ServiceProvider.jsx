@@ -18,7 +18,11 @@ export const ServiceProvider = ({ children }) => {
       PageSize = 10,
       SortBy,
       FilterID,
-      FilterString,
+      FilterServiceType,
+      FilterPackageOption,
+      FilterBuildingType,
+      FilterMainStructureType,
+      FilterDesignStyle,
     } = {}) => {
       try {
         setLoading(true);
@@ -27,7 +31,11 @@ export const ServiceProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
-          FilterString,
+          FilterServiceType,
+          FilterPackageOption,
+          FilterBuildingType,
+          FilterMainStructureType,
+          FilterDesignStyle,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,

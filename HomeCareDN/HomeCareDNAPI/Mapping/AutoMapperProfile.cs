@@ -178,8 +178,7 @@ namespace HomeCareDNAPI.Mapping
                         opt.MapFrom(src =>
                             src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
                         )
-                )
-                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+                );
 
             CreateMap<Address, AddressDto>();
 

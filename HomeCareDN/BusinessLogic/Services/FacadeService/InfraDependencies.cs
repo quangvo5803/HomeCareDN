@@ -29,3 +29,4 @@ namespace BusinessLogic.Services.FacadeService
             GroqClient = groqClient;
         }
     }
+}
