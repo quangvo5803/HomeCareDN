@@ -12,7 +12,8 @@
     "register": "Register",
     "search": "Search...",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "become_partner": "Become a Partner"
   },
   "home": {
     "slider_category1": "Commercial",
@@ -94,9 +95,121 @@
     "stat5_title": "Experience Engineers",
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
   },
+   "partner": {
+    "already_have_account": "Already have an account? ",
+    "become_partner": "Become a Partner",
+    "join_our_network": "Join Our Partner Network",
+    "partnership_benefits": "By partnering with HomeCareDN, your business gains access to a broad customer base, streamlined digital vendor management, and reputation growth.",
+    "choose_partner_type": "Choose Your Partner Type",
+    "select_type_description": "Select the type of partnership that best describes your business to get started with HomeCareDN.",
+    "why_partner_with_us": "Why Partner with HomeCareDN?",
+    
+    "expand_reach": "Expand Your Reach",
+    "expand_reach_desc": "Connect with thousands of customers looking for home care services and materials.",
+    "increase_sales": "Increase Business Opportunities", 
+    "increase_sales_desc": "Access new revenue streams through our established customer base.",
+    "trusted_platform": "Trusted Platform",
+    "trusted_platform_desc": "Join a reliable platform that prioritizes quality and customer satisfaction.",
+    
+    "key_benefits": "Key Benefits",
+    "continue_as": "Continue as",
+    "select_type_first": "Please select a partner type",
+    "change_type": "Change partner type",
+    
+    "distributor": "Material Distributor",
+    "contractor": "Service Contractor",
+    "distributor_desc": "Supply construction materials and home improvement products",
+    "contractor_desc": "Provide home care services and maintenance",
+    
+    "distributor_feature_1": "Access to wide customer network",
+    "distributor_feature_2": "Inventory management support", 
+    "distributor_feature_3": "Marketing and promotion tools",
+    "distributor_feature_4": "Competitive pricing advantages",
+    
+    "contractor_feature_1": "Direct customer connections",
+    "contractor_feature_2": "Project management tools",
+    "contractor_feature_3": "Quality assurance support",
+    "contractor_feature_4": "Professional certification",
+    
+    "partner_registration": "Partner Registration",
+    "partner_type": "Partner Type",
+    "company_name": "Company Name",
+    "company_name_placeholder": "Enter your registered company name",
+    "email": "Email Address",
+    "email_placeholder": "Enter business email",
+    "phone_number": "Phone Number", 
+    "phone_placeholder": "Enter phone number",
+    "description": "Business Description",
+    "description_placeholder": "Describe your business, services, or products...",
+    "business_images": "Business Images",
+    "upload_images": "Upload Business Images",
+    "drag_drop_images": "Drag & drop images here or click to select",
+    "image_requirements": "Upload up to 5 images (JPG, PNG, max 5MB each)",
+    
+    "submitting": "Submitting Application...",
+    "submit_application": "Submit Partner Application",
+    "registration_success": "Your partner application has been submitted successfully! We will review and contact you soon.",
+    "registration_error": "Failed to submit application. Please check your information and try again.",
+    "review_process_info": "📝 Your application will be reviewed by our team within 3-5 business days. We'll notify you via email once approved.",
+    
+    "have_questions": "Have questions about partnering with us?",
+    "contact_support": "Contact Partner Support",
+    
+    "validation": {
+      "partner_type_required": "Please select partner type",
+      "company_name_required": "Company name is required",
+      "email_required": "Email address is required", 
+      "email_invalid": "Please enter a valid email",
+      "phone_required": "Phone number is required",
+      "description_required": "Business description is required",
+      "images_required": "Please upload at least one business image"
+    },
+    
+    "partner_management": "Partner Management",
+    "management_description": "View, approve, or reject partner applications.",
+    "search_placeholder": "Search by company, contact person, or number...",
+    "submitted_at": "Submitted At",
+    "no_partners_found": "No partners have registered yet.",
+    "approve": "Approve",
+    "approve_partner": "Approve Partner",
+    "approval_comment": "Approval Comment (optional)",
+    "comment_placeholder": "Write any notes for approval...",
+    "approved_successfully": "Partner approved successfully.",
+    "approve_error": "Failed to approve partner.",
+    "reject": "Reject",
+    "reject_partner": "Reject Partner",
+    "rejection_reason": "Reason for rejection",
+    "reason_placeholder": "Provide reason for rejection...",
+    "reason_required": "Please provide a rejection reason.",
+    "rejected_successfully": "Partner rejected.",
+    "reject_error": "Failed to reject partner.",
+    "confirm_delete": "Delete this partner?",
+    "delete_warning": "This operation cannot be undone.",
+    "deleted_successfully": "Partner deleted.",
+    "delete_error": "Failed to delete partner.",
+    "partner_details": "Partner Details",
+    "detail_error": "Could not load partner details.",
+    "fetch_error": "Failed to load partners",
+    "company_info": "Company Information",
+    "contact_info": "Contact Information",
+    "pending": "Pending",
+    "approved": "Approved", 
+    "rejected": "Rejected"
+  },
   "common": {
     "home": "Home",
-    "about": "About"
+    "about": "About",
+    "back": "Back",
+    "back_to_home": "Back to Home",
+    "search": "Search",
+    "status": "Status",
+    "all_status": "All statuses",
+    "actions": "Actions",
+    "close": "Close",
+    "page_size": "Page size",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "view_details": "View Details"
   },
   "why": {
     "badge": "Why Choose Us",
@@ -197,7 +310,9 @@
     "email_placeholder": "Enter your email",
     "another_login": "Or login with",
     "not_have_account": "Don't have an account? ",
-    "register_link": " Register now"
+    "register_link": " Register now",
+    "business_owner": "Are you a business owner?",
+    "become_partner": "Become a Partner"
   },
   "register": {
     "title": "Register",
@@ -207,7 +322,9 @@
     "another_register": "Or register with ",
     "register_button": "Register",
     "have_account": "Already have an account? ",
-    "login_link": " Login now"
+    "login_link": " Login now",
+    "business_owner": "Are you a business owner?",
+    "become_partner": "Become a Partner"
   },
   "verifyotp": {
     "title": "Verify OTP",
@@ -386,6 +503,7 @@
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material",
+      "partner": "Partner",
       "support": "Support Manager"
     },
     "account": {

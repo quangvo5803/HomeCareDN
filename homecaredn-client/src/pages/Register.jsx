@@ -16,7 +16,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setPendingEmail, login } = useContext(AuthContext);
-
+  const handlePartnerRegistration = () => {
+    navigate('/PartnerRegistration');
+  };
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -196,6 +198,18 @@ export default function Register() {
                 {t('register.login_link')}
               </button>
             </div>
+                        {/* Partner Registration Link */}
+            <div className="text-center mt-4">
+              <span className="text-gray-600">
+                {t('register.business_owner')}
+              </span>
+              <button
+                onClick={handlePartnerRegistration}
+                className="text-green-600 hover:text-green-700 font-medium hover:underline transition-colors duration-200 ml-1"
+             >
+                {t('register.become_partner')}
+              </button>
+            </div>      
           </div>
         </div>
 

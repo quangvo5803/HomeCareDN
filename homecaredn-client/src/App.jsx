@@ -19,6 +19,7 @@ import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
+import AdminPartnerManager from './pages/admin/AdminPartnerManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -29,6 +30,8 @@ import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 import ServiceDetail from './pages/ServiceDetail';
+import PartnerRegistration from './pages/PartnerRegistration';
+import PartnerTypeSelection from './pages/PartnerTypeSelection';
 // Customer pages
 import Profile from './pages/customer/Profile';
 
@@ -54,7 +57,7 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
+  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP','/PartnerTypeSelection','/PartnerRegistration'];
 
   const showHeaderFooter =
     !noHeaderFooterPaths.includes(location.pathname) &&
@@ -119,6 +122,26 @@ function Layout() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/PartnerRegistration"
+          element={!user ? (
+              <PartnerRegistration />
+          ) : (
+            <Navigate to={getRedirectPath(user)} replace />
+          )}
+        />
+
+        {/* PartnerTypeSelection */}
+        <Route
+          path="/PartnerTypeSelection"
+          element={
+            !user ? (
+              <PartnerTypeSelection />
+            ) : (
+              <Navigate to={getRedirectPath(user)} replace />
+            )
+          }
+        />
         {/* Login */}
         <Route
           path="/Login"
@@ -171,6 +194,7 @@ function Layout() {
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="ServiceManager" element={<AdminServiceManager />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
+          <Route path="PartnerManager" element={<AdminPartnerManager />} />
         </Route>
         {/* Contractor routes */}
         <Route
