@@ -13,7 +13,13 @@ export const ServiceProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   // 📌 Public: fetch all
   const fetchServices = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID, FilterString } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterString,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await serviceService.getAllService({
@@ -32,7 +38,9 @@ export const ServiceProvider = ({ children }) => {
         return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setServices([]);
+        setTotalServices(0);
+        return [];
       } finally {
         setLoading(false);
       }
@@ -86,10 +94,10 @@ export const ServiceProvider = ({ children }) => {
           prev.map((s) =>
             s.serviceID === updated.serviceID
               ? {
-                ...s,
-                ...updated,
-                imageUrls: updated.imageUrls ?? s.imageUrls,
-              }
+                  ...s,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? s.imageUrls,
+                }
               : s
           )
         );
