@@ -7,7 +7,7 @@ const Loading = ({ progress }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col justify-center items-center bg-white p-4">
+    <div className="fixed inset-0 z-[9999] flex flex-col justify-center items-center bg-white p-4">
       <i
         className="fa-solid fa-building fa-flip mb-6"
         style={{ color: '#FDA12B', fontSize: '48px' }}
