@@ -61,6 +61,9 @@
     "material_title": "Materials for Construction and Renovation",
     "material_more": "More Materials",
 
+    "service_construction_more": "More Constructions",
+    "service_repair_more": "More Repairs",
+
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
     "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
@@ -176,6 +179,18 @@
     "default": "Default",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product"
   },
+  "serviceDetail": {
+    "breadcrumb_construction": "Construction",
+    "breadcrumb_repair": "Repair",
+    "serviceType": "Service type",
+    "buildingType": "Building type",
+    "packageOption": "Package option",
+    "mainStructure": "Main structure type",
+    "designStyle": "Design style",
+    "relatedRepair": "Related Repairs",
+    "relatedConstruction": "Related Constructions"
+  },
+  "breadcrumb_home": "Home",
   "login": {
     "title": "Login",
     "subtitle": "Welcome back!",
@@ -231,14 +246,56 @@
       "preview": "Preview: ",
       "addressPlaceholder": "House number, street name, area..."
     },
-    "service_request": {
+    "serviceRequest": {
       "title": "Service Requests",
       "subtitle": "View and manage your service requests.",
       "noRequest": "No service requests yet",
-      "letStart": "Start by creating your first service request"
+      "letStart": "Start by creating your first service request",
+      "label_buildingType": "Buidling type:",
+      "label_mainStructureType": "Main structure type:",
+      "label_area": "Area:",
+      "label_floors": "Floors:",
+      "label_designStyle": "Desgin style:",
+      "label_estimatePrice": "Estimate price: ",
+      "label_packageOption": "Package option: ",
+      "label_address": "Address: ",
+      "label_open": "Opening",
+      "label_close":"Closed"
+    },
+    "createServiceRequest":{
+      "title": "Create Service Request",
+      "subtitle": "Fill out the form below to submit your service request",
+      "header": "Service Request Details",
+      "form_serviceType": "Service Type",
+      "form_selectServiceType": "Select service type",
+      "form_packageOption": "Package Option",
+      "form_selectPackageOption":"Select package option",
+      "form_buildingType": "Building Type",
+      "form_selectBuildingType": "Select building type",
+      "form_structureType": "Structure Type",
+      "form_selectStructureType": "Select structure type",
+      "form_designStyle": "Design Style",
+      "form_selectDesignStyle": "Select design style",
+      "form_width": "Width (m)",
+      "form_widthPlaceholder":"Enter width in meters",
+      "form_length": "Length (m)",
+      "form_lengthPlaceholder": "Enter length in meters",
+      "form_floor": "Number of Floors",
+      "form_floorPlaceholder": "Enter number of floors",
+      "form_estimatePrice": "Estimate Price",
+      "form_estimatePricePlaceholder": "Enter estimate price",
+      "form_address": "Address",
+      "form_selectAddress": "Select address",
+      "form_description": "Description",
+      "form_descriptionPlaceholder": "Provide additional details about your service request...",
+      "form_images": "Reference / Current State (Maximum 5 images)",
+
+      "calculatedArea": "Construction floor area: ",
+      "estimatePrice": "Estimate price: ",
+      "estimateInWord": "By word: ",
+      "footer": "You will receive notification as soon as a contractor/distributor applies."
     }
   },
-
 
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -535,7 +592,6 @@
     "itemsCount": "{{count}} item(s)"
   },
 
-
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
@@ -600,7 +656,11 @@
     "SaveProfile": "Save Profile",
     "Save": "Save",
     "Saving": "Saving...",
-    "AddAddress": "Add Address"
+    "AddAddress": "Add Address",
+    "CreateServiceRequest": "Create Service Request",
+    "UpdateServiceRequest": "Update Service Request",
+    "Back": "Back",
+    "ViewDetail": "View detail"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -620,10 +680,6 @@
       "title": "Are you sure?",
       "text": "This material will be deleted and cannot be restored!"
     },
-    "DeleteImageModal": {
-      "title": "Are you sure?",
-      "text": "This image will be deleted and cannot be restored!"
-    },
     "DeleteServiceModal": {
       "title": "Are you sure?",
       "text": "This service will be deleted and cannot be restored!"
@@ -632,9 +688,17 @@
       "title": "Delete this address?",
       "text": "This action cannot be undone."
     },
+    "DeleteServiceRequestModal": {
+      "title": "Delete this service request?",
+      "text": "This action cannot be undone."
+    },
     "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
+    },
+    "DeleteImageModal": {
+      "title": "Are you sure?",
+      "text": "This image will be deleted and cannot be restored!"
     }
   },
   "ERROR": {
@@ -657,6 +721,7 @@
 
     "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+    "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service request ontime!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
@@ -675,6 +740,9 @@
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
+    "REQUIRED_ADDRESS": "Please provide address information before create service request!",
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please choose address",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please fill in more description for best search results",
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "Failed to load data, please try again later.",
@@ -692,13 +760,13 @@
     "CATEGORY_UPDATE": "Update category successfully.",
     "REPLY": "Replied successfully.",
     "MATERIAL_ADD": "Add material successfully",
-    "MATERIAL_UPDATE": "Update material successfully.",   
+    "MATERIAL_UPDATE": "Update material successfully.",
     "PROFILE_UPDATE": "Profile updated successfully.",
     "ADDRESS_ADD": "Add address successfully.",
     "ADDRESS_UPDATE": "Address updated successfully.",
     "SERVICE_ADD": "Add service successfully.",
     "SERVICE_UPDATE": "Service updated successfully."
-  }, 
+  },
   "roles": {
     "Distributor": "Distributor",
     "Contractor": "Contractor",
@@ -748,7 +816,7 @@
       "Other": "Other"
     }
   },
-  "toast":{
-      "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
+  "toast": {
+    "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   }
 }

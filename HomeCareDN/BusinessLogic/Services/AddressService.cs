@@ -31,7 +31,7 @@ namespace BusinessLogic.Services
             var entities = await _db
                 .Addresses.AsNoTracking()
                 .Where(a => a.UserId == userId)
-                .OrderByDescending(a => a.AddressId)
+                .OrderByDescending(a => a.AddressID)
                 .ToListAsync();
 
             var dtos = _mapper.Map<ICollection<AddressDto>>(entities);
@@ -58,7 +58,7 @@ namespace BusinessLogic.Services
 
         public async Task<AddressDto> UpdateAddressAsync(UpdateAddressDto dto)
         {
-            if (dto.AddressId == Guid.Empty)
+            if (dto.AddressID == Guid.Empty)
             {
                 var errors = new Dictionary<string, string[]>
                 {
@@ -67,7 +67,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var entity = await _db.Addresses.FirstOrDefaultAsync(a => a.AddressId == dto.AddressId);
+            var entity = await _db.Addresses.FirstOrDefaultAsync(a => a.AddressID == dto.AddressID);
 
             if (entity is null)
             {
@@ -86,7 +86,7 @@ namespace BusinessLogic.Services
 
         public async Task DeleteAddressAsync(Guid addressId)
         {
-            var entity = await _db.Addresses.FirstOrDefaultAsync(a => a.AddressId == addressId);
+            var entity = await _db.Addresses.FirstOrDefaultAsync(a => a.AddressID == addressId);
 
             if (entity is null)
             {

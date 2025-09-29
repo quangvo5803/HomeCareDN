@@ -507,7 +507,7 @@ export default function Home() {
               {randomServices.length === 0 ? (
                 <p></p>
               ) : (
-                randomServices.map((item) => (
+                randomServices?.map((item) => (
                   <CardItem key={item.serviceID} item={item} />
                 ))
               )}
@@ -548,7 +548,7 @@ export default function Home() {
               {randomMaterials.length === 0 ? (
                 <p></p>
               ) : (
-                randomMaterials.map((item) => (
+                randomMaterials?.map((item) => (
                   <CardItem key={item.materialID} item={item} />
                 ))
               )}

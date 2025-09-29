@@ -350,6 +350,10 @@ namespace DataAccess.Migrations.ApplicationDb
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("AddressId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BuildingType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -358,6 +362,7 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DesignStyle")
@@ -380,6 +385,7 @@ namespace DataAccess.Migrations.ApplicationDb
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PackageOption")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ServiceType")

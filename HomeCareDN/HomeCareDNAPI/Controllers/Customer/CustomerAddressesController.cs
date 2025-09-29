@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Authorize.Address;
+using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -9,13 +10,21 @@ namespace HomeCareDNAPI.Controllers.Customer;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
-public class AddressesController : ControllerBase
+public partial class CustomerController : ControllerBase
 {
     private readonly IAddressService _addressService;
+    private readonly IProfileService _profileService;
+    private readonly IFacadeService _facadeService;
 
-    public AddressesController(IAddressService addressService)
+    public CustomerController(
+        IAddressService addressService,
+        IProfileService profileService,
+        IFacadeService facadeService
+    )
     {
         _addressService = addressService;
+        _profileService = profileService;
+        _facadeService = facadeService;
     }
 
     [HttpGet("get-user-address/{userId}")]

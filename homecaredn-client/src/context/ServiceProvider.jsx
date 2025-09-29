@@ -13,7 +13,13 @@ export const ServiceProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   // 📌 Public: fetch all
   const fetchServices = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterString,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await serviceService.getAllService({
@@ -21,6 +27,7 @@ export const ServiceProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
+          FilterString,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -31,7 +38,9 @@ export const ServiceProvider = ({ children }) => {
         return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setServices([]);
+        setTotalServices(0);
+        return [];
       } finally {
         setLoading(false);
       }

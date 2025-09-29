@@ -178,8 +178,8 @@ export default function MaterialCatalog() {
                   {/* Image */}
                   <div className="relative h-52 bg-gradient-to-br from-gray-50 to-white">
                     <img
-                      src={m.img}
-                      alt={m.title}
+                      src={m.img || "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"}
+                      alt={m.title || "No image"}
                       className="object-contain w-full h-full p-3 transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                     />

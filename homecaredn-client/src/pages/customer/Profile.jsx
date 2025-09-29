@@ -1,13 +1,17 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hook/useAuth';
+import { useServiceRequest } from '../../hook/useServiceRequest';
 import { profileService } from '../../services/profileService';
-import { addressService } from '../../services/addressService';
+import { useAddress } from '../../hook/useAddress';
 import { geoService } from '../../services/geoService';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
+import PropTypes from 'prop-types';
+import Swal from 'sweetalert2';
 
 const emptyAddrForm = {
   id: null,
@@ -17,12 +21,14 @@ const emptyAddrForm = {
   detail: '',
 };
 
-export default function ProfilePage() {
+export default function ProfilePage({ defaultTab = 'profile' }) {
   const { user, loading: authLoading } = useAuth();
   const { t } = useTranslation();
-
+  const navigate = useNavigate();
   // Tabs
-  const [active, setActive] = useState('profile');
+  const location = useLocation();
+  const initialTab = location.state?.tab || defaultTab;
+  const [active, setActive] = useState(initialTab);
 
   // Profile form
   const [form, setForm] = useState({
@@ -34,10 +40,18 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
 
   // Address states
-  const [addrItems, setAddrItems] = useState([]);
   const [addrForm, setAddrForm] = useState(emptyAddrForm);
-  const [addrLoading, setAddrLoading] = useState(false);
   const [addrSubmitting, setAddrSubmitting] = useState(false);
+  //Address Context
+  const {
+    addresses,
+    totalAddressess,
+    loading: addrLoading,
+    fetchAddresses,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+  } = useAddress();
 
   // Geo data
   const [provinces, setProvinces] = useState([]);
@@ -50,46 +64,33 @@ export default function ProfilePage() {
   /* --------------------------------- Loaders -------------------------------- */
   useEffect(() => {
     if (!user?.id) return;
+
     (async () => {
       try {
-        const { data } = await profileService.getProfile(user.id);
-        setForm({
-          fullName: data.fullName || '',
-          phoneNumber: data.phoneNumber || '',
-          gender: data.gender ?? null,
-          email: data.email || data.userName || '',
-        });
+        if (active === 'profile') {
+          const { data } = await profileService.getProfile(user.id);
+          if (data) {
+            setForm({
+              fullName: data.fullName || '',
+              phoneNumber: data.phoneNumber || '',
+              gender: data.gender ?? null,
+              email: data.email || data.userName || '',
+            });
+          }
+        }
+        try {
+          const { data } = await geoService.getProvinces(1);
+          setProvinces(Array.isArray(data) ? data : []);
+        } catch {
+          setProvinces([]);
+        }
+
+        await fetchAddresses();
       } catch (error) {
         handleApiError(error, t('ERROR.LOAD_ERROR'));
       }
     })();
-  }, [user?.id, t]);
-
-  const loadAddresses = useCallback(async () => {
-    if (!user?.id) return;
-    setAddrLoading(true);
-    try {
-      const { data } = await addressService.getUserAddress(user.id);
-      setAddrItems(Array.isArray(data) ? data : []);
-    } catch (err) {
-      toast.error(handleApiError(err, t('ERROR.LOAD_ERROR')));
-    } finally {
-      setAddrLoading(false);
-    }
-  }, [t, user?.id]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    (async () => {
-      try {
-        const { data } = await geoService.getProvinces(1);
-        setProvinces(Array.isArray(data) ? data : []);
-      } catch {
-        setProvinces([]);
-      }
-      await loadAddresses();
-    })();
-  }, [authLoading, user?.id, loadAddresses]);
+  }, [user?.id, active, authLoading, fetchAddresses, t]);
 
   /* ------------------------------- Profile save ------------------------------ */
   const onChange = (e) =>
@@ -99,19 +100,13 @@ export default function ProfilePage() {
     e.preventDefault();
     if (saving) return;
     setSaving(true);
-    try {
-      await profileService.updateProfile({
-        userId: user.id,
-        fullName: form.fullName,
-        phoneNumber: form.phoneNumber || null,
-        gender: form.gender === '' ? null : Number(form.gender),
-      });
-      toast.success(t('SUCCESS.PROFILE_UPDATE'));
-    } catch (err) {
-      toast.error(handleApiError(err, t('ERROR.UPDATE_ERROR')));
-    } finally {
-      setSaving(false);
-    }
+    await profileService.updateProfile({
+      UserId: user.id,
+      FullName: form.fullName,
+      PhoneNumber: form.phoneNumber || null,
+      Gender: form.gender === '' ? null : Number(form.gender),
+    });
+    toast.success(t('SUCCESS.PROFILE_UPDATE'));
   };
 
   /* ------------------------------- Address CRUD ------------------------------ */
@@ -134,23 +129,26 @@ export default function ProfilePage() {
     const payload = {
       UserId: user.id,
       AddressId: addrForm.id,
-      city: addrForm.city.trim(),
-      district: addrForm.district.trim(),
-      ward: addrForm.ward.trim(),
-      detail: addrForm.detail.trim(),
+      City: addrForm.city.trim(),
+      District: addrForm.district.trim(),
+      Ward: addrForm.ward.trim(),
+      Detail: addrForm.detail.trim(),
     };
 
     try {
       if (addrForm.id) {
-        await addressService.updateAddress(payload);
+        await updateAddress(payload);
         toast.success(t('SUCCESS.ADDRESS_UPDATE'));
       } else {
-        await addressService.createAddress(payload);
+        if (totalAddressess === 5) {
+          toast.error(t('ERROR.ADDRESS_MAX'));
+          return;
+        }
+        await createAddress(payload);
         toast.success(t('SUCCESS.ADDRESS_ADD'));
       }
 
       resetAddressForm();
-      await loadAddresses();
     } catch (err) {
       toast.error(handleApiError(err, t('ERROR.SUBMIT_ERROR')));
     } finally {
@@ -224,9 +222,7 @@ export default function ProfilePage() {
       titleKey: 'ModalPopup.DeleteAddressModal.title',
       textKey: 'ModalPopup.DeleteAddressModal.text',
       onConfirm: async () => {
-        await addressService.removeAddress(id);
-        await loadAddresses();
-
+        await deleteAddress(id);
         toast.success(t('SUCCESS.DELETE'));
       },
     });
@@ -310,28 +306,80 @@ export default function ProfilePage() {
   ]
     .filter(Boolean)
     .join(', ');
-  if (authLoading || addrLoading) return <Loading />;
+
+  /* --------------------------------- Service Request --------------------------------- */
+  const {
+    loading: serviceRequestLoading,
+    serviceRequests,
+    fetchServiceRequestsByUserId,
+    deleteServiceRequest,
+  } = useServiceRequest();
+  useEffect(() => {
+    if (active === 'service_requests' && user?.id) {
+      (async () => {
+        try {
+          await fetchServiceRequestsByUserId({
+            FilterID: user.id,
+          });
+        } catch (err) {
+          toast.error(handleApiError(err, t('ERROR.LOAD_ERROR')));
+        }
+      })();
+    }
+  }, [active, user?.id, fetchServiceRequestsByUserId, t]);
+
+  const handleServiceRequestCreateUpdate = (serviceRequestId) => {
+    if (totalAddressess === 0) {
+      toast.error(t('ERROR.REQUIRED_ADDRESS'));
+      return;
+    }
+    if (!serviceRequestId && serviceRequests.length === 3) {
+      toast.error(t('ERROR.MAXIMUM_SERVICE_REQUEST'));
+      return;
+    }
+
+    if (serviceRequestId) {
+      // Update mode
+      navigate(`/Customer/ServiceRequest/${serviceRequestId}`);
+    } else {
+      // Create mode
+      navigate('/Customer/ServiceRequest');
+    }
+  };
+
+  const handleDeleteServiceRequest = (serviceRequestID) => {
+    showDeleteModal({
+      t,
+      titleKey: t('ModalPopup.DeleteServiceRequestModal.title'),
+      textKey: t('ModalPopup.DeleteServiceRequestModal.text'),
+      onConfirm: async () => {
+        try {
+          await deleteServiceRequest(serviceRequestID);
+          Swal.close();
+          toast.success(t('SUCCESS.DELETE'));
+        } catch (err) {
+          handleApiError(err, t);
+        }
+      },
+    });
+  };
+
+  if (authLoading || addrLoading || serviceRequestLoading) return <Loading />;
   /* --------------------------------- Render --------------------------------- */
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Font Awesome CDN */}
-      <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      />
-
       <div className="max-w-6xl mx-auto p-4 mt-5">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             {active === 'profile'
               ? t('userPage.profile.title')
-              : t('userPage.service_request.title')}
+              : t('userPage.serviceRequest.title')}
           </h1>
           <p className="text-gray-600">
             {active === 'profile'
               ? t('userPage.profile.subtitle')
-              : t('userPage.service_request.subtitle')}
+              : t('userPage.serviceRequest.subtitle')}
           </p>
         </div>
 
@@ -360,7 +408,7 @@ export default function ProfilePage() {
                   }`}
                 >
                   <i className="fas fa-clipboard-list"></i>
-                  {t('userPage.service_request.title')}
+                  {t('userPage.serviceRequest.title')}
                 </button>
               </nav>
             </div>
@@ -485,49 +533,49 @@ export default function ProfilePage() {
 
                     {/* Address List */}
                     <div className="mb-6">
-                      {!addrLoading && addrItems.length === 0 && (
-                        <div className="text-gray-500 text-center py-6 bg-gray-50 rounded-lg">
-                          <i className="fas fa-map-marker-alt text-3xl mb-2"></i>
-                          <div>{t('userPage.profile.noAddress')}</div>
-                        </div>
-                      )}
-
                       {!addrLoading &&
-                        addrItems.map((it) => (
-                          <div
-                            key={it.addressId}
-                            className="border border-gray-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow duration-200"
-                          >
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-start gap-3">
-                                <i className="fas fa-home text-orange-600 mt-1"></i>
-                                <div>
-                                  <div className="font-medium text-gray-800">
-                                    {it.detail}
-                                  </div>
-                                  <div className="text-sm text-gray-600">
-                                    {it.ward}, {it.district}, {it.city}
+                        (totalAddressess === 0 ? (
+                          <div className="text-gray-500 text-center py-6 bg-gray-50 rounded-lg">
+                            <i className="fas fa-map-marker-alt text-3xl mb-2"></i>
+                            <div>{t('userPage.profile.noAddress')}</div>
+                          </div>
+                        ) : (
+                          addresses.map((it) => (
+                            <div
+                              key={it.addressID}
+                              className="border border-gray-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow duration-200"
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex items-start gap-3">
+                                  <i className="fas fa-home text-orange-600 mt-1"></i>
+                                  <div>
+                                    <div className="font-medium text-gray-800">
+                                      {it.detail}
+                                    </div>
+                                    <div className="text-sm text-gray-600">
+                                      {it.ward}, {it.district}, {it.city}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => editAddrItem(it)}
-                                  className="text-orange-600 hover:text-orange-700 px-2 py-1 rounded hover:bg-orange-50 transition-colors duration-200"
-                                >
-                                  <i className="fas fa-edit mr-1"></i>
-                                  {t('BUTTON.Edit')}
-                                </button>
-                                <button
-                                  onClick={() => deleteAddrItem(it.addressId)}
-                                  className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
-                                >
-                                  <i className="fas fa-trash mr-1"></i>
-                                  {t('BUTTON.Delete')}
-                                </button>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => editAddrItem(it)}
+                                    className="text-orange-600 hover:text-orange-700 px-2 py-1 rounded hover:bg-orange-50 transition-colors duration-200"
+                                  >
+                                    <i className="fas fa-edit mr-1"></i>
+                                    {t('BUTTON.Edit')}
+                                  </button>
+                                  <button
+                                    onClick={() => deleteAddrItem(it.addressId)}
+                                    className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
+                                  >
+                                    <i className="fas fa-trash mr-1"></i>
+                                    {t('BUTTON.Delete')}
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          ))
                         ))}
                     </div>
 
@@ -680,14 +728,261 @@ export default function ProfilePage() {
               )}
 
               {active === 'service_requests' && (
-                <div className="text-center py-12">
-                  <i className="fas fa-tools text-6xl text-gray-300 mb-4"></i>
-                  <h2 className="text-xl font-semibold mb-2 text-gray-800">
-                    {t('userPage.service_request.noRequest')}
-                  </h2>
-                  <p className="text-gray-600">
-                    {t('userPage.service_request.letStart')}
-                  </p>
+                <div>
+                  {/* Header với button create */}
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-1">
+                        <i className="fas fa-clipboard-list text-orange-600 mr-2"></i>
+                        {t('userPage.serviceRequest.title')}
+                      </h2>
+                      <p className="text-sm text-gray-600">
+                        {t('userPage.serviceRequest.subtitle')}(
+                        {serviceRequests?.length || 0}/3)
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleServiceRequestCreateUpdate()}
+                      disabled={serviceRequests?.length >= 3}
+                      className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
+                    >
+                      <i className="fas fa-plus"></i>
+                      {t('BUTTON.CreateServiceRequest')}
+                    </button>
+                  </div>
+
+                  {/* Service Requests List */}
+                  {!serviceRequests || serviceRequests.length === 0 ? (
+                    <div className="text-center py-16 bg-gray-50 rounded-xl">
+                      <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-4">
+                        <i className="fas fa-tools text-3xl text-orange-600"></i>
+                      </div>
+                      <h3 className="text-lg font-medium text-gray-800 mb-2">
+                        {t('userPage.serviceRequest.noRequest')}
+                      </h3>
+                      <p className="text-gray-600 mb-4">
+                        {t('userPage.serviceRequest.letStart')}
+                      </p>
+                      <button
+                        onClick={() => handleServiceRequestCreateUpdate()}
+                        className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors duration-200 inline-flex items-center gap-2"
+                      >
+                        <i className="fas fa-plus"></i>
+                        {t('BUTTON.CreateServiceRequest')}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {serviceRequests.map((req) => (
+                        <div
+                          key={req.serviceRequestID}
+                          className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-200 hover:border-orange-200"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-3">
+                                <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full">
+                                  <i
+                                    className={`fas ${
+                                      req.serviceType === 'Repair'
+                                        ? 'fa-drafting-compass'
+                                        : req.serviceType === 'Construction'
+                                        ? 'fa-hammer'
+                                        : 'fa-wrench'
+                                    } text-orange-600`}
+                                  ></i>
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-gray-800 text-lg leading-tight">
+                                    {t(`Enums.ServiceType.${req.serviceType}`)}
+                                  </h3>
+                                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
+                                    <span className="flex items-center gap-1">
+                                      <i className="fas fa-calendar-alt"></i>
+                                      {new Date(
+                                        req.createdAt
+                                      ).toLocaleDateString('vi-VN')}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                      <i className="fas fa-hashtag"></i>
+                                      {req.serviceRequestID.substring(0, 8)}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <p className="text-gray-700 leading-relaxed mb-3">
+                                  {req.description}
+                                </p>
+
+                                {/* Thông tin chi tiết */}
+                                <div className="grid grid-cols-2 md:grid-cols-2 gap-3 text-sm">
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="fas fa-building mr-1 text-orange-500"></i>
+                                    {t(
+                                      `userPage.serviceRequest.label_buildingType`
+                                    )}
+                                    <span className="font-bold">
+                                      {t(
+                                        `Enums.BuildingType.${req.buildingType}`
+                                      )}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="fas fa-cube text-blue-500"></i>
+                                    {t(
+                                      `userPage.serviceRequest.label_mainStructureType`
+                                    )}
+                                    <span className="font-bold">
+                                      {t(
+                                        `Enums.MainStructure.${req.mainStructureType}`
+                                      )}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="fas fa-ruler text-green-500"></i>
+                                    {t(`userPage.serviceRequest.label_area`)}
+                                    <span className="font-bold">
+                                      {req.width}m × {req.length}m
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-gray-600">
+                                    <i className="fas fa-layer-group text-purple-500"></i>
+                                    {t(`userPage.serviceRequest.label_floors`)}
+                                    <span className="font-bold">
+                                      {req.floors}{' '}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {req.designStyle && (
+                                  <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                                    <i className="fas fa-palette text-pink-500"></i>
+                                    {t(
+                                      `userPage.serviceRequest.label_designStyle`
+                                    )}
+                                    <span className="font-bold">
+                                      {t(
+                                        `Enums.DesignStyle.${req.designStyle}`
+                                      )}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="mt-2 flex items-center gap-2 text-sm">
+                                  <i className="fa-solid fa-location-dot"></i>
+                                  {t(`userPage.serviceRequest.label_address`)}
+                                  <span className="font-semibold">
+                                    {req.address.detail}, {req.address.ward},{' '}
+                                    {req.address.district}, {req.address.city}
+                                  </span>
+                                </div>
+                                {req.estimatePrice && (
+                                  <div className="mt-2 flex items-center gap-2 text-sm">
+                                    <i className="fas fa-money-bill-wave text-emerald-500"></i>
+                                    <span className="text-emerald-600 font-semibold">
+                                      {t(
+                                        `userPage.serviceRequest.label_estimatePrice`
+                                      )}
+                                      {req.estimatePrice.toLocaleString(
+                                        'vi-VN'
+                                      )}{' '}
+                                      VNĐ
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                                      req.isOpen
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-gray-100 text-red-500'
+                                    }`}
+                                  >
+                                    <i
+                                      className={`fas ${
+                                        req.isOpen
+                                          ? 'fa-check-circle'
+                                          : 'fa-clock'
+                                      } mr-1`}
+                                    ></i>
+                                    {req.isOpen
+                                      ? t(`userPage.serviceRequest.label_open`)
+                                      : t(
+                                          `userPage.serviceRequest.label_close`
+                                        )}
+                                  </span>
+
+                                  <span
+                                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                      req.packageOption === 'StructureOnly'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : req.packageOption === 'BasicFinish'
+                                        ? 'bg-orange-100 text-orange-800'
+                                        : req.packageOption === 'FullFinish'
+                                        ? 'bg-purple-100 text-purple-800'
+                                        : 'bg-gray-100 text-gray-800'
+                                    }`}
+                                  >
+                                    <i
+                                      className={`fas ${
+                                        req.packageOption === 'BasicFinish'
+                                          ? 'fa-star'
+                                          : req.packageOption ===
+                                            'StructureOnly'
+                                          ? 'fa-star-half-alt'
+                                          : req.packageOption === 'FullFinish'
+                                          ? 'fa-crown'
+                                          : 'fa-box'
+                                      } mr-1`}
+                                    ></i>
+                                    {t(
+                                      `userPage.serviceRequest.label_packageOption`
+                                    )}
+                                    {t(
+                                      `Enums.PackageOption.${req.packageOption}`
+                                    )}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <button className="text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium">
+                                    <i className="fas fa-eye"></i>
+                                    {t('BUTTON.ViewDetail')}
+                                  </button>
+                                  <button
+                                    className="text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                                    onClick={() =>
+                                      handleServiceRequestCreateUpdate(
+                                        req.serviceRequestID
+                                      )
+                                    }
+                                  >
+                                    <i className="fas fa-edit"></i>
+                                    {t('BUTTON.Edit')}
+                                  </button>
+                                  <button
+                                    className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                                    onClick={() =>
+                                      handleDeleteServiceRequest(
+                                        req.serviceRequestID
+                                      )
+                                    }
+                                  >
+                                    <i className="fas fa-xmark"></i>
+                                    {t('BUTTON.Delete')}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -713,3 +1008,6 @@ function normalize(s) {
     .replace(/\s+/g, ' ')
     .trim();
 }
+ProfilePage.PropTypes = {
+  defaultTab: PropTypes.string,
+};

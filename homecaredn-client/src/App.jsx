@@ -28,8 +28,10 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+import ServiceDetail from './pages/ServiceDetail';
 // Customer pages
 import Profile from './pages/customer/Profile';
+import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -110,6 +112,14 @@ function Layout() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/ServiceDetail/:serviceID"
+          element={
+            <PublicRoute>
+              <ServiceDetail />
+            </PublicRoute>
+          }
+        />
         {/* Login */}
         <Route
           path="/Login"
@@ -148,6 +158,23 @@ function Layout() {
             </ProtectedRoute>
           }
         ></Route>
+        <Route
+          path="/Customer/ServiceRequest"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/Customer/ServiceRequest/:serviceRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/Admin"
