@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations.ApplicationDb
 {
     /// <inheritdoc />
-    public partial class CreateInit : Migration
+    public partial class InitDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -51,8 +51,9 @@ namespace DataAccess.Migrations.ApplicationDb
                 {
                     ServiceRequestID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AddressId = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ServiceType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PackageOption = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PackageOption = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BuildingType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MainStructureType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DesignStyle = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -60,7 +61,7 @@ namespace DataAccess.Migrations.ApplicationDb
                     Length = table.Column<double>(type: "float", nullable: false),
                     Floors = table.Column<int>(type: "int", nullable: false),
                     EstimatePrice = table.Column<double>(type: "float", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsOpen = table.Column<bool>(type: "bit", nullable: false)
                 },

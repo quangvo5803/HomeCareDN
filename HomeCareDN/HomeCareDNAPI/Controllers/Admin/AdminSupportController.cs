@@ -1,11 +1,19 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContactSupport;
+using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {
-    public partial class AdminController : ControllerBase
+    public class AdminSupportController : ControllerBase
     {
+        private readonly IFacadeService _facadeService;
+
+        public AdminSupportController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
         [HttpGet("get-all-support")]
         public async Task<IActionResult> ListContactSupports([FromQuery] QueryParameters parameters)
         {

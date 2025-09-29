@@ -118,7 +118,6 @@ namespace BusinessLogic.Services
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
-            //1. Get existing entity to validate and update
             var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == serviceUpdateDto.ServiceID,
                 includeProperties: SERVICE_INCLUDE

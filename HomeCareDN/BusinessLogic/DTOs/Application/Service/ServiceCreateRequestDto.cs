@@ -6,15 +6,15 @@ namespace BusinessLogic.DTOs.Application.Service
 {
     public class ServiceCreateRequestDto
     {
-        [Required]
-        public required string Name { get; set; }
+        [Required(ErrorMessage = "REQUIRED_SERVICENAME")]
+        public string Name { get; set; } = null!;
         public string? NameEN { get; set; }
 
-        [Required]
-        public required ServiceType ServiceType { get; set; }
+        [Required(ErrorMessage = "REQUIRED_SERVICETYPE")]
+        public ServiceType ServiceType { get; set; }
         public PackageOption? PackageOption { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "REQUIRED_BUILDINGTYPE")]
         public BuildingType BuildingType { get; set; }
         public MainStructureType? MainStructureType { get; set; }
         public DesignStyle? DesignStyle { get; set; }

@@ -13,11 +13,11 @@ namespace HomeCareDNAPI.Controllers.Distributor
         AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
         Roles = "Distributor"
     )]
-    public partial class DistributorController : ControllerBase
+    public class DistributorMaterialController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
-        public DistributorController(IFacadeService facadeService)
+        public DistributorMaterialController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }

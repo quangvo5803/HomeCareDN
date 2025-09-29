@@ -56,7 +56,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<UpdateAddressDto, Address>()
                 // Ignore AddressId and UserId to prevent overwriting them
-                .ForMember(d => d.AddressId, opt => opt.Ignore())
+                .ForMember(d => d.AddressID, opt => opt.Ignore())
                 .ForMember(d => d.UserId, opt => opt.Ignore());
 
             CreateMap<UpdateProfileDto, ApplicationUser>()
@@ -89,12 +89,14 @@ namespace HomeCareDNAPI.Mapping
                 )
                 .ForMember(
                     dest => dest.ImagePublicIds,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(i => i.PublicId).ToList()
-                            : new List<string>()
-                    )
-                );
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
+                )
+                .ForMember(dest => dest.Address, opt => opt.Ignore());
 
             CreateMap<Service, ServiceDto>()
                 .ForMember(
@@ -141,13 +143,13 @@ namespace HomeCareDNAPI.Mapping
                 )
                 .ForMember(
                     dest => dest.ImagePublicIds,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(i => i.PublicId).ToList()
-                            : new List<string>()
-                    )
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
                 );
-
 
             CreateMap<Category, CategoryDto>()
                 .ForMember(

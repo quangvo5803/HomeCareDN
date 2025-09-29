@@ -2,6 +2,8 @@
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.ServiceRequest;
+using BusinessLogic.DTOs.Authorize.AddressDtos;
+using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +16,7 @@ namespace BusinessLogic.Services.Interfaces
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly AuthorizeDbContext _authorizeDbContext;
 
         private const string ERROR_SERVICE_REQUEST = "Service Request";
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
@@ -21,16 +24,24 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE = "Images";
 
-        public ServiceRequestService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ServiceRequestService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            AuthorizeDbContext authorizeDbContext
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _authorizeDbContext = authorizeDbContext;
         }
 
-        public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(QueryParameters parameters)
+        public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
+            QueryParameters parameters
+        )
         {
-            var query = _unitOfWork.ServiceRequestRepository
-                .GetQueryable(includeProperties:INCLUDE);
+            var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
+                includeProperties: INCLUDE
+            );
 
             var totalCount = await query.CountAsync();
 
@@ -46,14 +57,28 @@ namespace BusinessLogic.Services.Interfaces
                 .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(items);
+
+            //Get Address
+            var addressIds = items.Select(i => i.AddressId).ToList();
+            var addresses = await _authorizeDbContext
+                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
+                .ToListAsync();
+            foreach (var dto in dtos)
+            {
+                var address = addresses.FirstOrDefault(a => a.AddressID == dto.AddressID);
+                if (address != null)
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                }
+            }
             return new PagedResultDto<ServiceRequestDto>
             {
-                Items = _mapper.Map<IEnumerable<ServiceRequestDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
             };
-            
         }
 
         public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id)
@@ -64,14 +89,26 @@ namespace BusinessLogic.Services.Interfaces
             );
             ValidateServiceRequest(serviceRequest);
 
-            return _mapper.Map<ServiceRequestDto>(serviceRequest);
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            return dto;
         }
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestByUserIdAsync(
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.ServiceRequestRepository.GetQueryable(includeProperties: INCLUDE);
+            var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
+                includeProperties: INCLUDE
+            );
 
             query = query.Where(sr => sr.UserID == parameters.FilterID.ToString());
             var totalCount = await query.CountAsync();
@@ -88,9 +125,23 @@ namespace BusinessLogic.Services.Interfaces
                 .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(items);
+            //Get Address
+            var addressIds = items.Select(i => i.AddressId).ToList();
+            var addresses = await _authorizeDbContext
+                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
+                .ToListAsync();
+            foreach (var dto in dtos)
+            {
+                var address = addresses.FirstOrDefault(a => a.AddressID == dto.AddressID);
+                if (address != null)
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                }
+            }
             return new PagedResultDto<ServiceRequestDto>
             {
-                Items = _mapper.Map<IEnumerable<ServiceRequestDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -105,23 +156,31 @@ namespace BusinessLogic.Services.Interfaces
 
             var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
             await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
-            
 
-            await UploadServiceRequestImagesAsync
-            (
+            await UploadServiceRequestImagesAsync(
                 serviceRequest.ServiceRequestID,
                 createRequestDto.ImageUrls,
                 createRequestDto.ImagePublicIds
             );
 
             await _unitOfWork.SaveAsync();
-            serviceRequest = await _unitOfWork.ServiceRequestRepository
-                .GetAsync(
-                    sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                    includeProperties: INCLUDE
-                );
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE
+            );
 
-            return _mapper.Map<ServiceRequestDto>(serviceRequest);
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+
+            return dto;
         }
 
         public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
@@ -137,23 +196,9 @@ namespace BusinessLogic.Services.Interfaces
 
             ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
 
-            _mapper.Map(serviceRequest, updateRequestDto);
+            _mapper.Map(updateRequestDto, serviceRequest);
 
-           
-            // Delete existing images
-            //var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-            //    i.ServiceRequestID == serviceRequest.ServiceRequestID
-            //);
-
-            //if (existingImages != null && existingImages.Any())
-            //{
-            //    foreach (var image in existingImages)
-            //    {
-            //        await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-            //    }
-            //}
-            await UploadServiceRequestImagesAsync
-            (
+            await UploadServiceRequestImagesAsync(
                 serviceRequest.ServiceRequestID,
                 updateRequestDto.ImageUrls,
                 updateRequestDto.ImagePublicIds
@@ -161,13 +206,22 @@ namespace BusinessLogic.Services.Interfaces
 
             await _unitOfWork.SaveAsync();
 
-            serviceRequest = await _unitOfWork.ServiceRequestRepository
-                .GetAsync(
-                    sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                    includeProperties: INCLUDE
-                );
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE
+            );
 
-            return _mapper.Map<ServiceRequestDto>(serviceRequest);
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            return dto;
         }
 
         public async Task DeleteServiceRequestAsync(Guid id)
@@ -198,20 +252,27 @@ namespace BusinessLogic.Services.Interfaces
             ICollection<string>? publicIds
         )
         {
-            if (imageUrls == null || !imageUrls.Any()) return;
+            if (imageUrls == null || !imageUrls.Any())
+                return;
 
             var ids = publicIds?.ToList() ?? new List<string>();
 
-            var images = imageUrls.Select((url, i) => new Image
-            {
-                ImageID = Guid.NewGuid(),
-                ServiceRequestID = serviceRequestId,
-                ImageUrl = url,
-                PublicId = i < ids.Count ? ids[i] : string.Empty
-            }).ToList();
+            var images = imageUrls
+                .Select(
+                    (url, i) =>
+                        new Image
+                        {
+                            ImageID = Guid.NewGuid(),
+                            ServiceRequestID = serviceRequestId,
+                            ImageUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
+
         private static void ValidateServiceRequest(ServiceRequest? serviceRequest)
         {
             if (serviceRequest == null)

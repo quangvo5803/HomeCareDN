@@ -4,7 +4,7 @@ namespace DataAccess.Entities.Authorize
 {
     public class Address
     {
-        public Guid AddressId { get; set; } = Guid.NewGuid();
+        public Guid AddressID { get; set; } = Guid.NewGuid();
 
         [Required]
         public string UserId { get; set; } = default!;

@@ -34,7 +34,9 @@ export const MaterialProvider = ({ children }) => {
         return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setMaterials([]);
+        setTotalMaterials(0);
+        return [];
       } finally {
         setLoading(false);
       }

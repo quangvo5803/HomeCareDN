@@ -33,6 +33,7 @@ import RepairViewAll from './pages/RepairViewAll';
 import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
 import Profile from './pages/customer/Profile';
+import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -125,17 +126,17 @@ function Layout() {
         <Route
           path="/Login"
           element={
-            !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
+            user ? <Navigate to={getRedirectPath(user)} replace /> : <Login />
           }
         />
         {/* Register */}
         <Route
           path="/Register"
           element={
-            !user ? (
-              <Register />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <Register />
             )
           }
         />
@@ -143,10 +144,10 @@ function Layout() {
         <Route
           path="/VerifyOTP"
           element={
-            !user ? (
-              <VerifyOTP />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <VerifyOTP />
             )
           }
         />
@@ -159,6 +160,23 @@ function Layout() {
             </ProtectedRoute>
           }
         ></Route>
+        <Route
+          path="/Customer/ServiceRequest"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/Customer/ServiceRequest/:serviceRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/Admin"
