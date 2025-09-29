@@ -370,7 +370,6 @@ namespace BusinessLogic.Services
             _emailQueue.QueueEmail(p.Email, title, BuildBaseEmail(title, body, highlight));
         }
 
-        // Email rejected (kèm lý do)
         private void QueueEmailRejected(Partner p)
         {
             var title = "HomeCareDN: Hồ sơ đối tác chưa được phê duyệt";
