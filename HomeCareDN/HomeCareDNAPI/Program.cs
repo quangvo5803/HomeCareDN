@@ -87,6 +87,9 @@ namespace HomeCareDNAPI
             builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
 
             /// Register services for Application
+
+            builder.Services.AddScoped<CoreDependencies>();
+            builder.Services.AddScoped<InfraDependencies>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
 
