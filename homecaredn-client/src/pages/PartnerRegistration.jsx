@@ -2,18 +2,21 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import { uploadImageToCloudinary } from '../utils/uploadImage';
 import partnerService from '../services/partnerService';
+import { isSafeEmail } from '../utils/validateEmail';
 
 const PartnerRegistration = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
-  
+  const [uploading, setUploading] = useState(false);
   const partnerTypeFromUrl = searchParams.get('type');
   
   const [formData, setFormData] = useState({
     partnerType: partnerTypeFromUrl || '',
+    fullName: '',
     companyName: '',
     email: '',
     phoneNumber: '',
@@ -37,26 +40,29 @@ const PartnerRegistration = () => {
   };
 
   const handleImageUpload = async (files) => {
+    if (!files?.length) return;
     if (files.length + imageUrls.length > 5) {
-      toast.error('Maximum 5 images allowed');
+      toast.error(t('ERROR.MAXIMUM_IMAGE') || 'Maximum 5 images allowed');
       return;
     }
-
-    const newUrls = [];
-    const newPublicIds = [];
-
-    // Mock upload - replace with actual implementation
-    for (let i = 0; i < files.length; i++) {
-      const mockUrl = URL.createObjectURL(files[i]);
-      const mockPublicId = `partner_${Date.now()}_${i}`;
-      newUrls.push(mockUrl);
-      newPublicIds.push(mockPublicId);
+    try {
+      setUploading(true);
+      const uploaded = await uploadImageToCloudinary(
+        files,
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+        null,
+        'HomeCareDN/Partner'
+      );
+      const arr = Array.isArray(uploaded) ? uploaded : [uploaded];
+      setImageUrls(prev => [...prev, ...arr.map(x => x.url)]);
+      setImagePublicIds(prev => [...prev, ...arr.map(x => x.publicId)]);
+      toast.success(t('SUCCESS.UPLOAD', 'Uploaded successfully'));
+    } catch {
+      toast.error(t('ERROR.UPLOAD_FAILED', 'Failed to upload image(s)'));
+    } finally {
+      setUploading(false);
     }
-
-    setImageUrls(prev => [...prev, ...newUrls]);
-    setImagePublicIds(prev => [...prev, ...newPublicIds]);
   };
-
   const removeImage = (index) => {
     setImageUrls(prev => prev.filter((_, i) => i !== index));
     setImagePublicIds(prev => prev.filter((_, i) => i !== index));
@@ -68,11 +74,15 @@ const PartnerRegistration = () => {
 
     try {
       // Validation
+       if (!formData.fullName || formData.fullName.length > 255) {
+        toast.error(t('partner.validation.full_name_required'));
+        return;
+      }
       if (!formData.companyName || formData.companyName.length > 255) {
         toast.error(t('partner.validation.company_name_required'));
         return;
       }
-      if (!formData.email) {
+      if (!formData.email || !isSafeEmail(formData.email)) {
         toast.error(t('partner.validation.email_required'));
         return;
       }
@@ -91,6 +101,7 @@ const PartnerRegistration = () => {
 
       const requestData = {
         partnerType: formData.partnerType,
+        fullName: formData.fullName,
         companyName: formData.companyName,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
@@ -167,6 +178,30 @@ const PartnerRegistration = () => {
         {/* Form Container với max height và scroll */}
         <div className="p-6 max-h-[75vh] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-4">
+             {/* Full Name */}
+            <div className="relative">
+              <input
+                type="text"
+                name="fullName"
+                id="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                required
+                maxLength="255"
+                className="w-full px-4 py-3 border border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder-transparent peer"
+                placeholder="Full Name"
+              />
+              <label
+                htmlFor="fullName"
+                className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                  formData.fullName
+                    ? '-top-2 text-xs bg-white px-1 text-blue-600'
+                    : 'top-3 text-base text-gray-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600'
+                }`}
+              >
+                {t('partner.full_name', 'Full name')} *
+              </label>
+            </div>
             {/* Company Name */}
             <div className="relative">
               <input
@@ -333,14 +368,14 @@ const PartnerRegistration = () => {
               
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || uploading}
                 className={`flex-1 py-3 px-4 rounded-lg font-medium text-white transition-all duration-200 ${
-                  loading
+                  loading || uploading
                     ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300'
                 }`}
               >
-                {loading ? (
+                {loading || uploading ? (
                   <span className="flex items-center justify-center">
                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

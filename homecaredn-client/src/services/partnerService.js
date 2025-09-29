@@ -3,71 +3,36 @@ import api from '../api';
 const partnerService = {
   createPartner: async (partnerData) => {
     try {
-      // Log data trước khi gửi để debug
-      console.log('Raw partner data:', partnerData);
+      const fd = new FormData();
+      fd.append('PartnerType', String(partnerData.partnerType).trim());
+      fd.append('FullName', String(partnerData.fullName || partnerData.FullName || '').trim());
+      fd.append('CompanyName', String(partnerData.companyName).trim());
+      fd.append('Email', String(partnerData.email).trim().toLowerCase());
+      fd.append('PhoneNumber', String(partnerData.phoneNumber).trim());
+      fd.append('Description', partnerData.description ? String(partnerData.description).trim() : '');
 
-      // Validate data trước khi gửi
-      if (!partnerData.partnerType || !partnerData.companyName || !partnerData.email || !partnerData.phoneNumber) {
-        throw new Error('Missing required fields');
-      }
+      const imageUrls = partnerData.imageUrls ?? [];
+      const imagePublicIds = partnerData.imagePublicIds ?? [];
 
-      // Chuẩn hóa data theo format backend expect
-      const requestPayload = {
-        partnerType: String(partnerData.partnerType).trim(),
-        companyName: String(partnerData.companyName).trim(),
-        email: String(partnerData.email).trim().toLowerCase(),
-        phoneNumber: String(partnerData.phoneNumber).trim(),
-        description: partnerData.description ? String(partnerData.description).trim() : '',
-        // Chỉ gửi imageUrls và imagePublicIds nếu có dữ liệu
-        ...(partnerData.imageUrls && partnerData.imageUrls.length > 0 && {
-          imageUrls: partnerData.imageUrls,
-          imagePublicIds: partnerData.imagePublicIds || []
-        })
-      };
+      imageUrls.forEach(u => fd.append('ImageUrls', u));
+      imagePublicIds.forEach(p => fd.append('ImagePublicIds', p));
 
-      console.log('Formatted request payload:', requestPayload);
-
-      const response = await api.post('/Partners/create-partner', requestPayload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      console.log('Create partner response:', response);
-      return response.data;
+      const res = await api.post('/Partners/create-partner', fd);
+      return res.data;
     } catch (error) {
-      console.error('Create partner error details:', {
+      console.error('Create partner error:', {
         message: error.message,
-        response: error.response?.data,
+        data: error.response?.data,
         status: error.response?.status,
-        config: error.config
       });
       throw error;
     }
   },
 
-  // ... other methods remain the same
   getAllPartners: async (params = {}) => {
     try {
-      const filteredParams = {};
-      
-      if (params.page && params.page > 0) {
-        filteredParams.page = params.page;
-      }
-      if (params.pageSize && params.pageSize > 0) {
-        filteredParams.pageSize = params.pageSize;
-      }
-      if (params.searchTerm && params.searchTerm.trim()) {
-        filteredParams.searchTerm = params.searchTerm.trim();
-      }
-      if (params.status && params.status !== '') {
-        filteredParams.status = params.status;
-      }
-
-      const response = await api.get('/Partners/get-all-partners', { 
-        params: filteredParams 
-      });
-      return response.data;
+      const res = await api.get('/Admin/get-all-partners', { params });
+      return res.data;
     } catch (error) {
       console.error('Get partners error:', error);
       throw error;
@@ -76,34 +41,34 @@ const partnerService = {
 
   getPartnerById: async (id) => {
     try {
-      const response = await api.get(`/Partners/get-partner/${id}`);
-      return response.data;
+      const res = await api.get(`/Admin/get-partner/${id}`);
+      return res.data;
     } catch (error) {
       console.error('Get partner by ID error:', error);
       throw error;
     }
   },
 
-  approvePartner: async (approveData) => {
+  approvePartner: async ({ partnerID, approvedUserId }) => {
     try {
-      const response = await api.put('/Partners/approve-partner', {
-        partnerID: approveData.partnerID,
-        approvedUserId: approveData.approvedUserId
+      const res = await api.put('/Admin/approve-partner', {
+        partnerID,
+        approvedUserId,
       });
-      return response.data;
+      return res.data;
     } catch (error) {
       console.error('Approve partner error:', error);
       throw error;
     }
   },
 
-  rejectPartner: async (rejectData) => {
+  rejectPartner: async ({ partnerID, rejectionReason }) => {
     try {
-      const response = await api.put('/Partners/reject-partner', {
-        partnerID: rejectData.partnerID,
-        rejectionReason: rejectData.rejectionReason
+      const res = await api.put('/Admin/reject-partner', {
+        partnerID,
+        rejectionReason,
       });
-      return response.data;
+      return res.data;
     } catch (error) {
       console.error('Reject partner error:', error);
       throw error;
@@ -112,8 +77,8 @@ const partnerService = {
 
   deletePartner: async (id) => {
     try {
-      const response = await api.delete(`/Partners/delete-partner/${id}`);
-      return response.data;
+      const res = await api.delete(`/Admin/delete-partner/${id}`);
+      return res.data;
     } catch (error) {
       console.error('Delete partner error:', error);
       throw error;

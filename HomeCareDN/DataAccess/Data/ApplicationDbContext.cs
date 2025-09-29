@@ -56,7 +56,11 @@ namespace DataAccess.Data
                 .WithOne(m => m.Conversation!)
                 .HasForeignKey(m => m.ConversationId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder.Entity<Partner>(entity =>
+            {
+                entity.Property(p => p.PartnerType).HasConversion<string>();
+                entity.Property(p => p.Status).HasConversion<string>();
+            });
             base.OnModelCreating(modelBuilder);
         }
     }

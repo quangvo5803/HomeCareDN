@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Authorize;
 
 namespace DataAccess.Entities.Application
 {
@@ -6,6 +7,9 @@ namespace DataAccess.Entities.Application
     {
         [Key]
         public Guid PartnerID { get; set; } = Guid.NewGuid();
+
+        [Required]
+        public required string FullName { get; set; }
 
         [Required]
         public PartnerType PartnerType { get; set; }
@@ -27,8 +31,9 @@ namespace DataAccess.Entities.Application
 
         [MaxLength(500)]
         public string? RejectionReason { get; set; }
-        public string? ApprovedUserId { get; set; } //Generated when approved by Admin
+        public string? ApprovedUserId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public ApplicationUser? AccountUser { get; set; }
         public ICollection<Image>? Images { get; set; } = new List<Image>();
     }
 

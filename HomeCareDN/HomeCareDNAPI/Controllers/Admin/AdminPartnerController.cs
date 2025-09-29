@@ -1,21 +1,12 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
-using BusinessLogic.Services.FacadeService;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {
-    public class AdminPartnersController : Controller
+    public partial class AdminController : ControllerBase
     {
-        private readonly IFacadeService _facadeService;
-
-        public AdminPartnersController(IFacadeService facadeService)
-        {
-            _facadeService = facadeService;
-        }
-
         [HttpGet("get-all-partners")]
         public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
         {

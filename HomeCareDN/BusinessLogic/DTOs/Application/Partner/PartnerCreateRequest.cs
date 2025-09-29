@@ -8,6 +8,9 @@ namespace BusinessLogic.DTOs.Application.Partner
         public required string PartnerType { get; set; } = default!;
 
         [Required, MaxLength(255)]
+        public required string FullName { get; set; } = default!;
+
+        [Required, MaxLength(255)]
         public required string CompanyName { get; set; } = default!;
 
         [Required, EmailAddress, MaxLength(255)]

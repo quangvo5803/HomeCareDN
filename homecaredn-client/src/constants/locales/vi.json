@@ -16,6 +16,7 @@
     "become_partner": "Trở Thành Đối Tác"
   },
     "partner": {
+    "full_name": "Họ và tên",
     "already_have_account": "Đã có tài khoản? ",
     "become_partner": "Trở Thành Đối Tác",
     "join_our_network": "Tham Gia Mạng Lưới Đối Tác",
@@ -77,6 +78,7 @@
     
     "validation": {
       "partner_type_required": "Vui lòng chọn loại đối tác",
+      "full_name_required": "Vui lòng nhập họ tên",
       "company_name_required": "Tên công ty là bắt buộc",
       "email_required": "Địa chỉ email là bắt buộc",
       "email_invalid": "Vui lòng nhập email hợp lệ", 

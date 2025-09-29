@@ -9,6 +9,7 @@ namespace BusinessLogic.DTOs.Application.Partner
     public class PartnerDto
     {
         public Guid PartnerID { get; set; }
+        public required string FullName { get; set; }
 
         public required string PartnerType { get; set; } = default!;
 

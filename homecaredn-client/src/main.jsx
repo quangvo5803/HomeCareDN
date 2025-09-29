@@ -10,7 +10,7 @@ import { BrandProvider } from './context/BrandProvider.jsx';
 import { CategoryProvider } from './context/CategoryProvider.jsx';
 import { MaterialProvider } from './context/MaterialProvider.jsx';
 import { ServiceProvider } from './context/ServiceProvider.jsx';
-
+import { PartnerProvider } from './context/PartnerProvider.jsx';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -19,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <CategoryProvider>
             <MaterialProvider>
               <ServiceProvider>
+                <PartnerProvider>
                 <App />
+                </PartnerProvider>
               </ServiceProvider>
             </MaterialProvider>
           </CategoryProvider>

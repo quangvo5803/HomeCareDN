@@ -96,6 +96,7 @@
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
   },
    "partner": {
+    "full_name": "Full name",
     "already_have_account": "Already have an account? ",
     "become_partner": "Become a Partner",
     "join_our_network": "Join Our Partner Network",
@@ -157,6 +158,7 @@
     
     "validation": {
       "partner_type_required": "Please select partner type",
+      "full_name_required": "Full name is required",
       "company_name_required": "Company name is required",
       "email_required": "Email address is required", 
       "email_invalid": "Please enter a valid email",

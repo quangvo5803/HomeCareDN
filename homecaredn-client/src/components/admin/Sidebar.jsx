@@ -41,9 +41,9 @@ export default function Sidebar() {
       link: '/Admin/Material',
     },
     {
-      icon: 'text-purple-600 fa-solid fa-handshake', // Icon handshake màu tím
-      title: 'partner',                              // Key cho i18n translation
-      link: '/Admin/PartnerManager',                 // Link tới trang Partner Manager
+      icon: 'text-purple-600 fa-solid fa-handshake', 
+      title: 'partner',                             
+      link: '/Admin/PartnerManager',                
   },
     {
       icon: 'text-emerald-600 fa-solid fa-headset',

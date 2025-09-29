@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BusinessLogic.Services.Interfaces;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Ultitity.Clients.Groqs;
@@ -30,7 +32,9 @@ namespace BusinessLogic.Services.FacadeService
             IMapper mapper,
             IDistributedCache cache,
             IHttpContextAccessor http,
-            IGroqClient groqClient
+            IGroqClient groqClient,
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager
         )
         {
             ServiceRequestService = new ServiceRequestService(unitOfWork, mapper);
@@ -43,7 +47,13 @@ namespace BusinessLogic.Services.FacadeService
             ConversationService = new ConversationService(unitOfWork, mapper);
             ContactSupportService = new ContactSupportService(unitOfWork, mapper, emailQueue);
             ImageService = new ImageService(unitOfWork);
-            PartnerService = new PartnerService(unitOfWork, mapper);
+            PartnerService = new PartnerService(
+                unitOfWork,
+                mapper,
+                userManager,
+                roleManager,
+                emailQueue
+            );
         }
     }
 }
