@@ -127,21 +127,23 @@ function Layout() {
         />
         <Route
           path="/PartnerRegistration"
-          element={!user ? (
-              <PartnerRegistration />
+          element={
+            user ? (
+              <Navigate to={getRedirectPath(user)} replace />
           ) : (
-            <Navigate to={getRedirectPath(user)} replace />
-          )}
+              <PartnerRegistration />
+            )
+          }
         />
 
         {/* PartnerTypeSelection */}
         <Route
           path="/PartnerTypeSelection"
           element={
-            !user ? (
-              <PartnerTypeSelection />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+               <PartnerTypeSelection />
             )
           }
         />

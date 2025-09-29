@@ -14,8 +14,14 @@ const partnerService = {
       const imageUrls = partnerData.imageUrls ?? [];
       const imagePublicIds = partnerData.imagePublicIds ?? [];
 
-      imageUrls.forEach(u => fd.append('ImageUrls', u));
-      imagePublicIds.forEach(p => fd.append('ImagePublicIds', p));
+      // Use for...of instead of forEach for better performance
+      for (const url of imageUrls) {
+        fd.append('ImageUrls', url);
+      }
+
+      for (const publicId of imagePublicIds) {
+        fd.append('ImagePublicIds', publicId);
+      }
 
       const res = await api.post('/Partners/create-partner', fd);
       return res.data;
@@ -31,7 +37,7 @@ const partnerService = {
 
   getAllPartners: async (params = {}) => {
     try {
-      const res = await api.get('/Admin/get-all-partners', { params });
+      const res = await api.get('/AdminPartner/get-all-partners', { params });
       return res.data;
     } catch (error) {
       console.error('Get partners error:', error);
@@ -41,7 +47,7 @@ const partnerService = {
 
   getPartnerById: async (id) => {
     try {
-      const res = await api.get(`/Admin/get-partner/${id}`);
+      const res = await api.get(`/AdminPartner/get-partner/${id}`);
       return res.data;
     } catch (error) {
       console.error('Get partner by ID error:', error);
@@ -51,7 +57,7 @@ const partnerService = {
 
   approvePartner: async ({ partnerID, approvedUserId }) => {
     try {
-      const res = await api.put('/Admin/approve-partner', {
+      const res = await api.put('/AdminPartner/approve-partner', {
         partnerID,
         approvedUserId,
       });
@@ -64,7 +70,7 @@ const partnerService = {
 
   rejectPartner: async ({ partnerID, rejectionReason }) => {
     try {
-      const res = await api.put('/Admin/reject-partner', {
+      const res = await api.put('/AdminPartner/reject-partner', {
         partnerID,
         rejectionReason,
       });
@@ -77,7 +83,7 @@ const partnerService = {
 
   deletePartner: async (id) => {
     try {
-      const res = await api.delete(`/Admin/delete-partner/${id}`);
+      const res = await api.delete(`/AdminPartner/delete-partner/${id}`);
       return res.data;
     } catch (error) {
       console.error('Delete partner error:', error);

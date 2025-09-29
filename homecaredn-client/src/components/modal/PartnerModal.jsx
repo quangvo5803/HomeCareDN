@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { usePartner } from '../../hook/usePartner';
@@ -15,35 +15,82 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
 
-  if (!isOpen || !partner) return null;
+  // Reset reason when modal closes or partner changes
+  useEffect(() => {
+    if (!isOpen) {
+      setReason('');
+      setBusy(false);
+    }
+  }, [isOpen]);
 
-  // --- Helpers (không dùng hook) ---
-  const getTypeLabel = (v) => {
+  // Prevent memory leaks - cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setReason('');
+      setBusy(false);
+    };
+  }, []);
+
+  // Keyboard event handler
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEscape = (event) => {
+      if (event.key === 'Escape' && !busy) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    
+    // Focus trap - focus first focusable element
+    const modal = document.querySelector('[role="dialog"]');
+    if (modal) {
+      const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements.length > 0) {
+        focusableElements[0].focus();
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, busy, onClose]);
+
+  // Memoized helper functions to prevent unnecessary re-renders
+  const getTypeLabel = useCallback((v) => {
     if (typeof v === 'string') return t(`partner.${v.toLowerCase()}`, v);
     if (v === 0) return t('partner.distributor', 'Distributor');
     if (v === 1) return t('partner.contractor', 'Contractor');
     return String(v ?? '-');
-  };
+  }, [t]);
 
-  const getStatusKey = (s) => {
+  const getStatusKey = useCallback((s) => {
     if (typeof s === 'string') return s.toLowerCase();
     if (s === 0) return 'pending';
     if (s === 1) return 'approved';
     if (s === 2) return 'rejected';
     return 'unknown';
-  };
+  }, []);
 
-  const getStatusLabel = (s) => t(`partner.status.${getStatusKey(s)}`, s ?? '-');
+  const getStatusLabel = useCallback((s) => t(`partner.status.${getStatusKey(s)}`, s ?? '-'), [t, getStatusKey]);
 
-  const isPending = (s) => getStatusKey(s) === 'pending';
+  const isPending = useCallback((s) => getStatusKey(s) === 'pending', [getStatusKey]);
 
-  const safeCreatedAt = (() => {
-    try { return partner.createdAt ? formatDate(partner.createdAt, i18n.language) : '-'; }
-    catch { return '-'; }
-  })();
+  const safeCreatedAt = useCallback(() => {
+    try { 
+      return partner?.createdAt ? formatDate(partner.createdAt, i18n.language) : '-'; 
+    } catch { 
+      return '-'; 
+    }
+  }, [partner?.createdAt, i18n.language]);
 
-  // --- Actions ---
-  const onApprove = async () => {
+  // Memoized action handlers
+  const handleApprove = useCallback(async () => {
+    if (busy) return;
+    
     try {
       setBusy(true);
       await approvePartner({
@@ -57,13 +104,16 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     } finally {
       setBusy(false);
     }
-  };
+  }, [busy, approvePartner, partner?.partnerID, user, t, onClose]);
 
-  const onReject = async () => {
-    if (!reason.trim()) {
-      toast.error(t('adminPartnerManager.modal.rejectionRequired', 'Please provide a rejection reason'));
+  const handleReject = useCallback(async () => {
+    if (busy || !reason.trim()) {
+      if (!reason.trim()) {
+        toast.error(t('adminPartnerManager.modal.rejectionRequired', 'Please provide a rejection reason'));
+      }
       return;
     }
+    
     try {
       setBusy(true);
       await rejectPartner({
@@ -77,31 +127,64 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     } finally {
       setBusy(false);
     }
-  };
+  }, [busy, reason, rejectPartner, partner?.partnerID, t, onClose]);
+
+  const handleBackdropClick = useCallback((e) => {
+    if (e.target === e.currentTarget && !busy) {
+      onClose();
+    }
+  }, [busy, onClose]);
+
+  const handleReasonChange = useCallback((e) => {
+    setReason(e.target.value);
+  }, []);
+
+  if (!isOpen || !partner) return null;
+
+  const typeLabel = getTypeLabel(partner.partnerType);
+  const statusLabel = getStatusLabel(partner.status);
+  const isPartnerPending = isPending(partner.status);
+  const formattedDate = safeCreatedAt();
+  const isAdmin = user?.role === 'Admin';
 
   return (
-    <div className="fixed inset-0 z-[1050] bg-black/40 flex items-center justify-center p-4" aria-modal="true" role="dialog">
-      <div className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden">
+    <div 
+      className="fixed inset-0 z-[1050] bg-black/40 flex items-center justify-center p-4" 
+      onClick={handleBackdropClick}
+      aria-modal="true" 
+      role="dialog"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <div 
+        className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h3 className="text-lg font-semibold">
+          <h3 id="modal-title" className="text-lg font-semibold">
             {t('adminPartnerManager.modal.title', 'Partner details')}
           </h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label={t('BUTTON.Close', 'Close')}>
+          <button 
+            onClick={onClose} 
+            disabled={busy}
+            className="text-gray-500 hover:text-gray-700 disabled:opacity-50" 
+            aria-label={t('BUTTON.Close', 'Close')}
+          >
             <i className="fa-solid fa-xmark" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div id="modal-description" className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Info label={t('partner.full_name', 'Full name')} value={partner.fullName} />
             <Info label={t('partner.company_name', 'Company')} value={partner.companyName} />
             <Info label="Email" value={partner.email} />
             <Info label={t('partner.phone_number', 'Phone')} value={partner.phoneNumber} />
-            <Info label={t('partner.type', 'Type')} value={getTypeLabel(partner.partnerType)} />
-            <Info label={t('common.status', 'Status')} value={getStatusLabel(partner.status)} />
-            <Info label={t('common.createdAt', 'Created')} value={safeCreatedAt} />
+            <Info label={t('partner.type', 'Type')} value={typeLabel} />
+            <Info label={t('common.status', 'Status')} value={statusLabel} />
+            <Info label={t('common.createdAt', 'Created')} value={formattedDate} />
           </div>
 
           {partner.description && (
@@ -121,50 +204,74 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
                 {t('common.images', 'Images')}
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {partner.imageUrls.map((u, i) => (
-                  <img key={`${u}-${i}`} src={u} alt={`partner-img-${i}`} className="w-full h-24 object-cover rounded-lg border" />
+                {partner.imageUrls.map((url, index) => (
+                  <img 
+                    key={`${partner.partnerID}-img-${index}`} 
+                    src={url} 
+                    alt={`${t('partner.image', 'Partner image')} ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg border" 
+                    loading="lazy"
+                  />
                 ))}
               </div>
             </div>
           )}
 
-          {user?.role === 'Admin' && isPending(partner.status) && (
+          {isAdmin && isPartnerPending && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label 
+                htmlFor="rejection-reason"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 {t('adminPartnerManager.modal.rejectionReason', 'Rejection reason')}
               </label>
               <textarea
+                id="rejection-reason"
                 rows="3"
                 value={reason}
-                onChange={e => setReason(e.target.value)}
-                className="w-full border rounded-lg p-3"
+                onChange={handleReasonChange}
+                disabled={busy}
+                className="w-full border rounded-lg p-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder={t('adminPartnerManager.modal.rejectionPlaceholder', 'Write reason if rejecting…')}
+                aria-describedby="rejection-help"
               />
+              <div id="rejection-help" className="sr-only">
+                {t('adminPartnerManager.modal.rejectionHelp', 'Required when rejecting a partner application')}
+              </div>
             </div>
           )}
         </div>
 
         {/* Footer */}
         <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border">
+          <button 
+            onClick={onClose} 
+            disabled={busy}
+            className="px-4 py-2 rounded-lg border disabled:opacity-50"
+          >
             {t('BUTTON.Close', 'Close')}
           </button>
 
-          {user?.role === 'Admin' && isPending(partner.status) && (
+          {isAdmin && isPartnerPending && (
             <>
               <button
                 disabled={busy}
-                onClick={onReject}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white disabled:opacity-60"
+                onClick={handleReject}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white disabled:opacity-60 hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                aria-describedby="reject-help"
               >
-                {t('BUTTON.Reject', 'Reject')}
+                {busy ? t('BUTTON.Processing', 'Processing...') : t('BUTTON.Reject', 'Reject')}
               </button>
+              <div id="reject-help" className="sr-only">
+                {t('adminPartnerManager.modal.rejectHelp', 'Requires rejection reason to be filled')}
+              </div>
+              
               <button
                 disabled={busy}
-                onClick={onApprove}
-                className="px-4 py-2 rounded-lg bg-green-600 text-white disabled:opacity-60"
+                onClick={handleApprove}
+                className="px-4 py-2 rounded-lg bg-green-600 text-white disabled:opacity-60 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                {t('BUTTON.Approve', 'Approve')}
+                {busy ? t('BUTTON.Processing', 'Processing...') : t('BUTTON.Approve', 'Approve')}
               </button>
             </>
           )}
@@ -174,14 +281,13 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   );
 }
 
-function Info({ label, value }) {
-  return (
-    <div>
-      <div className="text-sm text-gray-500">{label}</div>
-      <div className="font-medium text-gray-900 break-words">{value || '-'}</div>
-    </div>
-  );
-}
+// Memoized Info component to prevent unnecessary re-renders
+const Info = ({ label, value }) => (
+  <div>
+    <div className="text-sm text-gray-500">{label}</div>
+    <div className="font-medium text-gray-900 break-words">{value || '-'}</div>
+  </div>
+);
 
 Info.propTypes = {
   label: PropTypes.string.isRequired,

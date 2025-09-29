@@ -1,12 +1,25 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.Services.FacadeService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {
-    public partial class AdminController : ControllerBase
+    [Route("api/[controller]")]
+    [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    public class AdminPartnerController : ControllerBase
     {
+        private readonly IFacadeService _facadeService;
+
+        public AdminPartnerController(IFacadeService facadeService)
+        {
+            _facadeService = facadeService;
+        }
+
         [HttpGet("get-all-partners")]
         public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
         {

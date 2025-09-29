@@ -91,11 +91,7 @@ namespace BusinessLogic.Services
                 includeProperties: IMAGES
             );
 
-            try
-            {
-                QueueEmailReceived(partner);
-            }
-            catch { }
+            QueueEmailReceived(partner);
 
             return _mapper.Map<PartnerDto>(createdPartner);
         }
@@ -187,19 +183,15 @@ namespace BusinessLogic.Services
 
             await _unitOfWork.SaveAsync();
 
-            try
-            {
-                QueueEmailApproved(partner);
-            }
-            catch { }
+            QueueEmailApproved(partner);
 
             return _mapper.Map<PartnerDto>(partner);
         }
 
-        public async Task<PartnerDto> RejectPartnerAsync(PartnerRejectRequest requestRejectRequest)
+        public async Task<PartnerDto> RejectPartnerAsync(PartnerRejectRequest request)
         {
             var partner = await _unitOfWork.PartnerRepository.GetAsync(
-                p => p.PartnerID == requestRejectRequest.PartnerID,
+                p => p.PartnerID == request.PartnerID,
                 includeProperties: IMAGES
             );
 
@@ -207,15 +199,11 @@ namespace BusinessLogic.Services
             ValidatePartnerStatus(partner!, PartnerStatus.Pending);
 
             partner!.Status = PartnerStatus.Rejected;
-            partner.RejectionReason = requestRejectRequest.RejectionReason;
+            partner.RejectionReason = request.RejectionReason;
 
             await _unitOfWork.SaveAsync();
 
-            try
-            {
-                QueueEmailRejected(partner);
-            }
-            catch { }
+            QueueEmailRejected(partner);
 
             return _mapper.Map<PartnerDto>(partner);
         }
