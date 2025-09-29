@@ -145,7 +145,7 @@ export default function ServiceRequestCreateUpdate() {
       toast.success('SUCCESS.SERVICE_REQUEST_UPDATE');
     } else {
       createServiceRequest(payload);
-      toast.success('SUCCESS.SERVICE_REQUEST_CREATE');
+      toast.success('SUCCESS.SERVICE_REQUEST_ADD');
     }
     navigate('/Customer/Profile', {
       state: { tab: 'service_requests' },
