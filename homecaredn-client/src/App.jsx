@@ -124,17 +124,17 @@ function Layout() {
         <Route
           path="/Login"
           element={
-            !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
+            user ? <Navigate to={getRedirectPath(user)} replace /> : <Login />
           }
         />
         {/* Register */}
         <Route
           path="/Register"
           element={
-            !user ? (
-              <Register />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <Register />
             )
           }
         />
@@ -142,10 +142,10 @@ function Layout() {
         <Route
           path="/VerifyOTP"
           element={
-            !user ? (
-              <VerifyOTP />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <VerifyOTP />
             )
           }
         />

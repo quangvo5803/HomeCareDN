@@ -1,12 +1,4 @@
-﻿using AutoMapper;
-using BusinessLogic.Services.Interfaces;
-using DataAccess.Data;
-using DataAccess.UnitOfWork;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
-using Ultitity.Clients.Groqs;
-using Ultitity.Email.Interface;
+﻿using BusinessLogic.Services.Interfaces;
 
 namespace BusinessLogic.Services.FacadeService
 {
@@ -23,31 +15,29 @@ namespace BusinessLogic.Services.FacadeService
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
 
-        public FacadeService(
-            IUnitOfWork unitOfWork,
-            IConfiguration configuration,
-            IEmailQueue emailQueue,
-            IMapper mapper,
-            IDistributedCache cache,
-            IHttpContextAccessor http,
-            AuthorizeDbContext authorizeDbContext,
-            IGroqClient groqClient
-        )
+        public FacadeService(CoreDependencies core, InfraDependencies infra)
         {
             ServiceRequestService = new ServiceRequestService(
-                unitOfWork,
-                mapper,
-                authorizeDbContext
+                core.UnitOfWork,
+                core.Mapper,
+                core.AuthorizeDbContext
             );
-            MaterialService = new MaterialService(unitOfWork, mapper);
-            ServiceService = new ServicesService(unitOfWork, mapper);
-            ContractorApplicationService = new ContractorApplicationService(unitOfWork, mapper);
-            CategoryService = new CategoryService(unitOfWork, mapper);
-            BrandService = new BrandService(unitOfWork, mapper);
-            AiChatService = new AiChatService(cache, groqClient, http);
-            ConversationService = new ConversationService(unitOfWork, mapper);
-            ContactSupportService = new ContactSupportService(unitOfWork, mapper, emailQueue);
-            ImageService = new ImageService(unitOfWork);
+            MaterialService = new MaterialService(core.UnitOfWork, core.Mapper);
+            ServiceService = new ServicesService(core.UnitOfWork, core.Mapper);
+            ContractorApplicationService = new ContractorApplicationService(
+                core.UnitOfWork,
+                core.Mapper
+            );
+            CategoryService = new CategoryService(core.UnitOfWork, core.Mapper);
+            BrandService = new BrandService(core.UnitOfWork, core.Mapper);
+            AiChatService = new AiChatService(infra.Cache, infra.GroqClient, infra.Http);
+            ConversationService = new ConversationService(core.UnitOfWork, core.Mapper);
+            ContactSupportService = new ContactSupportService(
+                core.UnitOfWork,
+                core.Mapper,
+                infra.EmailQueue
+            );
+            ImageService = new ImageService(core.UnitOfWork);
         }
     }
 }

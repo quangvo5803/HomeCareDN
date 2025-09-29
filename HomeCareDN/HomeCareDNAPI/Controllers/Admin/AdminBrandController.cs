@@ -9,11 +9,11 @@ namespace HomeCareDNAPI.Controllers.Admin
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public partial class AdminController : ControllerBase
+    public partial class AdminBrandController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
-        public AdminController(IFacadeService facadeService)
+        public AdminBrandController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }

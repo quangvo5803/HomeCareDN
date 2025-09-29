@@ -56,26 +56,37 @@ export const serviceRequestService = {
 
   // ================== Customer APIs ==================
   getAllServiceRequestByUserId: async (params = {}) => {
-    const res = await api.get('/Customer/get-all-servicerequest-byuserid', {
-      params,
-    });
+    const res = await api.get(
+      '/CustomerServiceRequest/get-all-servicerequest-byuserid',
+      {
+        params,
+      }
+    );
     return res.data;
   },
 
   createServiceRequest: async (data) => {
     const formData = buildServiceRequestFormData(data);
-    const res = await api.post('/Customer/create-servicerequest', formData);
+    const res = await api.post(
+      '/CustomerServiceRequest/create-servicerequest',
+      formData
+    );
     return res.data;
   },
 
   updateServiceRequest: async (data) => {
     const formData = buildServiceRequestFormData(data);
-    const res = await api.put('/Customer/update-servicerequest', formData);
+    const res = await api.put(
+      '/CustomerServiceRequest/update-servicerequest',
+      formData
+    );
     return res.data;
   },
 
   deleteServiceRequest: async (id) => {
-    const res = await api.delete(`/Customer/delete-servicerequest/${id}`);
+    const res = await api.delete(
+      `/CustomerServiceRequest/delete-servicerequest/${id}`
+    );
     return res.data;
   },
 
