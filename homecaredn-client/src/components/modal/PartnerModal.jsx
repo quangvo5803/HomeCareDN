@@ -42,7 +42,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     };
 
     document.addEventListener('keydown', handleEscape);
-    
+
     // Focus trap - focus first focusable element
     const modal = document.querySelector('[role="dialog"]');
     if (modal) {
@@ -80,17 +80,17 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   const isPending = useCallback((s) => getStatusKey(s) === 'pending', [getStatusKey]);
 
   const safeCreatedAt = useCallback(() => {
-    try { 
-      return partner?.createdAt ? formatDate(partner.createdAt, i18n.language) : '-'; 
-    } catch { 
-      return '-'; 
+    try {
+      return partner?.createdAt ? formatDate(partner.createdAt, i18n.language) : '-';
+    } catch {
+      return '-';
     }
   }, [partner?.createdAt, i18n.language]);
 
   // Memoized action handlers
   const handleApprove = useCallback(async () => {
     if (busy) return;
-    
+
     try {
       setBusy(true);
       await approvePartner({
@@ -113,7 +113,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
       }
       return;
     }
-    
+
     try {
       setBusy(true);
       await rejectPartner({
@@ -148,27 +148,31 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   const isAdmin = user?.role === 'Admin';
 
   return (
-    <div 
-      className="fixed inset-0 z-[1050] bg-black/40 flex items-center justify-center p-4" 
+    <div
+      className="fixed inset-0 z-[1050] bg-black/40 flex items-center justify-center p-4"
       onClick={handleBackdropClick}
-      aria-modal="true" 
+      onKeyDown={(e) => { if(e.key === 'Escape' && !busy) onClose(); }}
+      tabIndex={-1}
+      aria-modal="true"
       role="dialog"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
-      <div 
+      <div
         className="bg-white rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
+        tabIndex={0}
+        role="document"
       >
         {/* Header */}
         <div className="px-6 py-4 border-b flex items-center justify-between">
           <h3 id="modal-title" className="text-lg font-semibold">
             {t('adminPartnerManager.modal.title', 'Partner details')}
           </h3>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             disabled={busy}
-            className="text-gray-500 hover:text-gray-700 disabled:opacity-50" 
+            className="text-gray-500 hover:text-gray-700 disabled:opacity-50"
             aria-label={t('BUTTON.Close', 'Close')}
           >
             <i className="fa-solid fa-xmark" />
@@ -205,11 +209,11 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 {partner.imageUrls.map((url, index) => (
-                  <img 
-                    key={`${partner.partnerID}-img-${index}`} 
-                    src={url} 
+                  <img
+                    key={`${partner.partnerID}-img-${index}`}
+                    src={url}
                     alt={`${t('partner.image', 'Partner image')} ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-lg border" 
+                    className="w-full h-24 object-cover rounded-lg border"
                     loading="lazy"
                   />
                 ))}
@@ -219,7 +223,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
 
           {isAdmin && isPartnerPending && (
             <div>
-              <label 
+              <label
                 htmlFor="rejection-reason"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
@@ -244,8 +248,8 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
 
         {/* Footer */}
         <div className="px-6 py-4 border-t bg-gray-50 flex items-center justify-end gap-2">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             disabled={busy}
             className="px-4 py-2 rounded-lg border disabled:opacity-50"
           >
@@ -262,10 +266,6 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
               >
                 {busy ? t('BUTTON.Processing', 'Processing...') : t('BUTTON.Reject', 'Reject')}
               </button>
-              <div id="reject-help" className="sr-only">
-                {t('adminPartnerManager.modal.rejectHelp', 'Requires rejection reason to be filled')}
-              </div>
-              
               <button
                 disabled={busy}
                 onClick={handleApprove}
@@ -281,7 +281,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   );
 }
 
-// Memoized Info component to prevent unnecessary re-renders
+// Memoized Info component for performance
 const Info = ({ label, value }) => (
   <div>
     <div className="text-sm text-gray-500">{label}</div>
