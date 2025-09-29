@@ -51,7 +51,7 @@ export const serviceService = {
   // 🔹 Admin-only APIs
   createService: async (data) => {
     const formData = buildServiceFormData(data);
-    const response = await api.post('/Admin/create-service', formData, {
+    const response = await api.post('/AdminService/create-service', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -59,14 +59,14 @@ export const serviceService = {
 
   updateService: async (data) => {
     const formData = buildServiceFormData(data);
-    const response = await api.put('/Admin/update-service', formData, {
+    const response = await api.put('/AdminService/update-service', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
 
   deleteService: async (id) => {
-    const response = await api.delete(`/Admin/delete-service/${id}`);
+    const response = await api.delete(`/AdminService/delete-service/${id}`);
     return response.data;
   },
 

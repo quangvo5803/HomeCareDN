@@ -5,53 +5,46 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HomeCareDNAPI.Controllers.Customer;
-
-[ApiController]
-[Route("api/[controller]")]
-[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
-public partial class CustomerController : ControllerBase
+namespace HomeCareDNAPI.Controllers.Customer
 {
-    private readonly IAddressService _addressService;
-    private readonly IProfileService _profileService;
-    private readonly IFacadeService _facadeService;
-
-    public CustomerController(
-        IAddressService addressService,
-        IProfileService profileService,
-        IFacadeService facadeService
-    )
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Customer")]
+    public class CustomerAddressesController : ControllerBase
     {
-        _addressService = addressService;
-        _profileService = profileService;
-        _facadeService = facadeService;
-    }
+        private readonly IAddressService _addressService;
 
-    [HttpGet("get-user-address/{userId}")]
-    public async Task<IActionResult> GetAddressByUserId([FromRoute] string userId)
-    {
-        var addresses = await _addressService.GetAddressByUserIdAsync(userId);
-        return Ok(addresses);
-    }
+        public CustomerAddressesController(IAddressService addressService)
+        {
+            _addressService = addressService;
+        }
 
-    [HttpPost("create-address")]
-    public async Task<IActionResult> CreateAddress([FromBody] CreateAddressDto dto)
-    {
-        var created = await _addressService.CreateAddressByUserIdAsync(dto);
-        return Ok(created);
-    }
+        [HttpGet("get-user-address/{userId}")]
+        public async Task<IActionResult> GetAddressByUserId([FromRoute] string userId)
+        {
+            var addresses = await _addressService.GetAddressByUserIdAsync(userId);
+            return Ok(addresses);
+        }
 
-    [HttpPut("update-address")]
-    public async Task<IActionResult> UpdateAddress([FromBody] UpdateAddressDto dto)
-    {
-        var updated = await _addressService.UpdateAddressAsync(dto);
-        return Ok(updated);
-    }
+        [HttpPost("create-address")]
+        public async Task<IActionResult> CreateAddress([FromBody] CreateAddressDto dto)
+        {
+            var created = await _addressService.CreateAddressByUserIdAsync(dto);
+            return Ok(created);
+        }
 
-    [HttpDelete("delete-address/{id:guid}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
-    {
-        await _addressService.DeleteAddressAsync(id);
-        return NoContent();
+        [HttpPut("update-address")]
+        public async Task<IActionResult> UpdateAddress([FromBody] UpdateAddressDto dto)
+        {
+            var updated = await _addressService.UpdateAddressAsync(dto);
+            return Ok(updated);
+        }
+
+        [HttpDelete("delete-address/{id:guid}")]
+        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        {
+            await _addressService.DeleteAddressAsync(id);
+            return NoContent();
+        }
     }
 }

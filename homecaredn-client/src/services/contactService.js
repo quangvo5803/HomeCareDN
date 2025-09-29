@@ -20,12 +20,12 @@ export const contactService = {
 
   // ===== Admin APIs =====
   listAll: async (params = {}) => {
-    const response = await api.get(`/Admin/get-all-support`, { params });
+    const response = await api.get(`/AdminSupport/get-all-support`, { params });
     return response.data;
   },
 
   reply: async ({ id, replyContent }) => {
-    const response = await api.post('/Admin/reply-support', {
+    const response = await api.post('/AdminSupport/reply-support', {
       id,
       replyContent,
     });
@@ -33,7 +33,7 @@ export const contactService = {
   },
 
   delete: async (id) => {
-    const response = await api.delete(`/Admin/delete-support/${id}`);
+    const response = await api.delete(`/AdminSupport/delete-support/${id}`);
     return response.data;
   },
 };

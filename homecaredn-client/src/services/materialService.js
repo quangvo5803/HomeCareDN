@@ -14,7 +14,6 @@ const buildMaterialFormData = ({
   DescriptionEN,
   ImageUrls,
   ImagePublicIds,
-
 }) => {
   const formData = new FormData();
   if (MaterialID) formData.append('MaterialID', MaterialID);
@@ -31,7 +30,7 @@ const buildMaterialFormData = ({
     ImageUrls.forEach((file) => formData.append('ImageUrls', file));
   }
   if (ImagePublicIds && ImagePublicIds.length > 0) {
-    ImagePublicIds.forEach((id) => formData.append('ImagePublicIds', id))
+    ImagePublicIds.forEach((id) => formData.append('ImagePublicIds', id));
   }
   return formData;
 };
@@ -49,30 +48,43 @@ export const materialService = {
 
   //Admin-only APIs
   getAllMaterialByUserId: async (params = {}) => {
-    const response = await api.get(`/Distributor/get-all-material-by-userid`, {
-      params,
-    });
+    const response = await api.get(
+      `/DistributorMaterial/get-all-material-by-userid`,
+      {
+        params,
+      }
+    );
     return response.data;
   },
 
   createMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.post('/Distributor/create-material', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await api.post(
+      '/DistributorMaterial/create-material',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return response.data;
   },
 
   updateMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.put('/Distributor/update-material', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await api.put(
+      '/DistributorMaterial/update-material',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return response.data;
   },
 
   deleteMaterial: async (id) => {
-    const response = await api.delete(`/Distributor/delete-material/${id}`);
+    const response = await api.delete(
+      `/DistributorMaterial/delete-material/${id}`
+    );
     return response.data;
   },
 
