@@ -59,7 +59,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<UpdateAddressDto, Address>()
                 // Ignore AddressId and UserId to prevent overwriting them
-                .ForMember(d => d.AddressId, opt => opt.Ignore())
+                .ForMember(d => d.AddressID, opt => opt.Ignore())
                 .ForMember(d => d.UserId, opt => opt.Ignore());
 
             CreateMap<UpdateProfileDto, ApplicationUser>()
@@ -101,7 +101,6 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
-
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -182,8 +181,7 @@ namespace HomeCareDNAPI.Mapping
                         opt.MapFrom(src =>
                             src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
                         )
-                )
-                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+                );
 
             CreateMap<Address, AddressDto>();
 

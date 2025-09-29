@@ -14,25 +14,42 @@ const buildMaterialFormData = ({
   DescriptionEN,
   ImageUrls,
   ImagePublicIds,
-
 }) => {
   const formData = new FormData();
-  if (MaterialID) formData.append('MaterialID', MaterialID);
-  if (UserID) formData.append('UserID', UserID);
-  if (CategoryID) formData.append('CategoryID', CategoryID);
-  if (Name) formData.append('Name', Name);
-  if (NameEN) formData.append('NameEN', NameEN);
-  if (BrandID) formData.append('BrandID', BrandID);
-  if (Unit) formData.append('Unit', Unit);
-  if (UnitEN) formData.append('UnitEN', UnitEN);
-  if (Description) formData.append('Description', Description);
-  if (DescriptionEN) formData.append('DescriptionEN', DescriptionEN);
-  if (ImageUrls && ImageUrls.length > 0) {
-    ImageUrls.forEach((file) => formData.append('ImageUrls', file));
+
+  // Map fields 1-1
+  const simpleFields = {
+    MaterialID,
+    UserID,
+    CategoryID,
+    Name,
+    NameEN,
+    BrandID,
+    Unit,
+    UnitEN,
+    Description,
+    DescriptionEN,
+  };
+
+  for (const [key, value] of Object.entries(simpleFields)) {
+    if (value) {
+      formData.append(key, value);
+    }
   }
-  if (ImagePublicIds && ImagePublicIds.length > 0) {
-    ImagePublicIds.forEach((id) => formData.append('ImagePublicIds', id))
+
+  // Handle arrays
+  if (Array.isArray(ImageUrls)) {
+    for (const file of ImageUrls) {
+      formData.append('ImageUrls', file);
+    }
   }
+
+  if (Array.isArray(ImagePublicIds)) {
+    for (const id of ImagePublicIds) {
+      formData.append('ImagePublicIds', id);
+    }
+  }
+
   return formData;
 };
 
@@ -49,30 +66,43 @@ export const materialService = {
 
   //Admin-only APIs
   getAllMaterialByUserId: async (params = {}) => {
-    const response = await api.get(`/Distributor/get-all-material-by-userid`, {
-      params,
-    });
+    const response = await api.get(
+      `/DistributorMaterial/get-all-material-by-userid`,
+      {
+        params,
+      }
+    );
     return response.data;
   },
 
   createMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.post('/Distributor/create-material', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await api.post(
+      '/DistributorMaterial/create-material',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return response.data;
   },
 
   updateMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.put('/Distributor/update-material', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const response = await api.put(
+      '/DistributorMaterial/update-material',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return response.data;
   },
 
   deleteMaterial: async (id) => {
-    const response = await api.delete(`/Distributor/delete-material/${id}`);
+    const response = await api.delete(
+      `/DistributorMaterial/delete-material/${id}`
+    );
     return response.data;
   },
 

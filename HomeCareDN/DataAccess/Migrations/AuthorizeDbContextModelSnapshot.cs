@@ -24,7 +24,7 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
                 {
-                    b.Property<Guid>("AddressId")
+                    b.Property<Guid>("AddressID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -52,7 +52,7 @@ namespace DataAccess.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("AddressId");
+                    b.HasKey("AddressID");
 
                     b.HasIndex("UserId", "City", "District", "Ward");
 

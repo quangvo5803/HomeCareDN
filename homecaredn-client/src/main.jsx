@@ -6,27 +6,34 @@ import './index.css';
 import './configs/i18n';
 
 import AuthProvider from './context/AuthProvider.jsx';
+import { AddressProvider } from './context/AddressProvider.jsx';
 import { BrandProvider } from './context/BrandProvider.jsx';
 import { CategoryProvider } from './context/CategoryProvider.jsx';
 import { MaterialProvider } from './context/MaterialProvider.jsx';
 import { ServiceProvider } from './context/ServiceProvider.jsx';
 import { PartnerProvider } from './context/PartnerProvider.jsx';
+import { ServiceRequestProvider } from './context/ServiceRequestProvider.jsx';
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
+<React.StrictMode>
+  <BrowserRouter>
+    <AuthProvider>
+      <AddressProvider>
         <BrandProvider>
           <CategoryProvider>
             <MaterialProvider>
               <ServiceProvider>
                 <PartnerProvider>
-                <App />
+                  <ServiceRequestProvider>
+                    <App />
+                  </ServiceRequestProvider>
                 </PartnerProvider>
               </ServiceProvider>
             </MaterialProvider>
           </CategoryProvider>
         </BrandProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+      </AddressProvider>
+    </AuthProvider>
+  </BrowserRouter>
+</React.StrictMode>
 );

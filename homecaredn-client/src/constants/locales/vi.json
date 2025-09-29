@@ -168,6 +168,9 @@
     "service_construction_more": "Xem thêm",
     "service_repair_more": "Xem thêm",
 
+    "default": "Mặc định",
+    "noDescription": "Mô tả không có sẵn",
+
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -290,21 +293,32 @@
     "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
-    "default": "Mặc định",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
+    "listMaterial": "Danh sách vật liệu",
+    "filterCategory": "Danh mục vật liệu",
+    "filterBrand": "Thương hiệu vật liệu",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
+    "noMaterial": "Không có vật liệu tương ứng"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",
     "breadcrumb_repair": "Sửa chữa",
+    "relatedRepair": "Các sửa chữa liên quan",
+    "relatedConstruction": "Các xây dụng liên quan"
+  },
+  "serviceViewAll": {
+    "title": "Danh sách dịch vụ",
+    "verifiedLicense": "Giấy phép đã được xác minh",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ",
+    "noService": "Không có dịch vụ tương ứng"
+  },
+  "breadcrumb_home": "Trang chủ",
+  "sharedEnums": {
     "serviceType": "Loại dịch vụ",
     "buildingType": "Loại tòa nhà",
     "packageOption": "Tùy chọn gói",
     "mainStructure": "Loại cấu trúc chính",
-    "designStyle": "Phong cách thiết kế",
-    "relatedRepair": "Các sửa chữa liên quan",
-    "relatedConstruction": "Các xây dụng liên quan"
+    "designStyle": "Phong cách thiết kế"
   },
-  "breadcrumb_home": "Trang chủ",
   "login": {
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",
@@ -365,11 +379,53 @@
       "preview": "Xem trước: ",
       "addressPlaceholder": "Số nhà, tên đường, khu vực..."
     },
-    "service_request": {
+    "serviceRequest": {
       "title": "Yêu cầu dịch vụ",
       "subtitle": "Xem và quản lý các yêu cầu dịch vụ của bạn.",
       "noRequest": "Chưa có yêu cầu dịch vụ nào",
-      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn"
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn",
+      "label_buildingType": "Loại công trình:",
+      "label_mainStructureType": "Cấu trúc chính:",
+      "label_area": "Diện tích:",
+      "label_floors": "Số tầng:",
+      "label_designStyle": "Phong cách:",
+      "label_estimatePrice": "Giá dự kiến: ",
+      "label_packageOption": "Gói xây dựng: ",
+      "label_address": "Địa chỉ: ",
+      "label_open": "Đang mở",
+      "label_close":"Đã đóng"
+    },
+    "createServiceRequest": {
+      "title": "Tạo yêu cầu dịch vụ",
+      "subtitle": "Điền vào biểu mẫu dưới đây để gửi yêu cầu dịch vụ của bạn",
+      "header": "Chi tiết yêu cầu dịch vụ",
+      "form_serviceType": "Loại dịch vụ",
+      "form_selectServiceType": "Chọn loại dịch vụ",
+      "form_packageOption": "Gói dịch vụ",
+      "form_selectPackageOption": "Chọn gói dịch vụ",
+      "form_buildingType": "Loại công trình",
+      "form_selectBuildingType": "Chọn loại công trình",
+      "form_structureType": "Loại kết cấu",
+      "form_selectStructureType": "Chọn loại kết cấu",
+      "form_designStyle": "Phong cách thiết kế",
+      "form_selectDesignStyle": "Chọn phong cách thiết kế",
+      "form_width": "Chiều rộng (m)",
+      "form_widthPlaceholder": "Nhập chiều rộng (mét)",
+      "form_length": "Chiều dài (m)",
+      "form_lengthPlaceholder": "Nhập chiều dài (mét)",
+      "form_floor": "Số tầng",
+      "form_floorPlaceholder": "Nhập số tầng",
+      "form_estimatePrice": "Giá ước tính",
+      "form_estimatePricePlaceholder": "Nhập giá ước tính",
+      "form_address": "Địa chỉ",
+      "form_selectAddress": "Chọn địa chỉ",
+      "form_description": "Mô tả",
+      "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
+      "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "calculatedArea": "Diện tích sàn xây dựng: ",
+      "estimatePrice": "Giá tiền ước tính: ",
+      "estimateInWord": "Bằng chữ: ",
+      "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
     }
   },
 
@@ -728,7 +784,11 @@
     "SaveProfile": "Lưu thông tin",
     "Save": "Lưu",
     "Saving": "Đang lưu...",
-    "AddAddress": "Thêm địa chỉ"
+    "AddAddress": "Thêm địa chỉ",
+    "CreateServiceRequest": "Tạo yêu cầu dịch vụ",
+    "UpdateServiceRequest": "Cập nhật yêu cầu dịch vụ",
+    "Back": "Trở về",
+    "ViewDetail": "Xem chi tiết"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -755,6 +815,10 @@
 
     "DeleteAddressModal": {
       "title": "Xóa địa chỉ này?",
+      "text": "Hành động này không thể hoàn tác."
+    },
+    "DeleteServiceRequestModal": {
+      "title": "Xóa yêu cầu này?",
       "text": "Hành động này không thể hoàn tác."
     },
     "DeletingLoadingModal": {
@@ -787,6 +851,7 @@
 
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
+    "MAXIMUM_SERVICE_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu dịch vụ!",
 
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
@@ -804,6 +869,9 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
+    "REQUIRED_ADDRESS":"Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhất",
 
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
@@ -826,7 +894,9 @@
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
     "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
     "SERVICE_ADD": "Thêm dịch vụ thành công.",
-    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
+    "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
+    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",

@@ -9,6 +9,9 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         [Required]
         public Guid ServiceRequestID { get; set; }
 
+        [Required(ErrorMessage = "REQUIRED_SERVICE_REQUEST_ADDRESS")]
+        public Guid AddressID { get; set; }
+
         public ServiceType? ServiceType { get; set; }
 
         public PackageOption? PackageOption { get; set; }

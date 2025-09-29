@@ -39,7 +39,8 @@ api.interceptors.response.use(
         toast.error('Không thể kết nối tới server, vui lòng thử lại sau!');
         console.warn('API unreachable');
       }
-      return Promise.reject({ ...error, handled: true });
+      error.handled = true;
+      throw error;
     }
 
     // 401 Unauthorized → refresh token
@@ -73,13 +74,13 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         authService.logout();
-        return Promise.reject(err);
+        throw err;
       } finally {
         isRefreshing = false;
       }
     }
 
-    return Promise.reject(error);
+    throw error;
   }
 );
 

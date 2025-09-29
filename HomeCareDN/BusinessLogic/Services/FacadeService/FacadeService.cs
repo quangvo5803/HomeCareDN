@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;

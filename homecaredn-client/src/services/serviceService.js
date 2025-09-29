@@ -10,35 +10,28 @@ const appendIf = (fd, key, value) => {
 const buildServiceFormData = (service) => {
   const formData = new FormData();
 
-  // Những field string/optional
-  const stringFields = [
-    'ServiceID',
-    'Name',
-    'NameEN',
-    'Description',
-    'DescriptionEN',
-  ];
-  stringFields.forEach(key => {
-    appendIf(formData, key, service[key]);
-  });
+  // ID (chỉ dùng khi update)
+  appendIf(formData, 'ServiceID', service.ServiceID);
 
-  // Những field có thể là number / enum, cần check null/undefined
-  const enumFields = [
-    'ServiceType',
-    'PackageOption',
-    'BuildingType',
-    'MainStructureType',
-    'DesignStyle',
-  ];
-  enumFields.forEach((key) => {
-    if (service[key] !== undefined && service[key] !== null && service[key] !== '') {
-      formData.append(key, service[key]);
-    }
-  });
+  // Required fields
+  appendIf(formData, 'Name', service.Name);
+  appendIf(formData, 'ServiceType', service.ServiceType);
+  appendIf(formData, 'BuildingType', service.BuildingType);
+  // Optional fields
+  appendIf(formData, 'NameEN', service.NameEN);
+  appendIf(formData, 'PackageOption', service.PackageOption);
+  appendIf(formData, 'MainStructureType', service.MainStructureType);
+  appendIf(formData, 'DesignStyle', service.DesignStyle);
+  appendIf(formData, 'Description', service.Description);
+  appendIf(formData, 'DescriptionEN', service.DescriptionEN);
 
   // Images
-  (service.ImageUrls || []).forEach(ImageUrls => formData.append('ImageUrls', ImageUrls));
-  (service.ImagePublicIds || []).forEach(ImagePublicIds => formData.append('ImagePublicIds', ImagePublicIds));
+  (service.ImageUrls || []).forEach((ImageUrls) =>
+    formData.append('ImageUrls', ImageUrls)
+  );
+  (service.ImagePublicIds || []).forEach((ImagePublicIds) =>
+    formData.append('ImagePublicIds', ImagePublicIds)
+  );
 
   return formData;
 };
@@ -58,7 +51,7 @@ export const serviceService = {
   // 🔹 Admin-only APIs
   createService: async (data) => {
     const formData = buildServiceFormData(data);
-    const response = await api.post('/Admin/create-service', formData, {
+    const response = await api.post('/AdminService/create-service', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
@@ -66,14 +59,14 @@ export const serviceService = {
 
   updateService: async (data) => {
     const formData = buildServiceFormData(data);
-    const response = await api.put('/Admin/update-service', formData, {
+    const response = await api.put('/AdminService/update-service', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },
 
   deleteService: async (id) => {
-    const response = await api.delete(`/Admin/delete-service/${id}`);
+    const response = await api.delete(`/AdminService/delete-service/${id}`);
     return response.data;
   },
 

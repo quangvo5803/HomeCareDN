@@ -7,33 +7,38 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
     public class ServiceRequestCreateRequestDto
     {
         [Required]
-        public required string UserID { get; set; }
+        public string UserID { get; set; } = null!;
 
-        [Required]
-        public required ServiceType ServiceType { get; set; }
+        [Required(ErrorMessage = "REQUIRED_SERVICE_REQUEST_ADDRESS")]
+        public Guid AddressID { get; set; }
 
-        public required PackageOption PackageOption { get; set; }
+        [Required(ErrorMessage = "REQUIRED_SERVICETYPE")]
+        public ServiceType ServiceType { get; set; }
 
-        [Required]
-        public required BuildingType BuildingType { get; set; }
+        [Required(ErrorMessage = "REQUIRED_PACKAGEOPTION")]
+        public PackageOption PackageOption { get; set; }
 
-        [Required]
-        public required MainStructureType MainStructureType { get; set; }
+        [Required(ErrorMessage = "REQUIRED_BUILDINGTYPE")]
+        public BuildingType BuildingType { get; set; }
+
+        [Required(ErrorMessage = "REQUIRED_STRUCTURETYPE")]
+        public MainStructureType MainStructureType { get; set; }
 
         public DesignStyle? DesignStyle { get; set; }
 
-        [Required]
-        public required double Width { get; set; }
+        [Required(ErrorMessage = "REQUIRED_WIDTH")]
+        public double Width { get; set; }
 
-        [Required]
-        public required double Length { get; set; }
+        [Required(ErrorMessage = "REQUIRED_LENGTH")]
+        public double Length { get; set; }
 
-        [Required]
-        public required int Floors { get; set; }
+        [Required(ErrorMessage = "REQUIRED_FLOORS")]
+        public int Floors { get; set; }
 
-        public required double? EstimatePrice { get; set; }
+        public double? EstimatePrice { get; set; }
 
-        public string? Description { get; set; }
+        [Required(ErrorMessage = "REQUIRED_SERVICE_REQUEST_DESCRIPTION")]
+        public string Description { get; set; } = null!;
 
         public List<string>? ImageUrls { get; set; }
         public List<string>? ImagePublicIds { get; set; }
