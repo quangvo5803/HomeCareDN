@@ -22,6 +22,7 @@ import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+
 //For TINY MCE
 export default function MaterialModal({
   isOpen,
@@ -30,7 +31,7 @@ export default function MaterialModal({
   material,
   brands,
   categories,
-  setUploadProgress
+  setUploadProgress,
 }) {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
@@ -47,7 +48,6 @@ export default function MaterialModal({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const [images, setImages] = useState([]);
-
 
   // Fill data khi edit
   useEffect(() => {
@@ -99,23 +99,23 @@ export default function MaterialModal({
       return;
     }
 
-    const mappedFiles = files.map(f => ({
+    const mappedFiles = files.map((f) => ({
       url: URL.createObjectURL(f),
       file: f,
       isNew: true,
     }));
 
-    setImages(prev => [...prev, ...mappedFiles]);
+    setImages((prev) => [...prev, ...mappedFiles]);
   };
 
   // Xóa ảnh local hoặc DB
   const removeImageFromState = (img) => {
-    setImages(prev => prev.filter(i => i.url !== img.url));
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
 
     if (!img.isNew && material) {
-      material.imageUrls = material.imageUrls.filter(url => url !== img.url);
+      material.imageUrls = material.imageUrls.filter((url) => url !== img.url);
     }
-  }
+  };
 
   const confirmDeleteImage = async (img) => {
     try {
@@ -166,7 +166,7 @@ export default function MaterialModal({
     }
 
     try {
-      const newFiles = images.filter(i => i.isNew).map(i => i.file);
+      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
 
       const data = {
         MaterialID: material?.materialID,
@@ -189,15 +189,14 @@ export default function MaterialModal({
           'HomeCareDN/Material'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        data.ImageUrls = uploadedArray.map(u => u.url);
-        data.ImagePublicIds = uploadedArray.map(u => u.publicId);
+        data.ImageUrls = uploadedArray.map((u) => u.url);
+        data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
 
         onClose();
         setUploadProgress(0);
       }
 
       await onSave(data);
-
     } catch (err) {
       toast.error(t(handleApiError(err)));
     }
@@ -316,8 +315,8 @@ export default function MaterialModal({
                   plugins: 'lists link image code',
                   toolbar:
                     'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                  skin: 'oxide',
-                  content_css: 'default',
+                  skin: false,
+                  content_css: false,
                 }}
                 onEditorChange={(content) => setDescription(content)}
               />
@@ -382,8 +381,8 @@ export default function MaterialModal({
                         plugins: 'lists link image code',
                         toolbar:
                           'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                        skin: 'oxide',
-                        content_css: 'default',
+                        skin: false,
+                        content_css: false,
                       }}
                       onEditorChange={(content) => setDescriptionEN(content)}
                     />
@@ -434,8 +433,8 @@ export default function MaterialModal({
                 <span className="ml-3 text-sm text-gray-500">
                   {images.filter((i) => i.isNew).length > 0
                     ? `${images.filter((i) => i.isNew).length} ${t(
-                      'distributorMaterialManager.materialModal.filesSelected'
-                    )}`
+                        'distributorMaterialManager.materialModal.filesSelected'
+                      )}`
                     : t('distributorMaterialManager.materialModal.noFile')}
                 </span>
               </div>

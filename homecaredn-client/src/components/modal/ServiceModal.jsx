@@ -236,8 +236,8 @@ export default function ServiceModal({
                 plugins: 'lists link image code',
                 toolbar:
                   'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                skin: 'oxide',
-                content_css: 'default',
+                skin: false,
+                content_css: false,
               }}
               onEditorChange={(content) => setDescription(content)}
             />
@@ -396,8 +396,8 @@ export default function ServiceModal({
                       plugins: 'lists link image code',
                       toolbar:
                         'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                      skin: 'oxide',
-                      content_css: 'default',
+                      skin: false,
+                      content_css: false,
                     }}
                     onEditorChange={(content) => setDescriptionEN(content)}
                   />
