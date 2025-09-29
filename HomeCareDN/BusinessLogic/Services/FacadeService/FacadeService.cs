@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.Services.Interfaces;
+using DataAccess.Data;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
@@ -29,10 +30,15 @@ namespace BusinessLogic.Services.FacadeService
             IMapper mapper,
             IDistributedCache cache,
             IHttpContextAccessor http,
+            AuthorizeDbContext authorizeDbContext,
             IGroqClient groqClient
         )
         {
-            ServiceRequestService = new ServiceRequestService(unitOfWork, mapper);
+            ServiceRequestService = new ServiceRequestService(
+                unitOfWork,
+                mapper,
+                authorizeDbContext
+            );
             MaterialService = new MaterialService(unitOfWork, mapper);
             ServiceService = new ServicesService(unitOfWork, mapper);
             ContractorApplicationService = new ContractorApplicationService(unitOfWork, mapper);

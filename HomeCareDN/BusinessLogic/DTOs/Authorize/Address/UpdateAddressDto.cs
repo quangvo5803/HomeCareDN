@@ -8,7 +8,7 @@ namespace BusinessLogic.DTOs.Authorize.Address
         public string UserId { get; set; } = default!;
 
         [Required(ErrorMessage = "REQUIRED_ADDRESS_ID")]
-        public Guid AddressId { get; set; }
+        public Guid AddressID { get; set; }
 
         [Required, MaxLength(100)]
         public string City { get; set; } = default!;

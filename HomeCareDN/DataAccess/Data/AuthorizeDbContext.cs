@@ -46,7 +46,7 @@ namespace DataAccess.Data
                 );
             builder.Entity<Address>(e =>
             {
-                e.HasKey(a => a.AddressId);
+                e.HasKey(a => a.AddressID);
                 e.Property(a => a.City).HasMaxLength(100).IsRequired();
                 e.Property(a => a.District).HasMaxLength(100).IsRequired();
                 e.Property(a => a.Ward).HasMaxLength(100).IsRequired();

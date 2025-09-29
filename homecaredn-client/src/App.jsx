@@ -31,6 +31,7 @@ import DistributorCategoryManager from './pages/distributor/DistributorCategoryM
 import ServiceDetail from './pages/ServiceDetail';
 // Customer pages
 import Profile from './pages/customer/Profile';
+import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -157,6 +158,23 @@ function Layout() {
             </ProtectedRoute>
           }
         ></Route>
+        <Route
+          path="/Customer/ServiceRequest"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/Customer/ServiceRequest/:serviceRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/Admin"

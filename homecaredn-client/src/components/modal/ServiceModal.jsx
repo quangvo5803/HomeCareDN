@@ -23,7 +23,13 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
 //For TINY MCE
 
-export default function ServiceModal({ isOpen, onClose, onSave, service, setUploadProgress, }) {
+export default function ServiceModal({
+  isOpen,
+  onClose,
+  onSave,
+  service,
+  setUploadProgress,
+}) {
   const { t } = useTranslation();
   const enums = useEnums();
   const { deleteServiceImage } = useService();
@@ -57,7 +63,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           (service.imageUrls || []).map((url) => ({
             url,
             isNew: false,
-          })))
+          }))
+        );
         setUploadProgress(0);
       } else {
         setName('');
@@ -71,7 +78,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
         setDesignStyle('');
         setImages([]);
         setUploadProgress(0);
-
       }
     }
   }, [isOpen, service, setUploadProgress]);
@@ -85,49 +91,41 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
-    const mappedFiles = files.map(f => ({
+    const mappedFiles = files.map((f) => ({
       file: f,
       url: URL.createObjectURL(f),
       isNew: true,
     }));
-    setImages(prev => [...prev, ...mappedFiles]);
+    setImages((prev) => [...prev, ...mappedFiles]);
   };
 
-  // Xoá ảnh DB
-  const handleDeleteImageFromDb = async (imageUrl, onSuccess) => {
-    showDeleteModal({
-      t,
-      titleKey: t('ModalPopup.DeleteImageModal.title'),
-      textKey: t('ModalPopup.DeleteImageModal.text'),
-      onConfirm: async () => {
-        await deleteServiceImage(service.serviceID, imageUrl);
-        Swal.close();
-        toast.success(t('SUCCESS.DELETE'));
-        if (onSuccess) onSuccess();
-        removeImageFromState({ url: imageUrl, isNew: false });
-      },
-    });
-  };
-
-  // Xoá ảnh chung (local hoặc DB)
+  // Xoá ảnh khỏi state
   const removeImageFromState = (img) => {
-    setImages(prev => prev.filter(i => i.url !== img.url));
-    if (!img.isNew && service) {
-      const idx = service.imageUrls.indexOf(img.url);
-      service.imageUrls.splice(idx, 1);
-      service.imagePublicIds.splice(idx, 1);
-    }
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
-  const handleDeleteImage = (img) => {
-    handleDeleteImageFromDb(img.url, () => removeImageFromState(img));
-  };
-
+  // Hàm xoá ảnh (local hoặc DB)
   const handleRemoveImage = (img) => {
     if (img.isNew) {
+      //  Ảnh mới chỉ xoá state
       removeImageFromState(img);
     } else {
-      handleDeleteImage(img);
+      //  Ảnh cũ confirm + gọi API
+      showDeleteModal({
+        t,
+        titleKey: t('ModalPopup.DeleteImageModal.title'),
+        textKey: t('ModalPopup.DeleteImageModal.text'),
+        onConfirm: async () => {
+          try {
+            await deleteServiceImage(service.serviceID, img.url);
+            Swal.close();
+            toast.success(t('SUCCESS.DELETE'));
+            removeImageFromState(img);
+          } catch (err) {
+            handleApiError(err, t);
+          }
+        },
+      });
     }
   };
 
@@ -145,7 +143,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
       return;
     }
     try {
-      const newFiles = images.filter(i => i.isNew).map(i => i.file);
+      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
       const data = {
         Name: name,
         NameEN: nameEN || null,
@@ -173,8 +171,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        data.ImageUrls = uploadedArray.map(u => u.url);
-        data.ImagePublicIds = uploadedArray.map(u => u.publicId);
+        data.ImageUrls = uploadedArray.map((u) => u.url);
+        data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
         onClose();
         setUploadProgress(0);
       }
@@ -462,7 +460,12 @@ export default function ServiceModal({ isOpen, onClose, onSave, service, setUplo
           <button
             className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
             onClick={handleSubmit}
-            disabled={!name.trim() || !serviceType || !buildingType || images.length === 0}
+            disabled={
+              !name.trim() ||
+              !serviceType ||
+              !buildingType ||
+              images.length === 0
+            }
           >
             {service ? t('BUTTON.Update') : t('BUTTON.Add')}
           </button>

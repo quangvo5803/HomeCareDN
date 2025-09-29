@@ -23,6 +23,7 @@
     "i18next-browser-languagedetector": "^8.2.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.544.0",
+    "number-to-words": "^1.2.4",
     "perfect-scrollbar": "^1.5.6",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",

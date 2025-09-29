@@ -88,7 +88,7 @@ export default function AdminCategoryManager() {
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">
-                {categories?.length || 0} {t('adminCategoryManager.categories')}
+                {totalCategories || 0} {t('adminCategoryManager.categories')}
               </span>
             </div>
             <button
@@ -143,8 +143,9 @@ export default function AdminCategoryManager() {
                     categories.map((cat, index) => (
                       <tr
                         key={cat.categoryID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -298,10 +299,11 @@ export default function AdminCategoryManager() {
                       </div>
                       <div className="text-center">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                            }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            cat.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
                         >
                           {cat.isActive
                             ? t('BUTTON.Activate')
@@ -366,7 +368,7 @@ export default function AdminCategoryManager() {
             </div>
 
             {/* Pagination */}
-            {totalCategories.length > 0 && (
+            {totalCategories > 0 && (
               <div className="flex justify-center py-4">
                 <Pagination
                   current={currentPage}
