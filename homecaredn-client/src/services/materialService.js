@@ -30,7 +30,9 @@ const buildMaterialFormData = ({
     ImageUrls.forEach((file) => formData.append('ImageUrls', file));
   }
   if (ImagePublicIds && ImagePublicIds.length > 0) {
-    ImagePublicIds.forEach((id) => formData.append('ImagePublicIds', id));
+    for (const id of ImagePublicIds) {
+      formData.append('ImagePublicIds', id);
+    }
   }
   return formData;
 };
