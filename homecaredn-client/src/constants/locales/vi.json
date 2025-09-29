@@ -774,7 +774,9 @@
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
     "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
     "SERVICE_ADD": "Thêm dịch vụ thành công.",
-    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
+    "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
+    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",

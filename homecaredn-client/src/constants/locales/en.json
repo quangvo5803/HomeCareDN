@@ -779,7 +779,9 @@
     "ADDRESS_ADD": "Add address successfully.",
     "ADDRESS_UPDATE": "Address updated successfully.",
     "SERVICE_ADD": "Add service successfully.",
-    "SERVICE_UPDATE": "Service updated successfully."
+    "SERVICE_UPDATE": "Service updated successfully.",
+    "SERVICE_REQUEST_ADD": "Add service request successfully.",
+    "SERVICE_REQUEST_UPDATE": "Service request updated successfully."
   },
   "roles": {
     "Distributor": "Distributor",
