@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 const CACHE_KEY = 'enumData';
 const CACHE_TIME = 7 * 24 * 60 * 60 * 1000; // 7 ngày (ms)
@@ -22,7 +22,7 @@ export function useEnums() {
       }
 
       try {
-        const res = await axios.get('/api/Enums/all');
+        const res = await api.get('/Enums/all');
 
         const data = res.data;
         setEnums(data);
