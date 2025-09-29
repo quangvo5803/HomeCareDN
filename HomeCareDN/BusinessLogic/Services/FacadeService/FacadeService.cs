@@ -21,6 +21,7 @@ namespace BusinessLogic.Services.FacadeService
         public IConversationService ConversationService { get; }
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
+        public IPartnerService PartnerService { get; }
 
         public FacadeService(
             IUnitOfWork unitOfWork,
@@ -42,6 +43,7 @@ namespace BusinessLogic.Services.FacadeService
             ConversationService = new ConversationService(unitOfWork, mapper);
             ContactSupportService = new ContactSupportService(unitOfWork, mapper, emailQueue);
             ImageService = new ImageService(unitOfWork);
+            PartnerService = new PartnerService(unitOfWork, mapper);
         }
     }
 }
