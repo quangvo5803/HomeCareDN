@@ -5,6 +5,8 @@ import { jwtDecode } from 'jwt-decode';
 import AuthContext from './AuthContext';
 import { authService } from '../services/authService';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
 
 export default function AuthProvider({ children }) {
   const navigate = useNavigate();
@@ -43,8 +45,8 @@ export default function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     try {
-      await authService.logout();
       setLoading(true);
+      await authService.logout();
     } catch {
       return;
     } finally {
@@ -84,18 +86,28 @@ export default function AuthProvider({ children }) {
   );
 
   const login = useCallback(
-    (token) => {
-      localStorage.setItem('accessToken', token);
-      const parsed = parseToken(token);
-      if (parsed) {
-        setUser(parsed);
-        setPendingEmail(null);
-        scheduleRefresh(parsed.exp);
-        if (parsed.role === 'Admin') navigate('/AdminDashboard');
-        else if (parsed.role === 'Contractor') navigate('/ContractorDashboard');
-        else if (parsed.role === 'Distributor')
-          navigate('/DistributorDashboard');
-        else navigate('/');
+    async (token) => {
+      setLoading(true);
+      try {
+        localStorage.setItem('accessToken', token);
+        const parsed = parseToken(token);
+
+        if (parsed) {
+          setUser(parsed);
+          setPendingEmail(null);
+          scheduleRefresh(parsed.exp);
+
+          if (parsed.role === 'Admin') navigate('/AdminDashboard');
+          else if (parsed.role === 'Contractor')
+            navigate('/ContractorDashboard');
+          else if (parsed.role === 'Distributor')
+            navigate('/DistributorDashboard');
+          else navigate('/');
+        }
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
       }
     },
     [navigate, parseToken, scheduleRefresh]
@@ -103,6 +115,7 @@ export default function AuthProvider({ children }) {
 
   // Load token khi F5
   useEffect(() => {
+    setLoading(true);
     const token = localStorage.getItem('accessToken');
     if (token) {
       const parsed = parseToken(token);
@@ -113,9 +126,12 @@ export default function AuthProvider({ children }) {
         logout();
       }
     }
-    setLoading(false); // 👈 chỉ set sau khi check token
+    setLoading(false);
+
     return () => {
-      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     };
   }, [parseToken, logout, scheduleRefresh]);
 
