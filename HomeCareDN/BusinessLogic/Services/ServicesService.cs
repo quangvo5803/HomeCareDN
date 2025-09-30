@@ -100,7 +100,7 @@ namespace BusinessLogic.Services
             return serviceDto;
         }
 
-        public async Task<ServiceDto> GetServiceByIdAsync(Guid id)
+        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
         {
             var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == id,
@@ -115,7 +115,7 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<ServiceDto>(service);
+            return _mapper.Map<ServiceDetailDto>(service);
         }
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
