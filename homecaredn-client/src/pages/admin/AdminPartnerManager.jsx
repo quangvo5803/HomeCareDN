@@ -131,7 +131,7 @@ export default function AdminPartnerManager() {
                   <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('partner.company_name', 'Company')}</th>
                   <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">Email</th>
                   <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('partner.phone_number', 'Phone')}</th>
-                  <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('partner.type', 'Type')}</th>
+                  <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('partner.type')}</th>
                   <th scope="col" className="px-6 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('common.status', 'Status')}</th>
                   <th scope="col" className="px-4 py-4 text-xs font-semibold text-center text-gray-600 uppercase">{t('adminServiceManager.action', 'Action')}</th>
                 </tr>

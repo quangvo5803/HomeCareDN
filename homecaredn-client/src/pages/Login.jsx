@@ -154,6 +154,18 @@ export default function Login() {
             <div className="flex justify-center mt-4">
               <GoogleLoginButton onLoginSuccess={login} />
             </div>
+             {/* Partner Registration Link */}
+            <div className="text-center mt-8">
+              <span className="text-gray-600">
+                {t('login.business_owner')}
+              </span>
+              <button
+                onClick={handlePartnerRegistration}
+                className="text-green-600 hover:text-green-700 font-medium hover:underline transition-colors duration-200"
+             >
+                {t('login.become_partner')}
+              </button>
+            </div>      
             {/* Register Link */}
             <div className="text-center mt-8">
               <span className="text-gray-600">
@@ -165,19 +177,7 @@ export default function Login() {
               > 
                 {t('login.register_link')}
               </button>
-            </div>  
-            {/* Partner Registration Link */}
-            <div className="text-center mt-4">
-              <span className="text-gray-600">
-                {t('login.business_owner')}
-              </span>
-              <button
-                onClick={handlePartnerRegistration}
-                className="text-green-600 hover:text-green-700 font-medium hover:underline transition-colors duration-200 ml-1"
-             >
-                {t('login.become_partner')}
-              </button>
-            </div>      
+            </div>            
           </div>
         </div>
       </div>

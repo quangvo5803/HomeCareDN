@@ -23,7 +23,7 @@ export default function PartnerTypeSelection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState('');
-
+  const canContinue = Boolean(selectedType);
   const handleSelect = useCallback(type => setSelectedType(type), []);
   const handleContinue = useCallback(() => {
     if (selectedType) navigate(`/PartnerRegistration?type=${selectedType}`);
@@ -142,15 +142,15 @@ export default function PartnerTypeSelection() {
             <button
               type="button"
               onClick={handleContinue}
-              disabled={!selectedType}
-              aria-describedby={!selectedType ? 'continue-help' : undefined}
+              disabled={!canContinue}
+              aria-describedby={!canContinue ? undefined : 'continue-help'}
               className={`w-full py-3 rounded-lg font-medium flex items-center justify-center transition focus:ring-2 focus:ring-offset-2 ${
-                selectedType
+                canContinue
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-300'
                   : 'bg-gray-300 text-gray-500 cursor-not-allowed focus:ring-gray-300'
               }`}
             >
-              {selectedType ? (
+              {canContinue ? (
                 <>
                   <i className="fas fa-arrow-right mr-2" aria-hidden="true" />
                   {t('partner.continue_as')} {t(`partner.${selectedType.toLowerCase()}`)}

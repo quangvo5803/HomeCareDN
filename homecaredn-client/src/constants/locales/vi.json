@@ -13,18 +13,22 @@
     "search": "Tìm kiếm...",
     "profile": "Hồ Sơ",
     "logout": "Đăng Xuất",
-    "become_partner": "Trở Thành Đối Tác"
+    "become_partner": "Đăng kí trở thành đối tác"
   },
     "partner": {
+    "subtitle": "Hãy cho chúng tôi biết về doanh nghiệp của bạn để được phê duyệt.",
+    "tip_best_quality": "Mẹo: Hình ảnh cửa hàng/danh mục rõ ràng sẽ mang lại hiệu quả tốt nhất",
+    "preview_image": "Số ảnh {{number}}",
+    "remove_image": "Xóa ảnh {{number}}",
     "full_name": "Họ và tên",
     "already_have_account": "Đã có tài khoản? ",
-    "become_partner": "Trở Thành Đối Tác",
+    "become_partner": "Đăng kí trở thành đối tác",
     "join_our_network": "Tham Gia Mạng Lưới Đối Tác",
     "partnership_benefits": "Khi hợp tác cùng HomeCareDN, doanh nghiệp của bạn tiếp cận được nhiều khách hàng, quản lý dịch vụ hiệu quả và nâng cao uy tín thương hiệu.",
     "choose_partner_type": "Chọn Loại Đối Tác",
     "select_type_description": "Chọn loại hợp tác phù hợp nhất với doanh nghiệp của bạn để bắt đầu với HomeCareDN.",
     "why_partner_with_us": "Tại Sao Nên Hợp Tác Với HomeCareDN?",
-    
+    "type": "Lọai",    
     "expand_reach": "Mở Rộng Tầm Với",
     "expand_reach_desc": "Kết nối với hàng nghìn khách hàng đang tìm kiếm dịch vụ chăm sóc nhà và vật liệu xây dựng.",
     "increase_sales": "Tăng Cơ Hội Kinh Doanh",
@@ -83,8 +87,10 @@
       "email_required": "Địa chỉ email là bắt buộc",
       "email_invalid": "Vui lòng nhập email hợp lệ", 
       "phone_required": "Số điện thoại là bắt buộc",
+
       "description_required": "Mô tả doanh nghiệp là bắt buộc",
-      "images_required": "Vui lòng tải lên ít nhất một hình ảnh"
+      "images_required": "Vui lòng tải lên ít nhất một hình ảnh",
+      "description_too_long": "Mô tả quá dài"
     },
     
     "partner_management": "Quản Lý Đối Tác",
@@ -214,7 +220,13 @@
     "page_size": "Hiển thị",
     "delete": "Xóa",
     "cancel": "Hủy",
-    "view_details": "Xem chi tiết"
+    "view_details": "Xem chi tiết",
+    "or": "Hoặc",
+    "selected": "Đã chọn",
+    "not_selected": "Chưa chọn",
+    "all": "Tất cả",
+    "filter_by_status": "Lọc theo trạng thái",
+    "pagination": "Điều hướng phân trang"
   },
   "why": {
     "badge": "Vì sao chọn chúng tôi",
@@ -327,7 +339,7 @@
     "not_have_account": "Bạn chưa có tài khoản? ",
     "register_link": " Đăng ký ngay",
     "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
-    "become_partner": "Trở thành Đối Tác"
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "register": {
     "title": "Đăng Ký",
@@ -339,7 +351,7 @@
     "have_account": "Đã có tài khoản? ",
     "login_link": " Đăng nhập ngay",
     "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
-    "become_partner": "Trở thành Đối Tác"
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "verifyotp": {
     "title": "Xác Thực OTP",
@@ -612,6 +624,27 @@
       "bounce": "Tăng trưởng"
     },
     "viewAll": "Xem tất cả"
+  },
+  "adminPartnerManager":{
+    "title": "Quản lý đối tác",
+    "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
+    "partners": "đối tác",
+    "no": "STT",
+    "companyName": "Tên công ty",
+    "contactName": "Người liên hệ",
+    "contactEmail": "Email liên hệ",
+    "contactPhone": "Số điện thoại",
+    "submittedAt": "Thời gian gửi",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noPartner": "Chưa có đăng ký hợp tác nào.",
+    "search_placeholder": "Tìm kiếm theo tên công ty, người liên hệ hoặc số...",
+    "approve": "Duyệt",
+    "reject": "Từ Chối",
+    "delete": "Xóa",
+    "viewDetails": "Xem chi tiết",
+    "total": "Tổng"
+
   },
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",

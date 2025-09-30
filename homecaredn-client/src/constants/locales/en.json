@@ -99,15 +99,17 @@
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
   },
    "partner": {
+    "subtitle": "Tell us about your business to get approved.",
+    "tip_best_quality": "Tip: Clear storefront/portfolio shots work best",
     "full_name": "Full name",
     "already_have_account": "Already have an account? ",
-    "become_partner": "Become a Partner",
+    "become_partner": "Register to Become a Partner",
     "join_our_network": "Join Our Partner Network",
     "partnership_benefits": "By partnering with HomeCareDN, your business gains access to a broad customer base, streamlined digital vendor management, and reputation growth.",
     "choose_partner_type": "Choose Your Partner Type",
     "select_type_description": "Select the type of partnership that best describes your business to get started with HomeCareDN.",
     "why_partner_with_us": "Why Partner with HomeCareDN?",
-    
+    "type": "Type",
     "expand_reach": "Expand Your Reach",
     "expand_reach_desc": "Connect with thousands of customers looking for home care services and materials.",
     "increase_sales": "Increase Business Opportunities", 
@@ -149,7 +151,9 @@
     "upload_images": "Upload Business Images",
     "drag_drop_images": "Drag & drop images here or click to select",
     "image_requirements": "Upload up to 5 images (JPG, PNG, max 5MB each)",
-    
+    "preview_image": "Preview image {{number}}",
+    "remove_image": "Remove image {{number}}",
+
     "submitting": "Submitting Application...",
     "submit_application": "Submit Partner Application",
     "registration_success": "Your partner application has been submitted successfully! We will review and contact you soon.",
@@ -167,7 +171,8 @@
       "email_invalid": "Please enter a valid email",
       "phone_required": "Phone number is required",
       "description_required": "Business description is required",
-      "images_required": "Please upload at least one business image"
+      "images_required": "Please upload at least one business image",
+      "description_too_long": "Description is too long"
     },
     
     "partner_management": "Partner Management",
@@ -201,6 +206,23 @@
     "approved": "Approved", 
     "rejected": "Rejected"
   },
+  "adminPartnerManager": {
+    "title": "Partner Manager",
+    "subtitle": "View and manage partner applications",
+    "partners": "partner(s)",
+    "no": "NO",
+    "company_name": "Company Name",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "type": "Type",
+    "status": "Status",
+    "action": "Action",
+    "noPartner": "No partners have registered yet.",
+    "letStart": "Start by reviewing partner applications.",
+    "partnerDetail": "Partner Detail",
+    "back_to_list": "Back to Partner List",
+    "total": "Total"
+  },
   "common": {
     "home": "Home",
     "about": "About",
@@ -214,7 +236,13 @@
     "page_size": "Page size",
     "delete": "Delete",
     "cancel": "Cancel",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "or": "Or",
+    "selected": "Selected",
+    "not_selected": "Not selected",
+    "all": "All",
+    "filter_by_status": "Filter by status",
+    "pagination": "Pagination navigation"
   },
   "why": {
     "badge": "Why Choose Us",
@@ -328,7 +356,7 @@
     "not_have_account": "Don't have an account? ",
     "register_link": " Register now",
     "business_owner": "Are you a business owner?",
-    "become_partner": "Become a Partner"
+    "become_partner": "Register to Become a Partner"
   },
   "register": {
     "title": "Register",
@@ -340,7 +368,7 @@
     "have_account": "Already have an account? ",
     "login_link": " Login now",
     "business_owner": "Are you a business owner?",
-    "become_partner": "Become a Partner"
+    "become_partner": "Register to Become a Partner"
   },
   "verifyotp": {
     "title": "Verify OTP",
