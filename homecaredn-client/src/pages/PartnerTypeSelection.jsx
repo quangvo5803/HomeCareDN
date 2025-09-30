@@ -3,20 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const partnerTypes = [
-  {
-    type: 'Distributor',
-    icon: 'fa-store',
-    color: 'blue',
-    title: 'partner.distributor',
-    desc: 'partner.distributor_desc'
-  },
-  {
-    type: 'Contractor',
-    icon: 'fa-tools',
-    color: 'green',
-    title: 'partner.contractor',
-    desc: 'partner.contractor_desc'
-  }
+  { type: 'Distributor', icon: 'fa-store', color: 'blue',  title: 'partner.distributor',  desc: 'partner.distributor_desc' },
+  { type: 'Contractor',  icon: 'fa-tools', color: 'green', title: 'partner.contractor',   desc: 'partner.contractor_desc' }
 ];
 
 export default function PartnerTypeSelection() {
@@ -24,11 +12,12 @@ export default function PartnerTypeSelection() {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState('');
   const canContinue = Boolean(selectedType);
+
   const handleSelect = useCallback(type => setSelectedType(type), []);
   const handleContinue = useCallback(() => {
     if (selectedType) navigate(`/PartnerRegistration?type=${selectedType}`);
   }, [selectedType, navigate]);
-  const goHome = useCallback(() => navigate('/'), [navigate]);
+  const goHome  = useCallback(() => navigate('/'),      [navigate]);
   const goLogin = useCallback(() => navigate('/Login'), [navigate]);
 
   const onKeySelect = useCallback((e, type) => {
@@ -41,9 +30,7 @@ export default function PartnerTypeSelection() {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{
-        background: 'url(https://res.cloudinary.com/dl4idg6ey/image/upload/v1749267431/loginBg_q3gjez.png) center/cover no-repeat'
-      }}
+      style={{ background: 'url(https://res.cloudinary.com/dl4idg6ey/image/upload/v1749267431/loginBg_q3gjez.png) center/cover no-repeat' }}
     >
       <div className="absolute inset-0 bg-black/20" />
 
@@ -143,7 +130,7 @@ export default function PartnerTypeSelection() {
               type="button"
               onClick={handleContinue}
               disabled={!canContinue}
-              aria-describedby={!canContinue ? undefined : 'continue-help'}
+              aria-describedby={canContinue ? undefined : 'continue-help'}
               className={`w-full py-3 rounded-lg font-medium flex items-center justify-center transition focus:ring-2 focus:ring-offset-2 ${
                 canContinue
                   ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 focus:ring-blue-300'

@@ -127,7 +127,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
         type="button"
         className="absolute inset-0 bg-black/40"
         aria-label={t('BUTTON.Close', 'Close')}
-        onClick={!busy ? onClose : undefined}
+        onClick={busy ? undefined : onClose}
       />
       {/* Dialog ngữ nghĩa */}
       <dialog

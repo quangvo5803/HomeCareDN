@@ -7,17 +7,15 @@ import partnerService from '../services/partnerService';
 import { isSafeEmail } from '../utils/validateEmail';
 import PropTypes from 'prop-types';
 
-
 const MAX_IMAGES = 5;
-const ALLOWED_TYPES = ['Distributor', 'Contractor'];
-
+// Dùng Set cho kiểm tra tồn tại
+const ALLOWED_TYPES = new Set(['Distributor', 'Contractor']);
 
 export default function PartnerRegistration() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const partnerTypeFromUrl = searchParams.get('type');
-
 
   const [formData, setFormData] = useState({
     partnerType: partnerTypeFromUrl || '',
@@ -32,31 +30,35 @@ export default function PartnerRegistration() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-
   const fileInputRef = useRef(null);
 
+  // Ngăn trình duyệt chiếm quyền drag toàn trang (a11y: bỏ handler ở <div> wrapper)
+  useEffect(() => {
+    const stop = (e) => { e.preventDefault(); e.stopPropagation(); };
+    const events = ['dragenter', 'dragover']; // không chặn 'drop' để khu vực nút vẫn nhận được
+    events.forEach(evt => window.addEventListener(evt, stop, { passive: false }));
+    return () => events.forEach(evt => window.removeEventListener(evt, stop));
+  }, []);
 
+  // Dùng Set.has thay vì includes
   const isValidType = useMemo(
-    () => ALLOWED_TYPES.includes(partnerTypeFromUrl || ''),
+    () => ALLOWED_TYPES.has(partnerTypeFromUrl ?? ''),
     [partnerTypeFromUrl]
   );
   const safeType = useMemo(
-    () => (ALLOWED_TYPES.includes(formData.partnerType) ? formData.partnerType : ''),
+    () => (ALLOWED_TYPES.has(formData.partnerType) ? formData.partnerType : ''),
     [formData.partnerType]
   );
   const canSubmit = useMemo(() => !loading && !uploading, [loading, uploading]);
-
 
   useEffect(() => {
     if (!isValidType) navigate('/PartnerTypeSelection', { replace: true });
   }, [isValidType, navigate]);
 
-
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
-
 
   const validateForm = useCallback(
     (data, imagesCount) => {
@@ -72,7 +74,7 @@ export default function PartnerRegistration() {
         toast.error(t('partner.validation.email_required'));
         return false;
       }
-      if(  !isSafeEmail(data.email)){
+      if (!isSafeEmail(data.email)) {
         toast.error(t('partner.validation.email_invalid'));
         return false;
       }
@@ -92,7 +94,6 @@ export default function PartnerRegistration() {
     },
     [t]
   );
-
 
   const handleImageUpload = useCallback(
     async (files) => {
@@ -122,7 +123,6 @@ export default function PartnerRegistration() {
     [imageUrls.length, t]
   );
 
-
   const handleFileInputChange = useCallback(
     (e) => {
       handleImageUpload(Array.from(e.target.files || []));
@@ -131,17 +131,14 @@ export default function PartnerRegistration() {
     [handleImageUpload]
   );
 
-
   const removeImage = useCallback((index) => {
     setImageUrls((prev) => prev.filter((_, i) => i !== index));
     setImagePublicIds((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
-
   const handleUploadAreaClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
-
 
   const handleUploadAreaKeyDown = useCallback(
     (e) => {
@@ -153,12 +150,10 @@ export default function PartnerRegistration() {
     [handleUploadAreaClick]
   );
 
-
   const preventDefaults = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
-
 
   const handleDrop = useCallback(
     (e) => {
@@ -169,13 +164,11 @@ export default function PartnerRegistration() {
     [handleImageUpload, preventDefaults]
   );
 
-
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
       const ok = validateForm(formData, imageUrls.length);
       if (!ok) return;
-
 
       setLoading(true);
       try {
@@ -193,7 +186,10 @@ export default function PartnerRegistration() {
       } finally {
         setLoading(false);
       }
-    },[formData, imageUrls, imagePublicIds, navigate, safeType, t, validateForm]);
+    },
+    [formData, imageUrls, imagePublicIds, navigate, safeType, t, validateForm]
+  );
+
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative"
@@ -204,19 +200,15 @@ export default function PartnerRegistration() {
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
-      onDragEnter={preventDefaults}
-      onDragOver={preventDefaults}
     >
-      <div className="absolute inset-0 bg-black/20"/>
-
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
       {/* Khung 1 cột: Form trung tâm */}
-      
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-2xl relative z-10 justify-center">
         <div className="p-4 md:p-6">
           {/* Logo → Home - CENTERED */}
           <div className="flex justify-center mb-6">
-            <button 
+            <button
               type="button"
               className="p-0 border-0 bg-transparent"
               aria-label={t('common.home', 'Home')}
@@ -229,7 +221,6 @@ export default function PartnerRegistration() {
               />
             </button>
           </div>
-
 
           {/* Title + Type pill */}
           <div className="flex items-start justify-between gap-3 mb-6">
@@ -249,13 +240,12 @@ export default function PartnerRegistration() {
               title={t('partner.change_type', 'Change type')}
             >
               <i className="fas fa-briefcase" />
-<span className="text-sm font-medium">
-   {safeType ? t(`partner.${safeType.toLowerCase()}`) : t('common.not_selected', '—')}
- </span>
+              <span className="text-sm font-medium">
+                {safeType ? t(`partner.${safeType.toLowerCase()}`) : t('common.not_selected', '—')}
+              </span>
               <i className="fas fa-edit ml-1 opacity-75" />
             </button>
           </div>
-
 
           {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -269,7 +259,6 @@ export default function PartnerRegistration() {
               onChange={handleInputChange}
             />
 
-
             <FloatingInput
               id="companyName"
               name="companyName"
@@ -279,7 +268,6 @@ export default function PartnerRegistration() {
               required
               onChange={handleInputChange}
             />
-
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FloatingInput
@@ -304,7 +292,6 @@ export default function PartnerRegistration() {
               />
             </div>
 
-
             <FloatingTextarea
               id="description"
               name="description"
@@ -315,19 +302,19 @@ export default function PartnerRegistration() {
               onChange={handleInputChange}
             />
 
-
             {/* Upload ảnh */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 {t('partner.business_images', 'Business images')} *
               </label>
 
-
               <button
                 type="button"
                 onClick={handleUploadAreaClick}
                 onKeyDown={handleUploadAreaKeyDown}
                 onDrop={handleDrop}
+                onDragEnter={preventDefaults}
+                onDragOver={preventDefaults}
                 disabled={uploading}
                 aria-describedby="upload-help"
                 className="w-full border border-gray-300 rounded-lg p-4 text-center bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
@@ -341,7 +328,6 @@ export default function PartnerRegistration() {
                 </p>
               </button>
 
-
               <input
                 ref={fileInputRef}
                 id="image-upload"
@@ -351,7 +337,6 @@ export default function PartnerRegistration() {
                 onChange={handleFileInputChange}
                 className="sr-only"
               />
-
 
               {imageUrls.length > 0 && (
                 <div className="mt-3">
@@ -387,7 +372,6 @@ export default function PartnerRegistration() {
               )}
             </div>
 
-
             {/* Actions */}
             <div className="flex gap-4 pt-2">
               <button
@@ -399,13 +383,17 @@ export default function PartnerRegistration() {
                 {t('common.back')}
               </button>
 
-
               <button
                 type="submit"
                 disabled={!canSubmit}
                 className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {(!canSubmit) ? (
+                {canSubmit ? (
+                  <>
+                    <i className="fas fa-paper-plane mr-2" />
+                    {t('partner.submit_application')}
+                  </>
+                ) : (
                   <>
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -413,15 +401,9 @@ export default function PartnerRegistration() {
                     </svg>
                     {t('partner.submitting')}
                   </>
-                ) : (
-                  <>
-                    <i className="fas fa-paper-plane mr-2" />
-                    {t('partner.submit_application')}
-                  </>
                 )}
               </button>
             </div>
-
 
             {/* Note */}
             <div
@@ -437,7 +419,6 @@ export default function PartnerRegistration() {
     </div>
   );
 }
-
 
 /* ======== Floating Inputs ======== */
 function FloatingInput({ id, name, label, type = 'text', ...rest }) {
@@ -475,7 +456,6 @@ FloatingInput.propTypes = {
   placeholder: PropTypes.string,
 };
 FloatingInput.defaultProps = { type: 'text' };
-
 
 function FloatingTextarea({ id, name, label, rows = 3, ...rest }) {
   return (
