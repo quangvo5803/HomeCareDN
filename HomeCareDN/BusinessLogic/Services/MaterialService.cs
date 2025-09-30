@@ -81,7 +81,7 @@ namespace BusinessLogic.Services
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
                 "materialnameen" => query.OrderBy(m => m.NameEN),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
-                "random" => query.OrderBy(s => EF.Functions.Random()),
+                "random" => query.OrderBy(m => m.MaterialID),
                 _ => query.OrderBy(b => b.MaterialID),
             };
             var items = await query

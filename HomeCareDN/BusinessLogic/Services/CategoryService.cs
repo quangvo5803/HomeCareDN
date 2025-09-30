@@ -43,7 +43,7 @@ namespace BusinessLogic.Services
                 "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
                 "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
                 "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
-                "random" => query.OrderBy(s => EF.Functions.Random()),
+                "random" => query.OrderBy(s => s.CategoryID),
                 _ => query.OrderBy(c => c.CategoryID),
             };
 
