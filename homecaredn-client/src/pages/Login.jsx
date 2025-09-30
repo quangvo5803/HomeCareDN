@@ -1,5 +1,5 @@
-import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useContext, useEffect, useRef , useMemo  } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
 import Loading from '../components/Loading';
@@ -14,7 +14,30 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { setPendingEmail, login } = useContext(AuthContext);
+  const TOAST_ID = useMemo(() => ({
+    notice: 'notice_once',
+    pending: 'pending_once',
+    rejected: 'rejected_once',
+  }), []);
+  const noticeShownRef = useRef(false);
+const getStatusCodes = (err) => {
+  const d = err?.response?.data ?? {};
+  const rootUpper = Array.isArray(d.STATUS) ? d.STATUS : [];
+  const rootLower = Array.isArray(d.status) ? d.status : [];
+  const errs = d.errors || d.Errors || {};
+  const modelState = Array.isArray(errs.STATUS) ? errs.STATUS : [];
+  return [...rootUpper, ...rootLower, ...modelState];
+};
+  useEffect(() => {
+    const noticeKey = location.state?.notice;
+    if (noticeKey && !noticeShownRef.current) {
+      noticeShownRef.current = true;
+      toast.info(t(noticeKey), { toastId: TOAST_ID.notice });
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state?.notice, location.pathname, navigate, t, TOAST_ID]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -35,18 +58,36 @@ export default function Login() {
       toast.success(t('SUCCESS.SEND_OTP'));
       navigate('/VerifyOTP', { state: { email } });
     } catch (err) {
+      const codes = getStatusCodes(err);
+      
+      if (codes.includes('PARTNER_PENDING_REVIEW')) {
+        if (!toast.isActive(TOAST_ID.pending)) {
+          toast.info(t('partner.login.pending_review'), { toastId: TOAST_ID.pending });
+        }
+        return;
+      }
+      if (codes.includes('PARTNER_REJECTED')) {
+        if (!toast.isActive(TOAST_ID.rejected)) {
+          toast.info(t('partner.login.rejected'), { toastId: TOAST_ID.rejected });
+        }
+        return;
+      }
+
       if (err.handled) return;
       toast.error(handleApiError(err));
     } finally {
       setLoading(false);
     }
   };
+
   const handleRegister = () => {
     window.location.href = '/Register';
   };
+
   const handlePartnerRegistration = () => {
     navigate('/PartnerRegistration');
   };
+
   if (loading) return <Loading />;
 
   return (
@@ -111,7 +152,7 @@ export default function Login() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder-transparent peer"
-                  placeholder="Email"
+                  placeholder=" "
                   onFocus={(e) =>
                     e.target.nextElementSibling.classList.add('focused')
                   }
@@ -154,14 +195,14 @@ export default function Login() {
             <div className="flex justify-center mt-4">
               <GoogleLoginButton onLoginSuccess={login} />
             </div>
-           {/* Partner Registration Button */}
+
+            {/* Partner Registration Button */}
             <div className="text-center mt-8">
               <button
                 type="button"
                 onClick={handlePartnerRegistration}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white font-medium shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
               >
-                {/* Icon optional, bỏ nếu không dùng Font Awesome */}
                 <i className="fa-solid fa-handshake" aria-hidden="true"></i>
                 <span>{t('login.become_partner')}</span>
               </button>
@@ -175,10 +216,10 @@ export default function Login() {
               <button
                 onClick={handleRegister}
                 className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200"
-              > 
+              >
                 {t('login.register_link')}
               </button>
-            </div>            
+            </div>
           </div>
         </div>
       </div>
