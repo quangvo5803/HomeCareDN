@@ -20,6 +20,7 @@ export default function AdminServiceManager() {
     totalServices,
     loading,
     fetchServices,
+    getServiceById,
     createService,
     updateService,
     deleteService,
@@ -166,8 +167,9 @@ export default function AdminServiceManager() {
                           <div className="flex items-center justify-center space-x-1">
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                              onClick={() => {
-                                setEditingService(svc);
+                              onClick={ async()  => {
+                                var res = await getServiceById(svc.serviceID);
+                                setEditingService(res);
                                 setIsModalOpen(true);
                               }}
                             >

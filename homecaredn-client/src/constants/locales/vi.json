@@ -80,6 +80,11 @@
     "have_questions": "Có câu hỏi về việc hợp tác với chúng tôi?",
     "contact_support": "Liên Hệ Hỗ Trợ Đối Tác",
     
+    "status": {
+      "pending": "Đang Chờ Duyệt",
+      "approved": "Đã Duyệt",
+      "rejected": "Đã Từ Chối"
+    },
     "validation": {
       "partner_type_required": "Vui lòng chọn loại đối tác",
       "full_name_required": "Vui lòng nhập họ tên",

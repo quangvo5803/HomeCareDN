@@ -59,8 +59,6 @@ export const ServiceProvider = ({ children }) => {
   // 📌 Public: get by id
   const getServiceById = useCallback(
     async (id) => {
-      const local = services.find((s) => s.serviceID === id);
-      if (local) return local;
       try {
         return await serviceService.getServiceById(id);
       } catch (err) {
@@ -68,7 +66,7 @@ export const ServiceProvider = ({ children }) => {
         return null;
       }
     },
-    [services]
+    []
   );
 
   // 📌 Admin-only: create
