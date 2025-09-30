@@ -35,13 +35,13 @@ namespace HomeCareDNAPI
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
             builder.Services.AddDbContext<AuthorizeDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("AuthorizeConnection")
-                )
+                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
             );
+
             var key = builder.Configuration["Jwt:Key"];
             if (string.IsNullOrEmpty(key))
             {
