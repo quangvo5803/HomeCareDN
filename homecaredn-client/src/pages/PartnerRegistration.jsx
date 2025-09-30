@@ -28,12 +28,9 @@ export default function PartnerRegistration() {
     description: '',
   });
 
-  // Preview URLs cho UI (giữ nguyên tên state để không đổi UI)
   const [imageUrls, setImageUrls] = useState([]);
-  // PublicId sẽ có sau khi upload (giữ nguyên để không đổi UI)
   const [imagePublicIds, setImagePublicIds] = useState([]);
 
-  // Danh sách file thực, chỉ upload khi submit
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -59,8 +56,9 @@ export default function PartnerRegistration() {
       for (const evt of events) {
         globalThis.removeEventListener(evt, stop);
       }
-      // cleanup: revoke all object URLs khi unmount
-      imageUrls.forEach((u) => URL.revokeObjectURL(u));
+    for (const url of imageUrls) {
+      URL.revokeObjectURL(url);
+    }
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -127,7 +125,6 @@ export default function PartnerRegistration() {
     [t]
   );
 
-  // CHỈ thêm file + tạo preview, KHÔNG upload Cloudinary
   const handleImageUpload = useCallback(
     async (files) => {
       if (!files?.length) return;
@@ -166,7 +163,6 @@ export default function PartnerRegistration() {
   );
 
   const removeImage = useCallback((index) => {
-    // revoke object URL trước khi xóa
     const url = imageUrls[index];
     if (url) URL.revokeObjectURL(url);
 
@@ -207,13 +203,11 @@ export default function PartnerRegistration() {
     async (e) => {
       e.preventDefault();
 
-      // validate theo số file đã chọn (chưa upload)
       const ok = validateForm(formData, selectedFiles.length);
       if (!ok) return;
 
       setLoading(true);
       try {
-        // ⬇️ Upload thật lên Cloudinary TẠI ĐÂY
         const uploaded = await uploadImageToCloudinary(
           selectedFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
@@ -234,8 +228,10 @@ export default function PartnerRegistration() {
 
         toast.success(t('partner.registration_success'));
 
-        // dọn preview
-        imageUrls.forEach((u) => URL.revokeObjectURL(u));
+        for (const url of imageUrls) {
+          URL.revokeObjectURL(url);
+        }
+
         setImageUrls([]);
         setImagePublicIds([]);
         setSelectedFiles([]);
