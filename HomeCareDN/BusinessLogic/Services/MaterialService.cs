@@ -120,7 +120,7 @@ namespace BusinessLogic.Services
             return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<MaterialDto> GetMaterialByIdAsync(Guid id)
+        public async Task<MaterialDetailDto> GetMaterialByIdAsync(Guid id)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
@@ -136,7 +136,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            return _mapper.Map<MaterialDto>(material);
+            return _mapper.Map<MaterialDetailDto>(material);
         }
 
         public async Task<MaterialDto> GetMaterialByCategoryAsync(Guid id)

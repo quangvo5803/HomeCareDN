@@ -47,8 +47,6 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Public: get material by id
   const getMaterialById = useCallback(
     async (id) => {
-      const local = materials.find((m) => m.materialID === id);
-      if (local) return local;
       try {
         return await materialService.getMaterialById(id);
       } catch (err) {
@@ -56,7 +54,7 @@ export const MaterialProvider = ({ children }) => {
         return null;
       }
     },
-    [materials]
+    []
   );
   // 📌 Distributor-only: get all by user id
   const fetchMaterialsByUserId = useCallback(
