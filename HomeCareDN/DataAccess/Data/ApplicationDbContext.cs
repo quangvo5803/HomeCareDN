@@ -1,5 +1,4 @@
-﻿using System.Reflection.Emit;
-using DataAccess.Entities.Application;
+﻿using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data
@@ -23,6 +22,7 @@ namespace DataAccess.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("app");
             modelBuilder.Entity<ServiceRequest>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();
