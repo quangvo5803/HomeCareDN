@@ -54,55 +54,53 @@ const buildMaterialFormData = ({
 };
 
 export const materialService = {
-  //Public APIs
+  // Public APIs
   getAllMaterial: async (params = {}) => {
     const response = await api.get('/Material/get-all-material', { params });
     return response.data;
   },
+
   getMaterialById: async (id) => {
     const response = await api.get(`/Material/get-material/${id}`);
     return response.data;
   },
 
-  //Admin-only APIs
+  getMaterialByCategory: async (id) => {
+    const response = await api.get(`/Material/get-material-bycategory/${id}`);
+    return response.data;
+  },
+
+  getMaterialByBrand: async (id) => {
+    const response = await api.get(`/Material/get-material-bybrand/${id}`);
+    return response.data;
+  },
+
+  // Authenticated APIs (Admin / Distributor)
   getAllMaterialByUserId: async (params = {}) => {
-    const response = await api.get(
-      `/DistributorMaterial/get-all-material-by-userid`,
-      {
-        params,
-      }
-    );
+    const response = await api.get('/Material/get-all-material-by-userid', {
+      params,
+    });
     return response.data;
   },
 
   createMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.post(
-      '/DistributorMaterial/create-material',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
+    const response = await api.post('/Material/create-material', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
   updateMaterial: async (data) => {
     const formData = buildMaterialFormData(data);
-    const response = await api.put(
-      '/DistributorMaterial/update-material',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
+    const response = await api.put('/Material/update-material', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data;
   },
 
   deleteMaterial: async (id) => {
-    const response = await api.delete(
-      `/DistributorMaterial/delete-material/${id}`
-    );
+    const response = await api.delete(`/Material/delete-material/${id}`);
     return response.data;
   },
 

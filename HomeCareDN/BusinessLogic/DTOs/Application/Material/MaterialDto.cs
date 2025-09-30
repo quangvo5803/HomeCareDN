@@ -8,6 +8,7 @@ namespace BusinessLogic.DTOs.Application.Material
     {
         public Guid MaterialID { get; set; }
         public required string UserID { get; set; }
+        public string? UserName { get; set; }
 
         public required string Name { get; set; }
         public required string NameEN { get; set; }

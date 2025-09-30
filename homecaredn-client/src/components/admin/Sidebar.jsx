@@ -38,7 +38,7 @@ export default function Sidebar() {
     {
       icon: 'text-orange-600 fa-solid fa-suitcase',
       title: 'material',
-      link: '/Admin/Material',
+      link: '/Admin/MaterialManager',
     },
     {
       icon: 'text-emerald-600 fa-solid fa-headset',

@@ -14,7 +14,14 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Public: fetch all material
   const fetchMaterials = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID, FilterCategoryID, FilterBrandID } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterCategoryID,
+      FilterBrandID,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await materialService.getAllMaterial({
@@ -61,7 +68,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: get all by user id
   const fetchMaterialsByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const data = await materialService.getAllMaterialByUserId({
@@ -84,7 +92,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: create
   const createMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
@@ -105,7 +114,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const updated = await materialService.updateMaterial(materialData);
@@ -113,10 +123,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                ...m,
-                ...updated,
-                imageUrls: updated.imageUrls ?? m.imageUrls,
-              }
+                  ...m,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? m.imageUrls,
+                }
               : m
           )
         );
@@ -134,7 +144,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete
   const deleteMaterial = useCallback(
     async (id) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
@@ -149,7 +160,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(
     async (materialId, imageUrl) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterialImage(imageUrl);
 

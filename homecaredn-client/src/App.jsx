@@ -19,6 +19,7 @@ import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
+import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -191,6 +192,7 @@ function Layout() {
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="ServiceManager" element={<AdminServiceManager />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
+          <Route path="MaterialManager" element={<AdminMaterialManager />} />
         </Route>
         {/* Contractor routes */}
         <Route
@@ -231,7 +233,6 @@ function Layout() {
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
         <Route path="RepairViewAll" element={<RepairViewAll />} />
         <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
-
       </Routes>
       {showHeaderFooter && <Footer />}
     </>
