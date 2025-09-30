@@ -55,8 +55,8 @@ export default function ServiceItem({ itemServiceType }) {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                     {/* Filter */}
-                    <div className="flex flex-col space-y-4">
-                        <h2 className="text-2xl font-semibold text-orange-400 ms-6">
+                    <div className="flex flex-col">
+                        <h2 className="text-2xl font-semibold text-orange-400 ms-6 -mb-8">
                             {t("serviceViewAll.title")}
                         </h2>
 

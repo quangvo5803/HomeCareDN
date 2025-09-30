@@ -44,6 +44,9 @@ export default function Login() {
   const handleRegister = () => {
     window.location.href = '/Register';
   };
+  const handlePartnerRegistration = () => {
+    navigate('/PartnerRegistration');
+  };
   if (loading) return <Loading />;
 
   return (
@@ -151,6 +154,19 @@ export default function Login() {
             <div className="flex justify-center mt-4">
               <GoogleLoginButton onLoginSuccess={login} />
             </div>
+           {/* Partner Registration Button */}
+            <div className="text-center mt-8">
+              <button
+                type="button"
+                onClick={handlePartnerRegistration}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white font-medium shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+              >
+                {/* Icon optional, bỏ nếu không dùng Font Awesome */}
+                <i className="fa-solid fa-handshake" aria-hidden="true"></i>
+                <span>{t('login.become_partner')}</span>
+              </button>
+            </div>
+
             {/* Register Link */}
             <div className="text-center mt-8">
               <span className="text-gray-600">
@@ -159,10 +175,10 @@ export default function Login() {
               <button
                 onClick={handleRegister}
                 className="text-blue-600 hover:text-blue-700 font-medium hover:underline transition-colors duration-200"
-              >
+              > 
                 {t('login.register_link')}
               </button>
-            </div>
+            </div>            
           </div>
         </div>
       </div>
