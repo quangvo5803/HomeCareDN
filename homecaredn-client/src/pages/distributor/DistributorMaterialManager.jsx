@@ -24,6 +24,7 @@ export default function DistributorMaterialManager() {
     totalMaterials,
     loading,
     fetchMaterialsByUserId,
+    getMaterialById,
     createMaterial,
     updateMaterial,
     deleteMaterial,
@@ -231,8 +232,9 @@ export default function DistributorMaterialManager() {
                     <div className="flex justify-center gap-2">
                       <button
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                        onClick={() => {
-                          setEditingMaterial(material);
+                        onClick={async () => {
+                          var res = await getMaterialById(material.materialID);
+                          setEditingMaterial(res);
                           setIsModalOpen(true);
                         }}
                       >
@@ -298,6 +300,6 @@ export default function DistributorMaterialManager() {
           />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
