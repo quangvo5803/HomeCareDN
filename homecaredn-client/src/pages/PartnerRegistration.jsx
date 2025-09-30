@@ -35,9 +35,23 @@ export default function PartnerRegistration() {
   // Ngăn trình duyệt chiếm quyền drag toàn trang (a11y: bỏ handler ở <div> wrapper)
   useEffect(() => {
     const stop = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+    const canBind =
+    typeof globalThis !== 'undefined' &&
+    typeof globalThis.addEventListener === 'function' &&
+    typeof globalThis.removeEventListener === 'function';
+
+    if (!canBind) return undefined;
+
     const events = ['dragenter', 'dragover']; // không chặn 'drop' để khu vực nút vẫn nhận được
-    events.forEach(evt => window.addEventListener(evt, stop, { passive: false }));
-    return () => events.forEach(evt => window.removeEventListener(evt, stop));
+    for (const evt of events) {
+      globalThis.addEventListener(evt, stop, { passive: false });
+    }
+    return () => {
+      for (const evt of events) {
+      globalThis.removeEventListener(evt, stop);
+      }
+    };
   }, []);
 
   // Dùng Set.has thay vì includes
