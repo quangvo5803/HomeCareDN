@@ -41,6 +41,11 @@ export default function Sidebar() {
       link: '/Admin/Material',
     },
     {
+      icon: 'text-purple-600 fa-solid fa-handshake', 
+      title: 'partner',                             
+      link: '/Admin/PartnerManager',                
+  },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',

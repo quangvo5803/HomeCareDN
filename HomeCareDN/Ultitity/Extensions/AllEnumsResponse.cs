@@ -7,5 +7,7 @@
         public List<EnumDto> BuildingTypes { get; set; } = new();
         public List<EnumDto> MainStructures { get; set; } = new();
         public List<EnumDto> DesignStyles { get; set; } = new();
+        public List<EnumDto> PartnerType { get; set; } = new();
+        public List<EnumDto> PartnerStatus { get; set; } = new();
     }
 }

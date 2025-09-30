@@ -19,6 +19,8 @@ namespace DataAccess.Data
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ContactSupport> ContactSupports { get; set; }
+        public DbSet<Partner> Partners { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ServiceRequest>(entity =>
@@ -48,12 +50,17 @@ namespace DataAccess.Data
                 entity.Property(e => e.BuildingType).HasConversion<string>();
             });
 
-            modelBuilder.Entity<Conversation>()
-            .HasMany(c => c.Messages)
-            .WithOne(m => m.Conversation!)
-            .HasForeignKey(m => m.ConversationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder
+                .Entity<Conversation>()
+                .HasMany(c => c.Messages)
+                .WithOne(m => m.Conversation!)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Partner>(entity =>
+            {
+                entity.Property(p => p.PartnerType).HasConversion<string>();
+                entity.Property(p => p.Status).HasConversion<string>();
+            });
             base.OnModelCreating(modelBuilder);
         }
     }

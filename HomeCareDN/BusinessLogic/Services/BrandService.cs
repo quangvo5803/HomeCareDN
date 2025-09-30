@@ -6,7 +6,6 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
