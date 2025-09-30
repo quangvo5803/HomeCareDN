@@ -158,7 +158,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
 
   const editAddrItem = async (it) => {
     setAddrForm({
-      id: it.addressId,
+      id: it.addressID,
       city: it.city,
       district: it.district,
       ward: it.ward,
@@ -566,7 +566,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     {t('BUTTON.Edit')}
                                   </button>
                                   <button
-                                    onClick={() => deleteAddrItem(it.addressId)}
+                                    onClick={() => deleteAddrItem(it.addressID)}
                                     className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
                                   >
                                     <i className="fas fa-trash mr-1"></i>
