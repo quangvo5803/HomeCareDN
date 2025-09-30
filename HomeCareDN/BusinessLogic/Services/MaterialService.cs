@@ -81,7 +81,7 @@ namespace BusinessLogic.Services
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
                 "materialnameen" => query.OrderBy(m => m.NameEN),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
+                "random" => query.OrderBy(s => EF.Functions.Random()),
                 _ => query.OrderBy(b => b.MaterialID),
             };
             var items = await query
@@ -106,8 +106,8 @@ namespace BusinessLogic.Services
 
             //upload image
             await UploadMaterialImagesAsync(
-                material.MaterialID, 
-                requestDto.ImageUrls, 
+                material.MaterialID,
+                requestDto.ImageUrls,
                 requestDto.ImagePublicIds
             );
 
@@ -188,8 +188,8 @@ namespace BusinessLogic.Services
 
             //upload image
             await UploadMaterialImagesAsync(
-                material.MaterialID, 
-                requestDto.ImageUrls, 
+                material.MaterialID,
+                requestDto.ImageUrls,
                 requestDto.ImagePublicIds
             );
 
@@ -257,20 +257,25 @@ namespace BusinessLogic.Services
             ICollection<string>? publicIds
         )
         {
-            if (imageUrls == null || !imageUrls.Any()) return;
+            if (imageUrls == null || !imageUrls.Any())
+                return;
 
             var ids = publicIds?.ToList() ?? new List<string>();
 
-            var images = imageUrls.Select((url, i) => new Image
-            {
-                ImageID = Guid.NewGuid(),
-                MaterialID = materialId,
-                ImageUrl = url,
-                PublicId = i < ids.Count ? ids[i] : string.Empty
-            }).ToList();
+            var images = imageUrls
+                .Select(
+                    (url, i) =>
+                        new Image
+                        {
+                            ImageID = Guid.NewGuid(),
+                            MaterialID = materialId,
+                            ImageUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
-
     }
 }

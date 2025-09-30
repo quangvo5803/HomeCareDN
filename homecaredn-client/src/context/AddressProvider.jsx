@@ -35,7 +35,6 @@ export const AddressProvider = ({ children }) => {
     async (dto) => {
       if (!user) throw new Error('Unauthorized');
       try {
-        setLoading(true);
         const newAddres = await addressService.createAddress(dto);
         setAddresses((prev) => [...prev, newAddres]);
         // Tăng tổng số address
@@ -44,9 +43,7 @@ export const AddressProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
-      }
+      } 
     },
     [user]
   );
@@ -59,7 +56,7 @@ export const AddressProvider = ({ children }) => {
         const updated = await addressService.updateAddress(dto);
         // Optimistic update
         setAddresses((prev) =>
-          prev.map((a) => (a.addressId === dto.AddressId ? updated : a))
+          prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
         );
       } catch (err) {
         toast.error(handleApiError(err));
@@ -77,7 +74,7 @@ export const AddressProvider = ({ children }) => {
       try {
         await addressService.deleteAddress(id);
         // Xoá khỏi local
-        setAddresses((prev) => prev.filter((a) => a.addressId !== id));
+        setAddresses((prev) => prev.filter((a) => a.addressID !== id));
         setTotalAddresses((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
