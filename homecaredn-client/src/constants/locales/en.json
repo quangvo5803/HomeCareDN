@@ -170,6 +170,8 @@
       "email_required": "Email address is required", 
       "email_invalid": "Please enter a valid email",
       "phone_required": "Phone number is required",
+      "phone_invalid": "Please enter a valid phone number",
+      "full_name_invalid": "Please enter a valid full name",
       "description_required": "Business description is required",
       "images_required": "Please upload at least one business image",
       "description_too_long": "Description is too long"
@@ -871,6 +873,9 @@
     "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
     "REGISTER_ALREADY_EXISTS": "Email already registered",
     "NULL_NAME": "Please enter your full name.",
+    "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
+    "NULL_PHONE": "Please enter your phone number.",
+    "INVALID_PHONE": "Invalid phone number.",
     "NULL_EMAIL": "Please enter your email.",
     "INVALID_EMAIL": "Invalid email.",
     "NOT_FOUND_EMAIL": "Email not found for verification.",

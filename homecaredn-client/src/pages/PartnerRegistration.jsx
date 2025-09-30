@@ -5,6 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { uploadImageToCloudinary } from '../utils/uploadImage';
 import partnerService from '../services/partnerService';
 import { isSafeEmail } from '../utils/validateEmail';
+import { isSafePhone } from '../utils/validatePhone';
+import { isSafeText } from '../utils/validateText';
+
+
 import PropTypes from 'prop-types';
 
 const MAX_IMAGES = 5;
@@ -80,6 +84,10 @@ export default function PartnerRegistration() {
         toast.error(t('partner.validation.full_name_required'));
         return false;
       }
+      if (!isSafeText(data.fullName)) {
+        toast.error(t('partner.validation.full_name_invalid'));
+        return false;
+      }
       if (!data.companyName.trim()) {
         toast.error(t('partner.validation.company_name_required'));
         return false;
@@ -92,8 +100,12 @@ export default function PartnerRegistration() {
         toast.error(t('partner.validation.email_invalid'));
         return false;
       }
-      if (!data.phoneNumber.trim()) {
-        toast.error(t('partner.validation.phone_required'));
+       if (!data.phoneNumber.trim()) {
+       toast.error(t('partner.validation.phone_required'));
+       return false;
+      }
+      if (!isSafePhone(data.phoneNumber)) {
+        toast.error(t('partner.validation.phone_invalid'));
         return false;
       }
       if (data.description.length > 1000) {

@@ -115,7 +115,7 @@ export default function AdminPartnerManager() {
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-blue-500 rounded-full" aria-hidden="true" />
             <span className="text-sm text-gray-600">
-              {t('adminPartnerManager.total', 'Total')}: {totalPartners || 0}
+              {t('adminPartnerManager.total')}: {totalPartners || 0}
             </span>
           </div>
         </div>

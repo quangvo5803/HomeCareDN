@@ -83,11 +83,12 @@
     "validation": {
       "partner_type_required": "Vui lòng chọn loại đối tác",
       "full_name_required": "Vui lòng nhập họ tên",
+      "full_name_invalid": "Vui lòng nhập họ tên hợp lệ",
       "company_name_required": "Tên công ty là bắt buộc",
       "email_required": "Địa chỉ email là bắt buộc",
       "email_invalid": "Vui lòng nhập email hợp lệ", 
       "phone_required": "Số điện thoại là bắt buộc",
-
+      "phone_invalid": "Vui lòng nhập số điện thoại hợp lệ",
       "description_required": "Mô tả doanh nghiệp là bắt buộc",
       "images_required": "Vui lòng tải lên ít nhất một hình ảnh",
       "description_too_long": "Mô tả quá dài"
@@ -872,6 +873,9 @@
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
     "NULL_NAME": "Vui lòng nhập họ và tên.",
+    "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
+    "NULL_PHONE": "Vui lòng nhập số điện thoại.",
+    "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "NULL_EMAIL": "Vui lòng nhập email.",
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
