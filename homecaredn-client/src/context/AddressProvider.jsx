@@ -35,7 +35,6 @@ export const AddressProvider = ({ children }) => {
     async (dto) => {
       if (!user) throw new Error('Unauthorized');
       try {
-        setLoading(true);
         const newAddres = await addressService.createAddress(dto);
         setAddresses((prev) => [...prev, newAddres]);
         // Tăng tổng số address
@@ -44,9 +43,7 @@ export const AddressProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
-      }
+      } 
     },
     [user]
   );
