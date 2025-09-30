@@ -14,7 +14,6 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -44,7 +43,7 @@ namespace BusinessLogic.Services
                 "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
                 "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
                 "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
-                "random" => query.OrderBy(c => Guid.NewGuid()),
+                "random" => query.OrderBy(s => EF.Functions.Random()),
                 _ => query.OrderBy(c => c.CategoryID),
             };
 
