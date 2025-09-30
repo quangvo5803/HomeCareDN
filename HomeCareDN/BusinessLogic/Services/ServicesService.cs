@@ -44,7 +44,9 @@ namespace BusinessLogic.Services
                 query = query.Where(s => s.BuildingType == parameters.FilterBuildingType.Value);
 
             if (parameters.FilterMainStructureType.HasValue)
-                query = query.Where(s => s.MainStructureType == parameters.FilterMainStructureType.Value);
+                query = query.Where(s =>
+                    s.MainStructureType == parameters.FilterMainStructureType.Value
+                );
 
             if (parameters.FilterDesignStyle.HasValue)
                 query = query.Where(s => s.DesignStyle == parameters.FilterDesignStyle.Value);
@@ -56,7 +58,7 @@ namespace BusinessLogic.Services
                 "servicename_desc" => query.OrderByDescending(s => s.Name),
                 "servicenameen" => query.OrderBy(s => s.NameEN),
                 "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
-                "random" => query.OrderBy(s => Guid.NewGuid()),
+                "random" => query.OrderBy(s => EF.Functions.Random()),
                 _ => query.OrderBy(b => b.ServiceID),
             };
             query = query

@@ -42,7 +42,7 @@ namespace BusinessLogic.Services
             {
                 "isprocess" => query.OrderBy(m => m.IsProcessed),
                 "isprocess_desc" => query.OrderByDescending(m => m.IsProcessed),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
+                "random" => query.OrderBy(s => EF.Functions.Random()),
                 _ => query.OrderBy(b => b.Id),
             };
             var items = await query
