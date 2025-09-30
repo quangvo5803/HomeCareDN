@@ -176,7 +176,13 @@
       "images_required": "Please upload at least one business image",
       "description_too_long": "Description is too long"
     },
-    
+
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+
     "partner_management": "Partner Management",
     "management_description": "View, approve, or reject partner applications.",
     "search_placeholder": "Search by company, contact person, or number...",
