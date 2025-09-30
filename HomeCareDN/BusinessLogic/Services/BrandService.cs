@@ -75,7 +75,7 @@ namespace BusinessLogic.Services
                 "brandname_desc" => query.OrderByDescending(b => b.BrandName),
                 "brandnameen" => query.OrderBy(b => b.BrandNameEN),
                 "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                "random" => query.OrderBy(s => EF.Functions.Random()),
+                "random" => query.OrderBy(b => b.BrandID),
                 _ => query.OrderBy(b => b.BrandID),
             };
             query = query
