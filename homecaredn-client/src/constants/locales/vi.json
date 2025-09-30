@@ -12,7 +12,123 @@
     "register": "Đăng ký",
     "search": "Tìm kiếm...",
     "profile": "Hồ Sơ",
-    "logout": "Đăng Xuất"
+    "logout": "Đăng Xuất",
+    "become_partner": "Đăng kí trở thành đối tác"
+  },
+    "partner": {
+    "subtitle": "Hãy cho chúng tôi biết về doanh nghiệp của bạn để được phê duyệt.",
+    "tip_best_quality": "Mẹo: Hình ảnh cửa hàng/danh mục rõ ràng sẽ mang lại hiệu quả tốt nhất",
+    "preview_image": "Số ảnh {{number}}",
+    "remove_image": "Xóa ảnh {{number}}",
+    "full_name": "Họ và tên",
+    "already_have_account": "Đã có tài khoản? ",
+    "become_partner": "Đăng kí trở thành đối tác",
+    "join_our_network": "Tham Gia Mạng Lưới Đối Tác",
+    "partnership_benefits": "Khi hợp tác cùng HomeCareDN, doanh nghiệp của bạn tiếp cận được nhiều khách hàng, quản lý dịch vụ hiệu quả và nâng cao uy tín thương hiệu.",
+    "choose_partner_type": "Chọn Loại Đối Tác",
+    "select_type_description": "Chọn loại hợp tác phù hợp nhất với doanh nghiệp của bạn để bắt đầu với HomeCareDN.",
+    "why_partner_with_us": "Tại Sao Nên Hợp Tác Với HomeCareDN?",
+    "type": "Lọai",    
+    "expand_reach": "Mở Rộng Tầm Với",
+    "expand_reach_desc": "Kết nối với hàng nghìn khách hàng đang tìm kiếm dịch vụ chăm sóc nhà và vật liệu xây dựng.",
+    "increase_sales": "Tăng Cơ Hội Kinh Doanh",
+    "increase_sales_desc": "Tiếp cận nguồn doanh thu mới thông qua cơ sở khách hàng đã thiết lập của chúng tôi.",
+    "trusted_platform": "Nền Tảng Uy Tín",
+    "trusted_platform_desc": "Tham gia nền tảng đáng tin cậy ưu tiên chất lượng và sự hài lòng của khách hàng.",
+    
+    "key_benefits": "Lợi Ích Chính",
+    "continue_as": "Tiếp tục với tư cách",
+    "select_type_first": "Vui lòng chọn loại đối tác",
+    "change_type": "Thay đổi loại đối tác",
+    
+    "distributor": "Nhà Phân Phối Vật Liệu",
+    "contractor": "Nhà Thầu Dịch Vụ", 
+    "distributor_desc": "Cung cấp vật liệu xây dựng và sản phẩm cải tạo nhà",
+    "contractor_desc": "Cung cấp dịch vụ chăm sóc và bảo trì nhà",
+    
+    "distributor_feature_1": "Tiếp cận mạng lưới khách hàng rộng lớn",
+    "distributor_feature_2": "Hỗ trợ quản lý kho hàng",
+    "distributor_feature_3": "Công cụ marketing và quảng bá",
+    "distributor_feature_4": "Ưu thế về giá cạnh tranh",
+    
+    "contractor_feature_1": "Kết nối trực tiếp với khách hàng", 
+    "contractor_feature_2": "Công cụ quản lý dự án",
+    "contractor_feature_3": "Hỗ trợ đảm bảo chất lượng",
+    "contractor_feature_4": "Chứng chỉ chuyên nghiệp",
+    
+    "partner_registration": "Đăng Ký Đối Tác",
+    "partner_type": "Loại Đối Tác",
+    "company_name": "Tên Công Ty",
+    "company_name_placeholder": "Nhập tên công ty đã đăng ký",
+    "email": "Địa Chỉ Email",
+    "email_placeholder": "Nhập email doanh nghiệp",
+    "phone_number": "Số Điện Thoại",
+    "phone_placeholder": "Nhập số điện thoại",
+    "description": "Mô Tả Doanh Nghiệp",
+    "description_placeholder": "Mô tả về doanh nghiệp, dịch vụ hoặc sản phẩm của bạn...",
+    "business_images": "Hình Ảnh Doanh Nghiệp",
+    "upload_images": "Tải Lên Hình Ảnh",
+    "drag_drop_images": "Kéo thả hình ảnh vào đây hoặc nhấp để chọn",
+    "image_requirements": "Tải lên tối đa 5 hình ảnh (JPG, PNG, tối đa 5MB mỗi ảnh)",
+    
+    "submitting": "Đang Gửi Đơn Đăng Ký...",
+    "submit_application": "Gửi Đơn Đăng Ký Đối Tác",
+    "registration_success": "Đơn đăng ký đối tác của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ sớm.",
+    "registration_error": "Gửi đơn đăng ký thất bại. Vui lòng kiểm tra thông tin và thử lại.",
+    "review_process_info": "📝 Đơn đăng ký của bạn sẽ được xem xét trong 3-5 ngày làm việc. Chúng tôi sẽ thông báo qua email khi được duyệt.",
+    
+    "have_questions": "Có câu hỏi về việc hợp tác với chúng tôi?",
+    "contact_support": "Liên Hệ Hỗ Trợ Đối Tác",
+    
+    "status": {
+      "pending": "Đang Chờ Duyệt",
+      "approved": "Đã Duyệt",
+      "rejected": "Đã Từ Chối"
+    },
+    "validation": {
+      "partner_type_required": "Vui lòng chọn loại đối tác",
+      "full_name_required": "Vui lòng nhập họ tên",
+      "full_name_invalid": "Vui lòng nhập họ tên hợp lệ",
+      "company_name_required": "Tên công ty là bắt buộc",
+      "email_required": "Địa chỉ email là bắt buộc",
+      "email_invalid": "Vui lòng nhập email hợp lệ", 
+      "phone_required": "Số điện thoại là bắt buộc",
+      "phone_invalid": "Vui lòng nhập số điện thoại hợp lệ",
+      "description_required": "Mô tả doanh nghiệp là bắt buộc",
+      "images_required": "Vui lòng tải lên ít nhất một hình ảnh",
+      "description_too_long": "Mô tả quá dài"
+    },
+    
+    "partner_management": "Quản Lý Đối Tác",
+    "management_description": "Xem, duyệt hay từ chối các đăng ký đối tác.",
+    "search_placeholder": "Tìm kiếm theo tên công ty, người liên hệ hoặc số...",
+    "submitted_at": "Thời Gian Gửi",
+    "no_partners_found": "Chưa có đăng ký hợp tác nào.",
+    "approve": "Duyệt",
+    "approve_partner": "Duyệt Đối Tác",
+    "approval_comment": "Ghi Chú Duyệt (tùy chọn)",
+    "comment_placeholder": "Ghi chú thêm về quá trình duyệt...",
+    "approved_successfully": "Đã duyệt đối tác thành công.",
+    "approve_error": "Không thể duyệt đối tác.",
+    "reject": "Từ Chối",
+    "reject_partner": "Từ Chối Đối Tác",
+    "rejection_reason": "Lý Do Từ Chối",
+    "reason_placeholder": "Ghi lý do từ chối...",
+    "reason_required": "Vui lòng nhập lý do từ chối.",
+    "rejected_successfully": "Đã từ chối đối tác.",
+    "reject_error": "Không thể từ chối đối tác.",
+    "confirm_delete": "Xóa đối tác này?",
+    "delete_warning": "Hành động này không thể hoàn tác.",
+    "deleted_successfully": "Đã xóa đối tác.",
+    "delete_error": "Xóa đối tác thất bại.",
+    "partner_details": "Chi Tiết Đối Tác",
+    "detail_error": "Không thể tải chi tiết đối tác.",
+    "fetch_error": "Không thể tải danh sách đối tác",
+    "company_info": "Thông Tin Công Ty",
+    "contact_info": "Thông Tin Liên Hệ",
+    "pending": "Đang Chờ Duyệt",
+    "approved": "Đã Duyệt",
+    "rejected": "Đã Từ Chối"
   },
   "home": {
     "slider_category1": "Thương mại",
@@ -99,7 +215,24 @@
   },
   "common": {
     "home": "Trang chủ",
-    "about": "Giới thiệu"
+    "about": "Giới thiệu",
+    "back": "Quay lại",
+    "back_to_home": "Quay về trang chủ",
+    "search": "Tìm kiếm",
+    "status": "Trạng thái",
+    "all_status": "Tất cả trạng thái",
+    "actions": "Thao tác",
+    "close": "Đóng",
+    "page_size": "Hiển thị",
+    "delete": "Xóa",
+    "cancel": "Hủy",
+    "view_details": "Xem chi tiết",
+    "or": "Hoặc",
+    "selected": "Đã chọn",
+    "not_selected": "Chưa chọn",
+    "all": "Tất cả",
+    "filter_by_status": "Lọc theo trạng thái",
+    "pagination": "Điều hướng phân trang"
   },
   "why": {
     "badge": "Vì sao chọn chúng tôi",
@@ -210,7 +343,9 @@
     "email_placeholder": "Nhập email của bạn",
     "another_login": "Hoặc đăng nhập với",
     "not_have_account": "Bạn chưa có tài khoản? ",
-    "register_link": " Đăng ký ngay"
+    "register_link": " Đăng ký ngay",
+    "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "register": {
     "title": "Đăng Ký",
@@ -220,7 +355,9 @@
     "another_register": "Hoặc đăng ký với",
     "register_button": "Đăng Ký",
     "have_account": "Đã có tài khoản? ",
-    "login_link": " Đăng nhập ngay"
+    "login_link": " Đăng nhập ngay",
+    "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "verifyotp": {
     "title": "Xác Thực OTP",
@@ -442,6 +579,7 @@
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
+      "partner": "Đối tác", 
       "support": "Quản lý hỗ trợ"
     },
     "account": {
@@ -492,6 +630,27 @@
       "bounce": "Tăng trưởng"
     },
     "viewAll": "Xem tất cả"
+  },
+  "adminPartnerManager":{
+    "title": "Quản lý đối tác",
+    "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
+    "partners": "đối tác",
+    "no": "STT",
+    "companyName": "Tên công ty",
+    "contactName": "Người liên hệ",
+    "contactEmail": "Email liên hệ",
+    "contactPhone": "Số điện thoại",
+    "submittedAt": "Thời gian gửi",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noPartner": "Chưa có đăng ký hợp tác nào.",
+    "search_placeholder": "Tìm kiếm theo tên công ty, người liên hệ hoặc số...",
+    "approve": "Duyệt",
+    "reject": "Từ Chối",
+    "delete": "Xóa",
+    "viewDetails": "Xem chi tiết",
+    "total": "Tổng"
+
   },
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
@@ -719,6 +878,9 @@
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
     "NULL_NAME": "Vui lòng nhập họ và tên.",
+    "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
+    "NULL_PHONE": "Vui lòng nhập số điện thoại.",
+    "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "NULL_EMAIL": "Vui lòng nhập email.",
     "INVALID_EMAIL": "Email không hợp lệ.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",

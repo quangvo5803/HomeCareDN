@@ -90,6 +90,7 @@ namespace HomeCareDNAPI
 
             builder.Services.AddScoped<CoreDependencies>();
             builder.Services.AddScoped<InfraDependencies>();
+            builder.Services.AddScoped<IdentityDependencies>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
 

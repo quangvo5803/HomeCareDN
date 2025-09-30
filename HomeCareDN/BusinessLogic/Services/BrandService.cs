@@ -6,7 +6,6 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -76,7 +75,7 @@ namespace BusinessLogic.Services
                 "brandname_desc" => query.OrderByDescending(b => b.BrandName),
                 "brandnameen" => query.OrderBy(b => b.BrandNameEN),
                 "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                "random" => query.OrderBy(s => Guid.NewGuid()),
+                "random" => query.OrderBy(b => b.BrandID),
                 _ => query.OrderBy(b => b.BrandID),
             };
             query = query

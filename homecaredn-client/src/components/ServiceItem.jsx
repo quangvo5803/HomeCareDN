@@ -55,8 +55,8 @@ export default function ServiceItem({ itemServiceType }) {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                     {/* Filter */}
-                    <div className="flex flex-col space-y-4">
-                        <h2 className="text-2xl font-semibold text-orange-400 ms-6">
+                    <div className="flex flex-col">
+                        <h2 className="text-2xl font-semibold text-orange-400 ms-6 -mb-8">
                             {t("serviceViewAll.title")}
                         </h2>
 
@@ -104,11 +104,6 @@ export default function ServiceItem({ itemServiceType }) {
                         <div className="flex flex-col space-y-6">
                             {services && services.length > 0 ? (
                                 services.map((item) => {
-                                    const description =
-                                        i18n.language === "vi"
-                                            ? item.description || ""
-                                            : item.descriptionEN || item.description || "";
-
                                     return (
                                         <Link
                                             to={`/ServiceDetail/${item.serviceID}`}
@@ -117,7 +112,7 @@ export default function ServiceItem({ itemServiceType }) {
                                         >
                                             <div className="flex flex-col lg:flex-row">
                                                 {/* Image */}
-                                                <div className="lg:w-1/3 flex items-center justify-center ">
+                                                <div className=" flex items-center justify-center ">
                                                     <div className=" flex items-center justify-center">
                                                         <img
                                                             src={
@@ -125,7 +120,7 @@ export default function ServiceItem({ itemServiceType }) {
                                                                 "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
                                                             }
                                                             alt={item.name || "No image"}
-                                                            className="max-w-[300px] max-h-[420px] object-cover duration-300 transform group-hover:scale-110"
+                                                            className="max-w-[400px] max-h-[200px] object-cover duration-300 transform group-hover:scale-105"
                                                         />
                                                     </div>
                                                 </div>
@@ -157,33 +152,7 @@ export default function ServiceItem({ itemServiceType }) {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center mb-2 mt-2 text-sm">
-                                                        <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded mr-3">
-                                                            $$$$$
-                                                        </span>
-                                                    </div>
 
-                                                    {/* Description */}
-                                                    <div className="text-gray-700 mb-4 flex items-start min-h-[48px]">
-                                                        {description && description.trim().length > 0 ? (
-                                                            <>
-                                                                <i className="fas fa-plus text-green-600 mr-2 mt-1"></i>
-                                                                <p
-                                                                    className="flex-1 line-clamp-2"
-                                                                    dangerouslySetInnerHTML={{
-                                                                        __html: DOMPurify.sanitize(description, {
-                                                                            FORBID_TAGS: ["img"],
-                                                                        }),
-                                                                    }}
-                                                                ></p>
-                                                                <i className="fas fa-info-circle text-gray-400 ml-1 mt-1"></i>
-                                                            </>
-                                                        ) : (
-                                                            <p className="flex-1 text-gray-400 italic">
-                                                                {t("home.noDescription")}
-                                                            </p>
-                                                        )}
-                                                    </div>
                                                 </div>
                                             </div>
                                         </Link>

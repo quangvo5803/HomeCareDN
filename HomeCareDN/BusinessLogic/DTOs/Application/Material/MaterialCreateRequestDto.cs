@@ -11,7 +11,7 @@ namespace BusinessLogic.DTOs.Application.Material
         [Required(ErrorMessage = "REQUIRED_MATERIALNAME")]
         public string Name { get; set; } = null!;
         public string? NameEN { get; set; }
-        public Guid BrandId { get; set; }
+        public Guid BrandID { get; set; }
 
         public string? Unit { get; set; }
         public string? UnitEN { get; set; }

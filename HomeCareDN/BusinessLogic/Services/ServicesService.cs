@@ -44,7 +44,9 @@ namespace BusinessLogic.Services
                 query = query.Where(s => s.BuildingType == parameters.FilterBuildingType.Value);
 
             if (parameters.FilterMainStructureType.HasValue)
-                query = query.Where(s => s.MainStructureType == parameters.FilterMainStructureType.Value);
+                query = query.Where(s =>
+                    s.MainStructureType == parameters.FilterMainStructureType.Value
+                );
 
             if (parameters.FilterDesignStyle.HasValue)
                 query = query.Where(s => s.DesignStyle == parameters.FilterDesignStyle.Value);
@@ -56,7 +58,7 @@ namespace BusinessLogic.Services
                 "servicename_desc" => query.OrderByDescending(s => s.Name),
                 "servicenameen" => query.OrderBy(s => s.NameEN),
                 "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
-                "random" => query.OrderBy(s => Guid.NewGuid()),
+                "random" => query.OrderBy(s => s.ServiceID),
                 _ => query.OrderBy(b => b.ServiceID),
             };
             query = query
@@ -98,7 +100,7 @@ namespace BusinessLogic.Services
             return serviceDto;
         }
 
-        public async Task<ServiceDto> GetServiceByIdAsync(Guid id)
+        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
         {
             var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == id,
@@ -113,7 +115,7 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<ServiceDto>(service);
+            return _mapper.Map<ServiceDetailDto>(service);
         }
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)

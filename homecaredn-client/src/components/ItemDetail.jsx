@@ -420,15 +420,6 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                                 <h4 className="mb-2 font-semibold text-gray-900 group-hover:text-orange-600">
                                     {i18n.language === "vi" ? m.name : m.nameEN || m.name}
                                 </h4>
-                                <p
-                                    className="text-sm text-gray-600 line-clamp-2"
-                                    dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(
-                                            i18n.language === "vi" ? m.description : m.descriptionEN || m.description,
-                                            { FORBID_TAGS: ["img"] }
-                                        ),
-                                    }}
-                                />
                             </div>
                         </Link>
                     ))}

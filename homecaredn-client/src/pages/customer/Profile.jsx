@@ -10,6 +10,8 @@ import { useTranslation } from 'react-i18next';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
+import { isSafeText } from '../../utils/validateText';
+import { isSafePhone } from '../../utils/validatePhone';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 
@@ -99,6 +101,19 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
   const onSave = async (e) => {
     e.preventDefault();
     if (saving) return;
+    const fullName = (form.fullName || '').trim();
+    if (!fullName) {
+      toast.error(t('ERROR.NULL_NAME'));
+      return;
+    }
+    if (!isSafeText(fullName)) {
+      toast.error(t('ERROR.INVALID_FULLNAME'));
+      return;
+    }
+    if (!isSafePhone(form.phoneNumber)) {
+      toast.error(t('ERROR.INVALID_PHONE'));
+      return;
+  }
     setSaving(true);
     await profileService.updateProfile({
       UserId: user.id,
@@ -107,6 +122,9 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
       Gender: form.gender === '' ? null : Number(form.gender),
     });
     toast.success(t('SUCCESS.PROFILE_UPDATE'));
+
+    setSaving(false);
+
   };
 
   /* ------------------------------- Address CRUD ------------------------------ */
@@ -158,7 +176,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
 
   const editAddrItem = async (it) => {
     setAddrForm({
-      id: it.addressId,
+      id: it.addressID,
       city: it.city,
       district: it.district,
       ward: it.ward,
@@ -566,7 +584,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     {t('BUTTON.Edit')}
                                   </button>
                                   <button
-                                    onClick={() => deleteAddrItem(it.addressId)}
+                                    onClick={() => deleteAddrItem(it.addressID)}
                                     className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
                                   >
                                     <i className="fas fa-trash mr-1"></i>
