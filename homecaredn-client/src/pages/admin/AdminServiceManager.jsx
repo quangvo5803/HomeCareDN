@@ -6,6 +6,7 @@ import { Pagination } from 'antd';
 import ServiceModal from '../../components/modal/ServiceModal';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useService } from '../../hook/useService';
+import { useDebounce } from 'use-debounce';
 
 export default function AdminServiceManager() {
   const { t, i18n } = useTranslation();
@@ -14,7 +15,8 @@ export default function AdminServiceManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 300);
   const {
     services,
     totalServices,
@@ -28,8 +30,17 @@ export default function AdminServiceManager() {
 
   // Load services khi page change
   useEffect(() => {
-    fetchServices({ PageNumber: currentPage, PageSize: pageSize });
-  }, [currentPage, fetchServices]);
+    fetchServices({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      Search: debouncedSearch || '',
+    });
+  }, [currentPage, pageSize, debouncedSearch, fetchServices]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
 
   const handleDelete = async (serviceID) => {
     showDeleteModal({
@@ -84,18 +95,33 @@ export default function AdminServiceManager() {
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Number of services */}
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span className="text-sm font-semibold text-gray-700">
                 {totalServices || 0} {t('adminServiceManager.services')}
               </span>
             </div>
+
+            {/* Input search */}
+            <div className="flex-1 max-w-lg w-full">
+              <input
+                id="search-input"
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              />
+            </div>
+
+            {/* Add New Service Button */}
             <button
-              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="mr-2 fa-solid fa-plus"></i>
+              <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewService')}
             </button>
           </div>
