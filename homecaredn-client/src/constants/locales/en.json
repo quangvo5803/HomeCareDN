@@ -1020,10 +1020,6 @@
     "Customer": "Customer"
   },
   "Enums": {
-     "PartnerType": {
-      "Distributor": "Distributor",
-      "Contractor": "Contractor"
-    },
     "ServiceType": {
       "Construction": "Construction",
       "Repair": "Repair",

@@ -1019,10 +1019,6 @@
     "Customer": "Khách hàng"
   },
   "Enums": {
-     "PartnerType": {
-      "Distributor": "Nhà phân phối",
-      "Contractor": "Nhà thầu"
-    },
     "ServiceType": {
       "Construction": "Xây dựng",
       "Repair": "Sửa chữa",
