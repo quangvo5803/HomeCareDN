@@ -27,13 +27,15 @@ namespace HomeCareDNAPI.Controllers.Admin
             [FromQuery(Name = "Status")] string? status
         )
         {
-            if (!string.IsNullOrWhiteSpace(status) && parameters.FilterPartnerStatus == null)
+            if (
+                !string.IsNullOrWhiteSpace(status)
+                && parameters.FilterPartnerStatus == null
+                && Enum.TryParse<PartnerStatus>(status, true, out var parsed)
+            )
             {
-                if (Enum.TryParse<PartnerStatus>(status, true, out var parsed))
-                {
-                    parameters.FilterPartnerStatus = parsed;
-                }
+                parameters.FilterPartnerStatus = parsed;
             }
+
             try
             {
                 var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
