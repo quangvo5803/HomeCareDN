@@ -15,7 +15,7 @@
     "logout": "Đăng Xuất",
     "become_partner": "Đăng kí trở thành đối tác"
   },
-    "partner": {
+  "partner": {
     "subtitle": "Hãy cho chúng tôi biết về doanh nghiệp của bạn để được phê duyệt.",
     "tip_best_quality": "Mẹo: Hình ảnh cửa hàng/danh mục rõ ràng sẽ mang lại hiệu quả tốt nhất",
     "preview_image": "Số ảnh {{number}}",
@@ -70,7 +70,8 @@
     "upload_images": "Tải Lên Hình Ảnh",
     "drag_drop_images": "Kéo thả hình ảnh vào đây hoặc nhấp để chọn",
     "image_requirements": "Tải lên tối đa 5 hình ảnh (JPG, PNG, tối đa 5MB mỗi ảnh)",
-    
+    "uploaded_images": "Hình ảnh đã tải lên",
+
     "submitting": "Đang Gửi Đơn Đăng Ký...",
     "submit_application": "Gửi Đơn Đăng Ký Đối Tác",
     "registration_success": "Đơn đăng ký đối tác của bạn đã được gửi thành công! Chúng tôi sẽ xem xét và liên hệ sớm.",
@@ -98,7 +99,10 @@
       "images_required": "Vui lòng tải lên ít nhất một hình ảnh",
       "description_too_long": "Mô tả quá dài"
     },
-    
+    "login": {
+      "pending_review": "Hồ sơ của bạn đang được xét duyệt. Vui lòng kiểm tra email và quay lại sau.",
+      "rejected": "Đơn của bạn đã bị từ chối. Vui lòng xem lý do trong email và bạn có thể đăng ký lại."
+    },
     "partner_management": "Quản Lý Đối Tác",
     "management_description": "Xem, duyệt hay từ chối các đăng ký đối tác.",
     "search_placeholder": "Tìm kiếm theo tên công ty, người liên hệ hoặc số...",
@@ -129,6 +133,10 @@
     "pending": "Đang Chờ Duyệt",
     "approved": "Đã Duyệt",
     "rejected": "Đã Từ Chối"
+  },
+  "auth": {
+    "email_exists_login": "Email đã có tài khoản. Vui lòng đăng nhập.",
+    "error_send_otp": "Không thể gửi OTP. Vui lòng thử lại."
   },
   "home": {
     "slider_category1": "Thương mại",
@@ -632,6 +640,8 @@
     "viewAll": "Xem tất cả"
   },
   "adminPartnerManager":{
+    "empty": "Không có đối tác nào",
+    "empty_description": "Chưa có đăng ký hợp tác nào.",
     "title": "Quản lý đối tác",
     "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
     "partners": "đối tác",
@@ -909,6 +919,7 @@
     }
   },
   "ERROR": {
+    "UPLOAD_FAILED": "Tải ảnh thất bại.",
     "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
     "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
@@ -961,6 +972,7 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau."
   },
   "SUCCESS": {
+    "UPLOAD": "Tải ảnh lên thành công.",
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
     "LOGIN": "Đăng nhập thành công.",
     "DELETE": "Đã xóa thành công.",

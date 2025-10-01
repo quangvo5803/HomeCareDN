@@ -153,6 +153,7 @@
     "image_requirements": "Upload up to 5 images (JPG, PNG, max 5MB each)",
     "preview_image": "Preview image {{number}}",
     "remove_image": "Remove image {{number}}",
+    "uploaded_images": "Uploaded images",
 
     "submitting": "Submitting Application...",
     "submit_application": "Submit Partner Application",
@@ -182,7 +183,10 @@
       "approved": "Approved",
       "rejected": "Rejected"
     },
-
+    "login": {
+      "pending_review": "Your application is under review. Please check your email and try again later.",
+      "rejected": "Your application was rejected. Please check the email for details — you can re-apply."
+    },
     "partner_management": "Partner Management",
     "management_description": "View, approve, or reject partner applications.",
     "search_placeholder": "Search by company, contact person, or number...",
@@ -214,7 +218,13 @@
     "approved": "Approved", 
     "rejected": "Rejected"
   },
+  "auth": {
+    "email_exists_login": "Email already has an account. Please log in.",
+    "error_send_otp": "Failed to send OTP. Please try again."
+  },
   "adminPartnerManager": {
+    "empty": "No partners have registered yet.",
+    "empty_description": "Start by reviewing partner applications.",
     "title": "Partner Manager",
     "subtitle": "View and manage partner applications",
     "partners": "partner(s)",
@@ -911,6 +921,7 @@
     }
   },
   "ERROR": {
+    "UPLOAD_FAILED": "Failed to upload image(s).",
     "LOGIN_NOT_FOUND": "Email not registered",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
     "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
@@ -963,6 +974,7 @@
     "UPDATE_ERROR": "Failed to update, please try again later."
   },
   "SUCCESS": {
+    "UPLOAD": "Uploaded successfully.",
     "SEND_OTP": "OTP code sent successfully.",
     "LOGIN": "Login successfully.",
     "DELETE": "Delete successfully.",

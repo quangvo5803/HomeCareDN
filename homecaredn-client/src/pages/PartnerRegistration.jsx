@@ -8,11 +8,9 @@ import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import { isSafeText } from '../utils/validateText';
 
-
 import PropTypes from 'prop-types';
 
 const MAX_IMAGES = 5;
-// Dùng Set cho kiểm tra tồn tại
 const ALLOWED_TYPES = new Set(['Distributor', 'Contractor']);
 
 export default function PartnerRegistration() {
@@ -29,36 +27,42 @@ export default function PartnerRegistration() {
     phoneNumber: '',
     description: '',
   });
+
   const [imageUrls, setImageUrls] = useState([]);
   const [imagePublicIds, setImagePublicIds] = useState([]);
+
+  const [selectedFiles, setSelectedFiles] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
   const fileInputRef = useRef(null);
 
-  // Ngăn trình duyệt chiếm quyền drag toàn trang (a11y: bỏ handler ở <div> wrapper)
   useEffect(() => {
     const stop = (e) => { e.preventDefault(); e.stopPropagation(); };
 
     const canBind =
-    typeof globalThis !== 'undefined' &&
-    typeof globalThis.addEventListener === 'function' &&
-    typeof globalThis.removeEventListener === 'function';
+      typeof globalThis !== 'undefined' &&
+      typeof globalThis.addEventListener === 'function' &&
+      typeof globalThis.removeEventListener === 'function';
 
     if (!canBind) return undefined;
 
-    const events = ['dragenter', 'dragover']; // không chặn 'drop' để khu vực nút vẫn nhận được
+    const events = ['dragenter', 'dragover'];
     for (const evt of events) {
       globalThis.addEventListener(evt, stop, { passive: false });
     }
     return () => {
       for (const evt of events) {
-      globalThis.removeEventListener(evt, stop);
+        globalThis.removeEventListener(evt, stop);
       }
+    for (const url of imageUrls) {
+      URL.revokeObjectURL(url);
+    }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Dùng Set.has thay vì includes
   const isValidType = useMemo(
     () => ALLOWED_TYPES.has(partnerTypeFromUrl ?? ''),
     [partnerTypeFromUrl]
@@ -100,9 +104,9 @@ export default function PartnerRegistration() {
         toast.error(t('partner.validation.email_invalid'));
         return false;
       }
-       if (!data.phoneNumber.trim()) {
-       toast.error(t('partner.validation.phone_required'));
-       return false;
+      if (!data.phoneNumber.trim()) {
+        toast.error(t('partner.validation.phone_required'));
+        return false;
       }
       if (!isSafePhone(data.phoneNumber)) {
         toast.error(t('partner.validation.phone_invalid'));
@@ -124,29 +128,30 @@ export default function PartnerRegistration() {
   const handleImageUpload = useCallback(
     async (files) => {
       if (!files?.length) return;
-      if (files.length + imageUrls.length > MAX_IMAGES) {
-        toast.error(t('ERROR.MAXIMUM_IMAGE') || `Maximum ${MAX_IMAGES} images allowed`);
+
+      if (files.length + selectedFiles.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
         return;
       }
+
       try {
         setUploading(true);
-        const uploaded = await uploadImageToCloudinary(
-          files,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          null,
-          'HomeCareDN/Partner'
-        );
-        const arr = Array.isArray(uploaded) ? uploaded : [uploaded];
-        setImageUrls((prev) => [...prev, ...arr.map((x) => x.url)]);
-        setImagePublicIds((prev) => [...prev, ...arr.map((x) => x.publicId)]);
-        toast.success(t('SUCCESS.UPLOAD', 'Uploaded successfully'));
+        const onlyImages = files.filter((f) => f.type.startsWith('image/'));
+
+        // Tạo preview URL cho UI
+        const previews = onlyImages.map((f) => URL.createObjectURL(f));
+        setSelectedFiles((prev) => [...prev, ...onlyImages]);
+        setImageUrls((prev) => [...prev, ...previews]);
+
+        // giữ nguyên thông điệp hiện có
+        toast.success(t('SUCCESS.UPLOAD'));
       } catch {
-        toast.error(t('ERROR.UPLOAD_FAILED', 'Failed to upload image(s)'));
+        toast.error(t('ERROR.UPLOAD_FAILED'));
       } finally {
         setUploading(false);
       }
     },
-    [imageUrls.length, t]
+    [selectedFiles.length, t]
   );
 
   const handleFileInputChange = useCallback(
@@ -158,9 +163,13 @@ export default function PartnerRegistration() {
   );
 
   const removeImage = useCallback((index) => {
+    const url = imageUrls[index];
+    if (url) URL.revokeObjectURL(url);
+
     setImageUrls((prev) => prev.filter((_, i) => i !== index));
     setImagePublicIds((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+  }, [imageUrls]);
 
   const handleUploadAreaClick = useCallback(() => {
     fileInputRef.current?.click();
@@ -193,27 +202,61 @@ export default function PartnerRegistration() {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault();
-      const ok = validateForm(formData, imageUrls.length);
+
+      const ok = validateForm(formData, selectedFiles.length);
       if (!ok) return;
 
       setLoading(true);
       try {
+        const uploaded = await uploadImageToCloudinary(
+          selectedFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          null,
+          'Test/Partner'
+        );
+        const arr = Array.isArray(uploaded) ? uploaded : [uploaded];
+        const uploadedUrls = arr.map((x) => x.url);
+        const uploadedIds  = arr.map((x) => x.publicId);
+
         await partnerService.createPartner({
           ...formData,
           partnerType: safeType,
           description: formData.description || null,
-          imageUrls,
-          imagePublicIds,
+          imageUrls: uploadedUrls,
+          imagePublicIds: uploadedIds,
         });
+
         toast.success(t('partner.registration_success'));
+
+        for (const url of imageUrls) {
+          URL.revokeObjectURL(url);
+        }
+
+        setImageUrls([]);
+        setImagePublicIds([]);
+        setSelectedFiles([]);
+
         setTimeout(() => navigate('/Login'), 1500);
       } catch (err) {
-        toast.error(err.response?.data?.message || t('partner.registration_error'));
+        const data = err?.response?.data || {};
+        const codes = Array.isArray(data.STATUS) ? data.STATUS : [];
+
+        if (codes.includes('PARTNER_PENDING_REVIEW')) {
+          navigate('/Login', { replace: true, state: { notice: 'partner.login.pending_review' } });
+          return;
+        }
+
+        if ((data.EMAIL || []).includes('EMAIL_ALREADY_EXISTS')) {
+          navigate('/Login', { replace: true, state: { notice: 'auth.email_exists_login' } });
+          return;
+        }
+
+        toast.error(data.message || t('partner.registration_error'));
       } finally {
         setLoading(false);
       }
     },
-    [formData, imageUrls, imagePublicIds, navigate, safeType, t, validateForm]
+    [formData, imageUrls, navigate, safeType, selectedFiles, t, validateForm]
   );
 
   return (
@@ -229,15 +272,14 @@ export default function PartnerRegistration() {
     >
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
-      {/* Khung 1 cột: Form trung tâm */}
       <div className="bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-2xl relative z-10 justify-center">
         <div className="p-4 md:p-6">
-          {/* Logo → Home - CENTERED */}
+          {/* Logo */}
           <div className="flex justify-center mb-6">
             <button
               type="button"
               className="p-0 border-0 bg-transparent"
-              aria-label={t('common.home', 'Home')}
+              aria-label={t('common.home')}
               onClick={() => navigate('/')}
             >
               <img
@@ -255,19 +297,19 @@ export default function PartnerRegistration() {
                 {t('partner.partner_registration')}
               </h1>
               <p className="text-gray-600 mt-1">
-                {t('partner.subtitle', 'Tell us about your business to get approved.')}
+                {t('partner.subtitle')}
               </p>
             </div>
             <button
               type="button"
               onClick={() => navigate('/PartnerTypeSelection')}
               className="shrink-0 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100"
-              aria-label={t('partner.change_type', 'Change type')}
-              title={t('partner.change_type', 'Change type')}
+              aria-label={t('partner.change_type')}
+              title={t('partner.change_type')}
             >
               <i className="fas fa-briefcase" />
               <span className="text-sm font-medium">
-                {safeType ? t(`partner.${safeType.toLowerCase()}`) : t('common.not_selected', '—')}
+                {safeType ? t(`partner.${safeType.toLowerCase()}`) : t('common.not_selected')}
               </span>
               <i className="fas fa-edit ml-1 opacity-75" />
             </button>
@@ -278,7 +320,7 @@ export default function PartnerRegistration() {
             <FloatingInput
               id="fullName"
               name="fullName"
-              label={t('partner.full_name', 'Full name')}
+              label={t('partner.full_name')}
               value={formData.fullName}
               maxLength={255}
               required
@@ -288,7 +330,7 @@ export default function PartnerRegistration() {
             <FloatingInput
               id="companyName"
               name="companyName"
-              label={t('partner.company_name', 'Company name')}
+              label={t('partner.company_name')}
               value={formData.companyName}
               maxLength={255}
               required
@@ -300,7 +342,7 @@ export default function PartnerRegistration() {
                 id="email"
                 type="email"
                 name="email"
-                label={t('partner.email', 'Email')}
+                label={t('partner.email')}
                 value={formData.email}
                 maxLength={255}
                 required
@@ -310,7 +352,7 @@ export default function PartnerRegistration() {
                 id="phoneNumber"
                 type="tel"
                 name="phoneNumber"
-                label={t('partner.phone_number', 'Phone')}
+                label={t('partner.phone_number')}
                 value={formData.phoneNumber}
                 maxLength={30}
                 required
@@ -321,7 +363,7 @@ export default function PartnerRegistration() {
             <FloatingTextarea
               id="description"
               name="description"
-              label={t('partner.description', 'Business description')}
+              label={t('partner.description')}
               value={formData.description}
               maxLength={1000}
               rows={3}
@@ -331,7 +373,7 @@ export default function PartnerRegistration() {
             {/* Upload ảnh */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t('partner.business_images', 'Business images')} *
+                {t('partner.business_images')} *
               </label>
 
               <button
@@ -350,7 +392,7 @@ export default function PartnerRegistration() {
                   {t('partner.drag_drop_images')}
                 </p>
                 <p id="upload-help" className="text-xs text-gray-500">
-                  {t('partner.image_requirements', 'Upload up to 5 images (JPG, PNG, max 5MB each)')}
+                  {t('partner.image_requirements')}
                 </p>
               </button>
 
@@ -368,10 +410,10 @@ export default function PartnerRegistration() {
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-gray-700">
-                      {t('partner.uploaded_images', 'Uploaded images')} ({imageUrls.length}/{MAX_IMAGES})
+                      {t('partner.uploaded_images')} ({imageUrls.length}/{MAX_IMAGES})
                     </h3>
                     <span className="text-xs text-gray-500">
-                      {t('partner.tip_best_quality', 'Tip: Clear storefront/portfolio shots work best')}
+                      {t('partner.tip_best_quality')}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
@@ -379,14 +421,14 @@ export default function PartnerRegistration() {
                       <div key={imagePublicIds[i] || `${url}-${i}`} className="relative group">
                         <img
                           src={url}
-                          alt={t('partner.preview_image', 'Preview image {{number}}', { number: i + 1 })}
+                          alt={t('partner.preview_image', { number: i + 1 })}
                           className="w-full h-20 object-cover rounded-md border"
                           loading="lazy"
                         />
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
-                          aria-label={t('partner.remove_image', 'Remove image {{number}}', { number: i + 1 })}
+                          aria-label={t('partner.remove_image', { number: i + 1 })}
                           className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                         >
                           ×
