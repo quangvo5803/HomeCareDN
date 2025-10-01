@@ -149,7 +149,7 @@ namespace BusinessLogic.Services
                 "partnertype_desc" => query.OrderByDescending(p => p.PartnerType),
                 "createdat" => query.OrderBy(p => p.CreatedAt),
                 "createdat_desc" => query.OrderByDescending(p => p.CreatedAt),
-                "random" => query.OrderBy(s => EF.Functions.Random()),
+                "random" => query.OrderBy(s => s.PartnerID),
                 _ => query.OrderByDescending(p => p.CreatedAt),
             };
 
