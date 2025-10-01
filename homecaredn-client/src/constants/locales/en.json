@@ -1040,6 +1040,15 @@
       "Indochine": "Indochine",
       "Rustic": "Rustic",
       "Other": "Other"
+    },
+    "PartnerStatus":{
+      "Pending": "Pending",
+      "Rejected": "Rejected",
+      "Approved": "Approved"
+    },
+    "PartnerType":{
+      "Distributor":"Distributor",
+      "Contractor": "Contractor"
     }
   },
   "toast": {

@@ -22,27 +22,10 @@ namespace HomeCareDNAPI.Controllers.Admin
         }
 
         [HttpGet("get-all-partners")]
-        public async Task<IActionResult> GetAllPartners(
-            [FromQuery] QueryParameters parameters,
-            [FromQuery(Name = "Status")] string? status
-        )
+        public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
         {
-            if (!string.IsNullOrWhiteSpace(status) && parameters.FilterPartnerStatus == null)
-            {
-                if (Enum.TryParse<PartnerStatus>(status, true, out var parsed))
-                {
-                    parameters.FilterPartnerStatus = parsed;
-                }
-            }
-            try
-            {
-                var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
+            return Ok(result);
         }
 
         [HttpGet("get-partner/{id:guid}")]
