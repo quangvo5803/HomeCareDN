@@ -135,6 +135,21 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.PartnerRepository.GetQueryable(includeProperties: IMAGES);
+            if (parameters.FilterPartnerStatus.HasValue)
+            {
+                var st = parameters.FilterPartnerStatus.Value;
+                query = query.Where(p => p.Status == st);
+            }
+            if (!string.IsNullOrWhiteSpace(parameters.Search))
+            {
+                var s = parameters.Search.Trim().ToLower();
+                query = query.Where(p =>
+                    p.FullName.ToLower().Contains(s)
+                    || p.CompanyName.ToLower().Contains(s)
+                    || p.Email.ToLower().Contains(s)
+                    || p.PhoneNumber.ToLower().Contains(s)
+                );
+            }
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch

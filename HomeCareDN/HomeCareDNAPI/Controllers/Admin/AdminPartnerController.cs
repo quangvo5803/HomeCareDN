@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.Services.FacadeService;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,18 @@ namespace HomeCareDNAPI.Controllers.Admin
         }
 
         [HttpGet("get-all-partners")]
-        public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
+        public async Task<IActionResult> GetAllPartners(
+            [FromQuery] QueryParameters parameters,
+            [FromQuery(Name = "Status")] string? status
+        )
         {
+            if (!string.IsNullOrWhiteSpace(status) && parameters.FilterPartnerStatus == null)
+            {
+                if (Enum.TryParse<PartnerStatus>(status, true, out var parsed))
+                {
+                    parameters.FilterPartnerStatus = parsed;
+                }
+            }
             try
             {
                 var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
