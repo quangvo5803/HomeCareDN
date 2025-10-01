@@ -2,7 +2,7 @@
 
 namespace BusinessLogic.DTOs.Application.Partner
 {
-    public class PartnerRejectRequest
+    public class RejectPartnerRequestDto
     {
         [Required]
         public required Guid PartnerID { get; set; }

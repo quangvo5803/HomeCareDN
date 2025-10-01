@@ -3,15 +3,15 @@ import PropTypes from 'prop-types';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { usePartner } from '../../hook/usePartner';
+import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
 
-export default function PartnerModal({ isOpen, onClose, partner }) {
+export default function PartnerRequestModal({ isOpen, onClose, partner }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { approvePartner, rejectPartner } = usePartner();
+  const { approvePartner, rejectPartner } = usePartnerRequest();
 
   const [reason, setReason] = useState('');
   const [busy, setBusy] = useState(false);
@@ -47,12 +47,15 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, busy, onClose]);
 
-  const getTypeLabel = useCallback((v) => {
-    if (typeof v === 'string') return t(`partner.${v.toLowerCase()}`, v);
-    if (v === 0) return t('partner.distributor', 'Distributor');
-    if (v === 1) return t('partner.contractor', 'Contractor');
-    return String(v ?? '-');
-  }, [t]);
+  const getTypeLabel = useCallback(
+    (v) => {
+      if (typeof v === 'string') return t(`partner.${v.toLowerCase()}`, v);
+      if (v === 0) return t('partner.distributor', 'Distributor');
+      if (v === 1) return t('partner.contractor', 'Contractor');
+      return String(v ?? '-');
+    },
+    [t]
+  );
 
   const getStatusKey = useCallback((s) => {
     if (typeof s === 'string') return s.toLowerCase();
@@ -67,11 +70,16 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     [t, getStatusKey]
   );
 
-  const isPending = useCallback((s) => getStatusKey(s) === 'pending', [getStatusKey]);
+  const isPending = useCallback(
+    (s) => getStatusKey(s) === 'pending',
+    [getStatusKey]
+  );
 
   const formattedCreatedAt = (() => {
     try {
-      return partner?.createdAt ? formatDate(partner.createdAt, i18n.language) : '-';
+      return partner?.createdAt
+        ? formatDate(partner.createdAt, i18n.language)
+        : '-';
     } catch {
       return '-';
     }
@@ -98,14 +106,20 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     if (busy || !reason.trim()) {
       if (!reason.trim()) {
         toast.error(
-          t('adminPartnerManager.modal.rejectionRequired', 'Please provide a rejection reason')
+          t(
+            'adminPartnerManager.modal.rejectionRequired',
+            'Please provide a rejection reason'
+          )
         );
       }
       return;
     }
     try {
       setBusy(true);
-      await rejectPartner({ partnerID: partner.partnerID, rejectionReason: reason.trim() });
+      await rejectPartner({
+        partnerID: partner.partnerID,
+        rejectionReason: reason.trim(),
+      });
       toast.success(t('SUCCESS.REJECT', 'Rejected successfully'));
       onClose();
     } catch (err) {
@@ -155,15 +169,36 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
         </div>
 
         {/* Body */}
-        <div id="modal-description" className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div
+          id="modal-description"
+          className="p-6 space-y-4 max-h-[70vh] overflow-y-auto"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Info label={t('partner.full_name', 'Full name')} value={partner.fullName} />
-            <Info label={t('partner.company_name', 'Company')} value={partner.companyName} />
+            <Info
+              label={t('partner.full_name', 'Full name')}
+              value={partner.fullName}
+            />
+            <Info
+              label={t('partner.company_name', 'Company')}
+              value={partner.companyName}
+            />
             <Info label="Email" value={partner.email} />
-            <Info label={t('partner.phone_number', 'Phone')} value={partner.phoneNumber} />
-            <Info label={t('partner.type', 'Type')} value={getTypeLabel(partner.partnerType)} />
-            <Info label={t('common.status', 'Status')} value={getStatusLabel(partner.status)} />
-            <Info label={t('common.createdAt', 'Created')} value={formattedCreatedAt} />
+            <Info
+              label={t('partner.phone_number', 'Phone')}
+              value={partner.phoneNumber}
+            />
+            <Info
+              label={t('partner.type', 'Type')}
+              value={getTypeLabel(partner.partnerType)}
+            />
+            <Info
+              label={t('common.status', 'Status')}
+              value={getStatusLabel(partner.status)}
+            />
+            <Info
+              label={t('common.createdAt', 'Created')}
+              value={formattedCreatedAt}
+            />
           </div>
 
           {partner.description && (
@@ -196,7 +231,10 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
                 htmlFor="rejection-reason"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                {t('adminPartnerManager.modal.rejectionReason', 'Rejection reason')}
+                {t(
+                  'adminPartnerManager.modal.rejectionReason',
+                  'Rejection reason'
+                )}
               </label>
               <textarea
                 id="rejection-reason"
@@ -233,7 +271,9 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
                 onClick={handleReject}
                 className="px-4 py-2 rounded-lg bg-red-600 text-white disabled:opacity-60 hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               >
-                {busy ? t('BUTTON.Processing', 'Processing...') : t('BUTTON.Reject', 'Reject')}
+                {busy
+                  ? t('BUTTON.Processing', 'Processing...')
+                  : t('BUTTON.Reject', 'Reject')}
               </button>
               <button
                 type="button"
@@ -241,7 +281,9 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
                 onClick={handleApprove}
                 className="px-4 py-2 rounded-lg bg-green-600 text-white disabled:opacity-60 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
-                {busy ? t('BUTTON.Processing', 'Processing...') : t('BUTTON.Approve', 'Approve')}
+                {busy
+                  ? t('BUTTON.Processing', 'Processing...')
+                  : t('BUTTON.Approve', 'Approve')}
               </button>
             </>
           )}
@@ -263,7 +305,7 @@ Info.propTypes = {
   value: PropTypes.any,
 };
 
-PartnerModal.propTypes = {
+PartnerRequestModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   partner: PropTypes.shape({

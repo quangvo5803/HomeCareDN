@@ -41,7 +41,7 @@ namespace DataAccess.UnitOfWork
             ConversationRepository = new ConversationRepository(_db);
             ChatMessageRepository = new ChatMessageRepository(_db);
             ContactSupportRepository = new ContactSupportRepository(_db);
-            PartnerRepository = new PartnerRepository(_db);
+            PartnerRepository = new PartnerRequestRepository(_db);
         }
 
         public async Task SaveAsync()

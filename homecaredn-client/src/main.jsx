@@ -11,29 +11,29 @@ import { BrandProvider } from './context/BrandProvider.jsx';
 import { CategoryProvider } from './context/CategoryProvider.jsx';
 import { MaterialProvider } from './context/MaterialProvider.jsx';
 import { ServiceProvider } from './context/ServiceProvider.jsx';
-import { PartnerProvider } from './context/PartnerProvider.jsx';
+import { PartnerRequestProvider } from './context/PartnerRequestProvider.jsx';
 import { ServiceRequestProvider } from './context/ServiceRequestProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-<React.StrictMode>
-  <BrowserRouter>
-    <AuthProvider>
-      <AddressProvider>
-        <BrandProvider>
-          <CategoryProvider>
-            <MaterialProvider>
-              <ServiceProvider>
-                <PartnerProvider>
-                  <ServiceRequestProvider>
-                    <App />
-                  </ServiceRequestProvider>
-                </PartnerProvider>
-              </ServiceProvider>
-            </MaterialProvider>
-          </CategoryProvider>
-        </BrandProvider>
-      </AddressProvider>
-    </AuthProvider>
-  </BrowserRouter>
-</React.StrictMode>
+  <React.StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <AddressProvider>
+          <BrandProvider>
+            <CategoryProvider>
+              <MaterialProvider>
+                <ServiceProvider>
+                  <PartnerRequestProvider>
+                    <ServiceRequestProvider>
+                      <App />
+                    </ServiceRequestProvider>
+                  </PartnerRequestProvider>
+                </ServiceProvider>
+              </MaterialProvider>
+            </CategoryProvider>
+          </BrandProvider>
+        </AddressProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

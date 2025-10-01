@@ -2,7 +2,7 @@
 
 namespace BusinessLogic.DTOs.Application.Partner
 {
-    public class PartnerCreateRequest
+    public class PartnerRequestCreateRequestDto
     {
         [Required]
         public required string PartnerType { get; set; } = default!;

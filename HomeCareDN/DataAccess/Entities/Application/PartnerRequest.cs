@@ -3,7 +3,7 @@ using DataAccess.Entities.Authorize;
 
 namespace DataAccess.Entities.Application
 {
-    public class Partner
+    public class PartnerRequest
     {
         [Key]
         public Guid PartnerID { get; set; } = Guid.NewGuid();

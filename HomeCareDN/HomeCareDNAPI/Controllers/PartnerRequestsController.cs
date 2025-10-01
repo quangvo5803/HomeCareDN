@@ -7,17 +7,19 @@ namespace HomeCareDNAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PartnersController : ControllerBase
+    public class PartnerRequestsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
-        public PartnersController(IFacadeService facadeService)
+        public PartnerRequestsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }
 
         [HttpPost("create-partner")]
-        public async Task<IActionResult> CreatePartner([FromForm] PartnerCreateRequest request)
+        public async Task<IActionResult> CreatePartner(
+            [FromForm] PartnerRequestCreateRequestDto request
+        )
         {
             try
             {

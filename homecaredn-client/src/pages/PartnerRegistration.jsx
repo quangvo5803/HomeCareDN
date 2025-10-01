@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { uploadImageToCloudinary } from '../utils/uploadImage';
-import partnerService from '../services/partnerService';
+import { partnerRequestService } from '../services/partnerRequestService';
 import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import { isSafeText } from '../utils/validateText';
@@ -39,7 +39,10 @@ export default function PartnerRegistration() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    const stop = (e) => { e.preventDefault(); e.stopPropagation(); };
+    const stop = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
 
     const canBind =
       typeof globalThis !== 'undefined' &&
@@ -56,11 +59,11 @@ export default function PartnerRegistration() {
       for (const evt of events) {
         globalThis.removeEventListener(evt, stop);
       }
-    for (const url of imageUrls) {
-      URL.revokeObjectURL(url);
-    }
+      for (const url of imageUrls) {
+        URL.revokeObjectURL(url);
+      }
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isValidType = useMemo(
@@ -162,14 +165,17 @@ export default function PartnerRegistration() {
     [handleImageUpload]
   );
 
-  const removeImage = useCallback((index) => {
-    const url = imageUrls[index];
-    if (url) URL.revokeObjectURL(url);
+  const removeImage = useCallback(
+    (index) => {
+      const url = imageUrls[index];
+      if (url) URL.revokeObjectURL(url);
 
-    setImageUrls((prev) => prev.filter((_, i) => i !== index));
-    setImagePublicIds((prev) => prev.filter((_, i) => i !== index));
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
-  }, [imageUrls]);
+      setImageUrls((prev) => prev.filter((_, i) => i !== index));
+      setImagePublicIds((prev) => prev.filter((_, i) => i !== index));
+      setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    },
+    [imageUrls]
+  );
 
   const handleUploadAreaClick = useCallback(() => {
     fileInputRef.current?.click();
@@ -193,7 +199,9 @@ export default function PartnerRegistration() {
   const handleDrop = useCallback(
     (e) => {
       preventDefaults(e);
-      const files = Array.from(e.dataTransfer?.files || []).filter((f) => f.type.startsWith('image/'));
+      const files = Array.from(e.dataTransfer?.files || []).filter((f) =>
+        f.type.startsWith('image/')
+      );
       handleImageUpload(files);
     },
     [handleImageUpload, preventDefaults]
@@ -216,9 +224,9 @@ export default function PartnerRegistration() {
         );
         const arr = Array.isArray(uploaded) ? uploaded : [uploaded];
         const uploadedUrls = arr.map((x) => x.url);
-        const uploadedIds  = arr.map((x) => x.publicId);
+        const uploadedIds = arr.map((x) => x.publicId);
 
-        await partnerService.createPartner({
+        await partnerRequestService.createPartner({
           ...formData,
           partnerType: safeType,
           description: formData.description || null,
@@ -242,12 +250,18 @@ export default function PartnerRegistration() {
         const codes = Array.isArray(data.STATUS) ? data.STATUS : [];
 
         if (codes.includes('PARTNER_PENDING_REVIEW')) {
-          navigate('/Login', { replace: true, state: { notice: 'partner.login.pending_review' } });
+          navigate('/Login', {
+            replace: true,
+            state: { notice: 'partner.login.pending_review' },
+          });
           return;
         }
 
         if ((data.EMAIL || []).includes('EMAIL_ALREADY_EXISTS')) {
-          navigate('/Login', { replace: true, state: { notice: 'auth.email_exists_login' } });
+          navigate('/Login', {
+            replace: true,
+            state: { notice: 'auth.email_exists_login' },
+          });
           return;
         }
 
@@ -296,9 +310,7 @@ export default function PartnerRegistration() {
               <h1 className="text-3xl font-bold text-gray-800">
                 {t('partner.partner_registration')}
               </h1>
-              <p className="text-gray-600 mt-1">
-                {t('partner.subtitle')}
-              </p>
+              <p className="text-gray-600 mt-1">{t('partner.subtitle')}</p>
             </div>
             <button
               type="button"
@@ -309,7 +321,9 @@ export default function PartnerRegistration() {
             >
               <i className="fas fa-briefcase" />
               <span className="text-sm font-medium">
-                {safeType ? t(`partner.${safeType.toLowerCase()}`) : t('common.not_selected')}
+                {safeType
+                  ? t(`partner.${safeType.toLowerCase()}`)
+                  : t('common.not_selected')}
               </span>
               <i className="fas fa-edit ml-1 opacity-75" />
             </button>
@@ -387,7 +401,10 @@ export default function PartnerRegistration() {
                 aria-describedby="upload-help"
                 className="w-full border border-gray-300 rounded-lg p-4 text-center bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               >
-                <i className="fas fa-cloud-upload-alt text-2xl mb-2" aria-hidden="true" />
+                <i
+                  className="fas fa-cloud-upload-alt text-2xl mb-2"
+                  aria-hidden="true"
+                />
                 <p className="text-gray-800 text-sm font-medium">
                   {t('partner.drag_drop_images')}
                 </p>
@@ -410,7 +427,8 @@ export default function PartnerRegistration() {
                 <div className="mt-3">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-medium text-gray-700">
-                      {t('partner.uploaded_images')} ({imageUrls.length}/{MAX_IMAGES})
+                      {t('partner.uploaded_images')} ({imageUrls.length}/
+                      {MAX_IMAGES})
                     </h3>
                     <span className="text-xs text-gray-500">
                       {t('partner.tip_best_quality')}
@@ -418,7 +436,10 @@ export default function PartnerRegistration() {
                   </div>
                   <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
                     {imageUrls.map((url, i) => (
-                      <div key={imagePublicIds[i] || `${url}-${i}`} className="relative group">
+                      <div
+                        key={imagePublicIds[i] || `${url}-${i}`}
+                        className="relative group"
+                      >
                         <img
                           src={url}
                           alt={t('partner.preview_image', { number: i + 1 })}
@@ -428,7 +449,9 @@ export default function PartnerRegistration() {
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
-                          aria-label={t('partner.remove_image', { number: i + 1 })}
+                          aria-label={t('partner.remove_image', {
+                            number: i + 1,
+                          })}
                           className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
                         >
                           ×
@@ -463,9 +486,24 @@ export default function PartnerRegistration() {
                   </>
                 ) : (
                   <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     {t('partner.submitting')}
                   </>
@@ -478,7 +516,10 @@ export default function PartnerRegistration() {
               role="note"
               className="mt-3 bg-blue-50 border border-blue-200 p-3 rounded-lg text-blue-800 text-xs flex items-start"
             >
-              <i className="fas fa-info-circle mr-2 mt-0.5 text-blue-600" aria-hidden="true" />
+              <i
+                className="fas fa-info-circle mr-2 mt-0.5 text-blue-600"
+                aria-hidden="true"
+              />
               {t('partner.review_process_info')}
             </div>
           </form>

@@ -1,6 +1,6 @@
 ﻿namespace BusinessLogic.DTOs.Application.Partner
 {
-    public class PartnerDto
+    public class PartnerRequestDto
     {
         public Guid PartnerID { get; set; }
         public required string FullName { get; set; }

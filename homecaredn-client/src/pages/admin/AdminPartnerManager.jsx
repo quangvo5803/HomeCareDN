@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { usePartner } from '../../hook/usePartner';
+import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { useEnums } from '../../hook/useEnums';
-import PartnerModal from '../../components/modal/PartnerModal';
+import PartnerRequestModal from '../../components/modal/PartnerRequestModal';
 import Loading from '../../components/Loading';
 import { useDebounce } from 'use-debounce';
 import i18n from '../../configs/i18n';
@@ -14,7 +14,12 @@ export default function AdminPartnerManager() {
   const enums = useEnums();
   const pageSize = 5;
 
-  const { partners, totalPartners, loading, fetchPartners } = usePartner();
+  const {
+    partnerRequests,
+    totalPartnerRequests,
+    loading,
+    fetchPartnerRequests,
+  } = usePartnerRequest();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('All');
@@ -24,16 +29,22 @@ export default function AdminPartnerManager() {
 
   // fetch data
   useEffect(() => {
-    fetchPartners({
+    fetchPartnerRequests({
       PageNumber: currentPage,
       PageSize: pageSize,
       Search: debouncedSearch || '',
       ...(statusFilter !== 'All' && { FilterPartnerStatus: statusFilter }),
     });
-  }, [currentPage, pageSize, debouncedSearch, statusFilter, fetchPartners]);
+  }, [
+    currentPage,
+    pageSize,
+    debouncedSearch,
+    statusFilter,
+    fetchPartnerRequests,
+  ]);
   const partnerTypeColors = {
-    Contractor: 'bg-blue-100 text-blue-800', // màu xanh
-    Distributor: 'bg-purple-100 text-purple-800', // màu tím
+    Contractor: 'bg-blue-100 text-blue-800',
+    Distributor: 'bg-purple-100 text-purple-800',
   };
   if (loading) return <Loading />;
 
@@ -59,7 +70,7 @@ export default function AdminPartnerManager() {
                 aria-hidden="true"
               />
               <span className="text-sm font-medium text-gray-700">
-                {totalPartners || 0}{' '}
+                {totalPartnerRequests || 0}{' '}
                 {t('adminPartnerManager.partners', 'Partners')}
               </span>
             </div>
@@ -129,8 +140,8 @@ export default function AdminPartnerManager() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {partners && partners.length > 0 ? (
-                    partners.map((p, idx) => {
+                  {partnerRequests && partnerRequests.length > 0 ? (
+                    partnerRequests.map((p, idx) => {
                       return (
                         <tr
                           key={p.partnerID}
@@ -225,12 +236,12 @@ export default function AdminPartnerManager() {
             </div>
 
             {/* Pagination */}
-            {totalPartners > 0 && (
+            {totalPartnerRequests > 0 && (
               <div className="flex justify-center py-4">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
-                  total={totalPartners}
+                  total={totalPartnerRequests}
                   onChange={(page) => setCurrentPage(page)}
                   showSizeChanger={false}
                   size="small"
@@ -242,7 +253,7 @@ export default function AdminPartnerManager() {
       </div>
 
       {/* Modal */}
-      <PartnerModal
+      <PartnerRequestModal
         isOpen={!!selected}
         onClose={() => setSelected(null)}
         partner={selected}

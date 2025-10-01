@@ -13,7 +13,7 @@ using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
-    public class PartnerService : IPartnerService
+    public class PartnerRequestService : IPartnerRequestService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -38,7 +38,7 @@ namespace BusinessLogic.Services
         private const string ROLE_CONTRACTOR = "Contractor";
         private const string IMAGES = "Images";
 
-        public PartnerService(
+        public PartnerRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
@@ -53,7 +53,9 @@ namespace BusinessLogic.Services
             _emailQueue = emailQueue;
         }
 
-        public async Task<PartnerDto> CreatePartnerAsync(PartnerCreateRequest request)
+        public async Task<PartnerRequestDto> CreatePartnerAsync(
+            PartnerRequestCreateRequestDto request
+        )
         {
             if (!Enum.TryParse<PartnerType>(request.PartnerType, out var type))
             {
@@ -102,13 +104,13 @@ namespace BusinessLogic.Services
 
                 QueueEmailReceived(existingPartner);
 
-                return _mapper.Map<PartnerDto>(existingPartner);
+                return _mapper.Map<PartnerRequestDto>(existingPartner);
             }
             //==================================================================
 
             //if new partner, create new
             ValidateImages(request.ImageUrls);
-            var partner = _mapper.Map<Partner>(request);
+            var partner = _mapper.Map<PartnerRequest>(request);
             partner.PartnerID = Guid.NewGuid();
             partner.PartnerType = type;
 
@@ -127,10 +129,10 @@ namespace BusinessLogic.Services
 
             QueueEmailReceived(partner);
 
-            return _mapper.Map<PartnerDto>(created);
+            return _mapper.Map<PartnerRequestDto>(created);
         }
 
-        public async Task<PagedResultDto<PartnerDto>> GetAllPartnersAsync(
+        public async Task<PagedResultDto<PartnerRequestDto>> GetAllPartnersAsync(
             QueryParameters parameters
         )
         {
@@ -173,9 +175,9 @@ namespace BusinessLogic.Services
 
             var partners = await query.ToListAsync();
 
-            var partnerDtos = _mapper.Map<IEnumerable<PartnerDto>>(partners);
+            var partnerDtos = _mapper.Map<IEnumerable<PartnerRequestDto>>(partners);
 
-            return new PagedResultDto<PartnerDto>
+            return new PagedResultDto<PartnerRequestDto>
             {
                 Items = partnerDtos,
                 TotalCount = totalCount,
@@ -184,7 +186,7 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<PartnerDto> GetPartnerByIdAsync(Guid partnerId)
+        public async Task<PartnerRequestDto> GetPartnerByIdAsync(Guid partnerId)
         {
             var partner = await _unitOfWork.PartnerRepository.GetAsync(
                 p => p.PartnerID == partnerId,
@@ -193,10 +195,10 @@ namespace BusinessLogic.Services
 
             ValidatePartner(partner);
 
-            return _mapper.Map<PartnerDto>(partner);
+            return _mapper.Map<PartnerRequestDto>(partner);
         }
 
-        public async Task<PartnerDto> ApprovePartnerAsync(PartnerApproveRequest request)
+        public async Task<PartnerRequestDto> ApprovePartnerAsync(ApprovePartnerRequestDto request)
         {
             var partner = await _unitOfWork.PartnerRepository.GetAsync(
                 p => p.PartnerID == request.PartnerID,
@@ -233,10 +235,10 @@ namespace BusinessLogic.Services
 
             QueueEmailApproved(partner);
 
-            return _mapper.Map<PartnerDto>(partner);
+            return _mapper.Map<PartnerRequestDto>(partner);
         }
 
-        public async Task<PartnerDto> RejectPartnerAsync(PartnerRejectRequest request)
+        public async Task<PartnerRequestDto> RejectPartnerAsync(RejectPartnerRequestDto request)
         {
             var partner = await _unitOfWork.PartnerRepository.GetAsync(
                 p => p.PartnerID == request.PartnerID,
@@ -253,7 +255,7 @@ namespace BusinessLogic.Services
 
             QueueEmailRejected(partner);
 
-            return _mapper.Map<PartnerDto>(partner);
+            return _mapper.Map<PartnerRequestDto>(partner);
         }
 
         public async Task DeletePartnerAsync(Guid partnerId)
@@ -299,8 +301,8 @@ namespace BusinessLogic.Services
         //====================Helpers====================
 
         private static void ApplyReapplyUpdates(
-            Partner target,
-            PartnerCreateRequest req,
+            PartnerRequest target,
+            PartnerRequestCreateRequestDto req,
             PartnerType type
         )
         {
@@ -316,7 +318,7 @@ namespace BusinessLogic.Services
         }
 
         private async Task ReplaceImagesAsync(
-            Partner partner,
+            PartnerRequest partner,
             ICollection<string>? urls,
             ICollection<string>? publicIds
         )
@@ -361,7 +363,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private static void ValidatePartner(Partner? partner)
+        private static void ValidatePartner(PartnerRequest? partner)
         {
             if (partner == null)
             {
@@ -373,7 +375,10 @@ namespace BusinessLogic.Services
             }
         }
 
-        private static void ValidatePartnerStatus(Partner partner, PartnerStatus expectedStatus)
+        private static void ValidatePartnerStatus(
+            PartnerRequest partner,
+            PartnerStatus expectedStatus
+        )
         {
             if (partner.Status != expectedStatus)
             {
@@ -439,7 +444,7 @@ namespace BusinessLogic.Services
                 + "</td></tr></table></td></tr></table>";
         }
 
-        private void QueueEmailReceived(Partner p)
+        private void QueueEmailReceived(PartnerRequest p)
         {
             var title = "HomeCareDN: Đã nhận hồ sơ đối tác của bạn";
             var body =
@@ -452,7 +457,7 @@ namespace BusinessLogic.Services
             _emailQueue.QueueEmail(p.Email, title, BuildBaseEmail(title, body));
         }
 
-        private void QueueEmailApproved(Partner p)
+        private void QueueEmailApproved(PartnerRequest p)
         {
             var title = "HomeCareDN: Hồ sơ đối tác đã được phê duyệt";
             var body =
@@ -464,7 +469,7 @@ namespace BusinessLogic.Services
             _emailQueue.QueueEmail(p.Email, title, BuildBaseEmail(title, body, highlight));
         }
 
-        private void QueueEmailRejected(Partner p)
+        private void QueueEmailRejected(PartnerRequest p)
         {
             var title = "HomeCareDN: Hồ sơ đối tác chưa được phê duyệt";
             var reason = string.IsNullOrWhiteSpace(p.RejectionReason)

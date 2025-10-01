@@ -12,11 +12,11 @@ namespace HomeCareDNAPI.Controllers.Admin
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    public class AdminPartnerController : ControllerBase
+    public class AdminPartnerRequestsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
-        public AdminPartnerController(IFacadeService facadeService)
+        public AdminPartnerRequestsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }
@@ -47,7 +47,7 @@ namespace HomeCareDNAPI.Controllers.Admin
         }
 
         [HttpPut("approve-partner")]
-        public async Task<IActionResult> ApprovePartner([FromBody] PartnerApproveRequest request)
+        public async Task<IActionResult> ApprovePartner([FromBody] ApprovePartnerRequestDto request)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace HomeCareDNAPI.Controllers.Admin
         }
 
         [HttpPut("reject-partner")]
-        public async Task<IActionResult> RejectPartner([FromBody] PartnerRejectRequest request)
+        public async Task<IActionResult> RejectPartner([FromBody] RejectPartnerRequestDto request)
         {
             try
             {

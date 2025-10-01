@@ -2,5 +2,5 @@
 
 namespace DataAccess.Repositories.Interfaces
 {
-    public interface IPartnerRepository : IRepository<Partner> { }
+    public interface IPartnerRepository : IRepository<PartnerRequest> { }
 }
