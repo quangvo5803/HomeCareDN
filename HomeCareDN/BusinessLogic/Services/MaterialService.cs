@@ -322,7 +322,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private bool ContainsSafe(string? source, string searchUpper)
+        private static bool ContainsSafe(string? source, string searchUpper)
         {
             return !string.IsNullOrEmpty(source) && source.ToUpper().Contains(searchUpper);
         }
