@@ -3,8 +3,10 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
 
@@ -14,16 +16,18 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const string MATERIAL = "Material";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(
@@ -57,9 +61,15 @@ namespace BusinessLogic.Services
                 .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -88,9 +98,15 @@ namespace BusinessLogic.Services
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
                 .ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,

@@ -28,7 +28,7 @@ public class FacadeService : IFacadeService
             coreDeps.AuthorizeDbContext
         );
 
-        MaterialService = new MaterialService(coreDeps.UnitOfWork, coreDeps.Mapper);
+        MaterialService = new MaterialService(coreDeps.UnitOfWork, coreDeps.Mapper,identityDeps.UserManager);
         ServiceService = new ServicesService(coreDeps.UnitOfWork, coreDeps.Mapper);
         ContractorApplicationService = new ContractorApplicationService(
             coreDeps.UnitOfWork,

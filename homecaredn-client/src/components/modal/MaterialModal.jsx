@@ -186,7 +186,7 @@ export default function MaterialModal({
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
-          'HomeCareDN/Material'
+          'Test/Material'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
@@ -227,6 +227,7 @@ export default function MaterialModal({
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.materialName')}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <input
                 type="text"
@@ -253,6 +254,7 @@ export default function MaterialModal({
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.brand')}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <select
                 value={brandID || ''}
@@ -278,6 +280,7 @@ export default function MaterialModal({
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
                 {t('distributorMaterialManager.materialModal.category')}
+                <span className="text-red-500 ms-1">*</span>
               </label>
               <select
                 value={categoryID || ''}

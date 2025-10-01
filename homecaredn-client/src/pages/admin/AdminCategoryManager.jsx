@@ -152,7 +152,7 @@ export default function AdminCategoryManager() {
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
+                        <td className="px-6 py-4 text-left align-middle">
                           <div className="flex items-center justify-center">
                             <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg">
                               {cat.categoryLogo ? (

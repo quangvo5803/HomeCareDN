@@ -19,6 +19,7 @@ import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
+import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminPartnerManager from './pages/admin/AdminPartnerManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -60,7 +61,13 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP','/PartnerTypeSelection','/PartnerRegistration'];
+  const noHeaderFooterPaths = [
+    '/Login',
+    '/Register',
+    '/VerifyOTP',
+    '/PartnerTypeSelection',
+    '/PartnerRegistration',
+  ];
 
   const showHeaderFooter =
     !noHeaderFooterPaths.includes(location.pathname) &&
@@ -130,7 +137,7 @@ function Layout() {
           element={
             user ? (
               <Navigate to={getRedirectPath(user)} replace />
-          ) : (
+            ) : (
               <PartnerRegistration />
             )
           }
@@ -143,7 +150,7 @@ function Layout() {
             user ? (
               <Navigate to={getRedirectPath(user)} replace />
             ) : (
-               <PartnerTypeSelection />
+              <PartnerTypeSelection />
             )
           }
         />
@@ -216,6 +223,7 @@ function Layout() {
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="ServiceManager" element={<AdminServiceManager />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
+          <Route path="MaterialManager" element={<AdminMaterialManager />} />
           <Route path="PartnerManager" element={<AdminPartnerManager />} />
         </Route>
         {/* Contractor routes */}
@@ -257,7 +265,6 @@ function Layout() {
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
         <Route path="RepairViewAll" element={<RepairViewAll />} />
         <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
-
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

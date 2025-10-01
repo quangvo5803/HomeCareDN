@@ -14,7 +14,6 @@ const partnerService = {
       const imageUrls = partnerData.imageUrls ?? [];
       const imagePublicIds = partnerData.imagePublicIds ?? [];
 
-      // Use for...of instead of forEach for better performance
       for (const url of imageUrls) {
         fd.append('ImageUrls', url);
       }
