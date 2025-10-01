@@ -178,7 +178,7 @@ export default function AdminPartnerManager() {
 
                           {/* Status enum */}
                           <td className="px-6 py-4 text-center align-middle">
-                            <StatusBadge status={p.status} enums={enums} />
+                            <StatusBadge status={p.status} />
                           </td>
 
                           <td className="px-4 py-4 text-center align-middle">
@@ -272,5 +272,4 @@ function StatusBadge({ status }) {
 
 StatusBadge.propTypes = {
   status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  enums: PropTypes.object.isRequired,
 };
