@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.Services.FacadeService;
 using DataAccess.Entities.Application;
@@ -24,15 +24,8 @@ namespace HomeCareDNAPI.Controllers.Admin
         [HttpGet("get-all-partners")]
         public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
         {
-            try
-            {
-                var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
+            return Ok(result);
         }
 
         [HttpGet("get-partner/{id:guid}")]

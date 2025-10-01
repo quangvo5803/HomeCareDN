@@ -137,8 +137,7 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.PartnerRepository.GetQueryable(includeProperties: IMAGES);
             if (parameters.FilterPartnerStatus.HasValue)
             {
-                var st = parameters.FilterPartnerStatus.Value;
-                query = query.Where(p => p.Status == st);
+                query = query.Where(p => p.Status == parameters.FilterPartnerStatus.Value);
             }
             if (!string.IsNullOrWhiteSpace(parameters.Search))
             {

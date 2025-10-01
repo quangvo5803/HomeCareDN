@@ -1063,6 +1063,15 @@
       "Indochine": "Đông Dương",
       "Rustic": "Mộc mạc",
       "Other": "Khác"
+    },
+    "PartnerStatus":{
+      "Pending": "Đang chờ",
+      "Rejected": "Đã từ chối",
+      "Approved": "Đã chấp nhận"
+    },
+    "PartnerType":{
+      "Distributor":"Nhà phân phối",
+      "Contractor": "Nhà thầu"
     }
   },
   "toast": {
