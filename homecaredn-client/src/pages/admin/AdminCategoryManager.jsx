@@ -220,7 +220,7 @@ export default function AdminCategoryManager() {
                   ) : (
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"

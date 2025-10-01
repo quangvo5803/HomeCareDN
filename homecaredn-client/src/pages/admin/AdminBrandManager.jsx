@@ -138,8 +138,9 @@ export default function AdminBrandManager() {
                     brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -202,7 +203,7 @@ export default function AdminBrandManager() {
                   ) : (
                     <tr>
                       <td colSpan="4" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"

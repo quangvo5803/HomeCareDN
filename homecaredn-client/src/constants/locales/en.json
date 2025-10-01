@@ -759,7 +759,7 @@
     "replyPlaceholder": "Type your reply here...",
     "noSupport": "No support requests yet",
     "all": "All",
-    "itemsCount": "{{count}} item(s)"
+    "itemsCount": "{{count}} request(s)"
   },
 
   "footer": {

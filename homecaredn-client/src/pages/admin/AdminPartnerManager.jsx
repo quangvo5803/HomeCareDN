@@ -10,19 +10,14 @@ export default function AdminPartnerManager() {
   const { t } = useTranslation();
   const pageSize = 10;
   const getPartnerTypeColor = useCallback((partnerType) => {
-  const typeColors = {
-    'Distributor': 'text-blue-800 bg-blue-100',
-    'Contractor': 'text-purple-800 bg-purple-100',
-  };
-  
-  return typeColors[partnerType] || 'text-gray-800 bg-gray-100';
-}, []);
-  const {
-    partners,
-    totalPartners,
-    loading,
-    fetchPartners,
-  } = usePartner();
+    const typeColors = {
+      Distributor: 'text-blue-800 bg-blue-100',
+      Contractor: 'text-purple-800 bg-purple-100',
+    };
+
+    return typeColors[partnerType] || 'text-gray-800 bg-gray-100';
+  }, []);
+  const { partners, totalPartners, loading, fetchPartners } = usePartner();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('All');
@@ -30,7 +25,11 @@ export default function AdminPartnerManager() {
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    fetchPartners({ PageNumber: currentPage, PageSize: pageSize, SortBy: 'createdat_desc' });
+    fetchPartners({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: 'createdat_desc',
+    });
   }, [currentPage, fetchPartners]);
 
   const toStatusString = useCallback((s) => {
@@ -41,15 +40,16 @@ export default function AdminPartnerManager() {
   const filtered = useMemo(() => {
     let list = partners || [];
     if (statusFilter !== 'All') {
-      list = list.filter(p => p.status === statusFilter);
+      list = list.filter((p) => p.status === statusFilter);
     }
     if (search.trim()) {
       const q = search.trim().toLowerCase();
-      list = list.filter(p =>
-        p.fullName?.toLowerCase().includes(q) ||
-        p.companyName?.toLowerCase().includes(q) ||
-        p.email?.toLowerCase().includes(q) ||
-        p.phoneNumber?.toLowerCase().includes(q)
+      list = list.filter(
+        (p) =>
+          p.fullName?.toLowerCase().includes(q) ||
+          p.companyName?.toLowerCase().includes(q) ||
+          p.email?.toLowerCase().includes(q) ||
+          p.phoneNumber?.toLowerCase().includes(q)
       );
     }
     return list;
@@ -94,9 +94,13 @@ export default function AdminPartnerManager() {
           {/* Table Header Actions */}
           <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" aria-hidden="true" />
+              <div
+                className="w-2 h-2 bg-blue-500 rounded-full"
+                aria-hidden="true"
+              />
               <span className="text-sm font-medium text-gray-700">
-                {totalPartners || 0} {t('adminPartnerManager.partners', 'Partners')}
+                {totalPartners || 0}{' '}
+                {t('adminPartnerManager.partners', 'Partners')}
               </span>
             </div>
 
@@ -165,50 +169,64 @@ export default function AdminPartnerManager() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filtered.length > 0 ? filtered.map((p, idx) => (
-                    <tr 
-                      key={p.partnerID} 
-                      className={`hover:bg-gray-50 transition-colors duration-150 ${
-                        idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                      }`}
-                    >
-                      <td className="px-4 py-4 text-center align-middle">
-                        <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                          {(currentPage - 1) * pageSize + idx + 1}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <div className="text-sm font-medium text-gray-900">{p.fullName}</div>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <div className="text-sm text-gray-900">{p.companyName}</div>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <div className="text-sm text-gray-900">{p.email}</div>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <div className="text-sm text-gray-900">{p.phoneNumber}</div>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPartnerTypeColor(p.partnerType)}`}>
-                          {p.partnerType}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-center align-middle">
-                        <StatusBadge status={toStatusString(p.status)} />
-                      </td>
-                      <td className="px-4 py-4 text-center align-middle">
-                        <button
-                          type="button"
-                          onClick={() => handleViewPartner(p)}
-                          aria-label={t('adminPartnerManager.view_partner', { name: p.fullName || p.companyName })}
-                          className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
-                        >
-                          {t('BUTTON.View')}
-                        </button>
-                      </td>
-                    </tr>
-                  )) : (
+                  {filtered.length > 0 ? (
+                    filtered.map((p, idx) => (
+                      <tr
+                        key={p.partnerID}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
+                      >
+                        <td className="px-4 py-4 text-center align-middle">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                            {(currentPage - 1) * pageSize + idx + 1}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <div className="text-sm font-medium text-gray-900">
+                            {p.fullName}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <div className="text-sm text-gray-900">
+                            {p.companyName}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <div className="text-sm text-gray-900">{p.email}</div>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <div className="text-sm text-gray-900">
+                            {p.phoneNumber}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <span
+                            className={`px-3 py-1 text-xs font-medium rounded-full ${getPartnerTypeColor(
+                              p.partnerType
+                            )}`}
+                          >
+                            {p.partnerType}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-center align-middle">
+                          <StatusBadge status={toStatusString(p.status)} />
+                        </td>
+                        <td className="px-4 py-4 text-center align-middle">
+                          <button
+                            type="button"
+                            onClick={() => handleViewPartner(p)}
+                            aria-label={t('adminPartnerManager.view_partner', {
+                              name: p.fullName || p.companyName,
+                            })}
+                            className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+                          >
+                            {t('BUTTON.View')}
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
                     <tr>
                       <td colSpan="8" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center">
@@ -242,48 +260,71 @@ export default function AdminPartnerManager() {
             {/* Mobile/Tablet Card Layout */}
             <div className="lg:hidden">
               <div className="p-4 space-y-4">
-                {filtered.length > 0 ? filtered.map((p, idx) => (
-                  <div key={p.partnerID} className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center space-x-3">
-                        <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                          {(currentPage - 1) * pageSize + idx + 1}
-                        </span>
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-900">{p.fullName}</h3>
-                          <p className="text-sm text-gray-600">{p.companyName}</p>
+                {filtered.length > 0 ? (
+                  filtered.map((p, idx) => (
+                    <div
+                      key={p.partnerID}
+                      className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                            {(currentPage - 1) * pageSize + idx + 1}
+                          </span>
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-900">
+                              {p.fullName}
+                            </h3>
+                            <p className="text-sm text-gray-600">
+                              {p.companyName}
+                            </p>
+                          </div>
+                        </div>
+                        <StatusBadge status={toStatusString(p.status)} />
+                      </div>
+
+                      <div className="space-y-2 text-sm mb-4">
+                        <div className="flex justify-between">
+                          <span className="font-medium text-gray-500">
+                            Email:
+                          </span>
+                          <span className="text-gray-900">{p.email}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium text-gray-500">
+                            Phone:
+                          </span>
+                          <span className="text-gray-900">{p.phoneNumber}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium text-gray-500">
+                            Type:
+                          </span>
+                          <span
+                            className={`px-3 py-1 text-xs font-medium rounded-full ${getPartnerTypeColor(
+                              p.partnerType
+                            )}`}
+                          >
+                            {p.partnerType}
+                          </span>
                         </div>
                       </div>
-                      <StatusBadge status={toStatusString(p.status)} />
-                    </div>
 
-                    <div className="space-y-2 text-sm mb-4">
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-500">Email:</span>
-                        <span className="text-gray-900">{p.email}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-500">Phone:</span>
-                        <span className="text-gray-900">{p.phoneNumber}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-500">Type:</span>
-                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPartnerTypeColor(p.partnerType)}`}>
-                          {p.partnerType}
-                        </span>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleViewPartner(p)}
+                        aria-label={t(
+                          'adminPartnerManager.view_partner',
+                          'View partner {{name}}',
+                          { name: p.fullName || p.companyName }
+                        )}
+                        className="w-full px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+                      >
+                        {t('BUTTON.View')}
+                      </button>
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleViewPartner(p)}
-                      aria-label={t('adminPartnerManager.view_partner', 'View partner {{name}}', { name: p.fullName || p.companyName })}
-                      className="w-full px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
-                    >
-                      {t('BUTTON.View')}
-                    </button>
-                  </div>
-                )) : (
+                  ))
+                ) : (
                   <div className="py-12 text-center">
                     <svg
                       className="w-12 h-12 mx-auto mb-4 text-gray-400"
@@ -347,7 +388,9 @@ function StatusBadge({ status }) {
 
   return (
     <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${statusMap[status] || 'bg-gray-100 text-gray-800 border-gray-300'}`}
+      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${
+        statusMap[status] || 'bg-gray-100 text-gray-800 border-gray-300'
+      }`}
       aria-label={`Status: ${status}`}
     >
       {status}
