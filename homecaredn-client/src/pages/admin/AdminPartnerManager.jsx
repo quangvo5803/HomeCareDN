@@ -1,79 +1,40 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartner } from '../../hook/usePartner';
+import { useEnums } from '../../hook/useEnums';
 import PartnerModal from '../../components/modal/PartnerModal';
 import Loading from '../../components/Loading';
+import { useDebounce } from 'use-debounce';
+import i18n from '../../configs/i18n';
 
 export default function AdminPartnerManager() {
   const { t } = useTranslation();
+  const enums = useEnums();
   const pageSize = 5;
 
-  const getPartnerTypeColor = useCallback((partnerType) => {
-
-    const type = typeof partnerType === 'number'
-      ? (['Distributor', 'Contractor'][partnerType] ?? '')
-      : (partnerType || '');
-    const typeColors = {
-      Distributor: 'text-blue-800 bg-blue-100',
-      Contractor: 'text-purple-800 bg-purple-100',
-    };
-    return typeColors[type] || 'text-gray-800 bg-gray-100';
-  }, []);
   const { partners, totalPartners, loading, fetchPartners } = usePartner();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('All');
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
   const [selected, setSelected] = useState(null);
 
+  // fetch data
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedSearch(search.trim()), 400);
-    return () => clearTimeout(id);
-  }, [search]);
-  const toStatusString = useCallback((s) => {
-    if (typeof s === 'string') return s;
-    return ['Pending', 'Approved', 'Rejected'][s] ?? String(s);
-  }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [statusFilter, debouncedSearch]);
-
-  useEffect(() => {
-    const params = {
+    fetchPartners({
       PageNumber: currentPage,
       PageSize: pageSize,
-      SortBy: 'createdat_desc',
-    };
-    if (statusFilter !== 'All') params.Status = statusFilter; 
-    if (debouncedSearch) params.Search = debouncedSearch;      
-
-    fetchPartners(params);
-  }, [currentPage, pageSize, statusFilter, debouncedSearch, fetchPartners]);
-
-  const handleStatusFilterChange = useCallback((e) => {
-    setStatusFilter(e.target.value);
-  }, []);
-
-  const handleSearchChange = useCallback((e) => {
-    setSearch(e.target.value);
-  }, []);
-
-  const handleViewPartner = useCallback((partner) => {
-    setSelected(partner);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setSelected(null);
-  }, []);
-
-  const handlePageChange = useCallback((page) => {
-    setCurrentPage(page);
-  }, []);
-
+      Search: debouncedSearch || '',
+      ...(statusFilter !== 'All' && { FilterPartnerStatus: statusFilter }),
+    });
+  }, [currentPage, pageSize, debouncedSearch, statusFilter, fetchPartners]);
+  const partnerTypeColors = {
+    Contractor: 'bg-blue-100 text-blue-800', // màu xanh
+    Distributor: 'bg-purple-100 text-purple-800', // màu tím
+  };
   if (loading) return <Loading />;
 
   return (
@@ -105,29 +66,29 @@ export default function AdminPartnerManager() {
 
             {/* Filter Controls */}
             <div className="flex flex-col sm:flex-row gap-2">
-              <label htmlFor="status-filter" className="sr-only">
-                {t('common.filter_by_status', 'Filter by status')}
-              </label>
+              {/* Filter by status */}
               <select
                 id="status-filter"
                 value={statusFilter}
-                onChange={handleStatusFilterChange}
+                onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="All">{t('common.all', 'All')}</option>
-                <option value="Pending">{t('partner.status.pending')}</option>
-                <option value="Approved">{t('partner.status.approved')}</option>
-                <option value="Rejected">{t('partner.status.rejected')}</option>
+                <option value="All">
+                  {i18n.language === 'vi' ? 'Tất cả' : 'All'}
+                </option>
+                {enums?.partnerStatus?.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {t(`Enums.PartnerStatus.${s.value}`)}
+                  </option>
+                ))}
               </select>
 
-              <label htmlFor="search-input" className="sr-only">
-                {t('common.search')}
-              </label>
+              {/* Search */}
               <input
                 id="search-input"
                 type="text"
                 value={search}
-                onChange={handleSearchChange}
+                onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('common.search')}
                 className="px-3 py-2 text-sm border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -141,73 +102,120 @@ export default function AdminPartnerManager() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">#</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('partner.full_name')}</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('partner.company_name')}</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">Email</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('partner.phone_number')}</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('partner.type')}</th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('common.status')}</th>
-                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('adminServiceManager.action')}</th>
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      #
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('partner.full_name')}
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('partner.company_name')}
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      Email
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('partner.phone_number')}
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('partner.type')}
+                    </th>
+                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('common.status')}
+                    </th>
+                    <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
+                      {t('adminServiceManager.action')}
+                    </th>
                   </tr>
                 </thead>
-                 <tbody className="divide-y divide-gray-200">
-                  {partners && partners.length > 0 ? partners.map((p, idx) => {
-                    const typeKey = (typeof p.partnerType === 'string'
-                      ? p.partnerType
-                      : (['Distributor', 'Contractor'][p.partnerType] || '')
-                    ).toLowerCase();
-                    return (
-                      <tr
-                        key={p.partnerID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                      >
-                        <td className="px-4 py-4 text-center align-middle">
-                          <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
-                            {(currentPage - 1) * pageSize + idx + 1}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm font-medium text-gray-900">{p.fullName}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm text-gray-900">{p.companyName}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm text-gray-900">{p.email}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <div className="text-sm text-gray-900">{p.phoneNumber}</div>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <span className={`px-3 py-1 text-xs font-medium rounded-full ${getPartnerTypeColor(p.partnerType)}`}>
-                            {t(`partner.${typeKey}`, p.partnerType)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center align-middle">
-                          <StatusBadge status={toStatusString(p.status)} />
-                        </td>
-                        <td className="px-4 py-4 text-center align-middle">
-                          <button
-                            type="button"
-                            onClick={() => handleViewPartner(p)}
-                            aria-label={t('adminPartnerManager.view_partner', { defaultValue: 'View partner {{name}}', name: p.fullName || p.companyName })}
-                            className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
-                          >
-                            {t('BUTTON.View')}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  }) : (
+                <tbody className="divide-y divide-gray-200">
+                  {partners && partners.length > 0 ? (
+                    partners.map((p, idx) => {
+                      return (
+                        <tr
+                          key={p.partnerID}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          }`}
+                        >
+                          <td className="px-4 py-4 text-center align-middle">
+                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
+                              {(currentPage - 1) * pageSize + idx + 1}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center align-middle">
+                            <div className="text-sm font-medium text-gray-900">
+                              {p.fullName}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center align-middle">
+                            <div className="text-sm text-gray-900">
+                              {p.companyName}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center align-middle">
+                            <div className="text-sm text-gray-900">
+                              {p.email}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center align-middle">
+                            <div className="text-sm text-gray-900">
+                              {p.phoneNumber}
+                            </div>
+                          </td>
+
+                          {/* PartnerType enum */}
+                          <td className="px-6 py-4 text-center align-middle">
+                            <span
+                              className={`px-3 py-1 text-xs font-medium rounded-full ${
+                                partnerTypeColors[p.partnerType] ||
+                                'bg-gray-100 text-gray-800'
+                              }`}
+                            >
+                              {t(`Enums.PartnerType.${p.partnerType}`)}
+                            </span>
+                          </td>
+
+                          {/* Status enum */}
+                          <td className="px-6 py-4 text-center align-middle">
+                            <StatusBadge status={p.status} />
+                          </td>
+
+                          <td className="px-4 py-4 text-center align-middle">
+                            <button
+                              type="button"
+                              onClick={() => setSelected(p)}
+                              className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+                            >
+                              {t('BUTTON.View')}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
                     <tr>
                       <td colSpan="8" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
-                          <svg className="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0z" />
+                        <div className="flex flex-col items-center mt-5 mb-5">
+                          <svg
+                            className="w-12 h-12 mb-4 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="1"
+                              d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                            />
                           </svg>
-                          <h3 className="mb-1 text-lg font-medium text-gray-900">{t('adminPartnerManager.empty')}</h3>
-                          <p className="text-gray-500">{t('adminPartnerManager.empty_description')}</p>
+                          <h3 className="mb-1 text-lg font-medium text-gray-900">
+                            {t('adminPartnerManager.empty')}
+                          </h3>
+                          <p className="text-gray-500">
+                            {t('adminPartnerManager.empty_description')}
+                          </p>
                         </div>
                       </td>
                     </tr>
@@ -223,10 +231,9 @@ export default function AdminPartnerManager() {
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalPartners}
-                  onChange={handlePageChange}
+                  onChange={(page) => setCurrentPage(page)}
                   showSizeChanger={false}
                   size="small"
-                  aria-label={t('common.pagination', 'Pagination navigation')}
                 />
               </div>
             )}
@@ -235,34 +242,34 @@ export default function AdminPartnerManager() {
       </div>
 
       {/* Modal */}
-      <PartnerModal isOpen={!!selected} onClose={handleCloseModal} partner={selected} />
+      <PartnerModal
+        isOpen={!!selected}
+        onClose={() => setSelected(null)}
+        partner={selected}
+      />
     </div>
   );
 }
 
 function StatusBadge({ status }) {
   const { t } = useTranslation();
-  const statusMap = {
+  const statusColors = {
     Pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    Approved: 'bg-green-100 text-green-800 border-green-300',
     Rejected: 'bg-red-100 text-red-800 border-red-300',
+    Approved: 'bg-green-100 text-green-800 border-green-300',
   };
-  const statusLabel = {
-    Pending: t('partner.status.pending'),
-    Approved: t('partner.status.approved'),
-    Rejected: t('partner.status.rejected'),
-  }[status] || status;
+  const colorClass =
+    statusColors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
 
   return (
     <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${statusMap[status] || 'bg-gray-100 text-gray-800 border-gray-300'}`}
-      aria-label={`${t('common.status', 'Status')}: ${statusLabel}`}
+      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${colorClass}`}
     >
-      {statusLabel}
+      {t(`Enums.PartnerStatus.${status}`, status)}
     </span>
   );
 }
 
 StatusBadge.propTypes = {
-  status: PropTypes.oneOf(['Pending', 'Approved', 'Rejected']).isRequired,
+  status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
