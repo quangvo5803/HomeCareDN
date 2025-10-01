@@ -10,6 +10,7 @@ import { useBrand } from '../../hook/useBrand';
 import { useCategory } from '../../hook/useCategory';
 import { handleApiError } from '../../utils/handleApiError';
 import { useAuth } from '../../hook/useAuth';
+import { useDebounce } from 'use-debounce';
 
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
@@ -28,7 +29,8 @@ export default function AdminMaterialManager() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
-
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 300);
   const {
     materials,
     totalMaterials,
@@ -56,8 +58,17 @@ export default function AdminMaterialManager() {
   }, [fetchAllBrands, fetchAllCategories]);
 
   useEffect(() => {
-    fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
-  }, [currentPage, fetchMaterials]);
+    fetchMaterials({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      Search: debouncedSearch || '',
+    });
+  }, [currentPage, pageSize, debouncedSearch, fetchMaterials]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
 
   const getCreatorId = (m) => (m?.userId ?? m?.userID)?.toString();
 
@@ -154,16 +165,32 @@ export default function AdminMaterialManager() {
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
             <div className="flex items-center space-x-2">
+              {/* Number of services */}
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-sm font-medium text-gray-700">
                 {totalMaterials || 0} {t('adminMaterialManager.material')}
               </span>
             </div>
+            {/* Input search */}
+            <div className="flex-1 max-w-lg w-full">
+              <input
+                id="search-input"
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              />
+            </div>
             <button
               className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
               onClick={() => {
+                if (brands.length === 0 || categories.length === 0) {
+                  toast.error(t('adminMaterialManager.noBrandAndService'));
+                  return;
+                }
                 setEditingMaterial(null);
                 setModalReadOnly(false);
                 setIsModalOpen(true);
@@ -334,7 +361,7 @@ export default function AdminMaterialManager() {
                   ) : (
                     <tr>
                       <td colSpan="7" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"
@@ -357,6 +384,15 @@ export default function AdminMaterialManager() {
                           <button
                             className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                             onClick={() => {
+                              if (
+                                brands.length === 0 ||
+                                categories.length === 0
+                              ) {
+                                toast.error(
+                                  t('adminMaterialManager.noBrandAndService')
+                                );
+                                return;
+                              }
                               setEditingMaterial(null);
                               setModalReadOnly(false);
                               setIsModalOpen(true);

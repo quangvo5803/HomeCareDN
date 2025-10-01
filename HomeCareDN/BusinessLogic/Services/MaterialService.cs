@@ -23,7 +23,11 @@ namespace BusinessLogic.Services
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public MaterialService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -37,6 +41,30 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
             );
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                var searchUpper = parameters.Search.ToUpper();
+
+                query = query.Where(b =>
+                    ContainsSafe(b.Name, searchUpper)
+                    || ContainsSafe(b.Description, searchUpper)
+                    || (
+                        b.Brand != null
+                        && (
+                            ContainsSafe(b.Brand.BrandName, searchUpper)
+                            || ContainsSafe(b.Brand.BrandNameEN, searchUpper)
+                        )
+                    )
+                    || (
+                        b.Category != null
+                        && (
+                            ContainsSafe(b.Category.CategoryName, searchUpper)
+                            || ContainsSafe(b.Category.CategoryNameEN, searchUpper)
+                        )
+                    )
+                );
+            }
+
             if (parameters.FilterCategoryID.HasValue)
             {
                 query = query.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
@@ -292,6 +320,11 @@ namespace BusinessLogic.Services
                 .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
+        }
+
+        private static bool ContainsSafe(string? source, string searchUpper)
+        {
+            return !string.IsNullOrEmpty(source) && source.ToUpper().Contains(searchUpper);
         }
     }
 }

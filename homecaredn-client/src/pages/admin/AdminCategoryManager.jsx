@@ -6,6 +6,7 @@ import { useCategory } from '../../hook/useCategory';
 import { Pagination } from 'antd';
 import CategoryModal from '../../components/modal/CategoryModal';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
+import { useDebounce } from 'use-debounce';
 
 export default function AdminCategoryManager() {
   const { t, i18n } = useTranslation();
@@ -14,7 +15,8 @@ export default function AdminCategoryManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 300);
   const {
     categories,
     totalCategories,
@@ -27,9 +29,17 @@ export default function AdminCategoryManager() {
 
   // Fetch categories khi vào trang
   useEffect(() => {
-    fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
-  }, [currentPage, fetchCategories]);
+    fetchCategories({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      Search: debouncedSearch || '',
+    });
+  }, [currentPage, pageSize, debouncedSearch, fetchCategories]);
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
   // Delete Category
   const handleDelete = async (categoryId) => {
     showDeleteModal({
@@ -84,18 +94,33 @@ export default function AdminCategoryManager() {
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Number of brands */}
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span className="text-sm font-semibold text-gray-700">
                 {totalCategories || 0} {t('adminCategoryManager.categories')}
               </span>
             </div>
+
+            {/* Input search */}
+            <div className="flex-1 max-w-lg w-full">
+              <input
+                id="search-input"
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              />
+            </div>
+
+            {/* Add New Category Button */}
             <button
-              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="mr-2 fa-solid fa-plus"></i>
+              <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewCategory')}
             </button>
           </div>
@@ -220,7 +245,7 @@ export default function AdminCategoryManager() {
                   ) : (
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"

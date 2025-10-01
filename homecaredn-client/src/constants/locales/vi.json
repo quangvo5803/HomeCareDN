@@ -768,6 +768,7 @@
     "noMaterial": "Chưa có vật liệu nào",
     "createdBy": "Tạo bởi",
     "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn.",
+    "noBrandAndService": "Vui lòng tạo thương hiệu và danh mục trước khi tạo vật liệu !",
     "materialModal": {
       "title": "Thêm vật liệu mới",
       "title2": "Cập nhật vật liệu",
@@ -806,7 +807,7 @@
     "replyPlaceholder": "Nhập nội dung phản hồi...",
     "noSupport": "Chưa có yêu cầu hỗ trợ nào",
     "all": "Tất cả",
-    "itemsCount": "{{count}} mục"
+    "itemsCount": "{{count}} yêu cầu"
   },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
