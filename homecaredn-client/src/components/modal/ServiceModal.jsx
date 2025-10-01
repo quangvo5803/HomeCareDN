@@ -168,7 +168,7 @@ export default function ServiceModal({
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
-          'Test/Service'
+          'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
@@ -225,7 +225,7 @@ export default function ServiceModal({
           {/* Description */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              {t('adminServiceManager.serviceModal.description')}
+              {t('adminServiceManager.serviceModal.serviceDescription')}
             </label>
             <Editor
               value={description}
@@ -302,7 +302,9 @@ export default function ServiceModal({
                 onChange={(e) => setBuildingType(e.target.value)}
               >
                 <option value="">
-                  {t('adminServiceManager.serviceModal.buildTypePlaceholder')}
+                  {t(
+                    'adminServiceManager.serviceModal.buildingTypePlaceholder'
+                  )}
                 </option>
                 {enums?.buildingTypes?.map((b) => (
                   <option key={b.value} value={b.value}>
@@ -385,7 +387,7 @@ export default function ServiceModal({
 
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-700">
-                    {t('adminServiceManager.serviceModal.descriptionEN')}
+                    {t('adminServiceManager.serviceModal.serviceDescriptionEN')}
                   </label>
                   <Editor
                     value={descriptionEN}

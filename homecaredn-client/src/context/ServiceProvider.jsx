@@ -57,17 +57,17 @@ export const ServiceProvider = ({ children }) => {
   );
 
   // 📌 Public: get by id
-  const getServiceById = useCallback(
-    async (id) => {
-      try {
-        return await serviceService.getServiceById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    []
-  );
+  const getServiceById = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      return await serviceService.getServiceById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // 📌 Admin-only: create
   const createService = useCallback(

@@ -67,6 +67,25 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.BrandRepository.GetQueryable(
                 includeProperties: "LogoImage,Materials"
             );
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                string searchLower = parameters.Search.ToLower();
+                query = query.Where(b =>
+                    b.BrandName.ToLower().Contains(searchLower)
+                    || (
+                        !string.IsNullOrEmpty(b.BrandDescription)
+                        && b.BrandDescription.ToLower().Contains(searchLower)
+                    )
+                    || (
+                        !string.IsNullOrEmpty(b.BrandNameEN)
+                        && b.BrandNameEN.ToLower().Contains(searchLower)
+                    )
+                    || (
+                        !string.IsNullOrEmpty(b.BrandDescriptionEN)
+                        && b.BrandDescriptionEN.ToLower().Contains(searchLower)
+                    )
+                );
+            }
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch

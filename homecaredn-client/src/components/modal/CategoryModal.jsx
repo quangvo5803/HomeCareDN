@@ -79,7 +79,7 @@ export default function CategoryModal({
           (percent) => {
             setUploadProgress(percent);
           },
-          'HomeCareDN/CategoryLogo'
+          'Test/CategoryLogo'
         );
         data.CategoryLogoUrl = result.url;
         data.CategoryLogoPublicId = result.publicId;

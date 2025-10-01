@@ -343,7 +343,7 @@
     "listMaterial": "List of materials",
     "filterCategory": "Material catalog",
     "filterBrand": "Material brand",
-    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product",
+    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
     "noMaterial": "No corresponding material"
   },
   "serviceDetail": {
@@ -355,7 +355,7 @@
   "serviceViewAll": {
     "title": "List of services",
     "verifiedLicense": "Verified License",
-    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service",
+    "pagination": "Showing {{start}} – {{end}} of {{totalServices}} service(s)",
     "noService": "No corresponding service"
   },
   "breadcrumb_home": "Home",
@@ -561,7 +561,7 @@
     "title": "Material Manager",
     "material": "materials",
     "no": "NO",
-    "materialName": "Material Name",
+    "materialName": "Material name",
     "brand": "Brand",
     "category": "Category",
     "unit": "Unit",
@@ -572,17 +572,17 @@
     "materialModal": {
       "title": "Add new material",
       "title2": "Update material",
-      "materialName": "Material Name (VietNamese)",
+      "materialName": "Material name",
       "brand": "Brand",
       "category": "Category",
-      "unit": "Unit (VietNamese)",
-      "description": "Descriptions (VietNamese)",
+      "unit": "Unit",
+      "description": "Descriptions",
       "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
       "unit_Price": "Unit Price",
       "images": "Images",
       "chooseBrand": "Choose brand",
       "chooseCategory": "Choose category",
-      "materialNameEN": "Material Name (English)",
+      "materialNameEN": "Material name (English)",
       "unitEN": "Unit (English)",
       "descriptionEN": "Description (English)",
       "descriptionsPlaceholderEN": "Enter descriptions in English...",
@@ -592,6 +592,7 @@
       "filesSelected": " selected file"
     }
   },
+  
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -712,6 +713,46 @@
       "isActive": "Activate category"
     }
   },
+  "adminMaterialManager": {
+    "title": "Material Manager",
+    "subtitle": "Manage material list",
+    "material": "materials",
+    "no": "NO",
+    "materialName": "Material Name",
+    "numberOfMaterials": "Number of Material",
+    "brand": "Brand",
+    "category": "Category",
+    "status": "Status",
+    "unit": "Unit",
+    "images": "Images",
+    "action": "Action",
+    "noMaterial": "No material yet",
+    "createdBy": "Created by",
+    "letStart": "Start by adding your first material.",
+    "noBrandAndService": "Please create brand and service before create material !",
+    "materialModal": {
+      "title": "Add new material",
+      "title2": "Update material",
+      "materialName": "Material name",
+      "brand": "Brand",
+      "category": "Category",
+      "unit": "Unit",
+      "description": "Descriptions",
+      "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
+      "unit_Price": "Unit Price",
+      "images": "Images",
+      "chooseBrand": "Choose brand",
+      "chooseCategory": "Choose category",
+      "materialNameEN": "Material Name (English)",
+      "unitEN": "Unit (English)",
+      "descriptionEN": "Description (English)",
+      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "multilanguage_for_data": " Multilanguage for data",
+      "chooseFile": "Choose file",
+      "noFile": "No files selected",
+      "filesSelected": " selected file"
+    }
+  },
   "adminServiceManager": {
     "title": "Service Manager",
     "subtitle": "Manage service list",
@@ -729,23 +770,21 @@
     "serviceModal": {
       "title": "Add new service",
       "title2": "Update service",
-      "serviceName": "Service name (VietNamese)",
+      "serviceName": "Service name",
       "serviceNamePlaceholder": "Enter service name...",
       "serviceNameEN": "Service name (English)",
       "serviceNamePlaceholderEN": "Enter service name in English...",
       "buildingType": "Building type",
-      "chooseBuildingType": "Choose building type",
-      "description": "Descriptions (VietNamese)",
+      "buildingTypePlaceholder": "Choose building type",
+      "serviceDescription": "Descriptions",
       "descriptionsPlaceholder": "Enter descriptions in VietNamese...",
-      "descriptionEN": "Descriptions (English)",
-      "descriptionsPlaceholderEN": "Enter descriptions in English...",
+      "serviceDescriptionEN": "Descriptions (English)",
+      "serviceDescriptionPlaceholderEN": "Enter descriptions in English...",
       "multilanguage_for_data": " Multilanguage for data",
       "serviceType": "Service type",
       "serviceTypePlaceholder": "Choose service type",
       "packageOption": "Package option",
       "packageOptionPlaceholder": "Choose package option",
-      "buildType": "Building type",
-      "buildTypePlaceholder": "Choose building type",
       "mainStructureType": "Main structure type",
       "mainStructureTypePlaceholder": "Choose main structure type",
       "designStyle": "Design style",
@@ -769,7 +808,7 @@
     "replyPlaceholder": "Type your reply here...",
     "noSupport": "No support requests yet",
     "all": "All",
-    "itemsCount": "{{count}} item(s)"
+    "itemsCount": "{{count}} request(s)"
   },
 
   "footer": {
