@@ -659,8 +659,25 @@
     "reject": "Từ Chối",
     "delete": "Xóa",
     "viewDetails": "Xem chi tiết",
-    "total": "Tổng"
-
+    "total": "Tổng",
+    "partnerModal": {
+      "title": "Partner Details",
+      "fullName": "Full Name",
+      "companyName": "Company Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "partnerType": "Partner Type",
+      "status": "Status",
+      "createdAt": "Created At",
+      "description": "Description",
+      "existingRejectionReason": "Existing Rejection Reason",
+      "images": "Images",
+      "partnerImage": "Partner image",
+      "adminActions": "Admin Actions",
+      "rejectionReason": "Rejection Reason",
+      "rejectionReasonPlaceholder": "Write the reason for rejection..."
+    }
+    
   },
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
@@ -856,6 +873,8 @@
     "UpdateService": "Cập nhật dịch vụ",
     "AddNewRequest": "Tạo và thêm yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
+    "Reject": "Từ chối",
+    "Approve": "Chấp nhận",
     "View": "Xem",
     "Edit": "Sửa",
     "Delete": "Xóa",
@@ -990,7 +1009,8 @@
     "SERVICE_ADD": "Thêm dịch vụ thành công.",
     "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
     "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
-    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công."
+    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
+    "REJECTED": "Từ chối thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -999,6 +1019,10 @@
     "Customer": "Khách hàng"
   },
   "Enums": {
+     "PartnerType": {
+      "Distributor": "Nhà phân phối",
+      "Contractor": "Nhà thầu"
+    },
     "ServiceType": {
       "Construction": "Xây dựng",
       "Repair": "Sửa chữa",

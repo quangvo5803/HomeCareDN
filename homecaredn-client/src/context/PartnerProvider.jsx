@@ -1,28 +1,41 @@
 import { useState, useCallback, useMemo } from 'react';
-import PropTypes from 'prop-types';
-import { toast } from 'react-toastify';
-import { handleApiError } from '../utils/handleApiError';
-import partnerService from '../services/partnerService';
+import { partnerService } from '../services/partnerService';
 import { useAuth } from '../hook/useAuth';
 import PartnerContext from './PartnerContext';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
+import PropTypes from 'prop-types';
 
 export const PartnerProvider = ({ children }) => {
   const { user } = useAuth();
-
   const [partners, setPartners] = useState([]);
   const [totalPartners, setTotalPartners] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  /** Public: lấy danh sách (paging/sort/filter tương tự Service) */
+  /** Admin: lấy danh sách (paging/sort/filter tương tự Service) */
 const fetchPartners = useCallback(
-  async (params = {}) => {
-    try {
-      setLoading(true);
-      const data = await partnerService.getAllPartners(params); 
-      const items = (data?.items ?? []).map((p) => ({ ...p }));
-      setPartners(items);
-      setTotalPartners(data?.totalCount ?? 0);
-      return items;
+  async ({  
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterPartnerStatus,
+      Search, 
+    } = {}) => {
+      try {
+        setLoading(true);
+        const data = await partnerService.getAllPartners({
+          PageNumber,
+          PageSize,
+          SortBy,
+          FilterID,
+          FilterPartnerStatus,
+          Search, 
+        });
+        const itemsWithStatus = (data.items || []).map((p) => ({ ...p ,type: 'partner',}));
+        setPartners(itemsWithStatus || []);
+        setTotalPartners(data?.totalCount || 0);
+      return itemsWithStatus;
     } catch (err) {
       toast.error(handleApiError(err));
       setPartners([]);
@@ -35,28 +48,27 @@ const fetchPartners = useCallback(
   []
 );
 
-  /** Public: lấy chi tiết */
+  /** Admin: lấy chi tiết */
   const getPartnerById = useCallback(
     async (id) => {
-      const local = partners.find((p) => p.partnerID === id);
-      if (local) return local;
       try {
+        setLoading(true);
         return await partnerService.getPartnerById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
+      } finally {
+        setLoading(false);
       }
-    },
-    [partners]
-  );
+    },[]);
 
   /** Admin: duyệt */
   const approvePartner = useCallback(
-    async ({ partnerID, approvedUserId }) => {
+    async ({ serviceData }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await partnerService.approvePartner({ partnerID, approvedUserId });
+        const updated = await partnerService.approvePartner(serviceData);
         setPartners((prev) =>
           prev.map((p) => (p.partnerID === updated.partnerID ? { ...p, ...updated } : p))
         );
@@ -73,11 +85,11 @@ const fetchPartners = useCallback(
 
   /** Admin: từ chối */
   const rejectPartner = useCallback(
-    async ({ partnerID, rejectionReason }) => {
+    async ({ serviceData }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await partnerService.rejectPartner({ partnerID, rejectionReason });
+        const updated = await partnerService.rejectPartner(serviceData);
         setPartners((prev) =>
           prev.map((p) => (p.partnerID === updated.partnerID ? { ...p, ...updated } : p))
         );

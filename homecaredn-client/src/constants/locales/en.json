@@ -239,7 +239,24 @@
     "letStart": "Start by reviewing partner applications.",
     "partnerDetail": "Partner Detail",
     "back_to_list": "Back to Partner List",
-    "total": "Total"
+    "total": "Total",
+    "partnerModal": {
+      "title": "Partner Details",
+      "fullName": "Full Name",
+      "companyName": "Company Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "partnerType": "Partner Type",
+      "status": "Status",
+      "createdAt": "Created At",
+      "description": "Description",
+      "existingRejectionReason": "Existing Rejection Reason",
+      "images": "Images",
+      "partnerImage": "Partner image",
+      "adminActions": "Admin Actions",
+      "rejectionReason": "Rejection Reason",
+      "rejectionReasonPlaceholder": "Write the reason for rejection..."
+    }
   },
   "common": {
     "home": "Home",
@@ -858,6 +875,8 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
+    "Reject": "Reject",
+    "Approve": "Approve",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -991,7 +1010,8 @@
     "SERVICE_ADD": "Add service successfully.",
     "SERVICE_UPDATE": "Service updated successfully.",
     "SERVICE_REQUEST_ADD": "Add service request successfully.",
-    "SERVICE_REQUEST_UPDATE": "Service request updated successfully."
+    "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
+    "REJECTED": "Rejected successfully."
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1000,6 +1020,10 @@
     "Customer": "Customer"
   },
   "Enums": {
+     "PartnerType": {
+      "Distributor": "Distributor",
+      "Contractor": "Contractor"
+    },
     "ServiceType": {
       "Construction": "Construction",
       "Repair": "Repair",

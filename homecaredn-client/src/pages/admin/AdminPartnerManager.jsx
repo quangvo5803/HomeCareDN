@@ -48,7 +48,10 @@ export default function AdminPartnerManager() {
       PageSize: pageSize,
       SortBy: 'createdat_desc',
     };
-    if (statusFilter !== 'All') params.FilterPartnerStatus  = statusFilter; 
+    if (statusFilter !== 'All') {
+     const statusToNum = { Pending: 0, Approved: 1, Rejected: 2 };
+     params.FilterPartnerStatus = statusToNum[statusFilter];
+  }
     if (debouncedSearch) params.Search = debouncedSearch;      
 
     fetchPartners(params);
@@ -59,7 +62,11 @@ export default function AdminPartnerManager() {
   }, []);
 
   const handleSearchChange = useCallback((e) => {
-    setSearch(e.target.value);
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const value = e.currentTarget.value.trim();
+      setSearch(value);
+    }
   }, []);
 
   const handleViewPartner = useCallback((partner) => {
@@ -126,8 +133,8 @@ export default function AdminPartnerManager() {
               <input
                 id="search-input"
                 type="text"
-                value={search}
-                onChange={handleSearchChange}
+                defaultValue={search}
+                onKeyDown={handleSearchChange}
                 placeholder={t('common.search')}
                 className="px-3 py-2 text-sm border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -204,7 +211,6 @@ export default function AdminPartnerManager() {
                       <td colSpan="8" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center">
                           <svg className="w-12 h-12 mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0z" />
                           </svg>
                           <h3 className="mb-1 text-lg font-medium text-gray-900">{t('adminPartnerManager.empty')}</h3>
                           <p className="text-gray-500">{t('adminPartnerManager.empty_description')}</p>

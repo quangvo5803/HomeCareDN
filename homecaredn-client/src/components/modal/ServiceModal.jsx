@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
@@ -33,7 +33,6 @@ export default function ServiceModal({
   const { t } = useTranslation();
   const enums = useEnums();
   const { deleteServiceImage } = useService();
-
   const [name, setName] = useState('');
   const [nameEN, setNameEN] = useState('');
   const [description, setDescription] = useState('');

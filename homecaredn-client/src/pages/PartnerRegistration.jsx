@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { uploadImageToCloudinary } from '../utils/uploadImage';
-import partnerService from '../services/partnerService';
+import { partnerService } from '../services/partnerService';
 import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import { isSafeText } from '../utils/validateText';
