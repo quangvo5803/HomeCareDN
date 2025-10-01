@@ -132,15 +132,8 @@ export default function AdminMaterialManager() {
     } else {
       await createMaterial(materialData);
       toast.success(t('SUCCESS.MATERIAL_ADD'));
-
-      const newTotal = (totalMaterials ?? 0) + 1;
-      const newLastPage = Math.ceil(newTotal / pageSize);
-
-      if (newLastPage !== currentPage) {
-        setCurrentPage(newLastPage);
-      } else {
-        await fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
-      }
+      const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
 
     setIsModalOpen(false);
@@ -280,8 +273,10 @@ export default function AdminMaterialManager() {
                                 ) : (
                                   <img
                                     src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                                    alt="No image"
+                                    alt=""
                                     className="object-cover w-10 h-10"
+                                    loading="lazy"
+                                    decoding="async"
                                   />
                                 )}
                               </div>
