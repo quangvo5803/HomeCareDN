@@ -77,7 +77,7 @@ export default function BrandModal({
           (percent) => {
             setUploadProgress(percent);
           },
-          'HomeCareDN/BrandLogo'
+          'Test/BrandLogo'
         );
         data.BrandLogoUrl = result.url;
         data.BrandLogoPublicId = result.publicId;
