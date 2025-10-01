@@ -14,40 +14,26 @@ export const PartnerProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   /** Public: lấy danh sách (paging/sort/filter tương tự Service) */
-  const fetchPartners = useCallback(
-    async ({
-      PageNumber = 1,
-      PageSize = 10,
-      SortBy,
-      FilterString,
-    } = {}) => {
-      try {
-        setLoading(true);
-        const data = await partnerService.getAllPartners({
-          PageNumber,
-          PageSize,
-          SortBy,
-          FilterString,
-        });
-
-        // Chuẩn hoá casing từ BE
-        const items =
-          (data?.items ?? data?.Items ?? []).map((p) => ({ ...p, type: 'partner' }));
-
-        setPartners(items);
-        setTotalPartners(data?.totalCount ?? data?.TotalCount ?? 0);
-        return items;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        setPartners([]);
-        setTotalPartners(0);
-        return [];
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+const fetchPartners = useCallback(
+  async (params = {}) => {
+    try {
+      setLoading(true);
+      const data = await partnerService.getAllPartners(params); // ✅ forward toàn bộ
+      const items = (data?.items ?? data?.Items ?? []).map((p) => ({ ...p, type: 'partner' }));
+      setPartners(items);
+      setTotalPartners(data?.totalCount ?? data?.TotalCount ?? 0);
+      return items;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      setPartners([]);
+      setTotalPartners(0);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  },
+  []
+);
 
   /** Public: lấy chi tiết */
   const getPartnerById = useCallback(
