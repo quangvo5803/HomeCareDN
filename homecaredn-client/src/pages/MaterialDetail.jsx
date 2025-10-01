@@ -4,7 +4,6 @@ import { useMaterial } from '../hook/useMaterial';
 import Loading from '../components/Loading';
 import ItemDetail from '../components/ItemDetail';
 
-
 export default function MaterialDetail() {
   const { materialID } = useParams();
   const [material, setMaterial] = useState({});
@@ -15,6 +14,7 @@ export default function MaterialDetail() {
   useEffect(() => {
     const fetchMaterial = async () => {
       const data = await getMaterialById(materialID);
+      data.type = 'material';
       setMaterial(data || {});
     };
     fetchMaterial();
@@ -46,11 +46,5 @@ export default function MaterialDetail() {
   }, [fetchMaterials, material.categoryID]);
 
   if (loading) return <Loading />;
-  return (
-    <ItemDetail
-      item={material}
-      relatedItems={randomMaterials}
-    />
-
-  );
+  return <ItemDetail item={material} relatedItems={randomMaterials} />;
 }

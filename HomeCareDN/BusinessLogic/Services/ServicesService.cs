@@ -33,7 +33,31 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                var searchUpper = parameters.Search.ToUpper();
 
+                query = query.Where(s =>
+                    (!string.IsNullOrEmpty(s.Name) && s.Name.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(s.NameEN) && s.NameEN.ToUpper().Contains(searchUpper))
+                    ||
+                    // Enums convert to string for searching
+                    s.ServiceType.ToString().ToUpper().Contains(searchUpper)
+                    || s.BuildingType.ToString().ToUpper().Contains(searchUpper)
+                    || (
+                        s.PackageOption.HasValue
+                        && s.PackageOption.Value.ToString().ToUpper().Contains(searchUpper)
+                    )
+                    || (
+                        s.MainStructureType.HasValue
+                        && s.MainStructureType.Value.ToString().ToUpper().Contains(searchUpper)
+                    )
+                    || (
+                        s.DesignStyle.HasValue
+                        && s.DesignStyle.Value.ToString().ToUpper().Contains(searchUpper)
+                    )
+                );
+            }
             if (parameters.FilterServiceType.HasValue)
                 query = query.Where(s => s.ServiceType == parameters.FilterServiceType.Value);
 

@@ -24,4 +24,8 @@
     <ProjectReference Include="..\Ultitity\Ultitity.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Distributor\" />
+  </ItemGroup>
+
 </Project>

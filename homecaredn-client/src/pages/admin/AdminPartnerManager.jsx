@@ -11,6 +11,7 @@ export default function AdminPartnerManager() {
   const pageSize = 5;
 
   const getPartnerTypeColor = useCallback((partnerType) => {
+
     const type = typeof partnerType === 'number'
       ? (['Distributor', 'Contractor'][partnerType] ?? '')
       : (partnerType || '');
@@ -20,7 +21,6 @@ export default function AdminPartnerManager() {
     };
     return typeColors[type] || 'text-gray-800 bg-gray-100';
   }, []);
-
   const { partners, totalPartners, loading, fetchPartners } = usePartner();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,7 +33,6 @@ export default function AdminPartnerManager() {
     const id = setTimeout(() => setDebouncedSearch(search.trim()), 400);
     return () => clearTimeout(id);
   }, [search]);
-
   const toStatusString = useCallback((s) => {
     if (typeof s === 'string') return s;
     return ['Pending', 'Approved', 'Rejected'][s] ?? String(s);
@@ -94,9 +93,13 @@ export default function AdminPartnerManager() {
           {/* Table Header Actions */}
           <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full" aria-hidden="true" />
+              <div
+                className="w-2 h-2 bg-blue-500 rounded-full"
+                aria-hidden="true"
+              />
               <span className="text-sm font-medium text-gray-700">
-                {totalPartners || 0} {t('adminPartnerManager.partners', 'Partners')}
+                {totalPartners || 0}{' '}
+                {t('adminPartnerManager.partners', 'Partners')}
               </span>
             </div>
 
@@ -148,7 +151,7 @@ export default function AdminPartnerManager() {
                     <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">{t('adminServiceManager.action')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                 <tbody className="divide-y divide-gray-200">
                   {partners && partners.length > 0 ? partners.map((p, idx) => {
                     const typeKey = (typeof p.partnerType === 'string'
                       ? p.partnerType
