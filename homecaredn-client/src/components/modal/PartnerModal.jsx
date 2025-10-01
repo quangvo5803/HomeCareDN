@@ -24,6 +24,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   const [status, setStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [busy, setBusy] = useState(false);
+  const statusKey = getStatusKey(status);
   
   // Fill data when modal opens
   useEffect(() => {
@@ -137,6 +138,14 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
 
   const isAdmin = user?.role === 'Admin';
   const isPartnerPending = isPending(partner.status);
+  let badgeTone;
+  if (isPending(status)) {
+    badgeTone = 'bg-yellow-100 text-yellow-800';
+  } else if (statusKey === 'Approved') {
+    badgeTone = 'bg-green-100 text-green-800';
+  } else {
+    badgeTone = 'bg-red-100 text-red-800';
+  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[1050] p-4 bg-black/40">
@@ -212,20 +221,18 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
                 {getTypeLabel(partnerType)}
               </div>
             </div>
-
+            
             {/* Status */}
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
                 {t('adminPartnerManager.partnerModal.status')}
               </label>
               <div className="w-full px-4 py-3 border rounded-xl bg-gray-50 text-gray-900">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  isPending(status) ? 'bg-yellow-100 text-yellow-800' :
-                  getStatusKey(status) === 'Approved' ? 'bg-green-100 text-green-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
-                  {getStatusLabel(status)}
-                </span>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                w-full px-4 py-3 border rounded-xl bg-gray-50 text-gray-900 ${badgeTone}`}>
+                    {getStatusLabel(status)}
+                  </span>
               </div>
             </div>
 
@@ -366,7 +373,6 @@ PartnerModal.propTypes = {
     imageUrls: PropTypes.arrayOf(PropTypes.string),
     imagePublicIds: PropTypes.arrayOf(PropTypes.string),
   }),
-  setUploadProgress: PropTypes.func.isRequired,
 };
 
 // Default props

@@ -23,13 +23,13 @@ const buildPartnerFormData = (partner) => {
   appendIf(formData, 'ApprovedUserId', partner.ApprovedUserId);
   appendIf(formData, 'CreatedAt', partner.CreatedAt);
   // Images
-  (partner.ImageUrls || []).forEach((ImageUrls) =>
-    formData.append('ImageUrls', ImageUrls)
-  );
-  (partner.ImagePublicIds || []).forEach((ImagePublicIds) =>
-    formData.append('ImagePublicIds', ImagePublicIds)
-  );
+    for (const url of (partner.ImageUrls ?? [])) {
+      formData.append('ImageUrls', url);
+    }
 
+    for (const publicId of (partner.ImagePublicIds ?? [])) {
+      formData.append('ImagePublicIds', publicId);
+    }
   return formData;
 };
 
