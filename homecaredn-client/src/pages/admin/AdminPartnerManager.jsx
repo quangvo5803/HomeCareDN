@@ -48,7 +48,7 @@ export default function AdminPartnerManager() {
       PageSize: pageSize,
       SortBy: 'createdat_desc',
     };
-    if (statusFilter !== 'All') params.Status = statusFilter; 
+    if (statusFilter !== 'All') params.FilterPartnerStatus  = statusFilter; 
     if (debouncedSearch) params.Search = debouncedSearch;      
 
     fetchPartners(params);

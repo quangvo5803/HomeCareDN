@@ -36,7 +36,6 @@ const partnerService = {
 
   getAllPartners: async (params = {}) => {
     try {
-      console.log('[getAllPartners] params =', params); 
       const res = await api.get('/AdminPartner/get-all-partners', { params });
       return res.data;
     } catch (error) {

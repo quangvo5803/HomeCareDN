@@ -18,10 +18,10 @@ const fetchPartners = useCallback(
   async (params = {}) => {
     try {
       setLoading(true);
-      const data = await partnerService.getAllPartners(params); // ✅ forward toàn bộ
-      const items = (data?.items ?? data?.Items ?? []).map((p) => ({ ...p, type: 'partner' }));
+      const data = await partnerService.getAllPartners(params); 
+      const items = (data?.items ?? []).map((p) => ({ ...p }));
       setPartners(items);
-      setTotalPartners(data?.totalCount ?? data?.TotalCount ?? 0);
+      setTotalPartners(data?.totalCount ?? 0);
       return items;
     } catch (err) {
       toast.error(handleApiError(err));
