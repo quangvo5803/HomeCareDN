@@ -24,7 +24,7 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
   const [status, setStatus] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [busy, setBusy] = useState(false);
-  const statusKey = getStatusKey(status);
+
   
   // Fill data when modal opens
   useEffect(() => {
@@ -82,7 +82,8 @@ export default function PartnerModal({ isOpen, onClose, partner }) {
     return statusKey === 'Pending' || s === 0;
   }, [getStatusKey]);
 
-  // Format date
+  const statusKey = getStatusKey(status);
+  
   const formattedCreatedAt = (() => {
     try {
       return partner?.createdAt ? formatDate(partner.createdAt, i18n.language) : '-';
