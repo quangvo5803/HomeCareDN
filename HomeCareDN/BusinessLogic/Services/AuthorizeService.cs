@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using AutoMapper;
 using BusinessLogic.DTOs.Authorize;
+using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
@@ -26,6 +27,7 @@ namespace BusinessLogic.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtOptions _jwtOptions;
         private readonly GoogleOptions _googleOptions;
+        private readonly IFacadeService _facadeService;
 
         private const int RefreshTokenDays = 7;
         private const int OtpExpiryMinutes = 5;
@@ -42,7 +44,8 @@ namespace BusinessLogic.Services
             IRefreshTokenRepository refreshTokenRepository,
             IHttpContextAccessor httpContextAccessor,
             IOptions<JwtOptions> jwtOptions,
-            IOptions<GoogleOptions> googleOptions
+            IOptions<GoogleOptions> googleOptions,
+            IFacadeService facadeService
         )
         {
             _userManager = userManager;
@@ -51,6 +54,7 @@ namespace BusinessLogic.Services
             _httpContextAccessor = httpContextAccessor;
             _jwtOptions = jwtOptions.Value;
             _googleOptions = googleOptions.Value;
+            _facadeService = facadeService;
         }
 
         #region OTP
@@ -58,6 +62,9 @@ namespace BusinessLogic.Services
         public async Task SendLoginOtpAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
+
+            await _facadeService.PartnerService.ValidateLoginAllowedAsync(email);
+
             if (user == null)
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>

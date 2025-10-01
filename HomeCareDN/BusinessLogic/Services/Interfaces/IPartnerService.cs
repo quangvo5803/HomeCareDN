@@ -11,5 +11,6 @@ namespace BusinessLogic.Services.Interfaces
         Task<PartnerDto> ApprovePartnerAsync(PartnerApproveRequest request);
         Task<PartnerDto> RejectPartnerAsync(PartnerRejectRequest request);
         Task DeletePartnerAsync(Guid partnerId);
+        Task ValidateLoginAllowedAsync(string email);
     }
 }
