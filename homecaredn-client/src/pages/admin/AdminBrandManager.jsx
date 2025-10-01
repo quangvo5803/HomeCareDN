@@ -15,7 +15,7 @@ export default function AdminBrandManager() {
   const [editingBrand, setEditingBrand] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
-  const [debouncedSearch] = useDebounce(search, 300);
+  const [debouncedSearch] = useDebounce(search, 1000);
   const {
     brands,
     totalBrands,

@@ -30,7 +30,7 @@ export default function AdminMaterialManager() {
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState('');
-  const [debouncedSearch] = useDebounce(search, 300);
+  const [debouncedSearch] = useDebounce(search, 1000);
   const {
     materials,
     totalMaterials,
