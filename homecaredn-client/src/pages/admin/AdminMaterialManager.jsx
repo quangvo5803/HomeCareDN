@@ -123,9 +123,9 @@ export default function AdminMaterialManager() {
       toast.success(t('SUCCESS.MATERIAL_ADD'));
 
       const newTotal = (totalMaterials ?? 0) + 1;
-      const newLastPage = Math.ceil(newTotal / pageSize);
+      const newLastPage = Math.ceil(newTotal / pageSize) || 1;
 
-      if (newLastPage !== currentPage) {
+      if (newLastPage === currentPage) {
         await fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
       } else {
         setCurrentPage(newLastPage);
