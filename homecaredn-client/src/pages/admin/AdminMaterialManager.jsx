@@ -246,6 +246,9 @@ export default function AdminMaterialManager() {
                     materials.map((m, index) => {
                       const owned = isOwnedByAdmin(m);
                       const creatorName = getCreatorName(m);
+                      const displayName = owned
+                        ? (i18n.language === 'vi' ? t('Của bạn') : t('Your'))
+                        : creatorName;
                       return (
                         <tr
                           key={m.materialID}
@@ -307,11 +310,7 @@ export default function AdminMaterialManager() {
 
                           <td className="px-6 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-md ">
-                              {
-                                owned
-                                  ? (i18n.language === 'vi' ? t('Của bạn') : t('Your'))
-                                  : creatorName
-                              }
+                              {displayName}
                             </span>
                           </td>
 
