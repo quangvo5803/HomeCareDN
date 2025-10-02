@@ -246,9 +246,18 @@ export default function AdminMaterialManager() {
                     materials.map((m, index) => {
                       const owned = isOwnedByAdmin(m);
                       const creatorName = getCreatorName(m);
-                      const displayName = owned
-                        ? (i18n.language === 'vi' ? t('Của bạn') : t('Your'))
-                        : creatorName;
+
+                      let displayName;
+                      if (owned) {
+                        if (i18n.language === 'vi') {
+                          displayName = t('Của bạn');
+                        } else {
+                          displayName = t('Your');
+                        }
+                      } else {
+                        displayName = creatorName;
+                      }
+
                       return (
                         <tr
                           key={m.materialID}
