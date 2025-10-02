@@ -190,17 +190,20 @@ Info.propTypes = {
 PartnerModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  partner: PropTypes.shape({
+  partnerRequest: PropTypes.shape({
     partnerID: PropTypes.string,
-    partnerRequestID: PropTypes.string,
-    fullName: PropTypes.string,
+    partnerRequestID: PropTypes.string.isRequired,
     companyName: PropTypes.string,
     email: PropTypes.string,
     phoneNumber: PropTypes.string,
-    partnerType: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    partnerRequestType: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     description: PropTypes.string,
     createdAt: PropTypes.string,
+    rejectionReason: PropTypes.string,
     imageUrls: PropTypes.arrayOf(PropTypes.string),
   }),
 };

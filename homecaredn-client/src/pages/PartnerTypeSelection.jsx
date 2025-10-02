@@ -23,10 +23,14 @@ const partnerTypes = [
 export default function PartnerTypeSelection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [selectedPartnerRequestType, setSelectedType] = useState('');
+  const [selectedPartnerRequestType, setSelectedPartnerRequestType] =
+    useState('');
   const canContinue = Boolean(selectedPartnerRequestType);
 
-  const handleSelect = useCallback((type) => setSelectedType(type), []);
+  const handleSelect = useCallback(
+    (type) => setSelectedPartnerRequestType(type),
+    []
+  );
   const handleContinue = useCallback(() => {
     if (selectedPartnerRequestType)
       navigate(
@@ -39,7 +43,7 @@ export default function PartnerTypeSelection() {
   const onKeySelect = useCallback((e, type) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      setSelectedType(type);
+      setSelectedPartnerRequestType(type);
     }
   }, []);
 
@@ -175,11 +179,9 @@ export default function PartnerTypeSelection() {
                   {t(`Enums.PartnerType.${selectedPartnerRequestType}`)}
                 </>
               ) : (
-                <>
-                  <span>
-                    {t('partnerRequest.partnerTypeSelection.selectType')}
-                  </span>
-                </>
+                <span>
+                  {t('partnerRequest.partnerTypeSelection.selectType')}
+                </span>
               )}
             </button>
 

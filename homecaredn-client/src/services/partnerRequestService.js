@@ -17,12 +17,13 @@ export const partnerRequestService = {
     appendIf(formData, 'PhoneNumber', partnerRequestData.PhoneNumber);
     appendIf(formData, 'Description', partnerRequestData.Description);
 
-    (partnerRequestData.ImageUrls || []).forEach((ImageUrls) =>
-      formData.append('ImageUrls', ImageUrls)
-    );
-    (partnerRequestData.ImagePublicIds || []).forEach((ImagePublicIds) =>
-      formData.append('ImagePublicIds', ImagePublicIds)
-    );
+    for (const imageUrl of partnerRequestData.ImageUrls || []) {
+      formData.append('ImageUrls', imageUrl);
+    }
+
+    for (const publicId of partnerRequestData.ImagePublicIds || []) {
+      formData.append('ImagePublicIds', publicId);
+    }
 
     const res = await api.post(
       '/PartnerRequests/create-partner-request',
