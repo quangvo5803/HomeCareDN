@@ -14,8 +14,8 @@ import { useDebounce } from 'use-debounce';
 
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
-  const { user: authUser } = useAuth();
-  const adminId = authUser?.id?.toString();
+  const { user } = useAuth();
+  const adminId = user?.id?.toString();
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -249,9 +249,8 @@ export default function AdminMaterialManager() {
                       return (
                         <tr
                           key={m.materialID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
                           {/* STT */}
                           <td className="px-4 py-4 text-center align-middle">
@@ -308,9 +307,11 @@ export default function AdminMaterialManager() {
 
                           <td className="px-6 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-md ">
-                              {owned
-                                ? t('common.you', { defaultValue: 'You' })
-                                : creatorName}
+                              {
+                                owned
+                                  ? (i18n.language === 'vi' ? t('Của bạn') : t('Your'))
+                                  : creatorName
+                              }
                             </span>
                           </td>
 
