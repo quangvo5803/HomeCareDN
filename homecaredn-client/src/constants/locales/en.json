@@ -97,171 +97,7 @@
     "stat4_text": "Client Satisfaction",
     "stat5_title": "Experience Engineers",
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
-  },
-   "partner": {
-    "subtitle": "Tell us about your business to get approved.",
-    "tip_best_quality": "Tip: Clear storefront/portfolio shots work best",
-    "full_name": "Full name",
-    "already_have_account": "Already have an account? ",
-    "become_partner": "Register to Become a Partner",
-    "join_our_network": "Join Our Partner Network",
-    "partnership_benefits": "By partnering with HomeCareDN, your business gains access to a broad customer base, streamlined digital vendor management, and reputation growth.",
-    "choose_partner_type": "Choose Your Partner Type",
-    "select_type_description": "Select the type of partnership that best describes your business to get started with HomeCareDN.",
-    "why_partner_with_us": "Why Partner with HomeCareDN?",
-    "type": "Type",
-    "expand_reach": "Expand Your Reach",
-    "expand_reach_desc": "Connect with thousands of customers looking for home care services and materials.",
-    "increase_sales": "Increase Business Opportunities", 
-    "increase_sales_desc": "Access new revenue streams through our established customer base.",
-    "trusted_platform": "Trusted Platform",
-    "trusted_platform_desc": "Join a reliable platform that prioritizes quality and customer satisfaction.",
-    
-    "key_benefits": "Key Benefits",
-    "continue_as": "Continue as",
-    "select_type_first": "Please select a partner type",
-    "change_type": "Change partner type",
-    
-    "distributor": "Material Distributor",
-    "contractor": "Service Contractor",
-    "distributor_desc": "Supply construction materials and home improvement products",
-    "contractor_desc": "Provide home care services and maintenance",
-    
-    "distributor_feature_1": "Access to wide customer network",
-    "distributor_feature_2": "Inventory management support", 
-    "distributor_feature_3": "Marketing and promotion tools",
-    "distributor_feature_4": "Competitive pricing advantages",
-    
-    "contractor_feature_1": "Direct customer connections",
-    "contractor_feature_2": "Project management tools",
-    "contractor_feature_3": "Quality assurance support",
-    "contractor_feature_4": "Professional certification",
-    
-    "partner_registration": "Partner Registration",
-    "partner_type": "Partner Type",
-    "company_name": "Company Name",
-    "company_name_placeholder": "Enter your registered company name",
-    "email": "Email Address",
-    "email_placeholder": "Enter business email",
-    "phone_number": "Phone Number", 
-    "phone_placeholder": "Enter phone number",
-    "description": "Business Description",
-    "description_placeholder": "Describe your business, services, or products...",
-    "business_images": "Business Images",
-    "upload_images": "Upload Business Images",
-    "drag_drop_images": "Drag & drop images here or click to select",
-    "image_requirements": "Upload up to 5 images (JPG, PNG, max 5MB each)",
-    "preview_image": "Preview image {{number}}",
-    "remove_image": "Remove image {{number}}",
-    "uploaded_images": "Uploaded images",
-
-    "submitting": "Submitting Application...",
-    "submit_application": "Submit Partner Application",
-    "registration_success": "Your partner application has been submitted successfully! We will review and contact you soon.",
-    "registration_error": "Failed to submit application. Please check your information and try again.",
-    "review_process_info": "📝 Your application will be reviewed by our team within 3-5 business days. We'll notify you via email once approved.",
-    
-    "have_questions": "Have questions about partnering with us?",
-    "contact_support": "Contact Partner Support",
-    
-    "validation": {
-      "partner_type_required": "Please select partner type",
-      "full_name_required": "Full name is required",
-      "company_name_required": "Company name is required",
-      "email_required": "Email address is required", 
-      "email_invalid": "Please enter a valid email",
-      "phone_required": "Phone number is required",
-      "phone_invalid": "Please enter a valid phone number",
-      "full_name_invalid": "Please enter a valid full name",
-      "description_required": "Business description is required",
-      "images_required": "Please upload at least one business image",
-      "description_too_long": "Description is too long"
-    },
-
-    "status": {
-      "pending": "Pending",
-      "approved": "Approved",
-      "rejected": "Rejected"
-    },
-    "login": {
-      "pending_review": "Your application is under review. Please check your email and try again later.",
-      "rejected": "Your application was rejected. Please check the email for details — you can re-apply."
-    },
-    "partner_management": "Partner Management",
-    "management_description": "View, approve, or reject partner applications.",
-    "search_placeholder": "Search by company, contact person, or number...",
-    "submitted_at": "Submitted At",
-    "no_partners_found": "No partners have registered yet.",
-    "approve": "Approve",
-    "approve_partner": "Approve Partner",
-    "approval_comment": "Approval Comment (optional)",
-    "comment_placeholder": "Write any notes for approval...",
-    "approved_successfully": "Partner approved successfully.",
-    "approve_error": "Failed to approve partner.",
-    "reject": "Reject",
-    "reject_partner": "Reject Partner",
-    "rejection_reason": "Reason for rejection",
-    "reason_placeholder": "Provide reason for rejection...",
-    "reason_required": "Please provide a rejection reason.",
-    "rejected_successfully": "Partner rejected.",
-    "reject_error": "Failed to reject partner.",
-    "confirm_delete": "Delete this partner?",
-    "delete_warning": "This operation cannot be undone.",
-    "deleted_successfully": "Partner deleted.",
-    "delete_error": "Failed to delete partner.",
-    "partner_details": "Partner Details",
-    "detail_error": "Could not load partner details.",
-    "fetch_error": "Failed to load partners",
-    "company_info": "Company Information",
-    "contact_info": "Contact Information",
-    "pending": "Pending",
-    "approved": "Approved", 
-    "rejected": "Rejected"
-  },
-  "auth": {
-    "email_exists_login": "Email already has an account. Please log in.",
-    "error_send_otp": "Failed to send OTP. Please try again."
-  },
-  "adminPartnerManager": {
-    "empty": "No partners have registered yet.",
-    "empty_description": "Start by reviewing partner applications.",
-    "title": "Partner Manager",
-    "subtitle": "View and manage partner applications",
-    "partners": "partner(s)",
-    "no": "NO",
-    "company_name": "Company Name",
-    "email": "Email",
-    "phone_number": "Phone Number",
-    "type": "Type",
-    "status": "Status",
-    "action": "Action",
-    "noPartner": "No partners have registered yet.",
-    "letStart": "Start by reviewing partner applications.",
-    "partnerDetail": "Partner Detail",
-    "back_to_list": "Back to Partner List",
-    "total": "Total"
-  },
-  "common": {
-    "home": "Home",
-    "about": "About",
-    "back": "Back",
-    "back_to_home": "Back to Home",
-    "search": "Search",
-    "status": "Status",
-    "all_status": "All statuses",
-    "actions": "Actions",
-    "close": "Close",
-    "page_size": "Page size",
-    "delete": "Delete",
-    "cancel": "Cancel",
-    "view_details": "View Details",
-    "or": "Or",
-    "selected": "Selected",
-    "not_selected": "Not selected",
-    "all": "All",
-    "filter_by_status": "Filter by status",
-    "pagination": "Pagination navigation"
-  },
+  }, 
   "why": {
     "badge": "Why Choose Us",
     "title": "Why Builders Trust",
@@ -396,6 +232,25 @@
     "resend_otp": "Resend",
     "not_receive_otp": "Did not receive the code? "
   },
+  "partnerRequest": {
+  "partnerTypeSelection": {
+    "title": "Register as a Partner",
+    "subtitle": "Please choose the role you want to register for",
+    "selectType": "Please select a role to continue",
+    "continueWithType": "Continue registration as "
+  },
+  "partnerRegistration": {
+    "title": "Register as a Partner",
+    "subtitle": "Please fill in all the information below",
+    "notSelectedType": "Please select a role",
+    "form_companyName": "Company Name",
+    "form_email": "Email",
+    "form_phoneNumber": "Phone Number",
+    "form_description": "Company Description",
+    "form_images": "Company Images",
+    "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
+  }
+},
   "userPage": {
     "profile": {
       "title": "My Profile",
@@ -793,6 +648,37 @@
       "chooseFiles": "Choose files to upload"
     }
   },
+  "adminPartnerManager": {
+    "empty": "No partners",
+    "empty_description": "No partnership requests have been submitted.",
+    "title": "Partner Management",
+    "subtitle": "Review, approve, or reject partner requests.",
+    "partners": "partners",
+    "no": "No.",
+    "companyName": "Company Name",
+    "phoneNumber": "Phone Number",
+    "submittedAt": "Submitted At",
+    "partnerRequestType": "Requested Role",
+    "status": "Status",
+    "action": "Action",
+    "noPartner": "No partnership requests yet.",
+    "searchPlaceholder": "Search by company name, email, or phone number...",
+    "approve": "Approve",
+    "reject": "Reject",
+    "delete": "Delete",
+    "viewDetails": "View Details",
+    "total": "Total",
+    "partnerRequestModal": {
+      "title": "Registration Details",
+      "companyName": "Company Name",
+      "phoneNumber": "Phone Number",
+      "submittedAt": "Submitted At",
+      "partnerRequestType": "Requested Role",
+      "status": "Status",
+      "rejectReason": "Rejection Reason",
+      "rejectReasonPlaceHolder": "Enter rejection reason"
+    }
+  },
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
@@ -879,7 +765,10 @@
     "CreateServiceRequest": "Create Service Request",
     "UpdateServiceRequest": "Update Service Request",
     "Back": "Back",
-    "ViewDetail": "View detail"
+    "ViewDetail": "View detail",
+    "RegisterPartner": "Register as Partner",
+    "Reject" : "Rejeact",
+    "Approve": "Approve"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -903,6 +792,10 @@
       "title": "Are you sure?",
       "text": "This service will be deleted and cannot be restored!"
     },
+    "DeletePartnerRequestModal": {
+      "title": "Are you sure?",
+      "text": "This request will be deleted and cannot be restored!"
+    },
     "DeleteAddressModal": {
       "title": "Delete this address?",
       "text": "This action cannot be undone."
@@ -921,57 +814,67 @@
     }
   },
   "ERROR": {
-    "UPLOAD_FAILED": "Failed to upload image(s).",
-    "LOGIN_NOT_FOUND": "Email not registered",
-    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
-    "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
-    "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
-    "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "REGISTER_ALREADY_EXISTS": "Email already registered",
+    "UPLOAD_FAILED": "Image upload failed.",
+    "LOGIN_NOT_FOUND": "Email is not registered.",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request is too frequent, please try again later!",
+    "LOGIN_OTP_INCORECT": "OTP is incorrect or has expired.",
+    "LOGIN_TOKEN_INVALID": "Invalid session, please log in again.",
+    "LOGIN_TOKEN_EXPIRED": "Session has expired, please log in again.",
+    "LOGIN_GOOGLE": "Google login failed.",
+    "REGISTER_ALREADY_EXISTS": "Email is already registered.",
+
     "NULL_NAME": "Please enter your full name.",
-    "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
     "NULL_PHONE": "Please enter your phone number.",
-    "INVALID_PHONE": "Invalid phone number.",
     "NULL_EMAIL": "Please enter your email.",
+    "NULL_OTP": "Please enter the OTP.",
+    "NULL_COMPANYNAME": "Please enter the company name.",
+    "NULL_PARTNERTYPE": "Please select a role.",
+    "NULL_IMAGES": "Please upload company images.",
+
+    "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
+    "INVALID_PHONE": "Invalid phone number.",
     "INVALID_EMAIL": "Invalid email.",
-    "NOT_FOUND_EMAIL": "Email not found for verification.",
-    "NULL_OTP": "Please enter OTP code.",
 
     "ADDRESS_NOT_FOUND": "Address not found.",
     "ADDRESS_ID_MISMATCH": "Address ID does not match.",
     "ADDRESS_MAX": "You can only add up to 5 addresses.",
-    "NETWORK_ERROR": "Unable to connect to server, please try again later!",
+    "NETWORK_ERROR": "Cannot connect to the server, please try again later!",
 
-    "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
+    "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
-    "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service request ontime!",
+    "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
     "MATERIAL_NOT_FOUND": "Material not found.",
-    "IMAGE_NOT_FOUND": "Image not found",
-    "SERVICE_NOT_FOUND": "Service not found.",
+    "IMAGE_NOT_FOUND": "Image not found.",
+    "NOT_FOUND_EMAIL": "Email for verification not found.",
 
-    "REQUIRED_BRANDNAME": "Please enter brand name.",
-    "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
-    "REQUIRED_CATEGORYNAME": "Please enter category name.",
+    "REQUIRED_BRANDNAME": "Please enter the brand name.",
+    "REQUIRED_BRANDLOGO": "Please upload the brand logo.",
+    "REQUIRED_CATEGORYNAME": "Please enter the category name.",
     "REQUIRED_MATERIAL_NAME": "Please enter the material name.",
-    "REQUIRED_MATERIAL_IMAGES": "Please upload a material image.",
+    "REQUIRED_MATERIAL_IMAGES": "Please upload material images.",
     "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
-    "REQUIRED_ADDRESS": "Please provide address information before create service request!",
-    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please choose address",
-    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please fill in more description for best search results",
+    "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
+    "REQUIRD_REJECT_REASON":"Please enter reject reason",
+
+    "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
+    "PARTNER_REQUEST_APPROVED": "This email has already been approved as a partner or has registered an account!",
+    "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
-    "LOAD_ERROR": "Failed to load data, please try again later.",
-    "SUBMIT_ERROR": "Failed to submit data, please try again later.",
-    "DELETE_ERROR": "Failed to delete, please try again later.",
-    "UPDATE_ERROR": "Failed to update, please try again later."
+    "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
+    "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
+    "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
+    "UPDATE_ERROR": "An error occurred while updating. Please try again later."
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -991,7 +894,9 @@
     "SERVICE_ADD": "Add service successfully.",
     "SERVICE_UPDATE": "Service updated successfully.",
     "SERVICE_REQUEST_ADD": "Add service request successfully.",
-    "SERVICE_REQUEST_UPDATE": "Service request updated successfully."
+    "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
+    "REJECT": "Request successfully rejected",
+    "APPROVE": "Request successfully approved"
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1048,7 +953,9 @@
     },
     "PartnerType":{
       "Distributor":"Distributor",
-      "Contractor": "Contractor"
+      "DistributorDescription": "Providing construction materials",      
+      "Contractor": "Contractor",
+      "ContractorDescription" :"Providing construction/repair solutions"
     }
   },
   "toast": {

@@ -54,7 +54,6 @@ public class FacadeService : IFacadeService
             coreDeps.UnitOfWork,
             coreDeps.Mapper,
             identityDeps.UserManager,
-            identityDeps.RoleManager,
             infraDeps.EmailQueue
         );
     }

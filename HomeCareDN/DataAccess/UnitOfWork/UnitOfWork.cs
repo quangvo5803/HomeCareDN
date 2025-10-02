@@ -26,7 +26,7 @@ namespace DataAccess.UnitOfWork
         public IConversationRepository ConversationRepository { get; private set; }
         public IChatMessageRepository ChatMessageRepository { get; private set; }
         public IContactSupportRepository ContactSupportRepository { get; private set; }
-        public IPartnerRepository PartnerRepository { get; private set; }
+        public IPartnerRequestRepository PartnerRequestRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
         {
@@ -41,7 +41,7 @@ namespace DataAccess.UnitOfWork
             ConversationRepository = new ConversationRepository(_db);
             ChatMessageRepository = new ChatMessageRepository(_db);
             ContactSupportRepository = new ContactSupportRepository(_db);
-            PartnerRepository = new PartnerRequestRepository(_db);
+            PartnerRequestRepository = new PartnerRequestRepository(_db);
         }
 
         public async Task SaveAsync()

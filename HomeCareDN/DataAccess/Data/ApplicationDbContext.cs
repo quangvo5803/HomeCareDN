@@ -58,7 +58,7 @@ namespace DataAccess.Data
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PartnerRequest>(entity =>
             {
-                entity.Property(p => p.PartnerType).HasConversion<string>();
+                entity.Property(p => p.PartnerRequestType).HasConversion<string>();
                 entity.Property(p => p.Status).HasConversion<string>();
             });
             base.OnModelCreating(modelBuilder);

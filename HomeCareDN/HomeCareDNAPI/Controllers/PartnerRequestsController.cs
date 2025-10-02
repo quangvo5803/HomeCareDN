@@ -16,24 +16,13 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpPost("create-partner")]
+        [HttpPost("create-partner-request")]
         public async Task<IActionResult> CreatePartner(
             [FromForm] PartnerRequestCreateRequestDto request
         )
         {
-            try
-            {
-                var partner = await _facadeService.PartnerService.CreatePartnerAsync(request);
-                return Ok(partner);
-            }
-            catch (CustomValidationException ex)
-            {
-                return BadRequest(ex.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var partner = await _facadeService.PartnerService.CreatePartnerRequestAsync(request);
+            return Ok(partner);
         }
     }
 }

@@ -21,83 +21,39 @@ namespace HomeCareDNAPI.Controllers.Admin
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-partners")]
+        [HttpGet("get-all-partner-requests")]
         public async Task<IActionResult> GetAllPartners([FromQuery] QueryParameters parameters)
         {
-            var result = await _facadeService.PartnerService.GetAllPartnersAsync(parameters);
+            var result = await _facadeService.PartnerService.GetAllPartnerRequestsAsync(parameters);
             return Ok(result);
         }
 
-        [HttpGet("get-partner/{id:guid}")]
+        [HttpGet("get-partner-request/{id:guid}")]
         public async Task<IActionResult> GetPartnerById(Guid id)
         {
-            try
-            {
-                var partner = await _facadeService.PartnerService.GetPartnerByIdAsync(id);
-                return Ok(partner);
-            }
-            catch (CustomValidationException ex)
-            {
-                return BadRequest(ex.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var partner = await _facadeService.PartnerService.GetPartnerRequestByIdAsync(id);
+            return Ok(partner);
         }
 
-        [HttpPut("approve-partner")]
-        public async Task<IActionResult> ApprovePartner([FromBody] ApprovePartnerRequestDto request)
+        [HttpPut("approve-partner-request/{id:guid}")]
+        public async Task<IActionResult> ApprovePartner(Guid id)
         {
-            try
-            {
-                var partner = await _facadeService.PartnerService.ApprovePartnerAsync(request);
-                return Ok(partner);
-            }
-            catch (CustomValidationException ex)
-            {
-                return BadRequest(ex.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var partner = await _facadeService.PartnerService.ApprovePartnerRequestAsync(id);
+            return Ok(partner);
         }
 
-        [HttpPut("reject-partner")]
+        [HttpPut("reject-partner-request")]
         public async Task<IActionResult> RejectPartner([FromBody] RejectPartnerRequestDto request)
         {
-            try
-            {
-                var partner = await _facadeService.PartnerService.RejectPartnerAsync(request);
-                return Ok(partner);
-            }
-            catch (CustomValidationException ex)
-            {
-                return BadRequest(ex.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var partner = await _facadeService.PartnerService.RejectPartnerRequestAsync(request);
+            return Ok(partner);
         }
 
-        [HttpDelete("delete-partner/{id:guid}")]
+        [HttpDelete("delete-partner-request/{id:guid}")]
         public async Task<IActionResult> DeletePartner(Guid id)
         {
-            try
-            {
-                await _facadeService.PartnerService.DeletePartnerAsync(id);
-                return NoContent();
-            }
-            catch (CustomValidationException ex)
-            {
-                return BadRequest(ex.Errors);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            await _facadeService.PartnerService.DeletePartnerRequestAsync(id);
+            return NoContent();
         }
     }
 }

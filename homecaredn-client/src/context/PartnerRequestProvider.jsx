@@ -19,7 +19,7 @@ export const PartnerRequestProvider = ({ children }) => {
       PageSize = 10,
       SortBy,
       FilterID,
-      FilterPartnerStatus,
+      FilterPartnerRequestStatus,
       Search,
     } = {}) => {
       try {
@@ -29,7 +29,7 @@ export const PartnerRequestProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
-          FilterPartnerStatus,
+          FilterPartnerRequestStatus,
           Search,
         });
         const items = data?.items || [];
@@ -48,10 +48,26 @@ export const PartnerRequestProvider = ({ children }) => {
     []
   );
 
+  const createPartnerRequest = useCallback(async (partnerRequestData) => {
+    try {
+      setLoading(true);
+      const newPartnerRequest =
+        await partnerRequestService.createPartnerRequest(partnerRequestData);
+      // Tăng tổng số material
+      setPartnerRequests((prev) => [...prev, newPartnerRequest]);
+      setTotalPartnerRequests((prev) => prev + 1);
+      return newPartnerRequest;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   /** Public: lấy chi tiết */
   const getPartnerRequestById = useCallback(
     async (id) => {
-      const local = partnerRequests.find((p) => p.partnerID === id);
+      const local = partnerRequests.find((p) => p.partnerRequestID === id);
       if (local) return local;
       try {
         return await partnerRequestService.getPartnerRequestById(id);
@@ -65,17 +81,18 @@ export const PartnerRequestProvider = ({ children }) => {
 
   /** Admin: duyệt */
   const approvePartnerRequest = useCallback(
-    async ({ partnerID, approvedUserId }) => {
+    async ({ PartnerRequestID }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
         const updated = await partnerRequestService.approvePartnerRequest({
-          partnerID,
-          approvedUserId,
+          PartnerRequestID,
         });
         setPartnerRequests((prev) =>
           prev.map((p) =>
-            p.partnerID === updated.partnerID ? { ...p, ...updated } : p
+            p.partnerRequestID === updated.partnerRequestID
+              ? { ...p, ...updated }
+              : p
           )
         );
         return updated;
@@ -91,17 +108,18 @@ export const PartnerRequestProvider = ({ children }) => {
 
   /** Admin: từ chối */
   const rejectPartnerRequest = useCallback(
-    async ({ partnerID, rejectionReason }) => {
+    async (rejectData) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await partnerRequestService.rejectPartnerReuquest({
-          partnerID,
-          rejectionReason,
-        });
+        const updated = await partnerRequestService.rejectPartnerRequest(
+          rejectData
+        );
         setPartnerRequests((prev) =>
           prev.map((p) =>
-            p.partnerID === updated.partnerID ? { ...p, ...updated } : p
+            p.partnerRequestID === updated.partnerRequestID
+              ? { ...p, ...updated }
+              : p
           )
         );
         return updated;
@@ -138,6 +156,7 @@ export const PartnerRequestProvider = ({ children }) => {
       loading,
       fetchPartnerRequests,
       getPartnerRequestById,
+      createPartnerRequest,
       approvePartnerRequest,
       rejectPartnerRequest,
       deletePartnerRequest,
@@ -148,6 +167,7 @@ export const PartnerRequestProvider = ({ children }) => {
       loading,
       fetchPartnerRequests,
       getPartnerRequestById,
+      createPartnerRequest,
       approvePartnerRequest,
       rejectPartnerRequest,
       deletePartnerRequest,

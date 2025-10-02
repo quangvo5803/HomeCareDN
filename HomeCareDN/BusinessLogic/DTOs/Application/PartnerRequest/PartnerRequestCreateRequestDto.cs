@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.Partner
 {
     public class PartnerRequestCreateRequestDto
     {
         [Required]
-        public required string PartnerType { get; set; } = default!;
-
-        [Required, MaxLength(255)]
-        public required string FullName { get; set; } = default!;
+        public PartnerRequestType PartnerRequestType { get; set; } = default!;
 
         [Required, MaxLength(255)]
         public required string CompanyName { get; set; } = default!;

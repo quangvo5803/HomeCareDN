@@ -1,66 +1,75 @@
 import api from '../api';
-
+const appendIf = (fd, key, value) => {
+  if (value !== undefined && value !== null && value !== '') {
+    fd.append(key, value);
+  }
+};
 export const partnerRequestService = {
-  createPartnerRequest: async (partnerData) => {
-    const fd = new FormData();
-    fd.append('PartnerType', String(partnerData.partnerType).trim());
-    fd.append(
-      'FullName',
-      String(partnerData.fullName || partnerData.FullName || '').trim()
+  createPartnerRequest: async (partnerRequestData) => {
+    const formData = new FormData();
+    appendIf(
+      formData,
+      'PartnerRequestType',
+      partnerRequestData.PartnerRequestType
     );
-    fd.append('CompanyName', String(partnerData.companyName).trim());
-    fd.append('Email', String(partnerData.email).trim().toLowerCase());
-    fd.append('PhoneNumber', String(partnerData.phoneNumber).trim());
-    fd.append(
-      'Description',
-      partnerData.description ? String(partnerData.description).trim() : ''
+    appendIf(formData, 'CompanyName', partnerRequestData.CompanyName);
+    appendIf(formData, 'Email', partnerRequestData.Email);
+    appendIf(formData, 'PhoneNumber', partnerRequestData.PhoneNumber);
+    appendIf(formData, 'Description', partnerRequestData.Description);
+
+    (partnerRequestData.ImageUrls || []).forEach((ImageUrls) =>
+      formData.append('ImageUrls', ImageUrls)
+    );
+    (partnerRequestData.ImagePublicIds || []).forEach((ImagePublicIds) =>
+      formData.append('ImagePublicIds', ImagePublicIds)
     );
 
-    const imageUrls = partnerData.imageUrls ?? [];
-    const imagePublicIds = partnerData.imagePublicIds ?? [];
-
-    for (const url of imageUrls) {
-      fd.append('ImageUrls', url);
-    }
-
-    for (const publicId of imagePublicIds) {
-      fd.append('ImagePublicIds', publicId);
-    }
-
-    const res = await api.post('/PartnerRequests/create-partner', fd);
+    const res = await api.post(
+      '/PartnerRequests/create-partner-request',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    );
     return res.data;
   },
 
   getAllPartnerRequests: async (params = {}) => {
-    const res = await api.get('/AdminPartnerRequests/get-all-partners', {
-      params,
-    });
+    const res = await api.get(
+      '/AdminPartnerRequests/get-all-partner-requests',
+      {
+        params,
+      }
+    );
     return res.data;
   },
 
   getPartnerRequestById: async (id) => {
-    const res = await api.get(`/AdminPartnerRequests/get-partner/${id}`);
+    const res = await api.get(
+      `/AdminPartnerRequests/get-partner-request/${id}`
+    );
     return res.data;
   },
 
-  approvePartnerRequest: async ({ partnerID, approvedUserId }) => {
-    const res = await api.put('/AdminPartnerRequests/approve-partner', {
-      partnerID,
-      approvedUserId,
-    });
+  approvePartnerRequest: async (id) => {
+    const res = await api.put(
+      `/AdminPartnerRequests/approve-partner-request/${id}`
+    );
     return res.data;
   },
 
-  rejectPartnerRequest: async ({ partnerID, rejectionReason }) => {
-    const res = await api.put('/AdminPartnerRequests/reject-partner', {
-      partnerID,
-      rejectionReason,
-    });
+  rejectPartnerRequest: async (rejectData) => {
+    const res = await api.put(
+      '/AdminPartnerRequests/reject-partner-request',
+      rejectData
+    );
     return res.data;
   },
 
   deletePartnerRequest: async (id) => {
-    const res = await api.delete(`/AdminPartner/delete-partner/${id}`);
+    const res = await api.delete(
+      `/AdminPartnerRequests/delete-partner-request/${id}`
+    );
     return res.data;
   },
 };

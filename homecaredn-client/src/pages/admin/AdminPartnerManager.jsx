@@ -6,8 +6,10 @@ import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { useEnums } from '../../hook/useEnums';
 import PartnerRequestModal from '../../components/modal/PartnerRequestModal';
 import Loading from '../../components/Loading';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useDebounce } from 'use-debounce';
 import i18n from '../../configs/i18n';
+import { toast } from 'react-toastify';
 
 export default function AdminPartnerManager() {
   const { t } = useTranslation();
@@ -18,6 +20,7 @@ export default function AdminPartnerManager() {
     partnerRequests,
     totalPartnerRequests,
     loading,
+    deletePartnerRequest,
     fetchPartnerRequests,
   } = usePartnerRequest();
 
@@ -45,6 +48,26 @@ export default function AdminPartnerManager() {
   const partnerTypeColors = {
     Contractor: 'bg-blue-100 text-blue-800',
     Distributor: 'bg-purple-100 text-purple-800',
+  };
+
+  const handleDelete = async (id) => {
+    showDeleteModal({
+      t,
+      titleKey: 'ModalPopup.DeleteBrandModal.title',
+      textKey: 'ModalPopup.DeleteBrandModal.text',
+      onConfirm: async () => {
+        await deletePartnerRequest(id);
+
+        const lastPage = Math.ceil((totalPartnerRequests - 1) / pageSize);
+        if (currentPage > lastPage) {
+          setCurrentPage(lastPage || 1);
+        } else {
+          fetchPartnerRequests({ PageNumber: currentPage, PageSize: pageSize });
+        }
+
+        toast.success(t('SUCCESS.DELETE'));
+      },
+    });
   };
   if (loading) return <Loading />;
 
@@ -100,7 +123,7 @@ export default function AdminPartnerManager() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('common.search')}
+                placeholder={t('adminPartnerManager.searchPlaceholder')}
                 className="px-3 py-2 text-sm border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -117,22 +140,19 @@ export default function AdminPartnerManager() {
                       #
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      {t('partner.full_name')}
-                    </th>
-                    <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      {t('partner.company_name')}
+                      {t('adminPartnerManager.companyName')}
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       Email
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      {t('partner.phone_number')}
+                      {t('adminPartnerManager.phoneNumber')}
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      {t('partner.type')}
+                      {t('adminPartnerManager.partnerRequestType')}
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      {t('common.status')}
+                      {t('adminPartnerManager.status')}
                     </th>
                     <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminServiceManager.action')}
@@ -144,7 +164,7 @@ export default function AdminPartnerManager() {
                     partnerRequests.map((p, idx) => {
                       return (
                         <tr
-                          key={p.partnerID}
+                          key={p.partnerRequestID}
                           className={`hover:bg-gray-50 transition-colors duration-150 ${
                             idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
                           }`}
@@ -154,11 +174,7 @@ export default function AdminPartnerManager() {
                               {(currentPage - 1) * pageSize + idx + 1}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-center align-middle">
-                            <div className="text-sm font-medium text-gray-900">
-                              {p.fullName}
-                            </div>
-                          </td>
+
                           <td className="px-6 py-4 text-center align-middle">
                             <div className="text-sm text-gray-900">
                               {p.companyName}
@@ -179,11 +195,11 @@ export default function AdminPartnerManager() {
                           <td className="px-6 py-4 text-center align-middle">
                             <span
                               className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                partnerTypeColors[p.partnerType] ||
+                                partnerTypeColors[p.partnerRequestType] ||
                                 'bg-gray-100 text-gray-800'
                               }`}
                             >
-                              {t(`Enums.PartnerType.${p.partnerType}`)}
+                              {t(`Enums.PartnerType.${p.partnerRequestType}`)}
                             </span>
                           </td>
 
@@ -196,10 +212,19 @@ export default function AdminPartnerManager() {
                             <button
                               type="button"
                               onClick={() => setSelected(p)}
-                              className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+                              className="mr-2 inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
                             >
                               {t('BUTTON.View')}
                             </button>
+                            {p?.status === 'Rejected' && (
+                              <button
+                                type="button"
+                                onClick={() => handleDelete(p.partnerRequestID)}
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors duration-150"
+                              >
+                                {t('BUTTON.Delete')}
+                              </button>
+                            )}
                           </td>
                         </tr>
                       );
@@ -256,7 +281,7 @@ export default function AdminPartnerManager() {
       <PartnerRequestModal
         isOpen={!!selected}
         onClose={() => setSelected(null)}
-        partner={selected}
+        partnerRequest={selected}
       />
     </div>
   );

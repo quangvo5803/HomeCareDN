@@ -16,7 +16,7 @@ namespace BusinessLogic.DTOs.Application
         public BuildingType? FilterBuildingType { get; set; }
         public MainStructureType? FilterMainStructureType { get; set; }
         public DesignStyle? FilterDesignStyle { get; set; }
-        public PartnerStatus? FilterPartnerStatus { get; set; }
+        public PartneRequestrStatus? FilterPartnerRequestStatus { get; set; }
 
         public Guid? FilterCategoryID { get; set; }
         public Guid? FilterBrandID { get; set; }

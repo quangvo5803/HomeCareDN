@@ -1,18 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities.Authorize;
 
 namespace DataAccess.Entities.Application
 {
     public class PartnerRequest
     {
         [Key]
-        public Guid PartnerID { get; set; } = Guid.NewGuid();
+        public Guid PartnerRequestID { get; set; } = Guid.NewGuid();
 
         [Required]
-        public required string FullName { get; set; }
-
-        [Required]
-        public PartnerType PartnerType { get; set; }
+        public PartnerRequestType PartnerRequestType { get; set; }
 
         [Required, MaxLength(255)]
         public string CompanyName { get; set; } = default!;
@@ -27,17 +23,15 @@ namespace DataAccess.Entities.Application
         public string? Description { get; set; }
 
         [Required]
-        public PartnerStatus Status { get; set; } = PartnerStatus.Pending;
+        public PartneRequestrStatus Status { get; set; } = PartneRequestrStatus.Pending;
 
         [MaxLength(500)]
         public string? RejectionReason { get; set; }
-        public string? ApprovedUserId { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ApplicationUser? AccountUser { get; set; }
         public ICollection<Image>? Images { get; set; } = new List<Image>();
     }
 
-    public enum PartnerType
+    public enum PartnerRequestType
     {
         [Display(Name = "Distributor")]
         Distributor,
@@ -46,7 +40,7 @@ namespace DataAccess.Entities.Application
         Contractor,
     }
 
-    public enum PartnerStatus
+    public enum PartneRequestrStatus
     {
         [Display(Name = "Pending")]
         Pending,

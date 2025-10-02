@@ -5,12 +5,13 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IPartnerRequestService
     {
-        Task<PagedResultDto<PartnerRequestDto>> GetAllPartnersAsync(QueryParameters parameters);
-        Task<PartnerRequestDto> GetPartnerByIdAsync(Guid partnerId);
-        Task<PartnerRequestDto> CreatePartnerAsync(PartnerRequestCreateRequestDto request);
-        Task<PartnerRequestDto> ApprovePartnerAsync(ApprovePartnerRequestDto request);
-        Task<PartnerRequestDto> RejectPartnerAsync(RejectPartnerRequestDto request);
-        Task DeletePartnerAsync(Guid partnerId);
-        Task ValidateLoginAllowedAsync(string email);
+        Task<PagedResultDto<PartnerRequestDto>> GetAllPartnerRequestsAsync(
+            QueryParameters parameters
+        );
+        Task<PartnerRequestDto> GetPartnerRequestByIdAsync(Guid partnerRequestID);
+        Task<PartnerRequestDto> CreatePartnerRequestAsync(PartnerRequestCreateRequestDto request);
+        Task<PartnerRequestDto> ApprovePartnerRequestAsync(Guid partnerRequestID);
+        Task<PartnerRequestDto> RejectPartnerRequestAsync(RejectPartnerRequestDto request);
+        Task DeletePartnerRequestAsync(Guid partnerRequestId);
     }
 }

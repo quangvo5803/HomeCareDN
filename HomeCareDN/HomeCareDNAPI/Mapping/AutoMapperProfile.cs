@@ -81,8 +81,6 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            CreateMap<ApprovePartnerRequestDto, PartnerRequest>();
-            CreateMap<RejectPartnerRequestDto, PartnerRequest>();
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -281,11 +279,6 @@ namespace HomeCareDNAPI.Mapping
             // Partner
             CreateMap<PartnerRequest, PartnerRequestDto>()
                 .ForMember(
-                    d => d.PartnerType,
-                    opt => opt.MapFrom(s => s.PartnerType.GetDisplayName())
-                )
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.GetDisplayName()))
-                .ForMember(
                     d => d.ImageUrls,
                     opt =>
                         opt.MapFrom(s =>
@@ -316,8 +309,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<PartnerType, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<PartnerStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartnerRequestType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

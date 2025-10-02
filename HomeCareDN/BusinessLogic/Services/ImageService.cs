@@ -19,17 +19,11 @@ namespace BusinessLogic.Services
                 img.ImageUrl == imageUrl
             );
 
-            if (request == null)
+            if (request != null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "ImageUrl", new[] { "IMAGE_NOT_FOUND" } },
-                };
-                throw new CustomValidationException(errors);
+                await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
+                await _unitOfWork.SaveAsync();
             }
-
-            await _unitOfWork.ImageRepository.DeleteImageAsync(request.PublicId);
-            await _unitOfWork.SaveAsync();
         }
     }
 }
