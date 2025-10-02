@@ -108,7 +108,7 @@ export default function PartnerRegistration() {
       setUploadProgress(0);
     }
     await createPartnerRequest(payload);
-    toast.success('SUCCESS.SERVICE_REQUEST_ADD');
+    toast.success(t('SUCCESS.PARTNER_REQUEST_ADD'));
     navigate('/Login');
   };
   if (loading) return <Loading />;

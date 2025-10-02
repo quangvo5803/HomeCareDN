@@ -24,9 +24,8 @@ namespace BusinessLogic.Services
 
         private const string PARTNER_REQUEST = "PartnerRequest";
         private const string ERROR_PARTNER_REQUEST_NOT_FOUND = "PARTNER_REQUEST_NOT_FOUND";
-        private const string ERROR_PARTNER_REQUEST_APPROVED = "PARTNER_REQUEST_APPROVED";
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
-
+        private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
         private const string PARTNER_REQUEST_INCLUDES = "Images";
 
         public PartnerRequestService(
@@ -114,27 +113,47 @@ namespace BusinessLogic.Services
         {
             try
             {
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user != null)
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { PARTNER_REQUEST, new[] { "REGISTER_ALREADY_EXISTS" } },
+                        }
+                    );
+                }
                 var existing = (
                     await _unitOfWork.PartnerRequestRepository.GetAllAsync()
                 ).FirstOrDefault(p => p.Email == request.Email);
 
                 if (existing != null)
                 {
-                    if (existing.Status == PartneRequestrStatus.Approved)
-                        throw new CustomValidationException(
-                            new Dictionary<string, string[]>
-                            {
-                                { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_APPROVED } },
-                            }
-                        );
+                    switch (existing.Status)
+                    {
+                        case PartneRequestrStatus.Pending:
+                            throw new CustomValidationException(
+                                new Dictionary<string, string[]>
+                                {
+                                    { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_PENDING } },
+                                }
+                            );
 
-                    if (existing.Status == PartneRequestrStatus.Pending)
-                        throw new CustomValidationException(
-                            new Dictionary<string, string[]>
+                        case PartneRequestrStatus.Rejected:
+                            if (existing.CreatedAt.AddDays(3) > DateTime.UtcNow)
                             {
-                                { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_PENDING } },
+                                throw new CustomValidationException(
+                                    new Dictionary<string, string[]>
+                                    {
+                                        {
+                                            PARTNER_REQUEST,
+                                            new[] { ERROR_PARTNER_REQUEST_REJECTED }
+                                        },
+                                    }
+                                );
                             }
-                        );
+                            break;
+                    }
                 }
 
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);

@@ -864,7 +864,7 @@
     "REQUIRD_REJECT_REASON":"Vui lòng nhập lí do từ chối",
 
     "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
-    "PARTNER_REQUEST_APPROVED": "Email này đã được duyệt làm đối tác hoặc đã đăng kí tài khoản!",
+    "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
     "PARTNER_REQUEST_PENDING": "Email này đã tạo đơn yêu cầu và đang trong thời gian xét duyệt!",
 
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
@@ -892,6 +892,7 @@
     "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
     "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
     "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
+    "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu"
   },

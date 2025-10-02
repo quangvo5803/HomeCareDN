@@ -867,7 +867,7 @@
     "REQUIRD_REJECT_REASON":"Please enter reject reason",
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
-    "PARTNER_REQUEST_APPROVED": "This email has already been approved as a partner or has registered an account!",
+    "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
     "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
@@ -895,6 +895,7 @@
     "SERVICE_UPDATE": "Service updated successfully.",
     "SERVICE_REQUEST_ADD": "Add service request successfully.",
     "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
+    "PARTNER_REQUEST_ADD": "Create partner register request successfully",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved"
   },

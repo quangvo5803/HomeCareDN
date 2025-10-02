@@ -81,13 +81,13 @@ export const PartnerRequestProvider = ({ children }) => {
 
   /** Admin: duyệt */
   const approvePartnerRequest = useCallback(
-    async ({ PartnerRequestID }) => {
+    async (PartnerRequestID) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await partnerRequestService.approvePartnerRequest({
-          PartnerRequestID,
-        });
+        const updated = await partnerRequestService.approvePartnerRequest(
+          PartnerRequestID
+        );
         setPartnerRequests((prev) =>
           prev.map((p) =>
             p.partnerRequestID === updated.partnerRequestID
@@ -139,7 +139,9 @@ export const PartnerRequestProvider = ({ children }) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         await partnerRequestService.deletePartnerRequest(id);
-        setPartnerRequests((prev) => prev.filter((p) => p.partnerID !== id));
+        setPartnerRequests((prev) =>
+          prev.filter((p) => p.partnerRequestID !== id)
+        );
         setTotalPartnerRequests((prev) => Math.max(0, prev - 1));
       } catch (err) {
         toast.error(handleApiError(err));
