@@ -37,7 +37,6 @@ api.interceptors.response.use(
       if (!originalRequest._networkHandled) {
         originalRequest._networkHandled = true;
         toast.error('Không thể kết nối tới server, vui lòng thử lại sau!');
-        console.warn('API unreachable');
       }
       error.handled = true;
       throw error;
