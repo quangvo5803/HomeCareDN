@@ -958,5 +958,8 @@
   },
   "toast": {
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
+  },
+  "common":{
+    "search":"Tìm kiếm..."
   }
 }

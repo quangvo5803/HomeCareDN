@@ -961,5 +961,8 @@
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
+  },
+  "common":{
+    "search":"Search..."
   }
 }

@@ -178,7 +178,7 @@ export default function AdminMaterialManager() {
               />
             </div>
             <button
-              className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => {
                 if (brands.length === 0 || categories.length === 0) {
                   toast.error(t('adminMaterialManager.noBrandAndService'));
