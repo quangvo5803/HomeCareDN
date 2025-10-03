@@ -26,6 +26,18 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.CategoryRepository.GetQueryable(
                 includeProperties: "Materials,LogoImage"
             );
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                string searchLower = parameters.Search.ToLower();
+                query = query.Where(c =>
+                    c.CategoryName.ToLower().Contains(searchLower)
+                    || (
+                        !string.IsNullOrEmpty(c.CategoryNameEN)
+                        && c.CategoryNameEN.ToLower().Contains(searchLower)
+                    )
+                );
+            }
             if (parameters.FilterID.HasValue)
             {
                 query = query.Where(c => c.UserID == parameters.FilterID);
@@ -135,7 +147,7 @@ namespace BusinessLogic.Services
                 var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
-                    CategoryID = category.CategoryLogoID,
+                    CategoryID = category.CategoryID,
                     ImageUrl = requestDto.CategoryLogoUrl,
                     PublicId = requestDto.CategoryLogoPublicId,
                 };

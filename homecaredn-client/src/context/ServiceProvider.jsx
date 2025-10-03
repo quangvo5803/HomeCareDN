@@ -23,6 +23,7 @@ export const ServiceProvider = ({ children }) => {
       FilterBuildingType,
       FilterMainStructureType,
       FilterDesignStyle,
+      Search,
     } = {}) => {
       try {
         setLoading(true);
@@ -36,6 +37,7 @@ export const ServiceProvider = ({ children }) => {
           FilterBuildingType,
           FilterMainStructureType,
           FilterDesignStyle,
+          Search,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -57,17 +59,17 @@ export const ServiceProvider = ({ children }) => {
   );
 
   // 📌 Public: get by id
-  const getServiceById = useCallback(
-    async (id) => {
-      try {
-        return await serviceService.getServiceById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    []
-  );
+  const getServiceById = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      return await serviceService.getServiceById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // 📌 Admin-only: create
   const createService = useCallback(
@@ -100,10 +102,10 @@ export const ServiceProvider = ({ children }) => {
           prev.map((s) =>
             s.serviceID === updated.serviceID
               ? {
-                  ...s,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? s.imageUrls,
-                }
+                ...s,
+                ...updated,
+                imageUrls: updated.imageUrls ?? s.imageUrls,
+              }
               : s
           )
         );

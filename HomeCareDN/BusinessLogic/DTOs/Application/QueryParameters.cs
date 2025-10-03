@@ -10,12 +10,13 @@ namespace BusinessLogic.DTOs.Application
         // mở rộng
         public Guid? FilterID { get; set; }
 
-        //filter 5 enum
+        //filter 6 enum
         public ServiceType? FilterServiceType { get; set; }
         public PackageOption? FilterPackageOption { get; set; }
         public BuildingType? FilterBuildingType { get; set; }
         public MainStructureType? FilterMainStructureType { get; set; }
         public DesignStyle? FilterDesignStyle { get; set; }
+        public PartneRequestrStatus? FilterPartnerRequestStatus { get; set; }
 
         public Guid? FilterCategoryID { get; set; }
         public Guid? FilterBrandID { get; set; }

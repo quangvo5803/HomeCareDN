@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.Partner
 {
-    public class PartnerDto
+    public class PartnerRequestDto
     {
-        public Guid PartnerID { get; set; }
+        public Guid PartnerRequestID { get; set; }
         public required string FullName { get; set; }
 
-        public required string PartnerType { get; set; } = default!;
+        public required string PartnerRequestType { get; set; }
 
         public required string CompanyName { get; set; } = default!;
 
@@ -21,8 +17,7 @@ namespace BusinessLogic.DTOs.Application.Partner
 
         public string? Description { get; set; }
 
-        public string Status { get; set; } = default!;
-
+        public required string Status { get; set; }
         public string? RejectionReason { get; set; }
 
         public string? ApprovedUserId { get; set; }

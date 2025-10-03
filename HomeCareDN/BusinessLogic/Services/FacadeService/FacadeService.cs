@@ -14,7 +14,7 @@ public class FacadeService : IFacadeService
     public IConversationService ConversationService { get; }
     public IContactSupportService ContactSupportService { get; }
     public IImageService ImageService { get; }
-    public IPartnerService PartnerService { get; }
+    public IPartnerRequestService PartnerService { get; }
 
     public FacadeService(
         CoreDependencies coreDeps,
@@ -28,7 +28,11 @@ public class FacadeService : IFacadeService
             coreDeps.AuthorizeDbContext
         );
 
-        MaterialService = new MaterialService(coreDeps.UnitOfWork, coreDeps.Mapper);
+        MaterialService = new MaterialService(
+            coreDeps.UnitOfWork,
+            coreDeps.Mapper,
+            identityDeps.UserManager
+        );
         ServiceService = new ServicesService(coreDeps.UnitOfWork, coreDeps.Mapper);
         ContractorApplicationService = new ContractorApplicationService(
             coreDeps.UnitOfWork,
@@ -46,11 +50,10 @@ public class FacadeService : IFacadeService
         );
         ImageService = new ImageService(coreDeps.UnitOfWork);
 
-        PartnerService = new PartnerService(
+        PartnerService = new PartnerRequestService(
             coreDeps.UnitOfWork,
             coreDeps.Mapper,
             identityDeps.UserManager,
-            identityDeps.RoleManager,
             infraDeps.EmailQueue
         );
     }

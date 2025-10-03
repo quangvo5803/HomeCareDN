@@ -3,9 +3,12 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -14,16 +17,22 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const string MATERIAL = "Material";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MaterialService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(
@@ -33,6 +42,13 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
             );
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                var searchUpper = parameters.Search.ToUpper();
+
+                query = query.Where(SearchMaterial(searchUpper));
+            }
+
             if (parameters.FilterCategoryID.HasValue)
             {
                 query = query.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
@@ -49,7 +65,7 @@ namespace BusinessLogic.Services
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
                 "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
+                "random" => query.OrderBy(b => b.MaterialID),
                 _ => query.OrderBy(m => m.NameEN ?? m.Name),
             };
             query = query
@@ -57,9 +73,15 @@ namespace BusinessLogic.Services
                 .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -88,9 +110,15 @@ namespace BusinessLogic.Services
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
                 .ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -276,6 +304,22 @@ namespace BusinessLogic.Services
                 .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
+        }
+
+        private static Expression<Func<Material, bool>> SearchMaterial(string searchUpper)
+        {
+            return b =>
+                (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.Description) && b.Description.ToUpper().Contains(searchUpper))
+                || (b.Brand != null && (
+                       (!string.IsNullOrEmpty(b.Brand.BrandName) && b.Brand.BrandName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Brand.BrandNameEN) && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper))
+                ))
+                || (b.Category != null && (
+                       (!string.IsNullOrEmpty(b.Category.CategoryName) && b.Category.CategoryName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Category.CategoryNameEN) && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper))
+                ));
         }
     }
 }

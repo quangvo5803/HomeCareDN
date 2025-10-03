@@ -142,10 +142,10 @@ export default function ServiceRequestCreateUpdate() {
     if (serviceRequestId) {
       payload.ServiceRequestID = serviceRequestId;
       updateServiceRequest(payload);
-      toast.success('SUCCESS.SERVICE_REQUEST_UPDATE');
+      toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
     } else {
       createServiceRequest(payload);
-      toast.success('SUCCESS.SERVICE_REQUEST_ADD');
+      toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
     }
     navigate('/Customer/Profile', {
       state: { tab: 'service_requests' },
