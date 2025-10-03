@@ -14,10 +14,10 @@ export const BrandProvider = ({ children }) => {
 
   // 📌 Public: fetch all brands pagination
   const fetchBrands = useCallback(
-    async ({ PageNumber = 1, PageSize = 10 } = {}) => {
+    async ({ PageNumber = 1, PageSize = 10, Search, } = {}) => {
       try {
         setLoading(true);
-        const data = await brandService.getAllBrands({ PageNumber, PageSize });
+        const data = await brandService.getAllBrands({ PageNumber, PageSize, Search });
         setBrands(data.items || []);
         setTotalBrands(data.totalCount || 0);
         return data;

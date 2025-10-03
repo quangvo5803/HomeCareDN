@@ -21,6 +21,7 @@ export const MaterialProvider = ({ children }) => {
       FilterID,
       FilterCategoryID,
       FilterBrandID,
+      Search,
     } = {}) => {
       try {
         setLoading(true);
@@ -31,6 +32,7 @@ export const MaterialProvider = ({ children }) => {
           FilterID,
           FilterCategoryID,
           FilterBrandID,
+          Search,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -121,10 +123,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                  ...m,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? m.imageUrls,
-                }
+                ...m,
+                ...updated,
+                imageUrls: updated.imageUrls ?? m.imageUrls,
+              }
               : m
           )
         );

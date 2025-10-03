@@ -291,7 +291,7 @@ export default function AdminMaterialManager() {
                                   />
                                 )}
                               </div>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-black">
                                 {i18n.language === 'vi'
                                   ? m.name
                                   : m.nameEN || m.name}
@@ -299,25 +299,25 @@ export default function AdminMaterialManager() {
                             </div>
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.brandName
                               : m.brandNameEN || m.brandName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.categoryName
                               : m.categoryNameEN || m.categoryName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.unit
                               : m.unitEN || m.unit}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             <span className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-md ">
                               {displayName}
                             </span>
