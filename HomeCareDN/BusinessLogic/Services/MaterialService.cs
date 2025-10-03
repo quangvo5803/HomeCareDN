@@ -46,7 +46,7 @@ namespace BusinessLogic.Services
             {
                 var searchUpper = parameters.Search.ToUpper();
 
-                query = query.Where(BuildSearchPredicate(searchUpper));
+                query = query.Where(SearchMaterial(searchUpper));
             }
 
             if (parameters.FilterCategoryID.HasValue)
@@ -306,12 +306,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private static bool ContainsSafe(string? source, string searchUpper)
-        {
-            return !string.IsNullOrEmpty(source) && source.ToUpper().Contains(searchUpper);
-        }
-
-        private static Expression<Func<Material, bool>> BuildSearchPredicate(string searchUpper)
+        private static Expression<Func<Material, bool>> SearchMaterial(string searchUpper)
         {
             return b =>
                 (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
