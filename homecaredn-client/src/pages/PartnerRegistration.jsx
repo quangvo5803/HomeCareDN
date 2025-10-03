@@ -100,7 +100,7 @@ export default function PartnerRegistration() {
         images.map((i) => i.file),
         import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
         (percent) => setUploadProgress(percent),
-        'HomeCareDN/PartnerRequest'
+        'Test/PartnerRequest'
       );
       const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
       payload.ImageUrls = uploadedArray.map((u) => u.url);

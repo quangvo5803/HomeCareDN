@@ -168,7 +168,7 @@ export default function ServiceModal({
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
-          'HomeCareDN/Service'
+          'Test/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);

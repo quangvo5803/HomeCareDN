@@ -46,22 +46,15 @@ namespace BusinessLogic.Services
                 var searchUpper = parameters.Search.ToUpper();
 
                 query = query.Where(b =>
-                    ContainsSafe(b.Name, searchUpper)
-                    || ContainsSafe(b.Description, searchUpper)
-                    || (
-                        b.Brand != null
-                        && (
-                            ContainsSafe(b.Brand.BrandName, searchUpper)
-                            || ContainsSafe(b.Brand.BrandNameEN, searchUpper)
-                        )
-                    )
-                    || (
-                        b.Category != null
-                        && (
-                            ContainsSafe(b.Category.CategoryName, searchUpper)
-                            || ContainsSafe(b.Category.CategoryNameEN, searchUpper)
-                        )
-                    )
+                    (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Description) && b.Description.ToUpper().Contains(searchUpper))
+                    || (b.Brand != null &&
+                        ((!string.IsNullOrEmpty(b.Brand.BrandName) && b.Brand.BrandName.ToUpper().Contains(searchUpper))
+                        || (!string.IsNullOrEmpty(b.Brand.BrandNameEN) && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper))))
+                    || (b.Category != null &&
+                        ((!string.IsNullOrEmpty(b.Category.CategoryName) && b.Category.CategoryName.ToUpper().Contains(searchUpper))
+                        || (!string.IsNullOrEmpty(b.Category.CategoryNameEN) && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper))))
                 );
             }
 
