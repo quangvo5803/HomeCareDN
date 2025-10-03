@@ -48,9 +48,9 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.PartnerRequestRepository.GetQueryable(
                 includeProperties: PARTNER_REQUEST_INCLUDES
             );
-            if (parameters.FilterPartnerRequestStatus != null)
+            if (parameters.FilterPartnerRequestStatus.HasValue)
             {
-                query = query.Where(p => p.Status == parameters.FilterPartnerRequestStatus);
+                query = query.Where(p => p.Status == parameters.FilterPartnerRequestStatus.Value);
             }
 
             if (parameters.Search != null)
@@ -274,6 +274,16 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.PartnerRequestID == partnerRequestId);
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+
             _unitOfWork.PartnerRequestRepository.Remove(partnerRequest);
             await _unitOfWork.SaveAsync();
         }
