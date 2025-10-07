@@ -15,6 +15,7 @@ export default function AdminBrandManager() {
   const [editingBrandID, setEditingBrandID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const {
     brands,
@@ -31,9 +32,10 @@ export default function AdminBrandManager() {
     fetchBrands({
       PageNumber: currentPage,
       PageSize: pageSize,
+      SortBy: sortBy,
       Search: debouncedSearch || '',
     });
-  }, [currentPage, pageSize, debouncedSearch, fetchBrands]);
+  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchBrands]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -93,24 +95,48 @@ export default function AdminBrandManager() {
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
-            {/* Number of brands */}
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span className="text-sm font-semibold text-gray-700">
-                {totalBrands || 0} {t('adminBrandManager.brands')}
-              </span>
-            </div>
+            {/* Left section: Search + Sort */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Search Input */}
+              <div className="w-full sm:w-64">
+                <input
+                  id="search-input"
+                  type="text"
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={t('common.search')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                />
+              </div>
 
-            {/* Input search */}
-            <div className="flex-1 max-w-lg w-full">
-              <input
-                id="search-input"
-                type="text"
-                value={search}
-                onChange={handleSearchChange}
-                placeholder={t('common.search')}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-              />
+              {/* Sort Dropdown */}
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option
+                  value={i18n.language === 'vi' ? 'brandName' : 'brandNameEN'}
+                >
+                  {t('common.sortName')}
+                </option>
+                <option
+                  value={
+                    i18n.language === 'vi'
+                      ? 'brandName_desc'
+                      : 'brandNameEN_desc'
+                  }
+                >
+                  {t('common.sortNameDesc')}
+                </option>
+                <option value="materialCount">
+                  {t('common.sortMaterialCount')}
+                </option>
+                <option value="materialCount_desc">
+                  {t('common.sortMaterialCountDesc')}
+                </option>
+              </select>
             </div>
 
             {/* Add New Brand Button */}
@@ -353,15 +379,26 @@ export default function AdminBrandManager() {
 
             {/* Pagination */}
             {totalBrands > 0 && (
-              <div className="flex justify-center py-4">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalBrands}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                  size="small"
-                />
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalBrands} {t('adminBrandManager.brands')}
+                  </span>
+                </div>
+
+                {/* Pagination (right) */}
+                <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalBrands}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
               </div>
             )}
           </div>

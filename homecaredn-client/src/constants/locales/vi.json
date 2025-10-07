@@ -959,6 +959,11 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "common":{
-    "search":"Tìm kiếm..."
+    "search":"Tìm kiếm...",
+    "sortDefault": "Mặc định",
+    "sortName": "Tên: A-Z",
+    "sortNameDesc": "Tên: Z-A",
+    "sortMaterialCount": "Số lượng sản phẩm: Nhiều -> Ít",
+    "sortMaterialCountDesc": "Số lượng sản phẩm: Ít -> Nhiều"
   }
 }
