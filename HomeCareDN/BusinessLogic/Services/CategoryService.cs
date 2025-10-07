@@ -147,7 +147,7 @@ namespace BusinessLogic.Services
                 var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
-                    CategoryID = category.CategoryLogoID,
+                    CategoryID = category.CategoryID,
                     ImageUrl = requestDto.CategoryLogoUrl,
                     PublicId = requestDto.CategoryLogoPublicId,
                 };

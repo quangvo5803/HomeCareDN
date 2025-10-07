@@ -8,6 +8,7 @@ using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -45,24 +46,7 @@ namespace BusinessLogic.Services
             {
                 var searchUpper = parameters.Search.ToUpper();
 
-                query = query.Where(b =>
-                    ContainsSafe(b.Name, searchUpper)
-                    || ContainsSafe(b.Description, searchUpper)
-                    || (
-                        b.Brand != null
-                        && (
-                            ContainsSafe(b.Brand.BrandName, searchUpper)
-                            || ContainsSafe(b.Brand.BrandNameEN, searchUpper)
-                        )
-                    )
-                    || (
-                        b.Category != null
-                        && (
-                            ContainsSafe(b.Category.CategoryName, searchUpper)
-                            || ContainsSafe(b.Category.CategoryNameEN, searchUpper)
-                        )
-                    )
-                );
+                query = query.Where(SearchMaterial(searchUpper));
             }
 
             if (parameters.FilterCategoryID.HasValue)
@@ -322,9 +306,20 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private static bool ContainsSafe(string? source, string searchUpper)
+        private static Expression<Func<Material, bool>> SearchMaterial(string searchUpper)
         {
-            return !string.IsNullOrEmpty(source) && source.ToUpper().Contains(searchUpper);
+            return b =>
+                (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.Description) && b.Description.ToUpper().Contains(searchUpper))
+                || (b.Brand != null && (
+                       (!string.IsNullOrEmpty(b.Brand.BrandName) && b.Brand.BrandName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Brand.BrandNameEN) && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper))
+                ))
+                || (b.Category != null && (
+                       (!string.IsNullOrEmpty(b.Category.CategoryName) && b.Category.CategoryName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Category.CategoryNameEN) && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper))
+                ));
         }
     }
 }

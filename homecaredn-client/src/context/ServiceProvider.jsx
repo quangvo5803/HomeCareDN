@@ -23,6 +23,7 @@ export const ServiceProvider = ({ children }) => {
       FilterBuildingType,
       FilterMainStructureType,
       FilterDesignStyle,
+      Search,
     } = {}) => {
       try {
         setLoading(true);
@@ -36,6 +37,7 @@ export const ServiceProvider = ({ children }) => {
           FilterBuildingType,
           FilterMainStructureType,
           FilterDesignStyle,
+          Search,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -100,10 +102,10 @@ export const ServiceProvider = ({ children }) => {
           prev.map((s) =>
             s.serviceID === updated.serviceID
               ? {
-                  ...s,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? s.imageUrls,
-                }
+                ...s,
+                ...updated,
+                imageUrls: updated.imageUrls ?? s.imageUrls,
+              }
               : s
           )
         );

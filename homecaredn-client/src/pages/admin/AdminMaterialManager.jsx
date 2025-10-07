@@ -14,8 +14,8 @@ import { useDebounce } from 'use-debounce';
 
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
-  const { user: authUser } = useAuth();
-  const adminId = authUser?.id?.toString();
+  const { user } = useAuth();
+  const adminId = user?.id?.toString();
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -244,6 +244,18 @@ export default function AdminMaterialManager() {
                     materials.map((material, index) => {
                       const owned = isOwnedByAdmin(material);
                       const creatorName = getCreatorName(material);
+
+                      let displayName;
+                      if (owned) {
+                        if (i18n.language === 'vi') {
+                          displayName = t('Của bạn');
+                        } else {
+                          displayName = t('Your');
+                        }
+                      } else {
+                        displayName = creatorName;
+                      }
+
                       return (
                         <tr
                           key={material.materialID}
@@ -279,7 +291,7 @@ export default function AdminMaterialManager() {
                                   />
                                 )}
                               </div>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-black">
                                 {i18n.language === 'vi'
                                   ? material.name
                                   : material.nameEN || material.name}
@@ -287,30 +299,28 @@ export default function AdminMaterialManager() {
                             </div>
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? material.brandName
                               : material.brandNameEN || material.brandName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? material.categoryName
                               : material.categoryNameEN ||
                                 material.categoryName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? material.unit
                               : material.unitEN || material.unit}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             <span className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-md ">
-                              {owned
-                                ? t('common.you', { defaultValue: 'You' })
-                                : creatorName}
+                              {displayName}
                             </span>
                           </td>
 

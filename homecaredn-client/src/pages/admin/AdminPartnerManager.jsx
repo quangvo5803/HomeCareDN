@@ -36,7 +36,7 @@ export default function AdminPartnerManager() {
       PageNumber: currentPage,
       PageSize: pageSize,
       Search: debouncedSearch || '',
-      ...(statusFilter !== 'All' && { FilterPartnerStatus: statusFilter }),
+      ...(statusFilter !== 'All' && { FilterPartnerRequestStatus: statusFilter }),
     });
   }, [
     currentPage,
@@ -165,9 +165,8 @@ export default function AdminPartnerManager() {
                       return (
                         <tr
                           key={p.partnerRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                            }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -194,10 +193,9 @@ export default function AdminPartnerManager() {
                           {/* PartnerType enum */}
                           <td className="px-6 py-4 text-center align-middle">
                             <span
-                              className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                partnerTypeColors[p.partnerRequestType] ||
+                              className={`px-3 py-1 text-xs font-medium rounded-full ${partnerTypeColors[p.partnerRequestType] ||
                                 'bg-gray-100 text-gray-800'
-                              }`}
+                                }`}
                             >
                               {t(`Enums.PartnerType.${p.partnerRequestType}`)}
                             </span>
