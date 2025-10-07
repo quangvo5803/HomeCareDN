@@ -514,50 +514,6 @@
     },
     "viewAll": "Xem tất cả"
   },
-<<<<<<< HEAD
-  "adminPartnerManager":{
-    "empty": "Không có đối tác nào",
-    "empty_description": "Chưa có đăng ký hợp tác nào.",
-    "title": "Quản lý đối tác",
-    "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
-    "partners": "đối tác",
-    "no": "STT",
-    "companyName": "Tên công ty",
-    "contactName": "Người liên hệ",
-    "contactEmail": "Email liên hệ",
-    "contactPhone": "Số điện thoại",
-    "submittedAt": "Thời gian gửi",
-    "status": "Trạng thái",
-    "action": "Thao tác",
-    "noPartner": "Chưa có đăng ký hợp tác nào.",
-    "search_placeholder": "Tìm kiếm theo tên công ty, người liên hệ hoặc số...",
-    "approve": "Duyệt",
-    "reject": "Từ Chối",
-    "delete": "Xóa",
-    "viewDetails": "Xem chi tiết",
-    "total": "Tổng",
-    "partnerModal": {
-      "title": "Partner Details",
-      "fullName": "Full Name",
-      "companyName": "Company Name",
-      "email": "Email",
-      "phoneNumber": "Phone Number",
-      "partnerType": "Partner Type",
-      "status": "Status",
-      "createdAt": "Created At",
-      "description": "Description",
-      "existingRejectionReason": "Existing Rejection Reason",
-      "images": "Images",
-      "partnerImage": "Partner image",
-      "adminActions": "Admin Actions",
-      "rejectionReason": "Rejection Reason",
-      "rejectionReasonPlaceholder": "Write the reason for rejection..."
-    }
-    
-  },
-=======
-
->>>>>>> develop
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
     "subtitle": "Quản lý danh sách các thương hiệu sản phẩm",
@@ -937,13 +893,9 @@
     "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
     "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
     "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
-<<<<<<< HEAD
-    "REJECTED": "Từ chối thành công."
-=======
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu"
->>>>>>> develop
   },
   "roles": {
     "Distributor": "Nhà phân phối",

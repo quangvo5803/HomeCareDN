@@ -3,11 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { uploadImageToCloudinary } from '../utils/uploadImage';
-<<<<<<< HEAD
-import { partnerService } from '../services/partnerService';
-=======
 import { usePartnerRequest } from '../hook/usePartnerRequest';
->>>>>>> develop
 import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import Loading from '../components/Loading';
