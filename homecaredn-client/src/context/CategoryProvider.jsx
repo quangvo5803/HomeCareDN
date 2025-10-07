@@ -14,7 +14,13 @@ export const CategoryProvider = ({ children }) => {
 
   // 📌 Public: fetch all categories pagination
   const fetchCategories = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, FilterID, FilterBool, Search } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      FilterID,
+      FilterBool,
+      Search,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await categoryService.getAllCategories({
@@ -56,15 +62,12 @@ export const CategoryProvider = ({ children }) => {
   const getCategoryById = useCallback(
     async (id) => {
       try {
-        setLoading(true);
         const local = categories.find((c) => c.categoryID === id);
         if (local) return local;
         return await categoryService.getCategoryById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     [categories]

@@ -11,7 +11,7 @@ import { useDebounce } from 'use-debounce';
 import i18n from '../../configs/i18n';
 import { toast } from 'react-toastify';
 
-export default function AdminPartnerManager() {
+export default function AdminPartnerRequestManager() {
   const { t } = useTranslation();
   const enums = useEnums();
   const pageSize = 5;
@@ -26,9 +26,10 @@ export default function AdminPartnerManager() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('All');
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
-  const [selected, setSelected] = useState(null);
+  const [partnerRequestID, setPartnerRequestID] = useState(null);
 
   // fetch data
   useEffect(() => {
@@ -36,7 +37,9 @@ export default function AdminPartnerManager() {
       PageNumber: currentPage,
       PageSize: pageSize,
       Search: debouncedSearch || '',
-      ...(statusFilter !== 'All' && { FilterPartnerRequestStatus: statusFilter }),
+      ...(statusFilter !== 'All' && {
+        FilterPartnerRequestStatus: statusFilter,
+      }),
     });
   }, [
     currentPage,
@@ -137,7 +140,7 @@ export default function AdminPartnerManager() {
                 <thead>
                   <tr className="border-b border-gray-200 bg-gray-50">
                     <th className="px-4 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
-                      #
+                      {t('adminPartnerManager.no')}
                     </th>
                     <th className="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-600 uppercase">
                       {t('adminPartnerManager.companyName')}
@@ -161,12 +164,13 @@ export default function AdminPartnerManager() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {partnerRequests && partnerRequests.length > 0 ? (
-                    partnerRequests.map((p, idx) => {
+                    partnerRequests.map((partnerRequest, idx) => {
                       return (
                         <tr
-                          key={p.partnerRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                            }`}
+                          key={partnerRequest.partnerRequestID}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                          }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -176,48 +180,59 @@ export default function AdminPartnerManager() {
 
                           <td className="px-6 py-4 text-center align-middle">
                             <div className="text-sm text-gray-900">
-                              {p.companyName}
+                              {partnerRequest.companyName}
                             </div>
                           </td>
                           <td className="px-6 py-4 text-center align-middle">
                             <div className="text-sm text-gray-900">
-                              {p.email}
+                              {partnerRequest.email}
                             </div>
                           </td>
                           <td className="px-6 py-4 text-center align-middle">
                             <div className="text-sm text-gray-900">
-                              {p.phoneNumber}
+                              {partnerRequest.phoneNumber}
                             </div>
                           </td>
 
                           {/* PartnerType enum */}
                           <td className="px-6 py-4 text-center align-middle">
                             <span
-                              className={`px-3 py-1 text-xs font-medium rounded-full ${partnerTypeColors[p.partnerRequestType] ||
-                                'bg-gray-100 text-gray-800'
-                                }`}
+                              className={`px-3 py-1 text-xs font-medium rounded-full ${
+                                partnerTypeColors[
+                                  partnerRequest.partnerRequestType
+                                ] || 'bg-gray-100 text-gray-800'
+                              }`}
                             >
-                              {t(`Enums.PartnerType.${p.partnerRequestType}`)}
+                              {t(
+                                `Enums.PartnerType.${partnerRequest.partnerRequestType}`
+                              )}
                             </span>
                           </td>
 
                           {/* Status enum */}
                           <td className="px-6 py-4 text-center align-middle">
-                            <StatusBadge status={p.status} />
+                            <StatusBadge status={partnerRequest.status} />
                           </td>
 
                           <td className="px-4 py-4 text-center align-middle">
                             <button
                               type="button"
-                              onClick={() => setSelected(p)}
+                              onClick={() => {
+                                setIsModalOpen(true);
+                                setPartnerRequestID(
+                                  partnerRequest.partnerRequestID
+                                );
+                              }}
                               className="mr-2 inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
                             >
                               {t('BUTTON.View')}
                             </button>
-                            {p?.status === 'Rejected' && (
+                            {partnerRequest?.status === 'Rejected' && (
                               <button
                                 type="button"
-                                onClick={() => handleDelete(p.partnerRequestID)}
+                                onClick={() =>
+                                  handleDelete(partnerRequest.partnerRequestID)
+                                }
                                 className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors duration-150"
                               >
                                 {t('BUTTON.Delete')}
@@ -277,9 +292,12 @@ export default function AdminPartnerManager() {
 
       {/* Modal */}
       <PartnerRequestModal
-        isOpen={!!selected}
-        onClose={() => setSelected(null)}
-        partnerRequest={selected}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setPartnerRequestID(null);
+        }}
+        partnerRequestID={partnerRequestID}
       />
     </div>
   );

@@ -8,6 +8,8 @@ import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import LoadingModal from './LoadingModal';
+
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
 import 'tinymce/tinymce';
@@ -27,12 +29,12 @@ export default function ServiceModal({
   isOpen,
   onClose,
   onSave,
-  service,
+  serviceID,
   setUploadProgress,
 }) {
   const { t } = useTranslation();
   const enums = useEnums();
-  const { deleteServiceImage } = useService();
+  const { loading, getServiceById, deleteServiceImage } = useService();
 
   const [name, setName] = useState('');
   const [nameEN, setNameEN] = useState('');
@@ -46,27 +48,34 @@ export default function ServiceModal({
   const [isExpanded, setIsExpanded] = useState(false);
   const [images, setImages] = useState([]);
 
+  const [service, setService] = useState();
   // Fill dữ liệu khi mở modal
   useEffect(() => {
-    if (isOpen) {
-      if (service) {
-        setName(service.name || '');
-        setNameEN(service.nameEN || '');
-        setDescription(service.description || '');
-        setDescriptionEN(service.descriptionEN || '');
-        setServiceType(service.serviceType ?? '');
-        setPackageOption(service.packageOption ?? '');
-        setBuildingType(service.buildingType ?? '');
-        setMainStructureType(service.mainStructureType ?? '');
-        setDesignStyle(service.designStyle ?? '');
-        setImages(
-          (service.imageUrls || []).map((url) => ({
-            url,
-            isNew: false,
-          }))
-        );
-        setUploadProgress(0);
-      } else {
+    const fetchService = async () => {
+      if (isOpen) {
+        if (serviceID) {
+          const result = await getServiceById(serviceID);
+          if (result) {
+            setService(result);
+            setName(result.name || '');
+            setNameEN(result.nameEN || '');
+            setDescription(result.description || '');
+            setDescriptionEN(result.descriptionEN || '');
+            setServiceType(result.serviceType ?? '');
+            setPackageOption(result.packageOption ?? '');
+            setBuildingType(result.buildingType ?? '');
+            setMainStructureType(result.mainStructureType ?? '');
+            setDesignStyle(result.designStyle ?? '');
+            setImages(
+              (result.imageUrls || []).map((url) => ({
+                url,
+                isNew: false,
+              }))
+            );
+            setUploadProgress(0);
+            return;
+          }
+        }
         setName('');
         setNameEN('');
         setDescription('');
@@ -79,8 +88,9 @@ export default function ServiceModal({
         setImages([]);
         setUploadProgress(0);
       }
-    }
-  }, [isOpen, service, setUploadProgress]);
+    };
+    fetchService();
+  }, [isOpen, serviceID, getServiceById, setUploadProgress]);
 
   // Xử lý chọn file
   const handleFileChange = (e) => {
@@ -208,247 +218,261 @@ export default function ServiceModal({
 
         {/* Body */}
         <div className="flex-1 p-6 space-y-6 overflow-y-auto">
-          {/* Name */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminServiceManager.serviceModal.serviceName')}{' '}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminServiceManager.serviceModal.serviceDescription')}
-            </label>
-            <Editor
-              value={description}
-              init={{
-                license_key: 'gpl',
-                height: 300,
-                menubar: false,
-                plugins: 'lists link image code',
-                toolbar:
-                  'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                skin: false,
-                content_css: false,
-              }}
-              onEditorChange={(content) => setDescription(content)}
-            />
-          </div>
-
-          {/* Enums dropdown */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {/* ServiceType */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminServiceManager.serviceModal.serviceType')}{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl"
-                value={serviceType}
-                onChange={(e) => setServiceType(e.target.value)}
-              >
-                <option value="">
-                  {t('adminServiceManager.serviceModal.serviceTypePlaceholder')}
-                </option>
-                {enums?.serviceTypes?.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {t(`Enums.ServiceType.${s.value}`)}
-                  </option>
-                ))}
-              </select>
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <LoadingModal />
             </div>
+          ) : (
+            <>
+              {/* Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminServiceManager.serviceModal.serviceName')}{' '}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-            {/* PackageOption */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminServiceManager.serviceModal.packageOption')}
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl"
-                value={packageOption}
-                onChange={(e) => setPackageOption(e.target.value)}
-              >
-                <option value="">
-                  {t(
-                    'adminServiceManager.serviceModal.packageOptionPlaceholder'
-                  )}
-                </option>
-                {enums?.packageOptions?.map((p) => (
-                  <option key={p.value} value={p.value}>
-                    {t(`Enums.PackageOption.${p.value}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminServiceManager.serviceModal.serviceDescription')}
+                </label>
+                <Editor
+                  value={description}
+                  init={{
+                    license_key: 'gpl',
+                    height: 300,
+                    menubar: false,
+                    plugins: 'lists link image code',
+                    toolbar:
+                      'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                    skin: false,
+                    content_css: false,
+                  }}
+                  onEditorChange={(content) => setDescription(content)}
+                />
+              </div>
 
-            {/* BuildingType */}
-            <div className="space-y-2 md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminServiceManager.serviceModal.buildingType')}{' '}
-                <span className="text-red-500">*</span>
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl"
-                value={buildingType}
-                onChange={(e) => setBuildingType(e.target.value)}
-              >
-                <option value="">
-                  {t(
-                    'adminServiceManager.serviceModal.buildingTypePlaceholder'
-                  )}
-                </option>
-                {enums?.buildingTypes?.map((b) => (
-                  <option key={b.value} value={b.value}>
-                    {t(`Enums.BuildingType.${b.value}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* MainStructureType */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminServiceManager.serviceModal.mainStructureType')}{' '}
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl"
-                value={mainStructureType}
-                onChange={(e) => setMainStructureType(e.target.value)}
-              >
-                <option value="">
-                  {t(
-                    'adminServiceManager.serviceModal.mainStructureTypePlaceholder'
-                  )}
-                </option>
-                {enums?.mainStructures?.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {t(`Enums.MainStructure.${m.value}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* DesignStyle */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminServiceManager.serviceModal.designStyle')}
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl"
-                value={designStyle}
-                onChange={(e) => setDesignStyle(e.target.value)}
-              >
-                <option value="">
-                  {t('adminServiceManager.serviceModal.designStylePlaceholder')}
-                </option>
-                {enums?.designStyles?.map((d) => (
-                  <option key={d.value} value={d.value}>
-                    {t(`Enums.DesignStyle.${d.value}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Expand for EN */}
-          <div>
-            <button
-              type="button"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 text-sm font-medium text-gray-700"
-            >
-              <i className="fas fa-globe"></i>
-              {t('adminServiceManager.serviceModal.multilanguage_for_data')}
-              <span>{isExpanded ? '▲' : '▼'}</span>
-            </button>
-
-            {isExpanded && (
-              <div className="p-3">
-                <div className="mb-4">
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    {t('adminServiceManager.serviceModal.serviceNameEN')}
+              {/* Enums dropdown */}
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* ServiceType */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.serviceType')}{' '}
+                    <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
+                  <select
                     className="w-full px-4 py-3 border rounded-xl"
-                    value={nameEN}
-                    onChange={(e) => setNameEN(e.target.value)}
-                  />
+                    value={serviceType}
+                    onChange={(e) => setServiceType(e.target.value)}
+                  >
+                    <option value="">
+                      {t(
+                        'adminServiceManager.serviceModal.serviceTypePlaceholder'
+                      )}
+                    </option>
+                    {enums?.serviceTypes?.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {t(`Enums.ServiceType.${s.value}`)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-700">
-                    {t('adminServiceManager.serviceModal.serviceDescriptionEN')}
+                {/* PackageOption */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.packageOption')}
                   </label>
-                  <Editor
-                    value={descriptionEN}
-                    init={{
-                      license_key: 'gpl',
-                      height: 300,
-                      menubar: false,
-                      plugins: 'lists link image code',
-                      toolbar:
-                        'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                      skin: false,
-                      content_css: false,
-                    }}
-                    onEditorChange={(content) => setDescriptionEN(content)}
-                  />
+                  <select
+                    className="w-full px-4 py-3 border rounded-xl"
+                    value={packageOption}
+                    onChange={(e) => setPackageOption(e.target.value)}
+                  >
+                    <option value="">
+                      {t(
+                        'adminServiceManager.serviceModal.packageOptionPlaceholder'
+                      )}
+                    </option>
+                    {enums?.packageOptions?.map((p) => (
+                      <option key={p.value} value={p.value}>
+                        {t(`Enums.PackageOption.${p.value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* BuildingType */}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.buildingType')}{' '}
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 border rounded-xl"
+                    value={buildingType}
+                    onChange={(e) => setBuildingType(e.target.value)}
+                  >
+                    <option value="">
+                      {t(
+                        'adminServiceManager.serviceModal.buildingTypePlaceholder'
+                      )}
+                    </option>
+                    {enums?.buildingTypes?.map((b) => (
+                      <option key={b.value} value={b.value}>
+                        {t(`Enums.BuildingType.${b.value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* MainStructureType */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.mainStructureType')}{' '}
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 border rounded-xl"
+                    value={mainStructureType}
+                    onChange={(e) => setMainStructureType(e.target.value)}
+                  >
+                    <option value="">
+                      {t(
+                        'adminServiceManager.serviceModal.mainStructureTypePlaceholder'
+                      )}
+                    </option>
+                    {enums?.mainStructures?.map((m) => (
+                      <option key={m.value} value={m.value}>
+                        {t(`Enums.MainStructure.${m.value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* DesignStyle */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.designStyle')}
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 border rounded-xl"
+                    value={designStyle}
+                    onChange={(e) => setDesignStyle(e.target.value)}
+                  >
+                    <option value="">
+                      {t(
+                        'adminServiceManager.serviceModal.designStylePlaceholder'
+                      )}
+                    </option>
+                    {enums?.designStyles?.map((d) => (
+                      <option key={d.value} value={d.value}>
+                        {t(`Enums.DesignStyle.${d.value}`)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-            )}
-          </div>
 
-          {/* Upload Images */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminServiceManager.serviceModal.images')}
-            </label>
-            <div className="flex flex-wrap gap-3">
-              {images.map((img) => (
-                <div
-                  key={img.url}
-                  className="relative overflow-hidden border w-28 h-28 rounded-xl group"
+              {/* Expand for EN */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center gap-1 text-sm font-medium text-gray-700"
                 >
-                  <img
-                    src={img.url}
-                    alt="preview"
-                    className="object-cover w-full h-full"
-                  />
-                  <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                    {(images.length !== 1 || img.isNew) && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(img)}
-                        className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
-                      >
-                        <i className="fa-solid fa-xmark"></i>
-                      </button>
-                    )}
+                  <i className="fas fa-globe"></i>
+                  {t('adminServiceManager.serviceModal.multilanguage_for_data')}
+                  <span>{isExpanded ? '▲' : '▼'}</span>
+                </button>
+
+                {isExpanded && (
+                  <div className="p-3">
+                    <div className="mb-4">
+                      <label className="block mb-2 text-sm font-medium text-gray-700">
+                        {t('adminServiceManager.serviceModal.serviceNameEN')}
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 border rounded-xl"
+                        value={nameEN}
+                        onChange={(e) => setNameEN(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block mb-2 text-sm font-medium text-gray-700">
+                        {t(
+                          'adminServiceManager.serviceModal.serviceDescriptionEN'
+                        )}
+                      </label>
+                      <Editor
+                        value={descriptionEN}
+                        init={{
+                          license_key: 'gpl',
+                          height: 300,
+                          menubar: false,
+                          plugins: 'lists link image code',
+                          toolbar:
+                            'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                          skin: false,
+                          content_css: false,
+                        }}
+                        onEditorChange={(content) => setDescriptionEN(content)}
+                      />
+                    </div>
                   </div>
+                )}
+              </div>
+
+              {/* Upload Images */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminServiceManager.serviceModal.images')}
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {images.map((img) => (
+                    <div
+                      key={img.url}
+                      className="relative overflow-hidden border w-28 h-28 rounded-xl group"
+                    >
+                      <img
+                        src={img.url}
+                        alt="preview"
+                        className="object-cover w-full h-full"
+                      />
+                      <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                        {(images.length !== 1 || img.isNew) && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(img)}
+                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                          >
+                            <i className="fa-solid fa-xmark"></i>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
-              {t('adminServiceManager.serviceModal.chooseFiles')}
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-              />
-            </label>
-          </div>
+                <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
+                  {t('adminServiceManager.serviceModal.chooseFiles')}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}
@@ -482,23 +506,7 @@ ServiceModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  service: PropTypes.shape({
-    serviceID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    name: PropTypes.string,
-    nameEN: PropTypes.string,
-    description: PropTypes.string,
-    descriptionEN: PropTypes.string,
-    serviceType: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    packageOption: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    buildingType: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    mainStructureType: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]),
-    designStyle: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    imageUrls: PropTypes.array.isRequired,
-    imagePublicIds: PropTypes.array.isRequired,
-  }),
+  serviceID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
 };
 

@@ -14,10 +14,14 @@ export const BrandProvider = ({ children }) => {
 
   // 📌 Public: fetch all brands pagination
   const fetchBrands = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, Search, } = {}) => {
+    async ({ PageNumber = 1, PageSize = 10, Search } = {}) => {
       try {
         setLoading(true);
-        const data = await brandService.getAllBrands({ PageNumber, PageSize, Search });
+        const data = await brandService.getAllBrands({
+          PageNumber,
+          PageSize,
+          Search,
+        });
         setBrands(data.items || []);
         setTotalBrands(data.totalCount || 0);
         return data;
@@ -46,15 +50,12 @@ export const BrandProvider = ({ children }) => {
   const getBrandById = useCallback(
     async (id) => {
       try {
-        setLoading(true);
         const local = brands.find((c) => c.brandID === id);
         if (local) return local;
         return await brandService.getBrandById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     [brands]

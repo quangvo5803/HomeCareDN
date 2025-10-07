@@ -6,7 +6,7 @@ import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useCategory } from '../../hook/useCategory';
-import Loading from '../Loading';
+import LoadingModal from './LoadingModal';
 
 export default function CategoryModal({
   isOpen,
@@ -128,102 +128,112 @@ export default function CategoryModal({
 
         {/* Body */}
         <div className="p-6 space-y-6">
-          {/* Category Name */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminCategoryManager.categoryModal.categoryName')}{' '}
-              <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder={t(
-                'adminCategoryManager.categoryModal.categoryNamePlaceholder'
-              )}
-              className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-            />
-          </div>
-          {/* Category Name English */}
-          <div>
-            {/* Nút Expand/Collapse */}
-            <button
-              type="button"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
-            >
-              <i className="fas fa-globe"></i>
-              {t('adminCategoryManager.categoryModal.multilanguage_for_data')}
-              <span>{isExpanded ? '▲' : '▼'}</span>
-            </button>
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <LoadingModal />
+            </div>
+          ) : (
+            <>
+              {/* Category Name */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminCategoryManager.categoryModal.categoryName')}{' '}
+                  <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  placeholder={t(
+                    'adminCategoryManager.categoryModal.categoryNamePlaceholder'
+                  )}
+                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  value={categoryName}
+                  onChange={(e) => setCategoryName(e.target.value)}
+                />
+              </div>
+              {/* Category Name English */}
+              <div>
+                {/* Nút Expand/Collapse */}
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
+                >
+                  <i className="fas fa-globe"></i>
+                  {t(
+                    'adminCategoryManager.categoryModal.multilanguage_for_data'
+                  )}
+                  <span>{isExpanded ? '▲' : '▼'}</span>
+                </button>
 
-            {/* Nội dung expand */}
-            {isExpanded && (
-              <div className="p-3 space-y-4">
-                {/* Category Name EN */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t('adminCategoryManager.categoryModal.categoryNameEN')}
+                {/* Nội dung expand */}
+                {isExpanded && (
+                  <div className="p-3 space-y-4">
+                    {/* Category Name EN */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        {t('adminCategoryManager.categoryModal.categoryNameEN')}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={t(
+                          'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
+                        )}
+                        className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value={categoryNameEN}
+                        onChange={(e) => setCategoryNameEN(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminCategoryManager.categoryModal.categoryLogo')}{' '}
+                  {category ? '' : <span className="text-red-500">*</span>}
+                </label>
+                <div className="flex items-center space-x-4">
+                  {logoPreview ? (
+                    <div className="w-full max-h-40 rounded-xl overflow-hidden">
+                      <img
+                        src={logoPreview}
+                        alt="Preview"
+                        className="w-full max-h-40 mt-2 rounded-xl object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
+                      <span className="text-gray-400">Logo</span>
+                    </div>
+                  )}
+                  <label className="cursor-pointer px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50">
+                    {logoFile
+                      ? logoFile.name
+                      : t('adminCategoryManager.categoryModal.chooseFile')}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
                   </label>
-                  <input
-                    type="text"
-                    placeholder={t(
-                      'adminCategoryManager.categoryModal.categoryNamePlaceholderEN'
-                    )}
-                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={categoryNameEN}
-                    onChange={(e) => setCategoryNameEN(e.target.value)}
-                  />
                 </div>
               </div>
-            )}
-          </div>
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              {t('adminCategoryManager.categoryModal.categoryLogo')}{' '}
-              {category ? '' : <span className="text-red-500">*</span>}
-            </label>
-            <div className="flex items-center space-x-4">
-              {logoPreview ? (
-                <div className="w-full max-h-40 rounded-xl overflow-hidden">
-                  <img
-                    src={logoPreview}
-                    alt="Preview"
-                    className="w-full max-h-40 mt-2 rounded-xl object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
-                  <span className="text-gray-400">Logo</span>
+              {user?.role === 'Admin' && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminCategoryManager.categoryModal.isActive')}
+                  </label>
+                  <select
+                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={isActive}
+                    onChange={(e) => setIsActive(e.target.value === 'true')}
+                  >
+                    <option value="true">{t('BUTTON.Activate')}</option>
+                    <option value="false">{t('BUTTON.Deactivate')}</option>
+                  </select>
                 </div>
               )}
-              <label className="cursor-pointer px-4 py-3 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50">
-                {logoFile
-                  ? logoFile.name
-                  : t('adminCategoryManager.categoryModal.chooseFile')}
-                <input
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                />
-              </label>
-            </div>
-          </div>
-          {user?.role === 'Admin' && (
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
-                {t('adminCategoryManager.categoryModal.isActive')}
-              </label>
-              <select
-                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                value={isActive}
-                onChange={(e) => setIsActive(e.target.value === 'true')}
-              >
-                <option value="true">{t('BUTTON.Activate')}</option>
-                <option value="false">{t('BUTTON.Deactivate')}</option>
-              </select>
-            </div>
+            </>
           )}
         </div>
 

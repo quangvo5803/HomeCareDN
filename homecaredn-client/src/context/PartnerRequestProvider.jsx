@@ -68,15 +68,12 @@ export const PartnerRequestProvider = ({ children }) => {
   const getPartnerRequestById = useCallback(
     async (id) => {
       try {
-        setLoading(true);
         const local = partnerRequests.find((p) => p.partnerRequestID === id);
         if (local) return local;
         return await partnerRequestService.getPartnerRequestById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     [partnerRequests]

@@ -6,22 +6,36 @@ import { toast } from 'react-toastify';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
+import LoadingModal from './LoadingModal';
 
-export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
+export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
   const { t, i18n } = useTranslation();
-  const { approvePartnerRequest, rejectPartnerRequest } = usePartnerRequest();
+  const {
+    loading,
+    getPartnerRequestById,
+    approvePartnerRequest,
+    rejectPartnerRequest,
+  } = usePartnerRequest();
 
   const [reason, setReason] = useState('');
-
+  const [partnerRequest, setPartnerRequest] = useState();
   useEffect(() => {
-    if (isOpen) {
-      if (partnerRequest) {
-        setReason(partnerRequest.rejectionReason || '');
-      } else {
+    const fetchPartnerRequest = async () => {
+      if (isOpen) {
+        if (partnerRequestID) {
+          const result = await getPartnerRequestById(partnerRequestID);
+          if (result) {
+            setPartnerRequest(result);
+            setReason(result.reason || '');
+            return;
+          }
+        }
+        setPartnerRequest(null);
         setReason('');
       }
-    }
-  }, [isOpen, partnerRequest]);
+    };
+    fetchPartnerRequest();
+  }, [isOpen, partnerRequestID, getPartnerRequestById]);
 
   const isPending = partnerRequest?.status === 'Pending';
 
@@ -32,7 +46,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
   const handleSubmit = async (action) => {
     try {
       if (action === 'approve') {
-        await approvePartnerRequest(partnerRequest.partnerRequestID);
+        await approvePartnerRequest(partnerRequestID);
         toast.success(t('SUCCESS.APPROVE'));
       } else if (action === 'reject') {
         if (!reason.trim()) {
@@ -40,7 +54,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
           return;
         }
         await rejectPartnerRequest({
-          PartnerRequestID: partnerRequest.partnerRequestID,
+          PartnerRequestID: partnerRequestID,
           RejectionReason: reason.trim(),
         });
         toast.success(t('SUCCESS.REJECT'));
@@ -51,7 +65,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
     }
   };
 
-  if (!isOpen || !partnerRequest) return null;
+  if (!isOpen || !partnerRequestID) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[1050] p-4 bg-black/40">
@@ -74,76 +88,107 @@ export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
 
         {/* Body */}
         <div className="flex-1 p-6 space-y-4 overflow-y-auto">
-          <Info
-            label={t('adminPartnerManager.partnerRequestModal.companyName')}
-            value={partnerRequest.companyName}
-          />
-          <Info label="Email" value={partnerRequest.email} />
-          <Info
-            label={t('adminPartnerManager.partnerRequestModal.phoneNumber')}
-            value={partnerRequest.phoneNumber}
-          />
-          <Info
-            label={t(
-              'adminPartnerManager.partnerRequestModal.partnerRequestType'
-            )}
-            value={t(`Enums.PartnerType.${partnerRequest.partnerRequestType}`)}
-          />
-          <Info
-            label={t('adminPartnerManager.partnerRequestModal.status')}
-            value={t(`Enums.PartnerStatus.${partnerRequest.status}`)}
-          />
-          <Info
-            label={t('adminPartnerManager.partnerRequestModal.submittedAt')}
-            value={formattedCreatedAt}
-          />
-
-          {partnerRequest.description && (
-            <div className="p-3 border rounded-lg bg-gray-50 text-gray-800">
-              {partnerRequest.description}
+          {loading || !partnerRequest ? (
+            <div className="flex items-center justify-center py-10">
+              <LoadingModal />
             </div>
-          )}
-
-          {Array.isArray(partnerRequest.imageUrls) &&
-            partnerRequest.imageUrls.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {partnerRequest.imageUrls.map((url, i) => (
-                  <img
-                    key={`${partnerRequest.partnerID}-img-${i}`}
-                    src={url}
-                    alt={`${t('partner.image', 'Partner image')} ${i + 1}`}
-                    className="w-full h-24 object-cover rounded-lg border"
-                  />
-                ))}
+          ) : (
+            <>
+              <div>
+                <div className="text-sm text-gray-500">
+                  {t('adminPartnerManager.partnerRequestModal.companyName')}
+                </div>
+                <div className="font-medium text-gray-900 break-words">
+                  {partnerRequest.companyName}
+                </div>
               </div>
-            )}
-
-          {/* Rejection reason for admin */}
-          {(isPending || partnerRequest?.status === 'Rejected') && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t('adminPartnerManager.partnerRequestModal.rejectReason')}
-              </label>
-              <textarea
-                rows={3}
-                value={
-                  partnerRequest?.status === 'Rejected'
-                    ? partnerRequest?.rejectionReason || ''
-                    : reason
-                }
-                disabled={partnerRequest?.status === 'Rejected'}
-                onChange={(e) =>
-                  partnerRequest?.status !== 'Rejected' &&
-                  setReason(e.target.value)
-                }
-                className={`w-full border rounded-lg p-3 ${
-                  partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
-                }`}
-                placeholder={t(
-                  'adminPartnerManager.partnerRequestModal.rejectReasonPlaceHolder'
+              <div>
+                <div className="text-sm text-gray-500">Email</div>
+                <div className="font-medium text-gray-900 break-words">
+                  {partnerRequest.email}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">
+                  {t('adminPartnerManager.partnerRequestModal.phoneNumber')}
+                </div>
+                <div className="font-medium text-gray-900 break-words">
+                  {partnerRequest.phoneNumber}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">
+                  {t(
+                    'adminPartnerManager.partnerRequestModal.partnerRequestType'
+                  )}
+                </div>
+                <div className="font-medium text-gray-900 break-words">
+                  {t(`Enums.PartnerType.${partnerRequest.partnerRequestType}`)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">
+                  {t('adminPartnerManager.partnerRequestModal.status')}
+                </div>
+                <div className="font-medium text-gray-900 break-words">
+                  {t(`Enums.PartnerStatus.${partnerRequest.status}`)}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">
+                  {t('adminPartnerManager.partnerRequestModal.submittedAt')}
+                </div>
+                <div className="font-medium text-gray-900 break-words">
+                  {formattedCreatedAt}
+                </div>
+              </div>
+              {partnerRequest.description && (
+                <div className="p-3 border rounded-lg bg-gray-50 text-gray-800">
+                  {partnerRequest.description}
+                </div>
+              )}
+              {Array.isArray(partnerRequest.imageUrls) &&
+                partnerRequest.imageUrls.length > 0 && (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {partnerRequest.imageUrls.map((url, i) => (
+                      <img
+                        key={`${partnerRequest.partnerID}-img-${i}`}
+                        src={url}
+                        alt={`${t('partner.image', 'Partner image')} ${i + 1}`}
+                        className="w-full h-24 object-cover rounded-lg border"
+                      />
+                    ))}
+                  </div>
                 )}
-              />
-            </div>
+
+              {/* Rejection reason for admin */}
+              {(isPending || partnerRequest?.status === 'Rejected') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('adminPartnerManager.partnerRequestModal.rejectReason')}
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={
+                      partnerRequest?.status === 'Rejected'
+                        ? partnerRequest?.rejectionReason || ''
+                        : reason
+                    }
+                    disabled={partnerRequest?.status === 'Rejected'}
+                    onChange={(e) =>
+                      partnerRequest?.status !== 'Rejected' &&
+                      setReason(e.target.value)
+                    }
+                    className={`w-full border rounded-lg p-3 ${
+                      partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
+                    }`}
+                    placeholder={t(
+                      'adminPartnerManager.partnerRequestModal.rejectReasonPlaceHolder'
+                    )}
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -175,35 +220,8 @@ export default function PartnerModal({ isOpen, onClose, partnerRequest }) {
   );
 }
 
-const Info = ({ label, value }) => (
-  <div>
-    <div className="text-sm text-gray-500">{label}</div>
-    <div className="font-medium text-gray-900 break-words">{value || '-'}</div>
-  </div>
-);
-
-Info.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.any,
-};
-
 PartnerModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  partnerRequest: PropTypes.shape({
-    partnerID: PropTypes.string,
-    partnerRequestID: PropTypes.string.isRequired,
-    companyName: PropTypes.string,
-    email: PropTypes.string,
-    phoneNumber: PropTypes.string,
-    partnerRequestType: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]),
-    status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    description: PropTypes.string,
-    createdAt: PropTypes.string,
-    rejectionReason: PropTypes.string,
-    imageUrls: PropTypes.arrayOf(PropTypes.string),
-  }),
+  partnerRequestID: PropTypes.string,
 };

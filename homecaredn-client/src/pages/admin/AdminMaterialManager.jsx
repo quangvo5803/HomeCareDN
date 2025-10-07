@@ -15,7 +15,6 @@ import { useDebounce } from 'use-debounce';
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const adminId = user?.id?.toString();
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -67,15 +66,6 @@ export default function AdminMaterialManager() {
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
-  };
-
-  const getCreatorId = (m) => (m?.userId ?? m?.userID)?.toString();
-
-  const getCreatorName = (m) => m?.userFullName || m?.userName || '-';
-
-  const isOwnedByAdmin = (m) => {
-    const creatorId = getCreatorId(m);
-    return creatorId && adminId && creatorId === adminId;
   };
 
   // Delete
@@ -138,8 +128,7 @@ export default function AdminMaterialManager() {
   };
 
   if (loading && !isModalOpen) return <Loading />;
-  if (uploadProgress && !isModalOpen)
-    return <Loading progress={uploadProgress} />;
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
@@ -242,16 +231,12 @@ export default function AdminMaterialManager() {
                 <tbody className="divide-y divide-gray-200">
                   {materials && materials.length > 0 ? (
                     materials.map((material, index) => {
-                      const owned = isOwnedByAdmin(material);
-                      const creatorName = getCreatorName(material);
+                      const ownedID = material.userID;
+                      const creatorName = material.userName;
 
                       let displayName;
-                      if (owned) {
-                        if (i18n.language === 'vi') {
-                          displayName = t('Của bạn');
-                        } else {
-                          displayName = t('Your');
-                        }
+                      if (ownedID == user.id) {
+                        displayName = 'Admin';
                       } else {
                         displayName = creatorName;
                       }
@@ -327,7 +312,7 @@ export default function AdminMaterialManager() {
                           {/* Actions */}
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex justify-center space-x-2">
-                              {owned ? (
+                              {ownedID === user.id ? (
                                 <>
                                   <button
                                     className="px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"

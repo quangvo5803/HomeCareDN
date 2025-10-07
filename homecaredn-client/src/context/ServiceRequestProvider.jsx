@@ -40,15 +40,12 @@ export const ServiceRequestProvider = ({ children }) => {
   const getServiceRequestById = useCallback(
     async (id) => {
       try {
-        setLoading(true);
         const local = serviceRequests.find((s) => s.serviceRequestID === id);
         if (local) return local;
         return await serviceRequestService.getServiceRequestById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     [serviceRequests]
