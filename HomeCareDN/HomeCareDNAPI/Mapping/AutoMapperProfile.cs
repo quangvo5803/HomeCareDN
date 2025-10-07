@@ -48,7 +48,7 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<CreateAddressDto, Address>();
-            CreateMap<PartnerCreateRequest, Partner>()
+            CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
                 .ForMember(d => d.Images, opt => opt.Ignore());
 
             // ------------------------
@@ -81,8 +81,6 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
-            CreateMap<PartnerApproveRequest, Partner>();
-            CreateMap<PartnerRejectRequest, Partner>();
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -279,12 +277,7 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<ContactSupport, ContactSupportDto>();
 
             // Partner
-            CreateMap<Partner, PartnerDto>()
-                .ForMember(
-                    d => d.PartnerType,
-                    opt => opt.MapFrom(s => s.PartnerType.GetDisplayName())
-                )
-                .ForMember(d => d.Status, opt => opt.MapFrom(s => s.Status.GetDisplayName()))
+            CreateMap<PartnerRequest, PartnerRequestDto>()
                 .ForMember(
                     d => d.ImageUrls,
                     opt =>
@@ -316,8 +309,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<PartnerType, string>().ConvertUsing(src => src.GetDisplayName());
-            CreateMap<PartnerStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartnerRequestType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

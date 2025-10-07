@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef , useMemo  } from 'react';
+import { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
@@ -16,20 +16,23 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { setPendingEmail, login } = useContext(AuthContext);
-  const TOAST_ID = useMemo(() => ({
-    notice: 'notice_once',
-    pending: 'pending_once',
-    rejected: 'rejected_once',
-  }), []);
+  const TOAST_ID = useMemo(
+    () => ({
+      notice: 'notice_once',
+      pending: 'pending_once',
+      rejected: 'rejected_once',
+    }),
+    []
+  );
   const noticeShownRef = useRef(false);
-const getStatusCodes = (err) => {
-  const d = err?.response?.data ?? {};
-  const rootUpper = Array.isArray(d.STATUS) ? d.STATUS : [];
-  const rootLower = Array.isArray(d.status) ? d.status : [];
-  const errs = d.errors || d.Errors || {};
-  const modelState = Array.isArray(errs.STATUS) ? errs.STATUS : [];
-  return [...rootUpper, ...rootLower, ...modelState];
-};
+  const getStatusCodes = (err) => {
+    const d = err?.response?.data ?? {};
+    const rootUpper = Array.isArray(d.STATUS) ? d.STATUS : [];
+    const rootLower = Array.isArray(d.status) ? d.status : [];
+    const errs = d.errors || d.Errors || {};
+    const modelState = Array.isArray(errs.STATUS) ? errs.STATUS : [];
+    return [...rootUpper, ...rootLower, ...modelState];
+  };
   useEffect(() => {
     const noticeKey = location.state?.notice;
     if (noticeKey && !noticeShownRef.current) {
@@ -59,16 +62,20 @@ const getStatusCodes = (err) => {
       navigate('/VerifyOTP', { state: { email } });
     } catch (err) {
       const codes = getStatusCodes(err);
-      
+
       if (codes.includes('PARTNER_PENDING_REVIEW')) {
         if (!toast.isActive(TOAST_ID.pending)) {
-          toast.info(t('partner.login.pending_review'), { toastId: TOAST_ID.pending });
+          toast.info(t('partner.login.pending_review'), {
+            toastId: TOAST_ID.pending,
+          });
         }
         return;
       }
       if (codes.includes('PARTNER_REJECTED')) {
         if (!toast.isActive(TOAST_ID.rejected)) {
-          toast.info(t('partner.login.rejected'), { toastId: TOAST_ID.rejected });
+          toast.info(t('partner.login.rejected'), {
+            toastId: TOAST_ID.rejected,
+          });
         }
         return;
       }
@@ -85,7 +92,7 @@ const getStatusCodes = (err) => {
   };
 
   const handlePartnerRegistration = () => {
-    navigate('/PartnerRegistration');
+    navigate('/PartnerTypeSelection');
   };
 
   if (loading) return <Loading />;

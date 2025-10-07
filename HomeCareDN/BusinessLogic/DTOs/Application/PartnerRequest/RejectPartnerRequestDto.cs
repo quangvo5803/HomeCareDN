@@ -2,10 +2,10 @@
 
 namespace BusinessLogic.DTOs.Application.Partner
 {
-    public class PartnerRejectRequest
+    public class RejectPartnerRequestDto
     {
         [Required]
-        public required Guid PartnerID { get; set; }
+        public required Guid PartnerRequestID { get; set; }
 
         [Required, MaxLength(500)]
         public string RejectionReason { get; set; } = default!;

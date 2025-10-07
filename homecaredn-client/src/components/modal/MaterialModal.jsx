@@ -32,6 +32,7 @@ export default function MaterialModal({
   brands,
   categories,
   setUploadProgress,
+  readOnly,
 }) {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
@@ -186,7 +187,7 @@ export default function MaterialModal({
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
-          'Test/Material'
+          'HomeCareDN/Material'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
@@ -406,22 +407,24 @@ export default function MaterialModal({
                     alt="preview"
                     className="object-cover w-full h-full"
                   />
-                  <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                    {(images.length !== 1 || img.isNew) && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(img)}
-                        className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
-                      >
-                        <i className="fa-solid fa-xmark"></i>
-                      </button>
-                    )}
-                  </div>
+                  {!readOnly && (
+                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                      {(images.length !== 1 || img.isNew) && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(img)}
+                          className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                        >
+                          <i className="fa-solid fa-xmark"></i>
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            {images.length < 5 && (
+            {!readOnly && images.length < 5 && (
               <div className="col-span-2">
                 <label className="inline-block px-4 py-2 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-emerald-400 hover:bg-emerald-50">
                   {t('distributorMaterialManager.materialModal.chooseFile')}
@@ -436,8 +439,8 @@ export default function MaterialModal({
                 <span className="ml-3 text-sm text-gray-500">
                   {images.filter((i) => i.isNew).length > 0
                     ? `${images.filter((i) => i.isNew).length} ${t(
-                        'distributorMaterialManager.materialModal.filesSelected'
-                      )}`
+                      'distributorMaterialManager.materialModal.filesSelected'
+                    )}`
                     : t('distributorMaterialManager.materialModal.noFile')}
                 </span>
               </div>
@@ -454,13 +457,15 @@ export default function MaterialModal({
           >
             {t('BUTTON.Cancel')}
           </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600"
-          >
-            {material ? t('BUTTON.Update') : t('BUTTON.Add')}
-          </button>
+          {!readOnly && (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600"
+            >
+              {material ? t('BUTTON.Update') : t('BUTTON.Add')}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -475,4 +480,5 @@ MaterialModal.propTypes = {
   brands: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   setUploadProgress: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool.isRequired,
 };

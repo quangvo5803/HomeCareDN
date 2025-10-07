@@ -97,6 +97,7 @@
     "stat4_text": "Client Satisfaction",
     "stat5_title": "Experience Engineers",
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
+<<<<<<< HEAD
   },
    "partner": {
     "subtitle": "Tell us about your business to get approved.",
@@ -279,6 +280,9 @@
     "filter_by_status": "Filter by status",
     "pagination": "Pagination navigation"
   },
+=======
+  }, 
+>>>>>>> develop
   "why": {
     "badge": "Why Choose Us",
     "title": "Why Builders Trust",
@@ -413,6 +417,25 @@
     "resend_otp": "Resend",
     "not_receive_otp": "Did not receive the code? "
   },
+  "partnerRequest": {
+  "partnerTypeSelection": {
+    "title": "Register as a Partner",
+    "subtitle": "Please choose the role you want to register for",
+    "selectType": "Please select a role to continue",
+    "continueWithType": "Continue registration as "
+  },
+  "partnerRegistration": {
+    "title": "Register as a Partner",
+    "subtitle": "Please fill in all the information below",
+    "notSelectedType": "Please select a role",
+    "form_companyName": "Company Name",
+    "form_email": "Email",
+    "form_phoneNumber": "Phone Number",
+    "form_description": "Company Description",
+    "form_images": "Company Images",
+    "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
+  }
+},
   "userPage": {
     "profile": {
       "title": "My Profile",
@@ -810,6 +833,37 @@
       "chooseFiles": "Choose files to upload"
     }
   },
+  "adminPartnerManager": {
+    "empty": "No partners",
+    "empty_description": "No partnership requests have been submitted.",
+    "title": "Partner Management",
+    "subtitle": "Review, approve, or reject partner requests.",
+    "partners": "partners",
+    "no": "No.",
+    "companyName": "Company Name",
+    "phoneNumber": "Phone Number",
+    "submittedAt": "Submitted At",
+    "partnerRequestType": "Requested Role",
+    "status": "Status",
+    "action": "Action",
+    "noPartner": "No partnership requests yet.",
+    "searchPlaceholder": "Search by company name, email, or phone number...",
+    "approve": "Approve",
+    "reject": "Reject",
+    "delete": "Delete",
+    "viewDetails": "View Details",
+    "total": "Total",
+    "partnerRequestModal": {
+      "title": "Registration Details",
+      "companyName": "Company Name",
+      "phoneNumber": "Phone Number",
+      "submittedAt": "Submitted At",
+      "partnerRequestType": "Requested Role",
+      "status": "Status",
+      "rejectReason": "Rejection Reason",
+      "rejectReasonPlaceHolder": "Enter rejection reason"
+    }
+  },
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
@@ -898,7 +952,10 @@
     "CreateServiceRequest": "Create Service Request",
     "UpdateServiceRequest": "Update Service Request",
     "Back": "Back",
-    "ViewDetail": "View detail"
+    "ViewDetail": "View detail",
+    "RegisterPartner": "Register as Partner",
+    "Reject" : "Rejeact",
+    "Approve": "Approve"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -922,6 +979,10 @@
       "title": "Are you sure?",
       "text": "This service will be deleted and cannot be restored!"
     },
+    "DeletePartnerRequestModal": {
+      "title": "Are you sure?",
+      "text": "This request will be deleted and cannot be restored!"
+    },
     "DeleteAddressModal": {
       "title": "Delete this address?",
       "text": "This action cannot be undone."
@@ -940,57 +1001,67 @@
     }
   },
   "ERROR": {
-    "UPLOAD_FAILED": "Failed to upload image(s).",
-    "LOGIN_NOT_FOUND": "Email not registered",
-    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request too frequent, please try again later!",
-    "LOGIN_OTP_INCORECT": "Incorrect or expired OTP code",
-    "LOGIN_TOKEN_INVALID": "Invalid login session, please log in again",
-    "LOGIN_TOKEN_EXPIRED": "Login session expired, please log in again",
-    "REGISTER_ALREADY_EXISTS": "Email already registered",
+    "UPLOAD_FAILED": "Image upload failed.",
+    "LOGIN_NOT_FOUND": "Email is not registered.",
+    "LOGIN_OTP_REQUEST_TOO_FREQUENT": "OTP request is too frequent, please try again later!",
+    "LOGIN_OTP_INCORECT": "OTP is incorrect or has expired.",
+    "LOGIN_TOKEN_INVALID": "Invalid session, please log in again.",
+    "LOGIN_TOKEN_EXPIRED": "Session has expired, please log in again.",
+    "LOGIN_GOOGLE": "Google login failed.",
+    "REGISTER_ALREADY_EXISTS": "Email is already registered.",
+
     "NULL_NAME": "Please enter your full name.",
-    "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
     "NULL_PHONE": "Please enter your phone number.",
-    "INVALID_PHONE": "Invalid phone number.",
     "NULL_EMAIL": "Please enter your email.",
+    "NULL_OTP": "Please enter the OTP.",
+    "NULL_COMPANYNAME": "Please enter the company name.",
+    "NULL_PARTNERTYPE": "Please select a role.",
+    "NULL_IMAGES": "Please upload company images.",
+
+    "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
+    "INVALID_PHONE": "Invalid phone number.",
     "INVALID_EMAIL": "Invalid email.",
-    "NOT_FOUND_EMAIL": "Email not found for verification.",
-    "NULL_OTP": "Please enter OTP code.",
 
     "ADDRESS_NOT_FOUND": "Address not found.",
     "ADDRESS_ID_MISMATCH": "Address ID does not match.",
     "ADDRESS_MAX": "You can only add up to 5 addresses.",
-    "NETWORK_ERROR": "Unable to connect to server, please try again later!",
+    "NETWORK_ERROR": "Cannot connect to the server, please try again later!",
 
-    "MAXIMUM_IMAGE": "You can only upload a maximum of 5 images.",
+    "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
-    "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service request ontime!",
+    "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
     "MATERIAL_NOT_FOUND": "Material not found.",
-    "IMAGE_NOT_FOUND": "Image not found",
-    "SERVICE_NOT_FOUND": "Service not found.",
+    "IMAGE_NOT_FOUND": "Image not found.",
+    "NOT_FOUND_EMAIL": "Email for verification not found.",
 
-    "REQUIRED_BRANDNAME": "Please enter brand name.",
-    "REQUIRED_BRANDLOGO": "Please upload your brand logo.",
-    "REQUIRED_CATEGORYNAME": "Please enter category name.",
+    "REQUIRED_BRANDNAME": "Please enter the brand name.",
+    "REQUIRED_BRANDLOGO": "Please upload the brand logo.",
+    "REQUIRED_CATEGORYNAME": "Please enter the category name.",
     "REQUIRED_MATERIAL_NAME": "Please enter the material name.",
-    "REQUIRED_MATERIAL_IMAGES": "Please upload a material image.",
+    "REQUIRED_MATERIAL_IMAGES": "Please upload material images.",
     "REQUIRED_MATERIAL_UNIT": "Please enter the material unit.",
     "REQUIRED_MATERIAL_BRAND": "Please select a brand.",
     "REQUIRED_MATERIAL_CATEGORY": "Please select a category.",
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
-    "REQUIRED_ADDRESS": "Please provide address information before create service request!",
-    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please choose address",
-    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please fill in more description for best search results",
+    "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
+    "REQUIRD_REJECT_REASON":"Please enter reject reason",
+
+    "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
+    "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
+    "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
-    "LOAD_ERROR": "Failed to load data, please try again later.",
-    "SUBMIT_ERROR": "Failed to submit data, please try again later.",
-    "DELETE_ERROR": "Failed to delete, please try again later.",
-    "UPDATE_ERROR": "Failed to update, please try again later."
+    "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
+    "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
+    "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
+    "UPDATE_ERROR": "An error occurred while updating. Please try again later."
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1011,7 +1082,13 @@
     "SERVICE_UPDATE": "Service updated successfully.",
     "SERVICE_REQUEST_ADD": "Add service request successfully.",
     "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
+<<<<<<< HEAD
     "REJECTED": "Rejected successfully."
+=======
+    "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "REJECT": "Request successfully rejected",
+    "APPROVE": "Request successfully approved"
+>>>>>>> develop
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1068,10 +1145,15 @@
     },
     "PartnerType":{
       "Distributor":"Distributor",
-      "Contractor": "Contractor"
+      "DistributorDescription": "Providing construction materials",      
+      "Contractor": "Contractor",
+      "ContractorDescription" :"Providing construction/repair solutions"
     }
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
+  },
+  "common":{
+    "search":"Search..."
   }
 }

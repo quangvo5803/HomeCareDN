@@ -1,7 +1,6 @@
 ﻿using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI.Controllers
 {

@@ -14,8 +14,8 @@ import { useDebounce } from 'use-debounce';
 
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
-  const { user: authUser } = useAuth();
-  const adminId = authUser?.id?.toString();
+  const { user } = useAuth();
+  const adminId = user?.id?.toString();
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -132,15 +132,8 @@ export default function AdminMaterialManager() {
     } else {
       await createMaterial(materialData);
       toast.success(t('SUCCESS.MATERIAL_ADD'));
-
-      const newTotal = (totalMaterials ?? 0) + 1;
-      const newLastPage = Math.ceil(newTotal / pageSize);
-
-      if (newLastPage !== currentPage) {
-        setCurrentPage(newLastPage);
-      } else {
-        await fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
-      }
+      const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
+      setCurrentPage(lastPage);
     }
 
     setIsModalOpen(false);
@@ -185,7 +178,7 @@ export default function AdminMaterialManager() {
               />
             </div>
             <button
-              className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => {
                 if (brands.length === 0 || categories.length === 0) {
                   toast.error(t('adminMaterialManager.noBrandAndService'));
@@ -253,12 +246,23 @@ export default function AdminMaterialManager() {
                     materials.map((m, index) => {
                       const owned = isOwnedByAdmin(m);
                       const creatorName = getCreatorName(m);
+
+                      let displayName;
+                      if (owned) {
+                        if (i18n.language === 'vi') {
+                          displayName = t('Của bạn');
+                        } else {
+                          displayName = t('Your');
+                        }
+                      } else {
+                        displayName = creatorName;
+                      }
+
                       return (
                         <tr
                           key={m.materialID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
                           {/* STT */}
                           <td className="px-4 py-4 text-center align-middle">
@@ -280,12 +284,14 @@ export default function AdminMaterialManager() {
                                 ) : (
                                   <img
                                     src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                                    alt="No image"
+                                    alt=""
                                     className="object-cover w-10 h-10"
+                                    loading="lazy"
+                                    decoding="async"
                                   />
                                 )}
                               </div>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm font-medium text-black">
                                 {i18n.language === 'vi'
                                   ? m.name
                                   : m.nameEN || m.name}
@@ -293,29 +299,27 @@ export default function AdminMaterialManager() {
                             </div>
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.brandName
                               : m.brandNameEN || m.brandName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.categoryName
                               : m.categoryNameEN || m.categoryName}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
                               ? m.unit
                               : m.unitEN || m.unit}
                           </td>
 
-                          <td className="px-6 py-4 text-center align-middle">
+                          <td className="px-6 py-4 text-center align-middle text-black">
                             <span className="inline-flex items-center justify-center px-2 py-1 text-xs rounded-md ">
-                              {owned
-                                ? t('common.you', { defaultValue: 'You' })
-                                : creatorName}
+                              {displayName}
                             </span>
                           </td>
 

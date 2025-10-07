@@ -167,9 +167,8 @@ export default function AdminServiceManager() {
                     services.map((svc, index) => (
                       <tr
                         key={svc.serviceID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${
-                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                        }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
