@@ -88,7 +88,7 @@ namespace BusinessLogic.Services
             }
             var totalCount = await query.CountAsync();
 
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
                 "brandName" => query.OrderBy(b => b.BrandName),
                 "brandName_desc" => query.OrderByDescending(b => b.BrandName),

@@ -5,27 +5,12 @@ import BrandContext from './BrandContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
-
+import { withMinLoading } from '../utils/withMinLoading';
 export const BrandProvider = ({ children }) => {
   const { user } = useAuth();
   const [brands, setBrands] = useState([]);
   const [totalBrands, setTotalBrands] = useState(0);
   const [loading, setLoading] = useState(false);
-
-  const MIN_LOADING_TIME = 500;
-
-  // 📌 Helper: đảm bảo loading hiển thị tối thiểu
-  const withMinLoading = async (asyncFunc) => {
-    const startTime = Date.now();
-    setLoading(true);
-    try {
-      return await asyncFunc();
-    } finally {
-      const elapsed = Date.now() - startTime;
-      const remaining = Math.max(MIN_LOADING_TIME - elapsed, 0);
-      setTimeout(() => setLoading(false), remaining);
-    }
-  };
 
   // 📌 Fetch brands (có min loading)
   const fetchBrands = useCallback(
@@ -45,23 +30,25 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           return { items: [], totalCount: 0 };
         }
-      });
+      }, setLoading);
     },
     []
   );
 
-  // 📌 Fetch all brands (dropdown) - không cần loading
+  // 📌 Fetch all brands (dropdown)
   const fetchAllBrands = useCallback(async () => {
-    try {
-      const data = await brandService.getAllBrands({
-        PageNumber: 1,
-        PageSize: 9999,
-      });
-      return data.items || [];
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return [];
-    }
+    return await withMinLoading(async () => {
+      try {
+        const data = await brandService.getAllBrands({
+          PageNumber: 1,
+          PageSize: 9999,
+        });
+        return data.items || [];
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return [];
+      }
+    }, setLoading);
   }, []);
 
   // 📌 Get by ID
@@ -93,7 +80,7 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           throw err;
         }
-      });
+      }, setLoading);
     },
     [user?.role]
   );
@@ -112,7 +99,7 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           throw err;
         }
-      });
+      }, setLoading);
     },
     [user?.role]
   );
