@@ -95,7 +95,7 @@ namespace BusinessLogic.Services
                 "brandnameen" => query.OrderBy(b => b.BrandNameEN),
                 "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
                 "random" => query.OrderBy(b => b.BrandID),
-                _ => query.OrderBy(b => b.BrandID),
+                _ => query.OrderBy(b => b.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

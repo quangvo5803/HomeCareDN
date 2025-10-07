@@ -56,7 +56,7 @@ namespace BusinessLogic.Services
                 "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
                 "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
                 "random" => query.OrderBy(s => s.CategoryID),
-                _ => query.OrderBy(c => c.CategoryID),
+                _ => query.OrderBy(c => c.CreatedAt),
             };
 
             query = query

@@ -55,12 +55,15 @@ export const CategoryProvider = ({ children }) => {
   const getCategoryById = useCallback(
     async (id) => {
       try {
+        setLoading(true);
         const local = categories.find((c) => c.categoryID === id);
         if (local) return local;
         return await categoryService.getCategoryById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
+      } finally {
+        setLoading(false);
       }
     },
     [categories]
@@ -119,6 +122,7 @@ export const CategoryProvider = ({ children }) => {
         await categoryService.deleteCategory(id);
         // Xoá khỏi local
         setCategories((prev) => prev.filter((c) => c.categoryID !== id));
+        setTotalCategories((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

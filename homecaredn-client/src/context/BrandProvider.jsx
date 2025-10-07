@@ -43,6 +43,22 @@ export const BrandProvider = ({ children }) => {
       return [];
     }
   }, []);
+  const getBrandById = useCallback(
+    async (id) => {
+      try {
+        setLoading(true);
+        const local = brands.find((c) => c.brandID === id);
+        if (local) return local;
+        return await brandService.getBrandById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [brands]
+  );
   const createBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
@@ -106,6 +122,7 @@ export const BrandProvider = ({ children }) => {
       loading,
       fetchBrands,
       fetchAllBrands,
+      getBrandById,
       createBrand,
       updateBrand,
       deleteBrand,
@@ -116,6 +133,7 @@ export const BrandProvider = ({ children }) => {
       loading,
       fetchBrands,
       fetchAllBrands,
+      getBrandById,
       createBrand,
       updateBrand,
       deleteBrand,

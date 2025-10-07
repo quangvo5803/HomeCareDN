@@ -12,7 +12,7 @@ export default function AdminBrandManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
+  const [editingBrandID, setEditingBrandID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
@@ -71,7 +71,7 @@ export default function AdminBrandManager() {
     }
 
     setIsModalOpen(false);
-    setEditingBrand(null);
+    setEditingBrandID(null);
   };
 
   if (loading) return <Loading />;
@@ -128,10 +128,10 @@ export default function AdminBrandManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingBrand(null);
+              setEditingBrandID(null);
             }}
             onSave={handleSave}
-            brand={editingBrand}
+            brandID={editingBrandID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -206,7 +206,7 @@ export default function AdminBrandManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
-                                setEditingBrand(brand);
+                                setEditingBrandID(brand.brandID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -301,7 +301,7 @@ export default function AdminBrandManager() {
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingBrand(brand);
+                            setEditingBrandID(brand);
                             setIsModalOpen(true);
                           }}
                         >

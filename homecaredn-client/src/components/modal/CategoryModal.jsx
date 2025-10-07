@@ -5,12 +5,14 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { useCategory } from '../../hook/useCategory';
+import Loading from '../Loading';
 
 export default function CategoryModal({
   isOpen,
   onClose,
   onSave,
-  category,
+  categoryID,
   setUploadProgress,
 }) {
   const { t } = useTranslation();
@@ -20,26 +22,36 @@ export default function CategoryModal({
   const [logoPreview, setLogoPreview] = useState(null);
   const [isActive, setIsActive] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [category, setCategory] = useState();
   const { user } = useAuth();
+  const { loading, getCategoryById } = useCategory();
   // Khi mở modal, nếu có category (edit) thì fill dữ liệu
   useEffect(() => {
-    if (isOpen) {
-      if (category) {
-        setCategoryName(category.categoryName || '');
-        setCategoryNameEN(category.categoryNameEN || '');
-        setLogoPreview(category.categoryLogo || null);
-        setLogoFile(null);
-        setIsActive(category.isActive ?? true);
-        setUploadProgress(0);
-      } else {
-        setCategoryName('');
-        setCategoryNameEN('');
-        setLogoFile(null);
-        setLogoPreview(null);
-        setUploadProgress(0);
+    const fetchCategory = async () => {
+      if (isOpen) {
+        if (categoryID) {
+          const result = await getCategoryById(categoryID);
+          if (result) {
+            setCategory(result);
+            setCategoryName(result.categoryName || '');
+            setCategoryNameEN(result.categoryNameEN || '');
+            setLogoPreview(result.categoryLogo || null);
+            setLogoFile(null);
+            setIsActive(result.isActive ?? true);
+            setUploadProgress(0);
+          }
+          return;
+        }
       }
-    }
-  }, [isOpen, category, setUploadProgress]);
+      setCategory(null);
+      setCategoryName('');
+      setCategoryNameEN('');
+      setLogoFile(null);
+      setLogoPreview(null);
+      setUploadProgress(0);
+    };
+    fetchCategory();
+  }, [isOpen, categoryID, category, getCategoryById, setUploadProgress]);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -94,6 +106,7 @@ export default function CategoryModal({
   };
 
   if (!isOpen) return null;
+  if (loading) return <Loading />;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
@@ -241,13 +254,7 @@ CategoryModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  category: PropTypes.shape({
-    categoryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    categoryName: PropTypes.string,
-    categoryNameEN: PropTypes.string,
-    categoryLogo: PropTypes.string,
-    isActive: PropTypes.bool,
-  }),
+  categoryID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
 };
 

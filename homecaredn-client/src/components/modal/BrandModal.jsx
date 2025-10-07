@@ -4,12 +4,14 @@ import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { useBrand } from '../../hook/useBrand';
+import Loading from '../Loading';
 
 export default function BrandModal({
   isOpen,
   onClose,
   onSave,
-  brand,
+  brandID,
   setUploadProgress,
 }) {
   const { t } = useTranslation();
@@ -20,19 +22,29 @@ export default function BrandModal({
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [brand, setBrand] = useState();
+
+  const { loading, getBrandById } = useBrand();
 
   // Khi mở modal, nếu có brand (chế độ edit) thì fill dữ liệu
   useEffect(() => {
-    if (isOpen) {
-      if (brand) {
-        setBrandName(brand.brandName || '');
-        setBrandDescription(brand.brandDescription || '');
-        setBrandNameEN(brand.brandNameEN || '');
-        setBrandDescriptionEN(brand.brandDescriptionEN || '');
-        setLogoPreview(brand.brandLogo || null);
-        setLogoFile(null);
-        setUploadProgress(0);
-      } else {
+    const fetchBrand = async () => {
+      if (isOpen) {
+        if (brandID) {
+          const result = await getBrandById(brandID);
+          if (result) {
+            setBrand(result);
+            setBrandName(result.brandName || '');
+            setBrandDescription(result.brandDescription || '');
+            setBrandNameEN(result.brandNameEN || '');
+            setBrandDescriptionEN(result.brandDescriptionEN || '');
+            setLogoPreview(result.brandLogo || null);
+            setLogoFile(null);
+            setUploadProgress(0);
+          }
+          return;
+        }
+        setBrand(null);
         setBrandName('');
         setBrandDescription('');
         setBrandNameEN('');
@@ -41,8 +53,10 @@ export default function BrandModal({
         setLogoPreview(null);
         setUploadProgress(0);
       }
-    }
-  }, [isOpen, brand, setUploadProgress]);
+    };
+
+    fetchBrand();
+  }, [isOpen, brandID, getBrandById, setUploadProgress]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -92,6 +106,7 @@ export default function BrandModal({
   };
 
   if (!isOpen) return null;
+  if (loading) return <Loading />;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
@@ -257,15 +272,7 @@ BrandModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  brand: PropTypes.shape({
-    brandID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    brandName: PropTypes.string,
-    brandDescription: PropTypes.string,
-    brandNameEN: PropTypes.string,
-    brandDescriptionEN: PropTypes.string,
-    brandLogo: PropTypes.string,
-    brandLogoPublicId: PropTypes.string,
-  }),
+  brandID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
 };
 // Default props

@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import Loading from '../Loading';
 
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -28,7 +29,7 @@ export default function MaterialModal({
   isOpen,
   onClose,
   onSave,
-  material,
+  materialID,
   brands,
   categories,
   setUploadProgress,
@@ -49,32 +50,41 @@ export default function MaterialModal({
 
   const [images, setImages] = useState([]);
 
+  const [material, setMaterial] = useState();
+  const { loading, getMaterialById } = useMaterial();
   // Fill data khi edit
   useEffect(() => {
-    if (isOpen) {
-      if (material) {
-        const foundBrand = brands.find(
-          (b) => b.brandName === material.brandName
-        );
-        const foundCategory = categories.find(
-          (c) => c.categoryName === material.categoryName
-        );
-        setName(material.name || '');
-        setNameEN(material.nameEN || '');
-        setUnit(material.unit || '');
-        setUnitEN(material.unitEN || '');
-        setBrandID(foundBrand?.brandID || '');
-        setCategoryID(foundCategory?.categoryID || '');
-        setDescription(material.description || '');
-        setDescriptionEN(material.descriptionEN || '');
-        setImages(
-          (material.imageUrls || []).map((url) => ({
-            url,
-            isNew: false,
-          }))
-        );
-        setUploadProgress(0);
-      } else {
+    const fetchMaterial = async () => {
+      if (isOpen) {
+        if (materialID) {
+          const result = await getMaterialById(materialID);
+          if (result) {
+            setMaterial(result);
+            const foundBrand = brands.find(
+              (b) => b.brandName === result.brandName
+            );
+            const foundCategory = categories.find(
+              (c) => c.categoryName === result.categoryName
+            );
+            setName(result.name || '');
+            setNameEN(result.nameEN || '');
+            setUnit(result.unit || '');
+            setUnitEN(result.unitEN || '');
+            setBrandID(foundBrand?.brandID || '');
+            setCategoryID(foundCategory?.categoryID || '');
+            setDescription(result.description || '');
+            setDescriptionEN(result.descriptionEN || '');
+            setImages(
+              (result.imageUrls || []).map((url) => ({
+                url,
+                isNew: false,
+              }))
+            );
+            setUploadProgress(0);
+          }
+          return;
+        }
+        setMaterial(null);
         setName('');
         setNameEN('');
         setUnit('');
@@ -86,8 +96,16 @@ export default function MaterialModal({
         setImages([]);
         setUploadProgress(0);
       }
-    }
-  }, [isOpen, material, brands, categories, setUploadProgress]);
+    };
+    fetchMaterial();
+  }, [
+    isOpen,
+    materialID,
+    brands,
+    categories,
+    getMaterialById,
+    setUploadProgress,
+  ]);
 
   // Chọn ảnh local
   const handleFileChange = (e) => {
@@ -119,7 +137,7 @@ export default function MaterialModal({
 
   const confirmDeleteImage = async (img) => {
     try {
-      await deleteMaterialImage(material.MaterialID, img.url);
+      await deleteMaterialImage(material.materialID, img.url);
       Swal.close();
       toast.success(t('SUCCESS.DELETE'));
       removeImageFromState(img);
@@ -203,6 +221,7 @@ export default function MaterialModal({
   };
 
   if (!isOpen) return null;
+  if (loading && isOpen) return <Loading />;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
@@ -471,7 +490,7 @@ MaterialModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  material: PropTypes.object,
+  materialID: PropTypes.string,
   brands: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   setUploadProgress: PropTypes.func.isRequired,

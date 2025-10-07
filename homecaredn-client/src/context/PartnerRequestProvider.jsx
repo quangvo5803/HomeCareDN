@@ -67,13 +67,16 @@ export const PartnerRequestProvider = ({ children }) => {
   /** Public: lấy chi tiết */
   const getPartnerRequestById = useCallback(
     async (id) => {
-      const local = partnerRequests.find((p) => p.partnerRequestID === id);
-      if (local) return local;
       try {
+        setLoading(true);
+        const local = partnerRequests.find((p) => p.partnerRequestID === id);
+        if (local) return local;
         return await partnerRequestService.getPartnerRequestById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
+      } finally {
+        setLoading(false);
       }
     },
     [partnerRequests]
