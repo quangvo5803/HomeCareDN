@@ -102,10 +102,10 @@ export const ServiceProvider = ({ children }) => {
           prev.map((s) =>
             s.serviceID === updated.serviceID
               ? {
-                ...s,
-                ...updated,
-                imageUrls: updated.imageUrls ?? s.imageUrls,
-              }
+                  ...s,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? s.imageUrls,
+                }
               : s
           )
         );

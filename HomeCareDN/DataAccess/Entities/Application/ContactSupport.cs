@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
 namespace DataAccess.Entities.Application
 {
     public class ContactSupport
@@ -22,5 +21,6 @@ namespace DataAccess.Entities.Application
         public bool IsProcessed { get; set; } = false;
         public string? ReplyContent { get; set; }
         public string? ReplyBy { get; set; }
+        public DateTime CreateAt { get; set; } = DateTime.UtcNow;
     }
 }

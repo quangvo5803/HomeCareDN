@@ -15,13 +15,12 @@ import { useDebounce } from 'use-debounce';
 export default function AdminMaterialManager() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const adminId = user?.id?.toString();
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMaterial, setEditingMaterial] = useState(null);
+  const [editingMaterialID, setEditingMaterialID] = useState(null);
   const [modalReadOnly, setModalReadOnly] = useState(false);
 
   const { fetchAllBrands } = useBrand();
@@ -36,7 +35,6 @@ export default function AdminMaterialManager() {
     totalMaterials,
     loading,
     fetchMaterials,
-    getMaterialById,
     createMaterial,
     updateMaterial,
     deleteMaterial,
@@ -70,15 +68,6 @@ export default function AdminMaterialManager() {
     setCurrentPage(1);
   };
 
-  const getCreatorId = (m) => (m?.userId ?? m?.userID)?.toString();
-
-  const getCreatorName = (m) => m?.userFullName || m?.userName || '-';
-
-  const isOwnedByAdmin = (m) => {
-    const creatorId = getCreatorId(m);
-    return creatorId && adminId && creatorId === adminId;
-  };
-
   // Delete
   const handleDelete = async (materialId) => {
     showDeleteModal({
@@ -102,16 +91,14 @@ export default function AdminMaterialManager() {
 
   // View (read-only)
   const handleView = async (m) => {
-    const res = await getMaterialById(m.materialID);
-    setEditingMaterial(res || m);
+    setEditingMaterialID(m.materialID);
     setModalReadOnly(true);
     setIsModalOpen(true);
   };
 
   // Edit (owner only)
   const handleEdit = async (m) => {
-    const res = await getMaterialById(m.materialID);
-    setEditingMaterial(res || m);
+    setEditingMaterialID(m.materialID);
     setModalReadOnly(false);
     setIsModalOpen(true);
   };
@@ -121,7 +108,7 @@ export default function AdminMaterialManager() {
     if (modalReadOnly) {
       toast.info(t('common.viewOnly', { defaultValue: 'View only' }));
       setIsModalOpen(false);
-      setEditingMaterial(null);
+      setEditingMaterialID(null);
       return;
     }
 
@@ -137,10 +124,10 @@ export default function AdminMaterialManager() {
     }
 
     setIsModalOpen(false);
-    setEditingMaterial(null);
+    setEditingMaterialID(null);
   };
 
-  if (loading) return <Loading />;
+  if (loading && !isModalOpen) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
@@ -184,7 +171,7 @@ export default function AdminMaterialManager() {
                   toast.error(t('adminMaterialManager.noBrandAndService'));
                   return;
                 }
-                setEditingMaterial(null);
+                setEditingMaterialID(null);
                 setModalReadOnly(false);
                 setIsModalOpen(true);
               }}
@@ -199,11 +186,11 @@ export default function AdminMaterialManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingMaterial(null);
+              setEditingMaterialID(null);
               setModalReadOnly(false);
             }}
             onSave={handleSave}
-            material={editingMaterial}
+            materialID={editingMaterialID}
             brands={brands}
             categories={categories}
             setUploadProgress={setUploadProgress}
@@ -243,26 +230,23 @@ export default function AdminMaterialManager() {
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {materials && materials.length > 0 ? (
-                    materials.map((m, index) => {
-                      const owned = isOwnedByAdmin(m);
-                      const creatorName = getCreatorName(m);
+                    materials.map((material, index) => {
+                      const ownedID = material.userID;
+                      const creatorName = material.userName;
 
                       let displayName;
-                      if (owned) {
-                        if (i18n.language === 'vi') {
-                          displayName = t('Của bạn');
-                        } else {
-                          displayName = t('Your');
-                        }
+                      if (ownedID == user.id) {
+                        displayName = 'Admin';
                       } else {
                         displayName = creatorName;
                       }
 
                       return (
                         <tr
-                          key={m.materialID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          key={material.materialID}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           {/* STT */}
                           <td className="px-4 py-4 text-center align-middle">
@@ -275,10 +259,11 @@ export default function AdminMaterialManager() {
                           <td className="px-6 py-4 text-left align-middle">
                             <div className="flex items-center">
                               <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg border border-gray-200">
-                                {m.imageUrls?.length > 0 && m.imageUrls[0] ? (
+                                {material.imageUrls?.length > 0 &&
+                                material.imageUrls[0] ? (
                                   <img
-                                    src={m.imageUrls[0]}
-                                    alt={m.name}
+                                    src={material.imageUrls[0]}
+                                    alt={material.name}
                                     className="object-cover w-full h-full"
                                   />
                                 ) : (
@@ -293,28 +278,29 @@ export default function AdminMaterialManager() {
                               </div>
                               <div className="text-sm font-medium text-black">
                                 {i18n.language === 'vi'
-                                  ? m.name
-                                  : m.nameEN || m.name}
+                                  ? material.name
+                                  : material.nameEN || material.name}
                               </div>
                             </div>
                           </td>
 
                           <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
-                              ? m.brandName
-                              : m.brandNameEN || m.brandName}
+                              ? material.brandName
+                              : material.brandNameEN || material.brandName}
                           </td>
 
                           <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
-                              ? m.categoryName
-                              : m.categoryNameEN || m.categoryName}
+                              ? material.categoryName
+                              : material.categoryNameEN ||
+                                material.categoryName}
                           </td>
 
                           <td className="px-6 py-4 text-center align-middle text-black">
                             {i18n.language === 'vi'
-                              ? m.unit
-                              : m.unitEN || m.unit}
+                              ? material.unit
+                              : material.unitEN || material.unit}
                           </td>
 
                           <td className="px-6 py-4 text-center align-middle text-black">
@@ -326,17 +312,19 @@ export default function AdminMaterialManager() {
                           {/* Actions */}
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex justify-center space-x-2">
-                              {owned ? (
+                              {ownedID === user.id ? (
                                 <>
                                   <button
                                     className="px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                                    onClick={() => handleEdit(m)}
+                                    onClick={() => handleEdit(material)}
                                   >
                                     {t('BUTTON.Edit')}
                                   </button>
                                   <button
                                     className="px-3 py-2 text-xs font-medium border rounded-md border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
-                                    onClick={() => handleDelete(m.materialID)}
+                                    onClick={() =>
+                                      handleDelete(material.materialID)
+                                    }
                                   >
                                     {t('BUTTON.Delete')}
                                   </button>
@@ -345,13 +333,15 @@ export default function AdminMaterialManager() {
                                 <>
                                   <button
                                     className="px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                                    onClick={() => handleView(m)}
+                                    onClick={() => handleView(material)}
                                   >
                                     {t('BUTTON.View')}
                                   </button>
                                   <button
                                     className="px-3 py-2 text-xs font-medium border rounded-md border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
-                                    onClick={() => handleDelete(m.materialID)}
+                                    onClick={() =>
+                                      handleDelete(material.materialID)
+                                    }
                                   >
                                     {t('BUTTON.Delete')}
                                   </button>
@@ -397,7 +387,7 @@ export default function AdminMaterialManager() {
                                 );
                                 return;
                               }
-                              setEditingMaterial(null);
+                              setEditingMaterialID(null);
                               setModalReadOnly(false);
                               setIsModalOpen(true);
                             }}
