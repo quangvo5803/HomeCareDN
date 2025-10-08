@@ -66,7 +66,7 @@ namespace BusinessLogic.Services
                 "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
                 "random" => query.OrderBy(b => b.MaterialID),
-                _ => query.OrderBy(m => m.NameEN ?? m.Name),
+                _ => query.OrderBy(m => m.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

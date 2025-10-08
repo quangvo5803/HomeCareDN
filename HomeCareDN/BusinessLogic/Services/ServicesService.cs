@@ -69,7 +69,7 @@ namespace BusinessLogic.Services
                 "servicenameen" => query.OrderBy(s => s.NameEN),
                 "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
                 "random" => query.OrderBy(s => s.ServiceID),
-                _ => query.OrderBy(b => b.ServiceID),
+                _ => query.OrderBy(b => b.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

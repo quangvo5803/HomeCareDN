@@ -573,9 +573,8 @@
     "services": "dịch vụ",
     "no": "STT",
     "serviceName": "Tên dịch vụ",
-    "numberOfRequest": "Số lượng yêu cầu",
-    "requests": "yêu cầu",
-    "status": "Trạng thái",
+    "serviceType": "Loại dịch vụ",
+    "buildingType": "Loại công trình xây dựng",
     "action": "Thao tác",
     "noService": "Chưa có dịch vụ nào",
     "letStart": "Bắt đầu bằng cách thêm dịch vụ đầu tiên của bạn",
@@ -973,6 +972,11 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "common": {
-    "search": "Tìm kiếm..."
+    "search": "Tìm kiếm...",
+    "sortDefault": "Mặc định",
+    "sortName": "Tên: A-Z",
+    "sortNameDesc": "Tên: Z-A",
+    "sortMaterialCount": "Số lượng sản phẩm: Nhiều -> Ít",
+    "sortMaterialCountDesc": "Số lượng sản phẩm: Ít -> Nhiều"
   }
 }

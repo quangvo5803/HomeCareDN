@@ -43,7 +43,7 @@ export default function Sidebar() {
     {
       icon: 'text-purple-600 fa-solid fa-handshake',
       title: 'partner',
-      link: '/Admin/PartnerManager',
+      link: '/Admin/PartnerRequestManager',
     },
     {
       icon: 'text-emerald-600 fa-solid fa-headset',
