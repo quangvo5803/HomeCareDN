@@ -208,13 +208,12 @@ export default function FilterItem({
                 {/* Dropdown Menu */}
                 {isOpen && (
                     <>
-                        <div
-                            className="fixed inset-0 z-10"
-                            role="button"
-                            tabIndex={0}
+                        <button
+                            type="button"
+                            className="fixed inset-0 z-10 bg-transparent cursor-default"
                             onClick={() => setIsOpen(false)}
-                            onKeyDown={(e) => e.key === "Enter" || e.key === " " ? setIsOpen(false) : null}
-                        />
+                            aria-label="Close modal"
+                        ></button>
 
                         {/* Options */}
                         <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
