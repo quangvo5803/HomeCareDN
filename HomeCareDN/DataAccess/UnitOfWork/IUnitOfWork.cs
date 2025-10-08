@@ -14,6 +14,7 @@ namespace DataAccess.UnitOfWork
         IConversationRepository ConversationRepository { get; }
         IChatMessageRepository ChatMessageRepository { get; }
         IContactSupportRepository ContactSupportRepository { get; }
+        IPartnerRequestRepository PartnerRequestRepository { get; }
         Task SaveAsync();
     }
 }

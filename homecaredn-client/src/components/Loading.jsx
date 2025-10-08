@@ -7,19 +7,19 @@ const Loading = ({ progress }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-white p-4">
+    <div className="fixed inset-0 z-[9999] flex flex-col justify-center items-center bg-white p-4">
       <i
         className="fa-solid fa-building fa-flip mb-6"
         style={{ color: '#FDA12B', fontSize: '48px' }}
       ></i>
 
-      {progress > 0 && (
+      {progress >= 0 && (
         <div className="w-full max-w-md">
           {/* Progress Bar Container */}
           <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-orange-600 transition-all duration-200"
-              style={{ width: `${progress || 0}%` }}
+              style={{ width: `${progress}%` }}
             ></div>
           </div>
 
@@ -32,7 +32,13 @@ const Loading = ({ progress }) => {
     </div>
   );
 };
+
 Loading.propTypes = {
-  progress: PropTypes.number.isRequired,
+  progress: PropTypes.number,
 };
+
+Loading.defaultProps = {
+  progress: 0,
+};
+
 export default Loading;

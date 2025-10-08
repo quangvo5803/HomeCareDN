@@ -6,15 +6,17 @@ import { useCategory } from '../../hook/useCategory';
 import { Pagination } from 'antd';
 import CategoryModal from '../../components/modal/CategoryModal';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
+import { useDebounce } from 'use-debounce';
 
 export default function AdminCategoryManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategoryID, setEditingCategoryID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
   const {
     categories,
     totalCategories,
@@ -27,9 +29,17 @@ export default function AdminCategoryManager() {
 
   // Fetch categories khi vào trang
   useEffect(() => {
-    fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
-  }, [currentPage, fetchCategories]);
+    fetchCategories({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      Search: debouncedSearch || '',
+    });
+  }, [currentPage, pageSize, debouncedSearch, fetchCategories]);
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
   // Delete Category
   const handleDelete = async (categoryId) => {
     showDeleteModal({
@@ -55,7 +65,6 @@ export default function AdminCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
-
       toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
@@ -65,7 +74,7 @@ export default function AdminCategoryManager() {
     }
 
     setIsModalOpen(false);
-    setEditingCategory(null);
+    setEditingCategoryID(null);
   };
   if (loading) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
@@ -85,18 +94,33 @@ export default function AdminCategoryManager() {
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
-                {categories?.length || 0} {t('adminCategoryManager.categories')}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Number of brands */}
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span className="text-sm font-semibold text-gray-700">
+                {totalCategories || 0} {t('adminCategoryManager.categories')}
               </span>
             </div>
+
+            {/* Input search */}
+            <div className="flex-1 max-w-lg w-full">
+              <input
+                id="search-input"
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+              />
+            </div>
+
+            {/* Add New Category Button */}
             <button
-              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="mr-2 fa-solid fa-plus"></i>
+              <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewCategory')}
             </button>
           </div>
@@ -106,10 +130,10 @@ export default function AdminCategoryManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingCategory(null);
+              setEditingCategoryID(null);
             }}
             onSave={handleSave}
-            category={editingCategory}
+            categoryID={editingCategoryID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -144,15 +168,16 @@ export default function AdminCategoryManager() {
                     categories.map((cat, index) => (
                       <tr
                         key={cat.categoryID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
                             {(currentPage - 1) * pageSize + index + 1}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-center align-middle">
+                        <td className="px-6 py-4 text-left align-middle">
                           <div className="flex items-center justify-center">
                             <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg">
                               {cat.categoryLogo ? (
@@ -199,7 +224,7 @@ export default function AdminCategoryManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
-                                setEditingCategory(cat);
+                                setEditingCategoryID(cat.categoryID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -220,7 +245,7 @@ export default function AdminCategoryManager() {
                   ) : (
                     <tr>
                       <td colSpan="5" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"
@@ -299,10 +324,11 @@ export default function AdminCategoryManager() {
                       </div>
                       <div className="text-center">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                            }`}
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            cat.isActive
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}
                         >
                           {cat.isActive
                             ? t('BUTTON.Activate')
@@ -316,7 +342,7 @@ export default function AdminCategoryManager() {
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingCategory(cat);
+                            setEditingCategoryID(cat.categoryID);
                             setIsModalOpen(true);
                           }}
                         >
@@ -367,7 +393,7 @@ export default function AdminCategoryManager() {
             </div>
 
             {/* Pagination */}
-            {totalCategories.length > 0 && (
+            {totalCategories > 0 && (
               <div className="flex justify-center py-4">
                 <Pagination
                   current={currentPage}

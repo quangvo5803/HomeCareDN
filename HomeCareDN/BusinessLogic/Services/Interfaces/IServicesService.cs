@@ -7,7 +7,7 @@ namespace BusinessLogic.Services.Interfaces
     {
         Task<PagedResultDto<ServiceDto>> GetAllServicesAsync(QueryParameters parameters);
         Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto);
-        Task<ServiceDto> GetServiceByIdAsync(Guid id);
+        Task<ServiceDetailDto> GetServiceByIdAsync(Guid id);
         Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto);
         Task DeleteServiceAsync(Guid id);
     }

@@ -17,6 +17,8 @@ namespace DataAccess.Entities.Application
         //EN
         public string? BrandNameEN { get; set; }
         public string? BrandDescriptionEN { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
         public ICollection<Material>? Materials { get; set; }
 
         [ForeignKey("BrandLogoID")]

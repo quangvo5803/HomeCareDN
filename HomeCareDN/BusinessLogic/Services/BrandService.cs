@@ -6,7 +6,6 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
@@ -68,16 +67,52 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.BrandRepository.GetQueryable(
                 includeProperties: "LogoImage,Materials"
             );
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                string searchLower = parameters.Search.ToLower();
+                query = query.Where(b =>
+                    b.BrandName.ToLower().Contains(searchLower)
+                    || (
+                        !string.IsNullOrEmpty(b.BrandDescription)
+                        && b.BrandDescription.ToLower().Contains(searchLower)
+                    )
+                    || (
+                        !string.IsNullOrEmpty(b.BrandNameEN)
+                        && b.BrandNameEN.ToLower().Contains(searchLower)
+                    )
+                    || (
+                        !string.IsNullOrEmpty(b.BrandDescriptionEN)
+                        && b.BrandDescriptionEN.ToLower().Contains(searchLower)
+                    )
+                );
+            }
             var totalCount = await query.CountAsync();
 
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
-                "brandname" => query.OrderBy(b => b.BrandName),
-                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
-                "brandnameen" => query.OrderBy(b => b.BrandNameEN),
-                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                "random" => query.OrderBy(s => Guid.NewGuid()),
-                _ => query.OrderBy(b => b.BrandID),
+                "brandName" => query.OrderBy(b => b.BrandName),
+                "brandName_desc" => query.OrderByDescending(b => b.BrandName),
+                "brandNameEN" => query.OrderBy(b => b.BrandNameEN),
+                "brandNameEN_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                "materialcount" => query
+                    .Select(b => new
+                    {
+                        Brand = b,
+                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
+                    })
+                    .OrderBy(x => x.MaterialCount)
+                    .Select(x => x.Brand),
+
+                "materialcount_desc" => query
+                    .Select(b => new
+                    {
+                        Brand = b,
+                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
+                    })
+                    .OrderByDescending(x => x.MaterialCount)
+                    .Select(x => x.Brand),
+                "random" => query.OrderBy(b => b.BrandID),
+                _ => query.OrderBy(b => b.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

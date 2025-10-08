@@ -5,6 +5,8 @@ import { useMaterial } from '../hook/useMaterial';
 import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
 import CardItem from '../components/CardItem';
+import Loading from '../components/Loading';
+
 const slides = [
   {
     id: 1,
@@ -106,8 +108,8 @@ export default function Home() {
   const { t } = useTranslation();
   const [randomMaterials, setRandomMaterials] = useState([]);
   const [randomServices, setRandomServices] = useState([]);
-  const { fetchMaterials } = useMaterial();
-  const { fetchServices } = useService();
+  const { loading: loadingMaterial, fetchMaterials } = useMaterial();
+  const { loading: loadingService, fetchServices } = useService();
 
   useEffect(() => {
     const loadMaterials = async () => {
@@ -210,7 +212,7 @@ export default function Home() {
     const id = setTimeout(tNext, 5000);
     return () => clearTimeout(id);
   }, [idx, tNext, hasMany]);
-
+  if (loadingMaterial || loadingService) return <Loading />;
   return (
     <div>
       {/* Carousel */}
@@ -507,7 +509,7 @@ export default function Home() {
               {randomServices.length === 0 ? (
                 <p></p>
               ) : (
-                randomServices.map((item) => (
+                randomServices?.map((item) => (
                   <CardItem key={item.serviceID} item={item} />
                 ))
               )}
@@ -548,7 +550,7 @@ export default function Home() {
               {randomMaterials.length === 0 ? (
                 <p></p>
               ) : (
-                randomMaterials.map((item) => (
+                randomMaterials?.map((item) => (
                   <CardItem key={item.materialID} item={item} />
                 ))
               )}

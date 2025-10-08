@@ -5,33 +5,41 @@ import BrandContext from './BrandContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
-
+import { withMinLoading } from '../utils/withMinLoading';
 export const BrandProvider = ({ children }) => {
   const { user } = useAuth();
   const [brands, setBrands] = useState([]);
   const [totalBrands, setTotalBrands] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all brands pagination
-  const fetchBrands = useCallback(
-    async ({ PageNumber = 1, PageSize = 10 } = {}) => {
-      try {
-        setLoading(true);
-        const data = await brandService.getAllBrands({ PageNumber, PageSize });
-        setBrands(data.items || []);
-        setTotalBrands(data.totalCount || 0);
-        return data;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-  //Fetch all brands (dùng cho filter dropdown, ko phân trang)
-  const fetchAllBrands = useCallback(async () => {
+  // 📌 Fetch brands (có min loading)
+  const executeFetch = async ({
+    PageNumber = 1,
+    PageSize = 10,
+    SortBy,
+    Search,
+  } = {}) => {
+    try {
+      const data = await brandService.getAllBrands({
+        PageNumber,
+        PageSize,
+        SortBy,
+        Search,
+      });
+      setBrands(data.items || []);
+      setTotalBrands(data.totalCount || 0);
+      return data;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return { items: [], totalCount: 0 };
+    }
+  };
+  const fetchBrands = useCallback(async (params = {}) => {
+    return await withMinLoading(() => executeFetch(params), setLoading);
+  }, []);
+
+  // 📌 Fetch all brands (dropdown)
+  const executeFetchAllBrands = async () => {
     try {
       const data = await brandService.getAllBrands({
         PageNumber: 1,
@@ -42,53 +50,73 @@ export const BrandProvider = ({ children }) => {
       toast.error(handleApiError(err));
       return [];
     }
+  };
+  const fetchAllBrands = useCallback(async () => {
+    return await withMinLoading(() => executeFetchAllBrands(), setLoading);
   }, []);
+
+  // 📌 Get by ID
+  const getBrandById = useCallback(
+    async (id) => {
+      try {
+        const local = brands.find((c) => c.brandID === id);
+        if (local) return local;
+        return await brandService.getBrandById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    },
+    [brands]
+  );
+
+  // 📌 Create brand (có min loading)
+  const executeCreate = async (dto) => {
+    try {
+      const newBrand = await brandService.createBrand(dto);
+      setBrands((prev) => [...prev, newBrand]);
+      setTotalBrands((prev) => prev + 1);
+      return newBrand;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  };
   const createBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      try {
-        setLoading(true);
-        const newBrand = await brandService.createBrand(dto);
-        setBrands((prev) => [...prev, newBrand]);
-        // Tăng tổng số brand
-        setTotalBrands((prev) => prev + 1);
-        return newBrand;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
+
+      return await withMinLoading(() => executeCreate(dto), setLoading);
     },
     [user?.role]
   );
 
+  // 📌 Update brand
+  const executeUpdateBrand = useCallback(async (dto) => {
+    try {
+      const updated = await brandService.updateBrand(dto);
+      setBrands((prev) =>
+        prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
+      );
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
   const updateBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      try {
-        setLoading(true);
-        const updated = await brandService.updateBrand(dto);
-        // Optimistic update
-        setBrands((prev) =>
-          prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
-        );
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
+      return await withMinLoading(() => executeUpdateBrand(dto), setLoading);
     },
-    [user?.role]
+    [user?.role, executeUpdateBrand]
   );
 
+  // 📌 Delete brand (xóa nhanh, không cần loading overlay)
   const deleteBrand = useCallback(
     async (id) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
       try {
         await brandService.deleteBrand(id);
-        // Xoá khỏi local
         setBrands((prev) => prev.filter((b) => b.brandID !== id));
         setTotalBrands((prev) => prev - 1);
       } catch (err) {
@@ -106,6 +134,7 @@ export const BrandProvider = ({ children }) => {
       loading,
       fetchBrands,
       fetchAllBrands,
+      getBrandById,
       createBrand,
       updateBrand,
       deleteBrand,
@@ -116,6 +145,7 @@ export const BrandProvider = ({ children }) => {
       loading,
       fetchBrands,
       fetchAllBrands,
+      getBrandById,
       createBrand,
       updateBrand,
       deleteBrand,

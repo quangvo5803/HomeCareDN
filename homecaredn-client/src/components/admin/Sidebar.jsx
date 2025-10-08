@@ -33,12 +33,17 @@ export default function Sidebar() {
     {
       icon: 'text-amber-600 fa-solid fa-truck',
       title: 'serviceRequest',
-      link: '/Admin/ServiceRequest',
+      link: '/Admin/ServiceRequestManager',
     },
     {
       icon: 'text-orange-600 fa-solid fa-suitcase',
       title: 'material',
-      link: '/Admin/Material',
+      link: '/Admin/MaterialManager',
+    },
+    {
+      icon: 'text-purple-600 fa-solid fa-handshake',
+      title: 'partner',
+      link: '/Admin/PartnerRequestManager',
     },
     {
       icon: 'text-emerald-600 fa-solid fa-headset',
@@ -48,7 +53,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl max-w-64 ease-nav-brand z-990 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0">
+    <aside className="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl max-w-64 ease-nav-brand z-50 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0">
       <div className="h-20 flex items-center justify-center">
         <a
           className="block m-0 text-sm whitespace-nowrap text-slate-700"
@@ -73,10 +78,9 @@ export default function Sidebar() {
                   to={menuItem.link}
                   end={menuItem.link === '/Admin'} // chỉ active root dashboard
                   className={({ isActive }) =>
-                    `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${
-                      isActive
-                        ? 'bg-blue-500 text-white'
-                        : 'text-slate-700 hover:bg-blue-100'
+                    `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${isActive
+                      ? 'bg-blue-500 text-white'
+                      : 'text-slate-700 hover:bg-blue-100'
                     }`
                   }
                 >
@@ -84,9 +88,8 @@ export default function Sidebar() {
                     <>
                       <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i
-                          className={`${menuItem.icon} ${
-                            isActive ? 'text-white' : ''
-                          } relative top-0 leading-normal`}
+                          className={`${menuItem.icon} ${isActive ? 'text-white' : ''
+                            } relative top-0 leading-normal`}
                         ></i>
                       </div>
                       <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">

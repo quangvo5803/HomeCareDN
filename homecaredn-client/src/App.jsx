@@ -19,6 +19,10 @@ import AdminBrandManager from './pages/admin/AdminBrandManager';
 import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
+import AdminMaterialManager from './pages/admin/AdminMaterialManager';
+import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
+import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail'
+import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -28,8 +32,14 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
+import ServiceDetail from './pages/ServiceDetail';
+import PartnerRegistration from './pages/PartnerRegistration';
+import PartnerTypeSelection from './pages/PartnerTypeSelection';
+import RepairViewAll from './pages/RepairViewAll';
+import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
 import Profile from './pages/customer/Profile';
+import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -53,7 +63,13 @@ function App() {
 function Layout() {
   const { user } = useAuth();
   const location = useLocation();
-  const noHeaderFooterPaths = ['/Login', '/Register', '/VerifyOTP'];
+  const noHeaderFooterPaths = [
+    '/Login',
+    '/Register',
+    '/VerifyOTP',
+    '/PartnerTypeSelection',
+    '/PartnerRegistration',
+  ];
 
   const showHeaderFooter =
     !noHeaderFooterPaths.includes(location.pathname) &&
@@ -110,21 +126,51 @@ function Layout() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/ServiceDetail/:serviceID"
+          element={
+            <PublicRoute>
+              <ServiceDetail />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/PartnerRegistration"
+          element={
+            user ? (
+              <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <PartnerRegistration />
+            )
+          }
+        />
+
+        {/* PartnerTypeSelection */}
+        <Route
+          path="/PartnerTypeSelection"
+          element={
+            user ? (
+              <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <PartnerTypeSelection />
+            )
+          }
+        />
         {/* Login */}
         <Route
           path="/Login"
           element={
-            !user ? <Login /> : <Navigate to={getRedirectPath(user)} replace />
+            user ? <Navigate to={getRedirectPath(user)} replace /> : <Login />
           }
         />
         {/* Register */}
         <Route
           path="/Register"
           element={
-            !user ? (
-              <Register />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <Register />
             )
           }
         />
@@ -132,10 +178,10 @@ function Layout() {
         <Route
           path="/VerifyOTP"
           element={
-            !user ? (
-              <VerifyOTP />
-            ) : (
+            user ? (
               <Navigate to={getRedirectPath(user)} replace />
+            ) : (
+              <VerifyOTP />
             )
           }
         />
@@ -148,6 +194,23 @@ function Layout() {
             </ProtectedRoute>
           }
         ></Route>
+        <Route
+          path="/Customer/ServiceRequest"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/Customer/ServiceRequest/:serviceRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestCreateUpdate />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -161,7 +224,14 @@ function Layout() {
           <Route path="BrandManager" element={<AdminBrandManager />} />
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="ServiceManager" element={<AdminServiceManager />} />
+          <Route path="ServiceRequestManager" element={<AdminServiceRequestManager />} />
+          <Route path="ServiceRequest/:id" element={<AdminServiceRequestDetail />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
+          <Route path="MaterialManager" element={<AdminMaterialManager />} />
+          <Route
+            path="PartnerRequestManager"
+            element={<AdminPartnerRequestManager />}
+          />
         </Route>
         {/* Contractor routes */}
         <Route
@@ -200,7 +270,8 @@ function Layout() {
           }
         />
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
-        {/* Profile route */}
+        <Route path="RepairViewAll" element={<RepairViewAll />} />
+        <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
       </Routes>
       {showHeaderFooter && <Footer />}
     </>

@@ -1,5 +1,4 @@
-﻿using System.Reflection.Emit;
-using DataAccess.Entities.Application;
+﻿using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Data
@@ -19,8 +18,11 @@ namespace DataAccess.Data
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ContactSupport> ContactSupports { get; set; }
+        public DbSet<PartnerRequest> PartnerRequests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("app");
             modelBuilder.Entity<ServiceRequest>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();
@@ -48,12 +50,17 @@ namespace DataAccess.Data
                 entity.Property(e => e.BuildingType).HasConversion<string>();
             });
 
-            modelBuilder.Entity<Conversation>()
-            .HasMany(c => c.Messages)
-            .WithOne(m => m.Conversation!)
-            .HasForeignKey(m => m.ConversationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder
+                .Entity<Conversation>()
+                .HasMany(c => c.Messages)
+                .WithOne(m => m.Conversation!)
+                .HasForeignKey(m => m.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<PartnerRequest>(entity =>
+            {
+                entity.Property(p => p.PartnerRequestType).HasConversion<string>();
+                entity.Property(p => p.Status).HasConversion<string>();
+            });
             base.OnModelCreating(modelBuilder);
         }
     }

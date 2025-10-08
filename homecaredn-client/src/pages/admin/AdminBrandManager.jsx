@@ -6,15 +6,17 @@ import { useBrand } from '../../hook/useBrand';
 import { Pagination } from 'antd';
 import BrandModal from '../../components/modal/BrandModal';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
-
+import { useDebounce } from 'use-debounce';
 export default function AdminBrandManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState(null);
+  const [editingBrandID, setEditingBrandID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
   const {
     brands,
     totalBrands,
@@ -27,9 +29,18 @@ export default function AdminBrandManager() {
 
   // Load brands khi page change
   useEffect(() => {
-    fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
-  }, [currentPage, fetchBrands]);
+    fetchBrands({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: sortBy,
+      Search: debouncedSearch || '',
+    });
+  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchBrands]);
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
   const handleDelete = async (brandId) => {
     showDeleteModal({
       t,
@@ -62,7 +73,7 @@ export default function AdminBrandManager() {
     }
 
     setIsModalOpen(false);
-    setEditingBrand(null);
+    setEditingBrandID(null);
   };
 
   if (loading) return <Loading />;
@@ -83,18 +94,57 @@ export default function AdminBrandManager() {
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
-                {totalBrands || 0} {t('adminBrandManager.brands')}
-              </span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Left section: Search + Sort */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Search Input */}
+              <div className="w-full sm:w-64">
+                <input
+                  id="search-input"
+                  type="text"
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={t('common.search')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                />
+              </div>
+
+              {/* Sort Dropdown */}
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option
+                  value={i18n.language === 'vi' ? 'brandName' : 'brandNameEN'}
+                >
+                  {t('common.sortName')}
+                </option>
+                <option
+                  value={
+                    i18n.language === 'vi'
+                      ? 'brandName_desc'
+                      : 'brandNameEN_desc'
+                  }
+                >
+                  {t('common.sortNameDesc')}
+                </option>
+                <option value="materialCount">
+                  {t('common.sortMaterialCount')}
+                </option>
+                <option value="materialCount_desc">
+                  {t('common.sortMaterialCountDesc')}
+                </option>
+              </select>
             </div>
+
+            {/* Add New Brand Button */}
             <button
-              className="w-full px-4 py-2 text-sm font-medium text-white transition-colors duration-200 bg-blue-600 rounded-lg sm:w-auto hover:bg-blue-700"
+              className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
               onClick={() => setIsModalOpen(true)}
             >
-              <i className="mr-2 fa-solid fa-plus"></i>
+              <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewBrand')}
             </button>
           </div>
@@ -104,10 +154,10 @@ export default function AdminBrandManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingBrand(null);
+              setEditingBrandID(null);
             }}
             onSave={handleSave}
-            brand={editingBrand}
+            brandID={editingBrandID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -138,8 +188,9 @@ export default function AdminBrandManager() {
                     brands.map((brand, index) => (
                       <tr
                         key={brand.brandID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -181,7 +232,7 @@ export default function AdminBrandManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
-                                setEditingBrand(brand);
+                                setEditingBrandID(brand.brandID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -202,7 +253,7 @@ export default function AdminBrandManager() {
                   ) : (
                     <tr>
                       <td colSpan="4" className="px-6 py-12 text-center">
-                        <div className="flex flex-col items-center">
+                        <div className="flex flex-col items-center mt-5 mb-5">
                           <svg
                             className="w-12 h-12 mb-4 text-gray-400"
                             fill="none"
@@ -276,7 +327,7 @@ export default function AdminBrandManager() {
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingBrand(brand);
+                            setEditingBrandID(brand);
                             setIsModalOpen(true);
                           }}
                         >
@@ -328,15 +379,26 @@ export default function AdminBrandManager() {
 
             {/* Pagination */}
             {totalBrands > 0 && (
-              <div className="flex justify-center py-4">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalBrands}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                  size="small"
-                />
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalBrands} {t('adminBrandManager.brands')}
+                  </span>
+                </div>
+
+                {/* Pagination (right) */}
+                <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalBrands}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
               </div>
             )}
           </div>

@@ -267,7 +267,7 @@ export default function AdminSupportManager() {
                 ) : (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center justify-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center text-gray-500  mt-5 mb-5">
                         {/* Icon */}
                         <svg
                           className="w-12 h-12 text-gray-400 mb-4 mx-auto"
@@ -295,16 +295,18 @@ export default function AdminSupportManager() {
             </table>
           </div>
           {/* Pagination */}
-          <div className="flex justify-center py-4">
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={total}
-              onChange={(page) => setCurrentPage(page)}
-              showSizeChanger={false}
-              size="small"
-            />
-          </div>
+          {total > 0 && (
+            <div className="flex justify-center py-4">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={total}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false}
+                size="small"
+              />
+            </div>
+          )}
         </div>
 
         {/* Modal */}

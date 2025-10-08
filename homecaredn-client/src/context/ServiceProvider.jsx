@@ -13,7 +13,18 @@ export const ServiceProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   // 📌 Public: fetch all
   const fetchServices = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterServiceType,
+      FilterPackageOption,
+      FilterBuildingType,
+      FilterMainStructureType,
+      FilterDesignStyle,
+      Search,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await serviceService.getAllService({
@@ -21,6 +32,12 @@ export const ServiceProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
+          FilterServiceType,
+          FilterPackageOption,
+          FilterBuildingType,
+          FilterMainStructureType,
+          FilterDesignStyle,
+          Search,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -31,7 +48,9 @@ export const ServiceProvider = ({ children }) => {
         return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setServices([]);
+        setTotalServices(0);
+        return [];
       } finally {
         setLoading(false);
       }
@@ -40,19 +59,17 @@ export const ServiceProvider = ({ children }) => {
   );
 
   // 📌 Public: get by id
-  const getServiceById = useCallback(
-    async (id) => {
-      const local = services.find((s) => s.serviceID === id);
-      if (local) return local;
-      try {
-        return await serviceService.getServiceById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    [services]
-  );
+  const getServiceById = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      return await serviceService.getServiceById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   // 📌 Admin-only: create
   const createService = useCallback(

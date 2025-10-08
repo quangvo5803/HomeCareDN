@@ -14,7 +14,13 @@ export const CategoryProvider = ({ children }) => {
 
   // 📌 Public: fetch all categories pagination
   const fetchCategories = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, FilterID, FilterBool } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      FilterID,
+      FilterBool,
+      Search,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await categoryService.getAllCategories({
@@ -22,6 +28,7 @@ export const CategoryProvider = ({ children }) => {
           PageSize,
           FilterID,
           FilterBool,
+          Search,
         });
         setCategories(data.items || []);
         setTotalCategories(data.totalCount || 0);
@@ -119,6 +126,7 @@ export const CategoryProvider = ({ children }) => {
         await categoryService.deleteCategory(id);
         // Xoá khỏi local
         setCategories((prev) => prev.filter((c) => c.categoryID !== id));
+        setTotalCategories((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

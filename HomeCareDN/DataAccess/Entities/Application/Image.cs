@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities.Application
 {
@@ -16,6 +15,7 @@ namespace DataAccess.Entities.Application
         public Guid? ContractorApplicationID { get; set; }
         public Guid? BrandID { get; set; }
         public Guid? CategoryID { get; set; }
+        public Guid? PartnerRequestID { get; set; }
         public string PublicId { get; set; } = string.Empty;
     }
 }

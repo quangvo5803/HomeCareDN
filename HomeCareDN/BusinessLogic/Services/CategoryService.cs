@@ -14,7 +14,6 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
 
         public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -27,6 +26,18 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.CategoryRepository.GetQueryable(
                 includeProperties: "Materials,LogoImage"
             );
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                string searchLower = parameters.Search.ToLower();
+                query = query.Where(c =>
+                    c.CategoryName.ToLower().Contains(searchLower)
+                    || (
+                        !string.IsNullOrEmpty(c.CategoryNameEN)
+                        && c.CategoryNameEN.ToLower().Contains(searchLower)
+                    )
+                );
+            }
             if (parameters.FilterID.HasValue)
             {
                 query = query.Where(c => c.UserID == parameters.FilterID);
@@ -44,8 +55,8 @@ namespace BusinessLogic.Services
                 "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
                 "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
                 "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
-                "random" => query.OrderBy(c => Guid.NewGuid()),
-                _ => query.OrderBy(c => c.CategoryID),
+                "random" => query.OrderBy(s => s.CategoryID),
+                _ => query.OrderBy(c => c.CreatedAt),
             };
 
             query = query
@@ -136,7 +147,7 @@ namespace BusinessLogic.Services
                 var imageUpload = new Image
                 {
                     ImageID = Guid.NewGuid(),
-                    CategoryID = category.CategoryLogoID,
+                    CategoryID = category.CategoryID,
                     ImageUrl = requestDto.CategoryLogoUrl,
                     PublicId = requestDto.CategoryLogoPublicId,
                 };

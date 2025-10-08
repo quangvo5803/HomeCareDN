@@ -12,6 +12,8 @@ export default function DistributorCategoryManager() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const pageSize = 10;
 
   const {
@@ -76,6 +78,8 @@ export default function DistributorCategoryManager() {
   };
 
   if (loading) return <Loading />;
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
+
   return (
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
       {/* Header */}
@@ -88,7 +92,8 @@ export default function DistributorCategoryManager() {
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             <span className="text-sm font-medium text-gray-700">
-              {totalCategories || 0} {t('distributorCategoryManager.categories')}
+              {totalCategories || 0}{' '}
+              {t('distributorCategoryManager.categories')}
             </span>
           </div>
         </div>
@@ -113,6 +118,7 @@ export default function DistributorCategoryManager() {
         }}
         onSave={handleSave}
         category={editingCategory}
+        setUploadProgress={setUploadProgress}
       />
 
       {/* Table */}
@@ -143,8 +149,9 @@ export default function DistributorCategoryManager() {
               categories.map((category, index) => (
                 <tr
                   key={category.categoryID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                    }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                  }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">

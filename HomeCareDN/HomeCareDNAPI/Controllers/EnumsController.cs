@@ -19,8 +19,9 @@ namespace HomeCareDNAPI.Controllers
                 BuildingTypes = EnumExtensions.GetEnumList<BuildingType>(),
                 MainStructures = EnumExtensions.GetEnumList<MainStructureType>(),
                 DesignStyles = EnumExtensions.GetEnumList<DesignStyle>(),
+                PartnerType = EnumExtensions.GetEnumList<PartnerRequestType>(),
+                PartnerStatus = EnumExtensions.GetEnumList<PartneRequestrStatus>(),
             };
-
             return Ok(result);
         }
     }

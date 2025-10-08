@@ -18,6 +18,7 @@ namespace DataAccess.Entities.Application
         public Guid? CategoryLogoID { get; set; }
         public bool IsActive { get; set; }
         public Guid UserID { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Quan hệ với Material
         public ICollection<Material>? Materials { get; set; }

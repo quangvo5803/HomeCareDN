@@ -14,7 +14,15 @@ export const MaterialProvider = ({ children }) => {
 
   // 📌 Public: fetch all material
   const fetchMaterials = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      FilterCategoryID,
+      FilterBrandID,
+      Search,
+    } = {}) => {
       try {
         setLoading(true);
         const data = await materialService.getAllMaterial({
@@ -22,6 +30,9 @@ export const MaterialProvider = ({ children }) => {
           PageSize,
           SortBy,
           FilterID,
+          FilterCategoryID,
+          FilterBrandID,
+          Search,
         });
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
@@ -32,7 +43,9 @@ export const MaterialProvider = ({ children }) => {
         return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setMaterials([]);
+        setTotalMaterials(0);
+        return [];
       } finally {
         setLoading(false);
       }
@@ -41,23 +54,22 @@ export const MaterialProvider = ({ children }) => {
   );
 
   // 📌 Public: get material by id
-  const getMaterialById = useCallback(
-    async (id) => {
-      const local = materials.find((m) => m.materialID === id);
-      if (local) return local;
-      try {
-        return await materialService.getMaterialById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    [materials]
-  );
+  const getMaterialById = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      return await materialService.getMaterialById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   // 📌 Distributor-only: get all by user id
   const fetchMaterialsByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const data = await materialService.getAllMaterialByUserId({
@@ -80,7 +92,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: create
   const createMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const newMaterial = await materialService.createMaterial(materialData);
@@ -101,7 +114,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const updated = await materialService.updateMaterial(materialData);
@@ -109,10 +123,10 @@ export const MaterialProvider = ({ children }) => {
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                  ...m,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? m.imageUrls,
-                }
+                ...m,
+                ...updated,
+                imageUrls: updated.imageUrls ?? m.imageUrls,
+              }
               : m
           )
         );
@@ -130,10 +144,12 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete
   const deleteMaterial = useCallback(
     async (id) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
+        setTotalMaterials((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
@@ -145,7 +161,8 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(
     async (materialId, imageUrl) => {
-      if (user?.role !== 'Distributor') throw new Error('Unauthorized');
+      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
+        throw new Error('Unauthorized');
       try {
         await materialService.deleteMaterialImage(imageUrl);
 

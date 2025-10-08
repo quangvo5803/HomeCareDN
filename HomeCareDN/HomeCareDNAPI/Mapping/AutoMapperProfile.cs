@@ -5,6 +5,7 @@ using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.Address;
@@ -47,6 +48,8 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
 
             CreateMap<CreateAddressDto, Address>();
+            CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
+                .ForMember(d => d.Images, opt => opt.Ignore());
 
             // ------------------------
             // Update DTO -> Entity (Write)
@@ -56,7 +59,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<UpdateAddressDto, Address>()
                 // Ignore AddressId and UserId to prevent overwriting them
-                .ForMember(d => d.AddressId, opt => opt.Ignore())
+                .ForMember(d => d.AddressID, opt => opt.Ignore())
                 .ForMember(d => d.UserId, opt => opt.Ignore());
 
             CreateMap<UpdateProfileDto, ApplicationUser>()
@@ -75,6 +78,7 @@ namespace HomeCareDNAPI.Mapping
 
             CreateMap<BrandUpdateRequestDto, Brand>()
                 .ForMember(dest => dest.LogoImage, opt => opt.Ignore());
+
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -85,9 +89,31 @@ namespace HomeCareDNAPI.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
                 );
-
             CreateMap<Service, ServiceDto>()
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
+                );
+            CreateMap<Service, ServiceDetailDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
@@ -132,14 +158,44 @@ namespace HomeCareDNAPI.Mapping
                 )
                 .ForMember(
                     dest => dest.ImagePublicIds,
-                    opt => opt.MapFrom(src =>
-                        src.Images != null
-                            ? src.Images.Select(i => i.PublicId).ToList()
-                            : new List<string>()
-                    )
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
                 );
-
-
+            CreateMap<Material, MaterialDetailDto>()
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
+                .ForMember(
+                    dest => dest.CategoryID,
+                    otp => otp.MapFrom(src => src.Category!.CategoryID)
+                )
+                .ForMember(
+                    dest => dest.BrandNameEN,
+                    opt => opt.MapFrom(src => src.Brand!.BrandNameEN)
+                )
+                .ForMember(
+                    dest => dest.CategoryName,
+                    opt => opt.MapFrom(src => src.Category!.CategoryName)
+                )
+                .ForMember(
+                    dest => dest.CategoryNameEN,
+                    opt => opt.MapFrom(src => src.Category!.CategoryNameEN)
+                )
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ImagePublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Images != null
+                                ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
+                );
             CreateMap<Category, CategoryDto>()
                 .ForMember(
                     dest => dest.CategoryLogo,
@@ -167,8 +223,7 @@ namespace HomeCareDNAPI.Mapping
                         opt.MapFrom(src =>
                             src.LogoImage != null ? src.LogoImage.PublicId : string.Empty
                         )
-                )
-                .ForMember(dest => dest.Materials, opt => opt.MapFrom(src => src.Materials));
+                );
 
             CreateMap<Address, AddressDto>();
 
@@ -220,6 +275,27 @@ namespace HomeCareDNAPI.Mapping
             // ContactSupport
             CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
+
+            // Partner
+            CreateMap<PartnerRequest, PartnerRequestDto>()
+                .ForMember(
+                    d => d.ImageUrls,
+                    opt =>
+                        opt.MapFrom(s =>
+                            s.Images != null
+                                ? s.Images.Select(i => i.ImageUrl).ToList()
+                                : new List<string>()
+                        )
+                )
+                .ForMember(
+                    d => d.ImagePublicIds,
+                    opt =>
+                        opt.MapFrom(s =>
+                            s.Images != null
+                                ? s.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
+                );
         }
 
         // ------------------------
@@ -233,6 +309,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<MainStructureType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<DesignStyle, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartnerRequestType, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

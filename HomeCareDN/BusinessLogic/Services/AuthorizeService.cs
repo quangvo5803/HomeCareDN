@@ -1,11 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using AutoMapper;
 using BusinessLogic.DTOs.Authorize;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Authorize;
 using DataAccess.Repositories.Interfaces;
+using DataAccess.UnitOfWork;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +26,7 @@ namespace BusinessLogic.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtOptions _jwtOptions;
         private readonly GoogleOptions _googleOptions;
+        private readonly IUnitOfWork _unitOfWork;
 
         private const int RefreshTokenDays = 7;
         private const int OtpExpiryMinutes = 5;
@@ -42,7 +43,8 @@ namespace BusinessLogic.Services
             IRefreshTokenRepository refreshTokenRepository,
             IHttpContextAccessor httpContextAccessor,
             IOptions<JwtOptions> jwtOptions,
-            IOptions<GoogleOptions> googleOptions
+            IOptions<GoogleOptions> googleOptions,
+            IUnitOfWork unitOfWork
         )
         {
             _userManager = userManager;
@@ -51,6 +53,7 @@ namespace BusinessLogic.Services
             _httpContextAccessor = httpContextAccessor;
             _jwtOptions = jwtOptions.Value;
             _googleOptions = googleOptions.Value;
+            _unitOfWork = unitOfWork;
         }
 
         #region OTP
@@ -58,6 +61,7 @@ namespace BusinessLogic.Services
         public async Task SendLoginOtpAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
+
             if (user == null)
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
@@ -71,6 +75,16 @@ namespace BusinessLogic.Services
 
         public async Task SendRegisterOtpAsync(string email, string fullName)
         {
+            var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAllAsync();
+            if (partnerRequest.Any(p => p.Email == email))
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ACCOUNT_STR, new[] { "REGISTER_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {

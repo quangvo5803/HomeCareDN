@@ -1,19 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities.Application;
-using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.Material
 {
     public class MaterialCreateRequestDto
     {
         [Required]
-        public required string UserID { get; set; }
+        public string UserID { get; set; } = null!;
         public required Guid CategoryID { get; set; }
 
-        [Required]
-        public required string Name { get; set; }
+        [Required(ErrorMessage = "REQUIRED_MATERIALNAME")]
+        public string Name { get; set; } = null!;
         public string? NameEN { get; set; }
-        public Guid BrandId { get; set; }
+        public Guid BrandID { get; set; }
 
         public string? Unit { get; set; }
         public string? UnitEN { get; set; }

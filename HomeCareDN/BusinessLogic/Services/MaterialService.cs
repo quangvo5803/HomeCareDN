@@ -3,9 +3,12 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -14,16 +17,22 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const string MATERIAL = "Material";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string ERROR_MATERIAL_NOT_FOUND = "MATERIAL_NOT_FOUND";
         private const string MATERIAL_INCLUDE = "Images,Category,Brand";
 
-        public MaterialService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MaterialService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(
@@ -33,9 +42,20 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
             );
-            if (parameters.FilterID.HasValue)
+            if (!string.IsNullOrEmpty(parameters.Search))
             {
-                query = query.Where(m => m.CategoryID == parameters.FilterID.Value);
+                var searchUpper = parameters.Search.ToUpper();
+
+                query = query.Where(SearchMaterial(searchUpper));
+            }
+
+            if (parameters.FilterCategoryID.HasValue)
+            {
+                query = query.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
+            }
+            if (parameters.FilterBrandID.HasValue)
+            {
+                query = query.Where(m => m.BrandID == parameters.FilterBrandID.Value);
             }
             var totalCount = await query.CountAsync();
 
@@ -45,17 +65,23 @@ namespace BusinessLogic.Services
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
                 "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
-                _ => query.OrderBy(m => m.NameEN ?? m.Name),
+                "random" => query.OrderBy(b => b.MaterialID),
+                _ => query.OrderBy(m => m.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
 
             var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -77,16 +103,22 @@ namespace BusinessLogic.Services
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
                 "materialnameen" => query.OrderBy(m => m.NameEN),
                 "materialnameen_desc" => query.OrderByDescending(m => m.NameEN),
-                "random" => query.OrderBy(b => Guid.NewGuid()),
+                "random" => query.OrderBy(m => m.MaterialID),
                 _ => query.OrderBy(b => b.MaterialID),
             };
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize)
                 .ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            foreach (var dto in dtos)
+            {
+                var user = await _userManager.FindByIdAsync(dto.UserID);
+                dto.UserName = user?.FullName;
+            }
             return new PagedResultDto<MaterialDto>
             {
-                Items = _mapper.Map<IEnumerable<MaterialDto>>(items),
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -98,12 +130,12 @@ namespace BusinessLogic.Services
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
             //check image
-            ValidateImages(requestDto.ImageUrls);
+            ValidateImages(requestDto.ImageUrls, 0);
 
             //upload image
             await UploadMaterialImagesAsync(
-                material.MaterialID, 
-                requestDto.ImageUrls, 
+                material.MaterialID,
+                requestDto.ImageUrls,
                 requestDto.ImagePublicIds
             );
 
@@ -116,7 +148,7 @@ namespace BusinessLogic.Services
             return _mapper.Map<MaterialDto>(material);
         }
 
-        public async Task<MaterialDto> GetMaterialByIdAsync(Guid id)
+        public async Task<MaterialDetailDto> GetMaterialByIdAsync(Guid id)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == id,
@@ -132,7 +164,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            return _mapper.Map<MaterialDto>(material);
+            return _mapper.Map<MaterialDetailDto>(material);
         }
 
         public async Task<MaterialDto> GetMaterialByCategoryAsync(Guid id)
@@ -184,8 +216,8 @@ namespace BusinessLogic.Services
 
             //upload image
             await UploadMaterialImagesAsync(
-                material.MaterialID, 
-                requestDto.ImageUrls, 
+                material.MaterialID,
+                requestDto.ImageUrls,
                 requestDto.ImagePublicIds
             );
 
@@ -253,20 +285,41 @@ namespace BusinessLogic.Services
             ICollection<string>? publicIds
         )
         {
-            if (imageUrls == null || !imageUrls.Any()) return;
+            if (imageUrls == null || !imageUrls.Any())
+                return;
 
             var ids = publicIds?.ToList() ?? new List<string>();
 
-            var images = imageUrls.Select((url, i) => new Image
-            {
-                ImageID = Guid.NewGuid(),
-                MaterialID = materialId,
-                ImageUrl = url,
-                PublicId = i < ids.Count ? ids[i] : string.Empty
-            }).ToList();
+            var images = imageUrls
+                .Select(
+                    (url, i) =>
+                        new Image
+                        {
+                            ImageID = Guid.NewGuid(),
+                            MaterialID = materialId,
+                            ImageUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
+        private static Expression<Func<Material, bool>> SearchMaterial(string searchUpper)
+        {
+            return b =>
+                (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(b.Description) && b.Description.ToUpper().Contains(searchUpper))
+                || (b.Brand != null && (
+                       (!string.IsNullOrEmpty(b.Brand.BrandName) && b.Brand.BrandName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Brand.BrandNameEN) && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper))
+                ))
+                || (b.Category != null && (
+                       (!string.IsNullOrEmpty(b.Category.CategoryName) && b.Category.CategoryName.ToUpper().Contains(searchUpper))
+                    || (!string.IsNullOrEmpty(b.Category.CategoryNameEN) && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper))
+                ));
+        }
     }
 }

@@ -16,7 +16,9 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setPendingEmail, login } = useContext(AuthContext);
-
+  const handlePartnerRegistration = () => {
+    navigate('/PartnerTypeSelection');
+  };
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -183,6 +185,18 @@ export default function Register() {
             {/* Google Register */}
             <div className="flex justify-center mt-4">
               <GoogleLoginButton onLoginSuccess={login} />
+            </div>
+            {/* Partner Registration Button */}
+            <div className="text-center mt-8">
+              <button
+                type="button"
+                onClick={handlePartnerRegistration}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-green-600 text-white font-medium shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+              >
+                {/* Icon optional, bỏ nếu không dùng Font Awesome */}
+                <i className="fa-solid fa-handshake" aria-hidden="true"></i>
+                <span>{t('login.become_partner')}</span>
+              </button>
             </div>
             {/* Login Link */}
             <div className="text-center mt-8">

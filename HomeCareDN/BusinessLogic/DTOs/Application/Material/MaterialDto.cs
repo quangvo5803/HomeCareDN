@@ -8,6 +8,7 @@ namespace BusinessLogic.DTOs.Application.Material
     {
         public Guid MaterialID { get; set; }
         public required string UserID { get; set; }
+        public string? UserName { get; set; }
 
         public required string Name { get; set; }
         public required string NameEN { get; set; }
@@ -23,8 +24,6 @@ namespace BusinessLogic.DTOs.Application.Material
 
         public string? Unit { get; set; }
         public string? UnitEN { get; set; }
-        public string? Description { get; set; }
-        public string? DescriptionEN { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
     }

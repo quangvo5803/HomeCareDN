@@ -12,7 +12,8 @@
     "register": "Đăng ký",
     "search": "Tìm kiếm...",
     "profile": "Hồ Sơ",
-    "logout": "Đăng Xuất"
+    "logout": "Đăng Xuất",
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "home": {
     "slider_category1": "Thương mại",
@@ -61,6 +62,12 @@
     "material_title": "Vật liệu xây dựng và cải tạo",
     "material_more": "Xem thêm",
 
+    "service_construction_more": "Xem thêm",
+    "service_repair_more": "Xem thêm",
+
+    "default": "Mặc định",
+    "noDescription": "Mô tả không có sẵn",
+
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -90,10 +97,6 @@
     "stat4_text": "Sự hài lòng của khách hàng",
     "stat5_title": "Kỹ sư giàu kinh nghiệm",
     "stat5_text": "Đội ngũ kỹ sư dày dạn kinh nghiệm mang đến hàng thập kỷ chuyên môn cho mỗi dự án, đảm bảo tiêu chuẩn chất lượng và an toàn cao nhất."
-  },
-  "common": {
-    "home": "Trang chủ",
-    "about": "Giới thiệu"
   },
   "why": {
     "badge": "Vì sao chọn chúng tôi",
@@ -164,17 +167,39 @@
     "sort_label": "Sắp xếp theo:"
   },
   "materialDetail": {
-    "breadcrumb_home": "Trang chủ",
     "breadcrumb_material": "Vật liệu",
     "category": "Danh mục",
     "brand": "Thương hiệu",
     "unit": "Đơn vị",
     "description": "Mô tả",
-    "relatedMaterial": "Vật liệu liên quan"
+    "relatedMaterial": "Các vật liệu liên quan"
   },
   "materialViewAll": {
-    "default": "Mặc định",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm"
+    "listMaterial": "Danh sách vật liệu",
+    "filterCategory": "Danh mục vật liệu",
+    "filterBrand": "Thương hiệu vật liệu",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
+    "noMaterial": "Không có vật liệu tương ứng"
+  },
+  "serviceDetail": {
+    "breadcrumb_construction": "Xây dựng",
+    "breadcrumb_repair": "Sửa chữa",
+    "relatedRepair": "Các sửa chữa liên quan",
+    "relatedConstruction": "Các xây dụng liên quan"
+  },
+  "serviceViewAll": {
+    "title": "Danh sách dịch vụ",
+    "verifiedLicense": "Giấy phép đã được xác minh",
+    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalServices}} dịch vụ",
+    "noService": "Không có dịch vụ tương ứng"
+  },
+  "breadcrumb_home": "Trang chủ",
+  "sharedEnums": {
+    "serviceType": "Loại dịch vụ",
+    "buildingType": "Loại tòa nhà",
+    "packageOption": "Tùy chọn gói",
+    "mainStructure": "Loại cấu trúc chính",
+    "designStyle": "Phong cách thiết kế"
   },
   "login": {
     "title": "Đăng Nhập",
@@ -182,7 +207,9 @@
     "email_placeholder": "Nhập email của bạn",
     "another_login": "Hoặc đăng nhập với",
     "not_have_account": "Bạn chưa có tài khoản? ",
-    "register_link": " Đăng ký ngay"
+    "register_link": " Đăng ký ngay",
+    "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "register": {
     "title": "Đăng Ký",
@@ -192,7 +219,9 @@
     "another_register": "Hoặc đăng ký với",
     "register_button": "Đăng Ký",
     "have_account": "Đã có tài khoản? ",
-    "login_link": " Đăng nhập ngay"
+    "login_link": " Đăng nhập ngay",
+    "business_owner": "Bạn có phải là chủ doanh nghiệp không?",
+    "become_partner": "Đăng kí trở thành đối tác"
   },
   "verifyotp": {
     "title": "Xác Thực OTP",
@@ -202,13 +231,32 @@
     "resend_otp": "Gửi lại",
     "not_receive_otp": "Không nhận được mã? "
   },
+  "partnerRequest": {
+    "partnerTypeSelection": {
+      "title": "Đăng ký trở thành đối tác",
+      "subtitle": "Vui lòng lựa chọn vai trò bạn muốn đăng kí",
+      "selectType": "Vui lòng chọn vai trò để tiếp tục",
+      "continueWithType": "Tiếp tục đăng kí với vai trò "
+    },
+    "partnerRegistration": {
+      "title": "Đăng ký trở thành đối tác",
+      "subtitle": "Vui lòng điền đầy đủ thông tin bên dưới",
+      "notSelectedType": "Vui lòng chọn vai trò",
+      "form_companyName": "Tên doanh nghiệp",
+      "form_email": "Email",
+      "form_phoneNumber": "Số điện thoại",
+      "form_description": "Mô tả doanh nghiệp",
+      "form_images": "Hình ảnh doanh nghiệp",
+      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
+    }
+  },
 
-  "userPage":{
+  "userPage": {
     "profile": {
       "title": "Hồ Sơ Của Tôi",
       "subtitle": "Quản lý thông tin cá nhân và địa chỉ của bạn.",
-      "header_profile":"Thông tin cá nhân",
-      "header_address":"Địa chỉ",
+      "header_profile": "Thông tin cá nhân",
+      "header_address": "Địa chỉ",
       "form": {
         "name": "Họ và tên",
         "email": "Email",
@@ -232,14 +280,55 @@
       "preview": "Xem trước: ",
       "addressPlaceholder": "Số nhà, tên đường, khu vực..."
     },
-    "service_request": {
+    "serviceRequest": {
       "title": "Yêu cầu dịch vụ",
       "subtitle": "Xem và quản lý các yêu cầu dịch vụ của bạn.",
       "noRequest": "Chưa có yêu cầu dịch vụ nào",
-      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn"    
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu dịch vụ đầu tiên của bạn",
+      "label_buildingType": "Loại công trình:",
+      "label_mainStructureType": "Cấu trúc chính:",
+      "label_area": "Diện tích:",
+      "label_floors": "Số tầng:",
+      "label_designStyle": "Phong cách:",
+      "label_estimatePrice": "Giá dự kiến: ",
+      "label_packageOption": "Gói xây dựng: ",
+      "label_address": "Địa chỉ: ",
+      "label_open": "Đang mở",
+      "label_close": "Đã đóng"
+    },
+    "createServiceRequest": {
+      "title": "Tạo yêu cầu dịch vụ",
+      "subtitle": "Điền vào biểu mẫu dưới đây để gửi yêu cầu dịch vụ của bạn",
+      "header": "Chi tiết yêu cầu dịch vụ",
+      "form_serviceType": "Loại dịch vụ",
+      "form_selectServiceType": "Chọn loại dịch vụ",
+      "form_packageOption": "Gói dịch vụ",
+      "form_selectPackageOption": "Chọn gói dịch vụ",
+      "form_buildingType": "Loại công trình",
+      "form_selectBuildingType": "Chọn loại công trình",
+      "form_structureType": "Loại kết cấu",
+      "form_selectStructureType": "Chọn loại kết cấu",
+      "form_designStyle": "Phong cách thiết kế",
+      "form_selectDesignStyle": "Chọn phong cách thiết kế",
+      "form_width": "Chiều rộng (m)",
+      "form_widthPlaceholder": "Nhập chiều rộng (mét)",
+      "form_length": "Chiều dài (m)",
+      "form_lengthPlaceholder": "Nhập chiều dài (mét)",
+      "form_floor": "Số tầng",
+      "form_floorPlaceholder": "Nhập số tầng",
+      "form_estimatePrice": "Giá ước tính",
+      "form_estimatePricePlaceholder": "Nhập giá ước tính",
+      "form_address": "Địa chỉ",
+      "form_selectAddress": "Chọn địa chỉ",
+      "form_description": "Mô tả",
+      "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
+      "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "calculatedArea": "Diện tích sàn xây dựng: ",
+      "estimatePrice": "Giá tiền ước tính: ",
+      "estimateInWord": "Bằng chữ: ",
+      "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
     }
   },
-
 
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -323,11 +412,11 @@
     "materialModal": {
       "title": "Thêm vật liệu mới",
       "title2": "Cập nhật vật liệu",
-      "materialName": "Tên vật liệu (Tiếng Việt)",
+      "materialName": "Tên vật liệu",
       "brand": "Thương hiệu",
       "category": "Danh mục",
-      "unit": "Đơn vị (Tiếng Việt)",
-      "description": "Mô tả (Tiếng Việt)",
+      "unit": "Đơn vị",
+      "description": "Mô tả",
       "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
       "unit_Price": "Giá",
       "images": "Hình ảnh",
@@ -357,7 +446,6 @@
     "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
   },
 
-
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -374,6 +462,7 @@
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
+      "partner": "Đối tác",
       "support": "Quản lý hỗ trợ"
     },
     "account": {
@@ -425,6 +514,7 @@
     },
     "viewAll": "Xem tất cả"
   },
+
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
     "subtitle": "Quản lý danh sách các thương hiệu sản phẩm",
@@ -469,7 +559,7 @@
       "title2": "Cập nhật danh mục",
       "categoryName": "Tên danh mục",
       "categoryNamePlaceholder": "Nhập tên danh mục...",
-      "categoryNameEN": "Tên danh mục(Tiếng Anh)",
+      "categoryNameEN": "Tên danh mục (Tiếng Anh)",
       "categoryNamePlaceholderEN": "Nhập tên danh mục bằng tiếng Anh...",
       "multilanguage_for_data": "Đa ngôn cho dữ liệu",
       "categoryLogo": "Logo danh mục",
@@ -483,9 +573,8 @@
     "services": "dịch vụ",
     "no": "STT",
     "serviceName": "Tên dịch vụ",
-    "numberOfRequest": "Số lượng yêu cầu",
-    "requests": "yêu cầu",
-    "status": "Trạng thái",
+    "serviceType": "Loại dịch vụ",
+    "buildingType": "Loại công trình xây dựng",
     "action": "Thao tác",
     "noService": "Chưa có dịch vụ nào",
     "letStart": "Bắt đầu bằng cách thêm dịch vụ đầu tiên của bạn",
@@ -509,10 +598,95 @@
       "mainStructureTypePlaceholder": "Chọn loại kết cấu chính",
       "designStyle": "Phong cách thiết kế",
       "designStylePlaceholder": "Chọn phong cách thiết kế",
-      "buildType": "Loại xây dựng",
-      "buildTypePlaceholder": "Chọn loại xây dựng",
-      "serviceImage": "Hình ảnh dịch vụ",
+      "buildingType": "Loại công trình xây dựng",
+      "buildingTypePlaceholder": "Chọn loại công trình xây dựng",
+      "images": "Hình ảnh dịch vụ",
       "chooseFiles": "Chọn tệp tải lên"
+    }
+  },
+  "adminServiceRequestManager": {
+    "no": "STT",
+    "title": "Quản lý dịch vụ đã yêu cầu",
+    "subtitle": "Quản lý danh sách dịch vụ đã yêu cầu",
+    "serviceRequests": "Dịch vụ đã yêu cầu",
+    "acreage": "Diện tích",
+    "numberOfFloors": "Số tầng",
+    "estimatePrice": "Giá ước tính",
+    "address": "Địa chỉ",
+    "label_open": "Đang mở",
+    "label_close": "Đã đóng",
+    "empty": "Không có yêu cầu dịch vụ nào",
+    "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi."
+  },
+  "adminMaterialManager": {
+    "title": "Quản lý Vật Liệu",
+    "subtitle": "Quản lý danh sách vật liệu",
+    "material": "vật liệu",
+    "no": "STT",
+    "materialName": "Tên Vật Liệu",
+    "numberOfMaterials": "Số lượng Vật Liệu",
+    "brand": "Thương Hiệu",
+    "category": "Danh Mục",
+    "status": "Trạng Thái",
+    "unit": "Đơn Vị",
+    "images": "Hình ảnh",
+    "action": "Hành Động",
+    "noMaterial": "Chưa có vật liệu nào",
+    "createdBy": "Tạo bởi",
+    "letStart": "Bắt đầu bằng cách thêm vật liệu đầu tiên của bạn.",
+    "noBrandAndService": "Vui lòng tạo thương hiệu và danh mục trước khi tạo vật liệu !",
+    "materialModal": {
+      "title": "Thêm vật liệu mới",
+      "title2": "Cập nhật vật liệu",
+      "materialName": "Tên Vật Liệu ",
+      "brand": "Thương Hiệu",
+      "category": "Danh Mục",
+      "unit": "Đơn Vị",
+      "description": "Mô Tả",
+      "descriptionsPlaceholder": "Nhập mô tả bằng tiếng Việt...",
+      "unit_Price": "Giá Đơn Vị",
+      "images": "Hình ảnh",
+      "chooseBrand": "Chọn thương hiệu",
+      "chooseCategory": "Chọn danh mục",
+      "materialNameEN": "Tên Vật Liệu (Tiếng Anh)",
+      "unitEN": "Đơn Vị (Tiếng Anh)",
+      "descriptionEN": "Mô Tả (Tiếng Anh)",
+      "descriptionsPlaceholderEN": "Nhập mô tả bằng tiếng Anh...",
+      "multilanguage_for_data": "Dữ liệu đa ngôn ngữ",
+      "chooseFile": "Chọn tệp",
+      "noFile": "Chưa chọn tệp nào",
+      "filesSelected": " tệp đã chọn"
+    }
+  },
+  "adminPartnerManager": {
+    "empty": "Không có đối tác nào",
+    "empty_description": "Chưa có đăng ký hợp tác nào.",
+    "title": "Quản lý đối tác",
+    "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
+    "partners": "đối tác",
+    "no": "STT",
+    "companyName": "Tên công ty",
+    "phoneNumber": "Số điện thoại",
+    "submittedAt": "Thời gian gửi",
+    "partnerRequestType": "Vai trò đăng kí",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "noPartner": "Chưa có đăng ký hợp tác nào.",
+    "searchPlaceholder": "Tìm kiếm theo tên công ty, email, số điện thoại...",
+    "approve": "Duyệt",
+    "reject": "Từ Chối",
+    "delete": "Xóa",
+    "viewDetails": "Xem chi tiết",
+    "total": "Tổng",
+    "partnerRequestModal": {
+      "title": "Thông tin đăng kí",
+      "companyName": "Tên công ty",
+      "phoneNumber": "Số điện thoại",
+      "submittedAt": "Thời gian gửi",
+      "partnerRequestType": "Vai trò đăng kí",
+      "status": "Trạng thái",
+      "rejectReason": "Lí do từ chối",
+      "rejectReasonPlaceHolder": "Nhập lí do từ chối"
     }
   },
   "adminSupportManager": {
@@ -530,7 +704,7 @@
     "replyPlaceholder": "Nhập nội dung phản hồi...",
     "noSupport": "Chưa có yêu cầu hỗ trợ nào",
     "all": "Tất cả",
-    "itemsCount": "{{count}} mục"
+    "itemsCount": "{{count}} yêu cầu"
   },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
@@ -596,7 +770,14 @@
     "SaveProfile": "Lưu thông tin",
     "Save": "Lưu",
     "Saving": "Đang lưu...",
-    "AddAddress": "Thêm địa chỉ"
+    "AddAddress": "Thêm địa chỉ",
+    "CreateServiceRequest": "Tạo yêu cầu dịch vụ",
+    "UpdateServiceRequest": "Cập nhật yêu cầu dịch vụ",
+    "Back": "Trở về",
+    "ViewDetail": "Xem chi tiết",
+    "RegisterPartner": "Đăng kí trở thành đối tác",
+    "Reject": "Từ chối",
+    "Approve": "Phê duyệt"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -620,9 +801,16 @@
       "title": "Bạn có chắc chắn?",
       "text": "Dịch vụ này sẽ bị xóa và không thể khôi phục!"
     },
-
+    "DeletePartnerRequestModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Yêu cầu này sẽ bị xóa và không thể khôi phục!"
+    },
     "DeleteAddressModal": {
       "title": "Xóa địa chỉ này?",
+      "text": "Hành động này không thể hoàn tác."
+    },
+    "DeleteServiceRequestModal": {
+      "title": "Xóa yêu cầu này?",
       "text": "Hành động này không thể hoàn tác."
     },
     "DeletingLoadingModal": {
@@ -633,9 +821,9 @@
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     }
-
   },
   "ERROR": {
+    "UPLOAD_FAILED": "Tải ảnh thất bại.",
     "LOGIN_NOT_FOUND": "Email chưa được đăng ký.",
     "LOGIN_OTP_REQUEST_TOO_FREQUENT": "Yêu cầu OTP quá thường xuyên, vui lòng thử lại sau!",
     "LOGIN_OTP_INCORECT": "Mã OTP không chính xác hoặc đã hết hạn.",
@@ -643,25 +831,33 @@
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
+
     "NULL_NAME": "Vui lòng nhập họ và tên.",
+    "NULL_PHONE": "Vui lòng nhập số điện thoại.",
     "NULL_EMAIL": "Vui lòng nhập email.",
-    "INVALID_EMAIL": "Email không hợp lệ.",
-    "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
     "NULL_OTP": "Vui lòng nhập mã OTP.",
+    "NULL_COMPANYNAME": "Vui lòng nhập tên doanh nghiệp",
+    "NULL_PARTNERTYPE": "Vui lòng lựa chọn vai trò",
+    "NULL_IMAGES": "Vui lòng tải lên hình ảnh doanh nghiệp",
+
+    "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
+    "INVALID_PHONE": "Số điện thoại không hợp lệ.",
+    "INVALID_EMAIL": "Email không hợp lệ.",
 
     "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
     "ADDRESS_MAX": "Bạn chỉ có thể thêm tối đa 5 địa chỉ.",
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
 
-
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
+    "MAXIMUM_SERVICE_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu dịch vụ!",
 
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
+    "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
 
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
@@ -674,6 +870,14 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
+    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhất",
+    "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
+
+    "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
+    "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
+    "PARTNER_REQUEST_PENDING": "Email này đã tạo đơn yêu cầu và đang trong thời gian xét duyệt!",
 
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
@@ -682,6 +886,7 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau."
   },
   "SUCCESS": {
+    "UPLOAD": "Tải ảnh lên thành công.",
     "SEND_OTP": "Đã gửi OTP thành công đến email của bạn. Vui lòng kiểm tra hộp thư đến.",
     "LOGIN": "Đăng nhập thành công.",
     "DELETE": "Đã xóa thành công.",
@@ -696,7 +901,12 @@
     "ADDRESS_ADD": "Thêm địa chỉ thành công.",
     "ADDRESS_UPDATE": "Cập nhật địa chỉ thành công.",
     "SERVICE_ADD": "Thêm dịch vụ thành công.",
-    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công."
+    "SERVICE_UPDATE": "Cập nhật dịch vụ thành công.",
+    "SERVICE_REQUEST_ADD": "Thêm yêu cầu dịch vụ thành công.",
+    "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
+    "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "REJECT": "Đã từ chối thành công yêu cầu",
+    "APPROVE": "Đã phê duyệt thành công yêu cầu"
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -745,9 +955,28 @@
       "Indochine": "Đông Dương",
       "Rustic": "Mộc mạc",
       "Other": "Khác"
+    },
+    "PartnerStatus": {
+      "Pending": "Đang chờ",
+      "Rejected": "Đã từ chối",
+      "Approved": "Đã chấp nhận"
+    },
+    "PartnerType": {
+      "Distributor": "Nhà phân phối",
+      "DistributorDescription": "Cung cấp vật liệu xây dựng",
+      "Contractor": "Nhà thầu",
+      "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
     }
   },
-  "toast":{
-      "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
+  "toast": {
+    "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
+  },
+  "common": {
+    "search": "Tìm kiếm...",
+    "sortDefault": "Mặc định",
+    "sortName": "Tên: A-Z",
+    "sortNameDesc": "Tên: Z-A",
+    "sortMaterialCount": "Số lượng sản phẩm: Nhiều -> Ít",
+    "sortMaterialCountDesc": "Số lượng sản phẩm: Ít -> Nhiều"
   }
 }
