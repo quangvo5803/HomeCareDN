@@ -385,7 +385,8 @@
     "durationDaysPlaceholder": "e.g., 60",
     "noteToOwner": "Message to the customer",
     "notePlaceholder": "Scope, warranty, timeline commitment...",
-    "viewAttachment": "Xem tệp đính kèm {{index}}"
+    "viewAttachment": "View attachment {{index}}",
+    "serviceRequestNotFound": "Service request not found"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",

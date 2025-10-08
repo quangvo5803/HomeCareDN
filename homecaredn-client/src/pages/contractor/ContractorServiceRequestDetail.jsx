@@ -13,6 +13,10 @@ export default function ContractorServiceRequestDetail() {
   const { getServiceRequestById, loading } = useServiceRequest();
   
   const [serviceRequest, setServiceRequest] = useState(null);
+  const [bidPrice, setBidPrice] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [durationDays, setDurationDays] = useState('');
+  const [noteToOwner, setNoteToOwner] = useState('');
 
   useEffect(() => {
     const loadServiceRequest = async () => {
@@ -22,8 +26,29 @@ export default function ContractorServiceRequestDetail() {
     loadServiceRequest();
   }, [serviceRequestId, getServiceRequestById]);
 
+  const handleImageClick = (imageUrl) => {
+    window.open(imageUrl, '_blank');
+  };
+
+  const handleImageKeyDown = (event, imageUrl) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      window.open(imageUrl, '_blank');
+    }
+  };
+
+  const handleApplyForProject = () => {
+    // Handle application logic
+    console.log('Applying for project with:', {
+      bidPrice,
+      startDate,
+      durationDays,
+      noteToOwner
+    });
+  };
+
   if (loading) return <Loading />;
-  if (!serviceRequest) return <div>Service request not found</div>;
+  if (!serviceRequest) return <div>{t('contractorServiceRequestDetail.serviceRequestNotFound')}</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -194,41 +219,37 @@ export default function ContractorServiceRequestDetail() {
                 </div>
               </div>
 
-              {/* Images */}
-              {Array.isArray(serviceRequest.imageUrls) && serviceRequest.imageUrls.filter(Boolean).length > 0 && (
+              {/* Images - FIXED: Proper accessibility and unique keys */}
+              {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && (
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
-                    <i className="fas fa-images" aria-hidden="true" />
+                    <i className="fas fa-images" />
                     {t('contractorServiceRequestDetail.images')}
                   </h3>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
-                    {serviceRequest.imageUrls
-                      .filter(Boolean)
-                      .map((imageUrl, idx) => (
-                        <div key={imageUrl} className="group aspect-square rounded-lg overflow-hidden" role="listitem">
-                          <a
-                            href={imageUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label={t('contractorServiceRequestDetail.viewAttachment', { index: idx + 1 })}
-                            className="block w-full h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
-                            title={t('contractorServiceRequestDetail.viewAttachment', { index: idx + 1 })}
-                          >
-                            <img
-                              src={imageUrl}
-                              alt=""                              
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                            />
-                          </a>
-                        </div>
-                      ))}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {serviceRequest.imageUrls.map((imageUrl) => (
+                      <div 
+                        key={imageUrl} // Using imageUrl as unique key instead of index
+                        className="aspect-square rounded-lg overflow-hidden"
+                      >
+                        <button
+                          type="button"
+                          className="w-full h-full p-0 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset"
+                          onClick={() => handleImageClick(imageUrl)}
+                          onKeyDown={(e) => handleImageKeyDown(e, imageUrl)}
+                          aria-label={`${t('contractorServiceRequestDetail.viewFullSize')} - ${t('contractorServiceRequestDetail.serviceRequestImage')}`}
+                        >
+                          <img
+                            src={imageUrl}
+                            alt={t('contractorServiceRequestDetail.serviceRequestImage')} // Removed redundant "image" word
+                            className="w-full h-full object-cover hover:scale-105 transition-transform"
+                          />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
-
 
               {/* STATUS */}
               <div className="mt-6">
@@ -247,12 +268,11 @@ export default function ContractorServiceRequestDetail() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
 
-        {/* RIGHT: Apply Form  */}
+        {/* RIGHT: Apply Form - FIXED: Controlled inputs with proper state management */}
         <div className="lg:col-span-4">
           <div className="bg-white rounded-lg shadow-lg ring-1 ring-gray-200 p-6 lg:sticky lg:top-24">
             <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
@@ -269,6 +289,8 @@ export default function ContractorServiceRequestDetail() {
                 <input
                   type="number"
                   min="0"
+                  value={bidPrice}
+                  onChange={(e) => setBidPrice(e.target.value)}
                   placeholder={
                     serviceRequest.estimatePrice
                       ? t('contractorServiceRequestDetail.bidPricePlaceholderWithEst', { est: formatVND(serviceRequest.estimatePrice) })
@@ -292,6 +314,8 @@ export default function ContractorServiceRequestDetail() {
                   </label>
                   <input
                     type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
                     aria-label={t('contractorServiceRequestDetail.startDate')}
                     className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
                   />
@@ -304,6 +328,8 @@ export default function ContractorServiceRequestDetail() {
                   <input
                     type="number"
                     min="1"
+                    value={durationDays}
+                    onChange={(e) => setDurationDays(e.target.value)}
                     placeholder={t('contractorServiceRequestDetail.durationDaysPlaceholder')}
                     aria-label={t('contractorServiceRequestDetail.durationDays')}
                     className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -318,6 +344,8 @@ export default function ContractorServiceRequestDetail() {
                 </label>
                 <textarea
                   rows={4}
+                  value={noteToOwner}
+                  onChange={(e) => setNoteToOwner(e.target.value)}
                   placeholder={t('contractorServiceRequestDetail.notePlaceholder')}
                   aria-label={t('contractorServiceRequestDetail.noteToOwner')}
                   className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -327,8 +355,10 @@ export default function ContractorServiceRequestDetail() {
               {/* Buttons */}
               <div className="pt-2">
                 <button
-                  className="w-full px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
-                  onClick={() => { /* Handle application logic */ }}
+                  type="button"
+                  className="w-full px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  onClick={handleApplyForProject}
+                  disabled={!bidPrice.trim() || !startDate || !durationDays}
                 >
                   <i className="fas fa-paper-plane" />
                   {t('contractorServiceRequestDetail.applyForProject')}

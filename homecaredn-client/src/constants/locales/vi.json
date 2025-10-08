@@ -384,7 +384,8 @@
     "durationDaysPlaceholder": "VD: 60",
     "noteToOwner": "Ghi chú cho chủ dự án",
     "notePlaceholder": "Phạm vi công việc, bảo hành, cam kết tiến độ...",
-    "viewAttachment": "View attachment {{index}}"
+    "viewAttachment": "Xem tệp đính kèm {{index}}",
+    "serviceRequestNotFound": "Không tìm thấy yêu cầu dịch vụ"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
