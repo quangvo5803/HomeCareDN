@@ -512,5 +512,5 @@ ServiceModal.propTypes = {
 
 // Default props
 ServiceModal.defaultProps = {
-  service: null,
+  serviceID: null,
 };
