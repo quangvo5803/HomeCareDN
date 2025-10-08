@@ -364,6 +364,9 @@
     "notification_item": "Notification #{{number}}",
     "change_language": "Change language",
     "account": "Account",
+    "my_projects": "My Projects",
+    "applications": "Applications",
+    "profile": "Profile",
     "kpi_meta": {
       "open_requests": "▲ +2 this week",
       "applied": "↺ 3 pending",
@@ -744,8 +747,6 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
-    "Reject": "Reject",
-    "Approve": "Approve",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",

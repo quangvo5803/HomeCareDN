@@ -363,6 +363,9 @@
     "notification_item": "Thông báo #{{number}}",
     "change_language": "Đổi ngôn ngữ",
     "account": "Tài khoản",
+    "my_projects": "Dự Án Của Tôi",
+    "applications": "Đơn Xin",
+    "profile": "Hồ Sơ",
     "kpi_meta": {
       "open_requests": "▲ +2 tuần này",
       "applied": "↺ 3 đang chờ",
@@ -738,8 +741,6 @@
     "UpdateService": "Cập nhật dịch vụ",
     "AddNewRequest": "Tạo và thêm yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
-    "Reject": "Từ chối",
-    "Approve": "Chấp nhận",
     "View": "Xem",
     "Edit": "Sửa",
     "Delete": "Xóa",
