@@ -34,14 +34,9 @@ export const BrandProvider = ({ children }) => {
       return { items: [], totalCount: 0 };
     }
   };
-  const fetchBrands = useCallback(
-    async (
-      params = { PageNumber: 1, PageSize: 10, Search: '', SortBy: '' }
-    ) => {
-      return await withMinLoading(() => executeFetch(params), setLoading);
-    },
-    []
-  );
+  const fetchBrands = useCallback(async (params = {}) => {
+    return await withMinLoading(() => executeFetch(params), setLoading);
+  }, []);
 
   // 📌 Fetch all brands (dropdown)
   const executeFetchAllBrands = async () => {
