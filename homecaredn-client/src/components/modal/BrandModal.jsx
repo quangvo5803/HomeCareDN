@@ -284,5 +284,5 @@ BrandModal.propTypes = {
 };
 // Default props
 BrandModal.defaultProps = {
-  brand: null,
+  brandID: null,
 };

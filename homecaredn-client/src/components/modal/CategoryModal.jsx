@@ -270,5 +270,5 @@ CategoryModal.propTypes = {
 
 // Default props
 CategoryModal.defaultProps = {
-  category: null,
+  categoryID: null,
 };
