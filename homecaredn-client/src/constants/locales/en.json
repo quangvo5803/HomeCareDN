@@ -330,7 +330,47 @@
       "footer": "You will receive notification as soon as a contractor/distributor applies."
     }
   },
-
+ "contractorServiceRequestManager": {
+    "title": "Service Request Manager",
+    "subtitle": "View and manage available service requests",
+    "noRequest": "No service requests yet",
+    "letStart": "Start by browsing available requests",
+    "serviceRequests": "service requests",
+    "packageOption": "Package Option",
+    "buildingType": "Building Type", 
+    "area": "Area",
+    "estimatePrice": "Estimate Price",
+    "createdAt": "Created",
+    "negotiable": "Negotiable",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "searchPlaceholder": "Search service requests...",
+    "sortDefault": "Default",
+    "sortOldest": "Oldest",
+    "sortNewest": "Newest"
+  },
+  "contractorServiceRequestDetail": {
+    "title": "Service Request Details",
+    "dimensions": "Project Dimensions",
+    "totalArea": "Total Area",
+    "applyForProject": "Apply for this Project",
+    "backToList": "Back to List",
+    "serviceType": "Service Type",
+    "packageOption": "Package Option",
+    "buildingType": "Building Type",
+    "structureType": "Structure Type",
+    "designStyle": "Design Style",
+    "floors": "Floors",
+    "floorsUnit": "floors",
+    "width": "Width",
+    "length": "Length", 
+    "estimatePrice": "Estimate Price",
+    "address": "Address",
+    "description": "Description",
+    "images": "Images",
+    "statusOpen": "Open",
+    "statusClosed": "Closed"
+  },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
@@ -770,8 +810,9 @@
     "Back": "Back",
     "ViewDetail": "View detail",
     "RegisterPartner": "Register as Partner",
-    "Reject" : "Rejeact",
-    "Approve": "Approve"
+    "Reject" : "Reject",
+    "Approve": "Approve",
+    "BackToList": "Back to List"
   },
   "ModalPopup": {
     "DeleteBrandModal": {

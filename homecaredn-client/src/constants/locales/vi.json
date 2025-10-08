@@ -328,8 +328,48 @@
       "estimateInWord": "Bằng chữ: ",
       "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
     }
+  },  
+"contractorServiceRequestManager": {
+    "title": "Quản lý yêu cầu dịch vụ",
+    "subtitle": "Xem và quản lý các yêu cầu dịch vụ có sẵn",
+    "noRequest": "Chưa có yêu cầu dịch vụ nào",
+    "letStart": "Bắt đầu bằng cách duyệt các yêu cầu có sẵn",
+    "serviceRequests": "yêu cầu dịch vụ",
+    "packageOption": "Gói dịch vụ",
+    "buildingType": "Loại công trình",
+    "area": "Diện tích",
+    "estimatePrice": "Giá ước tính",
+    "createdAt": "Ngày tạo",
+    "negotiable": "Thỏa thuận",
+    "statusOpen": "Mở",
+    "statusClosed": "Đóng",
+    "searchPlaceholder": "Tìm kiếm yêu cầu dịch vụ...",
+    "sortDefault": "Mặc định",
+    "sortOldest": "Cũ nhất", 
+    "sortNewest": "Mới nhất"
   },
-
+  "contractorServiceRequestDetail": {
+    "title": "Chi tiết yêu cầu dịch vụ",
+    "dimensions": "Kích thước dự án",
+    "totalArea": "Tổng diện tích",
+    "applyForProject": "Ứng tuyển dự án này",
+    "backToList": "Quay lại danh sách",
+    "serviceType": "Loại dịch vụ",
+    "packageOption": "Gói dịch vụ",
+    "buildingType": "Loại công trình",
+    "structureType": "Loại kết cấu",
+    "designStyle": "Phong cách thiết kế",
+    "floors": "Số tầng",
+    "floorsUnit": "tầng",
+    "width": "Chiều rộng",
+    "length": "Chiều dài",
+    "estimatePrice": "Giá ước tính",
+    "address": "Địa chỉ",
+    "description": "Mô tả",
+    "images": "Hình ảnh",
+    "statusOpen": "Mở",
+    "statusClosed": "Đóng"
+  },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
@@ -765,7 +805,8 @@
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
     "Reject" : "Từ chối",
-    "Approve": "Phê duyệt"
+    "Approve": "Phê duyệt",
+    "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
