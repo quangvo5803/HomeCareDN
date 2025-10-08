@@ -23,6 +23,8 @@ import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminPartnerManager from './pages/admin/AdminPartnerManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
+import ContractorServiceRequestManager from './pages/contractor/ContractorServiceRequestManager';
+import ContractorServiceRequestDetail from './pages/contractor/ContractorServiceRequestDetail';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
@@ -235,6 +237,22 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+        <Route
+            path="/contractor/service-requests"
+            element={
+              <ProtectedRoute requiredRoles={['Contractor']}>
+                <ContractorServiceRequestManager />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contractor/service-request/:serviceRequestId"
+            element={
+              <ProtectedRoute requiredRoles={['Contractor']}>
+                <ContractorServiceRequestDetail />
+              </ProtectedRoute>
+            }
+          />
         {/* Distributor routes */}
         <Route
           path="/Distributor"
