@@ -368,7 +368,22 @@
     "description": "Mô tả",
     "images": "Hình ảnh",
     "statusOpen": "Mở",
-    "statusClosed": "Đóng"
+    "statusClosed": "Đóng",
+    "applicationStatus": "Trạng thái ứng tuyển",
+    "notAppliedYet": "Chưa ứng tuyển",
+    "deadline": "Hạn chót",
+    "needConsultation": "Cần tư vấn?",
+    "consultationDescription": "Nhận lời khuyên chuyên môn về dự án này trước khi ứng tuyển. Đội ngũ hỗ trợ sẵn sàng giúp bạn!",
+    "availableNow": "Có sẵn ngay",
+    "applyFormTitle": "Ứng tuyển dự án",
+    "bidPrice": "Giá chào thầu (VND)",
+    "bidPricePlaceholder": "VD: 200.000.000",
+    "bidPricePlaceholderWithEst": "VD: khoảng {{est}}",
+    "startDate": "Ngày bắt đầu dự kiến",
+    "durationDays": "Thời gian thi công (ngày)",
+    "durationDaysPlaceholder": "VD: 60",
+    "noteToOwner": "Ghi chú cho chủ dự án",
+    "notePlaceholder": "Phạm vi công việc, bảo hành, cam kết tiến độ..."
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",

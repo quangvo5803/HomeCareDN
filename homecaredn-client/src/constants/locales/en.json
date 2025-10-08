@@ -369,7 +369,22 @@
     "description": "Description",
     "images": "Images",
     "statusOpen": "Open",
-    "statusClosed": "Closed"
+    "statusClosed": "Closed",
+    "applicationStatus": "Application Status",
+    "notAppliedYet": "Not applied yet",
+    "deadline": "Deadline",
+    "needConsultation": "Need Consultation?",
+    "consultationDescription": "Get expert advice about this project before applying. Our support team is ready to help!",
+    "availableNow": "Available now",
+    "applyFormTitle": "Apply to this project",
+    "bidPrice": "Bid price (VND)",
+    "bidPricePlaceholder": "e.g., 200,000,000",
+    "bidPricePlaceholderWithEst": "e.g., around {{est}}",
+    "startDate": "Expected start date",
+    "durationDays": "Construction time (days)",
+    "durationDaysPlaceholder": "e.g., 60",
+    "noteToOwner": "Message to the customer",
+    "notePlaceholder": "Scope, warranty, timeline commitment..."
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
