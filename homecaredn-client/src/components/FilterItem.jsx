@@ -173,9 +173,10 @@ export default function FilterItem({
                 >
                     <span className="text-sm md:text-base font-medium truncate">
                         {selectedValue
-                            ? options?.find(op => op[valueID] === selectedValue)?.[
-                            i18n.language === 'vi' ? name : nameEN || name
-                            ]
+                            ? (() => {
+                                const op = options?.find(op => op[valueID] === selectedValue);
+                                return op?.[i18n.language === 'vi' ? name : nameEN || name];
+                            })()
                             : label}
                     </span>
                 </button>
@@ -209,7 +210,10 @@ export default function FilterItem({
                     <>
                         <div
                             className="fixed inset-0 z-10"
+                            role="button"
+                            tabIndex={0}
                             onClick={() => setIsOpen(false)}
+                            onKeyDown={(e) => e.key === "Enter" || e.key === " " ? setIsOpen(false) : null}
                         />
 
                         {/* Options */}

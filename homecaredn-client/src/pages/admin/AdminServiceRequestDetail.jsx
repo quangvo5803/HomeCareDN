@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Loading from '../../components/Loading';
 import { useTranslation } from "react-i18next";
 import { useServiceRequest } from "../../hook/useServiceRequest";
-import { useNavigate } from "react-router-dom";
 import { formatVND } from '../../utils/formatters';
 
 
@@ -24,6 +23,10 @@ export default function AdminServiceRequestDetail() {
         fetchData();
     }, [id, getServiceRequestById]);
 
+    const icons = {
+        Repair: 'fa-drafting-compass',
+        Construction: 'fa-hammer',
+    };
 
     if (!detail) return <Loading />;
 
@@ -45,17 +48,12 @@ export default function AdminServiceRequestDetail() {
 
                             <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                                 <i
-                                    className={`fas ${detail.serviceType === 'Repair'
-                                        ? 'fa-drafting-compass'
-                                        : detail.serviceType === 'Construction'
-                                            ? 'fa-hammer'
-                                            : 'fa-wrench'
-                                        } text-2xl text-white`}
-                                ></i>
+                                    className={`fas ${icons[detail?.serviceType] || 'fa-wrench'} text-2xl text-white`}
+                                />
                             </div>
 
                             <div className="flex-1">
-                                <h1 classNameName="text-2xl font-bold">{t(`Enums.ServiceType.${detail.serviceType}`)}</h1>
+                                <h1 className="text-2xl font-bold">{t(`Enums.ServiceType.${detail.serviceType}`)}</h1>
                                 <div className="flex items-center gap-4 text-white/90 text-sm mt-1">
                                     <span className="flex items-center gap-1.5">
                                         <i className="far fa-calendar"></i>
@@ -194,7 +192,7 @@ export default function AdminServiceRequestDetail() {
                             <div className="mt-6 flex flex-wrap gap-4">
                                 {detail.imageUrls.map((url, i) => (
                                     <div
-                                        key={i}
+                                        key={`${url}-${i}`}
                                         className="bg-white rounded-lg border border-gray-200 p-2 flex items-center justify-center w-28 h-28"
                                     >
                                         <img
