@@ -13,7 +13,7 @@ export default function AdminCategoryManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategoryID, setEditingCategoryID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
@@ -74,7 +74,7 @@ export default function AdminCategoryManager() {
     }
 
     setIsModalOpen(false);
-    setEditingCategory(null);
+    setEditingCategoryID(null);
   };
   if (loading) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
@@ -130,10 +130,10 @@ export default function AdminCategoryManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingCategory(null);
+              setEditingCategoryID(null);
             }}
             onSave={handleSave}
-            category={editingCategory}
+            categoryID={editingCategoryID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -224,7 +224,7 @@ export default function AdminCategoryManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
-                                setEditingCategory(cat);
+                                setEditingCategoryID(cat.categoryID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -342,7 +342,7 @@ export default function AdminCategoryManager() {
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingCategory(cat);
+                            setEditingCategoryID(cat.categoryID);
                             setIsModalOpen(true);
                           }}
                         >

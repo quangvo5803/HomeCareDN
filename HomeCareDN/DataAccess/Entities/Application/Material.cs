@@ -35,6 +35,7 @@ namespace DataAccess.Entities.Application
         public string? UnitEN { get; set; }
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Image>? Images { get; set; }
     }

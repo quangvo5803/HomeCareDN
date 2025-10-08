@@ -88,14 +88,31 @@ namespace BusinessLogic.Services
             }
             var totalCount = await query.CountAsync();
 
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
-                "brandname" => query.OrderBy(b => b.BrandName),
-                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
-                "brandnameen" => query.OrderBy(b => b.BrandNameEN),
-                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                "brandName" => query.OrderBy(b => b.BrandName),
+                "brandName_desc" => query.OrderByDescending(b => b.BrandName),
+                "brandNameEN" => query.OrderBy(b => b.BrandNameEN),
+                "brandNameEN_desc" => query.OrderByDescending(b => b.BrandNameEN),
+                "materialcount" => query
+                    .Select(b => new
+                    {
+                        Brand = b,
+                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
+                    })
+                    .OrderBy(x => x.MaterialCount)
+                    .Select(x => x.Brand),
+
+                "materialcount_desc" => query
+                    .Select(b => new
+                    {
+                        Brand = b,
+                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
+                    })
+                    .OrderByDescending(x => x.MaterialCount)
+                    .Select(x => x.Brand),
                 "random" => query.OrderBy(b => b.BrandID),
-                _ => query.OrderBy(b => b.BrandID),
+                _ => query.OrderBy(b => b.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

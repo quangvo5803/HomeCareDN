@@ -54,17 +54,17 @@ export const MaterialProvider = ({ children }) => {
   );
 
   // 📌 Public: get material by id
-  const getMaterialById = useCallback(
-    async (id) => {
-      try {
-        return await materialService.getMaterialById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    []
-  );
+  const getMaterialById = useCallback(async (id) => {
+    try {
+      setLoading(true);
+      return await materialService.getMaterialById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
   // 📌 Distributor-only: get all by user id
   const fetchMaterialsByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
@@ -149,6 +149,7 @@ export const MaterialProvider = ({ children }) => {
       try {
         await materialService.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
+        setTotalMaterials((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

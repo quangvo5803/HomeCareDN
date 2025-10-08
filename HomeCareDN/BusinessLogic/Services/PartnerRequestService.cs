@@ -71,7 +71,7 @@ namespace BusinessLogic.Services
                 "createddate" => query.OrderBy(p => p.CreatedAt),
                 "createddatedesc" => query.OrderByDescending(p => p.CreatedAt),
                 "random" => query.OrderBy(p => p.PartnerRequestID),
-                _ => query.OrderBy(p => p.PartnerRequestID),
+                _ => query.OrderBy(p => p.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

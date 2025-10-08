@@ -43,7 +43,7 @@ namespace BusinessLogic.Services
                 "isprocess" => query.OrderBy(m => m.IsProcessed),
                 "isprocess_desc" => query.OrderByDescending(m => m.IsProcessed),
                 "random" => query.OrderBy(s => s.Id),
-                _ => query.OrderBy(b => b.Id),
+                _ => query.OrderBy(b => b.CreateAt),
             };
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
