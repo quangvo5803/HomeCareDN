@@ -384,7 +384,8 @@
     "durationDays": "Construction time (days)",
     "durationDaysPlaceholder": "e.g., 60",
     "noteToOwner": "Message to the customer",
-    "notePlaceholder": "Scope, warranty, timeline commitment..."
+    "notePlaceholder": "Scope, warranty, timeline commitment...",
+    "viewAttachment": "Xem tệp đính kèm {{index}}"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",

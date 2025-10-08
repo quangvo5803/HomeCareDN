@@ -195,26 +195,40 @@ export default function ContractorServiceRequestDetail() {
               </div>
 
               {/* Images */}
-              {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && (
+              {Array.isArray(serviceRequest.imageUrls) && serviceRequest.imageUrls.filter(Boolean).length > 0 && (
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
-                    <i className="fas fa-images" />
+                    <i className="fas fa-images" aria-hidden="true" />
                     {t('contractorServiceRequestDetail.images')}
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {serviceRequest.imageUrls.map((imageUrl, index) => (
-                      <div key={index} className="aspect-square rounded-lg overflow-hidden">
-                        <img
-                          src={imageUrl}
-                          alt={`Service request image ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
-                          onClick={() => window.open(imageUrl, '_blank')}
-                        />
-                      </div>
-                    ))}
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
+                    {serviceRequest.imageUrls
+                      .filter(Boolean)
+                      .map((imageUrl, idx) => (
+                        <div key={imageUrl} className="group aspect-square rounded-lg overflow-hidden" role="listitem">
+                          <a
+                            href={imageUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={t('contractorServiceRequestDetail.viewAttachment', { index: idx + 1 })}
+                            className="block w-full h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+                            title={t('contractorServiceRequestDetail.viewAttachment', { index: idx + 1 })}
+                          >
+                            <img
+                              src={imageUrl}
+                              alt=""                              
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                            />
+                          </a>
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}
+
 
               {/* STATUS */}
               <div className="mt-6">
@@ -233,7 +247,7 @@ export default function ContractorServiceRequestDetail() {
                   </div>
                 </div>
               </div>
-              {/* END STATUS */}
+
             </div>
           </div>
         </div>
