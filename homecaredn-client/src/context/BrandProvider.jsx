@@ -13,44 +13,51 @@ export const BrandProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // 📌 Fetch brands (có min loading)
+  const executeFetch = async ({
+    PageNumber = 1,
+    PageSize = 10,
+    SortBy,
+    Search,
+  } = {}) => {
+    try {
+      const data = await brandService.getAllBrands({
+        PageNumber,
+        PageSize,
+        SortBy,
+        Search,
+      });
+      setBrands(data.items || []);
+      setTotalBrands(data.totalCount || 0);
+      return data;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return { items: [], totalCount: 0 };
+    }
+  };
   const fetchBrands = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, SortBy, Search } = {}) => {
-      const excuteFetch = async () => {
-        try {
-          const data = await brandService.getAllBrands({
-            PageNumber,
-            PageSize,
-            SortBy,
-            Search,
-          });
-          setBrands(data.items || []);
-          setTotalBrands(data.totalCount || 0);
-          return data;
-        } catch (err) {
-          toast.error(handleApiError(err));
-          return { items: [], totalCount: 0 };
-        }
-      };
-      return await withMinLoading(excuteFetch, setLoading);
+    async (
+      params = { PageNumber: 1, PageSize: 10, Search: '', SortBy: '' }
+    ) => {
+      return await withMinLoading(() => executeFetch(params), setLoading);
     },
     []
   );
 
   // 📌 Fetch all brands (dropdown)
+  const executeFetchAllBrands = async () => {
+    try {
+      const data = await brandService.getAllBrands({
+        PageNumber: 1,
+        PageSize: 9999,
+      });
+      return data.items || [];
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return [];
+    }
+  };
   const fetchAllBrands = useCallback(async () => {
-    const excuteFetch = async () => {
-      try {
-        const data = await brandService.getAllBrands({
-          PageNumber: 1,
-          PageSize: 9999,
-        });
-        return data.items || [];
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return [];
-      }
-    };
-    return await withMinLoading(excuteFetch, setLoading);
+    return await withMinLoading(() => executeFetchAllBrands(), setLoading);
   }, []);
 
   // 📌 Get by ID
@@ -69,43 +76,44 @@ export const BrandProvider = ({ children }) => {
   );
 
   // 📌 Create brand (có min loading)
+  const executeCreate = async (dto) => {
+    try {
+      const newBrand = await brandService.createBrand(dto);
+      setBrands((prev) => [...prev, newBrand]);
+      setTotalBrands((prev) => prev + 1);
+      return newBrand;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  };
   const createBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      const excuteCreate = async () => {
-        try {
-          const newBrand = await brandService.createBrand(dto);
-          setBrands((prev) => [...prev, newBrand]);
-          setTotalBrands((prev) => prev + 1);
-          return newBrand;
-        } catch (err) {
-          toast.error(handleApiError(err));
-          throw err;
-        }
-      };
-      return await withMinLoading(excuteCreate, setLoading);
+
+      return await withMinLoading(() => executeCreate(dto), setLoading);
     },
     [user?.role]
   );
 
-  // 📌 Update brand (có min loading)
+  // 📌 Update brand
+  const executeUpdateBrand = useCallback(async (dto) => {
+    try {
+      const updated = await brandService.updateBrand(dto);
+      setBrands((prev) =>
+        prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
+      );
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
   const updateBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      const excuteUpdate = async () => {
-        try {
-          const updated = await brandService.updateBrand(dto);
-          setBrands((prev) =>
-            prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
-          );
-        } catch (err) {
-          toast.error(handleApiError(err));
-          throw err;
-        }
-      };
-      return await withMinLoading(excuteUpdate, setLoading);
+      return await withMinLoading(() => executeUpdateBrand(dto), setLoading);
     },
-    [user?.role]
+    [user?.role, executeUpdateBrand]
   );
 
   // 📌 Delete brand (xóa nhanh, không cần loading overlay)
