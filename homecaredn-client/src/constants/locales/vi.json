@@ -231,14 +231,14 @@
     "resend_otp": "Gửi lại",
     "not_receive_otp": "Không nhận được mã? "
   },
-  "partnerRequest":{
-    "partnerTypeSelection":{
+  "partnerRequest": {
+    "partnerTypeSelection": {
       "title": "Đăng ký trở thành đối tác",
       "subtitle": "Vui lòng lựa chọn vai trò bạn muốn đăng kí",
       "selectType": "Vui lòng chọn vai trò để tiếp tục",
       "continueWithType": "Tiếp tục đăng kí với vai trò "
     },
-    "partnerRegistration":{
+    "partnerRegistration": {
       "title": "Đăng ký trở thành đối tác",
       "subtitle": "Vui lòng điền đầy đủ thông tin bên dưới",
       "notSelectedType": "Vui lòng chọn vai trò",
@@ -247,7 +247,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
-      "process_infor":"Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
+      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
 
@@ -294,7 +294,7 @@
       "label_packageOption": "Gói xây dựng: ",
       "label_address": "Địa chỉ: ",
       "label_open": "Đang mở",
-      "label_close":"Đã đóng"
+      "label_close": "Đã đóng"
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -462,7 +462,7 @@
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
-      "partner": "Đối tác", 
+      "partner": "Đối tác",
       "support": "Quản lý hỗ trợ"
     },
     "account": {
@@ -605,6 +605,20 @@
       "chooseFiles": "Chọn tệp tải lên"
     }
   },
+  "adminServiceRequestManager": {
+    "no": "STT",
+    "title": "Quản lý dịch vụ đã yêu cầu",
+    "subtitle": "Quản lý danh sách dịch vụ đã yêu cầu",
+    "serviceRequests": "Dịch vụ đã yêu cầu",
+    "acreage": "Diện tích",
+    "numberOfFloors": "Số tầng",
+    "estimatePrice": "Giá ước tính",
+    "address": "Địa chỉ",
+    "label_open": "Đang mở",
+    "label_close": "Đã đóng",
+    "empty": "Không có yêu cầu dịch vụ nào",
+    "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi."
+  },
   "adminMaterialManager": {
     "title": "Quản lý Vật Liệu",
     "subtitle": "Quản lý danh sách vật liệu",
@@ -644,8 +658,8 @@
       "noFile": "Chưa chọn tệp nào",
       "filesSelected": " tệp đã chọn"
     }
-  },  
-  "adminPartnerManager":{
+  },
+  "adminPartnerManager": {
     "empty": "Không có đối tác nào",
     "empty_description": "Chưa có đăng ký hợp tác nào.",
     "title": "Quản lý đối tác",
@@ -665,7 +679,7 @@
     "delete": "Xóa",
     "viewDetails": "Xem chi tiết",
     "total": "Tổng",
-    "partnerRequestModal":{
+    "partnerRequestModal": {
       "title": "Thông tin đăng kí",
       "companyName": "Tên công ty",
       "phoneNumber": "Số điện thoại",
@@ -763,7 +777,7 @@
     "Back": "Trở về",
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
-    "Reject" : "Từ chối",
+    "Reject": "Từ chối",
     "Approve": "Phê duyệt"
   },
   "ModalPopup": {
@@ -817,7 +831,7 @@
     "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
-    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",   
+    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
 
     "NULL_NAME": "Vui lòng nhập họ và tên.",
     "NULL_PHONE": "Vui lòng nhập số điện thoại.",
@@ -830,7 +844,6 @@
     "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
     "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "INVALID_EMAIL": "Email không hợp lệ.",
-    
 
     "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
@@ -858,10 +871,10 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
-    "REQUIRED_ADDRESS":"Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhất",
-    "REQUIRD_REJECT_REASON":"Vui lòng nhập lí do từ chối",
+    "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
 
     "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
     "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
@@ -944,22 +957,22 @@
       "Rustic": "Mộc mạc",
       "Other": "Khác"
     },
-    "PartnerStatus":{
+    "PartnerStatus": {
       "Pending": "Đang chờ",
       "Rejected": "Đã từ chối",
       "Approved": "Đã chấp nhận"
     },
-    "PartnerType":{
-      "Distributor":"Nhà phân phối",
+    "PartnerType": {
+      "Distributor": "Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
       "Contractor": "Nhà thầu",
-      "ContractorDescription" :"Cung cấp giải pháp xây dựng/sửa chửa"
+      "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
     }
   },
   "toast": {
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
-  "common":{
-    "search":"Tìm kiếm..."
+  "common": {
+    "search": "Tìm kiếm..."
   }
 }

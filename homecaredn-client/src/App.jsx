@@ -21,6 +21,8 @@ import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
 import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminPartnerManager from './pages/admin/AdminPartnerManager';
+import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
+import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail'
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -222,6 +224,8 @@ function Layout() {
           <Route path="BrandManager" element={<AdminBrandManager />} />
           <Route path="CategoryManager" element={<AdminCategoryManager />} />
           <Route path="ServiceManager" element={<AdminServiceManager />} />
+          <Route path="ServiceRequestManager" element={<AdminServiceRequestManager />} />
+          <Route path="ServiceRequest/:id" element={<AdminServiceRequestDetail />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
           <Route path="MaterialManager" element={<AdminMaterialManager />} />
           <Route path="PartnerManager" element={<AdminPartnerManager />} />
