@@ -15,7 +15,7 @@ export const BrandProvider = ({ children }) => {
   // 📌 Fetch brands (có min loading)
   const fetchBrands = useCallback(
     async ({ PageNumber = 1, PageSize = 10, SortBy, Search } = {}) => {
-      return await withMinLoading(async () => {
+      const excuteFetch = async () => {
         try {
           const data = await brandService.getAllBrands({
             PageNumber,
@@ -30,14 +30,15 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           return { items: [], totalCount: 0 };
         }
-      }, setLoading);
+      };
+      return await withMinLoading(excuteFetch, setLoading);
     },
     []
   );
 
   // 📌 Fetch all brands (dropdown)
   const fetchAllBrands = useCallback(async () => {
-    return await withMinLoading(async () => {
+    const excuteFetch = async () => {
       try {
         const data = await brandService.getAllBrands({
           PageNumber: 1,
@@ -48,7 +49,8 @@ export const BrandProvider = ({ children }) => {
         toast.error(handleApiError(err));
         return [];
       }
-    }, setLoading);
+    };
+    return await withMinLoading(excuteFetch, setLoading);
   }, []);
 
   // 📌 Get by ID
@@ -70,7 +72,7 @@ export const BrandProvider = ({ children }) => {
   const createBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      return await withMinLoading(async () => {
+      const excuteCreate = async () => {
         try {
           const newBrand = await brandService.createBrand(dto);
           setBrands((prev) => [...prev, newBrand]);
@@ -80,7 +82,8 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           throw err;
         }
-      }, setLoading);
+      };
+      return await withMinLoading(excuteCreate, setLoading);
     },
     [user?.role]
   );
@@ -89,7 +92,7 @@ export const BrandProvider = ({ children }) => {
   const updateBrand = useCallback(
     async (dto) => {
       if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      return await withMinLoading(async () => {
+      const excuteUpdate = async () => {
         try {
           const updated = await brandService.updateBrand(dto);
           setBrands((prev) =>
@@ -99,7 +102,8 @@ export const BrandProvider = ({ children }) => {
           toast.error(handleApiError(err));
           throw err;
         }
-      }, setLoading);
+      };
+      return await withMinLoading(excuteUpdate, setLoading);
     },
     [user?.role]
   );
