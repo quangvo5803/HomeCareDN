@@ -959,6 +959,7 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "common":{
+    "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search":"Tìm kiếm...",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",

@@ -5,7 +5,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
     public class ServiceRequestDto
     {
         public Guid ServiceRequestID { get; set; }
-        public required string UserID { get; set; }
+        public required Guid CustomerID { get; set; }
         public required Guid AddressID { get; set; }
         public required AddressDto Address { get; set; }
         public required string ServiceType { get; set; }

@@ -62,7 +62,7 @@ namespace BusinessLogic.Services.Interfaces
             //Get Address
             var addressIds = items.Select(i => i.AddressId).ToList();
             var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
                 .ToListAsync();
             foreach (var dto in dtos)
             {
@@ -110,7 +110,7 @@ namespace BusinessLogic.Services.Interfaces
                 includeProperties: INCLUDE
             );
 
-            query = query.Where(sr => sr.UserID == parameters.FilterID.ToString());
+            query = query.Where(sr => sr.CustomerID == parameters.FilterID);
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
@@ -129,7 +129,7 @@ namespace BusinessLogic.Services.Interfaces
             //Get Address
             var addressIds = items.Select(i => i.AddressId).ToList();
             var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
                 .ToListAsync();
             foreach (var dto in dtos)
             {

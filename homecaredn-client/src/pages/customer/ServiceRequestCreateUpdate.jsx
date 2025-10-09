@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useEnums } from '../../hook/useEnums';
 import { useAuth } from '../../hook/useAuth';
@@ -20,6 +20,8 @@ export default function ServiceRequestCreateUpdate() {
   const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
   const { serviceRequestId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const passedService = location.state?.service;
   const {
     loading,
     createServiceRequest,
@@ -67,8 +69,21 @@ export default function ServiceRequestCreateUpdate() {
           );
         })
         .catch((err) => handleApiError(err, t));
+    } else if (passedService) {
+      // Nếu là tạo mới và có dữ liệu service truyền qua
+      setServiceType(passedService.serviceType || '');
+      setPackageOption(passedService.packageOption || '');
+      setBuildingType(passedService.buildingType || '');
+      setMainStructureType(passedService.mainStructureType || '');
+      setDesignStyle(passedService.designStyle || '');
     }
-  }, [serviceRequestId, fetchAddresses, getServiceRequestById, t]);
+  }, [
+    serviceRequestId,
+    passedService,
+    fetchAddresses,
+    getServiceRequestById,
+    t,
+  ]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -377,6 +392,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-arrows-alt-h text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_width')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
@@ -396,6 +412,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-arrows-alt-v text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_length')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
@@ -415,6 +432,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-layer-group text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_floor')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
