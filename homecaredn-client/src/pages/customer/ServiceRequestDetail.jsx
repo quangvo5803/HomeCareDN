@@ -23,9 +23,7 @@ const ServiceRequestDetail = () => {
 
     // Cleanup khi component unmount
     return () => {
-      if (venoboxInstance && venoboxInstance.close) {
-        venoboxInstance.close();
-      }
+      venoboxInstance?.close?.();
     };
   }, [selectedContractor]);
 
@@ -293,7 +291,7 @@ const ServiceRequestDetail = () => {
                 <div className="grid grid-cols-5 gap-3 pl-7">
                   {serviceRequest.images.map((img, idx) => (
                     <a
-                      key={idx}
+                      key={img}
                       href={img}
                       className="venobox aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform block"
                       data-gall="project-gallery"
@@ -403,7 +401,7 @@ const ServiceRequestDetail = () => {
                   <div className="grid grid-cols-3 gap-2">
                     {selectedContractor.proposalImages.map((img, idx) => (
                       <a
-                        key={idx}
+                        key={img}
                         href={img}
                         className="venobox aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform block"
                         data-gall="proposal-gallery"
@@ -524,9 +522,9 @@ const ServiceRequestDetail = () => {
           <span>Chat với nhà thầu</span>
         </h4>
         <div className="h-128 overflow-y-auto bg-gray-50 p-3 rounded-lg mb-3">
-          {messages.map((m, idx) => (
+          {messages.map((m) => (
             <div
-              key={idx}
+              key={m}
               className={`mb-2 flex ${
                 m.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}
