@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
 
 const ServiceRequestDetail = () => {
   const navigate = useNavigate();
@@ -8,9 +10,24 @@ const ServiceRequestDetail = () => {
     { sender: 'contractor', text: 'Xin chào, tôi đã xem yêu cầu của bạn.' },
   ]);
   const [input, setInput] = useState('');
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [lightboxType, setLightboxType] = useState('project');
+
+  useEffect(() => {
+    // Khởi tạo Venobox sau khi component render
+    const venoboxInstance = new VenoBox({
+      selector: '.venobox',
+      numeration: true,
+      infinigall: true,
+      spinner: 'rotating-plane',
+      spinColor: '#f97316',
+    });
+
+    // Cleanup khi component unmount
+    return () => {
+      if (venoboxInstance && venoboxInstance.close) {
+        venoboxInstance.close();
+      }
+    };
+  }, [selectedContractor]);
 
   const serviceRequest = {
     serviceType: 'Xây dựng',
@@ -104,44 +121,6 @@ const ServiceRequestDetail = () => {
     setInput('');
   };
 
-  const openLightbox = (index, type = 'project') => {
-    setLightboxType(type);
-    setLightboxIndex(index);
-    setLightboxOpen(true);
-  };
-
-  const closeLightbox = () => {
-    setLightboxOpen(false);
-  };
-
-  const nextImage = () => {
-    if (lightboxType === 'project') {
-      setLightboxIndex((prev) => (prev + 1) % serviceRequest.images.length);
-    } else {
-      setLightboxIndex(
-        (prev) => (prev + 1) % selectedContractor.proposalImages.length
-      );
-    }
-  };
-
-  const prevImage = () => {
-    if (lightboxType === 'project') {
-      setLightboxIndex((prev) =>
-        prev === 0 ? serviceRequest.images.length - 1 : prev - 1
-      );
-    } else {
-      setLightboxIndex((prev) =>
-        prev === 0 ? selectedContractor.proposalImages.length - 1 : prev - 1
-      );
-    }
-  };
-
-  const getCurrentImages = () => {
-    return lightboxType === 'project'
-      ? serviceRequest.images
-      : selectedContractor.proposalImages;
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="flex items-center justify-between px-6 py-5 bg-white border-b shadow-md">
@@ -232,7 +211,6 @@ const ServiceRequestDetail = () => {
                   </h3>
                 </div>
 
-                {/* Grid thông số */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
                     <div className="flex items-center gap-2 mb-2">
@@ -274,7 +252,6 @@ const ServiceRequestDetail = () => {
                 </div>
               </div>
 
-              {/* Grid diện tích và dự toán */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="p-5 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl border border-indigo-200">
                   <div className="flex items-center gap-2 mb-2">
@@ -315,17 +292,18 @@ const ServiceRequestDetail = () => {
                 </div>
                 <div className="grid grid-cols-5 gap-3 pl-7">
                   {serviceRequest.images.map((img, idx) => (
-                    <button
+                    <a
                       key={idx}
-                      onClick={() => openLightbox(idx, 'project')}
-                      className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform"
+                      href={img}
+                      className="venobox aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform block"
+                      data-gall="project-gallery"
                     >
                       <img
                         src={img}
-                        alt={`Project ${idx + 1}`}
+                        alt={`Hình ảnh dự án ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
@@ -334,64 +312,7 @@ const ServiceRequestDetail = () => {
         </div>
 
         <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6 overflow-y-auto">
-          {!selectedContractor ? (
-            <>
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-bold text-gray-800">
-                  Nhà thầu ứng tuyển
-                </h3>
-                <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">
-                  {contractors.length} nhà thầu
-                </span>
-              </div>
-              <div className="space-y-4">
-                {contractors.map((c) => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setSelectedContractor(c)}
-                    className="w-full text-left p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-orange-400 hover:shadow-lg hover:scale-105 group bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-400"
-                  >
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl border-2 border-gray-200 group-hover:border-orange-400 flex-shrink-0">
-                        {c.name.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-gray-800 group-hover:text-orange-600 transition truncate">
-                          {c.name}
-                        </h4>
-                        <div className="flex items-center gap-3 mt-1">
-                          <span className="flex items-center gap-1 text-xs text-yellow-600">
-                            <i className="fas fa-star"></i>
-                            <span className="font-semibold">{c.rating}</span>
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            <i className="fas fa-comments mr-1"></i>
-                            {c.reviewCount} đánh giá
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pl-1">
-                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
-                        {c.description}
-                      </p>
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-                        <span className="text-xs text-gray-500">
-                          <i className="fas fa-check-circle text-green-600 mr-1"></i>
-                          {c.completedProjects} dự án
-                        </span>
-                        <span className="text-sm font-bold text-emerald-600">
-                          {(c.bidPrice / 1000000).toFixed(0)} triệu
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </>
-          ) : (
+          {selectedContractor ? (
             <>
               <button
                 onClick={() => setSelectedContractor(null)}
@@ -481,17 +402,18 @@ const ServiceRequestDetail = () => {
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {selectedContractor.proposalImages.map((img, idx) => (
-                      <button
-                        key={img.url}
-                        onClick={() => openLightbox(idx, 'proposal')}
-                        className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform"
+                      <a
+                        key={idx}
+                        href={img}
+                        className="venobox aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform block"
+                        data-gall="proposal-gallery"
                       >
                         <img
                           src={img}
-                          alt={`Proposal ${idx + 1}`}
+                          alt={`Phương án thi công ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
-                      </button>
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -535,6 +457,63 @@ const ServiceRequestDetail = () => {
                 </div>
               </div>
             </>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-800">
+                  Nhà thầu ứng tuyển
+                </h3>
+                <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-semibold">
+                  {contractors.length} nhà thầu
+                </span>
+              </div>
+              <div className="space-y-4">
+                {contractors.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setSelectedContractor(c)}
+                    className="w-full text-left p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-orange-400 hover:shadow-lg hover:scale-105 group bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-400"
+                  >
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl border-2 border-gray-200 group-hover:border-orange-400 flex-shrink-0">
+                        {c.name.charAt(0)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-gray-800 group-hover:text-orange-600 transition truncate">
+                          {c.name}
+                        </h4>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="flex items-center gap-1 text-xs text-yellow-600">
+                            <i className="fas fa-star"></i>
+                            <span className="font-semibold">{c.rating}</span>
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            <i className="fas fa-comments mr-1"></i>
+                            {c.reviewCount} đánh giá
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pl-1">
+                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                        {c.description}
+                      </p>
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <span className="text-xs text-gray-500">
+                          <i className="fas fa-check-circle text-green-600 mr-1"></i>
+                          {c.completedProjects} dự án
+                        </span>
+                        <span className="text-sm font-bold text-emerald-600">
+                          {(c.bidPrice / 1000000).toFixed(0)} triệu
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -545,9 +524,9 @@ const ServiceRequestDetail = () => {
           <span>Chat với nhà thầu</span>
         </h4>
         <div className="h-128 overflow-y-auto bg-gray-50 p-3 rounded-lg mb-3">
-          {messages.map((m) => (
+          {messages.map((m, idx) => (
             <div
-              key={m.text}
+              key={idx}
               className={`mb-2 flex ${
                 m.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}
@@ -559,7 +538,7 @@ const ServiceRequestDetail = () => {
                     : 'bg-gray-200 text-gray-800'
                 }`}
               >
-                <p>{m.text}</p>
+                <p className="text-sm">{m.text}</p>
               </div>
             </div>
           ))}
@@ -588,49 +567,6 @@ const ServiceRequestDetail = () => {
           </div>
         </div>
       </div>
-
-      {lightboxOpen && (
-        <div
-          className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center"
-          onClick={closeLightbox}
-        >
-          <button
-            onClick={closeLightbox}
-            className="absolute top-4 right-4 text-white text-3xl hover:text-orange-400 transition z-10"
-          >
-            <i className="fas fa-times"></i>
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              prevImage();
-            }}
-            className="absolute left-4 text-white text-4xl hover:text-orange-400 transition z-10"
-          >
-            <i className="fas fa-chevron-left"></i>
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              nextImage();
-            }}
-            className="absolute right-4 text-white text-4xl hover:text-orange-400 transition z-10"
-          >
-            <i className="fas fa-chevron-right"></i>
-          </button>
-          <div className="max-w-5xl max-h-[90vh] flex flex-col items-center">
-            <img
-              src={getCurrentImages()[lightboxIndex]}
-              alt={`${lightboxType} ${lightboxIndex + 1}`}
-              className="max-w-full max-h-[85vh] object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
-            <div className="text-white mt-4 text-lg">
-              {lightboxIndex + 1} / {getCurrentImages().length}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
