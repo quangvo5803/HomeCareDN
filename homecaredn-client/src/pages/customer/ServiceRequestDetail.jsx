@@ -315,7 +315,7 @@ const ServiceRequestDetail = () => {
                 </div>
                 <div className="grid grid-cols-5 gap-3 pl-7">
                   {serviceRequest.images.map((img, idx) => (
-                    <div
+                    <button
                       key={idx}
                       onClick={() => openLightbox(idx, 'project')}
                       className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform"
@@ -325,7 +325,7 @@ const ServiceRequestDetail = () => {
                         alt={`Project ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -346,10 +346,11 @@ const ServiceRequestDetail = () => {
               </div>
               <div className="space-y-4">
                 {contractors.map((c) => (
-                  <div
+                  <button
                     key={c.id}
+                    type="button"
                     onClick={() => setSelectedContractor(c)}
-                    className="p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-orange-400 hover:shadow-lg hover:scale-105 group"
+                    className="w-full text-left p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-orange-400 hover:shadow-lg hover:scale-105 group bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-400"
                   >
                     <div className="flex items-start gap-3 mb-3">
                       <div className="w-14 h-14 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl border-2 border-gray-200 group-hover:border-orange-400 flex-shrink-0">
@@ -371,6 +372,7 @@ const ServiceRequestDetail = () => {
                         </div>
                       </div>
                     </div>
+
                     <div className="pl-1">
                       <p className="text-xs text-gray-600 mb-2 line-clamp-2">
                         {c.description}
@@ -385,7 +387,7 @@ const ServiceRequestDetail = () => {
                         </span>
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </>
@@ -472,15 +474,15 @@ const ServiceRequestDetail = () => {
                 <div>
                   <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                     <i className="fas fa-clipboard-list text-orange-500"></i>
-                    Mô tả phương án thi công
+                    <span>Mô tả phương án thi công</span>
                   </h4>
                   <p className="text-sm text-gray-600 leading-relaxed mb-4">
                     {selectedContractor.proposalDescription}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     {selectedContractor.proposalImages.map((img, idx) => (
-                      <div
-                        key={idx}
+                      <button
+                        key={img.url}
                         onClick={() => openLightbox(idx, 'proposal')}
                         className="aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition-opacity border-2 border-gray-200 hover:border-orange-400 hover:scale-105 transform"
                       >
@@ -489,7 +491,7 @@ const ServiceRequestDetail = () => {
                           alt={`Proposal ${idx + 1}`}
                           className="w-full h-full object-cover"
                         />
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -497,7 +499,7 @@ const ServiceRequestDetail = () => {
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-800 flex items-center gap-2">
                     <i className="fas fa-address-book text-orange-500"></i>
-                    Thông tin liên hệ
+                    <span>Thông tin liên hệ</span>
                   </h4>
                   <div className="space-y-2">
                     <a
@@ -524,11 +526,11 @@ const ServiceRequestDetail = () => {
                 <div className="grid grid-cols-2 gap-3 pt-4">
                   <button className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold text-sm">
                     <i className="fas fa-handshake mr-2"></i>
-                    Chấp nhận
+                    <span>Chấp nhận</span>
                   </button>
                   <button className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm">
                     <i className="fas fa-times mr-2"></i>
-                    Từ chối
+                    <span>Từ chối</span>
                   </button>
                 </div>
               </div>
@@ -540,12 +542,12 @@ const ServiceRequestDetail = () => {
       <div className="relative border-t bg-white p-4">
         <h4 className="font-semibold text-orange-600 mb-3 flex items-center gap-2">
           <i className="fas fa-comments"></i>
-          Chat với nhà thầu
+          <span>Chat với nhà thầu</span>
         </h4>
         <div className="h-128 overflow-y-auto bg-gray-50 p-3 rounded-lg mb-3">
-          {messages.map((m, i) => (
+          {messages.map((m) => (
             <div
-              key={i}
+              key={m.text}
               className={`mb-2 flex ${
                 m.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}
