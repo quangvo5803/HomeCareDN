@@ -124,7 +124,7 @@ export default function ServiceRequestCreateUpdate() {
     }
     const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const payload = {
-      UserID: user.id,
+      CustomerID: user.id,
       AddressID: addressID,
       ServiceType: serviceType,
       PackageOption: packageOption,

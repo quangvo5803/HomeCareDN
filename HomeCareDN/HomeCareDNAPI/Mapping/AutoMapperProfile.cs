@@ -87,6 +87,15 @@ namespace HomeCareDNAPI.Mapping
             // ------------------------
             CreateMap<ServiceRequest, ServiceRequestDto>()
                 .ForMember(
+                    dest => dest.ContractorApplyCount,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.ContractorApplications != null
+                                ? src.ContractorApplications.Count
+                                : 0
+                        )
+                )
+                .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )

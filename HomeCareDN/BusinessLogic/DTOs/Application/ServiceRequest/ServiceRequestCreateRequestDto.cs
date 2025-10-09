@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataAccess.Entities.Application;
-using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.ServiceRequest
 {
     public class ServiceRequestCreateRequestDto
     {
         [Required]
-        public string UserID { get; set; } = null!;
+        public string CustomerID { get; set; } = null!;
 
         [Required(ErrorMessage = "REQUIRED_SERVICE_REQUEST_ADDRESS")]
         public Guid AddressID { get; set; }

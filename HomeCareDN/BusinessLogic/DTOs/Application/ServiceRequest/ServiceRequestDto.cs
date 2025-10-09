@@ -20,6 +20,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public required string Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsOpen { get; set; }
+        public int ContractorApplyCount { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
     }

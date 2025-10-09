@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using DataAccess.Data;
@@ -8,7 +7,6 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BusinessLogic.Services.Interfaces
 {
@@ -22,7 +20,7 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
-        private const string INCLUDE = "Images";
+        private const string INCLUDE = "Images,ContractorApplications";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,

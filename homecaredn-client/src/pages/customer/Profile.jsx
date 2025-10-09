@@ -113,7 +113,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
     if (!isSafePhone(form.phoneNumber)) {
       toast.error(t('ERROR.INVALID_PHONE'));
       return;
-  }
+    }
     setSaving(true);
     await profileService.updateProfile({
       UserId: user.id,
@@ -124,7 +124,6 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
     toast.success(t('SUCCESS.PROFILE_UPDATE'));
 
     setSaving(false);
-
   };
 
   /* ------------------------------- Address CRUD ------------------------------ */
@@ -963,6 +962,10 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     {t(
                                       `Enums.PackageOption.${req.packageOption}`
                                     )}
+                                  </span>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i className="fas fa-users mr-1"></i>
+                                    {req.contractorApplyCount} ứng tuyển
                                   </span>
                                 </div>
 
