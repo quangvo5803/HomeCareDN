@@ -78,6 +78,7 @@ export default function AdminPartnerRequestManager() {
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
       <div className="w-full max-w-full mx-auto">
         {/* Header */}
+
         <div className="mb-8">
           <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
             <i className="mr-3 fa-solid fa-handshake" aria-hidden="true" />
@@ -90,15 +91,34 @@ export default function AdminPartnerRequestManager() {
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
           <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div
-                className="w-2 h-2 bg-blue-500 rounded-full"
-                aria-hidden="true"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                {totalPartnerRequests || 0}{' '}
-                {t('adminPartnerManager.partners', 'Partners')}
-              </span>
+            <div className="mb-4 flex flex-wrap gap-2">
+              <button
+                className={`px-3 py-1.5 rounded-full text-sm border ${
+                  // filter === 'all'
+                  //   ? 'bg-blue-600 text-white border-blue-600'
+                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {t('adminSupportManager.all')}
+              </button>
+              <button
+                className={`px-3 py-1.5 rounded-full text-sm border ${
+                  // filter === 'pending'
+                  //   ? 'bg-amber-600 text-white border-amber-600'
+                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {t('adminSupportManager.pending')}
+              </button>
+              <button
+                className={`px-3 py-1.5 rounded-full text-sm border ${
+                  // filter === 'processed'
+                  //   ? 'bg-green-600 text-white border-green-600'
+                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {t('adminSupportManager.processed')}
+              </button>
             </div>
 
             {/* Filter Controls */}
@@ -275,7 +295,16 @@ export default function AdminPartnerRequestManager() {
 
             {/* Pagination */}
             {totalPartnerRequests > 0 && (
-              <div className="flex justify-center py-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalBrands} {t('adminBrandManager.brands')}
+                  </span>
+                </div>
+
+                {/* Pagination (right) */}
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}

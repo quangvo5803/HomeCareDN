@@ -963,6 +963,11 @@
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
   "common":{
-    "search":"Search..."
+    "search":"Search...",
+    "sortDefault": "Default",
+    "sortName": "Name: A-Z",
+    "sortNameDesc": "Name: Z-A",
+    "sortMaterialCount": "Product Quantity: Low -> High",
+    "sortMaterialCountDesc": "Product Quantity: High -> Low"
   }
 }

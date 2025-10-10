@@ -90,27 +90,12 @@ namespace BusinessLogic.Services
 
             query = parameters.SortBy switch
             {
-                "brandName" => query.OrderBy(b => b.BrandName),
-                "brandName_desc" => query.OrderByDescending(b => b.BrandName),
-                "brandNameEN" => query.OrderBy(b => b.BrandNameEN),
-                "brandNameEN_desc" => query.OrderByDescending(b => b.BrandNameEN),
-                "materialcount" => query
-                    .Select(b => new
-                    {
-                        Brand = b,
-                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
-                    })
-                    .OrderBy(x => x.MaterialCount)
-                    .Select(x => x.Brand),
-
-                "materialcount_desc" => query
-                    .Select(b => new
-                    {
-                        Brand = b,
-                        MaterialCount = b.Materials != null ? b.Materials.Count : 0,
-                    })
-                    .OrderByDescending(x => x.MaterialCount)
-                    .Select(x => x.Brand),
+                "brandname" => query.OrderBy(b => b.BrandName),
+                "brandname_desc" => query.OrderByDescending(b => b.BrandName),
+                "brandnameen" => query.OrderBy(b => b.BrandNameEN ?? b.BrandName),
+                "brandnameen_desc" => query.OrderByDescending(b => b.BrandNameEN ?? b.BrandName),
+                "materialcount" => query.OrderBy(b => (int?)b.Materials!.Count ?? 0),
+                "materialcount_desc" => query.OrderByDescending(b => (int?)b.Materials!.Count ?? 0),
                 "random" => query.OrderBy(b => b.BrandID),
                 _ => query.OrderBy(b => b.CreatedAt),
             };

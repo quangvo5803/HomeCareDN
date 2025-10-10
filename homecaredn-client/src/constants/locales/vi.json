@@ -963,7 +963,7 @@
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
-    "sortMaterialCount": "Số lượng sản phẩm: Nhiều -> Ít",
-    "sortMaterialCountDesc": "Số lượng sản phẩm: Ít -> Nhiều"
+    "sortMaterialCount": "Số lượng sản phẩm: Ít -> Nhiều",
+    "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít"
   }
 }

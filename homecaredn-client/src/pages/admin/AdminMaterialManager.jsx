@@ -28,6 +28,7 @@ export default function AdminMaterialManager() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [sortBy, setSortBy] = useState('');
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const {
@@ -59,9 +60,10 @@ export default function AdminMaterialManager() {
     fetchMaterials({
       PageNumber: currentPage,
       PageSize: pageSize,
+      SortBy: sortBy,
       Search: debouncedSearch || '',
     });
-  }, [currentPage, pageSize, debouncedSearch, fetchMaterials]);
+  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchMaterials]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -81,7 +83,12 @@ export default function AdminMaterialManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          await fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
+          await fetchMaterials({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -144,39 +151,54 @@ export default function AdminMaterialManager() {
 
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
-          {/* Actions */}
+          {/* Table Header Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <div className="flex items-center space-x-2">
-              {/* Number of services */}
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium text-gray-700">
-                {totalMaterials || 0} {t('adminMaterialManager.material')}
-              </span>
+            {/* Left section: Search + Sort */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Search Input */}
+              <div className="w-full sm:w-64">
+                <input
+                  id="search-input"
+                  type="text"
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={t('common.search')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                />
+              </div>
+
+              {/* Sort Dropdown */}
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option
+                  value={
+                    i18n.language === 'vi' ? 'materialname' : 'materialnameen'
+                  }
+                >
+                  {t('common.sortName')}
+                </option>
+                <option
+                  value={
+                    i18n.language === 'vi'
+                      ? 'materialname_desc'
+                      : 'materialnameen_desc'
+                  }
+                >
+                  {t('common.sortNameDesc')}
+                </option>
+              </select>
             </div>
-            {/* Input search */}
-            <div className="flex-1 max-w-lg w-full">
-              <input
-                id="search-input"
-                type="text"
-                value={search}
-                onChange={handleSearchChange}
-                placeholder={t('common.search')}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-              />
-            </div>
+
+            {/* Add New Material Button */}
             <button
               className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
-              onClick={() => {
-                if (brands.length === 0 || categories.length === 0) {
-                  toast.error(t('adminMaterialManager.noBrandAndService'));
-                  return;
-                }
-                setEditingMaterialID(null);
-                setModalReadOnly(false);
-                setIsModalOpen(true);
-              }}
+              onClick={() => setIsModalOpen(true)}
             >
-              <i className="mr-2 fa-solid fa-plus"></i>
+              <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewMaterial')}
             </button>
           </div>
@@ -405,7 +427,15 @@ export default function AdminMaterialManager() {
 
             {/* Pagination */}
             {totalMaterials > 0 && (
-              <div className="flex justify-center py-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalMaterials} {t('adminMaterialManager.material')}
+                  </span>
+                </div>
+                {/* Pagination (right) */}
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
