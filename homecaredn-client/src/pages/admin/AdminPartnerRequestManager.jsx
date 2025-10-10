@@ -3,17 +3,14 @@ import PropTypes from 'prop-types';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
-import { useEnums } from '../../hook/useEnums';
 import PartnerRequestModal from '../../components/modal/PartnerRequestModal';
 import Loading from '../../components/Loading';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useDebounce } from 'use-debounce';
-import i18n from '../../configs/i18n';
 import { toast } from 'react-toastify';
 
 export default function AdminPartnerRequestManager() {
   const { t } = useTranslation();
-  const enums = useEnums();
   const pageSize = 5;
 
   const {
@@ -25,11 +22,12 @@ export default function AdminPartnerRequestManager() {
   } = usePartnerRequest();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const [partnerRequestID, setPartnerRequestID] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   // fetch data
   useEffect(() => {
@@ -37,20 +35,25 @@ export default function AdminPartnerRequestManager() {
       PageNumber: currentPage,
       PageSize: pageSize,
       Search: debouncedSearch || '',
-      ...(statusFilter !== 'All' && {
-        FilterPartnerRequestStatus: statusFilter,
-      }),
+      SortBy: sortBy,
+      FilterPartnerRequestStatus: filter === 'all' ? null : filter,
     });
   }, [
     currentPage,
     pageSize,
     debouncedSearch,
-    statusFilter,
+    sortBy,
+    filter,
     fetchPartnerRequests,
   ]);
   const partnerTypeColors = {
     Contractor: 'bg-blue-100 text-blue-800',
     Distributor: 'bg-purple-100 text-purple-800',
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleDelete = async (id) => {
@@ -65,7 +68,12 @@ export default function AdminPartnerRequestManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          fetchPartnerRequests({ PageNumber: currentPage, PageSize: pageSize });
+          fetchPartnerRequests({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -89,66 +97,67 @@ export default function AdminPartnerRequestManager() {
 
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
-          {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="mb-4 flex flex-wrap gap-2">
-              <button
-                className={`px-3 py-1.5 rounded-full text-sm border ${
-                  // filter === 'all'
-                  //   ? 'bg-blue-600 text-white border-blue-600'
-                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {t('adminSupportManager.all')}
-              </button>
-              <button
-                className={`px-3 py-1.5 rounded-full text-sm border ${
-                  // filter === 'pending'
-                  //   ? 'bg-amber-600 text-white border-amber-600'
-                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {t('adminSupportManager.pending')}
-              </button>
-              <button
-                className={`px-3 py-1.5 rounded-full text-sm border ${
-                  // filter === 'processed'
-                  //   ? 'bg-green-600 text-white border-green-600'
-                  'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
-                }`}
-              >
-                {t('adminSupportManager.processed')}
-              </button>
-            </div>
-
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row gap-2">
-              {/* Filter by status */}
-              <select
-                id="status-filter"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="All">
-                  {i18n.language === 'vi' ? 'Tất cả' : 'All'}
-                </option>
-                {enums?.partnerStatus?.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {t(`Enums.PartnerStatus.${s.value}`)}
-                  </option>
-                ))}
-              </select>
-
-              {/* Search */}
+          {/* Header Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Left: Search + Sort */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <input
                 id="search-input"
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('adminPartnerManager.searchPlaceholder')}
-                className="px-3 py-2 text-sm border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option value="companyname">{t('common.sortName')}</option>
+                <option value="companynamedesc">
+                  {t('common.sortNameDesc')}
+                </option>
+              </select>
+            </div>
+
+            {/* Right: Filter Buttons */}
+            <div className="flex flex-wrap justify-end gap-2">
+              {[
+                {
+                  key: 'all',
+                  label: t('adminSupportManager.all'),
+                  color: 'blue',
+                },
+                {
+                  key: 'Pending',
+                  label: t('adminSupportManager.pending'),
+                  color: 'amber',
+                },
+                {
+                  key: 'Approved',
+                  label: t('adminSupportManager.processed'),
+                  color: 'green',
+                },
+                {
+                  key: 'Rejected',
+                  label: t('adminSupportManager.rejected'),
+                  color: 'red',
+                },
+              ].map(({ key, label, color }) => (
+                <button
+                  key={key}
+                  onClick={() => setFilter(key)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors duration-150 ${
+                    filter === key
+                      ? `bg-${color}-600 text-white border-${color}-600`
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -300,19 +309,21 @@ export default function AdminPartnerRequestManager() {
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                   <span>
-                    {totalBrands} {t('adminBrandManager.brands')}
+                    {totalPartnerRequests} {t('adminPartnerManager.partners')}
                   </span>
                 </div>
 
                 {/* Pagination (right) */}
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalPartnerRequests}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                  size="small"
-                />
+                <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalPartnerRequests}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
               </div>
             )}
           </div>

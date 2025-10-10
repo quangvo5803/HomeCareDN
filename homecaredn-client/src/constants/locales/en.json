@@ -682,6 +682,7 @@
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
+    "no": "No",
     "fullName": "Full name",
     "email": "Email",
     "subject": "Subject",
@@ -689,6 +690,7 @@
     "processed": "Processed",
     "pending": "Pending",
     "action": "Action",
+    "rejected": "Rejected",
     "replyTitle": "Reply to request",
     "replyLabel": "Your reply",
     "replyPlaceholder": "Type your reply here...",
