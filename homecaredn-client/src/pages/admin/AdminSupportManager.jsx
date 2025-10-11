@@ -1,4 +1,3 @@
-// src/pages/admin/AdminSupportManager.jsx
 import { useEffect, useState } from 'react';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +8,7 @@ import Loading from '../../components/Loading';
 import { contactService } from '../../services/contactService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function AdminSupportManager() {
   const { t } = useTranslation();
@@ -16,6 +16,7 @@ export default function AdminSupportManager() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState('all');
   const [debouncedSearch] = useDebounce(search, 1000);
@@ -38,6 +39,7 @@ export default function AdminSupportManager() {
           PageNumber: currentPage,
           PageSize: pageSize,
           Search: debouncedSearch,
+          SortBy: sortBy,
           FilterBool: isProcessedParam,
         });
 
@@ -53,21 +55,30 @@ export default function AdminSupportManager() {
     };
 
     fetchData();
-  }, [currentPage, pageSize, debouncedSearch, filter]);
+  }, [currentPage, pageSize, debouncedSearch, filter, sortBy]);
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
   const handleDelete = async (id) => {
     showDeleteModal({
       t,
       titleKey: 'ModalPopup.DeleteSupportModal.title',
       textKey: 'ModalPopup.DeleteSupportModal.text',
       onConfirm: async () => {
-        await contactService.delete(id);
+        const result = await contactService.delete(id);
         toast.success(t('SUCCESS.DELETE'));
         contactService.listAll({
           PageNumber: currentPage,
           PageSize: pageSize,
           Search: debouncedSearch,
+          SortBy: sortBy,
         });
+        if (result) {
+          setSupports(result.items);
+          setTotalSupports(result.totalCount);
+        }
       },
     });
   };
@@ -90,13 +101,28 @@ export default function AdminSupportManager() {
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Header Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('common.search')}
-              className="w-full sm:w-72 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <input
+                id="search-input"
+                type="text"
+                value={search}
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option value="fullname">{t('common.sortName')}</option>
+                <option value="fullname_desc">
+                  {t('common.sortNameDesc')}
+                </option>
+              </select>
+            </div>
+
             <div className="flex flex-wrap gap-2 justify-end">
               {['all', 'pending', 'processed'].map((key) => (
                 <button
@@ -154,17 +180,9 @@ export default function AdminSupportManager() {
                       <td className="py-3">{s.email}</td>
                       <td className="py-3">{s.subject}</td>
                       <td className="text-center">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            s.isProcessed
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-amber-100 text-amber-700'
-                          }`}
-                        >
-                          {s.isProcessed
-                            ? t('adminSupportManager.processed')
-                            : t('adminSupportManager.pending')}
-                        </span>
+                        <StatusBadge
+                          status={s.isProcessed ? 'Processed' : 'Pending'}
+                        />
                       </td>
                       <td className="text-center space-x-2">
                         <button
@@ -242,23 +260,5 @@ export default function AdminSupportManager() {
         supportID={supportID}
       />
     </div>
-  );
-}
-function StatusBadge({ status }) {
-  const { t } = useTranslation();
-  const statusColors = {
-    Pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    Rejected: 'bg-red-100 text-red-800 border-red-300',
-    Approved: 'bg-green-100 text-green-800 border-green-300',
-  };
-  const colorClass =
-    statusColors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
-
-  return (
-    <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${colorClass}`}
-    >
-      {t(`Enums.PartnerStatus.${status}`, status)}
-    </span>
   );
 }
