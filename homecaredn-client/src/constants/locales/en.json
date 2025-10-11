@@ -696,7 +696,7 @@
     "replyPlaceholder": "Type your reply here...",
     "noSupport": "No support requests yet",
     "all": "All",
-    "itemsCount": "{{count}} request(s)"
+    "supports": "request(s)"
   },
 
   "footer": {
@@ -949,11 +949,6 @@
       "Rustic": "Rustic",
       "Other": "Other"
     },
-    "PartnerStatus":{
-      "Pending": "Pending",
-      "Rejected": "Rejected",
-      "Approved": "Approved"
-    },
     "PartnerType":{
       "Distributor":"Distributor",
       "DistributorDescription": "Providing construction materials",      
@@ -970,6 +965,11 @@
     "sortName": "Name: A-Z",
     "sortNameDesc": "Name: Z-A",
     "sortMaterialCount": "Product Quantity: Low -> High",
-    "sortMaterialCountDesc": "Product Quantity: High -> Low"
+    "sortMaterialCountDesc": "Product Quantity: High -> Low",
+    "all": "All",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "processed": "Processed"
   }
 }

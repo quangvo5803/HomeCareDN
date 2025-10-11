@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
@@ -8,6 +7,7 @@ import Loading from '../../components/Loading';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function AdminPartnerRequestManager() {
   const { t } = useTranslation();
@@ -50,7 +50,6 @@ export default function AdminPartnerRequestManager() {
     Contractor: 'bg-blue-100 text-blue-800',
     Distributor: 'bg-purple-100 text-purple-800',
   };
-
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
@@ -123,39 +122,18 @@ export default function AdminPartnerRequestManager() {
             </div>
 
             {/* Right: Filter Buttons */}
-            <div className="flex flex-wrap justify-end gap-2">
-              {[
-                {
-                  key: 'all',
-                  label: t('adminSupportManager.all'),
-                  color: 'blue',
-                },
-                {
-                  key: 'Pending',
-                  label: t('adminSupportManager.pending'),
-                  color: 'amber',
-                },
-                {
-                  key: 'Approved',
-                  label: t('adminSupportManager.processed'),
-                  color: 'green',
-                },
-                {
-                  key: 'Rejected',
-                  label: t('adminSupportManager.rejected'),
-                  color: 'red',
-                },
-              ].map(({ key, label, color }) => (
+            <div className="flex flex-wrap gap-2 justify-end">
+              {['all', 'pending', 'approved', 'rejected'].map((key) => (
                 <button
                   key={key}
                   onClick={() => setFilter(key)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors duration-150 ${
+                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${
                     filter === key
-                      ? `bg-${color}-600 text-white border-${color}-600`
+                      ? 'bg-blue-600 text-white border-blue-600'
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  {label}
+                  {t(`common.${key}`)}
                 </button>
               ))}
             </div>
@@ -342,26 +320,3 @@ export default function AdminPartnerRequestManager() {
     </div>
   );
 }
-
-function StatusBadge({ status }) {
-  const { t } = useTranslation();
-  const statusColors = {
-    Pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    Rejected: 'bg-red-100 text-red-800 border-red-300',
-    Approved: 'bg-green-100 text-green-800 border-green-300',
-  };
-  const colorClass =
-    statusColors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
-
-  return (
-    <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${colorClass}`}
-    >
-      {t(`Enums.PartnerStatus.${status}`, status)}
-    </span>
-  );
-}
-
-StatusBadge.propTypes = {
-  status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-};
