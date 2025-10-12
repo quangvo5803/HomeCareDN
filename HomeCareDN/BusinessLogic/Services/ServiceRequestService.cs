@@ -232,7 +232,7 @@ namespace BusinessLogic.Services.Interfaces
                     dto.ContractorApplications =
                         entity
                             .ContractorApplications?.Select(
-                                ca => new ContractorApplicationPendingrDto
+                                ca => new ContractorApplicationPendingDto
                                 {
                                     ContractorApplicationID = ca.ContractorApplicationID,
                                     Description = ca.Description,
@@ -245,7 +245,7 @@ namespace BusinessLogic.Services.Interfaces
                                     Status = ApplicationStatus.Pending.ToString(),
                                 }
                             )
-                            .ToList() ?? new List<ContractorApplicationPendingrDto>();
+                            .ToList() ?? new List<ContractorApplicationPendingDto>();
                 }
             }
         }
