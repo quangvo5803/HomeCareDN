@@ -113,7 +113,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
     if (!isSafePhone(form.phoneNumber)) {
       toast.error(t('ERROR.INVALID_PHONE'));
       return;
-  }
+    }
     setSaving(true);
     await profileService.updateProfile({
       UserId: user.id,
@@ -124,7 +124,6 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
     toast.success(t('SUCCESS.PROFILE_UPDATE'));
 
     setSaving(false);
-
   };
 
   /* ------------------------------- Address CRUD ------------------------------ */
@@ -345,6 +344,10 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
       })();
     }
   }, [active, user?.id, fetchServiceRequestsByUserId, t]);
+
+  const handleServiceRequestViewDetail = (serviceRequestId) => {
+    navigate(`/Customer/ServiceRequestDetail/${serviceRequestId}`);
+  };
 
   const handleServiceRequestCreateUpdate = (serviceRequestId) => {
     if (totalAddressess === 0) {
@@ -831,7 +834,9 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
 
                               <div className="mb-4">
                                 <p className="text-gray-700 leading-relaxed mb-3">
-                                  {req.description}
+                                  {req.description?.length > 100
+                                    ? req.description.slice(0, 100) + '...'
+                                    : req.description}
                                 </p>
 
                                 {/* Thông tin chi tiết */}
@@ -895,20 +900,27 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     {req.address.district}, {req.address.city}
                                   </span>
                                 </div>
-                                {req.estimatePrice && (
-                                  <div className="mt-2 flex items-center gap-2 text-sm">
-                                    <i className="fas fa-money-bill-wave text-emerald-500"></i>
+                                <div className="mt-2 flex items-center gap-2 text-sm">
+                                  <i className="fas fa-money-bill-wave text-emerald-500"></i>
+
+                                  {req.estimatePrice ? (
                                     <span className="text-emerald-600 font-semibold">
                                       {t(
-                                        `userPage.serviceRequest.label_estimatePrice`
+                                        'userPage.serviceRequest.label_estimatePrice'
                                       )}
                                       {req.estimatePrice.toLocaleString(
                                         'vi-VN'
                                       )}{' '}
                                       VNĐ
                                     </span>
-                                  </div>
-                                )}
+                                  ) : (
+                                    <span className="text-gray-500 italic">
+                                      {t(
+                                        'userPage.serviceRequest.label_notEstimated'
+                                      )}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
 
                               <div className="flex items-center justify-between">
@@ -964,24 +976,40 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                       `Enums.PackageOption.${req.packageOption}`
                                     )}
                                   </span>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i className="fas fa-users mr-1"></i>
+                                    {req.contractorApplyCount}{' '}
+                                    {t(
+                                      'userPage.serviceRequest.label_contractorApplyCount'
+                                    )}
+                                  </span>
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                  <button className="text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium">
-                                    <i className="fas fa-eye"></i>
-                                    {t('BUTTON.ViewDetail')}
-                                  </button>
                                   <button
-                                    className="text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                                    className="text-orange-600 hover:text-orange-700 bg-orange-50 hover:bg-orange-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium "
                                     onClick={() =>
-                                      handleServiceRequestCreateUpdate(
+                                      handleServiceRequestViewDetail(
                                         req.serviceRequestID
                                       )
                                     }
                                   >
-                                    <i className="fas fa-edit"></i>
-                                    {t('BUTTON.Edit')}
+                                    <i className="fas fa-eye"></i>
+                                    {t('BUTTON.ViewDetail')}
                                   </button>
+                                  {req.contractorApplyCount === 0 && (
+                                    <button
+                                      className="text-gray-600 hover:text-gray-700 bg-gray-50 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                                      onClick={() =>
+                                        handleServiceRequestCreateUpdate(
+                                          req.serviceRequestID
+                                        )
+                                      }
+                                    >
+                                      <i className="fas fa-edit"></i>
+                                      {t('BUTTON.Edit')}
+                                    </button>
+                                  )}
                                   <button
                                     className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
                                     onClick={() =>
