@@ -2,7 +2,7 @@
 
 namespace BusinessLogic.DTOs.Application.ContractorApplication
 {
-    public class ContractorApplicationPendingrDto
+    public class ContractorApplicationPendingDto
     {
         public Guid ContractorApplicationID { get; set; }
         public string? Description { get; set; }

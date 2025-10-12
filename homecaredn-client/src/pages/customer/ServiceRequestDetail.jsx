@@ -27,25 +27,18 @@ export default function ServiceRequestDetail() {
     const fetchServiceRequest = async () => {
       const result = await getServiceRequestById(serviceRequestId);
       setServiceRequest(result);
+      if (result.selectedContractorApplication) {
+        setSelectedContractor(result.selectedContractorApplication);
+      }
     };
     fetchServiceRequest();
   }, [serviceRequestId, getServiceRequestById]);
 
   useEffect(() => {
-    // Khởi tạo Venobox sau khi component render
-    const venoboxInstance = new VenoBox({
-      selector: '.venobox',
-      numeration: true,
-      infinigall: true,
-      spinner: 'rotating-plane',
-      spinColor: '#f97316',
-    });
-
-    // Cleanup khi component unmount
-    return () => {
-      venoboxInstance?.close?.();
-    };
-  }, [selectedContractor]);
+    if (!serviceRequest) return;
+    const vb = new VenoBox({ selector: '.venobox' });
+    return () => vb.close();
+  }, [serviceRequest, selectedContractor]);
 
   const handleSend = () => {
     if (!input.trim() || !selectedContractor) return;
@@ -330,32 +323,34 @@ export default function ServiceRequestDetail() {
         <div className="w-1/3 bg-white rounded-2xl shadow-lg p-6 overflow-y-auto">
           {selectedContractor ? (
             <>
-              <button
-                onClick={() => setSelectedContractor(null)}
-                className="text-sm text-gray-600 hover:text-orange-600 mb-4 flex items-center gap-2 font-medium transition"
-              >
-                <i className="fas fa-arrow-left"></i>
-                <span>{t('BUTTON.Back')}</span>
-              </button>
+              {!serviceRequest.selectedContractorApplication && (
+                <button
+                  onClick={() => setSelectedContractor(null)}
+                  className="text-sm text-gray-600 hover:text-orange-600 mb-4 flex items-center gap-2 font-medium transition"
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>{t('BUTTON.Back')}</span>
+                </button>
+              )}
               <div className="space-y-6">
                 <div className="text-center pb-6 border-b border-gray-200">
                   <div className="w-24 h-24 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold text-4xl border-4 border-orange-200 mx-auto mb-4">
-                    {selectedContractor.name.charAt(0)}
+                    {selectedContractor.contractorApplicationID.charAt(0)}
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    {selectedContractor.name}
+                    {selectedContractor.contractorApplicationID}
                   </h3>
                   <div className="flex items-center justify-center gap-4 text-sm">
                     <span className="flex items-center gap-1 text-yellow-600">
                       <i className="fas fa-star"></i>
                       <span className="font-bold">
-                        {selectedContractor.rating}
+                        {selectedContractor.averageRating}
                       </span>
                     </span>
                     <span className="text-gray-500">•</span>
                     <span className="text-gray-600">
                       <i className="fas fa-comments mr-1"></i>
-                      {selectedContractor.reviewCount}{' '}
+                      {selectedContractor.completedProjectCount}{' '}
                       {t('userPage.serviceRequestDetail.label_review')}
                     </span>
                   </div>
@@ -364,7 +359,7 @@ export default function ServiceRequestDetail() {
                   <div className="p-3 bg-green-50 rounded-lg text-center">
                     <i className="fas fa-check-double text-green-600 text-xl mb-1"></i>
                     <p className="text-2xl font-bold text-gray-800">
-                      {selectedContractor.completedProjects}
+                      {selectedContractor.completedProjectCount}
                     </p>
                     <p className="text-xs text-gray-600">
                       {' '}
@@ -374,7 +369,7 @@ export default function ServiceRequestDetail() {
                   <div className="p-3 bg-blue-50 rounded-lg text-center">
                     <i className="fas fa-award text-blue-600 text-xl mb-1"></i>
                     <p className="text-2xl font-bold text-gray-800">
-                      {selectedContractor.rating}
+                      {selectedContractor.averageRating}
                     </p>
                     <p className="text-xs text-gray-600">
                       {' '}
@@ -436,10 +431,10 @@ export default function ServiceRequestDetail() {
                     </span>
                   </h4>
                   <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                    {selectedContractor.proposalDescription}
+                    {selectedContractor.description}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
-                    {selectedContractor.proposalImages.map((img, idx) => (
+                    {selectedContractor.imageUrls.map((img, idx) => (
                       <a
                         key={img}
                         href={img}
@@ -485,19 +480,18 @@ export default function ServiceRequestDetail() {
                     </div>
                   </div>
                 )}
-                {selectedContractor.status !== 'Pending' &&
-                  !serviceRequest.selectedContractorApplication && (
-                    <div className="grid grid-cols-2 gap-3 pt-4">
-                      <button className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold text-sm">
-                        <i className="fas fa-handshake mr-2"></i>
-                        <span> {t('BUTTON.Accept')}</span>
-                      </button>
-                      <button className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm">
-                        <i className="fas fa-times mr-2"></i>
-                        <span>{t('BUTTON.Reject')}</span>
-                      </button>
-                    </div>
-                  )}
+                {selectedContractor.status !== 'Pending' && (
+                  <div className="grid grid-cols-2 gap-3 pt-4">
+                    <button className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold text-sm">
+                      <i className="fas fa-handshake mr-2"></i>
+                      <span> {t('BUTTON.Accept')}</span>
+                    </button>
+                    <button className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-semibold text-sm">
+                      <i className="fas fa-times mr-2"></i>
+                      <span>{t('BUTTON.Reject')}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -528,7 +522,7 @@ export default function ServiceRequestDetail() {
                 <div className="space-y-4">
                   {serviceRequest.contractorApplications.map((c) => (
                     <button
-                      key={c.id}
+                      key={c.contractorApplicationID}
                       type="button"
                       onClick={() => setSelectedContractor(c)}
                       className="w-full text-left p-4 border-2 border-gray-200 rounded-xl cursor-pointer transition-all hover:border-orange-400 hover:shadow-lg hover:scale-105 group bg-transparent focus:outline-none focus:ring-2 focus:ring-orange-400"
@@ -544,7 +538,9 @@ export default function ServiceRequestDetail() {
                           <div className="flex items-center gap-3 mt-1">
                             <span className="flex items-center gap-1 text-xs text-yellow-600">
                               <i className="fas fa-star"></i>
-                              <span className="font-semibold">{c.rating}</span>
+                              <span className="font-semibold">
+                                {c.averageRating}
+                              </span>
                             </span>
                             <span className="text-xs text-gray-500">
                               <i className="fas fa-comments mr-1"></i>
@@ -566,7 +562,7 @@ export default function ServiceRequestDetail() {
                             {t('userPage.serviceRequestDetail.label_project')}
                           </span>
                           <span className="text-sm font-bold text-emerald-600">
-                            {(c.EstimatePrice / 1000000).toFixed(0)}{' '}
+                            {(c.estimatePrice / 1000000).toFixed(0)}{' '}
                             {i18n.language === 'vi' ? 'triệu' : 'million'} VNĐ
                           </span>
                         </div>
@@ -579,7 +575,7 @@ export default function ServiceRequestDetail() {
           )}
         </div>
       </div>
-
+      {/* Chat Section */}
       <div className="relative border-t bg-white p-4">
         <h4 className="font-semibold text-orange-600 mb-3 flex items-center gap-2">
           <i className="fas fa-comments"></i>
@@ -588,7 +584,7 @@ export default function ServiceRequestDetail() {
         <div className="h-128 overflow-y-auto bg-gray-50 p-3 rounded-lg mb-3">
           {messages.map((m) => (
             <div
-              key={m}
+              key={m.sender}
               className={`mb-2 flex ${
                 m.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}

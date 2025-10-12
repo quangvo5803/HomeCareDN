@@ -136,7 +136,7 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
-            CreateMap<ContractorApplication, ContractorApplicationPendingrDto>()
+            CreateMap<ContractorApplication, ContractorApplicationPendingDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))

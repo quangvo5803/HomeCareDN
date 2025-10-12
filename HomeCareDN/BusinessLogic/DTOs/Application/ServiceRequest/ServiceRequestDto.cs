@@ -29,7 +29,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public ICollection<string>? ImagePublicIds { get; set; }
 
         // Danh sách ứng tuyển khi chưa chọn nhà thầu
-        public ICollection<ContractorApplicationPendingrDto>? ContractorApplications { get; set; }
+        public ICollection<ContractorApplicationPendingDto>? ContractorApplications { get; set; }
 
         // Thông tin nhà thầu đã được chọn (chỉ có 1 khi chọn)
         public ContractorApplicationFullDto? SelectedContractorApplication { get; set; }
