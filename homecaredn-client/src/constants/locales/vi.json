@@ -291,8 +291,10 @@
       "label_floors": "Số tầng:",
       "label_designStyle": "Phong cách:",
       "label_estimatePrice": "Giá dự kiến: ",
+      "label_notEstimated": "Chưa ước tính",
       "label_packageOption": "Gói xây dựng: ",
       "label_address": "Địa chỉ: ",
+      "label_contractorApplyCount": "đơn ứng tuyển",
       "label_open": "Đang mở",
       "label_close":"Đã đóng"
     },
@@ -327,6 +329,40 @@
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
       "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
+    },
+    "serviceRequestDetail": {
+      "title": "Chi tiết yêu cầu dịch vụ",
+      "label_open": "Đang mở",
+      "label_close":"Đã đóng",
+      "label_serviceInfor": "Thông tin công trình",
+      "label_serviceType": "Loại dịch vụ:",
+      "label_packageOption": "Gói dịch vụ",
+      "label_buildingType": "Loại công trình",
+      "label_mainStructureType": "Cấu trúc chính",
+      "label_designType": "Phong cách thiết kế",
+      "label_number": "Thông số kỹ thuật",
+      "label_width": "Chiều rộng",
+      "label_length": "Chiều dài",
+      "label_area": "Diện tích xây dựng:",
+      "label_floors": "Số tầng:",
+      "label_estimatePrice": "Giá ước tính",
+      "noEstimatePrice": "Không ước tính",
+      "label_address": "Địa chỉ thi công:",
+      "label_description": "Mô tả chi tiết:",
+      "label_images": "Hình ảnh minh họa / Hiện trạng:",     
+      "section_contractor": "Nhà thầu ứng tuyển",     
+      "noContractor": "Chưa có nhà thầu nào ứng tuyển",
+      "noContractorDesc": "Hiện tại chưa có nhà thầu nào ứng tuyển cho dự án của bạn. Vui lòng chờ thêm thời gian.",
+      "label_avarageRating": "Đánh giá trung bình:",
+      "contractorApplyCount": " nhà thầu",
+      "label_contact": "Thông tin liên hệ",
+      "label_descriptionContractor": "Mô tả phương án thi công",
+      "label_review": "Đánh giá",
+      "label_project": "Dự án",
+      "lowerThanEstimate": "Thấp hơn dự toán {{value}} triệu",
+      "higherThanEstimate": "Cao hơn dự toán {{value}} triệu",
+      "section_chat": "Trò chuyện với nhà thầu",
+      "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
     }
   },
 
@@ -762,6 +798,7 @@
     "Back": "Trở về",
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
+    "Accept": "Chấp nhận",
     "Reject" : "Từ chối",
     "Approve": "Phê duyệt"
   },
@@ -959,6 +996,7 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "common":{
+    "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search":"Tìm kiếm...",
     "sortDefault": "Mặc định",

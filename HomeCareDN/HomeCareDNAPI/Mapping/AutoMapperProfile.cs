@@ -35,9 +35,6 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
-            CreateMap<ContractorApplicationCreateRequestDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
-
             CreateMap<MaterialCreateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -66,9 +63,6 @@ namespace HomeCareDNAPI.Mapping
                 // Ignore Id to prevent overwriting them
                 .ForMember(d => d.Id, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
-
-            CreateMap<ContractorApplicationUpdateRequestDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
 
             CreateMap<MaterialUpdateRequestDto, Material>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -137,12 +131,16 @@ namespace HomeCareDNAPI.Mapping
                         )
                 );
 
-            CreateMap<ContractorApplication, ContractorApplicationDto>()
+            CreateMap<ContractorApplication, ContractorApplicationFullDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
-
+            CreateMap<ContractorApplication, ContractorApplicationPendingrDto>()
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                );
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(

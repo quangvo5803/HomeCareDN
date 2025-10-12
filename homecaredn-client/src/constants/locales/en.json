@@ -291,8 +291,10 @@
       "label_floors": "Floors:",
       "label_designStyle": "Desgin style:",
       "label_estimatePrice": "Estimate price: ",
+      "label_notEstimated": "Not estimated",
       "label_packageOption": "Package option: ",
       "label_address": "Address: ",
+      "label_contractorApplyCount": "application form(s)",
       "label_open": "Opening",
       "label_close":"Closed"
     },
@@ -328,6 +330,40 @@
       "estimatePrice": "Estimate price: ",
       "estimateInWord": "By word: ",
       "footer": "You will receive notification as soon as a contractor/distributor applies."
+    },
+    "serviceRequestDetail": {
+      "title": "Service Request Details",
+      "label_open": "Open",
+      "label_close": "Closed",
+      "label_serviceInfor": "Project Information",
+      "label_serviceType": "Service Type:",
+      "label_packageOption": "Service Package:",
+      "label_buildingType": "Building Type:",
+      "label_mainStructureType": "Main Structure:",
+      "label_designType": "Design Style:",
+      "label_number": "Technical Specifications:",
+      "label_width": "Width",
+      "label_length": "Length",
+      "label_area": "Construction Area:",
+      "label_floors": "Number of Floors:",
+      "label_estimatePrice": "Estimated Price:",
+      "noEstimatePrice": "Not estimated",
+      "label_address": "Construction Address:",
+      "label_description": "Detailed Description:",
+      "label_images": "Illustration / Current Condition Images:",
+      "section_contractor": "Applied Contractors",
+      "noContractor": "No contractors have applied",
+      "noContractorDesc": "Currently, no contractors have applied for your project. Please wait for more time.",
+      "label_avarageRating": "Average Rating:",
+      "contractorApplyCount": " contractor(s)",
+      "label_contact": "Contact Information",
+      "label_descriptionContractor": "Construction Proposal Description",
+      "label_review": "Reviews",
+      "label_project": "Projects",
+      "lowerThanEstimate": "Lower than estimate by {{value}} million",
+      "higherThanEstimate": "Higher than estimate by {{value}} million",
+      "section_chat": "Chat with Contractor",
+      "noChatFunction": "This feature is available only after you have selected a contractor"
     }
   },
 
@@ -767,7 +803,8 @@
     "Back": "Back",
     "ViewDetail": "View detail",
     "RegisterPartner": "Register as Partner",
-    "Reject" : "Rejeact",
+    "Accept": "Accept",
+    "Reject" : "Reject",
     "Approve": "Approve"
   },
   "ModalPopup": {
@@ -963,6 +1000,7 @@
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
   "common":{
+    "noRequirement":"No requirements",
     "search":"Search..."
   }
 }
