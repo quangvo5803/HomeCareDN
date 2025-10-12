@@ -36,14 +36,25 @@ namespace BusinessLogic.Services
             {
                 query = query.Where(s => s.IsProcessed == parameters.FilterBool);
             }
+            if (!string.IsNullOrWhiteSpace(parameters.Search))
+            {
+                var keyword = parameters.Search.Trim().ToLower();
+                query = query.Where(s =>
+                    s.FullName.ToLower().Contains(keyword)
+                    || s.Email.ToLower().Contains(keyword)
+                    || s.Subject.ToLower().Contains(keyword)
+                );
+            }
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
             {
                 "isprocess" => query.OrderBy(m => m.IsProcessed),
                 "isprocess_desc" => query.OrderByDescending(m => m.IsProcessed),
+                "fullname" => query.OrderBy(s => s.FullName),
+                "fullname_desc" => query.OrderByDescending(s => s.FullName),
                 "random" => query.OrderBy(s => s.Id),
-                _ => query.OrderBy(b => b.Id),
+                _ => query.OrderBy(b => b.CreateAt),
             };
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

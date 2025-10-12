@@ -10,6 +10,7 @@ namespace DataAccess.Data
 
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<ContractorApplication> ContractorApplications { get; set; }
+        public DbSet<Document> Documents { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<Service> Services { get; set; }

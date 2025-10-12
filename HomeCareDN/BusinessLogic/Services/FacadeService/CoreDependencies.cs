@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DataAccess.Data;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 
 namespace BusinessLogic.Services.FacadeService
 {
@@ -9,16 +11,19 @@ namespace BusinessLogic.Services.FacadeService
         public IUnitOfWork UnitOfWork { get; }
         public IMapper Mapper { get; }
         public AuthorizeDbContext AuthorizeDbContext { get; }
+        public UserManager<ApplicationUser> UserManager { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            AuthorizeDbContext authorizeDbContext
+            AuthorizeDbContext authorizeDbContext,
+            UserManager<ApplicationUser> userManager
         )
         {
             UnitOfWork = unitOfWork;
             Mapper = mapper;
             AuthorizeDbContext = authorizeDbContext;
+            UserManager = userManager;
         }
     }
 }

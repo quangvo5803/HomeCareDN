@@ -20,7 +20,7 @@ import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
 import AdminMaterialManager from './pages/admin/AdminMaterialManager';
-import AdminPartnerManager from './pages/admin/AdminPartnerManager';
+import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 //Contractor pages
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
 //Distributor pages
@@ -38,6 +38,7 @@ import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
 import Profile from './pages/customer/Profile';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
+import ServiceRequestDetail from './pages/customer/ServiceRequestDetail';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -209,6 +210,14 @@ function Layout() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/Customer/ServiceRequestDetail/:serviceRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <ServiceRequestDetail />
+            </ProtectedRoute>
+          }
+        />
         {/* Admin routes */}
         <Route
           path="/Admin"
@@ -224,7 +233,10 @@ function Layout() {
           <Route path="ServiceManager" element={<AdminServiceManager />} />
           <Route path="SupportManager" element={<AdminSupportManager />} />
           <Route path="MaterialManager" element={<AdminMaterialManager />} />
-          <Route path="PartnerManager" element={<AdminPartnerManager />} />
+          <Route
+            path="PartnerRequestManager"
+            element={<AdminPartnerRequestManager />}
+          />
         </Route>
         {/* Contractor routes */}
         <Route

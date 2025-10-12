@@ -37,19 +37,14 @@ export const ServiceRequestProvider = ({ children }) => {
   );
 
   // 📌 Public: get by id
-  const getServiceRequestById = useCallback(
-    async (id) => {
-      const local = serviceRequests.find((s) => s.serviceRequestID === id);
-      if (local) return local;
-      try {
-        return await serviceRequestService.getServiceRequestById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
-    },
-    [serviceRequests]
-  );
+  const getServiceRequestById = useCallback(async (id) => {
+    try {
+      return await serviceRequestService.getServiceRequestById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    }
+  }, []);
 
   // 📌 Customer: get all by userId
   const fetchServiceRequestsByUserId = useCallback(
@@ -133,6 +128,7 @@ export const ServiceRequestProvider = ({ children }) => {
         setServiceRequests((prev) =>
           prev.filter((s) => s.serviceRequestID !== id)
         );
+        setTotalServiceRequests((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

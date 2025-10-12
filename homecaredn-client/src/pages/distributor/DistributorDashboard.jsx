@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import StatusBadge from '../../components/StatusBadge';
 import { formatVND, formatDate } from '../../utils/formatters';
-
+import StatusBadge from '../../components/StatusBadge';
 /* Seed data */
 const SEED_APPS = [
   {
@@ -136,7 +135,7 @@ export default function DistributorDashboard() {
                     )}
                   </td>
                   <td className="py-3 px-3">
-                    <StatusBadge status={app.status} t={t} />
+                    <StatusBadge status={app.status} />
                   </td>
                   <td className="py-3 px-3">
                     <button

@@ -13,16 +13,16 @@ export default function AdminServiceManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingService, setEditingService] = useState(null);
+  const [editingServiceID, setEditingServiceID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const {
     services,
     totalServices,
     loading,
     fetchServices,
-    getServiceById,
     createService,
     updateService,
     deleteService,
@@ -33,9 +33,10 @@ export default function AdminServiceManager() {
     fetchServices({
       PageNumber: currentPage,
       PageSize: pageSize,
+      SortBy: sortBy,
       Search: debouncedSearch || '',
     });
-  }, [currentPage, pageSize, debouncedSearch, fetchServices]);
+  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchServices]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -54,7 +55,12 @@ export default function AdminServiceManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          fetchServices({ PageNumber: currentPage, PageSize: pageSize });
+          fetchServices({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -74,11 +80,11 @@ export default function AdminServiceManager() {
     }
 
     setIsModalOpen(false);
-    setEditingService(null);
+    setEditingServiceID(null);
     setUploadProgress(0);
   };
 
-  if (loading) return <Loading />;
+  if (loading && !isModalOpen) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
@@ -96,24 +102,44 @@ export default function AdminServiceManager() {
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
-            {/* Number of services */}
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span className="text-sm font-semibold text-gray-700">
-                {totalServices || 0} {t('adminServiceManager.services')}
-              </span>
-            </div>
+            {/* Left section: Search + Sort */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Search Input */}
+              <div className="w-full sm:w-64">
+                <input
+                  id="search-input"
+                  type="text"
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={t('common.search')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                />
+              </div>
 
-            {/* Input search */}
-            <div className="flex-1 max-w-lg w-full">
-              <input
-                id="search-input"
-                type="text"
-                value={search}
-                onChange={handleSearchChange}
-                placeholder={t('common.search')}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-              />
+              {/* Sort Dropdown */}
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option
+                  value={
+                    i18n.language === 'vi' ? 'servicename' : 'servicenameen'
+                  }
+                >
+                  {t('common.sortName')}
+                </option>
+                <option
+                  value={
+                    i18n.language === 'vi'
+                      ? 'servicename_desc'
+                      : 'servicenameen_desc'
+                  }
+                >
+                  {t('common.sortNameDesc')}
+                </option>
+              </select>
             </div>
 
             {/* Add New Service Button */}
@@ -131,10 +157,10 @@ export default function AdminServiceManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingService(null);
+              setEditingServiceID(null);
             }}
             onSave={handleSave}
-            service={editingService}
+            serviceID={editingServiceID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -167,8 +193,9 @@ export default function AdminServiceManager() {
                     services.map((svc, index) => (
                       <tr
                         key={svc.serviceID}
-                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                        className={`hover:bg-gray-50 transition-colors duration-150 ${
+                          index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                        }`}
                       >
                         <td className="px-4 py-4 text-center align-middle">
                           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -194,8 +221,7 @@ export default function AdminServiceManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={async () => {
-                                var res = await getServiceById(svc.serviceID);
-                                setEditingService(res);
+                                setEditingServiceID(svc.serviceID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -251,7 +277,15 @@ export default function AdminServiceManager() {
 
             {/* Pagination */}
             {totalServices > 0 && (
-              <div className="flex justify-center py-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalServices} {t('adminServiceManager.services')}
+                  </span>
+                </div>
+                {/* Pagination (right) */}
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}

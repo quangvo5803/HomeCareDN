@@ -13,9 +13,10 @@ export default function AdminCategoryManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategoryID, setEditingCategoryID] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const {
     categories,
@@ -32,9 +33,10 @@ export default function AdminCategoryManager() {
     fetchCategories({
       PageNumber: currentPage,
       PageSize: pageSize,
+      SortBy: sortBy,
       Search: debouncedSearch || '',
     });
-  }, [currentPage, pageSize, debouncedSearch, fetchCategories]);
+  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchCategories]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -53,7 +55,12 @@ export default function AdminCategoryManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          fetchCategories({ PageNumber: currentPage, PageSize: pageSize });
+          fetchCategories({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -74,7 +81,7 @@ export default function AdminCategoryManager() {
     }
 
     setIsModalOpen(false);
-    setEditingCategory(null);
+    setEditingCategoryID(null);
   };
   if (loading) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
@@ -95,24 +102,50 @@ export default function AdminCategoryManager() {
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
           {/* Table Header Actions */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 px-6 py-4 border-b border-gray-200 bg-gray-50">
-            {/* Number of brands */}
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span className="text-sm font-semibold text-gray-700">
-                {totalCategories || 0} {t('adminCategoryManager.categories')}
-              </span>
-            </div>
+            {/* Left section: Search + Sort */}
+            <div className="flex items-center gap-3 w-full sm:w-auto">
+              {/* Search Input */}
+              <div className="w-full sm:w-64">
+                <input
+                  id="search-input"
+                  type="text"
+                  value={search}
+                  onChange={handleSearchChange}
+                  placeholder={t('common.search')}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                />
+              </div>
 
-            {/* Input search */}
-            <div className="flex-1 max-w-lg w-full">
-              <input
-                id="search-input"
-                type="text"
-                value={search}
-                onChange={handleSearchChange}
-                placeholder={t('common.search')}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-              />
+              {/* Sort Dropdown */}
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option
+                  value={
+                    i18n.language === 'vi' ? 'categoryname' : 'categorynameen'
+                  }
+                >
+                  {t('common.sortName')}
+                </option>
+                <option
+                  value={
+                    i18n.language === 'vi'
+                      ? 'categoryname_desc'
+                      : 'categorynameen_desc'
+                  }
+                >
+                  {t('common.sortNameDesc')}
+                </option>
+                <option value="materialcount">
+                  {t('common.sortMaterialCount')}
+                </option>
+                <option value="materialcount_desc">
+                  {t('common.sortMaterialCountDesc')}
+                </option>
+              </select>
             </div>
 
             {/* Add New Category Button */}
@@ -130,10 +163,10 @@ export default function AdminCategoryManager() {
             isOpen={isModalOpen}
             onClose={() => {
               setIsModalOpen(false);
-              setEditingCategory(null);
+              setEditingCategoryID(null);
             }}
             onSave={handleSave}
-            category={editingCategory}
+            categoryID={editingCategoryID}
             setUploadProgress={setUploadProgress}
           />
 
@@ -224,7 +257,7 @@ export default function AdminCategoryManager() {
                             <button
                               className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                               onClick={() => {
-                                setEditingCategory(cat);
+                                setEditingCategoryID(cat.categoryID);
                                 setIsModalOpen(true);
                               }}
                             >
@@ -342,7 +375,7 @@ export default function AdminCategoryManager() {
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingCategory(cat);
+                            setEditingCategoryID(cat.categoryID);
                             setIsModalOpen(true);
                           }}
                         >
@@ -394,7 +427,15 @@ export default function AdminCategoryManager() {
 
             {/* Pagination */}
             {totalCategories > 0 && (
-              <div className="flex justify-center py-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalCategories} {t('adminCategoryManager.categories')}
+                  </span>
+                </div>{' '}
+                {/* Pagination (right) */}
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}

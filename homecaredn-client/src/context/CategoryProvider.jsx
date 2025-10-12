@@ -5,6 +5,7 @@ import CategoryContext from './CategoryContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
+import { withMinLoading } from '../utils/withMinLoading';
 
 export const CategoryProvider = ({ children }) => {
   const { user } = useAuth();
@@ -13,45 +14,59 @@ export const CategoryProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // 📌 Public: fetch all categories pagination
-  const fetchCategories = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, FilterID, FilterBool, Search } = {}) => {
-      try {
-        setLoading(true);
-        const data = await categoryService.getAllCategories({
-          PageNumber,
-          PageSize,
-          FilterID,
-          FilterBool,
-          Search,
-        });
-        setCategories(data.items || []);
-        setTotalCategories(data.totalCount || 0);
-        return data;
-      } catch (err) {
-        toast.error(handleApiError(err));
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-  const fetchAllCategories = useCallback(
-    async ({ FilterID, FilterBool } = {}) => {
-      try {
-        const data = await categoryService.getAllCategories({
-          PageNumber: 1,
-          PageSize: 9999,
-          FilterID,
-          FilterBool,
-        });
-        return data.items || [];
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return [];
-      }
-    },
-    []
-  );
+  const executeFetch = async ({
+    PageNumber = 1,
+    PageSize = 10,
+    FilterID,
+    FilterBool,
+    SortBy,
+    Search,
+  } = {}) => {
+    try {
+      setLoading(true);
+      const data = await categoryService.getAllCategories({
+        PageNumber,
+        PageSize,
+        FilterID,
+        FilterBool,
+        SortBy,
+        Search,
+      });
+      setCategories(data.items || []);
+      setTotalCategories(data.totalCount || 0);
+      return data;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return { items: [], totalCount: 0 };
+    }
+  };
+
+  const fetchCategories = useCallback(async (params = {}) => {
+    return await withMinLoading(() => executeFetch(params), setLoading);
+  }, []);
+
+  const executeFetchAllCategories = async ({ FilterID, FilterBool } = {}) => {
+    try {
+      const data = await categoryService.getAllCategories({
+        PageNumber: 1,
+        PageSize: 9999,
+        FilterID,
+        FilterBool,
+      });
+      return data.items || [];
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return [];
+    }
+  };
+
+  const fetchAllCategories = useCallback(async (filters = {}) => {
+    return await withMinLoading(
+      () => executeFetchAllCategories(filters),
+      setLoading
+    );
+  }, []);
+
   // 📌 Public: get category by id
   const getCategoryById = useCallback(
     async (id) => {
@@ -120,6 +135,7 @@ export const CategoryProvider = ({ children }) => {
         await categoryService.deleteCategory(id);
         // Xoá khỏi local
         setCategories((prev) => prev.filter((c) => c.categoryID !== id));
+        setTotalCategories((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

@@ -17,6 +17,7 @@ namespace DataAccess.Entities.Application
         public DesignStyle? DesignStyle { get; set; }
         public string? Description { get; set; }
         public string? DescriptionEN { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Image>? Images { get; set; } = new List<Image>();
     }

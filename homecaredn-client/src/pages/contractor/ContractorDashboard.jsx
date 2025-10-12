@@ -5,8 +5,9 @@ import MenuList from '../../components/partner/MenuList';
 import AvatarMenu from '../../components/AvatarMenu';
 import LanguageSwitch from '../../components/LanguageSwitch';
 import NotificationBell from '../../components/NotificationBell';
-import StatusBadge from '../../components/StatusBadge';
 import { formatVND, formatDate } from '../../utils/formatters';
+import StatusBadge from '../../components/StatusBadge';
+
 /* ========= Seed data (5 items) ========= */
 const SEED_APPS = [
   {
@@ -192,7 +193,7 @@ export default function DistributorDashboard() {
                         )}
                       </td>
                       <td className="py-3 px-3">
-                        <StatusBadge status={app.status} t={t} />
+                        <StatusBadge status={app.status} />
                       </td>
                       <td className="py-3 px-3">
                         <button

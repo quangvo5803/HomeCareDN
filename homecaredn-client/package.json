@@ -36,7 +36,8 @@
     "sweetalert2": "^11.22.4",
     "tailwindcss": "^4.1.12",
     "tinymce": "^8.1.2",
-    "use-debounce": "^10.0.6"
+    "use-debounce": "^10.0.6",
+    "venobox": "^2.1.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

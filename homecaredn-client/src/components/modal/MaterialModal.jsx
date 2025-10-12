@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import LoadingModal from './LoadingModal';
 
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -28,7 +29,7 @@ export default function MaterialModal({
   isOpen,
   onClose,
   onSave,
-  material,
+  materialID,
   brands,
   categories,
   setUploadProgress,
@@ -50,32 +51,41 @@ export default function MaterialModal({
 
   const [images, setImages] = useState([]);
 
+  const [material, setMaterial] = useState();
+  const { loading, getMaterialById } = useMaterial();
   // Fill data khi edit
   useEffect(() => {
-    if (isOpen) {
-      if (material) {
-        const foundBrand = brands.find(
-          (b) => b.brandName === material.brandName
-        );
-        const foundCategory = categories.find(
-          (c) => c.categoryName === material.categoryName
-        );
-        setName(material.name || '');
-        setNameEN(material.nameEN || '');
-        setUnit(material.unit || '');
-        setUnitEN(material.unitEN || '');
-        setBrandID(foundBrand?.brandID || '');
-        setCategoryID(foundCategory?.categoryID || '');
-        setDescription(material.description || '');
-        setDescriptionEN(material.descriptionEN || '');
-        setImages(
-          (material.imageUrls || []).map((url) => ({
-            url,
-            isNew: false,
-          }))
-        );
-        setUploadProgress(0);
-      } else {
+    const fetchMaterial = async () => {
+      if (isOpen) {
+        if (materialID) {
+          const result = await getMaterialById(materialID);
+          if (result) {
+            setMaterial(result);
+            const foundBrand = brands.find(
+              (b) => b.brandName === result.brandName
+            );
+            const foundCategory = categories.find(
+              (c) => c.categoryName === result.categoryName
+            );
+            setName(result.name || '');
+            setNameEN(result.nameEN || '');
+            setUnit(result.unit || '');
+            setUnitEN(result.unitEN || '');
+            setBrandID(foundBrand?.brandID || '');
+            setCategoryID(foundCategory?.categoryID || '');
+            setDescription(result.description || '');
+            setDescriptionEN(result.descriptionEN || '');
+            setImages(
+              (result.imageUrls || []).map((url) => ({
+                url,
+                isNew: false,
+              }))
+            );
+            setUploadProgress(0);
+          }
+          return;
+        }
+        setMaterial(null);
         setName('');
         setNameEN('');
         setUnit('');
@@ -87,8 +97,16 @@ export default function MaterialModal({
         setImages([]);
         setUploadProgress(0);
       }
-    }
-  }, [isOpen, material, brands, categories, setUploadProgress]);
+    };
+    fetchMaterial();
+  }, [
+    isOpen,
+    materialID,
+    brands,
+    categories,
+    getMaterialById,
+    setUploadProgress,
+  ]);
 
   // Chọn ảnh local
   const handleFileChange = (e) => {
@@ -120,7 +138,7 @@ export default function MaterialModal({
 
   const confirmDeleteImage = async (img) => {
     try {
-      await deleteMaterialImage(material.MaterialID, img.url);
+      await deleteMaterialImage(material.materialID, img.url);
       Swal.close();
       toast.success(t('SUCCESS.DELETE'));
       removeImageFromState(img);
@@ -223,229 +241,237 @@ export default function MaterialModal({
 
         {/* Body */}
         <div className="flex-1 pr-2 mt-4 space-y-6 overflow-y-auto">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-            {/* Material Name */}
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.materialName')}
-                <span className="text-red-500 ms-1">*</span>
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2.5 border rounded-xl"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <LoadingModal />
             </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+              {/* Material Name */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  {t('distributorMaterialManager.materialModal.materialName')}
+                  <span className="text-red-500 ms-1">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2.5 border rounded-xl"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-            {/* Unit */}
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.unit')}
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2.5 border rounded-xl"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-              />
-            </div>
+              {/* Unit */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  {t('distributorMaterialManager.materialModal.unit')}
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-2.5 border rounded-xl"
+                  value={unit}
+                  onChange={(e) => setUnit(e.target.value)}
+                />
+              </div>
 
-            {/* Brand */}
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.brand')}
-                <span className="text-red-500 ms-1">*</span>
-              </label>
-              <select
-                value={brandID || ''}
-                onChange={(e) => setBrandID(e.target.value)}
-                className="w-full px-4 py-2.5 border rounded-xl"
-              >
-                {!material && (
-                  <option value="">
-                    {t('distributorMaterialManager.materialModal.chooseBrand')}
-                  </option>
-                )}
-                {brands.map((b) => (
-                  <option key={b.brandID} value={b.brandID}>
-                    {i18n.language === 'vi'
-                      ? b.brandName
-                      : b.brandNameEN || b.brandName}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Brand */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  {t('distributorMaterialManager.materialModal.brand')}
+                  <span className="text-red-500 ms-1">*</span>
+                </label>
+                <select
+                  value={brandID || ''}
+                  onChange={(e) => setBrandID(e.target.value)}
+                  className="w-full px-4 py-2.5 border rounded-xl"
+                >
+                  {!material && (
+                    <option value="">
+                      {t(
+                        'distributorMaterialManager.materialModal.chooseBrand'
+                      )}
+                    </option>
+                  )}
+                  {brands.map((b) => (
+                    <option key={b.brandID} value={b.brandID}>
+                      {i18n.language === 'vi'
+                        ? b.brandName
+                        : b.brandNameEN || b.brandName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Category */}
-            <div>
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.category')}
-                <span className="text-red-500 ms-1">*</span>
-              </label>
-              <select
-                value={categoryID || ''}
-                onChange={(e) => setCategoryID(e.target.value)}
-                className="w-full px-4 py-2.5 border rounded-xl"
-              >
-                {!material && (
-                  <option value="">
-                    {t(
-                      'distributorMaterialManager.materialModal.chooseCategory'
-                    )}
-                  </option>
-                )}
-                {categories.map((c) => (
-                  <option key={c.categoryID} value={c.categoryID}>
-                    {i18n.language === 'vi'
-                      ? c.categoryName
-                      : c.categoryNameEN || c.categoryName}
-                  </option>
-                ))}
-              </select>
-            </div>
+              {/* Category */}
+              <div>
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  {t('distributorMaterialManager.materialModal.category')}
+                  <span className="text-red-500 ms-1">*</span>
+                </label>
+                <select
+                  value={categoryID || ''}
+                  onChange={(e) => setCategoryID(e.target.value)}
+                  className="w-full px-4 py-2.5 border rounded-xl"
+                >
+                  {!material && (
+                    <option value="">
+                      {t(
+                        'distributorMaterialManager.materialModal.chooseCategory'
+                      )}
+                    </option>
+                  )}
+                  {categories.map((c) => (
+                    <option key={c.categoryID} value={c.categoryID}>
+                      {i18n.language === 'vi'
+                        ? c.categoryName
+                        : c.categoryNameEN || c.categoryName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Description */}
-            <div className="col-span-2">
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                {t('distributorMaterialManager.materialModal.description')}
-              </label>
-              <Editor
-                value={description}
-                init={{
-                  license_key: 'gpl',
-                  height: 300,
-                  menubar: false,
-                  plugins: 'lists link image code',
-                  toolbar:
-                    'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                  skin: false,
-                  content_css: false,
-                }}
-                onEditorChange={(content) => setDescription(content)}
-              />
-            </div>
+              {/* Description */}
+              <div className="col-span-2">
+                <label className="block mb-2 text-sm font-medium text-gray-700">
+                  {t('distributorMaterialManager.materialModal.description')}
+                </label>
+                <Editor
+                  value={description}
+                  init={{
+                    license_key: 'gpl',
+                    height: 300,
+                    menubar: false,
+                    plugins: 'lists link image code',
+                    toolbar:
+                      'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                    skin: false,
+                    content_css: false,
+                  }}
+                  onEditorChange={(content) => setDescription(content)}
+                />
+              </div>
 
-            {/* Multilanguage */}
-            <div className="col-span-2">
-              <button
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700"
-              >
-                <i className="fas fa-globe text-emerald-500"></i>
-                {t(
-                  'distributorMaterialManager.materialModal.multilanguage_for_data'
-                )}
-                <span className="ml-auto">{isExpanded ? '▲' : '▼'}</span>
-              </button>
+              {/* Multilanguage */}
+              <div className="col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700"
+                >
+                  <i className="fas fa-globe text-emerald-500"></i>
+                  {t(
+                    'distributorMaterialManager.materialModal.multilanguage_for_data'
+                  )}
+                  <span className="ml-auto">{isExpanded ? '▲' : '▼'}</span>
+                </button>
 
-              {isExpanded && (
-                <div className="p-5 space-y-4 rounded-xl bg-gray-50">
-                  <div className="grid grid-cols-2 gap-6">
+                {isExpanded && (
+                  <div className="p-5 space-y-4 rounded-xl bg-gray-50">
+                    <div className="grid grid-cols-2 gap-6">
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-gray-700">
+                          {t(
+                            'distributorMaterialManager.materialModal.materialNameEN'
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-2.5 border rounded-xl"
+                          value={nameEN}
+                          onChange={(e) => setNameEN(e.target.value)}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block mb-2 text-sm font-medium text-gray-700">
+                          {t('distributorMaterialManager.materialModal.unitEN')}
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full px-4 py-2.5 border rounded-xl"
+                          value={unitEN}
+                          onChange={(e) => setUnitEN(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block mb-2 text-sm font-medium text-gray-700">
                         {t(
-                          'distributorMaterialManager.materialModal.materialNameEN'
+                          'distributorMaterialManager.materialModal.descriptionEN'
                         )}
                       </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2.5 border rounded-xl"
-                        value={nameEN}
-                        onChange={(e) => setNameEN(e.target.value)}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block mb-2 text-sm font-medium text-gray-700">
-                        {t('distributorMaterialManager.materialModal.unitEN')}
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-2.5 border rounded-xl"
-                        value={unitEN}
-                        onChange={(e) => setUnitEN(e.target.value)}
+                      <Editor
+                        value={descriptionEN}
+                        init={{
+                          license_key: 'gpl',
+                          height: 300,
+                          menubar: false,
+                          plugins: 'lists link image code',
+                          toolbar:
+                            'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                          skin: false,
+                          content_css: false,
+                        }}
+                        onEditorChange={(content) => setDescriptionEN(content)}
                       />
                     </div>
                   </div>
+                )}
+              </div>
 
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-700">
-                      {t(
-                        'distributorMaterialManager.materialModal.descriptionEN'
-                      )}
-                    </label>
-                    <Editor
-                      value={descriptionEN}
-                      init={{
-                        license_key: 'gpl',
-                        height: 300,
-                        menubar: false,
-                        plugins: 'lists link image code',
-                        toolbar:
-                          'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                        skin: false,
-                        content_css: false,
-                      }}
-                      onEditorChange={(content) => setDescriptionEN(content)}
+              {/* Images */}
+              <div className="flex flex-wrap col-span-2 gap-3">
+                {images.map((img) => (
+                  <div
+                    key={img.url}
+                    className="relative overflow-hidden border w-28 h-28 rounded-xl group"
+                  >
+                    <img
+                      src={img.url}
+                      alt="preview"
+                      className="object-cover w-full h-full"
                     />
+                    {!readOnly && (
+                      <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                        {(images.length !== 1 || img.isNew) && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(img)}
+                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                          >
+                            <i className="fa-solid fa-xmark"></i>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
+                ))}
+              </div>
+
+              {!readOnly && images.length < 5 && (
+                <div className="col-span-2">
+                  <label className="inline-block px-4 py-2 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-emerald-400 hover:bg-emerald-50">
+                    {t('distributorMaterialManager.materialModal.chooseFile')}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </label>
+                  <span className="ml-3 text-sm text-gray-500">
+                    {images.filter((i) => i.isNew).length > 0
+                      ? `${images.filter((i) => i.isNew).length} ${t(
+                          'distributorMaterialManager.materialModal.filesSelected'
+                        )}`
+                      : t('distributorMaterialManager.materialModal.noFile')}
+                  </span>
                 </div>
               )}
             </div>
-
-            {/* Images */}
-            <div className="flex flex-wrap col-span-2 gap-3">
-              {images.map((img) => (
-                <div
-                  key={img.url}
-                  className="relative overflow-hidden border w-28 h-28 rounded-xl group"
-                >
-                  <img
-                    src={img.url}
-                    alt="preview"
-                    className="object-cover w-full h-full"
-                  />
-                  {!readOnly && (
-                    <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                      {(images.length !== 1 || img.isNew) && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(img)}
-                          className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
-                        >
-                          <i className="fa-solid fa-xmark"></i>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {!readOnly && images.length < 5 && (
-              <div className="col-span-2">
-                <label className="inline-block px-4 py-2 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-emerald-400 hover:bg-emerald-50">
-                  {t('distributorMaterialManager.materialModal.chooseFile')}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                  />
-                </label>
-                <span className="ml-3 text-sm text-gray-500">
-                  {images.filter((i) => i.isNew).length > 0
-                    ? `${images.filter((i) => i.isNew).length} ${t(
-                      'distributorMaterialManager.materialModal.filesSelected'
-                    )}`
-                    : t('distributorMaterialManager.materialModal.noFile')}
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -476,7 +502,7 @@ MaterialModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
-  material: PropTypes.object,
+  materialID: PropTypes.string,
   brands: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   setUploadProgress: PropTypes.func.isRequired,

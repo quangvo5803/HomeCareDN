@@ -3,20 +3,17 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations.Application
+namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251002044509_RefactorPartnerRequest")]
-    partial class RefactorPartnerRequest
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +45,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("BrandNameEN")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("BrandID");
 
                     b.HasIndex("BrandLogoID");
@@ -71,6 +71,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<string>("CategoryNameEN")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -125,6 +128,9 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -161,10 +167,14 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContractorID")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<double>("EstimatePrice")
@@ -174,10 +184,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserID")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -216,6 +222,31 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("Conversations", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
+                {
+                    b.Property<Guid>("DocumentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ContractorApplicationID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DocumentUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ServiceRequestID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("DocumentID");
+
+                    b.ToTable("Documents", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.Property<Guid>("ImageID")
@@ -236,9 +267,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("text");
 
                     b.Property<Guid?>("MaterialID")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PartnerID")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("PartnerRequestID")
@@ -280,6 +308,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<Guid>("CategoryID")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -370,6 +401,9 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -407,9 +441,8 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AddressId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BuildingType")
                         .IsRequired()
@@ -417,6 +450,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerID")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -445,11 +481,10 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ServiceType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("SelectedContractorApplicationID")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("UserID")
+                    b.Property<string>("ServiceType")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -457,6 +492,8 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("double precision");
 
                     b.HasKey("ServiceRequestID");
+
+                    b.HasIndex("SelectedContractorApplicationID");
 
                     b.ToTable("ServiceRequests", "app");
                 });
@@ -539,6 +576,15 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("Brand");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
+                        .WithMany()
+                        .HasForeignKey("SelectedContractorApplicationID");
+
+                    b.Navigation("SelectedContractorApplication");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>

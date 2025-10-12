@@ -40,8 +40,14 @@ namespace BusinessLogic.Services
                 query = query.Where(s =>
                     (!string.IsNullOrEmpty(s.Name) && s.Name.ToUpper().Contains(searchUpper))
                     || (!string.IsNullOrEmpty(s.NameEN) && s.NameEN.ToUpper().Contains(searchUpper))
-                    || (!string.IsNullOrEmpty(s.Description) && s.Description.ToUpper().Contains(searchUpper))
-                    || (!string.IsNullOrEmpty(s.DescriptionEN) && s.DescriptionEN.ToUpper().Contains(searchUpper))
+                    || (
+                        !string.IsNullOrEmpty(s.Description)
+                        && s.Description.ToUpper().Contains(searchUpper)
+                    )
+                    || (
+                        !string.IsNullOrEmpty(s.DescriptionEN)
+                        && s.DescriptionEN.ToUpper().Contains(searchUpper)
+                    )
                 );
             }
             if (parameters.FilterServiceType.HasValue)
@@ -62,14 +68,14 @@ namespace BusinessLogic.Services
                 query = query.Where(s => s.DesignStyle == parameters.FilterDesignStyle.Value);
 
             var totalCount = await query.CountAsync();
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
                 "servicename" => query.OrderBy(s => s.Name),
                 "servicename_desc" => query.OrderByDescending(s => s.Name),
-                "servicenameen" => query.OrderBy(s => s.NameEN),
-                "servicenameen_desc" => query.OrderByDescending(s => s.NameEN),
+                "servicenameen" => query.OrderBy(s => s.NameEN ?? s.Name),
+                "servicenameen_desc" => query.OrderByDescending(s => s.NameEN ?? s.Name),
                 "random" => query.OrderBy(s => s.ServiceID),
-                _ => query.OrderBy(b => b.ServiceID),
+                _ => query.OrderBy(b => b.CreatedAt),
             };
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

@@ -1,22 +1,4 @@
-﻿using BusinessLogic.DTOs.Application.ContractorApplication;
-
-namespace BusinessLogic.Services.Interfaces
+﻿namespace BusinessLogic.Services.Interfaces
 {
-    public interface IContractorApplicationService
-    {
-        Task<ContractorApplicationDto> GetContractorApplicationByIdAsync(
-            Guid contractorApplicationId
-        );
-        Task<List<ContractorApplicationDto>> GetContractorApplicationByServiceRequestIDAsync(
-            ContractorApplicationGetByServiceRequestDto requestDto
-        );
-
-        Task<ContractorApplicationDto> CreateContractorApplicationAsync(
-            ContractorApplicationCreateRequestDto createRequestDto
-        );
-        Task<ContractorApplicationDto> UpdateContractorApplicationAsync(
-            ContractorApplicationUpdateRequestDto updateRequestDto
-        );
-        Task DeleteContractorApplicationAsync(Guid contractorApplicationId);
-    }
+    public interface IContractorApplicationService { }
 }
