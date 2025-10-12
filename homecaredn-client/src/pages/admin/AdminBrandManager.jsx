@@ -53,7 +53,12 @@ export default function AdminBrandManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          fetchBrands({ PageNumber: currentPage, PageSize: pageSize });
+          fetchBrands({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -117,23 +122,23 @@ export default function AdminBrandManager() {
               >
                 <option value="">{t('common.sortDefault')}</option>
                 <option
-                  value={i18n.language === 'vi' ? 'brandName' : 'brandNameEN'}
+                  value={i18n.language === 'vi' ? 'brandname' : 'brandnameen'}
                 >
                   {t('common.sortName')}
                 </option>
                 <option
                   value={
                     i18n.language === 'vi'
-                      ? 'brandName_desc'
-                      : 'brandNameEN_desc'
+                      ? 'brandname_desc'
+                      : 'brandnameen_desc'
                   }
                 >
                   {t('common.sortNameDesc')}
                 </option>
-                <option value="materialCount">
+                <option value="materialcount">
                   {t('common.sortMaterialCount')}
                 </option>
-                <option value="materialCount_desc">
+                <option value="materialcount_desc">
                   {t('common.sortMaterialCountDesc')}
                 </option>
               </select>

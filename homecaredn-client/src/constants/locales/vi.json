@@ -678,12 +678,14 @@
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",
     "subtitle": "Yêu cầu từ khách hàng",
+    "no":"STT",
     "fullName": "Họ và tên",
     "email": "Email",
     "subject": "Chủ đề",
     "status": "Trạng thái",
     "processed": "Đã xử lý",
     "pending": "Đang chờ",
+    "rejected": "Đã từ chối",
     "action": "Thao tác",
     "replyTitle": "Phản hồi yêu cầu",
     "replyLabel": "Nội dung phản hồi",
@@ -943,11 +945,7 @@
       "Rustic": "Mộc mạc",
       "Other": "Khác"
     },
-    "PartnerStatus":{
-      "Pending": "Đang chờ",
-      "Rejected": "Đã từ chối",
-      "Approved": "Đã chấp nhận"
-    },
+
     "PartnerType":{
       "Distributor":"Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
@@ -963,7 +961,12 @@
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
-    "sortMaterialCount": "Số lượng sản phẩm: Nhiều -> Ít",
-    "sortMaterialCountDesc": "Số lượng sản phẩm: Ít -> Nhiều"
+    "sortMaterialCount": "Số lượng sản phẩm: Ít -> Nhiều",
+    "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít",
+    "All": "Tất cả",
+    "pending": "Đang chờ",
+    "rejected": "Đã từ chối",
+    "approved": "Đã chấp nhận",
+    "processed": "Đã xử lý"
   }
 }
