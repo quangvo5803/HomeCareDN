@@ -718,6 +718,7 @@
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
+    "no": "No",
     "fullName": "Full name",
     "email": "Email",
     "subject": "Subject",
@@ -725,12 +726,13 @@
     "processed": "Processed",
     "pending": "Pending",
     "action": "Action",
+    "rejected": "Rejected",
     "replyTitle": "Reply to request",
     "replyLabel": "Your reply",
     "replyPlaceholder": "Type your reply here...",
     "noSupport": "No support requests yet",
     "all": "All",
-    "itemsCount": "{{count}} request(s)"
+    "supports": "request(s)"
   },
 
   "footer": {
@@ -984,11 +986,6 @@
       "Rustic": "Rustic",
       "Other": "Other"
     },
-    "PartnerStatus":{
-      "Pending": "Pending",
-      "Rejected": "Rejected",
-      "Approved": "Approved"
-    },
     "PartnerType":{
       "Distributor":"Distributor",
       "DistributorDescription": "Providing construction materials",      
@@ -1001,6 +998,16 @@
   },
   "common":{
     "noRequirement":"No requirements",
-    "search":"Search..."
+    "search":"Search...",
+    "sortDefault": "Default",
+    "sortName": "Name: A-Z",
+    "sortNameDesc": "Name: Z-A",
+    "sortMaterialCount": "Product Quantity: Low -> High",
+    "sortMaterialCountDesc": "Product Quantity: High -> Low",
+    "all": "All",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "approved": "Approved",
+    "processed": "Processed"
   }
 }
