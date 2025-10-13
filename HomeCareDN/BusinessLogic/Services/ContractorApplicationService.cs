@@ -38,11 +38,11 @@ namespace BusinessLogic.Services
         }
 
         public async Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
-            ContractorApplicationApplyDto createApplycation
+            ContractorApplicationApplyDto createRequest
         )
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
-                s.ServiceRequestID == createApplycation.ServiceRequestID
+                s.ServiceRequestID == createRequest.ServiceRequestID
             );
 
             if (serviceRequest == null)
@@ -54,7 +54,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             var contractor = await _userManager.FindByIdAsync(
-                createApplycation.ContractorID.ToString()
+                createRequest.ContractorID.ToString()
             );
 
             if (contractor == null)
@@ -68,8 +68,8 @@ namespace BusinessLogic.Services
 
             var existingApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 existingApplication =>
-                    existingApplication.ServiceRequestID == createApplycation.ServiceRequestID
-                    && existingApplication.ContractorID == createApplycation.ContractorID
+                    existingApplication.ServiceRequestID == createRequest.ServiceRequestID
+                    && existingApplication.ContractorID == createRequest.ContractorID
             );
             if (existingApplication != null)
             {
@@ -80,13 +80,13 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var contractorApplication = _mapper.Map<ContractorApplication>(createApplycation);
+            var contractorApplication = _mapper.Map<ContractorApplication>(createRequest);
             contractorApplication.ContractorApplicationID = Guid.NewGuid();
 
-            if (createApplycation.ImageUrls != null)
+            if (createRequest.ImageUrls != null)
             {
-                var ids = createApplycation.ImagePublicIds?.ToList() ?? new List<string>();
-                var images = createApplycation
+                var ids = createRequest.ImagePublicIds?.ToList() ?? new List<string>();
+                var images = createRequest
                     .ImageUrls.Select(
                         (url, i) =>
                             new Image
