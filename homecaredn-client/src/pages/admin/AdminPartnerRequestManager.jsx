@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
-import { useEnums } from '../../hook/useEnums';
 import PartnerRequestModal from '../../components/modal/PartnerRequestModal';
 import Loading from '../../components/Loading';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useDebounce } from 'use-debounce';
-import i18n from '../../configs/i18n';
 import { toast } from 'react-toastify';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function AdminPartnerRequestManager() {
   const { t } = useTranslation();
-  const enums = useEnums();
   const pageSize = 5;
 
   const {
@@ -25,11 +22,12 @@ export default function AdminPartnerRequestManager() {
   } = usePartnerRequest();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const [partnerRequestID, setPartnerRequestID] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   // fetch data
   useEffect(() => {
@@ -37,20 +35,24 @@ export default function AdminPartnerRequestManager() {
       PageNumber: currentPage,
       PageSize: pageSize,
       Search: debouncedSearch || '',
-      ...(statusFilter !== 'All' && {
-        FilterPartnerRequestStatus: statusFilter,
-      }),
+      SortBy: sortBy,
+      FilterPartnerRequestStatus: filter === 'all' ? null : filter,
     });
   }, [
     currentPage,
     pageSize,
     debouncedSearch,
-    statusFilter,
+    sortBy,
+    filter,
     fetchPartnerRequests,
   ]);
   const partnerTypeColors = {
     Contractor: 'bg-blue-100 text-blue-800',
     Distributor: 'bg-purple-100 text-purple-800',
+  };
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
   };
 
   const handleDelete = async (id) => {
@@ -65,7 +67,12 @@ export default function AdminPartnerRequestManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          fetchPartnerRequests({ PageNumber: currentPage, PageSize: pageSize });
+          fetchPartnerRequests({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
+          });
         }
 
         toast.success(t('SUCCESS.DELETE'));
@@ -78,6 +85,7 @@ export default function AdminPartnerRequestManager() {
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br rounded-2xl from-gray-50 to-gray-100">
       <div className="w-full max-w-full mx-auto">
         {/* Header */}
+
         <div className="mb-8">
           <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
             <i className="mr-3 fa-solid fa-handshake" aria-hidden="true" />
@@ -88,47 +96,45 @@ export default function AdminPartnerRequestManager() {
 
         {/* Table Container */}
         <div className="overflow-hidden bg-white border border-gray-200 shadow-lg rounded-xl">
-          {/* Table Header Actions */}
-          <div className="flex flex-col items-start justify-between gap-3 px-4 py-4 border-b border-gray-200 lg:px-6 bg-gray-50 sm:flex-row sm:items-center">
-            <div className="flex items-center space-x-2">
-              <div
-                className="w-2 h-2 bg-green-500 rounded-full"
-                aria-hidden="true"
-              />
-              <span className="text-sm font-medium text-gray-700">
-                {totalPartnerRequests || 0}{' '}
-                {t('adminPartnerManager.partners', 'Partners')}
-              </span>
-            </div>
-
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row gap-2">
-              {/* Filter by status */}
-              <select
-                id="status-filter"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="All">
-                  {i18n.language === 'vi' ? 'Tất cả' : 'All'}
-                </option>
-                {enums?.partnerStatus?.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {t(`Enums.PartnerStatus.${s.value}`)}
-                  </option>
-                ))}
-              </select>
-
-              {/* Search */}
+          {/* Header Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4 border-b border-gray-200 bg-gray-50">
+            {/* Left: Search + Sort */}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <input
                 id="search-input"
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('adminPartnerManager.searchPlaceholder')}
-                className="px-3 py-2 text-sm border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                onChange={handleSearchChange}
+                placeholder={t('common.search')}
+                className="w-full sm:w-64 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+              <select
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="">{t('common.sortDefault')}</option>
+                <option value="companyname">{t('common.sortName')}</option>
+                <option value="companynamedesc">
+                  {t('common.sortNameDesc')}
+                </option>
+              </select>
+            </div>
+
+            {/* Right: Filter Buttons */}
+            <div className="flex flex-wrap gap-2 justify-end">
+              {['all', 'pending', 'approved', 'rejected'].map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setFilter(key)}
+                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${filter === key
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
+                >
+                  {t(`common.${key}`)}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -273,15 +279,26 @@ export default function AdminPartnerRequestManager() {
 
             {/* Pagination */}
             {totalPartnerRequests > 0 && (
-              <div className="flex justify-center py-4">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalPartnerRequests}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                  size="small"
-                />
+              <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                {/* Total count (left) */}
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  <span>
+                    {totalPartnerRequests} {t('adminPartnerManager.partners')}
+                  </span>
+                </div>
+
+                {/* Pagination (right) */}
+                <div className="w-full sm:w-auto flex justify-center sm:justify-end">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalPartnerRequests}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                    size="small"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -300,26 +317,3 @@ export default function AdminPartnerRequestManager() {
     </div>
   );
 }
-
-function StatusBadge({ status }) {
-  const { t } = useTranslation();
-  const statusColors = {
-    Pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    Rejected: 'bg-red-100 text-red-800 border-red-300',
-    Approved: 'bg-green-100 text-green-800 border-green-300',
-  };
-  const colorClass =
-    statusColors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
-
-  return (
-    <span
-      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium border ${colorClass}`}
-    >
-      {t(`Enums.PartnerStatus.${status}`, status)}
-    </span>
-  );
-}
-
-StatusBadge.propTypes = {
-  status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-};

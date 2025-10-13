@@ -15,7 +15,7 @@ const buildServiceRequestFormData = (serviceRequest) => {
   appendIf(formData, 'ServiceRequestID', serviceRequest.ServiceRequestID);
 
   // Required fields
-  appendIf(formData, 'UserID', serviceRequest.UserID);
+  appendIf(formData, 'CustomerID', serviceRequest.CustomerID);
   appendIf(formData, 'AddressID', serviceRequest.AddressID);
   appendIf(formData, 'ServiceType', serviceRequest.ServiceType);
   appendIf(formData, 'PackageOption', serviceRequest.PackageOption);

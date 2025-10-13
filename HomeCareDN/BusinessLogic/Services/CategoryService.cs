@@ -49,12 +49,16 @@ namespace BusinessLogic.Services
 
             var totalCount = await query.CountAsync();
 
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
                 "categoryname" => query.OrderBy(c => c.CategoryName),
                 "categoryname_desc" => query.OrderByDescending(c => c.CategoryName),
-                "categorynameen" => query.OrderBy(c => c.CategoryNameEN),
-                "categorynameen_desc" => query.OrderByDescending(c => c.CategoryNameEN),
+                "categorynameen" => query.OrderBy(c => c.CategoryNameEN ?? c.CategoryName),
+                "categorynameen_desc" => query.OrderByDescending(c =>
+                    c.CategoryNameEN ?? c.CategoryName
+                ),
+                "materialcount" => query.OrderBy(b => (int?)b.Materials!.Count ?? 0),
+                "materialcount_desc" => query.OrderByDescending(b => (int?)b.Materials!.Count ?? 0),
                 "random" => query.OrderBy(s => s.CategoryID),
                 _ => query.OrderBy(c => c.CreatedAt),
             };

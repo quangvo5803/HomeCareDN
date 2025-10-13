@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations.Application
+namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251001125147_RenamePartnerTable")]
-    partial class RenamePartnerTable
+    [Migration("20251009053536_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,6 +48,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("BrandNameEN")
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("BrandID");
 
                     b.HasIndex("BrandLogoID");
@@ -71,6 +74,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<string>("CategoryNameEN")
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -125,6 +131,9 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
@@ -161,10 +170,14 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("ContractorID")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<double>("EstimatePrice")
@@ -174,10 +187,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserID")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -216,6 +225,31 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("Conversations", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
+                {
+                    b.Property<Guid>("DocumentID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ContractorApplicationID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DocumentUrl")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ServiceRequestID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("DocumentID");
+
+                    b.ToTable("Documents", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.Property<Guid>("ImageID")
@@ -238,10 +272,7 @@ namespace DataAccess.Migrations.Application
                     b.Property<Guid?>("MaterialID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("PartnerID")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("PartnerRequestPartnerID")
+                    b.Property<Guid?>("PartnerRequestID")
                         .HasColumnType("uuid");
 
                     b.Property<string>("PublicId")
@@ -260,7 +291,7 @@ namespace DataAccess.Migrations.Application
 
                     b.HasIndex("MaterialID");
 
-                    b.HasIndex("PartnerRequestPartnerID");
+                    b.HasIndex("PartnerRequestID");
 
                     b.HasIndex("ServiceID");
 
@@ -280,6 +311,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<Guid>("CategoryID")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -317,15 +351,9 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
-                    b.Property<Guid>("PartnerID")
+                    b.Property<Guid>("PartnerRequestID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("AccountUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ApprovedUserId")
-                        .HasColumnType("text");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -344,11 +372,7 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PartnerType")
+                    b.Property<string>("PartnerRequestType")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -365,9 +389,7 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("PartnerID");
-
-                    b.HasIndex("AccountUserId");
+                    b.HasKey("PartnerRequestID");
 
                     b.ToTable("PartnerRequests", "app");
                 });
@@ -381,6 +403,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("BuildingType")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -419,9 +444,8 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AddressId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("AddressId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("BuildingType")
                         .IsRequired()
@@ -429,6 +453,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CustomerID")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -457,11 +484,10 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("ServiceType")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("SelectedContractorApplicationID")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("UserID")
+                    b.Property<string>("ServiceType")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -470,136 +496,9 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("ServiceRequestID");
 
+                    b.HasIndex("SelectedContractorApplicationID");
+
                     b.ToTable("ServiceRequests", "app");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
-                {
-                    b.Property<Guid>("AddressID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Detail")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("District")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Ward")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("AddressID");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Address", "app");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .HasColumnType("text");
-
-                    b.Property<string>("CurrentOTP")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("Gender")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("LastOTPSentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("OTPExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApplicationUser", "app");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RefreshToken", "app");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
@@ -652,7 +551,7 @@ namespace DataAccess.Migrations.Application
 
                     b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
                         .WithMany("Images")
-                        .HasForeignKey("PartnerRequestPartnerID");
+                        .HasForeignKey("PartnerRequestID");
 
                     b.HasOne("DataAccess.Entities.Application.Service", null)
                         .WithMany("Images")
@@ -682,35 +581,13 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
+            modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Authorize.ApplicationUser", "AccountUser")
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
                         .WithMany()
-                        .HasForeignKey("AccountUserId");
+                        .HasForeignKey("SelectedContractorApplicationID");
 
-                    b.Navigation("AccountUser");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.Address", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Authorize.ApplicationUser", "User")
-                        .WithMany("Addresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.RefreshToken", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Authorize.ApplicationUser", "User")
-                        .WithMany("RefreshTokens")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
+                    b.Navigation("SelectedContractorApplication");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
@@ -753,13 +630,6 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("ContractorApplications");
 
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Authorize.ApplicationUser", b =>
-                {
-                    b.Navigation("Addresses");
-
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,17 +1,22 @@
 import PropTypes from 'prop-types';
-
-export default function StatusBadge({ status, t }) {
+import { useTranslation } from 'react-i18next';
+export default function StatusBadge({ status }) {
+  const { t } = useTranslation();
   const map = {
     Pending: {
-      text: t('partnerDashboard.pending'),
+      text: t('common.pending'),
       cls: 'bg-yellow-100 text-yellow-700',
     },
     Approved: {
-      text: t('partnerDashboard.approved'),
+      text: t('common.approved'),
+      cls: 'bg-green-100 text-green-700',
+    },
+    Process: {
+      text: t('common.approved'),
       cls: 'bg-green-100 text-green-700',
     },
     Rejected: {
-      text: t('partnerDashboard.rejected'),
+      text: t('common.rejected'),
       cls: 'bg-red-100 text-red-700',
     },
   };
