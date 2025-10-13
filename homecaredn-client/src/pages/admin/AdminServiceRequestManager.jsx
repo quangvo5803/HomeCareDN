@@ -143,13 +143,20 @@ export default function ServiceRequest() {
                                                     {formatVND(Number(item.estimatePrice))}
                                                 </td>
                                                 <td className="px-4 py-4 text-center">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => navigate(`/Admin/ServiceRequest/${item.serviceRequestID}`)}
-                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition"
-                                                    >
-                                                        {t('BUTTON.View')}
-                                                    </button>
+                                                    {item.isOpen ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => navigate(`/Admin/ServiceRequest/${item.serviceRequestID}`)}
+                                                            className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition"
+                                                        >
+                                                            {t('BUTTON.View')}
+                                                        </button>
+                                                    ) : (
+                                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-red-500">
+                                                            <i className="fas fa-clock mr-1"></i>
+                                                            {t('userPage.serviceRequest.label_close')}
+                                                        </span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))

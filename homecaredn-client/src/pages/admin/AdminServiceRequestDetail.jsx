@@ -5,6 +5,29 @@ import { useTranslation } from "react-i18next";
 import { useServiceRequest } from "../../hook/useServiceRequest";
 import { formatVND } from '../../utils/formatters';
 
+const contractors = [
+    {
+        name: 'Phan Đình Phúc',
+        email: 'abc@gmail.com'
+    },
+    {
+        name: 'Nguyễn Văn A',
+        email: 'afgdsas@gmail.com'
+    },
+    {
+        name: 'Nguyễn Văn A',
+        email: 'dsas@gmail.com'
+    },
+    {
+        name: 'Nguyễn Văn A',
+        email: 'gdsas@gmail.com'
+    },
+    {
+        name: 'Nguyễn Văn A',
+        email: 'fgdsas@gmail.com'
+    }
+];
+
 
 export default function AdminServiceRequestDetail() {
     const { id } = useParams();
@@ -98,7 +121,7 @@ export default function AdminServiceRequestDetail() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
+                            <div className="flex items-center gap-3 p-3 bg-red-50 rounded-xl">
                                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                                     <i className="fa-solid fa-building-columns text-red-600"></i>
                                 </div>
@@ -108,7 +131,7 @@ export default function AdminServiceRequestDetail() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl">
+                            <div className="flex items-center gap-3 p-3 bg-pink-50 rounded-xl">
                                 <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
                                     <i className="fa-solid fa-palette text-pink-500"></i>
                                 </div>
@@ -210,45 +233,38 @@ export default function AdminServiceRequestDetail() {
 
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-xl font-bold text-gray-800">Danh sách ứng tuyển</h3>
-                        <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">3 ứng viên</span>
+                        <h3 className="text-xl font-bold text-gray-800">{t('adminServiceRequestManager.listCandidate')}</h3>
+                        <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">3 {t('adminServiceRequestManager.totalCandidate')}</span>
                     </div>
 
                     <div className="space-y-3">
-
-                        <div className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow duration-200 cursor-pointer group">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                        NT
+                        {contractors.map((contractor, index) => (
+                            <div
+                                key={index}
+                                className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow duration-200 cursor-pointer group"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-12 h-12 rounded-full overflow-hidden">
+                                            <img
+                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                                    contractor.email || 'User'
+                                                )}&background=random`}
+                                                alt="avatar"
+                                                className="object-cover w-full h-full"
+                                            />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-800">{contractor.name}</p>
+                                            <p className="text-sm text-gray-500">{contractor.email}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">Nguyễn Văn Thành</p>
-                                        <p className="text-sm text-gray-500">nguyenthanhxd@gmail.com</p>
-                                    </div>
+                                    <button className="text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
+                                        {t('adminServiceRequestManager.viewProfile')} <i className="fa-solid fa-arrow-right ms-1"></i>
+                                    </button>
                                 </div>
-                                <button className="text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
-                                    Xem hồ sơ →
-                                </button>
                             </div>
-                        </div>
-
-                        <div className="p-4 border border-gray-200 rounded-xl hover:shadow-md transition-shadow duration-200 cursor-pointer group">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-semibold">
-                                        LH
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">Lê Văn Hải</p>
-                                        <p className="text-sm text-gray-500">levanhai@gmail.com</p>
-                                    </div>
-                                </div>
-                                <button className="text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg transition-colors duration-200 font-medium">
-                                    Xem hồ sơ →
-                                </button>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
