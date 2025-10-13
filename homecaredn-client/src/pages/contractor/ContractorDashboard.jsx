@@ -1,8 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import MenuList from '../../components/partner/MenuList';
-import AvatarMenu from '../../components/AvatarMenu';
-import LanguageSwitch from '../../components/LanguageSwitch';
-import NotificationBell from '../../components/NotificationBell';
+import { useNavigate } from 'react-router-dom';
 import { formatVND, formatDate } from '../../utils/formatters';
 import StatusBadge from '../../components/StatusBadge';
 
@@ -53,43 +50,6 @@ const SEED_APPS = [
 export default function DistributorDashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
-  const kpis = useMemo(
-    () => [
-      {
-        label: t('partnerDashboard.kpi.open_requests'),
-        value: 8,
-        meta: t('partnerDashboard.kpi_meta.open_requests'),
-        cls: 'text-green-600',
-      },
-      {
-        label: t('partnerDashboard.kpi.applied'),
-        value: 14,
-        meta: t('partnerDashboard.kpi_meta.applied'),
-        cls: 'text-gray-600',
-      },
-      {
-        label: t('partnerDashboard.kpi.won'),
-        value: 5,
-        meta: t('partnerDashboard.kpi_meta.won'),
-        cls: 'text-green-600',
-      },
-      {
-        label: t('partnerDashboard.kpi.pending_payments'),
-        value: 3,
-        meta: t('partnerDashboard.kpi_meta.pending_payments'),
-        cls: 'text-red-600',
-      },
-    ],
-    [t]
-  );
-
-  const items = SEED_APPS;
-  const totalNotifications = items.reduce(
-    (s, it) => s + (it.notifications || 0),
-    0
-  );
-
   return (
     <>
       {/* Header */}
@@ -235,9 +195,6 @@ export default function DistributorDashboard() {
                 </tbody>
               </table>
             </div>
-          </section>
-        </main>
-
         <footer className="p-6 text-center text-gray-500 text-sm">
           © {new Date().getFullYear()} HomeCareDN
         </footer>

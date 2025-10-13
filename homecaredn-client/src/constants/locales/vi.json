@@ -419,7 +419,12 @@
     "noteToOwner": "Ghi chú cho chủ dự án",
     "notePlaceholder": "Phạm vi công việc, bảo hành, cam kết tiến độ...",
     "viewAttachment": "Xem tệp đính kèm {{index}}",
-    "serviceRequestNotFound": "Không tìm thấy yêu cầu dịch vụ"
+    "serviceRequestNotFound": "Không tìm thấy yêu cầu dịch vụ",
+    "yourBid": "Giá bạn chào",
+    "appliedTitle": "Bạn đã ứng tuyển",
+    "yourNote": "Ghi chú của bạn cho khách hàng",
+    "yourImages": "Hình ảnh của bạn",
+    "deleteApplication": "Xóa đơn ứng tuyển"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -903,6 +908,10 @@
     "DeleteImageModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteApplicationModal":{
+      "title": "Bạn có chắc chắn?",
+      "text":"Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
     }
   },
   "ERROR": {
@@ -967,7 +976,12 @@
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
     "DELETE_ERROR": "Đã có lỗi xảy ra khi xóa. Vui lòng thử lại sau.",
-    "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau."
+    "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
+
+    "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả"
+
+
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -990,7 +1004,10 @@
     "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
-    "APPROVE": "Đã phê duyệt thành công yêu cầu"
+    "APPROVE": "Đã phê duyệt thành công yêu cầu",
+    "DELETE_APPLICATION":"Đã xóa thành công đơn ứng tuyển của bạn",
+    "APPICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
+
   },
   "roles": {
     "Distributor": "Nhà phân phối",

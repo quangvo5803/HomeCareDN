@@ -325,7 +325,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
-
+      "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
       "estimateInWord": "By word: ",
@@ -420,7 +420,12 @@
     "noteToOwner": "Message to the customer",
     "notePlaceholder": "Scope, warranty, timeline commitment...",
     "viewAttachment": "View attachment {{index}}",
-    "serviceRequestNotFound": "Service request not found"
+    "serviceRequestNotFound": "Service request not found",
+    "yourBid":"Your Bid",
+    "appliedTitle": "Applied title",
+    "yourNote": "Your note for customer",
+    "yourImages": "Your Images",
+    "deleteApplication": "Delete Application"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -908,6 +913,10 @@
     "DeleteImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
+    },
+    "DeleteApplicationModal":{
+      "title": "Are you sure?",
+      "text":"This application will be gone forever"
     }
   },
   "ERROR": {
@@ -971,7 +980,10 @@
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
     "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
     "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
-    "UPDATE_ERROR": "An error occurred while updating. Please try again later."
+    "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
+
+    "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description"
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -994,7 +1006,9 @@
     "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
     "REJECT": "Request successfully rejected",
-    "APPROVE": "Request successfully approved"
+    "APPROVE": "Request successfully approved",
+    "DELETE_APPLICATION":"Delete Application Successful",
+    "APPICATION_CREATE": "Create Application Successful"
   },
   "roles": {
     "Distributor": "Distributor",
