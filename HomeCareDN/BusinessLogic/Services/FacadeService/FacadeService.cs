@@ -25,7 +25,8 @@ namespace BusinessLogic.Services.FacadeService
             ServiceRequestService = new ServiceRequestService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
-                coreDeps.AuthorizeDbContext
+                coreDeps.AuthorizeDbContext,
+                coreDeps.UserManager
             );
 
             MaterialService = new MaterialService(

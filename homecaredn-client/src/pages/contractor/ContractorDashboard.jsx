@@ -1,7 +1,94 @@
 import { useTranslation } from 'react-i18next';
+import MenuList from '../../components/partner/MenuList';
+import AvatarMenu from '../../components/AvatarMenu';
+import LanguageSwitch from '../../components/LanguageSwitch';
+import NotificationBell from '../../components/NotificationBell';
+import { formatVND, formatDate } from '../../utils/formatters';
+import StatusBadge from '../../components/StatusBadge';
 
-export default function ContractorDashboard() {
-  const { t } = useTranslation();
+/* ========= Seed data (5 items) ========= */
+const SEED_APPS = [
+  {
+    id: 'APP-2025-0001',
+    description: 'Electrical repair — replace breaker',
+    estimatePrice: 1800000,
+    createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+    status: 'Pending',
+    notifications: 2,
+  },
+  {
+    id: 'APP-2025-0002',
+    description: 'Paint 60m² apartment (materials included)',
+    estimatePrice: 9200000,
+    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+    status: 'Approved',
+    notifications: 0,
+  },
+  {
+    id: 'APP-2025-0003',
+    description: 'Plumbing leak fix — kitchen sink',
+    estimatePrice: 1500000,
+    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+    status: 'Pending',
+    notifications: 1,
+  },
+  {
+    id: 'APP-2025-0004',
+    description: 'AC installation (1.5HP) — Binh Thanh',
+    estimatePrice: 6500000,
+    createdAt: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(),
+    status: 'Approved',
+    notifications: 3,
+  },
+  {
+    id: 'APP-2025-0005',
+    description: 'Socket replacement — 4 rooms',
+    estimatePrice: 1200000,
+    createdAt: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
+    status: 'Rejected',
+    notifications: 0,
+  },
+];
+
+export default function DistributorDashboard() {
+  const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
+  const kpis = useMemo(
+    () => [
+      {
+        label: t('partnerDashboard.kpi.open_requests'),
+        value: 8,
+        meta: t('partnerDashboard.kpi_meta.open_requests'),
+        cls: 'text-green-600',
+      },
+      {
+        label: t('partnerDashboard.kpi.applied'),
+        value: 14,
+        meta: t('partnerDashboard.kpi_meta.applied'),
+        cls: 'text-gray-600',
+      },
+      {
+        label: t('partnerDashboard.kpi.won'),
+        value: 5,
+        meta: t('partnerDashboard.kpi_meta.won'),
+        cls: 'text-green-600',
+      },
+      {
+        label: t('partnerDashboard.kpi.pending_payments'),
+        value: 3,
+        meta: t('partnerDashboard.kpi_meta.pending_payments'),
+        cls: 'text-red-600',
+      },
+    ],
+    [t]
+  );
+
+  const items = SEED_APPS;
+  const totalNotifications = items.reduce(
+    (s, it) => s + (it.notifications || 0),
+    0
+  );
 
   return (
     <>
@@ -83,95 +170,77 @@ export default function ContractorDashboard() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('partnerDashboard.id')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('partnerDashboard.description')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('partnerDashboard.estimate')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('partnerDashboard.status')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('partnerDashboard.action')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {/* Sample Data */}
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  APP-2025-0001
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Electrical repair – replace breaker
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  1.800.000 ₫
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                    {t('partnerDashboard.pending')}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800">
-                    {t('partnerDashboard.view')}
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  APP-2025-0002
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Paint 60m² apartment (materials included)
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  9.200.000 ₫
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    {t('partnerDashboard.approved')}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800">
-                    {t('partnerDashboard.view')}
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  APP-2025-0003
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  Plumbing leak fix – kitchen sink
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  1.500.000 ₫
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                    {t('partnerDashboard.pending')}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800">
-                    {t('partnerDashboard.view')}
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-xs text-gray-500">
+                  <tr className="border-b">
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.id')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.description')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.estimate')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.last_update')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.notifications')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.status')}
+                    </th>
+                    <th className="py-2 px-3 text-left">
+                      {t('partnerDashboard.action')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SEED_APPS.map((app) => (
+                    <tr key={app.id} className="border-b hover:bg-gray-50">
+                      <td className="py-3 px-3">{app.id}</td>
+                      <td className="py-3 px-3">{app.description}</td>
+                      <td className="py-3 px-3">
+                        {formatVND(app.estimatePrice)}
+                      </td>
+                      <td className="py-3 px-3">
+                        {formatDate(app.createdAt, i18n.language)}
+                      </td>
+                      <td className="py-3 px-3">
+                        {app.notifications > 0 ? (
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-red-200 text-red-700">
+                            {app.notifications}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-1000">
+                            0
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-3 px-3">
+                        <StatusBadge status={app.status} />
+                      </td>
+                      <td className="py-3 px-3">
+                        <button
+                          onClick={() => navigate(`/applications/${app.id}`)}
+                          className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
+                        >
+                          {t('partnerDashboard.view')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </main>
+
+        <footer className="p-6 text-center text-gray-500 text-sm">
+          © {new Date().getFullYear()} HomeCareDN
+        </footer>
       </div>
     </>
   );
