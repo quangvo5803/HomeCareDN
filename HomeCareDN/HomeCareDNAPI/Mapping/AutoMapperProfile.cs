@@ -47,7 +47,8 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<CreateAddressDto, Address>();
             CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
                 .ForMember(d => d.Images, opt => opt.Ignore());
-
+            CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
@@ -141,6 +142,7 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
+
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(
