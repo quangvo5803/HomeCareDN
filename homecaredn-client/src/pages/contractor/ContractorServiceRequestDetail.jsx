@@ -32,30 +32,24 @@ export default function ContractorServiceRequestDetail() {
   useEffect(() => { 
     const loadData = async () => { 
       if (!serviceRequestId || !user?.id) return; 
-
       try { 
         setIsChecking(true); 
-        
         const serviceRequestData = await getServiceRequestById(serviceRequestId); 
-
         setServiceRequest(serviceRequestData); 
-
         const existingApplicationData = await contractorApplicationService.getApplication({
           ServiceRequestID: serviceRequestId,
           ContractorID: user.id,
         });
-
         setExistingApplication(existingApplicationData); 
-
       } catch (error) { 
         toast.error(t(handleApiError(error)));
       } finally { 
         setIsChecking(false); 
       } 
     }; 
-
     loadData(); 
   }, [serviceRequestId, getServiceRequestById, user, t]); 
+
   useEffect(() => {
     if (!serviceRequest) return;
     const vb = new VenoBox({ selector: '.venobox' });
@@ -117,7 +111,6 @@ export default function ContractorServiceRequestDetail() {
   
   const handleDeleteApplication = () => { 
     if (!existingApplication) return; 
-    
     showDeleteModal({ 
       t, 
       titleKey: 'ModalPopup.DeleteApplicationModal.title', 
@@ -179,182 +172,298 @@ export default function ContractorServiceRequestDetail() {
   }; 
 
   if (loading || isChecking) return <Loading />; 
-  if (!serviceRequest) return <div>{t('contractorServiceRequestDetail.serviceRequestNotFound')}</div>; 
+  if (!serviceRequest) return <div className="px-4 py-8 text-center text-gray-600">{t('contractorServiceRequestDetail.serviceRequestNotFound')}</div>; 
   if (uploadProgress > 0) return <Loading message={`${t('createServiceRequest.uploading')} ${uploadProgress}%`} />; 
 
+  const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
+  const totalArea = baseArea * (serviceRequest?.floors ?? 1);
+  const unitPrice =
+    totalArea > 0 && serviceRequest?.estimatePrice ? Math.round(serviceRequest.estimatePrice / totalArea) : null;
+
+  const addressText = [
+    serviceRequest?.address?.detail,
+    serviceRequest?.address?.ward,
+    serviceRequest?.address?.district,
+    serviceRequest?.address?.city,
+  ].filter(Boolean).join(', ');
 
   return ( 
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"> 
-      <div className="mb-3"> 
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6"> 
+      {/* Top bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <button 
           onClick={() => navigate('/Contractor/service-requests')} 
           className="inline-flex items-center px-3 py-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors" 
         > 
           <i className="fas fa-arrow-left mr-2" /> 
           {t('contractorServiceRequestDetail.backToList')} 
-        </button> 
-      </div> 
+        </button>
+      </div>
 
-      <div className="mb-6"> 
-        <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center"> 
-          <span className="inline-flex items-center justify-center gap-3"> 
-            <i className="fas fa-clipboard-list text-orange-600" /> 
-            {t('contractorServiceRequestDetail.title')} 
-          </span> 
-        </h1> 
-      </div> 
+     {/* HERO SUMMARY */}
+      <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600">
+        <div className="px-6 py-6 sm:px-8 sm:py-8 text-white">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold inline-flex items-center gap-3 justify-center">
+              <i className="fas fa-clipboard-list opacity-90" />
+              {t('contractorServiceRequestDetail.title')}
+            </h1>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8"> 
-        {/* LEFT: Details*/} 
-        <div className="lg:col-span-8"> 
-          <div className="bg-white rounded-lg shadow-lg overflow-hidden"> 
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-4"> 
-              <div className="flex justify-between items-start text-white"> 
-                <div className="inline-flex items-center gap-2"> 
-                  <i className="fas fa-wrench" /> 
-                  <h2 className="text-xl font-semibold"> 
-                    {t(`Enums.ServiceType.${serviceRequest.serviceType}`)} 
-                  </h2> 
-                </div> 
-              </div> 
-            </div> 
-            <div className="p-6"> 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"> 
+
+      {/* BODY */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6"> 
+        {/* LEFT: Details */} 
+        <div className="lg:col-span-8 space-y-6"> 
+          {/* Specs card */}
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
+            <div className="px-6 py-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> 
                 <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                    <i className="fas fa-screwdriver-wrench mr-2" /> 
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                    <i className="fas fa-screwdriver-wrench mr-2 text-gray-400" /> 
                     {t('contractorServiceRequestDetail.serviceType')} 
                   </label> 
-                  <p className="text-gray-900">{t(`Enums.ServiceType.${serviceRequest.serviceType}`)}</p> 
+                  <p className="text-gray-900 font-medium">{t(`Enums.ServiceType.${serviceRequest.serviceType}`)}</p> 
                 </div> 
                 <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                    <i className="fas fa-box-open mr-2" /> 
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                    <i className="fas fa-box-open mr-2 text-gray-400" /> 
                     {t('contractorServiceRequestDetail.packageOption')} 
                   </label> 
-                  <p className="text-gray-900">{t(`Enums.PackageOption.${serviceRequest.packageOption}`)}</p> 
+                  <p className="text-gray-900 font-medium">{t(`Enums.PackageOption.${serviceRequest.packageOption}`)}</p> 
                 </div> 
                 <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                    <i className="fas fa-building mr-2" /> 
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                    <i className="fas fa-building mr-2 text-gray-400" /> 
                     {t('contractorServiceRequestDetail.buildingType')} 
                   </label> 
-                  <p className="text-gray-900">{t(`Enums.BuildingType.${serviceRequest.buildingType}`)}</p> 
+                  <p className="text-gray-900 font-medium">{t(`Enums.BuildingType.${serviceRequest.buildingType}`)}</p> 
                 </div> 
                 <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                    <i className="fas fa-cubes mr-2" /> 
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                    <i className="fas fa-cubes mr-2 text-gray-400" /> 
                     {t('contractorServiceRequestDetail.structureType')} 
                   </label> 
-                  <p className="text-gray-900">{t(`Enums.MainStructure.${serviceRequest.mainStructureType}`)}</p> 
+                  <p className="text-gray-900 font-medium">{t(`Enums.MainStructure.${serviceRequest.mainStructureType}`)}</p> 
                 </div> 
                 {serviceRequest.designStyle && ( 
                   <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-palette mr-2" /> 
+                    <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                      <i className="fas fa-palette mr-2 text-gray-400" /> 
                       {t('contractorServiceRequestDetail.designStyle')} 
                     </label> 
-                    <p className="text-gray-900">{t(`Enums.DesignStyle.${serviceRequest.designStyle}`)}</p> 
+                    <p className="text-gray-900 font-medium">{t(`Enums.DesignStyle.${serviceRequest.designStyle}`)}</p> 
                   </div> 
                 )} 
                 <div> 
-                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                    <i className="fas fa-th-large mr-2" /> 
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1"> 
+                    <i className="fas fa-th-large mr-2 text-gray-400" /> 
                     {t('contractorServiceRequestDetail.floors')} 
                   </label> 
-                  <p className="text-gray-900"> 
+                  <p className="text-gray-900 font-medium"> 
                     {serviceRequest.floors} {t('contractorServiceRequestDetail.floorsUnit')} 
                   </p> 
                 </div> 
               </div> 
-              <div className="bg-gray-50 rounded-lg p-4 mb-6"> 
+            </div>
+          </div>
+
+          {/* Dimensions & Estimate row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Dimensions */}
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200"> 
+              <div className="px-6 py-5"> 
                 <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                  <i className="fas fa-ruler-combined" /> 
+                  <i className="fas fa-ruler-combined text-gray-500" /> 
                   {t('contractorServiceRequestDetail.dimensions')} 
                 </h3> 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4"> 
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4"> 
                   <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-arrows-alt-h mr-2" /> 
+                    <label className="block text-sm font-medium text-gray-600 mb-1"> 
+                      <i className="fas fa-arrows-alt-h mr-2 text-gray-400" /> 
                       {t('contractorServiceRequestDetail.width')} 
                     </label> 
                     <p className="text-gray-900">{serviceRequest.width} m</p> 
                   </div> 
                   <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-arrows-alt-v mr-2" /> 
+                    <label className="block text-sm font-medium text-gray-600 mb-1"> 
+                      <i className="fas fa-arrows-alt-v mr-2 text-gray-400" /> 
                       {t('contractorServiceRequestDetail.length')} 
                     </label> 
                     <p className="text-gray-900">{serviceRequest.length} m</p> 
                   </div> 
                   <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-expand-arrows-alt mr-2" /> 
+                    <label className="block text-sm font-medium text-gray-600 mb-1"> 
+                      <i className="fas fa-expand-arrows-alt mr-2 text-gray-400" /> 
                       {t('contractorServiceRequestDetail.totalArea')} 
                     </label> 
                     <p className="text-xl font-bold text-orange-600"> 
-                      {serviceRequest.width * serviceRequest.length * serviceRequest.floors} m² 
+                      {totalArea} m² 
                     </p> 
                   </div> 
                 </div> 
               </div> 
-              {serviceRequest.estimatePrice && ( 
-                <div className="bg-orange-50 rounded-lg p-4 mb-6"> 
+            </div> 
+
+            {/* Estimate */}
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-orange-200"> 
+              <div className="px-6 py-5"> 
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
+                  <i className="fas fa-dollar-sign text-orange-500" /> 
+                  {t('contractorServiceRequestDetail.estimatePrice')} 
+                </h3> 
+                <p className="text-2xl font-bold text-orange-600 mb-1"> 
+                  {serviceRequest.estimatePrice ? formatVND(serviceRequest.estimatePrice) : '—'} 
+                </p> 
+                {serviceRequest.estimatePrice && (
+                  <>
+                    <p className="text-sm text-gray-600 mb-1">{numberToWordsByLang(serviceRequest.estimatePrice)}</p>
+                    <p className="text-sm text-gray-700">
+                      {unitPrice ? `${formatVND(unitPrice)} / m²` : ''}
+                    </p>
+                  </>
+                )}
+              </div> 
+            </div> 
+          </div>
+
+          {/* Address & Description row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Address */}
+            {serviceRequest.address && ( 
+              <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200"> 
+                <div className="px-6 py-5"> 
                   <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                    <i className="fas fa-dollar-sign" /> 
-                    {t('contractorServiceRequestDetail.estimatePrice')} 
-                  </h3> 
-                  <p className="text-2xl font-bold text-orange-600 mb-2"> 
-                    {formatVND(serviceRequest.estimatePrice)} 
-                  </p> 
-                  <p className="text-sm text-gray-600"> 
-                    {numberToWordsByLang(serviceRequest.estimatePrice)} 
-                  </p> 
-                </div> 
-              )} 
-              {serviceRequest.address && ( 
-                <div className="mb-6"> 
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                    <i className="fas fa-map-marker-alt" /> 
+                    <i className="fas fa-map-marker-alt text-gray-500" /> 
                     {t('contractorServiceRequestDetail.address')} 
                   </h3> 
-                  <div className="bg-gray-50 rounded-lg p-4"> 
-                    <p className="text-gray-900"> 
-                      {serviceRequest.address.detail}, {serviceRequest.address.ward}, 
-                      {serviceRequest.address.district}, {serviceRequest.address.city} 
-                    </p> 
-                  </div> 
-                </div> 
-              )} 
-              <div className="mb-2"> 
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                  <i className="fas fa-align-left" /> 
-                  {t('contractorServiceRequestDetail.description')} 
-                </h3> 
-                <div className="bg-gray-50 rounded-lg p-4"> 
-                  <p className="text-gray-700 whitespace-pre-wrap"> 
-                    {serviceRequest.description} 
-                  </p> 
+                  <p className="text-gray-900" title={addressText}>{addressText}</p>
                 </div> 
               </div> 
-              {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && ( 
-                <div className="mt-6"> 
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                    <i className="fas fa-images" /> 
-                    {t('contractorServiceRequestDetail.images')} 
-                  </h3> 
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {serviceRequest.imageUrls.map((imageUrl) => (
+            )} 
+
+            {/* Description */}
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200"> 
+              <div className="px-6 py-5"> 
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
+                  <i className="fas fa-align-left text-gray-500" /> 
+                  {t('contractorServiceRequestDetail.description')} 
+                </h3> 
+                <p className="text-gray-700 whitespace-pre-wrap"> 
+                  {serviceRequest.description} 
+                </p> 
+              </div> 
+            </div>
+          </div>
+
+          {/* Images */}
+          {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && ( 
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200"> 
+              <div className="px-6 py-5"> 
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
+                  <i className="fas fa-images text-gray-500" /> 
+                  {t('contractorServiceRequestDetail.images')} 
+                </h3> 
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {serviceRequest.imageUrls.map((imageUrl) => (
+                    <a
+                      key={imageUrl}
+                      href={imageUrl}
+                      className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
+                      data-gall="service-request-gallery"
+                      aria-label={`${t('contractorServiceRequestDetail.viewFullSize')} - ${t('contractorServiceRequestDetail.serviceRequestImage')}`}
+                      title={t('contractorServiceRequestDetail.viewFullSize')}
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={t('contractorServiceRequestDetail.serviceRequestImage')}
+                        className="w-full h-full object-contain bg-white p-1 group-hover:scale-105 transition-transform"
+                      />
+                    </a>
+                  ))}
+                </div>
+              </div> 
+            </div> 
+          )} 
+
+          {/* Status */}
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200"> 
+            <div className="px-6 py-5"> 
+              <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
+                <i className="fas fa-info-circle text-gray-500" /> 
+                {t('contractorServiceRequestDetail.applicationStatus')} 
+              </h3> 
+              <div className={`rounded-lg p-4 ring-1 ${serviceRequest.isOpen ? 'bg-green-50 ring-green-200' : 'bg-gray-50 ring-gray-200'}`}> 
+                <div className="flex items-center space-x-2"> 
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${serviceRequest.isOpen ? 'bg-green-500' : 'bg-gray-400'}`} /> 
+                  <span className="text-gray-800 font-medium"> 
+                    {serviceRequest.isOpen ? t('contractorServiceRequestDetail.statusOpen') : t('contractorServiceRequestDetail.statusClosed')} 
+                  </span> 
+                </div> 
+              </div> 
+            </div> 
+          </div> 
+        </div> 
+
+        {/* RIGHT: Apply Form or Applied Details */} 
+        <div className="lg:col-span-4"> 
+          {existingApplication ? ( 
+            // Applied
+            <div className="bg-white rounded-2xl shadow-lg ring-1 ring-blue-200 p-6 lg:sticky lg:top-24 space-y-5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2 text-blue-600"> 
+                  <i className="fas fa-check-circle" /> 
+                  {t('contractorServiceRequestDetail.appliedTitle')} 
+                </h3>
+                <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs bg-blue-50 text-blue-700 ring-1 ring-blue-200">
+                  <i className="fas fa-paper-plane" />
+                  {t('BUTTON.View')}
+                </span>
+              </div>
+
+              <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  <i className="fas fa-coins mr-2" />
+                  {t('contractorServiceRequestDetail.yourBid')}
+                </label>
+                <p className="text-lg font-bold text-gray-900">{formatVND(existingApplication.estimatePrice)}</p>
+              </div>
+
+              <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
+                <label className="block text-sm font-medium text-gray-600 mb-2">
+                  <i className="fas fa-comment-alt mr-2" />
+                  {t('contractorServiceRequestDetail.yourNote')}
+                </label>
+                <p className="text-gray-700 bg-white p-3 rounded-md whitespace-pre-wrap ring-1 ring-gray-200">
+                  {existingApplication.description}
+                </p>
+              </div>
+
+              {existingApplication.imageUrls && existingApplication.imageUrls.length > 0 && (
+                <div> 
+                  <div className="flex items-center justify-between mb-2"> 
+                    <label className="block text-sm font-medium text-gray-600">
+                      <i className="fas fa-images mr-2" />
+                      {t('contractorServiceRequestDetail.yourImages')}
+                    </label> 
+                    <span className="text-xs text-gray-500">{existingApplication.imageUrls.length} ảnh</span>
+                  </div> 
+                  <div className="grid grid-cols-3 gap-2">
+                    {existingApplication.imageUrls.map((url) => (
                       <a
-                        key={imageUrl}
-                        href={imageUrl}
-                        className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500"
-                        data-gall="service-request-gallery"
-                        aria-label={`${t('contractorServiceRequestDetail.viewFullSize')} - ${t('contractorServiceRequestDetail.serviceRequestImage')}`}
+                        key={url}
+                        href={url}
+                        className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-gray-200 bg-white p-1"
+                        data-gall="application-gallery"
+                        aria-label={t('contractorServiceRequestDetail.appliedImage')}
+                        title={t('contractorServiceRequestDetail.viewFullSize')}
                       >
                         <img
-                          src={imageUrl}
-                          alt={t('contractorServiceRequestDetail.serviceRequestImage')}
+                          src={url}
+                          alt={t('contractorServiceRequestDetail.appliedImage')}
                           className="w-full h-full object-contain bg-white p-1 group-hover:scale-105 transition-transform"
                         />
                       </a>
@@ -362,85 +471,37 @@ export default function ContractorServiceRequestDetail() {
                   </div>
                 </div> 
               )} 
-              <div className="mt-6"> 
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2"> 
-                  <i className="fas fa-info-circle" /> 
-                  {t('contractorServiceRequestDetail.applicationStatus')} 
-                </h3> 
-                <div className={`rounded-lg p-4 ring-1 ${serviceRequest.isOpen ? 'bg-green-50 ring-green-200' : 'bg-gray-50 ring-gray-200'}`}> 
-                  <div className="flex items-center space-x-2"> 
-                    <span className={`inline-block w-2.5 h-2.5 rounded-full ${serviceRequest.isOpen ? 'bg-green-500' : 'bg-gray-400'}`} /> 
-                    <span className="text-gray-800 font-medium"> 
-                      {serviceRequest.isOpen ? t('contractorServiceRequestDetail.statusOpen') : t('contractorServiceRequestDetail.statusClosed')} 
-                    </span> 
-                  </div> 
-                </div> 
+
+              <div className="pt-4 border-t border-gray-200"> 
+                <button onClick={handleDeleteApplication} className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"> 
+                  <i className="fas fa-trash-alt" /> 
+                  {t('contractorServiceRequestDetail.deleteApplication')} 
+                </button> 
+                <p className="mt-3 text-xs text-gray-500 text-center">
+                  <i className="fas fa-info-circle mr-1" />
+                  {t('contractorServiceRequestDetail.statusOpen')}? {t('contractorServiceRequestDetail.applyFormTitle')}
+                </p>
               </div> 
             </div> 
-          </div> 
-        </div> 
+          ) : ( 
+            // Apply form
+            <div className="bg-white rounded-2xl shadow-lg ring-1 ring-gray-200 p-6 lg:sticky lg:top-24">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2"> 
+                <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-green-50 ring-4 ring-green-100">
+                  <i className="fas fa-clipboard-list text-green-600" />
+                </span>
+                {t('contractorServiceRequestDetail.applyFormTitle')} 
+              </h3> 
 
-          {/* RIGHT: Apply Form or Applied Details */} 
-          <div className="lg:col-span-4"> 
-            {existingApplication ? ( 
-              // UI Applied 
-              <div className="bg-white rounded-lg shadow-lg ring-1 ring-blue-200 p-6 lg:sticky lg:top-24"> 
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2 text-blue-600"> 
-                  <i className="fas fa-check-circle" /> 
-                  {t('contractorServiceRequestDetail.appliedTitle')} 
-                </h3> 
-                <div className="space-y-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-500"><i className="fas fa-coins mr-2" />{t('contractorServiceRequestDetail.yourBid')}</label> 
-                    <p className="text-lg font-bold text-gray-800">{formatVND(existingApplication.estimatePrice)}</p> 
-                  </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-500"><i className="fas fa-comment-alt mr-2" />{t('contractorServiceRequestDetail.yourNote')}</label> 
-                    <p className="text-gray-700 bg-gray-50 p-3 rounded-md whitespace-pre-wrap">{existingApplication.description}</p> 
-                  </div> 
-                  {existingApplication.imageUrls && existingApplication.imageUrls.length > 0 && ( 
-                    <div> 
-                      <label className="block text-sm font-medium text-gray-500 mb-2"><i className="fas fa-images mr-2" />{t('contractorServiceRequestDetail.yourImages')}</label> 
-                    <div className="grid grid-cols-3 gap-2">
-                          {existingApplication.imageUrls.map((url) => (
-                            <a
-                              key={url}
-                              href={url}
-                              className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white p-1"
-                              data-gall="application-gallery"
-                              aria-label={t('contractorServiceRequestDetail.appliedImage')}
-                            >
-                              <img
-                                src={url}
-                                alt={t('contractorServiceRequestDetail.appliedImage')}
-                                className="w-full h-full object-contain bg-white p-1 group-hover:scale-105 transition-transform"
-                              />
-                            </a>
-                          ))}
-                      </div>
-                    </div> 
-                  )} 
-                  <div className="pt-4 border-t border-gray-200"> 
-                    <button onClick={handleDeleteApplication} className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"> 
-                      <i className="fas fa-trash-alt" /> 
-                      {t('contractorServiceRequestDetail.deleteApplication')} 
-                    </button> 
-                  </div> 
-                </div> 
-              </div> 
-            ) : ( 
-              // UI Not Apply 
-              <div className="bg-white rounded-lg shadow-lg ring-1 ring-gray-200 p-6 lg:sticky lg:top-24"> 
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2"> 
-                  <i className="fas fa-clipboard-list" /> 
-                  {t('contractorServiceRequestDetail.applyFormTitle')} 
-                </h3> 
-                <form onSubmit={handleSubmit} className="space-y-4"> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-coins mr-2" /> 
-                      {t('contractorServiceRequestDetail.bidPrice')} 
-                    </label> 
+              <form onSubmit={handleSubmit} className="space-y-5"> 
+                {/* Bid price */} 
+                <div> 
+                  <label className="block text-sm font-medium text-gray-700 mb-1"> 
+                    <i className="fas fa-coins mr-2 text-gray-500" /> 
+                    {t('contractorServiceRequestDetail.bidPrice')} 
+                  </label> 
+                  <div className="relative"> 
+                    <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">₫</span>
                     <input 
                       type="number" 
                       min="0" 
@@ -452,114 +513,128 @@ export default function ContractorServiceRequestDetail() {
                           : t('contractorServiceRequestDetail.bidPricePlaceholder') 
                       } 
                       aria-label={t('contractorServiceRequestDetail.bidPrice')} 
-                      className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                      className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 pl-7 pr-14" 
                     /> 
-                    {serviceRequest.estimatePrice && ( 
-                      <p className="mt-1 text-xs text-gray-500"> 
-                        {numberToWordsByLang(serviceRequest.estimatePrice)} 
-                      </p> 
-                    )} 
+                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400 text-xs">VND</span>
                   </div> 
-                  <div> 
-                    <label className="block text-sm font-medium text-gray-700 mb-1"> 
-                      <i className="fas fa-comment-alt mr-2" /> 
+                  {serviceRequest.estimatePrice && ( 
+                    <p className="mt-1 text-xs text-gray-500"> 
+                      {numberToWordsByLang(serviceRequest.estimatePrice)} 
+                    </p> 
+                  )} 
+                </div> 
+
+                {/* Note */} 
+                <div> 
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-sm font-medium text-gray-700"> 
+                      <i className="fas fa-comment-alt mr-2 text-gray-500" /> 
                       {t('contractorServiceRequestDetail.noteToOwner')} 
                     </label> 
-                    <textarea 
-                      rows={4} 
-                      value={description} 
-                      onChange={(e) => setDescription(e.target.value)} 
-                      placeholder={t('contractorServiceRequestDetail.notePlaceholder')} 
-                      aria-label={t('contractorServiceRequestDetail.noteToOwner')} 
-                      className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
-                    /> 
-                  </div> 
-                  
-                  <div className="space-y-4 lg:col-span-2"> 
-                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2"> 
+                    <span className="text-xs text-gray-400">{description.length} chars</span>
+                  </div>
+                  <textarea 
+                    rows={4} 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    placeholder={t('contractorServiceRequestDetail.notePlaceholder')} 
+                    aria-label={t('contractorServiceRequestDetail.noteToOwner')} 
+                    className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500" 
+                  /> 
+                </div> 
+                
+                {/* Images */} 
+                <div className="space-y-3 lg:col-span-2"> 
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-sm font-medium text-gray-700"> 
                       <i className="fas fa-images text-orange-500 mr-2"></i> 
                       {t('userPage.createServiceRequest.form_images')} 
-                    </label> 
+                    </label>
+                    <span className="text-xs text-gray-500">{images.length}/5</span>
+                  </div>
 
-                    <div className="relative"> 
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple 
-                        onChange={handleImageChange} 
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                      /> 
-                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer"> 
-                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4"> 
-                          <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i> 
-                        </div> 
-                        <p className="text-gray-600 text-center mb-2"> 
-                          <span className="font-semibold text-orange-600"> 
-                            {i18n.language === 'vi' 
-                              ? 'Bấm để tải lên' 
-                              : 'Click to upload'} 
-                          </span>{' '} 
-                          {i18n.language === 'vi' 
-                            ? 'hoặc kéo và thả' 
-                            : 'or drag and drop'} 
-                        </p> 
-                        <p className="text-sm text-gray-400"> 
-                          {i18n.language === 'vi' 
-                            ? 'PNG, JPG, GIF tối đa 5MB mỗi file' 
-                            : 'PNG, JPG, GIF up to 5MB each'} 
-                        </p> 
+                  <div className="relative"> 
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      multiple 
+                      onChange={handleImageChange} 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                      aria-label="Upload images"
+                    /> 
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer"> 
+                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4"> 
+                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i> 
                       </div> 
+                      <p className="text-gray-600 text-center mb-2"> 
+                        <span className="font-semibold text-orange-600"> 
+                          {i18n.language === 'vi' ? 'Bấm để tải lên' : 'Click to upload'} 
+                        </span>{' '} 
+                        {i18n.language === 'vi' ? 'hoặc kéo và thả' : 'or drag and drop'} 
+                      </p> 
+                      <p className="text-sm text-gray-400"> 
+                        {i18n.language === 'vi' ? 'PNG, JPG, GIF tối đa 5MB mỗi file' : 'PNG, JPG, GIF up to 5MB each'} 
+                      </p> 
                     </div> 
+                  </div> 
 
-                    {images.length > 0 && ( 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"> 
-                        {images.map((img, idx) => ( 
-                          <div 
-                            key={img.url} 
-                            className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors" 
-                          > 
-                            <img 
-                              src={img.url} 
-                              alt={`Preview ${idx + 1}`} 
-                              className="w-full h-full object-contain bg-white p-1" 
-                            /> 
-                            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"> 
-                              <button 
-                                type="button" 
-                                onClick={() => handleRemoveImage(img)} 
-                                className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors" 
-                              > 
-                                <i className="fas fa-trash-alt text-sm"></i> 
-                              </button> 
-                            </div> 
-                            {img.isNew && ( 
-                              <div className="absolute top-2 left-2"> 
-                                <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"> 
-                                  {i18n.language === 'vi' ? 'Mới' : 'New'} 
-                                </span> 
-                              </div> 
-                            )} 
+                  {images.length > 0 && ( 
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"> 
+                      {images.map((img, idx) => ( 
+                        <div 
+                          key={img.url} 
+                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200" 
+                        > 
+                          <img 
+                            src={img.url} 
+                            alt={`Preview ${idx + 1}`} 
+                            className="w-full h-full object-contain bg-white p-1" 
+                          /> 
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"> 
+                            <button 
+                              type="button" 
+                              onClick={() => handleRemoveImage(img)} 
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors" 
+                              aria-label="Remove image"
+                            > 
+                              <i className="fas fa-trash-alt text-sm"></i> 
+                            </button> 
                           </div> 
-                        ))} 
-                      </div> 
-                    )} 
-                  </div> 
-                  <div className="pt-2"> 
-                    <button 
-                      type="submit" 
-                      className="w-full px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" 
-                      disabled={!estimatePrice.trim() || !description.trim()} 
-                    > 
-                      <i className="fas fa-paper-plane" /> 
-                      {t('contractorServiceRequestDetail.applyForProject')} 
-                    </button> 
-                  </div> 
-                </form> 
-              </div> 
-            )} 
-          </div> 
+                          {img.isNew && ( 
+                            <div className="absolute top-2 left-2"> 
+                              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"> 
+                                {i18n.language === 'vi' ? 'Mới' : 'New'} 
+                              </span> 
+                            </div> 
+                          )} 
+                        </div> 
+                      ))} 
+                    </div> 
+                  )} 
+                </div> 
+
+                {/* Submit */} 
+                <div className="pt-1"> 
+                  <button 
+                    type="submit" 
+                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" 
+                    disabled={!estimatePrice.trim() || !description.trim()} 
+                  > 
+                    <i className="fas fa-paper-plane" /> 
+                    {t('contractorServiceRequestDetail.applyForProject')} 
+                  </button> 
+                  <p className="mt-3 text-xs text-gray-500 text-center">
+                    <i className="fas fa-shield-alt mr-1" />
+                    {i18n.language === 'vi'
+                      ? 'Thông tin của bạn chỉ được chủ dự án xem.'
+                      : 'Your information is visible only to the project owner.'}
+                  </p>
+                </div> 
+              </form> 
+            </div> 
+          )} 
+        </div> 
       </div> 
     </div> 
   ); 
 }
-
