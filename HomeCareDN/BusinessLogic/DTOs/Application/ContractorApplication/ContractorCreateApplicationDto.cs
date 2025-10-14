@@ -2,7 +2,7 @@
 
 namespace BusinessLogic.DTOs.Application.ContractorApplication
 {
-    public class ContractorApplicationApplyDto
+    public class ContractorCreateApplicationDto
     {
         [Required(ErrorMessage = "REQUIRED_CONTRACTOR_APPLYCATION_ID")]
         public Guid ContractorApplicationID { get; set; }

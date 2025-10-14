@@ -39,25 +39,17 @@ export const contractorApplicationService = {
   },
 
   
-  getApplication: async (serviceRequestId, contractorId) => {
+  getApplication: async (getRequest) => {
     const response = await api.get('/ContractorApplication/get-contractor-application', {
-      params: {
-        serviceRequestId,
-        contractorId,
-      },
+      params: getRequest
     });
     return response.data;
   },
 
 
-  deleteApplication: async (contractorApplicationId, contractorId) => {
+  deleteApplication: async (contractorApplicationId) => {
     const response = await api.delete(
-      `/ContractorApplication/delete-contractor-application/${contractorApplicationId}`,
-      {
-        params: {
-          contractorId,
-        },
-      }
+      `/ContractorApplication/delete-contractor-application/${contractorApplicationId}`
     );
     return response.data;
   },

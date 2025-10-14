@@ -18,40 +18,32 @@ namespace HomeCareDNAPI.Controllers.Contractor
 
         [HttpPost("create-contractor-request")]
         public async Task<IActionResult> CreateApplication(
-            [FromForm] ContractorApplicationApplyDto request
+            [FromForm] ContractorCreateApplicationDto dto
         )
         {
-            var contractor =
+            var request =
                 await _facadeService.ContractorApplicationService.CreateContractorApplicationAsync(
-                    request
+                    dto
                 );
-            return Ok(contractor);
+            return Ok(request);
         }
 
         [HttpGet("get-contractor-application")]
         public async Task<IActionResult> GetByApplication(
-            [FromQuery] Guid serviceRequestId,
-            [FromQuery] Guid contractorId
+            [FromQuery] ContractorGetApplicationDto dto
         )
         {
-            var dto =
+            var request =
                 await _facadeService.ContractorApplicationService.GetApplicationByRequestAndContractorAsync(
-                    serviceRequestId,
-                    contractorId
+                    dto
                 );
-            return Ok(dto);
+            return Ok(request);
         }
 
-        [HttpDelete("delete-contractor-application/{contractorApplicationId:guid}")]
-        public async Task<IActionResult> DeleteAppication(
-            [FromRoute] Guid contractorApplicationId,
-            [FromQuery] Guid contractorId
-        )
+        [HttpDelete("delete-contractor-application/{id:guid}")]
+        public async Task<IActionResult> DeleteAppication(Guid id)
         {
-            await _facadeService.ContractorApplicationService.DeleteContractorApplicationAsync(
-                contractorApplicationId,
-                contractorId
-            );
+            await _facadeService.ContractorApplicationService.DeleteContractorApplicationAsync(id);
             return NoContent();
         }
     }

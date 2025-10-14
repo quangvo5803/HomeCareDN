@@ -21,7 +21,7 @@ export default function ContractorServiceRequestDetail() {
   const { getServiceRequestById, loading, deleteServiceRequestImage } = useServiceRequest(); 
   const [serviceRequest, setServiceRequest] = useState(null); 
   const [existingApplication, setExistingApplication] = useState(null); 
-  const [isChecking, setIsChecking] = useState(true); 
+  const [isChecking, setIsChecking] = useState(false); 
   const [images, setImages] = useState([]); 
   const [description, setDescription] = useState(''); 
   const [estimatePrice, setEstimatePrice] = useState(''); 
@@ -37,14 +37,16 @@ export default function ContractorServiceRequestDetail() {
         const serviceRequestData = await getServiceRequestById(serviceRequestId); 
 
         setServiceRequest(serviceRequestData); 
-        const existingApplicationData = await contractorApplicationService.getApplication(serviceRequestId, user.id); 
+
+        const existingApplicationData = await contractorApplicationService.getApplication({
+          ServiceRequestID: serviceRequestId,
+          ContractorID: user.id,
+        });
+
         setExistingApplication(existingApplicationData); 
+
       } catch (error) { 
-        if (error.response && error.response.status === 404) { 
-          setExistingApplication(null); 
-        } else { 
-          toast.error(t(handleApiError(error))); 
-        } 
+        toast.error(t(handleApiError(error)));
       } finally { 
         setIsChecking(false); 
       } 
@@ -105,7 +107,10 @@ export default function ContractorServiceRequestDetail() {
       await contractorApplicationService.createContractorApplication(payload); 
       toast.success(t('SUCCESS.APPICATION_CREATE')); 
       
-      const appData = await contractorApplicationService.getApplication(serviceRequestId, user.id); 
+      const appData = await contractorApplicationService.getApplication({
+        serviceRequestId: serviceRequestId,
+        contractorId: user.id
+      });
       setExistingApplication(appData); 
 
     } catch(error){ 
@@ -123,7 +128,7 @@ export default function ContractorServiceRequestDetail() {
       textKey: 'ModalPopup.DeleteApplicationModal.text', 
       onConfirm: async () => { 
         try { 
-          await contractorApplicationService.deleteApplication(existingApplication.contractorApplicationID, user.id); 
+          await contractorApplicationService.deleteApplication(existingApplication.contractorApplicationID); 
           Swal.close(); 
           toast.success(t('SUCCESS.DELETE_APPLICATION')); 
           setExistingApplication(null); 

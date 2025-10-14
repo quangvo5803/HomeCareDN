@@ -5,12 +5,12 @@ namespace BusinessLogic.Services.Interfaces
     public interface IContractorApplicationService
     {
         Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
-            ContractorApplicationApplyDto createRequest
+            ContractorCreateApplicationDto createRequest
         );
         Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
-            Guid serviceRequestId,
-            Guid contractorId
+            ContractorGetApplicationDto getRequest
         );
-        Task DeleteContractorApplicationAsync(Guid contractorApplicationId, Guid contractorId);
+
+        Task DeleteContractorApplicationAsync(Guid id);
     }
 }

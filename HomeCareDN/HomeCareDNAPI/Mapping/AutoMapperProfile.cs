@@ -47,7 +47,7 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<CreateAddressDto, Address>();
             CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
                 .ForMember(d => d.Images, opt => opt.Ignore());
-            CreateMap<ContractorApplicationApplyDto, ContractorApplication>()
+            CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
             // ------------------------
             // Update DTO -> Entity (Write)

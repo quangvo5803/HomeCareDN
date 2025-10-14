@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.Services.Interfaces;
-using CloudinaryDotNet;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
@@ -38,7 +37,7 @@ namespace BusinessLogic.Services
         }
 
         public async Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
-            ContractorApplicationApplyDto createRequest
+            ContractorCreateApplicationDto createRequest
         )
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
@@ -112,13 +111,13 @@ namespace BusinessLogic.Services
         }
 
         public async Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
-            Guid serviceRequestId,
-            Guid contractorId
+            ContractorGetApplicationDto getRequest
         )
         {
             var result = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 filter: app =>
-                    app.ServiceRequestID == serviceRequestId && app.ContractorID == contractorId,
+                    app.ServiceRequestID == getRequest.ServiceRequestID
+                    && app.ContractorID == getRequest.ContractorID,
                 includeProperties: "Images"
             );
 
@@ -128,7 +127,7 @@ namespace BusinessLogic.Services
             }
             var dto = _mapper.Map<ContractorApplicationFullDto>(result);
 
-            var contractor = await _userManager.FindByIdAsync(contractorId.ToString());
+            var contractor = await _userManager.FindByIdAsync(getRequest.ContractorID.ToString());
             dto.ContractorEmail = contractor?.Email ?? string.Empty;
             dto.ContractorName = contractor?.FullName ?? string.Empty;
             dto.ContractorPhone = contractor?.PhoneNumber ?? string.Empty;
@@ -136,10 +135,7 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task DeleteContractorApplicationAsync(
-            Guid contractorApplicationId,
-            Guid contractorId
-        )
+        public async Task DeleteContractorApplicationAsync(Guid contractorApplicationId)
         {
             var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
                 ca.ContractorApplicationID == contractorApplicationId
@@ -154,17 +150,8 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            if (application.ContractorID != contractorId)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { APPLICATION, new[] { ERROR_NOT_OWNER } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.ContractorApplicationID == contractorApplicationId
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(img =>
+                img.ContractorApplicationID == contractorApplicationId
             );
             if (images != null && images.Any())
             {
