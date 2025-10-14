@@ -389,9 +389,9 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
   /* --------------------------------- Render --------------------------------- */
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-4 mt-5">
+      <div className="max-w-6xl mx-auto p-3">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 mt-5">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
             {active === 'profile'
               ? t('userPage.profile.title')
@@ -407,7 +407,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
         <div className="grid grid-cols-12 gap-6">
           {/* Navigation - Left Column */}
           <div className="col-span-3">
-            <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
+            <div className="bg-white rounded-lg shadow-md p-4 sticky top-25">
               <nav className="space-y-2">
                 <button
                   onClick={() => setActive('profile')}
@@ -840,9 +840,9 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                 </p>
 
                                 {/* Thông tin chi tiết */}
-                                <div className="grid grid-cols-2 md:grid-cols-2 gap-3 text-sm">
+                                <div className="grid grid-cols-2 md:grid-cols-2 gap-2 text-sm">
                                   <div className="flex items-center gap-2 text-gray-600">
-                                    <i className="fas fa-building mr-1 text-orange-500"></i>
+                                    <i className="fas fa-building text-orange-500"></i>
                                     {t(
                                       `userPage.serviceRequest.label_buildingType`
                                     )}
@@ -853,7 +853,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 text-gray-600">
-                                    <i className="fas fa-cube text-blue-500"></i>
+                                    <i className="fas fa-cube text-orange-500"></i>
                                     {t(
                                       `userPage.serviceRequest.label_mainStructureType`
                                     )}
@@ -864,14 +864,14 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 text-gray-600">
-                                    <i className="fas fa-ruler text-green-500"></i>
+                                    <i className="fas fa-ruler text-orange-500"></i>
                                     {t(`userPage.serviceRequest.label_area`)}
                                     <span className="font-bold">
                                       {req.width}m × {req.length}m
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2 text-gray-600">
-                                    <i className="fas fa-layer-group text-purple-500"></i>
+                                    <i className="fas fa-layer-group text-orange-500"></i>
                                     {t(`userPage.serviceRequest.label_floors`)}
                                     <span className="font-bold">
                                       {req.floors}{' '}
@@ -881,7 +881,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
 
                                 {req.designStyle && (
                                   <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
-                                    <i className="fas fa-palette text-pink-500"></i>
+                                    <i className="fas fa-palette text-orange-500"></i>
                                     {t(
                                       `userPage.serviceRequest.label_designStyle`
                                     )}
@@ -893,7 +893,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                   </div>
                                 )}
                                 <div className="mt-2 flex items-center gap-2 text-sm">
-                                  <i className="fa-solid fa-location-dot"></i>
+                                  <i className="fa-solid fa-location-dot text-orange-500"></i>
                                   {t(`userPage.serviceRequest.label_address`)}
                                   <span className="font-semibold">
                                     {req.address.detail}, {req.address.ward},{' '}
@@ -901,7 +901,7 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                   </span>
                                 </div>
                                 <div className="mt-2 flex items-center gap-2 text-sm">
-                                  <i className="fas fa-money-bill-wave text-emerald-500"></i>
+                                  <i className="fas fa-money-bill-wave text-orange-500"></i>
 
                                   {req.estimatePrice ? (
                                     <span className="text-emerald-600 font-semibold">
@@ -970,18 +970,12 @@ export default function ProfilePage({ defaultTab = 'profile' }) {
                                       } mr-1`}
                                     ></i>
                                     {t(
-                                      `userPage.serviceRequest.label_packageOption`
-                                    )}
-                                    {t(
                                       `Enums.PackageOption.${req.packageOption}`
                                     )}
                                   </span>
                                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                                     <i className="fas fa-users mr-1"></i>
-                                    {req.contractorApplyCount}{' '}
-                                    {t(
-                                      'userPage.serviceRequest.label_contractorApplyCount'
-                                    )}
+                                    {req.contractorApplyCount}
                                   </span>
                                 </div>
 
