@@ -317,9 +317,7 @@ export default function ContractorServiceRequestDetail() {
                   {formatVND(serviceRequest.estimatePrice)} 
                 </p> 
                 {serviceRequest.estimatePrice && (
-                  <>
                     <p className="text-sm text-gray-600 mb-1">{numberToWordsByLang(serviceRequest.estimatePrice)}</p>
-                  </>
                 )}
               </div> 
             </div> 
