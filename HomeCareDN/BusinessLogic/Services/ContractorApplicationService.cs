@@ -135,10 +135,10 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task DeleteContractorApplicationAsync(Guid contractorApplicationId)
+        public async Task DeleteContractorApplicationAsync(Guid id)
         {
             var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
-                ca.ContractorApplicationID == contractorApplicationId
+                ca.ContractorApplicationID == id
             );
 
             if (application == null)
@@ -151,7 +151,7 @@ namespace BusinessLogic.Services
             }
 
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(img =>
-                img.ContractorApplicationID == contractorApplicationId
+                img.ContractorApplicationID == id
             );
             if (images != null && images.Any())
             {
