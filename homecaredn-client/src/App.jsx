@@ -22,7 +22,10 @@ import AdminSupportManager from './pages/admin/AdminSupportManager';
 import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 //Contractor pages
+import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
+import ContractorServiceRequestManager from './pages/contractor/ContractorServiceRequestManager';
+import ContractorServiceRequestDetail from './pages/contractor/ContractorServiceRequestDetail';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
@@ -238,15 +241,22 @@ function Layout() {
             element={<AdminPartnerRequestManager />}
           />
         </Route>
-        {/* Contractor routes */}
-        <Route
-          path="/ContractorDashboard"
-          element={
-            <ProtectedRoute allowedRoles={['Contractor']}>
-              <ContractorDashboard />
-            </ProtectedRoute>
-          }
-        />
+          {/* Contractor routes */}
+          <Route
+            path="/Contractor"
+            element={
+              <ProtectedRoute allowedRoles={['Contractor']}>
+                <ContractorLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ContractorDashboard />} />
+            <Route path="service-requests" element={<ContractorServiceRequestManager />} />
+            <Route path="service-request/:serviceRequestId" element={<ContractorServiceRequestDetail />} />
+            <Route path="my-projects" element={<div>My Projects - Coming Soon</div>} />
+            <Route path="applications" element={<div>Applications - Coming Soon</div>} />
+            <Route path="profile" element={<div>Profile - Coming Soon</div>} />
+          </Route>
         {/* Distributor routes */}
         <Route
           path="/Distributor"
@@ -287,7 +297,7 @@ function getRedirectPath(user) {
     case 'Admin':
       return '/Admin';
     case 'Contractor':
-      return '/ContractorDashboard';
+      return '/Contractor';
     case 'Distributor':
       return '/Distributor';
     default:

@@ -325,7 +325,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
-
+      "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
       "estimateInWord": "By word: ",
@@ -366,7 +366,68 @@
       "noChatFunction": "This feature is available only after you have selected a contractor"
     }
   },
-
+ "contractorServiceRequestManager": {
+    "title": "Service Request Manager",
+    "subtitle": "View and manage available service requests",
+    "noRequest": "No service requests yet",
+    "letStart": "Start by browsing available requests",
+    "serviceRequests": "service requests",
+    "packageOption": "Package Option",
+    "buildingType": "Building Type", 
+    "area": "Area",
+    "estimatePrice": "Estimate Price",
+    "createdAt": "Created",
+    "negotiable": "Negotiable",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "searchPlaceholder": "Search service requests...",
+    "sortDefault": "Default",
+    "sortOldest": "Oldest",
+    "sortNewest": "Newest"
+  },
+  "contractorServiceRequestDetail": {
+    "privacyNotice":"Your information is visible only to the project owner.",
+    "title": "Service Request Details",
+    "dimensions": "Project Dimensions",
+    "totalArea": "Total Area",
+    "applyForProject": "Apply for this Project",
+    "backToList": "Back to List",
+    "serviceType": "Service Type",
+    "packageOption": "Package Option",
+    "buildingType": "Building Type",
+    "structureType": "Structure Type",
+    "designStyle": "Design Style",
+    "floors": "Floors",
+    "floorsUnit": "floors",
+    "width": "Width",
+    "length": "Length", 
+    "estimatePrice": "Estimate Price",
+    "address": "Address",
+    "description": "Description",
+    "images": "Images",
+    "statusOpen": "Open",
+    "statusClosed": "Closed",
+    "applicationStatus": "Application Status",
+    "notAppliedYet": "Not applied yet",
+    "deadline": "Deadline",
+    "availableNow": "Available now",
+    "applyFormTitle": "Apply to this project",
+    "bidPrice": "Bid price (VND)",
+    "bidPricePlaceholder": "e.g., 200,000,000",
+    "bidPricePlaceholderWithEst": "e.g., around {{est}}",
+    "startDate": "Expected start date",
+    "durationDays": "Construction time (days)",
+    "durationDaysPlaceholder": "e.g., 60",
+    "noteToOwner": "Message to the customer",
+    "notePlaceholder": "Scope, warranty, timeline commitment...",
+    "viewAttachment": "View attachment {{index}}",
+    "serviceRequestNotFound": "Service request not found",
+    "yourBid":"Your Bid",
+    "appliedTitle": "Applied title",
+    "yourNote": "Your note for customer",
+    "yourImages": "Your Images",
+    "deleteApplication": "Delete Application"
+  },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
@@ -400,6 +461,9 @@
     "notification_item": "Notification #{{number}}",
     "change_language": "Change language",
     "account": "Account",
+    "my_projects": "My Projects",
+    "applications": "Applications",
+    "profile": "Profile",
     "kpi_meta": {
       "open_requests": "▲ +2 this week",
       "applied": "↺ 3 pending",
@@ -850,6 +914,10 @@
     "DeleteImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
+    },
+    "DeleteApplicationModal":{
+      "title": "Are you sure?",
+      "text":"This application will be gone forever"
     }
   },
   "ERROR": {
@@ -913,7 +981,10 @@
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
     "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
     "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
-    "UPDATE_ERROR": "An error occurred while updating. Please try again later."
+    "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
+
+    "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description"
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -936,7 +1007,9 @@
     "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
     "REJECT": "Request successfully rejected",
-    "APPROVE": "Request successfully approved"
+    "APPROVE": "Request successfully approved",
+    "DELETE_APPLICATION":"Delete Application Successful",
+    "APPICATION_CREATE": "Create Application Successful"
   },
   "roles": {
     "Distributor": "Distributor",
@@ -995,6 +1068,11 @@
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
+  },
+  "upload":{
+    "clickToUpload":"Click to upload",
+    "orDragAndDrop":"or drag and drop",
+    "fileTypesHint":"PNG, JPG, GIF up to 5MB each"
   },
   "common":{
     "noRequirement":"No requirements",

@@ -15,7 +15,7 @@ import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
 
 export default function ServiceRequestCreateUpdate() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
   const { serviceRequestId } = useParams();
@@ -487,8 +487,7 @@ export default function ServiceRequestCreateUpdate() {
                         {t('userPage.createServiceRequest.estimateInWord')}
                         <span className="font-semibold">
                           {numberToWordsByLang(
-                            Number(estimatePrice),
-                            i18n.language
+                            Number(estimatePrice)
                           )}
                         </span>
                       </p>
@@ -540,78 +539,73 @@ export default function ServiceRequestCreateUpdate() {
                   />
                 </div>
 
-                {/* Images Upload Section */}
-                <div className="space-y-4 lg:col-span-2">
-                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-images text-orange-500 mr-2"></i>
-                    {t('userPage.createServiceRequest.form_images')}
-                  </label>
+              {/* Images Upload Section */}
+              <div className="space-y-4 lg:col-span-2">
+                <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                  <i className="fas fa-images text-orange-500 mr-2"></i>
+                  {t('userPage.createServiceRequest.form_images')}
+                </label>
 
-                  {/* Upload Button */}
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
-                      </div>
-                      <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-orange-600">
-                          {i18n.language === 'vi'
-                            ? 'Bấm để tải lên'
-                            : 'Click to upload'}
-                        </span>{' '}
-                        {i18n.language === 'vi'
-                          ? 'hoặc kéo và thả'
-                          : 'or drag and drop'}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {i18n.language === 'vi'
-                          ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
-                          : 'PNG, JPG, GIF up to 5MB each'}
-                      </p>
+                {/* Upload Button */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                      <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
                     </div>
+                    <p className="text-gray-600 text-center mb-2">
+                      <span className="font-semibold text-orange-600">
+                        {t('upload.clickToUpload')}
+                      </span>{' '}
+                      {t('upload.orDragAndDrop')}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {t('upload.fileTypesHint')}
+                    </p>
                   </div>
-
-                  {/* Image Preview Grid */}
-                  {images.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {images.map((img, idx) => (
-                        <div
-                          key={img.url}
-                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors"
-                        >
-                          <img
-                            src={img.url}
-                            alt={`Preview ${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(img)}
-                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
-                            >
-                              <i className="fas fa-trash-alt text-sm"></i>
-                            </button>
-                          </div>
-                          {img.isNew && (
-                            <div className="absolute top-2 left-2">
-                              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                {i18n.language === 'vi' ? 'Mới' : 'New'}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
+
+                {/* Image Preview Grid */}
+                {images.length > 0 && (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {images.map((img, idx) => (
+                      <div
+                        key={img.url}
+                        className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors"
+                      >
+                        <img
+                          src={img.url}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(img)}
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                          >
+                            <i className="fas fa-trash-alt text-sm"></i>
+                          </button>
+                        </div>
+                        {img.isNew && (
+                          <div className="absolute top-2 left-2">
+                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                              {t('common.new')}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               </div>
 
               {/* Submit Button */}

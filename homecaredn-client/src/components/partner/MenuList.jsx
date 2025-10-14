@@ -19,34 +19,95 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { user, logout: ctxLogout } = useContext(AuthContext) || {};
 
-  const menu = useMemo(
-    () => [
-      {
-        key: 'dashboard',
-        label: t('partnerDashboard.dashboard'),
-        icon: <i className="fa-solid fa-house"></i>,
-        to: '/Distributor',
-      },
-      {
-        key: 'service_requests',
-        label: t('partnerDashboard.service_requests'),
-        icon: <i className="fa-solid fa-calendar"></i>,
-        to: '/Distributor/service-requests',
-        badge: serviceRequestsCount,
-      },
-      {
-        key: 'categories',
-        label: t('partnerDashboard.category'),
-        icon: <i className="fa-solid fa-tags"></i>,
-        to: '/Distributor/CategoryManager',
-      },
-      {
-        key: 'materials',
-        label: t('partnerDashboard.materials'),
-        icon: <i className="fa-solid fa-box"></i>,
-        to: '/Distributor/MaterialManager',
-      },
-
+ const menu = useMemo(() => {
+    // Menu cho Distributor 
+    if (user?.role === 'Distributor') {
+      return [
+        {
+          key: 'dashboard',
+          label: t('partnerDashboard.dashboard'),
+          icon: <i className="fa-solid fa-house"></i>,
+          to: '/Distributor',
+        },
+        {
+          key: 'service_requests',
+          label: t('partnerDashboard.service_requests'),
+          icon: <i className="fa-solid fa-calendar"></i>,
+          to: '/Distributor/service-requests',
+          badge: serviceRequestsCount,
+        },
+        {
+          key: 'categories',
+          label: t('partnerDashboard.category'),
+          icon: <i className="fa-solid fa-tags"></i>,
+          to: '/Distributor/CategoryManager',
+        },
+        {
+          key: 'materials',
+          label: t('partnerDashboard.materials'),
+          icon: <i className="fa-solid fa-box"></i>,
+          to: '/Distributor/MaterialManager',
+        },
+        {
+          key: 'logout',
+          label: t('header.logout'),
+          icon: <i className="text-red-500 fa-solid fa-right-from-bracket"></i>,
+          onClick: () => {
+            if (typeof ctxLogout === 'function') ctxLogout();
+            authService.logout();
+            navigate('/login', { replace: true });
+          },
+        },
+      ];
+    }
+    
+    // Menu cho Contractor
+    if (user?.role === 'Contractor') {
+      return [
+        {
+          key: 'dashboard',
+          label: t('partnerDashboard.dashboard'),
+          icon: <i className="fa-solid fa-house"></i>,
+          to: '/Contractor',
+        },
+        {
+          key: 'service_requests',
+          label: t('partnerDashboard.service_requests'),
+          icon: <i className="fa-solid fa-list-alt"></i>,
+          to: '/Contractor/service-requests',
+          badge: serviceRequestsCount,
+        },
+        {
+          key: 'my_projects',
+          label: t('partnerDashboard.my_projects'),
+          icon: <i className="fa-solid fa-project-diagram"></i>,
+          to: '/Contractor/my-projects',
+        },
+        {
+          key: 'applications',
+          label: t('partnerDashboard.applications'),
+          icon: <i className="fa-solid fa-file-signature"></i>,
+          to: '/Contractor/applications',
+        },
+        {
+          key: 'profile',
+          label: t('partnerDashboard.profile'),
+          icon: <i className="fa-solid fa-id-card"></i>,
+          to: '/Contractor/profile',
+        },
+        {
+          key: 'logout',
+          label: t('header.logout'),
+          icon: <i className="text-red-500 fa-solid fa-right-from-bracket"></i>,
+          onClick: () => {
+            if (typeof ctxLogout === 'function') ctxLogout();
+            authService.logout();
+            navigate('/login', { replace: true });
+          },
+        },
+      ];
+    }
+    return [
       {
         key: 'logout',
         label: t('header.logout'),
@@ -57,9 +118,8 @@ export default function Sidebar({
           navigate('/login', { replace: true });
         },
       },
-    ],
-    [t, serviceRequestsCount, ctxLogout, navigate]
-  );
+    ];
+  }, [t, serviceRequestsCount, ctxLogout, navigate, user?.role]);
 
   const handleClick = (it) =>
     typeof it.onClick === 'function' ? it.onClick() : it.to && navigate(it.to);
