@@ -385,6 +385,7 @@
     "sortNewest": "Mới nhất"
   },
   "contractorServiceRequestDetail": {
+    "privacyNotice":"Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
     "title": "Chi tiết yêu cầu dịch vụ",
     "dimensions": "Kích thước dự án",
     "totalArea": "Tổng diện tích",
@@ -1068,7 +1069,13 @@
   "toast": {
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
+  "upload":{
+    "clickToUpload":"Chọn để tải ảnh",
+    "orDragAndDrop":"hoặc kéo và thả",
+    "fileTypesHint":"PNG, JPG, GIF mỗi file 5MB"
+  },
   "common":{
+    "new":"mới",
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search":"Tìm kiếm...",

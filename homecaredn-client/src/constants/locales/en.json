@@ -386,6 +386,7 @@
     "sortNewest": "Newest"
   },
   "contractorServiceRequestDetail": {
+    "privacyNotice":"Your information is visible only to the project owner.",
     "title": "Service Request Details",
     "dimensions": "Project Dimensions",
     "totalArea": "Total Area",
@@ -1067,6 +1068,11 @@
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
+  },
+  "upload":{
+    "clickToUpload":"Click to upload",
+    "orDragAndDrop":"or drag and drop",
+    "fileTypesHint":"PNG, JPG, GIF up to 5MB each"
   },
   "common":{
     "noRequirement":"No requirements",

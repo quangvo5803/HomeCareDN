@@ -107,9 +107,6 @@ export default function ContractorServiceRequestManager() {
                                             request?.address?.city,
                                         ].filter(Boolean);
                                         const addressText = addressParts.join(', ') || '—';
-
-                                        const area = (request?.width ?? 0) * (request?.length ?? 0);
-
                                         return (
                                             <div
                                                 key={request.serviceRequestID}
@@ -175,7 +172,6 @@ export default function ContractorServiceRequestManager() {
                                                     )}
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
                                                         <i className="fa-solid fa-ruler-combined" />
-                                                        {area} m²
                                                     </span>
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs
                                                         bg-orange-50 text-orange-700 ring-1 ring-orange-200">
@@ -229,11 +225,6 @@ export default function ContractorServiceRequestManager() {
                                         ].filter(Boolean);
                                         const addressText = addressParts.join(', ') || '—';
 
-                                        const area = (request?.width ?? 0) * (request?.length ?? 0);
-                                        const unitPrice = area > 0 && request?.estimatePrice
-                                            ? Math.round(request.estimatePrice / area)
-                                            : null;
-
                                         return (
                                             <div
                                                 key={request.serviceRequestID}
@@ -281,14 +272,7 @@ export default function ContractorServiceRequestManager() {
                                                     )}
                                                     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-100 text-gray-700">
                                                         <i className="fa-solid fa-ruler-combined" />
-                                                        {area} m²
                                                     </span>
-                                                    {unitPrice && (
-                                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-200" title="Đơn giá trên mỗi m²">
-                                                            <i className="fa-solid fa-scale-balanced" />
-                                                            {formatVND(unitPrice)} / m²
-                                                        </span>
-                                                    )}
                                                 </div>
 
                                                 <div className="flex justify-between items-center">

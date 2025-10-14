@@ -17,7 +17,7 @@ import Loading from '../../components/Loading';
 
 export default function ContractorServiceRequestDetail() { 
   const { serviceRequestId } = useParams(); 
-  const { t, i18n } = useTranslation(); 
+  const { t } = useTranslation(); 
   const { user } = useAuth(); 
   const navigate = useNavigate(); 
   const { getServiceRequestById, loading, deleteServiceRequestImage } = useServiceRequest(); 
@@ -177,8 +177,6 @@ export default function ContractorServiceRequestDetail() {
 
   const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
   const totalArea = baseArea * (serviceRequest?.floors ?? 1);
-  const unitPrice =
-    totalArea > 0 && serviceRequest?.estimatePrice ? Math.round(serviceRequest.estimatePrice / totalArea) : null;
 
   const addressText = [
     serviceRequest?.address?.detail,
@@ -316,14 +314,11 @@ export default function ContractorServiceRequestDetail() {
                   {t('contractorServiceRequestDetail.estimatePrice')} 
                 </h3> 
                 <p className="text-2xl font-bold text-orange-600 mb-1"> 
-                  {serviceRequest.estimatePrice ? formatVND(serviceRequest.estimatePrice) : '—'} 
+                  {formatVND(serviceRequest.estimatePrice)} 
                 </p> 
                 {serviceRequest.estimatePrice && (
                   <>
                     <p className="text-sm text-gray-600 mb-1">{numberToWordsByLang(serviceRequest.estimatePrice)}</p>
-                    <p className="text-sm text-gray-700">
-                      {unitPrice ? `${formatVND(unitPrice)} / m²` : ''}
-                    </p>
                   </>
                 )}
               </div> 
@@ -531,7 +526,7 @@ export default function ContractorServiceRequestDetail() {
                       <i className="fas fa-comment-alt mr-2 text-gray-500" /> 
                       {t('contractorServiceRequestDetail.noteToOwner')} 
                     </label> 
-                    <span className="text-xs text-gray-400">{description.length} chars</span>
+                    <span className="text-xs text-gray-400">{description.length}</span>
                   </div>
                   <textarea 
                     rows={4} 
@@ -543,93 +538,91 @@ export default function ContractorServiceRequestDetail() {
                   /> 
                 </div> 
                 
-                {/* Images */} 
-                <div className="space-y-3 lg:col-span-2"> 
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center text-sm font-medium text-gray-700"> 
-                      <i className="fas fa-images text-orange-500 mr-2"></i> 
-                      {t('userPage.createServiceRequest.form_images')} 
-                    </label>
-                    <span className="text-xs text-gray-500">{images.length}/5</span>
-                  </div>
+             {/* Images */}
+              <div className="space-y-3 lg:col-span-2"> 
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center text-sm font-medium text-gray-700"> 
+                    <i className="fas fa-images text-orange-500 mr-2"></i> 
+                    {t('userPage.createServiceRequest.form_images')}
+                  </label>
+                  <span className="text-xs text-gray-500">{images.length}/5</span>
+                </div>
 
-                  <div className="relative"> 
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      multiple 
-                      onChange={handleImageChange} 
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                      aria-label="Upload images"
-                    /> 
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer"> 
-                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4"> 
-                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i> 
-                      </div> 
-                      <p className="text-gray-600 text-center mb-2"> 
-                        <span className="font-semibold text-orange-600"> 
-                          {i18n.language === 'vi' ? 'Bấm để tải lên' : 'Click to upload'} 
-                        </span>{' '} 
-                        {i18n.language === 'vi' ? 'hoặc kéo và thả' : 'or drag and drop'} 
-                      </p> 
-                      <p className="text-sm text-gray-400"> 
-                        {i18n.language === 'vi' ? 'PNG, JPG, GIF tối đa 5MB mỗi file' : 'PNG, JPG, GIF up to 5MB each'} 
-                      </p> 
+                <div className="relative"> 
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    multiple 
+                    onChange={handleImageChange} 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    aria-label="Upload images"
+                  /> 
+                  <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer"> 
+                    <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4"> 
+                      <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i> 
                     </div> 
+                    <p className="text-gray-600 text-center mb-2"> 
+                      <span className="font-semibold text-orange-600"> 
+                        {t('upload.clickToUpload')}
+                      </span>{' '} 
+                      {t('upload.orDragAndDrop')}
+                    </p> 
+                    <p className="text-sm text-gray-400"> 
+                      {t('upload.fileTypesHint')}
+                    </p> 
                   </div> 
+                </div> 
 
-                  {images.length > 0 && ( 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"> 
-                      {images.map((img, idx) => ( 
-                        <div 
-                          key={img.url} 
-                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200" 
-                        > 
-                          <img 
-                            src={img.url} 
-                            alt={`Preview ${idx + 1}`} 
-                            className="w-full h-full object-contain bg-white p-1" 
-                          /> 
-                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"> 
-                            <button 
-                              type="button" 
-                              onClick={() => handleRemoveImage(img)} 
-                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors" 
-                              aria-label="Remove image"
-                            > 
-                              <i className="fas fa-trash-alt text-sm"></i> 
-                            </button> 
-                          </div> 
-                          {img.isNew && ( 
-                            <div className="absolute top-2 left-2"> 
-                              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"> 
-                                {i18n.language === 'vi' ? 'Mới' : 'New'} 
-                              </span> 
-                            </div> 
-                          )} 
+                {images.length > 0 && ( 
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4"> 
+                    {images.map((img, idx) => ( 
+                      <div 
+                        key={img.url} 
+                        className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200" 
+                      > 
+                        <img 
+                          src={img.url} 
+                          alt={`Preview ${idx + 1}`} 
+                          className="w-full h-full object-contain bg-white p-1" 
+                        /> 
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"> 
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveImage(img)} 
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors" 
+                            aria-label="Remove image"
+                          > 
+                            <i className="fas fa-trash-alt text-sm"></i> 
+                          </button> 
                         </div> 
-                      ))} 
-                    </div> 
-                  )} 
-                </div> 
+                        {img.isNew && ( 
+                          <div className="absolute top-2 left-2"> 
+                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full"> 
+                              {t('common.new')}
+                            </span> 
+                          </div> 
+                        )} 
+                      </div> 
+                    ))} 
+                  </div> 
+                )} 
+              </div> 
 
-                {/* Submit */} 
-                <div className="pt-1"> 
-                  <button 
-                    type="submit" 
-                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" 
-                    disabled={!estimatePrice.trim() || !description.trim()} 
-                  > 
-                    <i className="fas fa-paper-plane" /> 
-                    {t('contractorServiceRequestDetail.applyForProject')} 
-                  </button> 
-                  <p className="mt-3 text-xs text-gray-500 text-center">
-                    <i className="fas fa-shield-alt mr-1" />
-                    {i18n.language === 'vi'
-                      ? 'Thông tin của bạn chỉ được chủ dự án xem.'
-                      : 'Your information is visible only to the project owner.'}
-                  </p>
-                </div> 
+              {/* Submit */} 
+              <div className="pt-1"> 
+                <button 
+                  type="submit" 
+                  className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" 
+                  disabled={!estimatePrice.trim() || !description.trim()} 
+                > 
+                  <i className="fas fa-paper-plane" /> 
+                  {t('contractorServiceRequestDetail.applyForProject')} 
+                </button> 
+                <p className="mt-3 text-xs text-gray-500 text-center">
+                  <i className="fas fa-shield-alt mr-1" />
+                  {t('contractorServiceRequestDetail.privacyNotice')}
+                </p>
+              </div>
               </form> 
             </div> 
           )} 
