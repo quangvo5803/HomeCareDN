@@ -47,9 +47,9 @@ export const contractorApplicationService = {
   },
 
 
-  deleteApplication: async (contractorApplicationId) => {
+  deleteApplication: async (id) => {
     const response = await api.delete(
-      `/ContractorApplication/delete-contractor-application/${contractorApplicationId}`
+      `/ContractorApplication/delete-contractor-application/${id}`
     );
     return response.data;
   },

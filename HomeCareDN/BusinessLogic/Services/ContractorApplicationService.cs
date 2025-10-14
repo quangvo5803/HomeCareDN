@@ -162,7 +162,6 @@ namespace BusinessLogic.Services
                         await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                     }
                 }
-                _unitOfWork.ImageRepository.RemoveRange(images);
             }
 
             _unitOfWork.ContractorApplicationRepository.Remove(application);

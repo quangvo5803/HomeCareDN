@@ -9,6 +9,8 @@ import { numberToWordsByLang } from '../../utils/numberToWords';
 import { uploadImageToCloudinary } from '../../utils/uploadImage'; 
 import { showDeleteModal } from '../../components/modal/DeleteModal'; 
 import { handleApiError } from '../../utils/handleApiError'; 
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
 import Swal from 'sweetalert2'; 
 import { toast } from 'react-toastify'; 
 import Loading from '../../components/Loading'; 
@@ -54,17 +56,11 @@ export default function ContractorServiceRequestDetail() {
 
     loadData(); 
   }, [serviceRequestId, getServiceRequestById, user, t]); 
-
-  const handleImageClick = (imageUrl) => { 
-    window.open(imageUrl, '_blank'); 
-  }; 
-
-  const handleImageKeyDown = (event, imageUrl) => { 
-    if (event.key === 'Enter' || event.key === ' ') { 
-      event.preventDefault(); 
-      window.open(imageUrl, '_blank'); 
-    } 
-  }; 
+  useEffect(() => {
+    if (!serviceRequest) return;
+    const vb = new VenoBox({ selector: '.venobox' });
+    return () => vb.close();
+  }, [serviceRequest, existingApplication]);
 
   const handleSubmit = async (e) => { 
     e.preventDefault(); 
@@ -347,15 +343,23 @@ export default function ContractorServiceRequestDetail() {
                     <i className="fas fa-images" /> 
                     {t('contractorServiceRequestDetail.images')} 
                   </h3> 
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"> 
-                    {serviceRequest.imageUrls.map((imageUrl) => ( 
-                      <div key={imageUrl} className="aspect-square rounded-lg overflow-hidden"> 
-                        <button type="button" className="w-full h-full p-0 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset" onClick={() => handleImageClick(imageUrl)} onKeyDown={(e) => handleImageKeyDown(e, imageUrl)} aria-label={`${t('contractorServiceRequestDetail.viewFullSize')} - ${t('contractorServiceRequestDetail.serviceRequestImage')}`}> 
-                          <img src={imageUrl} alt={t('contractorServiceRequestDetail.serviceRequestImage')} className="w-full h-full object-cover hover:scale-105 transition-transform" /> 
-                        </button> 
-                      </div> 
-                    ))} 
-                  </div> 
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {serviceRequest.imageUrls.map((imageUrl) => (
+                      <a
+                        key={imageUrl}
+                        href={imageUrl}
+                        className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        data-gall="service-request-gallery"
+                        aria-label={`${t('contractorServiceRequestDetail.viewFullSize')} - ${t('contractorServiceRequestDetail.serviceRequestImage')}`}
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={t('contractorServiceRequestDetail.serviceRequestImage')}
+                          className="w-full h-full object-contain bg-white p-1 group-hover:scale-105 transition-transform"
+                        />
+                      </a>
+                    ))}
+                  </div>
                 </div> 
               )} 
               <div className="mt-6"> 
@@ -397,13 +401,23 @@ export default function ContractorServiceRequestDetail() {
                   {existingApplication.imageUrls && existingApplication.imageUrls.length > 0 && ( 
                     <div> 
                       <label className="block text-sm font-medium text-gray-500 mb-2"><i className="fas fa-images mr-2" />{t('contractorServiceRequestDetail.yourImages')}</label> 
-                      <div className="grid grid-cols-3 gap-2"> 
-                        {existingApplication.imageUrls.map(url => ( 
-                          <button key={url} type="button" onClick={() => handleImageClick(url)} className="aspect-square w-full h-full p-0 border-0 bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset rounded-md"> 
-                            <img src={url} alt={t('contractorServiceRequestDetail.appliedImage')} className="w-full h-full object-cover rounded-md" /> 
-                          </button> 
-                        ))} 
-                      </div> 
+                    <div className="grid grid-cols-3 gap-2">
+                          {existingApplication.imageUrls.map((url) => (
+                            <a
+                              key={url}
+                              href={url}
+                              className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white p-1"
+                              data-gall="application-gallery"
+                              aria-label={t('contractorServiceRequestDetail.appliedImage')}
+                            >
+                              <img
+                                src={url}
+                                alt={t('contractorServiceRequestDetail.appliedImage')}
+                                className="w-full h-full object-contain bg-white p-1 group-hover:scale-105 transition-transform"
+                              />
+                            </a>
+                          ))}
+                      </div>
                     </div> 
                   )} 
                   <div className="pt-4 border-t border-gray-200"> 
@@ -507,7 +521,7 @@ export default function ContractorServiceRequestDetail() {
                             <img 
                               src={img.url} 
                               alt={`Preview ${idx + 1}`} 
-                              className="w-full h-full object-cover" 
+                              className="w-full h-full object-contain bg-white p-1" 
                             /> 
                             <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"> 
                               <button 
