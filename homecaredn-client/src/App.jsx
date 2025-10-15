@@ -41,7 +41,7 @@ import PartnerTypeSelection from './pages/PartnerTypeSelection';
 import RepairViewAll from './pages/RepairViewAll';
 import ConstructionViewAll from './pages/ConstructionViewAll';
 // Customer pages
-import Profile from './pages/customer/Profile';
+import CustomerPage from './pages/customer/CustomerPage';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 import ServiceRequestDetail from './pages/customer/ServiceRequestDetail';
 
@@ -221,10 +221,10 @@ function Layout() {
         />
         {/* Customer routes */}
         <Route
-          path="/Customer/Profile"
+          path="/Customer"
           element={
             <ProtectedRoute allowedRoles={['Customer']}>
-              <Profile />
+              <CustomerPage />
             </ProtectedRoute>
           }
         ></Route>
@@ -273,22 +273,34 @@ function Layout() {
             element={<AdminPartnerRequestManager />}
           />
         </Route>
-          {/* Contractor routes */}
+        {/* Contractor routes */}
+        <Route
+          path="/Contractor"
+          element={
+            <ProtectedRoute allowedRoles={['Contractor']}>
+              <ContractorLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<ContractorDashboard />} />
           <Route
-            path="/Contractor"
-            element={
-              <ProtectedRoute allowedRoles={['Contractor']}>
-                <ContractorLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<ContractorDashboard />} />
-            <Route path="service-requests" element={<ContractorServiceRequestManager />} />
-            <Route path="service-request/:serviceRequestId" element={<ContractorServiceRequestDetail />} />
-            <Route path="my-projects" element={<div>My Projects - Coming Soon</div>} />
-            <Route path="applications" element={<div>Applications - Coming Soon</div>} />
-            <Route path="profile" element={<div>Profile - Coming Soon</div>} />
-          </Route>
+            path="service-requests"
+            element={<ContractorServiceRequestManager />}
+          />
+          <Route
+            path="service-request/:serviceRequestId"
+            element={<ContractorServiceRequestDetail />}
+          />
+          <Route
+            path="my-projects"
+            element={<div>My Projects - Coming Soon</div>}
+          />
+          <Route
+            path="applications"
+            element={<div>Applications - Coming Soon</div>}
+          />
+          <Route path="profile" element={<div>Profile - Coming Soon</div>} />
+        </Route>
         {/* Distributor routes */}
         <Route
           path="/Distributor"

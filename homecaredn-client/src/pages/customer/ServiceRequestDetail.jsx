@@ -41,13 +41,13 @@ export default function ServiceRequestDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b sticky top-0 z-10 shadow-sm">
+      <div className="bg-white p-3 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="relative flex items-center justify-between">
             {/* Nút back (bên trái) */}
             <button
               onClick={() =>
-                navigate('/Customer/Profile', {
+                navigate('/Customer', {
                   state: { tab: 'service_requests' },
                 })
               }
@@ -59,6 +59,7 @@ export default function ServiceRequestDetail() {
 
             {/* Title ở giữa */}
             <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-orange-500">
+              <i class="fa-solid fa-clipboard-list mr-2"></i>
               {t('userPage.serviceRequestDetail.title')}
             </h1>
           </div>
@@ -282,7 +283,7 @@ export default function ServiceRequestDetail() {
 
           {/* Right Column - Contractors */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-24">
+            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-28">
               {selectedContractor ? (
                 <>
                   {/* Contractor Detail View */}
