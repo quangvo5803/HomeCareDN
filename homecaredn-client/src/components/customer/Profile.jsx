@@ -118,11 +118,11 @@ export default function Profile({ user }) {
 
   const isEditingAddr = Boolean(addrForm.id);
 
-  const addrSubmitText = addrSubmitting
-    ? t('BUTTON.Saving')
-    : isEditingAddr
-    ? t('BUTTON.Save')
-    : t('BUTTON.AddAddress');
+  let labelKey = 'BUTTON.AddAddress';
+  if (isEditingAddr) labelKey = 'BUTTON.Save';
+  if (addrSubmitting) labelKey = 'BUTTON.Saving';
+
+  const addrSubmitText = t(labelKey);
 
   const addrHandleSubmit = async (e) => {
     e.preventDefault();
@@ -602,15 +602,16 @@ Profile.propTypes = {
 /** Chuẩn hoá tên địa lý */
 function normalize(s) {
   const base = (s || '').normalize('NFD');
+
   const noDiacritics = (
-    base.replace(/[\u0300-\u036f]/g, '') || base
+    base.replaceAll(/[\u0300-\u036f]/g, '') || base
   ).toLowerCase();
 
   return noDiacritics
-    .replace(
+    .replaceAll(
       /\b(thanh pho thuoc tinh|thanh pho|tinh|quan|huyen|thi xa|thi tran|phuong|xa)\b/g,
       ''
     )
-    .replace(/\s+/g, ' ')
+    .replaceAll(/\s+/g, ' ')
     .trim();
 }

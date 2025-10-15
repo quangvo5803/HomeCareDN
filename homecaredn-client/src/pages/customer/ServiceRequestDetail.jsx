@@ -59,7 +59,7 @@ export default function ServiceRequestDetail() {
 
             {/* Title ở giữa */}
             <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-orange-500">
-              <i class="fa-solid fa-clipboard-list mr-2"></i>
+              <i className="fa-solid fa-clipboard-list mr-2"></i>
               {t('userPage.serviceRequestDetail.title')}
             </h1>
           </div>

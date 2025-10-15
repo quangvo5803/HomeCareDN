@@ -5,8 +5,9 @@ import Profile from '../../components/customer/Profile';
 import ServiceRequestManager from '../../components/customer/ServiceRequestManager';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
-export default function CustomerProfilePage({ defaultTab = 'profile' }) {
+export default function CustomerPage({ defaultTab = 'profile' }) {
   const { user, loading: authLoading } = useAuth();
   const { t } = useTranslation();
   const location = useLocation();
@@ -33,7 +34,7 @@ export default function CustomerProfilePage({ defaultTab = 'profile' }) {
 
         <div className="grid grid-cols-12 gap-6">
           <div className="col-span-3">
-            <div className="bg-white rounded-lg shadow-md p-4 sticky top-25">
+            <div className="bg-white rounded-lg shadow-md p-4 sticky top-28">
               <nav className="space-y-2">
                 <button
                   onClick={() => setActive('profile')}
@@ -74,3 +75,6 @@ export default function CustomerProfilePage({ defaultTab = 'profile' }) {
     </div>
   );
 }
+CustomerPage.propTypes = {
+  defaultTab: PropTypes.string,
+};
