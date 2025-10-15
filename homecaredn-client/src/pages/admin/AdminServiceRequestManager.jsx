@@ -43,7 +43,7 @@ export default function ServiceRequest() {
                 {/* Header */}
                 <div className="mb-8">
                     <h2 className="mb-2 text-2xl font-bold text-gray-800 lg:text-3xl">
-                        <i className="mr-3 fa-solid fa-truck" />
+                        <i className="mr-3 fa-solid fa-clipboard-list" />
                         {t('adminServiceRequestManager.title')}
                     </h2>
                     <p className="text-gray-600">{t('adminServiceRequestManager.subtitle')}</p>
@@ -164,7 +164,7 @@ export default function ServiceRequest() {
                                         <tr>
                                             <td colSpan="8" className="px-6 py-12 text-center">
                                                 <div className="flex flex-col items-center mt-5 mb-5">
-                                                    <i className="text-4xl mb-2 mt-2 fa-solid fa-truck"></i>
+                                                    <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
                                                     <h3 className="mb-1 text-lg font-medium text-gray-900">
                                                         {t('adminPartnerManager.empty')}
                                                     </h3>
