@@ -365,7 +365,68 @@
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
     }
   },
-
+  "contractorServiceRequestManager": {
+    "title": "Quản lý yêu cầu dịch vụ",
+    "subtitle": "Xem và quản lý các yêu cầu dịch vụ có sẵn",
+    "noRequest": "Chưa có yêu cầu dịch vụ nào",
+    "letStart": "Bắt đầu bằng cách duyệt các yêu cầu có sẵn",
+    "serviceRequests": "yêu cầu dịch vụ",
+    "packageOption": "Gói dịch vụ",
+    "buildingType": "Loại công trình",
+    "area": "Diện tích",
+    "estimatePrice": "Giá ước tính",
+    "createdAt": "Ngày tạo",
+    "negotiable": "Thỏa thuận",
+    "statusOpen": "Mở",
+    "statusClosed": "Đóng",
+    "searchPlaceholder": "Tìm kiếm yêu cầu dịch vụ...",
+    "sortDefault": "Mặc định",
+    "sortOldest": "Cũ nhất",
+    "sortNewest": "Mới nhất"
+  },
+  "contractorServiceRequestDetail": {
+    "privacyNotice": "Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
+    "title": "Chi tiết yêu cầu dịch vụ",
+    "dimensions": "Kích thước dự án",
+    "totalArea": "Tổng diện tích",
+    "applyForProject": "Ứng tuyển dự án này",
+    "backToList": "Quay lại danh sách",
+    "serviceType": "Loại dịch vụ",
+    "packageOption": "Gói dịch vụ",
+    "buildingType": "Loại công trình",
+    "structureType": "Loại kết cấu",
+    "designStyle": "Phong cách thiết kế",
+    "floors": "Số tầng",
+    "floorsUnit": "tầng",
+    "width": "Chiều rộng",
+    "length": "Chiều dài",
+    "estimatePrice": "Giá ước tính",
+    "address": "Địa chỉ",
+    "description": "Mô tả",
+    "images": "Hình ảnh",
+    "statusOpen": "Mở",
+    "statusClosed": "Đóng",
+    "applicationStatus": "Trạng thái ứng tuyển",
+    "notAppliedYet": "Chưa ứng tuyển",
+    "deadline": "Hạn chót",
+    "availableNow": "Có sẵn ngay",
+    "applyFormTitle": "Ứng tuyển dự án",
+    "bidPrice": "Giá chào thầu (VND)",
+    "bidPricePlaceholder": "VD: 200.000.000",
+    "bidPricePlaceholderWithEst": "VD: khoảng {{est}}",
+    "startDate": "Ngày bắt đầu dự kiến",
+    "durationDays": "Thời gian thi công (ngày)",
+    "durationDaysPlaceholder": "VD: 60",
+    "noteToOwner": "Ghi chú cho chủ dự án",
+    "notePlaceholder": "Phạm vi công việc, bảo hành, cam kết tiến độ...",
+    "viewAttachment": "Xem tệp đính kèm {{index}}",
+    "serviceRequestNotFound": "Không tìm thấy yêu cầu dịch vụ",
+    "yourBid": "Giá bạn chào",
+    "appliedTitle": "Bạn đã ứng tuyển",
+    "yourNote": "Ghi chú của bạn cho khách hàng",
+    "yourImages": "Hình ảnh của bạn",
+    "deleteApplication": "Xóa đơn ứng tuyển"
+  },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
@@ -399,6 +460,9 @@
     "notification_item": "Thông báo #{{number}}",
     "change_language": "Đổi ngôn ngữ",
     "account": "Tài khoản",
+    "my_projects": "Dự Án Của Tôi",
+    "applications": "Đơn Xin",
+    "profile": "Hồ Sơ",
     "kpi_meta": {
       "open_requests": "▲ +2 tuần này",
       "applied": "↺ 3 đang chờ",
@@ -550,7 +614,6 @@
     },
     "viewAll": "Xem tất cả"
   },
-
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
     "subtitle": "Quản lý danh sách các thương hiệu sản phẩm",
@@ -819,7 +882,8 @@
     "RegisterPartner": "Đăng kí trở thành đối tác",
     "Accept": "Chấp nhận",
     "Reject": "Từ chối",
-    "Approve": "Phê duyệt"
+    "Approve": "Phê duyệt",
+    "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
     "DeleteBrandModal": {
@@ -862,6 +926,10 @@
     "DeleteImageModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
+    },
+    "DeleteApplicationModal": {
+      "title": "Bạn có chắc chắn?",
+      "text": "Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
     }
   },
   "ERROR": {
@@ -925,7 +993,10 @@
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
     "DELETE_ERROR": "Đã có lỗi xảy ra khi xóa. Vui lòng thử lại sau.",
-    "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau."
+    "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
+
+    "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả"
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -948,7 +1019,9 @@
     "SERVICE_REQUEST_UPDATE": "Cập nhật yêu cầu dịch vụ thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
-    "APPROVE": "Đã phê duyệt thành công yêu cầu"
+    "APPROVE": "Đã phê duyệt thành công yêu cầu",
+    "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
+    "APPICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1009,7 +1082,13 @@
   "toast": {
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
+  "upload": {
+    "clickToUpload": "Chọn để tải ảnh",
+    "orDragAndDrop": "hoặc kéo và thả",
+    "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
+  },
   "common": {
+    "new": "mới",
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search": "Tìm kiếm...",

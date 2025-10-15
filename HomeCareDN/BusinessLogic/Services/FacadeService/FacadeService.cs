@@ -37,7 +37,8 @@ namespace BusinessLogic.Services.FacadeService
             ServiceService = new ServicesService(coreDeps.UnitOfWork, coreDeps.Mapper);
             ContractorApplicationService = new ContractorApplicationService(
                 coreDeps.UnitOfWork,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                identityDeps.UserManager
             );
             CategoryService = new CategoryService(coreDeps.UnitOfWork, coreDeps.Mapper);
             BrandService = new BrandService(coreDeps.UnitOfWork, coreDeps.Mapper);
