@@ -248,42 +248,66 @@ export default function AdminServiceRequestDetail() {
                     <div className="space-y-3">
                         {contractors && contractors.length > 0 ? (
                             <>
-                                {contractors.map((items) => (
-                                    <button
-                                        key={items.contractorApplicationID}
-                                        onClick={() => handleSelectContractor(items.contractorEmail)}
-                                        className="w-full text-left p-4 border border-gray-300 rounded-xl bg-white
-        hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer group
-        focus:outline-none focus:ring-0 appearance-none"
-                                    >
+                                {contractors.map((items) => {
+                                    const isSelected = items.contractorEmail === selectedContractorEmail;
 
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-orange-400 transition-all duration-300">
-                                                    <img
-                                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                                            items.contractorEmail || 'User'
-                                                        )}&background=random`}
-                                                        alt="avatar"
-                                                        className="object-cover w-full h-full"
-                                                    />
+                                    return (
+                                        <button
+                                            key={items.contractorApplicationID}
+                                            onClick={() => handleSelectContractor(items.contractorEmail)}
+                                            className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
+                                                focus:outline-none focus:ring-0 appearance-none
+                                                ${isSelected
+                                                    ? 'bg-orange-500 border-orange-600 text-white'
+                                                    : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div
+                                                        className={`w-12 h-12 rounded-full overflow-hidden ring-2 transition-all duration-300
+                                                            ${isSelected
+                                                                ? 'ring-white bg-white'
+                                                                : 'ring-transparent group-hover:ring-orange-400'
+                                                            }`}
+                                                    >
+                                                        <img
+                                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(items.contractorEmail || 'User')}
+                                                                &background=${isSelected ? 'ffffff' : 'random'}&color=${isSelected ? '000000' : 'fff'}`
+                                                            }
+                                                            alt="avatar"
+                                                            className="object-cover w-full h-full"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <p
+                                                            className={`font-semibold transition-colors duration-200 
+                                                                ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-600'}`
+                                                            }
+                                                        >
+                                                            {items.contractorName}
+                                                        </p>
+                                                        <p className={`text-sm ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
+                                                            {items.contractorEmail}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <p className="font-semibold text-gray-800 group-hover:text-orange-600 transition-colors duration-200">
-                                                        {items.contractorName}
-                                                    </p>
-                                                    <p className="text-sm text-gray-500">{items.contractorEmail}</p>
-                                                </div>
+
+                                                <button
+                                                    className={`px-4 py-2 rounded-lg transition-colors duration-200 font-medium ${isSelected
+                                                        ? 'bg-orange-500 border-orange-600 text-white'
+                                                        : 'text-orange-600'
+                                                        }`}
+                                                    onClick={() => handleSelectContractor(items.contractorEmail)}
+                                                >
+                                                    {t('adminServiceRequestManager.viewProfile')}{' '}
+                                                    <i className="fa-solid fa-arrow-right ms-1"></i>
+                                                </button>
+
                                             </div>
-                                            <button
-                                                className="text-orange-600 hover:bg-orange-50 px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
-                                                onClick={() => handleSelectContractor(items.contractorEmail)}
-                                            >
-                                                {t('adminServiceRequestManager.viewProfile')} <i className="fa-solid fa-arrow-right ms-1"></i>
-                                            </button>
-                                        </div>
-                                    </button>
-                                ))}
+                                        </button>
+                                    );
+                                })}
 
                                 {/* Pagination */}
                                 {totalContractors > 0 && (
@@ -317,11 +341,9 @@ export default function AdminServiceRequestDetail() {
                         Pending: 'bg-yellow-100 text-yellow-700 border-yellow-300',
                         Approved: 'bg-green-100 text-green-700 border-green-300',
                         Rejected: 'bg-red-100 text-red-700 border-red-300',
-                        Default: 'bg-gray-100 text-gray-600 border-gray-300',
                     };
 
-                    const statusClass =
-                        STATUS_STYLES[selectedContractor.status] || STATUS_STYLES.Default;
+                    const statusClass = STATUS_STYLES[selectedContractor.status];
 
                     return (
                         <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
@@ -334,7 +356,7 @@ export default function AdminServiceRequestDetail() {
                                     <span
                                         className={`px-4 py-1.5 backdrop-blur-sm text-sm rounded-full font-medium border ${statusClass}`}
                                     >
-                                        {selectedContractor.status}
+                                        {t(`adminServiceRequestManager.status.${selectedContractor.status}`)}
                                     </span>
                                 </div>
                             </div>

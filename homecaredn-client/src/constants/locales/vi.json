@@ -729,6 +729,11 @@
       "rating": "Đánh giá",
       "createAt": "Ngày tạo",
       "images": "Hình ảnh dự án"
+    },
+    "status": {
+      "Pending": "Chờ duyệt",
+      "Approved": "Đã duyệt",
+      "Rejected": "Đã từ chối"
     }
   },
   "adminMaterialManager": {

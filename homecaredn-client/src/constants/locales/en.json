@@ -774,6 +774,11 @@
       "rating": "Rating",
       "createAt": "Creation date",
       "images": "Project images"
+    },
+    "status": {
+      "Pending": "Pending",
+      "Approved": "Approved",
+      "Rejected": "Rejected"
     }
   },
   "adminPartnerManager": {
