@@ -55,7 +55,7 @@ export default function AdminSupportManager() {
     };
 
     fetchData();
-  }, [currentPage, pageSize, debouncedSearch, filter, sortBy]);
+  }, [t, currentPage, pageSize, debouncedSearch, filter, sortBy]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
