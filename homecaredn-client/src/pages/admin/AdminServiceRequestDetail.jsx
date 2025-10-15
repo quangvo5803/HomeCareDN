@@ -48,6 +48,17 @@ export default function AdminServiceRequestDetail() {
         Construction: 'fa-hammer',
     };
 
+    const STATUS_STYLES = {
+        Pending: 'bg-yellow-100 text-yellow-700 border-yellow-300',
+        Approved: 'bg-green-100 text-green-700 border-green-300',
+        Rejected: 'bg-red-100 text-red-700 border-red-300',
+        Default: 'bg-gray-100 text-gray-600 border-gray-300',
+    };
+
+    const statusClass =
+        STATUS_STYLES[selectedContractor.status] || STATUS_STYLES.Default;
+
+
     const handleSelectContractor = (email) => {
         setSelectedContractorEmail(email);
         setTimeout(() => {
@@ -238,6 +249,7 @@ export default function AdminServiceRequestDetail() {
 
                 </div>
 
+                {/* List contractor */}
                 <div className="bg-white rounded-2xl shadow-lg p-6">
                     <div className="flex items-center justify-between mb-5">
                         <h3 className="text-xl font-bold text-gray-800">{t('adminServiceRequestManager.listCandidate')}</h3>
@@ -247,9 +259,9 @@ export default function AdminServiceRequestDetail() {
                     <div className="space-y-3">
                         {contractors && contractors.length > 0 ? (
                             <>
-                                {contractors.map((items, index) => (
+                                {contractors.map((items) => (
                                     <button
-                                        key={index}
+                                        key={items.contractorApplicationID}
                                         onClick={() => handleSelectContractor(items.contractorEmail)}
                                         className="w-full text-left p-4 border border-gray-300 rounded-xl bg-white
         hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer group
@@ -319,15 +331,7 @@ export default function AdminServiceRequestDetail() {
                             <div className="flex items-center justify-between">
                                 <h3 className="text-2xl font-bold text-black">{t('adminServiceRequestManager.contractorDetail.title')}</h3>
                                 <span
-                                    className={`px-4 py-1.5 backdrop-blur-sm text-sm rounded-full font-medium border 
-                                        ${selectedContractor.status === 'Pending'
-                                            ? 'bg-yellow-100 text-yellow-700 border-yellow-300'
-                                            : selectedContractor.status === 'Approved'
-                                                ? 'bg-green-100 text-green-700 border-green-300'
-                                                : selectedContractor.status === 'Rejected'
-                                                    ? 'bg-red-100 text-red-700 border-red-300'
-                                                    : 'bg-gray-100 text-gray-600 border-gray-300'
-                                        }`}
+                                    className={`px-4 py-1.5 backdrop-blur-sm text-sm rounded-full font-medium border ${statusClass}`}
                                 >
                                     {selectedContractor.status}
                                 </span>
@@ -360,7 +364,7 @@ export default function AdminServiceRequestDetail() {
                                 </div>
                             </div>
 
-                            {/* Stats Grid */}
+                            {/* Content */}
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
                                     <p className="text-emerald-600 text-sm font-medium mb-1">{t('adminServiceRequestManager.estimatePrice')}</p>
@@ -401,7 +405,7 @@ export default function AdminServiceRequestDetail() {
                                     <div className="grid grid-cols-5 gap-3">
                                         {selectedContractor.imageUrls.map((url, i) => (
                                             <div
-                                                key={i}
+                                                key={`${url}-${i}`}
                                                 className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer"
                                             >
                                                 <img
