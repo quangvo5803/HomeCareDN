@@ -19,17 +19,25 @@ const buildContractorFormData = (contractor) => {
   appendIf(formData, 'Status', contractor.Status);
 
   // Images
-    for (const url of (contractor.ImageUrls ?? [])) {
-      formData.append('ImageUrls', url);
-    }
+  for (const url of (contractor.ImageUrls ?? [])) {
+    formData.append('ImageUrls', url);
+  }
 
-    for (const publicId of (contractor.ImagePublicIds ?? [])) {
-      formData.append('ImagePublicIds', publicId);
-    }
+  for (const publicId of (contractor.ImagePublicIds ?? [])) {
+    formData.append('ImagePublicIds', publicId);
+  }
   return formData;
 };
 
 export const contractorApplicationService = {
+
+  getAllContractorByServiceRequestId: async (params = {}) => {
+    const res = await api.get('/ContractorApplication/get-all-contractor-byservicerequestid', {
+      params,
+    });
+    return res.data;
+  },
+
   createContractorApplication: async (contractorData) => {
     const formData = buildContractorFormData(contractorData);
     const response = await api.post('/ContractorApplication/create-contractor-request', formData, {
@@ -38,7 +46,6 @@ export const contractorApplicationService = {
     return response.data;
   },
 
-  
   getApplication: async (getRequest) => {
     const response = await api.get('/ContractorApplication/get-contractor-application', {
       params: getRequest

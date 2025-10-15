@@ -753,17 +753,28 @@
     "title": "Manage requested services",
     "subtitle": "Manage list of requested services",
     "serviceRequests": "requested services",
+    "description": "Descriptions",
     "acreage": "Acreage",
     "numberOfFloors": "Number of floors",
     "estimatePrice": "Estimated price",
     "address": "Address",
     "label_open": "Opening",
     "label_close": "Closed",
-    "listCandidate": "List of candidates",
-    "totalCandidate": "Candidates",
+    "listCandidate": "List of contractors",
+    "totalCandidate": "contractors",
     "viewProfile": "View profile",
     "empty": "No service request",
-    "empty_description": "No service request have been submitted."
+    "empty_description": "No service request have been submitted.",
+    "noContractor": "No contractor",
+    "noContractorYet": "No contractor have registered yet.",
+    "contractorDetail": {
+      "title": "Contractor details",
+      "completedProject": "Completed project",
+      "project": "project",
+      "rating": "Rating",
+      "createAt": "Creation date",
+      "images": "Project images"
+    }
   },
   "adminPartnerManager": {
     "empty": "No partners",
