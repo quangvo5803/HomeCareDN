@@ -17,7 +17,7 @@ namespace HomeCareDNAPI.Controllers.Contractor
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-contractor-byservicerequestid")]
+        [HttpGet("get-all-contractor-by-service-request-id")]
         public async Task<IActionResult> GetAllContractorByServiceRequestId([FromQuery] QueryParameters parameters)
         {
             return Ok(await _facadeService.ContractorApplicationService

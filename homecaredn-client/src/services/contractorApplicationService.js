@@ -32,7 +32,7 @@ const buildContractorFormData = (contractor) => {
 export const contractorApplicationService = {
 
   getAllContractorByServiceRequestId: async (params = {}) => {
-    const res = await api.get('/ContractorApplication/get-all-contractor-byservicerequestid', {
+    const res = await api.get('/ContractorApplication/get-all-contractor-by-service-request-id', {
       params,
     });
     return res.data;
