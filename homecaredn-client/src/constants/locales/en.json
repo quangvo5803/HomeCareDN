@@ -1086,6 +1086,7 @@
     "pending": "Pending",
     "rejected": "Rejected",
     "approved": "Approved",
-    "processed": "Processed"
+    "processed": "Processed",
+    "new": "New"
   }
 }

@@ -7,6 +7,10 @@ import 'venobox/dist/venobox.min.css';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
+import { handleApiError } from '../../utils/handleApiError';
+import { toast } from 'react-toastify';
+import { contractorApplicationService } from '../../services/contractorApplicationService';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function ServiceRequestDetail() {
   const navigate = useNavigate();
@@ -17,6 +21,53 @@ export default function ServiceRequestDetail() {
 
   const [serviceRequest, setServiceRequest] = useState(null);
   const [selectedContractor, setSelectedContractor] = useState(null);
+  const [estimatePrice, setEstimatePrice] = useState('');
+
+  const handleAcceptContractor = async () => {
+    console.log('Accept contractor');
+    const contractorApplicationID = selectedContractor.contractorApplicationID;
+    try {
+      const approvedContractor =
+        await contractorApplicationService.acceptContractorApplication(
+          contractorApplicationID
+        );
+      setSelectedContractor(approvedContractor);
+
+      setServiceRequest((prev) => ({
+        ...prev,
+        contractorApplications: prev.contractorApplications.map((c) =>
+          c.contractorApplicationID === contractorApplicationID
+            ? approvedContractor
+            : c
+        ),
+      }));
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
+    }
+  };
+
+  const handleRejectContractors = async () => {
+    console.log('Reject contractor');
+    const contractorApplicationID = selectedContractor.contractorApplicationID;
+    try {
+      const rejectContractor =
+        await contractorApplicationService.rejectContractorApplication(
+          contractorApplicationID
+        );
+      setSelectedContractor(rejectContractor);
+
+      setServiceRequest((prev) => ({
+        ...prev,
+        contractorApplications: prev.contractorApplications.map((c) =>
+          c.contractorApplicationID === contractorApplicationID
+            ? rejectContractor
+            : c
+        ),
+      }));
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
+    }
+  };
 
   useEffect(() => {
     if (!serviceRequestId) return;
@@ -304,11 +355,10 @@ export default function ServiceRequestDetail() {
                     <h3 className="font-bold text-gray-900 mb-2 text-lg">
                       {selectedContractor.contractorApplicationID.substring(
                         0,
-                        16
+                        12
                       )}
-                      ...
                     </h3>
-                    <div className="flex items-center justify-center gap-4 text-sm">
+                    <div className="flex items-center justify-center gap-4 text-sm mb-2">
                       <span className="flex items-center gap-1 text-yellow-600">
                         <i className="fas fa-star"></i>
                         <span className="font-semibold">
@@ -322,6 +372,7 @@ export default function ServiceRequestDetail() {
                         {t('userPage.serviceRequestDetail.label_project')}
                       </span>
                     </div>
+                    <StatusBadge status={selectedContractor.status} />
                   </div>
 
                   {/* Price */}
@@ -431,11 +482,17 @@ export default function ServiceRequestDetail() {
                   {/* Action Buttons */}
                   {selectedContractor.status === 'Pending' && (
                     <div className="grid grid-cols-2 gap-3">
-                      <button className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold shadow-sm hover:shadow-md">
+                      <button
+                        onClick={() => handleAcceptContractor()}
+                        className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition font-semibold shadow-sm hover:shadow-md"
+                      >
                         <i className="fas fa-check mr-2"></i>
                         {t('BUTTON.Accept')}
                       </button>
-                      <button className="px-4 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold border border-gray-300">
+                      <button
+                        onClick={() => handleRejectContractors()}
+                        className="px-4 py-3 bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold border border-gray-300"
+                      >
                         <i className="fas fa-times mr-2"></i>
                         {t('BUTTON.Reject')}
                       </button>
@@ -480,7 +537,7 @@ export default function ServiceRequestDetail() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-gray-900 group-hover:text-orange-600 transition truncate mb-1">
-                                {c.contractorApplicationID.substring(0, 12)}...
+                                {c.contractorApplicationID.substring(0, 12)}
                               </h4>
                               <div className="flex items-center gap-3 text-xs text-gray-500">
                                 <span className="flex items-center gap-1">
@@ -506,15 +563,18 @@ export default function ServiceRequestDetail() {
                           </p>
 
                           <div className="flex items-center justify-between pt-3 border-t">
-                            <span className="text-xs text-gray-500 uppercase tracking-wide">
-                              {t(
-                                'userPage.serviceRequestDetail.label_estimatePrice'
-                              )}
+                            <span className="text-xs text-gray-500 tracking-wide">
+                              <StatusBadge status={c.status} />
                             </span>
                             <span className="text-lg font-bold text-orange-600">
+                              <span className="text-sm text-gray-500 font-normal">
+                                {t(
+                                  'userPage.serviceRequestDetail.label_estimatePrice'
+                                )}{' '}
+                              </span>
                               {(c.estimatePrice / 1000000).toFixed(0)}{' '}
                               <span className="text-sm">
-                                {i18n.language === 'vi' ? 'triệu' : 'M'}
+                                {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
                               </span>
                             </span>
                           </div>
