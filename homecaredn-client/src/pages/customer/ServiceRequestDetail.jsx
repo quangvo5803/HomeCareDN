@@ -21,7 +21,6 @@ export default function ServiceRequestDetail() {
 
   const [serviceRequest, setServiceRequest] = useState(null);
   const [selectedContractor, setSelectedContractor] = useState(null);
-  const [estimatePrice, setEstimatePrice] = useState('');
 
   const handleAcceptContractor = async () => {
     console.log('Accept contractor');

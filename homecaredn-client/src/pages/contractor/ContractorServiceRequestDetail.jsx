@@ -548,44 +548,6 @@ export default function ContractorServiceRequestDetail() {
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-5">
-<<<<<<< HEAD
-                {/* Bid price */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    <i className="fas fa-coins mr-2 text-gray-500" />
-                    {t('contractorServiceRequestDetail.bidPrice')}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
-                      ₫
-                    </span>
-                    <input
-                      type="number"
-                      min="0"
-                      value={estimatePrice}
-                      onChange={(e) => setEstimatePrice(e.target.value)}
-                      placeholder={
-                        serviceRequest.estimatePrice
-                          ? t(
-                              'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                              { est: formatVND(serviceRequest.estimatePrice) }
-                            )
-                          : t(
-                              'contractorServiceRequestDetail.bidPricePlaceholder'
-                            )
-                      }
-                      aria-label={t('contractorServiceRequestDetail.bidPrice')}
-                      className="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-green-500 pl-7 pr-14"
-                    />
-                    <span className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400 text-xs">
-                      VND
-                    </span>
-                  </div>
-                  {serviceRequest.estimatePrice && (
-                    <p className="mt-1 text-xs text-gray-500">
-                      {numberToWordsByLang(serviceRequest.estimatePrice)}
-                    </p>
-=======
                 {/* Bid Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -630,7 +592,6 @@ export default function ContractorServiceRequestDetail() {
                         </span>
                       </p>
                     </>
->>>>>>> 977613e ([HuyLTM - 2025-10-17] Customer Select/Reject Contractor for Servcie Request (FE))
                   )}
                 </div>
 
