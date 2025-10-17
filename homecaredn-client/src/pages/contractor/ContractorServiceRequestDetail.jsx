@@ -548,6 +548,7 @@ export default function ContractorServiceRequestDetail() {
               </h3>
 
               <form onSubmit={handleSubmit} className="space-y-5">
+<<<<<<< HEAD
                 {/* Bid price */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -584,6 +585,52 @@ export default function ContractorServiceRequestDetail() {
                     <p className="mt-1 text-xs text-gray-500">
                       {numberToWordsByLang(serviceRequest.estimatePrice)}
                     </p>
+=======
+                {/* Bid Price */}
+                <div className="space-y-2 lg:col-span-2">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <i className="fas fa-coins text-orange-500 mr-2"></i>
+                    {t('contractorServiceRequestDetail.bidPrice')}
+                  </label>
+
+                  <input
+                    type="number"
+                    min={0}
+                    step={1000}
+                    value={estimatePrice}
+                    onChange={(e) => setEstimatePrice(e.target.value)}
+                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg 
+               focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    placeholder={
+                      serviceRequest.estimatePrice
+                        ? t(
+                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                            {
+                              est: formatVND(serviceRequest.estimatePrice),
+                            }
+                          )
+                        : t(
+                            'contractorServiceRequestDetail.bidPricePlaceholder'
+                          )
+                    }
+                  />
+
+                  {estimatePrice && (
+                    <>
+                      <p className="text-sm text-gray-500">
+                        {t('contractorServiceRequestDetail.bidPriceLabel')}{' '}
+                        <span className="font-semibold text-orange-600">
+                          {formatVND(Number(estimatePrice))}
+                        </span>
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {t('contractorServiceRequestDetail.bidPriceInWords')}{' '}
+                        <span className="font-semibold">
+                          {numberToWordsByLang(Number(estimatePrice))}
+                        </span>
+                      </p>
+                    </>
+>>>>>>> 977613e ([HuyLTM - 2025-10-17] Customer Select/Reject Contractor for Servcie Request (FE))
                   )}
                 </div>
 

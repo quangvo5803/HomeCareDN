@@ -415,6 +415,8 @@
     "bidPrice": "Bid price (VND)",
     "bidPricePlaceholder": "e.g., 200,000,000",
     "bidPricePlaceholderWithEst": "e.g., around {{est}}",
+    "bidPriceLabel": "Bid amount:",
+    "bidPriceInWords": "In words:",
     "startDate": "Expected start date",
     "durationDays": "Construction time (days)",
     "durationDaysPlaceholder": "e.g., 60",

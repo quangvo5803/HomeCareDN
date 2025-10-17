@@ -414,6 +414,8 @@
     "bidPrice": "Giá chào thầu (VND)",
     "bidPricePlaceholder": "VD: 200.000.000",
     "bidPricePlaceholderWithEst": "VD: khoảng {{est}}",
+    "bidPriceLabel": "Số tiền chào thầu:",
+    "bidPriceInWords": "Bằng chữ:",
     "startDate": "Ngày bắt đầu dự kiến",
     "durationDays": "Thời gian thi công (ngày)",
     "durationDaysPlaceholder": "VD: 60",
