@@ -73,10 +73,17 @@ export default function ServiceRequestDetail() {
   useEffect(() => {
     if (!serviceRequestId) return;
     const fetchServiceRequest = async () => {
-      const result = await getServiceRequestById(serviceRequestId);
-      setServiceRequest(result);
-      if (result.selectedContractorApplication) {
-        setSelectedContractor(result.selectedContractorApplication);
+      try {
+        setUploadProgress(1);
+        const result = await getServiceRequestById(serviceRequestId);
+        setServiceRequest(result);
+        if (result.selectedContractorApplication) {
+          setSelectedContractor(result.selectedContractorApplication);
+        }
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setUploadProgress(0);
       }
     };
     fetchServiceRequest();
