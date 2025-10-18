@@ -5,12 +5,13 @@ import { useTranslation } from "react-i18next";
 import { useServiceRequest } from "../../hook/useServiceRequest";
 import { formatVND } from '../../utils/formatters';
 import { Pagination } from 'antd';
-
-
+import StatusBadge from "../../components/StatusBadge";
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
 
 export default function AdminServiceRequestDetail() {
     const { id } = useParams();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [detail, setDetail] = useState(null);
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
@@ -58,6 +59,11 @@ export default function AdminServiceRequestDetail() {
     const selectedContractor = contractors?.find(
         (c) => c.contractorEmail === selectedContractorEmail
     );
+
+    useEffect(() => {
+        const vb = new VenoBox({ selector: '.venobox' });
+        return () => vb.close();
+    }, [detail, selectedContractor]);
 
     if (!detail) return <Loading />;
     if (loading) return <Loading />;
@@ -211,8 +217,8 @@ export default function AdminServiceRequestDetail() {
                                         className={`fas ${detail.isOpen ? 'fa-check-circle' : 'fa-clock'} mr-1`}
                                     ></i>
                                     {detail.isOpen
-                                        ? t('userPage.serviceRequest.label_open')
-                                        : t('userPage.serviceRequest.label_close')}
+                                        ? t('adminServiceRequestManager.label_open')
+                                        : t('adminServiceRequestManager.label_close')}
                                 </span>
                             </div>
                         </div>
@@ -222,16 +228,19 @@ export default function AdminServiceRequestDetail() {
                     {detail.imageUrls?.length > 0 && (
                         <div className="mt-6 flex flex-wrap gap-4">
                             {detail.imageUrls.map((url, i) => (
-                                <div
+                                <a
                                     key={`${url}-${i}`}
-                                    className="bg-white rounded-lg border border-gray-200 p-2 flex items-center justify-center w-28 h-28"
+                                    href={url}
+                                    className="venobox bg-white rounded-lg border border-gray-200 p-2 flex items-center justify-center w-28 h-28 overflow-hidden"
+                                    data-gall="detail-image-gallery"
+                                    title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${i + 1}`}
                                 >
                                     <img
                                         src={url}
                                         alt={`img-${i}`}
                                         className="max-w-full max-h-full object-contain rounded-md hover:scale-105 transition-transform duration-300"
                                     />
-                                </div>
+                                </a>
                             ))}
                         </div>
                     )}
@@ -273,7 +282,7 @@ export default function AdminServiceRequestDetail() {
                                                     >
                                                         <img
                                                             src={`https://ui-avatars.com/api/?name=${encodeURIComponent(items.contractorEmail || 'User')}
-                                                                &background=${isSelected ? 'ffffff' : 'random'}&color=${isSelected ? '000000' : 'fff'}`
+                                                                &background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`
                                                             }
                                                             alt="avatar"
                                                             className="object-cover w-full h-full"
@@ -336,137 +345,125 @@ export default function AdminServiceRequestDetail() {
                 </div>
 
                 {/* Detail contractor */}
-                {selectedContractor && (() => {
-                    const STATUS_STYLES = {
-                        Pending: 'bg-yellow-100 text-yellow-700 border-yellow-300',
-                        Approved: 'bg-green-100 text-green-700 border-green-300',
-                        Rejected: 'bg-red-100 text-red-700 border-red-300',
-                    };
-
-                    const statusClass = STATUS_STYLES[selectedContractor.status];
-
-                    return (
-                        <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-                            {/* Header */}
-                            <div className="bg-gradient-to-r px-8 py-6">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-2xl font-bold text-black">
-                                        {t('adminServiceRequestManager.contractorDetail.title')}
-                                    </h3>
-                                    <span
-                                        className={`px-4 py-1.5 backdrop-blur-sm text-sm rounded-full font-medium border ${statusClass}`}
-                                    >
-                                        {t(`adminServiceRequestManager.status.${selectedContractor.status}`)}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Content */}
-                            <div className="p-8">
-                                {/* Profile Section */}
-                                <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
-                                    <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
-                                        <img
-                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                                selectedContractor.contractorName
-                                            )}&background=f97316&color=fff&bold=true&size=128`}
-                                            alt="avatar"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-xl text-gray-800 mb-2">{selectedContractor.contractorName}</h4>
-                                        <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
-                                            <i className="fa-solid fa-envelope text-orange-500"></i>
-                                            {selectedContractor.contractorEmail}
-                                        </p>
-                                        <p className="text-gray-600 text-sm flex items-center gap-2">
-                                            <i className="fa-solid fa-phone text-orange-500"></i>
-                                            {selectedContractor.contractorPhone}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Grid Info */}
-                                <div className="grid grid-cols-2 gap-4 mb-8">
-                                    {/* Estimate Price */}
-                                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
-                                        <p className="text-emerald-600 text-sm font-medium mb-1">
-                                            {t('adminServiceRequestManager.estimatePrice')}
-                                        </p>
-                                        <p className="font-bold text-lg text-emerald-700">
-                                            {formatVND(selectedContractor.estimatePrice)}
-                                        </p>
-                                    </div>
-
-                                    {/* Completed Project */}
-                                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
-                                        <p className="text-blue-600 text-sm font-medium mb-1">
-                                            {t('adminServiceRequestManager.contractorDetail.completedProject')}
-                                        </p>
-                                        <p className="font-bold text-lg text-blue-700">
-                                            {selectedContractor.completedProjectCount}{' '}
-                                            {t('adminServiceRequestManager.contractorDetail.project')}
-                                        </p>
-                                    </div>
-
-                                    {/* Rating */}
-                                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
-                                        <p className="text-amber-600 text-sm font-medium mb-1">
-                                            {t('adminServiceRequestManager.contractorDetail.rating')}
-                                        </p>
-                                        <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
-                                            <i className="fa-solid fa-star"></i>
-                                            {selectedContractor.averageRating}
-                                        </p>
-                                    </div>
-
-                                    {/* Created At */}
-                                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
-                                        <p className="text-purple-600 text-sm font-medium mb-1">
-                                            {t('adminServiceRequestManager.contractorDetail.createAt')}
-                                        </p>
-                                        <p className="font-bold text-lg text-purple-700">
-                                            {new Date(selectedContractor.createdAt).toLocaleDateString('vi-VN')}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Description */}
-                                <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-                                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-                                        {t('adminServiceRequestManager.description')}
-                                    </p>
-                                    <p className="text-gray-700 leading-relaxed">{selectedContractor.description}</p>
-                                </div>
-
-                                {/* Images */}
-                                {selectedContractor.imageUrls?.length > 0 && (
-                                    <div>
-                                        <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
-                                            {t('adminServiceRequestManager.contractorDetail.images')}
-                                        </p>
-                                        <div className="grid grid-cols-5 gap-3">
-                                            {selectedContractor.imageUrls.map((url, i) => (
-                                                <div
-                                                    key={`${url}-${i}`}
-                                                    className="w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer"
-                                                >
-                                                    <img
-                                                        src={url}
-                                                        alt={`${i + 1}`}
-                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                {selectedContractor && (
+                    <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r px-8 py-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-2xl font-bold text-black">
+                                    {t('adminServiceRequestManager.contractorDetail.title')}
+                                </h3>
+                                <StatusBadge status={selectedContractor.status} />
                             </div>
                         </div>
-                    );
-                })()}
 
+                        {/* Content */}
+                        <div className="p-8">
+                            {/* Profile Section */}
+                            <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
+                                <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
+                                    <img
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                            selectedContractor.contractorName
+                                        )}&background=f97316&color=fff&bold=true&size=128`}
+                                        alt="avatar"
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-xl text-gray-800 mb-2">{selectedContractor.contractorName}</h4>
+                                    <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
+                                        <i className="fa-solid fa-envelope text-orange-500"></i>
+                                        {selectedContractor.contractorEmail}
+                                    </p>
+                                    <p className="text-gray-600 text-sm flex items-center gap-2">
+                                        <i className="fa-solid fa-phone text-orange-500"></i>
+                                        {selectedContractor.contractorPhone}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Grid Info */}
+                            <div className="grid grid-cols-2 gap-4 mb-8">
+                                {/* Estimate Price */}
+                                <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
+                                    <p className="text-emerald-600 text-sm font-medium mb-1">
+                                        {t('adminServiceRequestManager.estimatePrice')}
+                                    </p>
+                                    <p className="font-bold text-lg text-emerald-700">
+                                        {formatVND(selectedContractor.estimatePrice)}
+                                    </p>
+                                </div>
+
+                                {/* Completed Project */}
+                                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
+                                    <p className="text-blue-600 text-sm font-medium mb-1">
+                                        {t('adminServiceRequestManager.contractorDetail.completedProject')}
+                                    </p>
+                                    <p className="font-bold text-lg text-blue-700">
+                                        {selectedContractor.completedProjectCount}{' '}
+                                        {t('adminServiceRequestManager.contractorDetail.project')}
+                                    </p>
+                                </div>
+
+                                {/* Rating */}
+                                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
+                                    <p className="text-amber-600 text-sm font-medium mb-1">
+                                        {t('adminServiceRequestManager.contractorDetail.rating')}
+                                    </p>
+                                    <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
+                                        <i className="fa-solid fa-star"></i>
+                                        {selectedContractor.averageRating}
+                                    </p>
+                                </div>
+
+                                {/* Created At */}
+                                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
+                                    <p className="text-purple-600 text-sm font-medium mb-1">
+                                        {t('adminServiceRequestManager.contractorDetail.createAt')}
+                                    </p>
+                                    <p className="font-bold text-lg text-purple-700">
+                                        {new Date(selectedContractor.createdAt).toLocaleDateString('vi-VN')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Description */}
+                            <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+                                <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+                                    {t('adminServiceRequestManager.description')}
+                                </p>
+                                <p className="text-gray-700 leading-relaxed">{selectedContractor.description}</p>
+                            </div>
+
+                            {/* Images */}
+                            {selectedContractor.imageUrls?.length > 0 && (
+                                <div>
+                                    <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
+                                        {t('adminServiceRequestManager.contractorDetail.images')}
+                                    </p>
+                                    <div className="grid grid-cols-5 gap-3">
+                                        {selectedContractor.imageUrls.map((url, i) => (
+                                            <a
+                                                key={`${url}-${i}`}
+                                                href={url}
+                                                className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                                                data-gall="contractor-gallery"
+                                                title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${i + 1}`}
+                                            >
+                                                <img
+                                                    src={url}
+                                                    alt={`contractor-${i}`}
+                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                />
+                                            </a>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
