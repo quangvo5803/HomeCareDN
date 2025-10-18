@@ -23,30 +23,24 @@ export default function ServiceRequestDetail() {
   const [selectedContractor, setSelectedContractor] = useState(null);
 
   const handleAcceptContractor = async () => {
-    console.log('Accept contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
-      const approvedContractor =
-        await contractorApplicationService.acceptContractorApplication(
-          contractorApplicationID
-        );
-      setSelectedContractor(approvedContractor);
-
-      setServiceRequest((prev) => ({
-        ...prev,
-        contractorApplications: prev.contractorApplications.map((c) =>
-          c.contractorApplicationID === contractorApplicationID
-            ? approvedContractor
-            : c
-        ),
-      }));
+      await contractorApplicationService.acceptContractorApplication(
+        contractorApplicationID
+      );
+      const updatedServiceRequest = await getServiceRequestById(
+        serviceRequestId
+      );
+      setServiceRequest(updatedServiceRequest);
+      setSelectedContractor(
+        updatedServiceRequest.selectedContractorApplication
+      );
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
   };
 
   const handleRejectContractors = async () => {
-    console.log('Reject contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
       const rejectContractor =
