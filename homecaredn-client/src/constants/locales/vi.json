@@ -1087,9 +1087,10 @@
     "sortMaterialCount": "Số lượng sản phẩm: Ít -> Nhiều",
     "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít",
     "All": "Tất cả",
-    "pending": "Đang chờ",
-    "rejected": "Đã từ chối",
-    "approved": "Đã chấp nhận",
-    "processed": "Đã xử lý"
+    "Pending": "Đang chờ",
+    "Rejected": "Đã từ chối",
+    "Approved": "Đã chấp nhận",
+    "Processed": "Đã xử lý",
+    "New": "Mới"
   }
 }

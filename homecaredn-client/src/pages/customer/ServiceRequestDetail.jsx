@@ -24,47 +24,49 @@ export default function ServiceRequestDetail() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleAcceptContractor = async () => {
+    console.log('Accept contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
-      await contractorApplicationService.acceptContractorApplication(
-        contractorApplicationID
-      );
-      const updatedServiceRequest = await getServiceRequestById(
-        serviceRequestId
-      );
-      setServiceRequest(updatedServiceRequest);
-      setSelectedContractor(
-        updatedServiceRequest.selectedContractorApplication
-      );
+      const approvedContractor =
+        await contractorApplicationService.acceptContractorApplication(
+          contractorApplicationID
+        );
+      setSelectedContractor(approvedContractor);
+
+      setServiceRequest((prev) => ({
+        ...prev,
+        contractorApplications: prev.contractorApplications.map((c) =>
+          c.contractorApplicationID === contractorApplicationID
+            ? approvedContractor
+            : c
+        ),
+        selectedContractorApplication: approvedContractor,
+      }));
     } catch (error) {
       toast.error(t(handleApiError(error)));
-    } finally {
-      setUploadProgress(0);
     }
   };
 
   const handleRejectContractors = async () => {
+    console.log('Reject contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
-      await contractorApplicationService.rejectContractorApplication(
-        contractorApplicationID
-      );
-      const updatedServiceRequest = await getServiceRequestById(
-        serviceRequestId
-      );
-      setServiceRequest(updatedServiceRequest);
+      const rejectContractor =
+        await contractorApplicationService.rejectContractorApplication(
+          contractorApplicationID
+        );
+      setSelectedContractor(rejectContractor);
 
-      // Giữ focus vào contractor vừa thao tác (nếu còn trong list)
-      const updatedItem =
-        (updatedServiceRequest.contractorApplications || []).find(
-          (c) => c.contractorApplicationID === contractorApplicationID
-        ) || null;
-
-      setSelectedContractor(updatedItem);
+      setServiceRequest((prev) => ({
+        ...prev,
+        contractorApplications: prev.contractorApplications.map((c) =>
+          c.contractorApplicationID === contractorApplicationID
+            ? rejectContractor
+            : c
+        ),
+      }));
     } catch (error) {
       toast.error(t(handleApiError(error)));
-    } finally {
-      setUploadProgress(0);
     }
   };
 

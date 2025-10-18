@@ -8,19 +8,19 @@ export default function StatusBadge({ status }) {
       : status;
   const map = {
     Pending: {
-      text: t('common.pending'),
+      text: t('common.Pending'),
       cls: 'bg-yellow-100 text-yellow-700',
     },
     Approved: {
-      text: t('common.approved'),
+      text: t('common.Approved'),
       cls: 'bg-green-100 text-green-700',
     },
     Process: {
-      text: t('common.approved'),
+      text: t('common.Processed'),
       cls: 'bg-green-100 text-green-700',
     },
     Rejected: {
-      text: t('common.rejected'),
+      text: t('common.Rejected'),
       cls: 'bg-red-100 text-red-700',
     },
   };
