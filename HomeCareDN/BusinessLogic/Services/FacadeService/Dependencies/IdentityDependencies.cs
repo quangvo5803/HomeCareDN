@@ -1,7 +1,7 @@
 ﻿using DataAccess.Entities.Authorize;
 using Microsoft.AspNetCore.Identity;
 
-namespace BusinessLogic.Services.FacadeService
+namespace BusinessLogic.Services.FacadeService.Dependencies
 {
     public class IdentityDependencies
     {

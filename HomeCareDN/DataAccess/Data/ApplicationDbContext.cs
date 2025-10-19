@@ -20,6 +20,10 @@ namespace DataAccess.Data
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ContactSupport> ContactSupports { get; set; }
         public DbSet<PartnerRequest> PartnerRequests { get; set; }
+        public DbSet<MaterialRequest> MaterialRequests { get; set; }
+        public DbSet<MaterialRequestItem> MaterialRequestItems { get; set; }
+        public DbSet<DistributorApplication> DistributorApplications { get; set; }
+        public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
