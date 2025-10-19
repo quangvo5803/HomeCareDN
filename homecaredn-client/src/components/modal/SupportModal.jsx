@@ -127,7 +127,7 @@ export default function SupportModal({ isOpen, onClose, supportID }) {
               onClick={handleSubmit}
               className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
             >
-              {t('BUTTON.SendReply')}
+              {t('BUTTON.Send')}
             </button>
           )}
         </div>

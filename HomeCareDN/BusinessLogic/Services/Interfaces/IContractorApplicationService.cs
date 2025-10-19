@@ -10,6 +10,12 @@ namespace BusinessLogic.Services.Interfaces
         Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
             ContractorGetApplicationDto getRequest
         );
+        Task<ContractorApplicationPendingDto> AcceptContractorApplicationAsync(
+            Guid contractorApplicationID
+        );
+        Task<ContractorApplicationPendingDto> RejectContractorApplicationAsync(
+            Guid contractorApplicationID
+        );
 
         Task DeleteContractorApplicationAsync(Guid id);
     }
