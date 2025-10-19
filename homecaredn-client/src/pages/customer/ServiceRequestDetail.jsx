@@ -24,7 +24,6 @@ export default function ServiceRequestDetail() {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleAcceptContractor = async () => {
-    console.log('Accept contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
       const approvedContractor =
@@ -48,7 +47,6 @@ export default function ServiceRequestDetail() {
   };
 
   const handleRejectContractors = async () => {
-    console.log('Reject contractor');
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
       const rejectContractor =
