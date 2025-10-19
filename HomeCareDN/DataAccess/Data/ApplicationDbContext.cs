@@ -39,6 +39,7 @@ namespace DataAccess.Data
                 entity.Property(e => e.MainStructureType).HasConversion<string>();
 
                 entity.Property(e => e.DesignStyle).HasConversion<string>();
+                entity.Property(e => e.Status).HasConversion<string>();
             });
 
             modelBuilder.Entity<ContractorApplication>(entity =>
@@ -65,6 +66,10 @@ namespace DataAccess.Data
             {
                 entity.Property(p => p.PartnerRequestType).HasConversion<string>();
                 entity.Property(p => p.Status).HasConversion<string>();
+            });
+            modelBuilder.Entity<MaterialRequest>(entity =>
+            {
+                entity.Property(mr => mr.Status).HasConversion<string>();
             });
             base.OnModelCreating(modelBuilder);
         }

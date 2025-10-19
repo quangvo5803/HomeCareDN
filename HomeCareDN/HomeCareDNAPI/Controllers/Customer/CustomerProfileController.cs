@@ -1,5 +1,4 @@
 ﻿using BusinessLogic.DTOs.Authorize.Profiles;
-using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
