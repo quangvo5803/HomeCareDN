@@ -1,3 +1,4 @@
+using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
 
 namespace BusinessLogic.Services.FacadeService

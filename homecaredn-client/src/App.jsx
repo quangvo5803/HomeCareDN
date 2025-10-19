@@ -1,9 +1,19 @@
 import { useState, useEffect } from 'react';
 
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import 'react-toastify/dist/ReactToastify.css';
+import { setNavigate } from './utils/navigateHelper';
+
+import Unauthorized from './pages/Unauthorized';
+import NotFound from './pages/NotFound';
 
 // Public pages
 import Home from './pages/Home';
@@ -60,7 +70,11 @@ function App() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    setNavigate(navigate);
+  }, [navigate]);
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
@@ -331,6 +345,12 @@ function Layout() {
         <Route path="MaterialViewAll" element={<MaterialViewAll />} />
         <Route path="RepairViewAll" element={<RepairViewAll />} />
         <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
+
+        {/* Trang thông báo lỗi */}
+        <Route path="/Unauthorized" element={<Unauthorized />} />
+
+        {/* 404 fallback */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {showHeaderFooter && <Footer />}
     </>
