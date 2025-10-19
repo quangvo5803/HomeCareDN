@@ -49,6 +49,26 @@ namespace HomeCareDNAPI.Controllers.Contractor
             return Ok(request);
         }
 
+        [HttpPut("accept-contractor-application/{contractorApplicationID:guid}")]
+        public async Task<IActionResult> AcceptApplication(Guid contractorApplicationID)
+        {
+            var request =
+                await _facadeService.ContractorApplicationService.AcceptContractorApplicationAsync(
+                    contractorApplicationID
+                );
+            return Ok(request);
+        }
+
+        [HttpPut("reject-contractor-application/{contractorApplicationID:guid}")]
+        public async Task<IActionResult> RejectApplication(Guid contractorApplicationID)
+        {
+            var request =
+                await _facadeService.ContractorApplicationService.RejectContractorApplicationAsync(
+                    contractorApplicationID
+                );
+            return Ok(request);
+        }
+
         [HttpDelete("delete-contractor-application/{id:guid}")]
         public async Task<IActionResult> DeleteAppication(Guid id)
         {
