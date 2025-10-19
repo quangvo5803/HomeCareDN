@@ -37,7 +37,7 @@ api.interceptors.response.use(
       originalRequest._forbiddenHandled = true;
       toast.error('Bạn không có quyền truy cập trang này!');
       navigateTo('/Unauthorized');
-      return Promise.reject(error);
+      return error;
     }
     // Network Error
     if (error.message === 'Network Error' && !error.response) {
