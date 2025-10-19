@@ -199,7 +199,8 @@
     "buildingType": "Loại tòa nhà",
     "packageOption": "Tùy chọn gói",
     "mainStructure": "Loại cấu trúc chính",
-    "designStyle": "Phong cách thiết kế"
+    "designStyle": "Phong cách thiết kế",
+    "updating": "Đang cập nhật"
   },
   "login": {
     "title": "Đăng Nhập",

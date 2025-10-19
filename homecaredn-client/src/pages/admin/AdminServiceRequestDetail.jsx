@@ -32,17 +32,23 @@ export default function AdminServiceRequestDetail() {
         const fetchData = async () => {
             const detailServiceRes = await getServiceRequestById(id);
             setDetail(detailServiceRes);
-        };
-        fetchData();
-    }, [id, getServiceRequestById]);
 
-    useEffect(() => {
-        fetchContractorByServiceRequestId({
-            PageNumber: currentPage,
-            PageSize: pageSize,
-            FilterID: id,
-        });
-    }, [currentPage, pageSize, fetchContractorByServiceRequestId, id]);
+            const allPending =
+                detailServiceRes.selectedContractorApplication?.every(
+                    (c) => c.status === "Pending"
+                ) ?? true;
+            if (allPending) {
+                fetchContractorByServiceRequestId({
+                    PageNumber: currentPage,
+                    PageSize: pageSize,
+                    FilterID: id,
+                });
+            }
+        };
+
+        fetchData();
+    }, [id, currentPage, pageSize, getServiceRequestById, fetchContractorByServiceRequestId]);
+
 
     const icons = {
         Repair: 'fa-drafting-compass',
@@ -67,6 +73,8 @@ export default function AdminServiceRequestDetail() {
 
     if (!detail) return <Loading />;
     if (loading) return <Loading />;
+
+    const isPendingStatus = detail.contractorApplications?.some(c => c.status === "Pending");
     return (
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-3xl">
 
@@ -124,7 +132,11 @@ export default function AdminServiceRequestDetail() {
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500">{t('sharedEnums.packageOption')}</p>
-                                <p className="font-semibold text-gray-800">{t(`Enums.PackageOption.${detail.packageOption}`)}</p>
+                                <p className="font-semibold text-gray-800">
+                                    {detail.packageOption
+                                        ? t(`Enums.PackageOption.${detail.packageOption}`)
+                                        : t(`sharedEnums.updating`)
+                                    }</p>
                             </div>
                         </div>
 
@@ -144,7 +156,11 @@ export default function AdminServiceRequestDetail() {
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500">{t('sharedEnums.mainStructure')}</p>
-                                <p className="font-semibold text-gray-800">{t(`Enums.MainStructure.${detail.mainStructureType}`)}</p>
+                                <p className="font-semibold text-gray-800">
+                                    {detail.mainStructureType
+                                        ? t(`Enums.MainStructure.${detail.mainStructureType}`)
+                                        : t(`sharedEnums.updating`)
+                                    }</p>
                             </div>
                         </div>
 
@@ -154,7 +170,11 @@ export default function AdminServiceRequestDetail() {
                             </div>
                             <div>
                                 <p className="text-xs text-gray-500">{t('sharedEnums.designStyle')}</p>
-                                <p className="font-semibold text-gray-800">{t(`Enums.DesignStyle.${detail.designStyle}`)}</p>
+                                <p className="font-semibold text-gray-800">
+                                    {detail.designStyle
+                                        ? t(`Enums.DesignStyle.${detail.designStyle}`)
+                                        : t(`sharedEnums.updating`)}
+                                </p>
                             </div>
                         </div>
 
@@ -247,105 +267,218 @@ export default function AdminServiceRequestDetail() {
 
                 </div>
 
-                {/* List contractor */}
-                <div className="bg-white rounded-2xl shadow-lg p-6">
-                    <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-xl font-bold text-gray-800">{t('adminServiceRequestManager.listCandidate')}</h3>
-                        <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">{totalContractors || 0} {t('adminServiceRequestManager.totalCandidate')}</span>
-                    </div>
+                {/* Nếu status là Pending → hiển thị danh sách contractor */}
+                {isPendingStatus ? (
+                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-xl font-bold text-gray-800">
+                                {t('adminServiceRequestManager.listCandidate')}
+                            </h3>
+                            <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
+                                {totalContractors || 0} {t('adminServiceRequestManager.totalCandidate')}
+                            </span>
+                        </div>
 
-                    <div className="space-y-3">
-                        {contractors && contractors.length > 0 ? (
-                            <>
-                                {contractors.map((items) => {
-                                    const isSelected = items.contractorEmail === selectedContractorEmail;
+                        <div className="space-y-3">
+                            {contractors && contractors.length > 0 ? (
+                                <>
+                                    {contractors.map((items) => {
+                                        const isSelected = items.contractorEmail === selectedContractorEmail;
 
-                                    return (
-                                        <button
-                                            key={items.contractorApplicationID}
-                                            onClick={() => handleSelectContractor(items.contractorEmail)}
-                                            className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
-                                                focus:outline-none focus:ring-0 appearance-none
-                                                ${isSelected
-                                                    ? 'bg-orange-500 border-orange-600 text-white'
-                                                    : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
-                                                }`}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div
-                                                        className={`w-12 h-12 rounded-full overflow-hidden ring-2 transition-all duration-300
-                                                            ${isSelected
+                                        return (
+                                            <button
+                                                key={items.contractorApplicationID}
+                                                onClick={() => handleSelectContractor(items.contractorEmail)}
+                                                className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
+                                                    ${isSelected
+                                                        ? 'bg-orange-500 border-orange-600 text-white'
+                                                        : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div
+                                                            className={`w-12 h-12 rounded-full overflow-hidden ring-2 ${isSelected
                                                                 ? 'ring-white bg-white'
                                                                 : 'ring-transparent group-hover:ring-orange-400'
-                                                            }`}
-                                                    >
-                                                        <img
-                                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(items.contractorEmail || 'User')}
-                                                                &background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`
-                                                            }
-                                                            alt="avatar"
-                                                            className="object-cover w-full h-full"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <p
-                                                            className={`font-semibold transition-colors duration-200 
-                                                                ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-600'}`
-                                                            }
+                                                                }`}
                                                         >
-                                                            {items.contractorName}
-                                                        </p>
-                                                        <p className={`text-sm ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
-                                                            {items.contractorEmail}
-                                                        </p>
+                                                            <img
+                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(items.contractorEmail || 'User')}
+                                                                &background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`}
+                                                                alt="avatar"
+                                                                className="object-cover w-full h-full"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <p className={`font-semibold ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-600'}`}>
+                                                                {items.contractorName}
+                                                            </p>
+                                                            <p className={`text-sm ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
+                                                                {items.contractorEmail}
+                                                            </p>
+                                                        </div>
                                                     </div>
+
+                                                    <button
+                                                        className={`px-4 py-2 rounded-lg font-medium ${isSelected
+                                                            ? 'bg-orange-500 border-orange-600 text-white'
+                                                            : 'text-orange-600'
+                                                            }`}
+                                                        onClick={() => handleSelectContractor(items.contractorEmail)}
+                                                    >
+                                                        {t('adminServiceRequestManager.viewProfile')}{' '}
+                                                        <i className="fa-solid fa-arrow-right ms-1"></i>
+                                                    </button>
                                                 </div>
+                                            </button>
+                                        );
+                                    })}
 
-                                                <button
-                                                    className={`px-4 py-2 rounded-lg transition-colors duration-200 font-medium ${isSelected
-                                                        ? 'bg-orange-500 border-orange-600 text-white'
-                                                        : 'text-orange-600'
-                                                        }`}
-                                                    onClick={() => handleSelectContractor(items.contractorEmail)}
-                                                >
-                                                    {t('adminServiceRequestManager.viewProfile')}{' '}
-                                                    <i className="fa-solid fa-arrow-right ms-1"></i>
-                                                </button>
-
-                                            </div>
-                                        </button>
-                                    );
-                                })}
-
-                                {/* Pagination */}
-                                {totalContractors > 0 && (
-                                    <div className="flex justify-center py-4">
-                                        <Pagination
-                                            current={currentPage}
-                                            pageSize={pageSize}
-                                            total={totalContractors}
-                                            onChange={(page) => setCurrentPage(page)}
-                                            showSizeChanger={false}
-                                            size="small"
+                                    {totalContractors > 0 && (
+                                        <div className="flex justify-center py-4">
+                                            <Pagination
+                                                current={currentPage}
+                                                pageSize={pageSize}
+                                                total={totalContractors}
+                                                onChange={(page) => setCurrentPage(page)}
+                                                showSizeChanger={false}
+                                                size="small"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center mt-5 mb-5">
+                                    <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
+                                    <h3 className="mb-1 text-lg font-medium text-gray-900">
+                                        {t('adminServiceRequestManager.noContractor')}
+                                    </h3>
+                                    <p className="text-gray-500">{t('adminServiceRequestManager.noContractorYet')}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                ) : (
+                    //detail contractor được chọn
+                    detail?.selectedContractorApplication?.status === 'Approved' && (
+                        <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+                            <div className="bg-gradient-to-r px-8 py-6">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-2xl font-bold text-black">
+                                        {t('adminServiceRequestManager.contractorDetail.title')}
+                                    </h3>
+                                    <StatusBadge status={detail.selectedContractorApplication.status} />
+                                </div>
+                            </div>
+                            <div className="p-8">
+                                <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
+                                    <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
+                                        <img
+                                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                                detail.selectedContractorApplication.contractorName
+                                            )}&background=f97316&color=fff&bold=true&size=128`}
+                                            alt="avatar"
+                                            className="w-full h-full object-cover"
                                         />
                                     </div>
-                                )}
-                            </>
-                        ) : (
-                            <div className="flex flex-col items-center mt-5 mb-5">
-                                <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
-                                <h3 className="mb-1 text-lg font-medium text-gray-900">
-                                    {t('adminServiceRequestManager.noContractor')}
-                                </h3>
-                                <p className="text-gray-500">{t('adminServiceRequestManager.noContractorYet')}</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                                    <div className="flex-1">
+                                        <h4 className="font-bold text-xl text-gray-800 mb-2">{detail.selectedContractorApplication.contractorName}</h4>
+                                        <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
+                                            <i className="fa-solid fa-envelope text-orange-500"></i>
+                                            {detail.selectedContractorApplication.contractorEmail}
+                                        </p>
+                                        <p className="text-gray-600 text-sm flex items-center gap-2">
+                                            <i className="fa-solid fa-phone text-orange-500"></i>
+                                            {detail.selectedContractorApplication.contractorPhone}
+                                        </p>
+                                    </div>
+                                </div>
+                                {/* Grid Info */}
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    {/* Estimate Price */}
+                                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
+                                        <p className="text-emerald-600 text-sm font-medium mb-1">
+                                            {t('adminServiceRequestManager.estimatePrice')}
+                                        </p>
+                                        <p className="font-bold text-lg text-emerald-700">
+                                            {formatVND(detail.selectedContractorApplication.estimatePrice)}
+                                        </p>
+                                    </div>
 
-                {/* Detail contractor */}
-                {selectedContractor && (
+                                    {/* Completed Project */}
+                                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
+                                        <p className="text-blue-600 text-sm font-medium mb-1">
+                                            {t('adminServiceRequestManager.contractorDetail.completedProject')}
+                                        </p>
+                                        <p className="font-bold text-lg text-blue-700">
+                                            {detail.selectedContractorApplication.completedProjectCount ?? 0}{' '}
+                                            {t('adminServiceRequestManager.contractorDetail.project')}
+                                        </p>
+                                    </div>
+
+                                    {/* Rating */}
+                                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
+                                        <p className="text-amber-600 text-sm font-medium mb-1">
+                                            {t('adminServiceRequestManager.contractorDetail.rating')}
+                                        </p>
+                                        <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
+                                            <i className="fa-solid fa-star"></i>
+                                            {detail.selectedContractorApplication.averageRating}
+                                        </p>
+                                    </div>
+
+                                    {/* Created At */}
+                                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
+                                        <p className="text-purple-600 text-sm font-medium mb-1">
+                                            {t('adminServiceRequestManager.contractorDetail.createAt')}
+                                        </p>
+                                        <p className="font-bold text-lg text-purple-700">
+                                            {new Date(detail.selectedContractorApplication.createdAt).toLocaleDateString('vi-VN')}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Description */}
+                                <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+                                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+                                        {t('adminServiceRequestManager.description')}
+                                    </p>
+                                    <p className="text-gray-700 leading-relaxed">{detail.selectedContractorApplication.description}</p>
+                                </div>
+
+                                {/* Images */}
+                                {detail.selectedContractorApplication.imageUrls?.length > 0 && (
+                                    <div>
+                                        <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
+                                            {t('adminServiceRequestManager.contractorDetail.images')}
+                                        </p>
+                                        <div className="grid grid-cols-5 gap-3">
+                                            {detail.selectedContractorApplication.imageUrls.map((url, i) => (
+                                                <a
+                                                    key={`${url}-${i}`}
+                                                    href={url}
+                                                    className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                                                    data-gall="contractor-gallery"
+                                                    title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${i + 1}`}
+                                                >
+                                                    <img
+                                                        src={url}
+                                                        alt={`contractor-${i}`}
+                                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                    />
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )
+                )}
+
+                {/* Nếu Pending và có contractor đang chọn thì vẫn hiển thị detail bên dưới */}
+                {isPendingStatus && selectedContractor && (
                     <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                         {/* Header */}
                         <div className="bg-gradient-to-r px-8 py-6">

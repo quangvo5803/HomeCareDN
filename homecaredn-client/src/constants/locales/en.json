@@ -200,7 +200,8 @@
     "buildingType": "Building type",
     "packageOption": "Package option",
     "mainStructure": "Main structure type",
-    "designStyle": "Design style"
+    "designStyle": "Design style",
+    "updating": "Updating"
   },
   "login": {
     "title": "Login",
