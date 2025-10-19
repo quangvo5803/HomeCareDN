@@ -26,7 +26,7 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,SelectedContractorApplication";
+            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,

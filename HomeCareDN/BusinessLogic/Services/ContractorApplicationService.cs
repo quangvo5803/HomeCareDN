@@ -135,6 +135,89 @@ namespace BusinessLogic.Services
             return dto;
         }
 
+        public async Task<ContractorApplicationPendingDto> AcceptContractorApplicationAsync(
+            Guid contractorApplicationID
+        )
+        {
+            var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == contractorApplicationID,
+                includeProperties: "Images"
+            );
+            if (contractorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == contractorApplication.ServiceRequestID,
+                includeProperties: "ContractorApplications"
+            );
+
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            contractorApplication.Status = ApplicationStatus.Approved;
+            serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
+
+            if (serviceRequest.ContractorApplications != null)
+            {
+                foreach (var app in serviceRequest.ContractorApplications)
+                {
+                    if (app.ContractorApplicationID != contractorApplicationID)
+                    {
+                        app.Status = ApplicationStatus.Rejected;
+                    }
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<ContractorApplicationPendingDto>(contractorApplication);
+
+            return dto;
+        }
+
+        public async Task<ContractorApplicationPendingDto> RejectContractorApplicationAsync(
+            Guid contractorApplicationID
+        )
+        {
+            var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == contractorApplicationID
+            );
+
+            if (contractorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            if (contractorApplication.Status != ApplicationStatus.Pending)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { "APPLICATION_NOT_PENDING" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            contractorApplication.Status = ApplicationStatus.Rejected;
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<ContractorApplicationPendingDto>(contractorApplication);
+            return dto;
+        }
+
         public async Task DeleteContractorApplicationAsync(Guid id)
         {
             var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
