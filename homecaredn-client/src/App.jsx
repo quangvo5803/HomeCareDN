@@ -54,6 +54,7 @@ import ConstructionViewAll from './pages/ConstructionViewAll';
 import CustomerPage from './pages/customer/CustomerPage';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
 import ServiceRequestDetail from './pages/customer/ServiceRequestDetail';
+import MaterialRequestDetail from './pages/customer/MaterialRequestDetail';
 
 import AuthProvider from './context/AuthProvider';
 import { useAuth } from './hook/useAuth';
@@ -264,6 +265,14 @@ function Layout() {
           element={
             <ProtectedRoute allowedRoles={['Customer']}>
               <ServiceRequestDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Customer/MaterialRequestDetail/:materialRequestId"
+          element={
+            <ProtectedRoute allowedRoles={['Customer']}>
+              <MaterialRequestDetail />
             </ProtectedRoute>
           }
         />

@@ -16,7 +16,7 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-material-service")]
+        [HttpGet("get-all-material-request")]
         public async Task<IActionResult> GetAllMaterialRequest(
             [FromQuery] QueryParameters parameters
         )
@@ -26,7 +26,7 @@ namespace HomeCareDNAPI.Controllers
             );
         }
 
-        [HttpGet("get-service-request-by-id/{id:guid}")]
+        [HttpGet("get-material-request-by-id/{id:guid}")]
         public async Task<IActionResult> GetServiceRequestById(Guid id)
         {
             return Ok(await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(id));

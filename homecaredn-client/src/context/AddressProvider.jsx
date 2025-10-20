@@ -89,7 +89,9 @@ export const AddressProvider = ({ children }) => {
       setTotalAddresses(0);
       return;
     }
-    fetchAddresses();
+    if (user.role === 'Customer') {
+      fetchAddresses();
+    }
   }, [user, fetchAddresses]);
 
   const contextValue = useMemo(
