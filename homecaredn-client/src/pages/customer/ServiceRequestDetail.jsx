@@ -85,7 +85,7 @@ export default function ServiceRequestDetail() {
       }
     };
     fetchServiceRequest();
-  }, [serviceRequestId, getServiceRequestById]);
+  }, [serviceRequestId, getServiceRequestById, t]);
 
   useEffect(() => {
     if (!serviceRequest) return;
@@ -147,17 +147,7 @@ export default function ServiceRequestDetail() {
                   </span>
                 </div>
                 <div className="flex gap-3">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      serviceRequest.isOpen
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {serviceRequest.isOpen
-                      ? t('userPage.serviceRequestDetail.label_open')
-                      : t('userPage.serviceRequestDetail.label_close')}
-                  </span>
+                  <StatusBadge status={serviceRequest.status} />
                 </div>
               </div>
 

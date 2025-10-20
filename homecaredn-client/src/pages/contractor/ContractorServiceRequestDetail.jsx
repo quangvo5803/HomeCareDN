@@ -453,7 +453,7 @@ export default function ContractorServiceRequestDetail() {
             // Applied
             <div className="bg-white rounded-2xl shadow-lg ring-1 ring-blue-200 p-6 lg:sticky lg:top-24 space-y-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2 text-blue-600">
+                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
                   <i className="fas fa-check-circle" />
                   {t('contractorServiceRequestDetail.appliedTitle')}
                 </h3>
