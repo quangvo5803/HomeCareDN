@@ -9,7 +9,6 @@ import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
-import Loading from '../Loading';
 
 const emptyAddrForm = {
   id: null,
@@ -36,8 +35,6 @@ export default function Profile({ user }) {
   const {
     addresses,
     totalAddressess,
-    loading: addrLoading,
-    fetchAddresses,
     createAddress,
     updateAddress,
     deleteAddress,
@@ -70,8 +67,6 @@ export default function Profile({ user }) {
         } catch {
           setProvinces([]);
         }
-
-        await fetchAddresses();
       } catch (err) {
         handleApiError(err, t('ERROR.LOAD_ERROR'));
       }
@@ -307,8 +302,6 @@ export default function Profile({ user }) {
     .filter(Boolean)
     .join(', ');
 
-  if (addrLoading) return <Loading />;
-
   return (
     <div className="space-y-8">
       <div>
@@ -416,50 +409,49 @@ export default function Profile({ user }) {
         </div>
 
         <div className="mb-6">
-          {!addrLoading &&
-            (totalAddressess === 0 ? (
-              <div className="text-gray-500 text-center py-6 bg-gray-50 rounded-lg">
-                <i className="fas fa-map-marker-alt text-3xl mb-2"></i>
-                <div>{t('userPage.profile.noAddress')}</div>
-              </div>
-            ) : (
-              addresses.map((it) => (
-                <div
-                  key={it.addressID}
-                  className="border border-gray-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow duration-200"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-start gap-3">
-                      <i className="fas fa-home text-orange-600 mt-1"></i>
-                      <div>
-                        <div className="font-medium text-gray-800">
-                          {it.detail}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {it.ward}, {it.district}, {it.city}
-                        </div>
+          {totalAddressess === 0 ? (
+            <div className="text-gray-500 text-center py-6 bg-gray-50 rounded-lg">
+              <i className="fas fa-map-marker-alt text-3xl mb-2"></i>
+              <div>{t('userPage.profile.noAddress')}</div>
+            </div>
+          ) : (
+            addresses.map((it) => (
+              <div
+                key={it.addressID}
+                className="border border-gray-200 rounded-lg p-4 mb-3 hover:shadow-md transition-shadow duration-200"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex items-start gap-3">
+                    <i className="fas fa-home text-orange-600 mt-1"></i>
+                    <div>
+                      <div className="font-medium text-gray-800">
+                        {it.detail}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {it.ward}, {it.district}, {it.city}
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => editAddrItem(it)}
-                        className="text-orange-600 hover:text-orange-700 px-2 py-1 rounded hover:bg-orange-50 transition-colors duration-200"
-                      >
-                        <i className="fas fa-edit mr-1"></i>
-                        {t('BUTTON.Edit')}
-                      </button>
-                      <button
-                        onClick={() => deleteAddrItem(it.addressID)}
-                        className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
-                      >
-                        <i className="fas fa-trash mr-1"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
-                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => editAddrItem(it)}
+                      className="text-orange-600 hover:text-orange-700 px-2 py-1 rounded hover:bg-orange-50 transition-colors duration-200"
+                    >
+                      <i className="fas fa-edit mr-1"></i>
+                      {t('BUTTON.Edit')}
+                    </button>
+                    <button
+                      onClick={() => deleteAddrItem(it.addressID)}
+                      className="text-red-600 hover:text-red-700 px-2 py-1 rounded hover:bg-red-50 transition-colors duration-200"
+                    >
+                      <i className="fas fa-trash mr-1"></i>
+                      {t('BUTTON.Delete')}
+                    </button>
                   </div>
                 </div>
-              ))
-            ))}
+              </div>
+            ))
+          )}
         </div>
 
         <div className="bg-gray-50 rounded-lg p-4">

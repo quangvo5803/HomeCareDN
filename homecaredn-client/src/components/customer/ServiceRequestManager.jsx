@@ -1,5 +1,3 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
@@ -7,30 +5,15 @@ import { toast } from 'react-toastify';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
+import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
 
-export default function ServiceRequestManager({ user }) {
+export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const {
-    loading,
-    serviceRequests,
-    fetchServiceRequestsByUserId,
-    deleteServiceRequest,
-  } = useServiceRequest();
-
-  useEffect(() => {
-    if (!user?.id) return;
-    (async () => {
-      try {
-        await fetchServiceRequestsByUserId({ FilterID: user.id });
-      } catch (err) {
-        toast.error(handleApiError(err, t('ERROR.LOAD_ERROR')));
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  const { loading, serviceRequests, deleteServiceRequest } =
+    useServiceRequest();
 
   const handleServiceRequestViewDetail = (serviceRequestId) => {
     navigate(`/Customer/ServiceRequestDetail/${serviceRequestId}`);
@@ -70,25 +53,6 @@ export default function ServiceRequestManager({ user }) {
       default:
         return 'fa-wrench';
     }
-  };
-
-  const getStatusBadge = (isOpen) => {
-    const statusClass = isOpen
-      ? 'bg-green-100 text-green-800'
-      : 'bg-gray-100 text-red-500';
-    const statusIcon = isOpen ? 'fa-check-circle' : 'fa-clock';
-    const statusText = isOpen
-      ? t('userPage.serviceRequest.label_open')
-      : t('userPage.serviceRequest.label_close');
-
-    return (
-      <span
-        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusClass}`}
-      >
-        <i className={`fas ${statusIcon} mr-1`} />
-        {statusText}
-      </span>
-    );
   };
 
   const getPackageBadge = (packageOption) => {
@@ -283,7 +247,7 @@ export default function ServiceRequestManager({ user }) {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(req.isOpen)}
+                      <StatusBadge status={req.status} />
                       {getPackageBadge(req.packageOption)}
                       {getContractorBadge(req.contractorApplyCount)}
                     </div>
@@ -333,7 +297,3 @@ export default function ServiceRequestManager({ user }) {
     </div>
   );
 }
-
-ServiceRequestManager.propTypes = {
-  user: PropTypes.object.isRequired,
-};

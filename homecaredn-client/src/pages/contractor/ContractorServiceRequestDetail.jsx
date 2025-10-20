@@ -14,6 +14,7 @@ import 'venobox/dist/venobox.min.css';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
@@ -423,25 +424,8 @@ export default function ContractorServiceRequestDetail() {
                 <i className="fas fa-info-circle text-gray-500" />
                 {t('contractorServiceRequestDetail.applicationStatus')}
               </h3>
-              <div
-                className={`rounded-lg p-4 ring-1 ${
-                  serviceRequest.isOpen
-                    ? 'bg-green-50 ring-green-200'
-                    : 'bg-gray-50 ring-gray-200'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`inline-block w-2.5 h-2.5 rounded-full ${
-                      serviceRequest.isOpen ? 'bg-green-500' : 'bg-gray-400'
-                    }`}
-                  />
-                  <span className="text-gray-800 font-medium">
-                    {serviceRequest.isOpen
-                      ? t('contractorServiceRequestDetail.statusOpen')
-                      : t('contractorServiceRequestDetail.statusClosed')}
-                  </span>
-                </div>
+              <div className="rounded-lg p-4 ring-1 ring-gray-200 bg-gray-50">
+                <StatusBadge status={serviceRequest.status} />
               </div>
             </div>
           </div>
@@ -453,7 +437,7 @@ export default function ContractorServiceRequestDetail() {
             // Applied
             <div className="bg-white rounded-2xl shadow-lg ring-1 ring-blue-200 p-6 lg:sticky lg:top-24 space-y-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2 text-blue-600">
+                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
                   <i className="fas fa-check-circle" />
                   {t('contractorServiceRequestDetail.appliedTitle')}
                 </h3>

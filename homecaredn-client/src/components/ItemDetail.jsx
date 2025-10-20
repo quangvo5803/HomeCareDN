@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
+import { useMaterialRequest } from '../hook/useMaterialRequest';
 
 export default function ItemDetail({ item, relatedItems = [] }) {
   const { t, i18n } = useTranslation();
@@ -14,7 +15,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const navigate = useNavigate();
   const MAX_LENGTH = 500;
-
+  const { createMaterialRequest } = useMaterialRequest();
   useEffect(() => {
     if (item?.imageUrls?.length > 0) {
       setMainImage(item.imageUrls[0]);
@@ -44,13 +45,21 @@ export default function ItemDetail({ item, relatedItems = [] }) {
   const showBrand = getText(item.brandName, item.brandNameEN);
   const showUnit = getText(item.unit, item.unitEN);
 
-  const HandleAddNewServiceRequest = (service) => {
+  const handleAddNewServiceRequest = (service) => {
     if (!user) {
       toast.error(t('common.notLogin'));
       navigate('/Login');
       return;
     }
     navigate('/Customer/ServiceRequest', { state: { service } });
+  };
+  const handleAddNewMaterialRequest = (materialID) => {
+    if (!user) {
+      toast.error(t('common.notLogin'));
+      navigate('/Login');
+      return;
+    }
+    createMaterialRequest({ CustomerID: user.id, FirstMaterialID: materialID });
   };
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -217,7 +226,12 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     </div>
                     {/* Buttons */}
                     <div className="flex flex-col gap-4 mt-10 sm:flex-row">
-                      <button className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all">
+                      <button
+                        className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all"
+                        onClick={() =>
+                          handleAddNewMaterialRequest(item.materialID)
+                        }
+                      >
                         <i className="mr-2 fa-solid fa-plus"></i>
                         {t('BUTTON.AddNewRequest')}
                       </button>
@@ -334,7 +348,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     <div className="flex flex-col gap-4 mt-10 sm:flex-row">
                       <button
                         className="flex-1 px-6 py-3 bg-orange-500 text-white font-medium rounded-xl hover:scale-[1.02] transition-all"
-                        onClick={() => HandleAddNewServiceRequest(item)}
+                        onClick={() => handleAddNewServiceRequest(item)}
                       >
                         <i className="mr-2 fa-solid fa-plus"></i>
                         {t('BUTTON.AddNewRequest')}
@@ -467,6 +481,9 @@ ItemDetail.propTypes = {
     designStyle: PropTypes.string,
     packageOption: PropTypes.string,
     mainStructureType: PropTypes.string,
+    // ✅ Thêm vào đây
+    materialID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    serviceID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
   relatedItems: PropTypes.array,
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -25,37 +25,32 @@ export default function AdminSupportManager() {
   const [supports, setSupports] = useState([]);
   const [totalSupports, setTotalSupports] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        // Xử lý tham số lọc
-        const isProcessedParam =
-          filter === 'all' ? undefined : filter === 'processed';
-
-        // Gọi API lấy danh sách
-        const result = await contactService.listAll({
-          PageNumber: currentPage,
-          PageSize: pageSize,
-          Search: debouncedSearch,
-          SortBy: sortBy,
-          FilterBool: isProcessedParam,
-        });
-
-        if (result) {
-          setSupports(result.items);
-          setTotalSupports(result.totalCount);
-        }
-      } catch (error) {
-        toast.error(t(handleApiError(error)));
-      } finally {
-        setLoading(false);
+  const fetchSupports = useCallback(async () => {
+    try {
+      setLoading(true);
+      const isProcessedParam =
+        filter === 'all' ? undefined : filter === 'processed';
+      const result = await contactService.listAll({
+        PageNumber: currentPage,
+        PageSize: pageSize,
+        Search: debouncedSearch,
+        SortBy: sortBy,
+        FilterBool: isProcessedParam,
+      });
+      if (result) {
+        setSupports(result.items);
+        setTotalSupports(result.totalCount);
       }
-    };
-
-    fetchData();
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
+    } finally {
+      setLoading(false);
+    }
   }, [t, currentPage, pageSize, debouncedSearch, filter, sortBy]);
+
+  useEffect(() => {
+    fetchSupports();
+  }, [fetchSupports]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -67,18 +62,10 @@ export default function AdminSupportManager() {
       titleKey: 'ModalPopup.DeleteSupportModal.title',
       textKey: 'ModalPopup.DeleteSupportModal.text',
       onConfirm: async () => {
-        const result = await contactService.delete(id);
+        await contactService.delete(id);
         toast.success(t('SUCCESS.DELETE'));
-        contactService.listAll({
-          PageNumber: currentPage,
-          PageSize: pageSize,
-          Search: debouncedSearch,
-          SortBy: sortBy,
-        });
-        if (result) {
-          setSupports(result.items);
-          setTotalSupports(result.totalCount);
-        }
+
+        fetchSupports();
       },
     });
   };
@@ -258,6 +245,7 @@ export default function AdminSupportManager() {
           setSupportID(null);
         }}
         supportID={supportID}
+        onReplySent={() => fetchSupports()}
       />
     </div>
   );

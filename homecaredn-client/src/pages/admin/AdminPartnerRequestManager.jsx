@@ -132,7 +132,7 @@ export default function AdminPartnerRequestManager() {
                       : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
                 >
-                  {t(`common.${key}`)}
+                  {t(`adminPartnerManager.${key}`)}
                 </button>
               ))}
             </div>

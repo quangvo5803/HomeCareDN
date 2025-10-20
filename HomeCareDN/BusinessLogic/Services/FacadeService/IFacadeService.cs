@@ -16,5 +16,6 @@ namespace BusinessLogic.Services.FacadeService
         IImageService ImageService { get; }
         IPartnerRequestService PartnerService { get; }
         IPaymentService PaymentService { get; }
+        IMaterialRequestService MaterialRequestService { get; }
     }
 }

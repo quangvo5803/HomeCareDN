@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { addressService } from '../services/addressService';
 import { useAuth } from '../hook/useAuth';
 import AddressContext from './AddressContext';
@@ -43,7 +43,7 @@ export const AddressProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } 
+      }
     },
     [user]
   );
@@ -83,6 +83,14 @@ export const AddressProvider = ({ children }) => {
     },
     [user]
   );
+  useEffect(() => {
+    if (!user) {
+      setAddresses([]);
+      setTotalAddresses(0);
+      return;
+    }
+    fetchAddresses();
+  }, [user, fetchAddresses]);
 
   const contextValue = useMemo(
     () => ({

@@ -125,11 +125,12 @@ namespace BusinessLogic.Services
 
             if (service == null)
             {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
+                    }
+                );
             }
             return _mapper.Map<ServiceDetailDto>(service);
         }
