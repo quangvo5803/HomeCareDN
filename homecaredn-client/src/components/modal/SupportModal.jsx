@@ -7,7 +7,12 @@ import { handleApiError } from '../../utils/handleApiError';
 import LoadingModal from './LoadingModal';
 import { contactService } from '../../services/contactService';
 
-export default function SupportModal({ isOpen, onClose, supportID }) {
+export default function SupportModal({
+  isOpen,
+  onClose,
+  supportID,
+  onReplySent,
+}) {
   const { t } = useTranslation();
 
   const [support, setSupport] = useState(null);
@@ -39,6 +44,7 @@ export default function SupportModal({ isOpen, onClose, supportID }) {
     try {
       await contactService.reply({ id: supportID, replyContent: reply });
       toast.success(t('SUCCESS.REPLY'));
+      onReplySent();
       onClose();
     } catch (err) {
       toast.error(handleApiError(err));
