@@ -62,10 +62,10 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {materials.map((m) => (
-          <div
+          <button
             key={m.materialID}
-            className="border rounded-lg p-4 hover:bg-gray-50 hover:shadow-md cursor-pointer transition-all duration-200"
             onClick={() => onSelect?.(m)}
+            className="border rounded-lg p-4 text-left hover:bg-gray-50 hover:shadow-md cursor-pointer transition-all duration-200 w-full"
           >
             <div className="flex flex-col space-y-2">
               <span
@@ -78,7 +78,7 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
                 #{m.materialID.slice(0, 8)}
               </span>
             </div>
-          </div>
+          </button>
         ))}
       </div>
     );
