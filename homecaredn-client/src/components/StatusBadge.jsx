@@ -57,5 +57,4 @@ export default function StatusBadge({ status }) {
 
 StatusBadge.propTypes = {
   status: PropTypes.string.isRequired,
-  t: PropTypes.func.isRequired,
 };

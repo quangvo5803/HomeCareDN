@@ -14,6 +14,7 @@ import 'venobox/dist/venobox.min.css';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
+import StatusBadge from '../../components/StatusBadge';
 
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
@@ -423,25 +424,8 @@ export default function ContractorServiceRequestDetail() {
                 <i className="fas fa-info-circle text-gray-500" />
                 {t('contractorServiceRequestDetail.applicationStatus')}
               </h3>
-              <div
-                className={`rounded-lg p-4 ring-1 ${
-                  serviceRequest.isOpen
-                    ? 'bg-green-50 ring-green-200'
-                    : 'bg-gray-50 ring-gray-200'
-                }`}
-              >
-                <div className="flex items-center space-x-2">
-                  <span
-                    className={`inline-block w-2.5 h-2.5 rounded-full ${
-                      serviceRequest.isOpen ? 'bg-green-500' : 'bg-gray-400'
-                    }`}
-                  />
-                  <span className="text-gray-800 font-medium">
-                    {serviceRequest.isOpen
-                      ? t('contractorServiceRequestDetail.statusOpen')
-                      : t('contractorServiceRequestDetail.statusClosed')}
-                  </span>
-                </div>
+              <div className="rounded-lg p-4 ring-1 ring-gray-200 bg-gray-50">
+                <StatusBadge status={serviceRequest.status} />
               </div>
             </div>
           </div>
