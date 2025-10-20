@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
+import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
 
 export default function ServiceRequestManager() {
@@ -52,25 +53,6 @@ export default function ServiceRequestManager() {
       default:
         return 'fa-wrench';
     }
-  };
-
-  const getStatusBadge = (isOpen) => {
-    const statusClass = isOpen
-      ? 'bg-green-100 text-green-800'
-      : 'bg-gray-100 text-red-500';
-    const statusIcon = isOpen ? 'fa-check-circle' : 'fa-clock';
-    const statusText = isOpen
-      ? t('userPage.serviceRequest.label_open')
-      : t('userPage.serviceRequest.label_close');
-
-    return (
-      <span
-        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${statusClass}`}
-      >
-        <i className={`fas ${statusIcon} mr-1`} />
-        {statusText}
-      </span>
-    );
   };
 
   const getPackageBadge = (packageOption) => {
@@ -265,7 +247,7 @@ export default function ServiceRequestManager() {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(req.isOpen)}
+                      <StatusBadge status={req.status} />
                       {getPackageBadge(req.packageOption)}
                       {getContractorBadge(req.contractorApplyCount)}
                     </div>

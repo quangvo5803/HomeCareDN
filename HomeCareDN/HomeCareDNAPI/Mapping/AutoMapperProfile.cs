@@ -104,7 +104,8 @@ namespace HomeCareDNAPI.Mapping
                                 ? src.Images.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
-                );
+                )
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
