@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251019031353_CreateMaterialRequetEntityAndRelatedEntity")]
+    partial class CreateMaterialRequetEntityAndRelatedEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,8 +248,6 @@ namespace DataAccess.Migrations
 
                     b.HasKey("DistributorApplicationID");
 
-                    b.HasIndex("MaterialRequestID");
-
                     b.ToTable("DistributorApplications", "app");
                 });
 
@@ -413,21 +414,16 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("SelectedDistributorApplicationDistributorApplicationID")
-                        .HasColumnType("uuid");
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("SelectedDistributorApplicationID")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("MaterialRequestID");
-
-                    b.HasIndex("SelectedDistributorApplicationDistributorApplicationID");
 
                     b.ToTable("MaterialRequests", "app");
                 });
@@ -448,10 +444,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("MaterialRequestItemID");
-
-                    b.HasIndex("MaterialID");
-
-                    b.HasIndex("MaterialRequestID");
 
                     b.ToTable("MaterialRequestItems", "app");
                 });
@@ -577,6 +569,9 @@ namespace DataAccess.Migrations
                     b.Property<int>("Floors")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("boolean");
+
                     b.Property<double>("Length")
                         .HasColumnType("double precision");
 
@@ -592,10 +587,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("ServiceType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -647,15 +638,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.MaterialRequest", null)
-                        .WithMany("DistributorApplications")
-                        .HasForeignKey("MaterialRequestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -698,32 +680,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.DistributorApplication", "SelectedDistributorApplication")
-                        .WithMany()
-                        .HasForeignKey("SelectedDistributorApplicationDistributorApplicationID");
-
-                    b.Navigation("SelectedDistributorApplication");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequestItem", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.Material", "Material")
-                        .WithMany()
-                        .HasForeignKey("MaterialID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataAccess.Entities.Application.MaterialRequest", null)
-                        .WithMany("MaterialRequestItems")
-                        .HasForeignKey("MaterialRequestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Material");
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
@@ -756,13 +712,6 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
                 {
                     b.Navigation("Images");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
-                {
-                    b.Navigation("DistributorApplications");
-
-                    b.Navigation("MaterialRequestItems");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { authService } from './services/authService';
 import { toast } from 'react-toastify';
+import { navigateTo } from './utils/navigateHelper';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -31,7 +32,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
+    // 🟧 403 Forbidden → Không có quyền
+    if (error.response?.status === 403 && !originalRequest._forbiddenHandled) {
+      originalRequest._forbiddenHandled = true;
+      toast.error('Bạn không có quyền truy cập trang này!');
+      navigateTo('/Unauthorized');
+      return error;
+    }
     // Network Error
     if (error.message === 'Network Error' && !error.response) {
       if (!originalRequest._networkHandled) {

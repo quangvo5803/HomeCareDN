@@ -297,7 +297,8 @@
       "label_address": "Address: ",
       "label_contractorApplyCount": "application form(s)",
       "label_open": "Opening",
-      "label_close": "Closed"
+      "label_close": "Closed",
+      "label_contractorApplied": "contractor(s)"
     },
     "createServiceRequest": {
       "title": "Create Service Request",
@@ -365,6 +366,14 @@
       "higherThanEstimate": "Higher than estimate by {{value}} million",
       "section_chat": "Chat with Contractor",
       "noChatFunction": "This feature is available only after you have selected a contractor"
+    },
+    "materialRequest": {
+      "title": "Material Requests",
+      "subtitle": "View and manage your material requests.",
+      "noRequest": "No material requests yet",
+      "letStart": "Start by creating your first material request",
+      "lbl_distributor": "distributor(s)",
+      "lbl_canEditQuantity": "Allow distributor to edit quantity"
     }
   },
   "contractorServiceRequestManager": {
@@ -867,6 +876,7 @@
     "LoginGoogle": "Login with Google",
     "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page",
+    "BackToHome": "Back to Home Page",
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
     "AddNewCategory": "Add new Category",
@@ -1015,7 +1025,17 @@
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
 
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
+<<<<<<< HEAD
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description"
+=======
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description",
+
+    "UNAUTHORIZED_ACCESS":"Unauthorized access",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"You do not have permission to access this resource",
+
+    "NOTFOUND": "Resource not found",
+    "NOTFOUND_DESCRIPTION": "The requested resource could not be found"
+>>>>>>> develop
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1052,7 +1072,7 @@
     "ServiceType": {
       "Construction": "Construction",
       "Repair": "Repair",
-      "MaterialOrder": "Material Order"
+      "Material": "Material Request"
     },
     "PackageOption": {
       "StructureOnly": "Structure Only",
@@ -1094,7 +1114,20 @@
       "Distributor": "Distributor",
       "DistributorDescription": "Providing construction materials",
       "Contractor": "Contractor",
+<<<<<<< HEAD
       "ContractorDescription": "Providing construction/repair solutions"
+=======
+      "ContractorDescription" :"Providing construction/repair solutions"
+    },
+    "Status":{
+      "Pending":"Pending",
+      "Approved":"Approved",
+      "Rejected":"Rejected",
+      "Closed":"Closed",
+      "Opening":"Opening",
+      "Processed":"Processed",
+      "Draft":"Draft"
+>>>>>>> develop
     }
   },
   "toast": {
@@ -1113,11 +1146,6 @@
     "sortNameDesc": "Name: Z-A",
     "sortMaterialCount": "Product Quantity: Low -> High",
     "sortMaterialCountDesc": "Product Quantity: High -> Low",
-    "all": "All",
-    "Pending": "Pending",
-    "Rejected": "Rejected",
-    "Approved": "Approved",
-    "Processed": "Processed",
-    "New": "New"
+    "All": "All"
   }
 }

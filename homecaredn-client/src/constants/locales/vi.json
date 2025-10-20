@@ -297,7 +297,8 @@
       "label_address": "Địa chỉ: ",
       "label_contractorApplyCount": "đơn ứng tuyển",
       "label_open": "Đang mở",
-      "label_close": "Đã đóng"
+      "label_close": "Đã đóng",
+      "label_contractorApplied": "nhà thầu"
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -364,6 +365,14 @@
       "higherThanEstimate": "Cao hơn dự toán {{value}} triệu",
       "section_chat": "Trò chuyện với nhà thầu",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
+    },
+    "materialRequest":{
+      "title": "Yêu cầu vật liệu",
+      "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
+      "noRequest": "Chưa có yêu cầu vật liệu nào",
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu vật liệu đầu tiên của bạn",
+      "lbl_distributor": "nhà cung cấp",
+      "lbl_canEditQuantity": "Cho phép nhà cung cấp chỉnh sửa số lượng"
     }
   },
   "contractorServiceRequestManager": {
@@ -861,6 +870,7 @@
     "CreateAccount": "Tạo tài khoản",
     "Processing": "Đang xử lí",
     "BackToLogin": "Quay Về Trang Đăng Nhập",
+    "BackToHome": "Quay Về Trang Chủ",
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
     "AddNewCategory": "Thêm danh mục mới",
@@ -1010,7 +1020,18 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
 
     "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
+<<<<<<< HEAD
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả"
+=======
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả",
+
+    "UNAUTHORIZED_ACCESS":"Không được phép truy cập",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"Bạn không có quyền truy cập tài nguyên này",
+
+    "NOTFOUND": "Không tìm thấy tài nguyên",
+    "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại"
+
+>>>>>>> develop
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1047,7 +1068,7 @@
     "ServiceType": {
       "Construction": "Xây dựng",
       "Repair": "Sửa chữa",
-      "MaterialOrder": "Đặt vật liệu"
+      "Material": "Yêu cầu vật liệu"
     },
     "PackageOption": {
       "StructureOnly": "Phần thô",
@@ -1090,7 +1111,20 @@
       "Distributor": "Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
       "Contractor": "Nhà thầu",
+<<<<<<< HEAD
       "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
+=======
+      "ContractorDescription" :"Cung cấp giải pháp xây dựng/sửa chửa"
+    },
+    "Status":{
+      "Pending":"Đang chờ",
+      "Approved":"Đã phê duyệt",
+      "Rejected":"Đã từ chối",
+      "Closed":"Đã đóng",
+      "Opening":"Đang mở",
+      "Processed":"Đã xử lý",
+      "Draft":"Bản nháp"
+>>>>>>> develop
     }
   },
   "toast": {
@@ -1111,11 +1145,6 @@
     "sortNameDesc": "Tên: Z-A",
     "sortMaterialCount": "Số lượng sản phẩm: Ít -> Nhiều",
     "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít",
-    "All": "Tất cả",
-    "Pending": "Đang chờ",
-    "Rejected": "Đã từ chối",
-    "Approved": "Đã chấp nhận",
-    "Processed": "Đã xử lý",
-    "New": "Mới"
+    "All": "Tất cả"
   }
 }

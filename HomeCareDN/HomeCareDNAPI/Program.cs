@@ -2,6 +2,7 @@
 using System.Text;
 using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
+using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Data;
 using DataAccess.Entities.Authorize;

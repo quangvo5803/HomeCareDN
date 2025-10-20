@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../hook/useAuth';
 import Profile from '../../components/customer/Profile';
 import ServiceRequestManager from '../../components/customer/ServiceRequestManager';
+import MaterialRequestManager from '../../components/customer/MaterialRequestManager';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
@@ -15,21 +16,26 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
   const [active, setActive] = useState(initialTab);
 
   if (authLoading) return <Loading />;
+  const titleMap = {
+    profile: t('userPage.profile.title'),
+    service_requests: t('userPage.serviceRequest.title'),
+    material_requests: t('userPage.materialRequest.title'),
+  };
+  const subtitleMap = {
+    profile: t('userPage.profile.subtitle'),
+    service_requests: t('userPage.serviceRequest.subtitle'),
+    material_requests: t('userPage.materialRequest.subtitle'),
+  };
+
+  const title = titleMap[active] || t('userPage.profile.title');
+  const subtitle = subtitleMap[active] || t('userPage.profile.subtitle');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto p-3">
         <div className="text-center mb-8 mt-5">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            {active === 'profile'
-              ? t('userPage.profile.title')
-              : t('userPage.serviceRequest.title')}
-          </h1>
-          <p className="text-gray-600">
-            {active === 'profile'
-              ? t('userPage.profile.subtitle')
-              : t('userPage.serviceRequest.subtitle')}
-          </p>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{title}</h1>
+          <p className="text-gray-600">{subtitle}</p>
         </div>
 
         <div className="grid grid-cols-12 gap-6">
@@ -58,6 +64,17 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
                   <i className="fas fa-clipboard-list"></i>
                   {t('userPage.serviceRequest.title')}
                 </button>
+                <button
+                  onClick={() => setActive('material_requests')}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center gap-3 ${
+                    active === 'material_requests'
+                      ? 'bg-orange-50 text-orange-700 border border-orange-200'
+                      : 'hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <i className="fas fa-truck"></i>
+                  {t('userPage.materialRequest.title')}
+                </button>
               </nav>
             </div>
           </div>
@@ -67,6 +84,9 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
               {active === 'profile' && <Profile user={user} />}
               {active === 'service_requests' && (
                 <ServiceRequestManager user={user} />
+              )}
+              {active === 'material_requests' && (
+                <MaterialRequestManager user={user} />
               )}
             </div>
           </div>
