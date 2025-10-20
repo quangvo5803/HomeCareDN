@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using System.Text;
-using BusinessLogic.Services;
+﻿using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
@@ -14,6 +12,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Net.payOS;
+using System.Security.Claims;
+using System.Text;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -107,6 +108,16 @@ namespace HomeCareDNAPI
                 client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             });
+            //PayOS
+            builder.Services.AddSingleton(sp =>
+            {
+                var config = sp.GetRequiredService<IConfiguration>();
+                var clientId = config["PayOS:ClientId"];
+                var apiKey = config["PayOS:ApiKey"];
+                var checksumKey = config["PayOS:ChecksumKey"];
+
+                return new PayOS(clientId!, apiKey!, checksumKey!);
+            });
 
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -123,6 +134,7 @@ namespace HomeCareDNAPI
             /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
+            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

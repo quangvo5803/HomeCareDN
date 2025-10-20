@@ -366,7 +366,7 @@
       "section_chat": "Trò chuyện với nhà thầu",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
     },
-    "materialRequest":{
+    "materialRequest": {
       "title": "Yêu cầu vật liệu",
       "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
       "noRequest": "Chưa có yêu cầu vật liệu nào",
@@ -1020,18 +1020,13 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
 
     "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
-<<<<<<< HEAD
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả"
-=======
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả",
 
-    "UNAUTHORIZED_ACCESS":"Không được phép truy cập",
-    "UNAUTHORIZED_ACCESS_DESCRIPTION":"Bạn không có quyền truy cập tài nguyên này",
+    "UNAUTHORIZED_ACCESS": "Không được phép truy cập",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION": "Bạn không có quyền truy cập tài nguyên này",
 
     "NOTFOUND": "Không tìm thấy tài nguyên",
     "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại"
-
->>>>>>> develop
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1111,20 +1106,16 @@
       "Distributor": "Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
       "Contractor": "Nhà thầu",
-<<<<<<< HEAD
       "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
-=======
-      "ContractorDescription" :"Cung cấp giải pháp xây dựng/sửa chửa"
     },
-    "Status":{
-      "Pending":"Đang chờ",
-      "Approved":"Đã phê duyệt",
-      "Rejected":"Đã từ chối",
-      "Closed":"Đã đóng",
-      "Opening":"Đang mở",
-      "Processed":"Đã xử lý",
-      "Draft":"Bản nháp"
->>>>>>> develop
+    "Status": {
+      "Pending": "Đang chờ",
+      "Approved": "Đã phê duyệt",
+      "Rejected": "Đã từ chối",
+      "Closed": "Đã đóng",
+      "Opening": "Đang mở",
+      "Processed": "Đã xử lý",
+      "Draft": "Bản nháp"
     }
   },
   "toast": {

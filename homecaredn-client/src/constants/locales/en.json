@@ -1025,17 +1025,13 @@
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
 
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
-<<<<<<< HEAD
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description"
-=======
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description",
 
-    "UNAUTHORIZED_ACCESS":"Unauthorized access",
-    "UNAUTHORIZED_ACCESS_DESCRIPTION":"You do not have permission to access this resource",
+    "UNAUTHORIZED_ACCESS": "Unauthorized access",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION": "You do not have permission to access this resource",
 
     "NOTFOUND": "Resource not found",
     "NOTFOUND_DESCRIPTION": "The requested resource could not be found"
->>>>>>> develop
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1114,20 +1110,16 @@
       "Distributor": "Distributor",
       "DistributorDescription": "Providing construction materials",
       "Contractor": "Contractor",
-<<<<<<< HEAD
       "ContractorDescription": "Providing construction/repair solutions"
-=======
-      "ContractorDescription" :"Providing construction/repair solutions"
     },
-    "Status":{
-      "Pending":"Pending",
-      "Approved":"Approved",
-      "Rejected":"Rejected",
-      "Closed":"Closed",
-      "Opening":"Opening",
-      "Processed":"Processed",
-      "Draft":"Draft"
->>>>>>> develop
+    "Status": {
+      "Pending": "Pending",
+      "Approved": "Approved",
+      "Rejected": "Rejected",
+      "Closed": "Closed",
+      "Opening": "Opening",
+      "Processed": "Processed",
+      "Draft": "Draft"
     }
   },
   "toast": {
