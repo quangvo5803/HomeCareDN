@@ -34,7 +34,7 @@ const buildMaterialRequestFormData = (data) => {
 };
 export const materialRequestService = {
   getAllMaterialRequest: async (params = {}) => {
-    const res = await api.get('/MaterialRequests/get-all-material-service', {
+    const res = await api.get('/MaterialRequests/get-all-material-request', {
       params,
     });
     return res.data;
@@ -47,7 +47,9 @@ export const materialRequestService = {
     return res.data;
   },
   getMaterialRequestById: async (id) => {
-    const response = await api.get(`/Material/get-material/${id}`);
+    const response = await api.get(
+      `/MaterialRequests/get-material-request-by-id/${id}`
+    );
     return response.data;
   },
   // 🔹 Create new MaterialRequest

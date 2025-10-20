@@ -4,8 +4,10 @@ import { useTranslation } from 'react-i18next';
 import Loading from '../Loading';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function MaterialRequestManager({ user }) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const {
     loading,
@@ -15,7 +17,7 @@ export default function MaterialRequestManager({ user }) {
   } = useMaterialRequest();
 
   const handleViewDetail = (materialRequestID) => {
-    alert(`Xem chi tiết yêu cầu: ${materialRequestID}`);
+    navigate(`/Customer/MaterialRequestDetail/${materialRequestID}`);
   };
 
   const handleCreate = async () => {

@@ -36,17 +36,22 @@ export const MaterialRequestProvider = ({ children }) => {
     []
   );
 
-  const getMaterialRequestById = useCallback(async (id) => {
-    try {
-      setLoading(true);
-      return await materialRequestService.getMaterialById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const getMaterialRequestById = useCallback(
+    async (id) => {
+      const local = materialRequests.find((m) => m.materialRequestID === id);
+      if (local) return local;
+      try {
+        setLoading(true);
+        return await materialRequestService.getMaterialRequestById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [materialRequests]
+  );
 
   const fetchMaterialRequestsByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
@@ -150,7 +155,9 @@ export const MaterialRequestProvider = ({ children }) => {
       setTotalMaterialRequests(0);
       return;
     }
-    fetchMaterialRequestsByUserId({ FilterID: user?.id });
+    if (user.role === 'Customer') {
+      fetchMaterialRequestsByUserId({ FilterID: user?.id });
+    }
   }, [user, fetchMaterialRequestsByUserId]);
 
   const contextValue = useMemo(

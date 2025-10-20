@@ -194,7 +194,9 @@ export const ServiceRequestProvider = ({ children }) => {
       setTotalServiceRequests(0);
       return;
     }
-    fetchServiceRequestsByUserId({ FilterID: user?.id });
+    if (user.role === 'Customer') {
+      fetchServiceRequestsByUserId({ FilterID: user.id });
+    }
   }, [user, fetchServiceRequestsByUserId]);
   const contextValue = useMemo(
     () => ({
