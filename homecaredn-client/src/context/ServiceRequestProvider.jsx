@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { serviceRequestService } from '../services/serviceRequestService';
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
@@ -162,7 +162,14 @@ export const ServiceRequestProvider = ({ children }) => {
     },
     [user?.role]
   );
-
+  useEffect(() => {
+    if (!user) {
+      setServiceRequests([]);
+      setTotalServiceRequests(0);
+      return;
+    }
+    fetchServiceRequestsByUserId({ FilterID: user?.id });
+  }, [user, fetchServiceRequestsByUserId]);
   const contextValue = useMemo(
     () => ({
       serviceRequests,

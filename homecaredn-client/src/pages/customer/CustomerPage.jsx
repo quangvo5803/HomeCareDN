@@ -82,9 +82,7 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
           <div className="col-span-9">
             <div className="bg-white rounded-lg shadow-md p-6">
               {active === 'profile' && <Profile user={user} />}
-              {active === 'service_requests' && (
-                <ServiceRequestManager user={user} />
-              )}
+              {active === 'service_requests' && <ServiceRequestManager />}
               {active === 'material_requests' && (
                 <MaterialRequestManager user={user} />
               )}

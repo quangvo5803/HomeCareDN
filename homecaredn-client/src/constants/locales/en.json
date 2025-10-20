@@ -368,9 +368,13 @@
       "title": "Material Requests",
       "subtitle": "View and manage your material requests.",
       "noRequest": "No material requests yet",
-      "letStart": "Start by creating your first material request",
-      "lbl_distributor": "distributor(s)",
-      "lbl_canEditQuantity": "Allow distributor to edit quantity"
+      "letStart": "Get started by creating your first material request",
+      "lbl_distributor": "supplier",
+      "lbl_canEditQuantity": "Allow supplier to edit quantity",
+      "lbl_materialList": "Material List",
+      "lbl_materialUnit": "type",
+      "lbl_andMoreMaterial": "... and {{count}} more materials",
+      "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
     }
   },
  "contractorServiceRequestManager": {
@@ -960,6 +964,7 @@
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
+    "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
