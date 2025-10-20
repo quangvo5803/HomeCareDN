@@ -146,4 +146,5 @@ SupportModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   supportID: PropTypes.string,
+  onReplySent: PropTypes.func,
 };
