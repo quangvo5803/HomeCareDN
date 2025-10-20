@@ -120,7 +120,6 @@ export default function MaterialRequestManager({ user }) {
 
                     {/* Material Items */}
                     {req.materialRequestItems?.length > 0 ? (
-                      // ✅ Có vật liệu → hiển thị danh sách như hiện tại
                       <div className="bg-gray-50 rounded-lg p-3 mb-3">
                         <div className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
                           <i className="fas fa-list text-orange-500"></i>
@@ -130,22 +129,20 @@ export default function MaterialRequestManager({ user }) {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                          {req.materialRequestItems
-                            .slice(0, 4)
-                            .map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="flex items-center gap-2 text-gray-600"
-                              >
-                                <i className="fas fa-cube text-orange-400 text-xs"></i>
-                                <span className="font-medium">
-                                  {item.materialName}:
-                                </span>
-                                <span className="text-black font-semibold">
-                                  {item.quantity} {item.unit}
-                                </span>
-                              </div>
-                            ))}
+                          {req.materialRequestItems.slice(0, 4).map((item) => (
+                            <div
+                              key={item.materialRequestItemID}
+                              className="flex items-center gap-2 text-gray-600"
+                            >
+                              <i className="fas fa-cube text-orange-400 text-xs"></i>
+                              <span className="font-medium">
+                                {item.materialName}:
+                              </span>
+                              <span className="text-black font-semibold">
+                                {item.quantity} {item.unit}
+                              </span>
+                            </div>
+                          ))}
                         </div>
 
                         {req.materialRequestItems.length > 4 && (

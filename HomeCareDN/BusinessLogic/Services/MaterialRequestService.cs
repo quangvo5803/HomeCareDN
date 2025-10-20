@@ -146,7 +146,18 @@ namespace BusinessLogic.Services
                     }
                 );
             }
+            await UpdateMaterialListAsync(materialRequestUpdateRequestDto, materialRequest);
 
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
+            return dto;
+        }
+
+        private async Task UpdateMaterialListAsync(
+            MaterialRequestUpdateRequestDto materialRequestUpdateRequestDto,
+            MaterialRequest materialRequest
+        )
+        {
             if (materialRequestUpdateRequestDto.DeleteItemIDs != null)
             {
                 foreach (var itemId in materialRequestUpdateRequestDto.DeleteItemIDs)
@@ -188,9 +199,6 @@ namespace BusinessLogic.Services
                     );
                 }
             }
-            await _unitOfWork.SaveAsync();
-            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
-            return dto;
         }
 
         public async Task DeleteMaterialRequest(Guid materialRequestID)
