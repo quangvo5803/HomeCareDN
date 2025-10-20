@@ -9,7 +9,6 @@ import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
-import Loading from '../Loading';
 
 const emptyAddrForm = {
   id: null,

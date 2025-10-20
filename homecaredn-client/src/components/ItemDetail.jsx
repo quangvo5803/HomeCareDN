@@ -482,6 +482,9 @@ ItemDetail.propTypes = {
     designStyle: PropTypes.string,
     packageOption: PropTypes.string,
     mainStructureType: PropTypes.string,
+    // ✅ Thêm vào đây
+    materialID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    serviceID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,
   relatedItems: PropTypes.array,
 };
