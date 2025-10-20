@@ -307,6 +307,7 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+            CreateMap<MaterialRequest, MaterialRequestDto>();
         }
 
         // ------------------------
