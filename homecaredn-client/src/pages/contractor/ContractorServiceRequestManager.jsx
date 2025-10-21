@@ -170,9 +170,6 @@ export default function ContractorServiceRequestManager() {
                                                             {request.floors} {t('contractorServiceRequestDetail.floorsUnit')}
                                                         </span>
                                                     )}
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-                                                        <i className="fa-solid fa-ruler-combined" />
-                                                    </span>
                                                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs
                                                         bg-orange-50 text-orange-700 ring-1 ring-orange-200">
                                                         <i className="fa-solid fa-coins" />
