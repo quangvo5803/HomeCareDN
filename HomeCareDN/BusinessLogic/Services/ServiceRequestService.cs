@@ -26,7 +26,7 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,SelectedContractorApplication";
+            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -218,7 +218,7 @@ namespace BusinessLogic.Services.Interfaces
                             selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                         CompletedProjectCount = 0,
                         AverageRating = 4.4,
-                        Status = ApplicationStatus.Approved.ToString(),
+                        Status = selected.Status.ToString(),
                         ContractorEmail = contractor?.Email ?? string.Empty,
                         ContractorName = contractor?.FullName ?? string.Empty,
                         ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
@@ -242,7 +242,8 @@ namespace BusinessLogic.Services.Interfaces
                                         ?? new List<string>(),
                                     CompletedProjectCount = 0,
                                     AverageRating = 0,
-                                    Status = ApplicationStatus.Pending.ToString(),
+                                    Status = ca.Status.ToString(),
+                                    CreatedAt = ca.CreatedAt,
                                 }
                             )
                             .ToList() ?? new List<ContractorApplicationPendingDto>();

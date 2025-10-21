@@ -23,8 +23,7 @@ namespace DataAccess.Entities.Application
         public double? EstimatePrice { get; set; }
         public required string Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public bool IsOpen { get; set; } = true;
-
+        public RequestStatus Status { get; set; } = RequestStatus.Opening;
         public Guid? SelectedContractorApplicationID { get; set; } //Nhà thầu khách hàng chọn
 
         [ForeignKey("SelectedContractorApplicationID")]

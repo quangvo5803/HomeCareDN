@@ -295,8 +295,7 @@
       "label_packageOption": "Package option: ",
       "label_address": "Address: ",
       "label_contractorApplyCount": "application form(s)",
-      "label_open": "Opening",
-      "label_close":"Closed"
+      "label_contractorApplied": "contractor(s)"
     },
     "createServiceRequest":{
       "title": "Create Service Request",
@@ -364,6 +363,18 @@
       "higherThanEstimate": "Higher than estimate by {{value}} million",
       "section_chat": "Chat with Contractor",
       "noChatFunction": "This feature is available only after you have selected a contractor"
+    },
+    "materialRequest": {
+      "title": "Material Requests",
+      "subtitle": "View and manage your material requests.",
+      "noRequest": "No material requests yet",
+      "letStart": "Get started by creating your first material request",
+      "lbl_distributor": "supplier",
+      "lbl_canEditQuantity": "Allow supplier to edit quantity",
+      "lbl_materialList": "Material List",
+      "lbl_materialUnit": "type",
+      "lbl_andMoreMaterial": "... and {{count}} more materials",
+      "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
     }
   },
  "contractorServiceRequestManager": {
@@ -415,6 +426,8 @@
     "bidPrice": "Bid price (VND)",
     "bidPricePlaceholder": "e.g., 200,000,000",
     "bidPricePlaceholderWithEst": "e.g., around {{est}}",
+    "bidPriceLabel": "Bid amount:",
+    "bidPriceInWords": "In words:",
     "startDate": "Expected start date",
     "durationDays": "Construction time (days)",
     "durationDaysPlaceholder": "e.g., 60",
@@ -763,8 +776,10 @@
     "action": "Action",
     "noPartner": "No partnership requests yet.",
     "searchPlaceholder": "Search by company name, email, or phone number...",
-    "approve": "Approve",
-    "reject": "Reject",
+    "all": "All",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
     "delete": "Delete",
     "viewDetails": "View Details",
     "total": "Total",
@@ -836,6 +851,7 @@
     "LoginGoogle": "Login with Google",
     "RegisterGoogle": "Register with Google",
     "BackToLogin": "Back to Login Page",
+    "BackToHome": "Back to Home Page",
     "AddNewBrand": "Add new Brand",
     "UpdateBrand": "Update Brand",
     "AddNewCategory": "Add new Category",
@@ -950,6 +966,7 @@
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
+    "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
     "CATEGORY_NOT_FOUND": "Category not found.",
@@ -984,7 +1001,13 @@
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
 
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description"
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description",
+
+    "UNAUTHORIZED_ACCESS":"Unauthorized access",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"You do not have permission to access this resource",
+
+    "NOTFOUND": "Resource not found",
+    "NOTFOUND_DESCRIPTION": "The requested resource could not be found"
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1021,7 +1044,7 @@
     "ServiceType": {
       "Construction": "Construction",
       "Repair": "Repair",
-      "MaterialOrder": "Material Order"
+      "Material": "Material Request"
     },
     "PackageOption": {
       "StructureOnly": "Structure Only",
@@ -1064,6 +1087,15 @@
       "DistributorDescription": "Providing construction materials",      
       "Contractor": "Contractor",
       "ContractorDescription" :"Providing construction/repair solutions"
+    },
+    "Status":{
+      "Pending":"Pending",
+      "Approved":"Approved",
+      "Rejected":"Rejected",
+      "Closed":"Closed",
+      "Opening":"Opening",
+      "Processed":"Processed",
+      "Draft":"Draft"
     }
   },
   "toast": {
@@ -1082,10 +1114,6 @@
     "sortNameDesc": "Name: Z-A",
     "sortMaterialCount": "Product Quantity: Low -> High",
     "sortMaterialCountDesc": "Product Quantity: High -> Low",
-    "all": "All",
-    "pending": "Pending",
-    "rejected": "Rejected",
-    "approved": "Approved",
-    "processed": "Processed"
+    "All": "All"
   }
 }

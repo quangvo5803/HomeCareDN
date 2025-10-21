@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email.Interface;
 
-namespace BusinessLogic.Services.FacadeService
+namespace BusinessLogic.Services.FacadeService.Dependencies
 {
     public class InfraDependencies
     {

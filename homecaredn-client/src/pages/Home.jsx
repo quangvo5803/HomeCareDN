@@ -156,13 +156,6 @@ export default function Home() {
   }, [current]);
 
   // Back to top
-  const [showBackTop, setShowBackTop] = useState(false);
-  const handleBackTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-  useEffect(() => {
-    const onScroll = () => setShowBackTop(window.scrollY > 300);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   /* ===== Testimonial Slider ===== */
   const baseSlides = TESTIMONIALS;
@@ -737,29 +730,6 @@ export default function Home() {
       <div className="fixed bottom-6 right-24 z-[60]">
         <SupportChatWidget brand="HomeCareDN" />
       </div>
-
-      {/* Back to Top */}
-      <button
-        onClick={handleBackTop}
-        aria-label="Back to top"
-        className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
-                    flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${
-                      showBackTop
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 translate-y-3 pointer-events-none'
-                    }`}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-6 h-6"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          aria-hidden="true"
-        >
-          <path d="M12 4l-7 7h5v9h4v-9h5z" />
-        </svg>
-      </button>
     </div>
   );
 }

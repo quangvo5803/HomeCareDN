@@ -295,8 +295,7 @@
       "label_packageOption": "Gói xây dựng: ",
       "label_address": "Địa chỉ: ",
       "label_contractorApplyCount": "đơn ứng tuyển",
-      "label_open": "Đang mở",
-      "label_close":"Đã đóng"
+      "label_contractorApplied": "nhà thầu"
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -363,6 +362,18 @@
       "higherThanEstimate": "Cao hơn dự toán {{value}} triệu",
       "section_chat": "Trò chuyện với nhà thầu",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
+    },
+    "materialRequest":{
+      "title": "Yêu cầu vật liệu",
+      "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
+      "noRequest": "Chưa có yêu cầu vật liệu nào",
+      "letStart": "Bắt đầu bằng cách tạo yêu cầu vật liệu đầu tiên của bạn",
+      "lbl_distributor": "nhà cung cấp",
+      "lbl_canEditQuantity": "Cho phép nhà cung cấp chỉnh sửa số lượng",
+      "lbl_materialList": "Danh sách vật liệu",
+      "lbl_materialUnit": "loại",
+      "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
+      "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
     }
   },  
 "contractorServiceRequestManager": {
@@ -414,6 +425,8 @@
     "bidPrice": "Giá chào thầu (VND)",
     "bidPricePlaceholder": "VD: 200.000.000",
     "bidPricePlaceholderWithEst": "VD: khoảng {{est}}",
+    "bidPriceLabel": "Số tiền chào thầu:",
+    "bidPriceInWords": "Bằng chữ:",
     "startDate": "Ngày bắt đầu dự kiến",
     "durationDays": "Thời gian thi công (ngày)",
     "durationDaysPlaceholder": "VD: 60",
@@ -830,6 +843,7 @@
     "CreateAccount": "Tạo tài khoản",
     "Processing": "Đang xử lí",
     "BackToLogin": "Quay Về Trang Đăng Nhập",
+    "BackToHome": "Quay Về Trang Chủ",
     "AddNewBrand": "Thêm thương hiệu mới",
     "UpdateBrand": "Cập nhật thương hiệu",
     "AddNewCategory": "Thêm danh mục mới",
@@ -860,6 +874,8 @@
     "AddAddress": "Thêm địa chỉ",
     "CreateServiceRequest": "Tạo yêu cầu dịch vụ",
     "UpdateServiceRequest": "Cập nhật yêu cầu dịch vụ",
+    "CreateMaterialRequest": "Tạo yêu cầu vật liệu",
+    "UpdateMaterialRequest": "Cập nhật yêu cầu vật liệu",
     "Back": "Trở về",
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
@@ -946,6 +962,7 @@
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu dịch vụ!",
+    "MAXIMUM_MATERIAL_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu vật liệu!",
 
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
@@ -980,8 +997,13 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
 
     "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả"
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả",
 
+    "UNAUTHORIZED_ACCESS":"Không được phép truy cập",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"Bạn không có quyền truy cập tài nguyên này",
+
+    "NOTFOUND": "Không tìm thấy tài nguyên",
+    "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại"
 
   },
   "SUCCESS": {
@@ -1020,7 +1042,7 @@
     "ServiceType": {
       "Construction": "Xây dựng",
       "Repair": "Sửa chữa",
-      "MaterialOrder": "Đặt vật liệu"
+      "Material": "Yêu cầu vật liệu"
     },
     "PackageOption": {
       "StructureOnly": "Phần thô",
@@ -1064,6 +1086,15 @@
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
       "Contractor": "Nhà thầu",
       "ContractorDescription" :"Cung cấp giải pháp xây dựng/sửa chửa"
+    },
+    "Status":{
+      "Pending":"Đang chờ",
+      "Approved":"Đã phê duyệt",
+      "Rejected":"Đã từ chối",
+      "Closed":"Đã đóng",
+      "Opening":"Đang mở",
+      "Processed":"Đã xử lý",
+      "Draft":"Bản nháp"
     }
   },
   "toast": {
@@ -1084,10 +1115,6 @@
     "sortNameDesc": "Tên: Z-A",
     "sortMaterialCount": "Số lượng sản phẩm: Ít -> Nhiều",
     "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít",
-    "All": "Tất cả",
-    "pending": "Đang chờ",
-    "rejected": "Đã từ chối",
-    "approved": "Đã chấp nhận",
-    "processed": "Đã xử lý"
+    "All": "Tất cả"
   }
 }
