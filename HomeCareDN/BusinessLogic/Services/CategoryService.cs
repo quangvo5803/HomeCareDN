@@ -99,6 +99,19 @@ namespace BusinessLogic.Services
 
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
+            if (
+                _unitOfWork
+                    .CategoryRepository.GetQueryable()
+                    .Any(c => c.CategoryName == requestDto.CategoryName)
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             var category = _mapper.Map<Category>(requestDto);
             category.CategoryID = Guid.NewGuid();
 
@@ -130,6 +143,18 @@ namespace BusinessLogic.Services
             if (category == null)
             {
                 errors.Add("Category", new[] { "CATEGORY_NOT_FOUND" });
+                throw new CustomValidationException(errors);
+            }
+            if (
+                _unitOfWork
+                    .CategoryRepository.GetQueryable()
+                    .Any(c =>
+                        c.CategoryID != requestDto.CategoryID
+                        && c.CategoryName == requestDto.CategoryName
+                    )
+            )
+            {
+                errors.Add("CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" });
                 throw new CustomValidationException(errors);
             }
             _mapper.Map(requestDto, category);

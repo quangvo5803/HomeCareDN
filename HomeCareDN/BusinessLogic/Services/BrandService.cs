@@ -22,6 +22,19 @@ namespace BusinessLogic.Services
 
         public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
         {
+            if (
+                _unitOfWork
+                    .BrandRepository.GetQueryable()
+                    .Any(b => b.BrandName == requestDto.BrandName)
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             var brand = _mapper.Map<Brand>(requestDto);
             brand.BrandID = Guid.NewGuid();
 
@@ -142,6 +155,21 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+            if (
+                _unitOfWork
+                    .BrandRepository.GetQueryable()
+                    .Any(b =>
+                        b.BrandID != requestDto.BrandID && b.BrandName == requestDto.BrandName
+                    )
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             _mapper.Map(requestDto, brand);
 
             if (
