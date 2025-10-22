@@ -39,6 +39,11 @@ api.interceptors.response.use(
       navigateTo('/Unauthorized');
       return error;
     }
+    if (error.response?.status === 404 && !originalRequest._forbiddenHandled) {
+      originalRequest._forbiddenHandled = true;
+      navigateTo('/NotFound');
+      return error;
+    }
     // Network Error
     if (error.message === 'Network Error' && !error.response) {
       if (!originalRequest._networkHandled) {
