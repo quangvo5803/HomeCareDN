@@ -598,7 +598,7 @@ export default function ServiceRequestCreateUpdate() {
                           {img.isNew && (
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                {t('common.New')}
+                                {t('common.new')}
                               </span>
                             </div>
                           )}

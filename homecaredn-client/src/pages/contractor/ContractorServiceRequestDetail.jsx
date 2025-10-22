@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
@@ -16,10 +16,13 @@ import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
 import StatusBadge from '../../components/StatusBadge';
 import { PaymentService } from '../../services/paymentService';
-
-
+import PaymentSuccessModal from '../../components/modal/PaymentSuccessModal';
+import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const status = searchParams.get('status');
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -33,49 +36,68 @@ export default function ContractorServiceRequestDetail() {
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
+
   useEffect(() => {
     const loadData = async () => {
       if (!serviceRequestId || !user?.id) return;
+
       try {
         setIsChecking(true);
-        const serviceRequestData = await getServiceRequestById(serviceRequestId);
-        setServiceRequest(serviceRequestData);
+        const data = await getServiceRequestById(serviceRequestId);
+        setServiceRequest(data);
 
-        if (serviceRequestData.status === 'Pending' || !serviceRequestData.selectedContractorApplication) {
-          const existingApplicationData =
-            await contractorApplicationService.getApplication({
-              ServiceRequestID: serviceRequestId,
-              ContractorID: user.id,
-            });
-          setExistingApplication(existingApplicationData || null);
+        let appData = null;
+        const isPending =
+          data.status === 'Pending' || !data.selectedContractorApplication;
+        const selectedApp = data.selectedContractorApplication;
+
+        if (isPending) {
+          appData = await contractorApplicationService.getApplication({
+            ServiceRequestID: serviceRequestId,
+            ContractorID: user.id,
+          });
+        } else if (selectedApp.contractorID === user.id) {
+          appData = selectedApp;
         } else {
-          const selectedApp = serviceRequestData.selectedContractorApplication;
-
-          if (selectedApp.contractorID === user.id) {
-            setExistingApplication(selectedApp);
-          } else {
-            const existingApplicationData =
-              await contractorApplicationService.getApplication({
-                ServiceRequestID: serviceRequestId,
-                ContractorID: user.id,
-              });
-            setExistingApplication(existingApplicationData || null);
-          }
+          appData = await contractorApplicationService.getApplication({
+            ServiceRequestID: serviceRequestId,
+            ContractorID: user.id,
+          });
         }
+
+        setExistingApplication(appData || null);
       } catch (error) {
         toast.error(t(handleApiError(error)));
       } finally {
         setIsChecking(false);
       }
     };
-    loadData();
-  }, [serviceRequestId, getServiceRequestById, user, t]);
 
+    loadData();
+  }, [serviceRequestId, user?.id, getServiceRequestById, t]);
   useEffect(() => {
-    if (!serviceRequest) return;
-    const vb = new VenoBox({ selector: '.venobox' });
-    return () => vb.close();
-  }, [serviceRequest, existingApplication]);
+    let timer;
+    if (status) {
+      if (status.toLowerCase() === 'success') setOpenSuccess(true);
+      if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
+      timer = setTimeout(() => {
+        setOpenSuccess(false);
+        setOpenCancel(false);
+      }, 3000);
+    }
+
+    if (serviceRequest) {
+      const vb = new VenoBox({ selector: '.venobox' });
+      return () => {
+        clearTimeout(timer);
+        vb.close();
+      };
+    }
+
+    return () => clearTimeout(timer);
+  }, [status, serviceRequest, existingApplication]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,23 +178,21 @@ export default function ContractorServiceRequestDetail() {
   const handlePayCommission = async () => {
     try {
       toast.info(t('contractorServiceRequestDetail.processingPayment'));
-
       const result = await PaymentService.createPayCommission({
         contractorApplicationID: existingApplication.contractorApplicationID,
         serviceRequestID: serviceRequestId,
-        amount: existingApplication.estimatePrice * 0.006,
+        amount: Number(existingApplication.estimatePrice) * 0.006,
         description: serviceRequestId.slice(0, 19),
-        itemName: "Service Request Commission"
+        itemName: 'Service Request Commission',
       });
 
       if (result?.checkoutUrl) {
-        globalThis.location.href = result.checkoutUrl;
+        window.location.href = result.checkoutUrl;
       } else {
         toast.error(t('contractorServiceRequestDetail.paymentFailed'));
       }
-
     } catch (err) {
-      toast.error(t(handleApiError(err)));
+      toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
 
@@ -341,7 +361,9 @@ export default function ContractorServiceRequestDetail() {
             <p className="mt-3 text-xs text-gray-500 text-center">
               <i className="fas fa-info-circle mr-1" />
               {t('contractorServiceRequestDetail.statusOpen')}?{' '}
-              {t('contractorServiceRequestDetail.selectedPendingCommissionNote')}
+              {t(
+                'contractorServiceRequestDetail.selectedPendingCommissionNote'
+              )}
             </p>
           </div>
         </div>
@@ -428,7 +450,6 @@ export default function ContractorServiceRequestDetail() {
       </div>
     );
   };
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -628,12 +649,6 @@ export default function ContractorServiceRequestDetail() {
                       href={imageUrl}
                       className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
                       data-gall="service-request-gallery"
-                      aria-label={`${t(
-                        'contractorServiceRequestDetail.viewFullSize'
-                      )} - ${t(
-                        'contractorServiceRequestDetail.serviceRequestImage'
-                      )}`}
-                      title={t('contractorServiceRequestDetail.viewFullSize')}
                     >
                       <img
                         src={imageUrl}
@@ -681,6 +696,7 @@ export default function ContractorServiceRequestDetail() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-coins text-orange-500 mr-2"></i>
                     {t('contractorServiceRequestDetail.bidPrice')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
 
                   <input
@@ -694,14 +710,14 @@ export default function ContractorServiceRequestDetail() {
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                          {
-                            est: formatVND(serviceRequest.estimatePrice),
-                          }
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                            {
+                              est: formatVND(serviceRequest.estimatePrice),
+                            }
+                          )
                         : t(
-                          'contractorServiceRequestDetail.bidPricePlaceholder'
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholder'
+                          )
                     }
                   />
 
@@ -729,6 +745,7 @@ export default function ContractorServiceRequestDetail() {
                     <label className="block text-sm font-medium text-gray-700">
                       <i className="fas fa-comment-alt mr-2 text-gray-500" />
                       {t('contractorServiceRequestDetail.noteToOwner')}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     <span className="text-xs text-gray-400">
                       {description.length}
@@ -833,6 +850,14 @@ export default function ContractorServiceRequestDetail() {
           {existingApplication && renderApplicationContent()}
         </div>
       </div>
+      <PaymentSuccessModal
+        open={openSuccess}
+        onClose={() => setOpenSuccess(false)}
+      />
+      <PaymentCancelModal
+        open={openCancel}
+        onClose={() => setOpenCancel(false)}
+      />
     </div>
   );
 }

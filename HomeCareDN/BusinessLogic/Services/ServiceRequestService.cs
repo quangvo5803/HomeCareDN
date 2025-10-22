@@ -25,8 +25,6 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
-        private const string INCLUDE_DELETE =
-            "Images,ContractorApplications,ContractorApplications.Images";
         private const string INCLUDE_DETAIL =
             "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
 
@@ -333,7 +331,7 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
-                includeProperties: INCLUDE_DELETE
+                includeProperties: INCLUDE_DETAIL
             );
 
             ValidateServiceRequest(serviceRequest);
@@ -375,6 +373,7 @@ namespace BusinessLogic.Services.Interfaces
                     _unitOfWork.ContractorApplicationRepository.Remove(contractorApplication);
                 }
             }
+            await _unitOfWork.SaveAsync();
         }
 
         private async Task UploadServiceRequestImagesAsync(

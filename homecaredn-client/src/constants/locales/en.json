@@ -439,7 +439,7 @@
     "viewAttachment": "View attachment {{index}}",
     "serviceRequestNotFound": "Service request not found",
     "yourBid": "Your Bid",
-    "appliedTitle": "Applied title",
+    "appliedTitle": "You have applied",
     "yourNote": "Your note for customer",
     "yourImages": "Your Images",
     "deleteApplication": "Delete Application",
@@ -899,6 +899,7 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
+    "CreateMaterialRequest": "Create Material Request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -1153,6 +1154,7 @@
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },
   "common": {
+    "new": "New",
     "noRequirement": "No requirements",
     "search": "Search...",
     "sortDefault": "Default",

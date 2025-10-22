@@ -221,6 +221,7 @@ namespace BusinessLogic.Services
                 UserName = partnerRequest.Email,
                 FullName = partnerRequest.CompanyName,
                 PhoneNumber = partnerRequest.PhoneNumber,
+                EmailConfirmed = true,
             };
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(
@@ -275,7 +276,9 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.PartnerRequestID == partnerRequestId);
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.PartnerRequestID == partnerRequestId
+            );
             if (images != null && images.Any())
             {
                 foreach (var image in images)

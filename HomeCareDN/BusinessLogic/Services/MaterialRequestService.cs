@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.Services.Interfaces;
@@ -217,12 +218,12 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            DeleteRelatedEntity(materialRequest);
+            await DeleteRelatedEntity(materialRequest);
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
             await _unitOfWork.SaveAsync();
         }
 
-        private void DeleteRelatedEntity(MaterialRequest materialRequest)
+        private async Task DeleteRelatedEntity(MaterialRequest materialRequest)
         {
             if (materialRequest.MaterialRequestItems != null)
             {
@@ -238,6 +239,7 @@ namespace BusinessLogic.Services
                     _unitOfWork.DistributorApplicationRepository.Remove(app);
                 }
             }
+            await _unitOfWork.SaveAsync();
         }
     }
 }
