@@ -122,6 +122,10 @@ export default function ServiceRequestCreateUpdate() {
       toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
       return;
     }
+    if (!description) {
+      toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
+      return;
+    }
     const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const payload = {
       CustomerID: user.id,

@@ -34,6 +34,14 @@ const buildContractorFormData = (contractor) => {
 };
 
 export const contractorApplicationService = {
+
+  getAllContractorByServiceRequestId: async (params = {}) => {
+    const res = await api.get('/ContractorApplication/get-all-contractor-by-service-request-id', {
+      params,
+    });
+    return res.data;
+  },
+
   createContractorApplication: async (contractorData) => {
     const formData = buildContractorFormData(contractorData);
     const response = await api.post(

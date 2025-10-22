@@ -3,6 +3,7 @@ using DataAccess.Data;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
+using Net.payOS;
 
 namespace BusinessLogic.Services.FacadeService.Dependencies
 {
@@ -12,18 +13,21 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public IMapper Mapper { get; }
         public AuthorizeDbContext AuthorizeDbContext { get; }
         public UserManager<ApplicationUser> UserManager { get; }
+        public PayOS PayOS { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            PayOS payOS
         )
         {
             UnitOfWork = unitOfWork;
             Mapper = mapper;
             AuthorizeDbContext = authorizeDbContext;
             UserManager = userManager;
+            PayOS = payOS;
         }
     }
 }

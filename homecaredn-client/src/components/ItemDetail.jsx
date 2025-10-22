@@ -132,11 +132,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     <button
                       key={src}
                       onClick={() => setMainImage(src)}
-                      className={`relative bg-white rounded-xl overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg ${
-                        mainImage === src
-                          ? 'ring-2 ring-orange-500 shadow-md scale-105'
-                          : 'hover:scale-105 shadow-sm'
-                      }`}
+                      className={`relative bg-white rounded-xl overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg ${mainImage === src
+                        ? 'ring-2 ring-orange-500 shadow-md scale-105'
+                        : 'hover:scale-105 shadow-sm'
+                        }`}
                       aria-label={`${item.name} thumbnail ${i + 1}`}
                     >
                       <img
@@ -283,64 +282,65 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                       </div>
 
                       {/* Package Option */}
-                      {item?.packageOption && (
-                        <div className="group">
+                      <div className="group">
+                        <div className="flex items-center mb-2">
+                          <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                            <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
+                          </div>
+                          <div>
+                            <p className="text-xs tracking-wider text-gray-500 uppercase">
+                              {t('sharedEnums.packageOption')}
+                            </p>
+                            <p className="font-semibold text-gray-800">
+                              {item.packageOption
+                                ? t(`Enums.PackageOption.${item.packageOption}`)
+                                : t(`sharedEnums.updating`)
+                              }
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-center gap-6 md:col-span-3">
+                        {/* Design style */}
+                        <div className="w-50 group">
                           <div className="flex items-center mb-2">
                             <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                              <i className="text-lg text-green-600 fa-solid fa-box-open"></i>
+                              <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
                             </div>
                             <div>
                               <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                {t('sharedEnums.packageOption')}
+                                {t('sharedEnums.designStyle')}
                               </p>
                               <p className="font-semibold text-gray-800">
-                                {t(`Enums.PackageOption.${item.packageOption}`)}
+                                {item.designStyle
+                                  ? t(`Enums.DesignStyle.${item.designStyle}`)
+                                  : t(`sharedEnums.updating`)
+                                }
                               </p>
                             </div>
                           </div>
                         </div>
-                      )}
-
-                      <div className="flex justify-center gap-6 md:col-span-3">
-                        {/* Design style */}
-                        {item?.designStyle && (
-                          <div className="w-50 group">
-                            <div className="flex items-center mb-2">
-                              <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                <i className="text-lg text-purple-600 fa-solid fa-palette"></i>
-                              </div>
-                              <div>
-                                <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                  {t('sharedEnums.designStyle')}
-                                </p>
-                                <p className="font-semibold text-gray-800">
-                                  {t(`Enums.DesignStyle.${item.designStyle}`)}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
 
                         {/* Main Structure Type */}
-                        {item?.mainStructureType && (
-                          <div className="group">
-                            <div className="flex items-center mb-2">
-                              <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
-                                <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
-                              </div>
-                              <div>
-                                <p className="text-xs tracking-wider text-gray-500 uppercase">
-                                  {t('sharedEnums.mainStructure')}
-                                </p>
-                                <p className="font-semibold text-gray-800">
-                                  {t(
-                                    `Enums.MainStructure.${item.mainStructureType}`
-                                  )}
-                                </p>
-                              </div>
+                        <div className="group">
+                          <div className="flex items-center mb-2">
+                            <div className="flex items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-lg">
+                              <i className="text-lg text-red-600 fa-solid fa-building-columns"></i>
+                            </div>
+                            <div>
+                              <p className="text-xs tracking-wider text-gray-500 uppercase">
+                                {t('sharedEnums.mainStructure')}
+                              </p>
+                              <p className="font-semibold text-gray-800">
+                                {item.mainStructureType
+                                  ? t(`Enums.MainStructure.${item.mainStructureType}`)
+                                  : t(`sharedEnums.updating`)
+                                }
+                              </p>
                             </div>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
 
@@ -437,9 +437,8 @@ export default function ItemDetail({ item, relatedItems = [] }) {
           {relatedItems.map((m) => (
             <Link
               key={m.serviceID || m.materialID}
-              to={`/${
-                item.type === 'material' ? 'MaterialDetail' : 'ServiceDetail'
-              }/${m.serviceID || m.materialID}`}
+              to={`/${item.type === 'material' ? 'MaterialDetail' : 'ServiceDetail'
+                }/${m.serviceID || m.materialID}`}
               className="overflow-hidden transition-all bg-white shadow-lg rounded-2xl hover:shadow-2xl hover:-translate-y-1"
             >
               <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">

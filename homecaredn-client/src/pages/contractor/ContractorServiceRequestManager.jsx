@@ -134,11 +134,11 @@ export default function ContractorServiceRequestManager() {
                     return (
                       <div
                         key={request.serviceRequestID}
-                        className={`group relative bg-white border rounded-xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-gray-200`}
+                        className={`group relative bg-white border-2 rounded-xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-gray-300`}
                       >
                         {/* Left accent bar */}
                         <div
-                          className={`absolute inset-y-0 left-0 w-1 rounded-l-xl bg-gray-200`}
+                          className={`absolute inset-y-0 left-0 w-1 rounded-l-xl bg-gray-300`}
                         />
 
                         {/* Header row */}
@@ -167,7 +167,7 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} />
+                          <StatusBadge status={request.status} type="Request" />
                         </div>
 
                         {/* Meta chips */}
@@ -275,7 +275,7 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} />
+                          <StatusBadge status={request.status} type="Request" />
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3 text-xs">
