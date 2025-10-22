@@ -166,7 +166,7 @@ export default function ContractorServiceRequestDetail() {
       });
 
       if (result?.checkoutUrl) {
-        window.location.href = result.checkoutUrl;
+        globalThis.location.href = result.checkoutUrl;
       } else {
         toast.error(t('contractorServiceRequestDetail.paymentFailed'));
       }
