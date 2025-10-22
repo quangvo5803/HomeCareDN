@@ -101,6 +101,12 @@ export default function BrandModal({
 
       await onSave(data);
     } catch (err) {
+      const msg =
+        err?.response?.data?.BrandName?.[0] ||
+        err?.response?.data?.errors?.BrandName?.[0];
+      if (msg === 'BRAND_NAME_ALREADY_EXISTS') {
+        return toast.error(t('ERROR.BRAND_NAME_ALREADY_EXISTS'));
+      }
       toast.error(t(handleApiError(err)));
     }
   };

@@ -567,7 +567,7 @@
     "menu": {
       "dashboard": "Bảng điều khiển",
       "brand": "Thương hiệu",
-      "category": "Danh mục vật liệu",
+      "category": "Danh mục ",
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
@@ -651,8 +651,8 @@
     }
   },
   "adminCategoryManager": {
-    "title": "Quản lí danh mục vật liệu",
-    "subtitle": "Quản lí danh sác các danh mục vật liệu",
+    "title": "Quản lí danh mục ",
+    "subtitle": "Quản lí danh sác các danh mục",
     "categories": "danh mục",
     "no": "STT",
     "categoryName": "Tên danh mục",
@@ -959,6 +959,8 @@
 
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
+    "BRAND_NAME_ALREADY_EXISTS": "Tên thương hiệu đã tồn tại.",
+    "CATEGORY_NAME_ALREADY_EXISTS": "Tên danh mục đã tồn tại.",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",

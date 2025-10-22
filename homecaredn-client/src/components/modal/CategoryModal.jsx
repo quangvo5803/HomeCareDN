@@ -101,6 +101,12 @@ export default function CategoryModal({
 
       await onSave(data);
     } catch (err) {
+      const msg =
+        err?.response?.data?.CategoryName?.[0] ||
+        err?.response?.data?.errors?.CategoryName?.[0];
+      if (msg === 'CATEGORY_NAME_ALREADY_EXISTS') {
+        return toast.error(t('ERROR.CATEGORY_NAME_ALREADY_EXISTS'));
+      }
       toast.error(t(handleApiError(err)));
     }
   };
