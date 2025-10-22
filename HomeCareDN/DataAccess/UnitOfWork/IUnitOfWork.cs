@@ -19,6 +19,7 @@ namespace DataAccess.UnitOfWork
         IMaterialRequestItemRepository MaterialRequestItemRepository { get; }
         IDistributorApplicationRepository DistributorApplicationRepository { get; }
         IDistributorApplicationItemRepository DistributorApplicationItemRepository { get; }
+        IPaymentTransactionsRepository PaymentTransactionsRepository { get; }
         Task SaveAsync();
     }
 }
