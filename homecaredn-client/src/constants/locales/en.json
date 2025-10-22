@@ -446,7 +446,9 @@
     "youAreSelected": "You are selected",
     "customerInfo": "Customer information",
     "payCommission": "Commission Payment",
-    "selectedPendingCommissionNote": "Waiting for commission payment"
+    "selectedPendingCommissionNote": "Waiting for commission payment",
+    "processingPayment": "Processing Payment",
+    "paymentFailed": "Payment Failed"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",

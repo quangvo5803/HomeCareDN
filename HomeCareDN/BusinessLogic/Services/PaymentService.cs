@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
+using System.Globalization;
 using Ultitity.Exceptions;
 using Ultitity.Options;
 
@@ -93,14 +94,20 @@ namespace BusinessLogic.Services
                         { "OrderCodeNull", new[] { "ERROR_SERVICE_NOT_FOUND" } },
                    }
                );
-            }   
+            }
 
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
-                if (DateTime.TryParse(data.TransactionDateTime, out var paidAt))
+
+                if (DateTime.TryParseExact(
+                        data.TransactionDateTime,
+                        "yyyy-MM-dd HH:mm:ss",
+                        CultureInfo.InvariantCulture,
+                        DateTimeStyles.None,
+                        out var paidAt))
                 {
-                    payment.PaidAt = DateTime.SpecifyKind(paidAt, DateTimeKind.Utc);
+                    payment.PaidAt = DateTime.SpecifyKind(paidAt, DateTimeKind.Local).ToUniversalTime();
                 }
                 else
                 {

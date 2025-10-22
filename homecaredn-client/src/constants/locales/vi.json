@@ -445,7 +445,9 @@
     "youAreSelected": "Bạn đã được chọn",
     "customerInfo": "Thông tin khác hàng",
     "payCommission": "Thanh toán hoa hồng",
-    "selectedPendingCommissionNote": "Đang đợi thanh toán hoa hồng"
+    "selectedPendingCommissionNote": "Đang đợi thanh toán hoa hồng",
+    "processingPayment": "Đang xử lý thanh toán",
+    "paymentFailed": "Thanh toán thất bại"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",

@@ -12,11 +12,9 @@ namespace HomeCareDNAPI.Controllers.Payment
     public class PaymentController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
-        private readonly ILogger<PaymentController> _logger;
-        public PaymentController(IFacadeService facadeService, ILogger<PaymentController> logger)
+        public PaymentController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
-            _logger = logger;
         }
 
         [HttpPost("create-payment")]

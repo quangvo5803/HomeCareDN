@@ -253,100 +253,7 @@ export default function AdminServiceRequestDetail() {
                 </div>
 
                 {/* Nếu status là Pending → hiển thị danh sách contractor */}
-                {detail.contractorApplications !== null ? (
-                    // ===== DANH SÁCH ỨNG VIÊN =====
-                    <div className="bg-white rounded-2xl shadow-lg p-6">
-                        <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-xl font-bold text-gray-800">
-                                {t('adminServiceRequestManager.listCandidate')}
-                            </h3>
-                            <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
-                                {totalContractors || 0} {t('adminServiceRequestManager.totalCandidate')}
-                            </span>
-                        </div>
-
-                        <div className="space-y-3">
-                            {contractors && contractors.length > 0 ? (
-                                <>
-                                    {contractors.map((items) => {
-                                        const isSelected = items.contractorEmail === selectedContractorEmail;
-
-                                        return (
-                                            <button
-                                                key={items.contractorApplicationID}
-                                                onClick={() => handleSelectContractor(items.contractorEmail)}
-                                                className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
-                                                    ${isSelected
-                                                        ? 'bg-orange-500 border-orange-600 text-white'
-                                                        : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
-                                                    }`}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div
-                                                            className={`w-12 h-12 rounded-full overflow-hidden ring-2 ${isSelected
-                                                                ? 'ring-white bg-white'
-                                                                : 'ring-transparent group-hover:ring-orange-400'
-                                                                }`}
-                                                        >
-                                                            <img
-                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                                                    items.contractorEmail || 'User'
-                                                                )}&background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`}
-                                                                alt="avatar"
-                                                                className="object-cover w-full h-full"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <p className={`font-semibold ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-600'}`}>
-                                                                {items.contractorName}
-                                                            </p>
-                                                            <p className={`text-sm ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
-                                                                {items.contractorEmail}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    <button
-                                                        className={`px-4 py-2 rounded-lg font-medium ${isSelected
-                                                            ? 'bg-orange-500 border-orange-600 text-white'
-                                                            : 'text-orange-600'
-                                                            }`}
-                                                        onClick={() => handleSelectContractor(items.contractorEmail)}
-                                                    >
-                                                        {t('adminServiceRequestManager.viewProfile')}{' '}
-                                                        <i className="fa-solid fa-arrow-right ms-1"></i>
-                                                    </button>
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-
-                                    {totalContractors > 0 && (
-                                        <div className="flex justify-center py-4">
-                                            <Pagination
-                                                current={currentPage}
-                                                pageSize={pageSize}
-                                                total={totalContractors}
-                                                onChange={(page) => setCurrentPage(page)}
-                                                showSizeChanger={false}
-                                                size="small"
-                                            />
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="flex flex-col items-center mt-5 mb-5">
-                                    <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
-                                    <h3 className="mb-1 text-lg font-medium text-gray-900">
-                                        {t('adminServiceRequestManager.noContractor')}
-                                    </h3>
-                                    <p className="text-gray-500">{t('adminServiceRequestManager.noContractorYet')}</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ) : (
+                {detail.contractorApplications === null ? (
                     // ===== CHI TIẾT CONTRACTOR ĐƯỢC CHỌN =====
                     (
                         ['Approved', 'PendingCommission'].includes(detail?.selectedContractorApplication?.status)
@@ -466,6 +373,99 @@ export default function AdminServiceRequestDetail() {
                             </div>
                         </div>
                     )
+                ) : (
+                    // ===== DANH SÁCH ỨNG VIÊN =====
+                    <div className="bg-white rounded-2xl shadow-lg p-6">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-xl font-bold text-gray-800">
+                                {t('adminServiceRequestManager.listCandidate')}
+                            </h3>
+                            <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
+                                {totalContractors || 0} {t('adminServiceRequestManager.totalCandidate')}
+                            </span>
+                        </div>
+
+                        <div className="space-y-3">
+                            {contractors && contractors.length > 0 ? (
+                                <>
+                                    {contractors.map((items) => {
+                                        const isSelected = items.contractorEmail === selectedContractorEmail;
+
+                                        return (
+                                            <button
+                                                key={items.contractorApplicationID}
+                                                onClick={() => handleSelectContractor(items.contractorEmail)}
+                                                className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
+                                                    ${isSelected
+                                                        ? 'bg-orange-500 border-orange-600 text-white'
+                                                        : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
+                                                    }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div
+                                                            className={`w-12 h-12 rounded-full overflow-hidden ring-2 ${isSelected
+                                                                ? 'ring-white bg-white'
+                                                                : 'ring-transparent group-hover:ring-orange-400'
+                                                                }`}
+                                                        >
+                                                            <img
+                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                                                    items.contractorEmail || 'User'
+                                                                )}&background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`}
+                                                                alt="avatar"
+                                                                className="object-cover w-full h-full"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <p className={`font-semibold ${isSelected ? 'text-white' : 'text-gray-800 group-hover:text-orange-600'}`}>
+                                                                {items.contractorName}
+                                                            </p>
+                                                            <p className={`text-sm ${isSelected ? 'text-orange-100' : 'text-gray-500'}`}>
+                                                                {items.contractorEmail}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        className={`px-4 py-2 rounded-lg font-medium ${isSelected
+                                                            ? 'bg-orange-500 border-orange-600 text-white'
+                                                            : 'text-orange-600'
+                                                            }`}
+                                                        onClick={() => handleSelectContractor(items.contractorEmail)}
+                                                    >
+                                                        {t('adminServiceRequestManager.viewProfile')}{' '}
+                                                        <i className="fa-solid fa-arrow-right ms-1"></i>
+                                                    </button>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+
+                                    {totalContractors > 0 && (
+                                        <div className="flex justify-center py-4">
+                                            <Pagination
+                                                current={currentPage}
+                                                pageSize={pageSize}
+                                                total={totalContractors}
+                                                onChange={(page) => setCurrentPage(page)}
+                                                showSizeChanger={false}
+                                                size="small"
+                                            />
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="flex flex-col items-center mt-5 mb-5">
+                                    <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
+                                    <h3 className="mb-1 text-lg font-medium text-gray-900">
+                                        {t('adminServiceRequestManager.noContractor')}
+                                    </h3>
+                                    <p className="text-gray-500">{t('adminServiceRequestManager.noContractorYet')}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 )}
 
                 {/* Nếu Pending và có contractor tham gia thì vẫn hiển thị detail bên dưới */}
