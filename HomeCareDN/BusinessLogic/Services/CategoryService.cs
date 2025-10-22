@@ -100,9 +100,9 @@ namespace BusinessLogic.Services
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
             if (
-                _unitOfWork
+                await _unitOfWork
                     .CategoryRepository.GetQueryable()
-                    .Any(c => c.CategoryName == requestDto.CategoryName)
+                    .AnyAsync(c => c.CategoryName == requestDto.CategoryName)
             )
             {
                 throw new CustomValidationException(
@@ -146,9 +146,9 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             if (
-                _unitOfWork
+                await _unitOfWork
                     .CategoryRepository.GetQueryable()
-                    .Any(c =>
+                    .AnyAsync(c =>
                         c.CategoryID != requestDto.CategoryID
                         && c.CategoryName == requestDto.CategoryName
                     )

@@ -23,9 +23,9 @@ namespace BusinessLogic.Services
         public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
         {
             if (
-                _unitOfWork
+                await _unitOfWork
                     .BrandRepository.GetQueryable()
-                    .Any(b => b.BrandName == requestDto.BrandName)
+                    .AnyAsync(b => b.BrandName == requestDto.BrandName)
             )
             {
                 throw new CustomValidationException(
@@ -156,9 +156,9 @@ namespace BusinessLogic.Services
             }
 
             if (
-                _unitOfWork
+                await _unitOfWork
                     .BrandRepository.GetQueryable()
-                    .Any(b =>
+                    .AnyAsync(b =>
                         b.BrandID != requestDto.BrandID && b.BrandName == requestDto.BrandName
                     )
             )
