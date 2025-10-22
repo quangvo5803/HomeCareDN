@@ -128,8 +128,8 @@ export default function AdminPartnerRequestManager() {
                   key={key}
                   onClick={() => setFilter(key)}
                   className={`px-3 py-1.5 rounded-full text-sm border font-medium ${filter === key
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
                     }`}
                 >
                   {t(`adminPartnerManager.${key}`)}
@@ -215,7 +215,7 @@ export default function AdminPartnerRequestManager() {
 
                           {/* Status enum */}
                           <td className="px-6 py-4 text-center align-middle">
-                            <StatusBadge status={partnerRequest.status} />
+                            <StatusBadge status={partnerRequest.status} type="PartnerRequest" />
                           </td>
 
                           <td className="px-4 py-4 text-center align-middle">

@@ -130,71 +130,71 @@ export default function DistributorDashboard() {
           </div>
         </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs text-gray-500">
-                  <tr className="border-b">
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.id')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.description')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.estimate')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.last_update')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.notifications')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.status')}
-                    </th>
-                    <th className="py-2 px-3 text-left">
-                      {t('partnerDashboard.action')}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SEED_APPS.map((app) => (
-                    <tr key={app.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-3">{app.id}</td>
-                      <td className="py-3 px-3">{app.description}</td>
-                      <td className="py-3 px-3">
-                        {formatVND(app.estimatePrice)}
-                      </td>
-                      <td className="py-3 px-3">
-                        {formatDate(app.createdAt, i18n.language)}
-                      </td>
-                      <td className="py-3 px-3">
-                        {app.notifications > 0 ? (
-                          <span className="px-2 py-0.5 rounded-full text-xs bg-red-200 text-red-700">
-                            {app.notifications}
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-1000">
-                            0
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-3 px-3">
-                        <StatusBadge status={app.status} />
-                      </td>
-                      <td className="py-3 px-3">
-                        <button
-                          onClick={() => navigate(`/applications/${app.id}`)}
-                          className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
-                        >
-                          {t('partnerDashboard.view')}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-xs text-gray-500">
+              <tr className="border-b">
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.id')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.description')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.estimate')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.last_update')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.notifications')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.status')}
+                </th>
+                <th className="py-2 px-3 text-left">
+                  {t('partnerDashboard.action')}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {SEED_APPS.map((app) => (
+                <tr key={app.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-3">{app.id}</td>
+                  <td className="py-3 px-3">{app.description}</td>
+                  <td className="py-3 px-3">
+                    {formatVND(app.estimatePrice)}
+                  </td>
+                  <td className="py-3 px-3">
+                    {formatDate(app.createdAt, i18n.language)}
+                  </td>
+                  <td className="py-3 px-3">
+                    {app.notifications > 0 ? (
+                      <span className="px-2 py-0.5 rounded-full text-xs bg-red-200 text-red-700">
+                        {app.notifications}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-1000">
+                        0
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 px-3">
+                    <StatusBadge status={app.status} type="PartnerRequest" />
+                  </td>
+                  <td className="py-3 px-3">
+                    <button
+                      onClick={() => navigate(`/applications/${app.id}`)}
+                      className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
+                    >
+                      {t('partnerDashboard.view')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <footer className="p-6 text-center text-gray-500 text-sm">
           © {new Date().getFullYear()} HomeCareDN
         </footer>

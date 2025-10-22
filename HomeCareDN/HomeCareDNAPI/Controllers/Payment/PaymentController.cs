@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Services.FacadeService;
+﻿using BusinessLogic.DTOs.Application.Payment;
+using BusinessLogic.Services.FacadeService;
 using DataAccess.Entities;
 using DataAccess.Entities.Payment;
 using Microsoft.AspNetCore.Http;
@@ -11,18 +12,19 @@ namespace HomeCareDNAPI.Controllers.Payment
     public class PaymentController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
-        public PaymentController(IFacadeService facadeService)
+        private readonly ILogger<PaymentController> _logger;
+        public PaymentController(IFacadeService facadeService, ILogger<PaymentController> logger)
         {
             _facadeService = facadeService;
+            _logger = logger;
         }
 
         [HttpPost("create-payment")]
-        public async Task<IActionResult> CreatePayment([FromBody] CreatePaymentRequest request)
+        public async Task<IActionResult> CreatePayment([FromBody] PaymentCreateRequestDto request)
         {
             try
             {
-                var result = await _facadeService.PaymentService.CreatePaymentAsync(request.Amount, request.Description!, request.ItemName!);
-
+                var result = await _facadeService.PaymentService.CreatePaymentAsync(request);
                 return Ok(new
                 {
                     code = 200,
@@ -36,5 +38,13 @@ namespace HomeCareDNAPI.Controllers.Payment
                 return BadRequest(new { code = 500, message = ex.Message });
             }
         }
+
+        [HttpPost("webhook")]
+        public async Task<IActionResult> WebhookPost([FromBody] PayOSCallbackDto callback)
+        {
+            await _facadeService.PaymentService.HandlePayOSCallbackAsync(callback);
+            return Ok(new { message = "Cập nhật thanh toán thành công" });
+        }
+
     }
 }

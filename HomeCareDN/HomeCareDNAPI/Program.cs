@@ -82,11 +82,13 @@ namespace HomeCareDNAPI
             builder.Services.AddHttpContextAccessor();
 
             /// Register Options
+            /// 
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<CloudinaryOptions>(
                 builder.Configuration.GetSection("Cloudinary")
             );
             builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
+            builder.Services.Configure<PayOsOptions>(builder.Configuration.GetSection("PayOS"));
 
             /// Register services for Application
 
@@ -111,10 +113,9 @@ namespace HomeCareDNAPI
             //PayOS
             builder.Services.AddSingleton(sp =>
             {
-                var config = sp.GetRequiredService<IConfiguration>();
-                var clientId = config["PayOS:ClientId"];
-                var apiKey = config["PayOS:ApiKey"];
-                var checksumKey = config["PayOS:ChecksumKey"];
+                var clientId = builder.Configuration["PayOS:ClientId"];
+                var apiKey = builder.Configuration["PayOS:ApiKey"];
+                var checksumKey = builder.Configuration["PayOS:ChecksumKey"];
 
                 return new PayOS(clientId!, apiKey!, checksumKey!);
             });

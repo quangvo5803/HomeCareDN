@@ -33,11 +33,8 @@ export default function AdminServiceRequestDetail() {
             const detailServiceRes = await getServiceRequestById(id);
             setDetail(detailServiceRes);
 
-            const allPending =
-                detailServiceRes.selectedContractorApplication?.every(
-                    (c) => c.status === "Pending"
-                ) ?? true;
-            if (allPending) {
+            const selectedContractor = !!detailServiceRes.selectedContractorApplication;
+            if (!selectedContractor) {
                 fetchContractorByServiceRequestId({
                     PageNumber: currentPage,
                     PageSize: pageSize,
@@ -48,7 +45,6 @@ export default function AdminServiceRequestDetail() {
 
         fetchData();
     }, [id, currentPage, pageSize, getServiceRequestById, fetchContractorByServiceRequestId]);
-
 
     const icons = {
         Repair: 'fa-drafting-compass',
@@ -227,20 +223,9 @@ export default function AdminServiceRequestDetail() {
 
                             {/* Trạng thái */}
                             <div className="flex items-center justify-end">
-                                <span
-                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${detail.isOpen
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-gray-100 text-red-500'
-                                        }`}
-                                >
-                                    <i
-                                        className={`fas ${detail.isOpen ? 'fa-check-circle' : 'fa-clock'} mr-1`}
-                                    ></i>
-                                    {detail.isOpen
-                                        ? t('adminServiceRequestManager.label_open')
-                                        : t('adminServiceRequestManager.label_close')}
-                                </span>
+                                <StatusBadge status={detail.status} type="Request" />
                             </div>
+
                         </div>
                     </div>
 
@@ -268,7 +253,8 @@ export default function AdminServiceRequestDetail() {
                 </div>
 
                 {/* Nếu status là Pending → hiển thị danh sách contractor */}
-                {isPendingStatus ? (
+                {detail.contractorApplications !== null ? (
+                    // ===== DANH SÁCH ỨNG VIÊN =====
                     <div className="bg-white rounded-2xl shadow-lg p-6">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-xl font-bold text-gray-800">
@@ -304,8 +290,9 @@ export default function AdminServiceRequestDetail() {
                                                                 }`}
                                                         >
                                                             <img
-                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(items.contractorEmail || 'User')}
-                                                                &background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`}
+                                                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                                                    items.contractorEmail || 'User'
+                                                                )}&background=${isSelected ? 'ffffff' : 'FB8C00'}&color=${isSelected ? 'FB8C00' : 'fff'}`}
                                                                 alt="avatar"
                                                                 className="object-cover w-full h-full"
                                                             />
@@ -360,17 +347,20 @@ export default function AdminServiceRequestDetail() {
                         </div>
                     </div>
                 ) : (
-                    //detail contractor được chọn
-                    detail?.selectedContractorApplication?.status === 'Approved' && (
+                    // ===== CHI TIẾT CONTRACTOR ĐƯỢC CHỌN =====
+                    (
+                        ['Approved', 'PendingCommission'].includes(detail?.selectedContractorApplication?.status)
+                    ) && (
                         <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                             <div className="bg-gradient-to-r px-8 py-6">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-2xl font-bold text-black">
                                         {t('adminServiceRequestManager.contractorDetail.title')}
                                     </h3>
-                                    <StatusBadge status={detail.selectedContractorApplication.status} />
+                                    <StatusBadge status={detail.selectedContractorApplication.status} type="Application" />
                                 </div>
                             </div>
+
                             <div className="p-8">
                                 <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
                                     <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
@@ -383,7 +373,9 @@ export default function AdminServiceRequestDetail() {
                                         />
                                     </div>
                                     <div className="flex-1">
-                                        <h4 className="font-bold text-xl text-gray-800 mb-2">{detail.selectedContractorApplication.contractorName}</h4>
+                                        <h4 className="font-bold text-xl text-gray-800 mb-2">
+                                            {detail.selectedContractorApplication.contractorName}
+                                        </h4>
                                         <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
                                             <i className="fa-solid fa-envelope text-orange-500"></i>
                                             {detail.selectedContractorApplication.contractorEmail}
@@ -394,9 +386,9 @@ export default function AdminServiceRequestDetail() {
                                         </p>
                                     </div>
                                 </div>
+
                                 {/* Grid Info */}
                                 <div className="grid grid-cols-2 gap-4 mb-8">
-                                    {/* Estimate Price */}
                                     <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
                                         <p className="text-emerald-600 text-sm font-medium mb-1">
                                             {t('adminServiceRequestManager.estimatePrice')}
@@ -406,7 +398,6 @@ export default function AdminServiceRequestDetail() {
                                         </p>
                                     </div>
 
-                                    {/* Completed Project */}
                                     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
                                         <p className="text-blue-600 text-sm font-medium mb-1">
                                             {t('adminServiceRequestManager.contractorDetail.completedProject')}
@@ -417,7 +408,6 @@ export default function AdminServiceRequestDetail() {
                                         </p>
                                     </div>
 
-                                    {/* Rating */}
                                     <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
                                         <p className="text-amber-600 text-sm font-medium mb-1">
                                             {t('adminServiceRequestManager.contractorDetail.rating')}
@@ -428,7 +418,6 @@ export default function AdminServiceRequestDetail() {
                                         </p>
                                     </div>
 
-                                    {/* Created At */}
                                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
                                         <p className="text-purple-600 text-sm font-medium mb-1">
                                             {t('adminServiceRequestManager.contractorDetail.createAt')}
@@ -444,7 +433,9 @@ export default function AdminServiceRequestDetail() {
                                     <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
                                         {t('adminServiceRequestManager.description')}
                                     </p>
-                                    <p className="text-gray-700 leading-relaxed">{detail.selectedContractorApplication.description}</p>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        {detail.selectedContractorApplication.description}
+                                    </p>
                                 </div>
 
                                 {/* Images */}
@@ -477,7 +468,7 @@ export default function AdminServiceRequestDetail() {
                     )
                 )}
 
-                {/* Nếu Pending và có contractor đang chọn thì vẫn hiển thị detail bên dưới */}
+                {/* Nếu Pending và có contractor tham gia thì vẫn hiển thị detail bên dưới */}
                 {isPendingStatus && selectedContractor && (
                     <div ref={contractorDetailRef} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                         {/* Header */}
@@ -486,7 +477,7 @@ export default function AdminServiceRequestDetail() {
                                 <h3 className="text-2xl font-bold text-black">
                                     {t('adminServiceRequestManager.contractorDetail.title')}
                                 </h3>
-                                <StatusBadge status={selectedContractor.status} />
+                                <StatusBadge status={selectedContractor.status} type="Application" />
                             </div>
                         </div>
 

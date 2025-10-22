@@ -13,21 +13,21 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public IMapper Mapper { get; }
         public AuthorizeDbContext AuthorizeDbContext { get; }
         public UserManager<ApplicationUser> UserManager { get; }
-        public PayOS PayOSClient { get; }
+        public PayOS PayOS { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            PayOS payOSClient
+            PayOS payOS
         )
         {
             UnitOfWork = unitOfWork;
             Mapper = mapper;
             AuthorizeDbContext = authorizeDbContext;
             UserManager = userManager;
-            PayOSClient = payOSClient;
+            PayOS = payOS;
         }
     }
 }

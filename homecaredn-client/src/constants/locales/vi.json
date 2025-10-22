@@ -441,7 +441,11 @@
     "appliedTitle": "Bạn đã ứng tuyển",
     "yourNote": "Ghi chú của bạn cho khách hàng",
     "yourImages": "Hình ảnh của bạn",
-    "deleteApplication": "Xóa đơn ứng tuyển"
+    "deleteApplication": "Xóa đơn ứng tuyển",
+    "youAreSelected": "Bạn đã được chọn",
+    "customerInfo": "Thông tin khác hàng",
+    "payCommission": "Thanh toán hoa hồng",
+    "selectedPendingCommissionNote": "Đang đợi thanh toán hoa hồng"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -1115,14 +1119,23 @@
       "Contractor": "Nhà thầu",
       "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
     },
-    "Status": {
+    "ApplicationStatus": {
       "Pending": "Đang chờ",
+      "PendingCommission": "Đang chờ xử lý",
       "Approved": "Đã phê duyệt",
-      "Rejected": "Đã từ chối",
+      "Rejected": "Đã từ chối"
+    },
+    "RequestStatus": {
       "Closed": "Đã đóng",
       "Opening": "Đang mở",
-      "Processed": "Đã xử lý",
-      "Draft": "Bản nháp"
+      "Pending": "Đang xử lý",
+      "Draft": "Bản nháp",
+      "Processed": "Đã xử lý"
+    },
+    "PartneRequestrStatus": {
+      "Pending": "Đang chờ",
+      "Approved": "Đã phê duyệt",
+      "Rejected": "Đã từ chối"
     }
   },
   "toast": {

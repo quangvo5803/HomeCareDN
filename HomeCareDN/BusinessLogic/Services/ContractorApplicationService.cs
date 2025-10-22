@@ -210,7 +210,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            contractorApplication.Status = ApplicationStatus.Approved;
+            contractorApplication.Status = ApplicationStatus.PendingCommission;
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)

@@ -442,7 +442,11 @@
     "appliedTitle": "Applied title",
     "yourNote": "Your note for customer",
     "yourImages": "Your Images",
-    "deleteApplication": "Delete Application"
+    "deleteApplication": "Delete Application",
+    "youAreSelected": "You are selected",
+    "customerInfo": "Customer information",
+    "payCommission": "Commission Payment",
+    "selectedPendingCommissionNote": "Waiting for commission payment"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -1119,14 +1123,23 @@
       "Contractor": "Contractor",
       "ContractorDescription": "Providing construction/repair solutions"
     },
-    "Status": {
+    "ApplicationStatus": {
       "Pending": "Pending",
+      "PendingCommission": "Pending",
       "Approved": "Approved",
-      "Rejected": "Rejected",
+      "Rejected": "Rejected"
+    },
+    "RequestStatus": {
       "Closed": "Closed",
       "Opening": "Opening",
-      "Processed": "Processed",
-      "Draft": "Draft"
+      "Pending": "Pending",
+      "Draft": "Draft",
+      "Processed": "Processed"
+    },
+    "PartneRequestrStatus": {
+      "Pending": "Pending",
+      "Approved": "Approved",
+      "Rejected": "Rejected"
     }
   },
   "toast": {

@@ -67,7 +67,9 @@ namespace BusinessLogic.Services.FacadeService
             );
 
             PaymentService = new PaymentService(
-                coreDeps.PayOSClient
+                coreDeps.PayOS,
+                coreDeps.UnitOfWork,
+                infraDeps.PayOsOptions
             );
 
             MaterialRequestService = new MaterialRequestService(
