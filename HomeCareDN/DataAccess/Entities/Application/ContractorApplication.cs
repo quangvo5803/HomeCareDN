@@ -21,6 +21,9 @@ namespace DataAccess.Entities.Application
         [Display(Name = "Pending")]
         Pending,
 
+        [Display(Name = "PendingCommission")]
+        PendingCommission,
+
         [Display(Name = "Approved")]
         Approved,
 

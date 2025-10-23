@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251021094559_UpdatePaymentTransaction1")]
+    partial class UpdatePaymentTransaction1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -286,9 +289,6 @@ namespace DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("PartnerRequestID")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -297,12 +297,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("DocumentID");
-
-                    b.HasIndex("ContractorApplicationID");
-
-                    b.HasIndex("PartnerRequestID");
-
-                    b.HasIndex("ServiceRequestID");
 
                     b.ToTable("Documents", "app");
                 });
@@ -719,21 +713,6 @@ namespace DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ContractorApplicationID");
-
-                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("PartnerRequestID");
-
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ServiceRequestID");
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -834,8 +813,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Images");
                 });
 
@@ -858,8 +835,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Images");
                 });
 
@@ -871,8 +846,6 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
-
-                    b.Navigation("Documents");
 
                     b.Navigation("Images");
                 });
