@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
-import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useBrand } from '../../hook/useBrand';
 import LoadingModal from './LoadingModal';
@@ -74,41 +73,31 @@ export default function BrandModal({
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
 
-    try {
-      const data = {
-        BrandName: brandName,
-        BrandDescription: brandDescription || null,
-        BrandNameEN: brandNameEN || null,
-        BrandDescriptionEN: brandDescriptionEN || null,
+    const data = {
+      BrandName: brandName,
+      BrandDescription: brandDescription || null,
+      BrandNameEN: brandNameEN || null,
+      BrandDescriptionEN: brandDescriptionEN || null,
 
-        ...(brand?.brandID && { BrandID: brand.brandID }),
-      };
+      ...(brand?.brandID && { BrandID: brand.brandID }),
+    };
 
-      if (logoFile) {
-        const result = await uploadImageToCloudinary(
-          logoFile,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => {
-            setUploadProgress(percent);
-          },
-          'HomeCareDN/BrandLogo'
-        );
-        data.BrandLogoUrl = result.url;
-        data.BrandLogoPublicId = result.publicId;
-        onClose();
-        setUploadProgress(0);
-      }
-
-      await onSave(data);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.BrandName?.[0] ||
-        err?.response?.data?.errors?.BrandName?.[0];
-      if (msg === 'BRAND_NAME_ALREADY_EXISTS') {
-        return toast.error(t('ERROR.BRAND_NAME_ALREADY_EXISTS'));
-      }
-      toast.error(t(handleApiError(err)));
+    if (logoFile) {
+      const result = await uploadImageToCloudinary(
+        logoFile,
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+        (percent) => {
+          setUploadProgress(percent);
+        },
+        'HomeCareDN/BrandLogo'
+      );
+      data.BrandLogoUrl = result.url;
+      data.BrandLogoPublicId = result.publicId;
+      onClose();
+      setUploadProgress(0);
     }
+
+    await onSave(data);
   };
 
   if (!isOpen) return null;

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
-import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useCategory } from '../../hook/useCategory';
 import LoadingModal from './LoadingModal';
@@ -83,32 +82,22 @@ export default function CategoryModal({
       data.IsActive = user?.role === 'Admin';
       data.UserID = user?.id;
     }
-    try {
-      if (logoFile) {
-        const result = await uploadImageToCloudinary(
-          logoFile,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => {
-            setUploadProgress(percent);
-          },
-          'HomeCareDN/CategoryLogo'
-        );
-        data.CategoryLogoUrl = result.url;
-        data.CategoryLogoPublicId = result.publicId;
-        onClose();
-        setUploadProgress(0);
-      }
-
-      await onSave(data);
-    } catch (err) {
-      const msg =
-        err?.response?.data?.CategoryName?.[0] ||
-        err?.response?.data?.errors?.CategoryName?.[0];
-      if (msg === 'CATEGORY_NAME_ALREADY_EXISTS') {
-        return toast.error(t('ERROR.CATEGORY_NAME_ALREADY_EXISTS'));
-      }
-      toast.error(t(handleApiError(err)));
+    if (logoFile) {
+      const result = await uploadImageToCloudinary(
+        logoFile,
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+        (percent) => {
+          setUploadProgress(percent);
+        },
+        'HomeCareDN/CategoryLogo'
+      );
+      data.CategoryLogoUrl = result.url;
+      data.CategoryLogoPublicId = result.publicId;
+      onClose();
+      setUploadProgress(0);
     }
+
+    await onSave(data);
   };
 
   if (!isOpen) return null;
