@@ -240,6 +240,7 @@
     "continueWithType": "Continue registration as "
   },
   "partnerRegistration": {
+    "form_documents":"Attachments / Documents (Maximum 5 documents)",  
     "title": "Register as a Partner",
     "subtitle": "Please fill in all the information below",
     "notSelectedType": "Please select a role",
@@ -247,7 +248,7 @@
     "form_email": "Email",
     "form_phoneNumber": "Phone Number",
     "form_description": "Company Description",
-    "form_images": "Company Images",
+    "form_images": "Company Images (Maximum 5 images)",
     "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
   }
 },
@@ -324,6 +325,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
+      "form_documents": "Attachments / Documents (Maximum 5 documents)",
       "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
@@ -331,6 +333,7 @@
       "footer": "You will receive notification as soon as a contractor/distributor applies."
     },
     "serviceRequestDetail": {
+      "label_documents": "Attachments / Documents:",
       "title": "Service Request Details",
       "label_open": "Open",
       "label_close": "Closed",
@@ -439,7 +442,10 @@
     "appliedTitle": "Applied title",
     "yourNote": "Your note for customer",
     "yourImages": "Your Images",
-    "deleteApplication": "Delete Application"
+    "deleteApplication": "Delete Application",
+    "documents": "Documents",
+    "viewDocument": "View document",
+    "yourDocuments": "Your Documents"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -934,7 +940,11 @@
     "DeleteApplicationModal":{
       "title": "Are you sure?",
       "text":"This application will be gone forever"
-    }
+    },
+    "DeleteDocumentModal": {
+      "title": "Are you sure?",
+      "text": "This document will be deleted and cannot be restored!"
+    } 
   },
   "ERROR": {
     "UPLOAD_FAILED": "Image upload failed.",
@@ -965,6 +975,10 @@
 
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+    
+    "MAXIMUM_DOCUMENT": "You can only upload up to 5 documents.",
+    "MAXIMUM_DOCUMENT_SIZE": "Each document must be less than 25 MB.",
+
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
@@ -1104,9 +1118,13 @@
   "upload":{
     "clickToUpload":"Click to upload",
     "orDragAndDrop":"or drag and drop",
-    "fileTypesHint":"PNG, JPG, GIF up to 5MB each"
+    "fileTypesHint":"PNG, JPG, GIF up to 5MB each",
+    "fileTypesDocumentHint":"PDF, DOC, DOCX, TXT up to 25MB each"
   },
   "common":{
+    "Download":"Download",
+    "files":"Files",
+    "new":"New",
     "noRequirement":"No requirements",
     "search":"Search...",
     "sortDefault": "Default",

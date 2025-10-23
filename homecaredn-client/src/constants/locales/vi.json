@@ -324,12 +324,14 @@
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "form_documents": "Tài liệu đính kèm (Tối đa 5 tài liệu)",
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
       "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
     },
     "serviceRequestDetail": {
+      "label_documents": "Đính kèm / Tài liệu:",
       "title": "Chi tiết yêu cầu dịch vụ",
       "label_open": "Đang mở",
       "label_close":"Đã đóng",
@@ -438,7 +440,11 @@
     "appliedTitle": "Bạn đã ứng tuyển",
     "yourNote": "Ghi chú của bạn cho khách hàng",
     "yourImages": "Hình ảnh của bạn",
-    "deleteApplication": "Xóa đơn ứng tuyển"
+    "deleteApplication": "Xóa đơn ứng tuyển",
+    "documents": "Tài liệu",
+    "viewDocument": "Xem tài liệu ",
+    "yourDocuments": "Tài liệu của bạn"
+
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -929,6 +935,10 @@
     "DeleteApplicationModal":{
       "title": "Bạn có chắc chắn?",
       "text":"Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
+    },
+    "DeleteDocumentModal":{
+      "title": "Bạn có chắc chắn?",
+      "text":"Tài liệu này sẽ bị xóa vĩnh viễn"
     }
   },
   "ERROR": {
@@ -1103,10 +1113,13 @@
   "upload":{
     "clickToUpload":"Chọn để tải ảnh",
     "orDragAndDrop":"hoặc kéo và thả",
-    "fileTypesHint":"PNG, JPG, GIF mỗi file 5MB"
+    "fileTypesHint":"PNG, JPG, GIF mỗi file 5MB",
+    "fileTypesDocumentHint":"PDF, DOC, DOCX, TXT up to 25MB each"
   },
   "common":{
-    "new":"mới",
+    "Download":"Tải xuống",
+    "files":"tệp",
+    "new":"Mới",
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search":"Tìm kiếm...",

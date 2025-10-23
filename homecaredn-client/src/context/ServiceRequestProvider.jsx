@@ -162,6 +162,38 @@ export const ServiceRequestProvider = ({ children }) => {
     },
     [user?.role]
   );
+
+  const deleteServiceRequestDocument = useCallback(
+    async (serviceRequestId, documentUrl) => {
+      if (user?.role !== 'Customer') throw new Error('Unauthorized');
+      try {
+        // 1. Call the service
+        await serviceRequestService.deleteServiceRequestDocument(documentUrl);
+
+        // 2. Update local state
+        setServiceRequests((prev) =>
+          prev.map((s) =>
+            s.serviceRequestID === serviceRequestId
+              ? {
+                  ...s,
+                  // Filter out the deleted document URL
+                  documentUrls: s.documentUrls.filter(
+                    (doc) => doc !== documentUrl
+                  ),
+                  // Optionally filter publicIds if you store them in state
+                  // documentPublicIds: s.documentPublicIds.filter(...)
+                }
+              : s
+          )
+        );
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      }
+    },
+    [user?.role]
+  );
+
   useEffect(() => {
     if (!user) {
       setServiceRequests([]);
@@ -184,6 +216,7 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     }),
     [
       serviceRequests,
@@ -196,6 +229,7 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     ]
   );
 

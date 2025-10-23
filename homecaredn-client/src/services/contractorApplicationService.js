@@ -30,6 +30,16 @@ const buildContractorFormData = (contractor) => {
   for (const publicId of contractor.ImagePublicIds ?? []) {
     formData.append('ImagePublicIds', publicId);
   }
+
+  //Documents
+  for (const url of contractor.DocumentUrls ?? []) {
+    formData.append('DocumentUrls', url);
+  }
+
+  for (const publicId of contractor.DocumentPublicIds ?? []) {
+    formData.append('DocumentPublicIds', publicId);
+  }
+
   return formData;
 };
 

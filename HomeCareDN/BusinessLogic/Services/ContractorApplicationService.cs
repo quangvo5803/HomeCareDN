@@ -101,6 +101,26 @@ namespace BusinessLogic.Services
 
                 await _unitOfWork.ImageRepository.AddRangeAsync(images);
             }
+            if (createRequest.DocumentUrls != null && createRequest.DocumentUrls.Any())
+            {
+                var docIds = createRequest.DocumentPublicIds?.ToList() ?? new List<string>();
+                var documents = createRequest
+                    .DocumentUrls.Select(
+                        (url, i) =>
+                            new Document
+                            {
+                                DocumentID = Guid.NewGuid(),
+                                DocumentUrl = url,
+                                PublicId = i < docIds.Count ? docIds[i] : string.Empty,
+                                ContractorApplicationID =
+                                    contractorApplication.ContractorApplicationID,
+                            }
+                    )
+                    .ToList();
+
+                await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+            }
+
             await _unitOfWork.ContractorApplicationRepository.AddAsync(contractorApplication);
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationFullDto>(contractorApplication);
@@ -118,7 +138,7 @@ namespace BusinessLogic.Services
                 filter: app =>
                     app.ServiceRequestID == getRequest.ServiceRequestID
                     && app.ContractorID == getRequest.ContractorID,
-                includeProperties: "Images"
+                includeProperties: "Images,Documents"
             );
 
             if (result == null)
@@ -126,7 +146,6 @@ namespace BusinessLogic.Services
                 return null;
             }
             var dto = _mapper.Map<ContractorApplicationFullDto>(result);
-
             var contractor = await _userManager.FindByIdAsync(getRequest.ContractorID.ToString());
             dto.ContractorEmail = contractor?.Email ?? string.Empty;
             dto.ContractorName = contractor?.FullName ?? string.Empty;
@@ -141,7 +160,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == contractorApplicationID,
-                includeProperties: "Images"
+                includeProperties: "Images, Documents"
             );
             if (contractorApplication == null)
             {
@@ -191,7 +210,8 @@ namespace BusinessLogic.Services
         )
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
-                ca => ca.ContractorApplicationID == contractorApplicationID
+                ca => ca.ContractorApplicationID == contractorApplicationID,
+                includeProperties: "Images,Documents"
             );
 
             if (contractorApplication == null)
@@ -243,6 +263,19 @@ namespace BusinessLogic.Services
                     if (!string.IsNullOrEmpty(image.PublicId))
                     {
                         await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                    }
+                }
+            }
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(doc =>
+                doc.ContractorApplicationID == id
+            );
+            if (documents != null && documents.Any())
+            {
+                foreach (var document in documents)
+                {
+                    if (!string.IsNullOrEmpty(document.PublicId))
+                    {
+                        await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
                     }
                 }
             }

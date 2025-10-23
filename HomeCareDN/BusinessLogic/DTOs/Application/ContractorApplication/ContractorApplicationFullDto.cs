@@ -6,6 +6,8 @@
         public string? Description { get; set; }
         public double EstimatePrice { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
+        public ICollection<string>? DocumentUrls { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public required string Status { get; set; }
 

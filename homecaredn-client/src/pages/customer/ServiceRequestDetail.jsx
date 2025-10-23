@@ -199,6 +199,77 @@ export default function ServiceRequestDetail() {
                   </div>
                 </div>
               )}
+              {/* Documents */}
+              {serviceRequest.documentUrls.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    <i className="fas fa-file-alt text-orange-500 mt-1"></i>{' '}
+                    {t('userPage.serviceRequestDetail.label_documents')}
+                  </h3>
+
+                  <div className="space-y-3">
+                    {serviceRequest.documentUrls.map((docUrl) => {
+                      const fileName = decodeURIComponent(
+                        docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+
+                      const iconClass =
+                        ext === 'pdf'
+                          ? 'fa-file-pdf text-red-600'
+                          : ext === 'doc' || ext === 'docx'
+                          ? 'fa-file-word text-blue-600'
+                          : ext === 'xls' || ext === 'xlsx'
+                          ? 'fa-file-excel text-green-600'
+                          : ext === 'ppt' || ext === 'pptx'
+                          ? 'fa-file-powerpoint text-orange-600'
+                          : ext === 'txt'
+                          ? 'fa-file-lines text-gray-600'
+                          : 'fa-file-alt text-gray-500';
+
+                      return (
+                        <div
+                          key={docUrl}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition bg-white"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={docUrl}
+                              download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Specifications Card */}
@@ -416,18 +487,24 @@ export default function ServiceRequestDetail() {
                     )}
                   </div>
 
-                  {/* Description */}
+                  {/* Description  */}
                   <div className="mb-6">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
                       {t(
                         'userPage.serviceRequestDetail.label_descriptionContractor'
                       )}
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4">
-                      {selectedContractor.description}
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {selectedContractor?.description}
                     </p>
+                  </div>
 
-                    {selectedContractor.imageUrls.length > 0 && (
+                  {/* Images */}
+                  {selectedContractor?.imageUrls?.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                        {t('contractorServiceRequestDetail.images')}
+                      </h4>
                       <div className="grid grid-cols-3 gap-2">
                         {selectedContractor.imageUrls.map((img, idx) => (
                           <a
@@ -444,8 +521,81 @@ export default function ServiceRequestDetail() {
                           </a>
                         ))}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* Documents  */}
+                  {selectedContractor?.documentUrls?.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                        {t('contractorServiceRequestDetail.documents')}
+                      </h4>
+
+                      <div className="space-y-3">
+                        {selectedContractor.documentUrls.map((doc) => {
+                          const fileName = decodeURIComponent(
+                            doc.split('/').pop()?.split('?')[0] ?? 'document'
+                          );
+                          const ext = (
+                            fileName.includes('.')
+                              ? fileName.split('.').pop()
+                              : ''
+                          ).toLowerCase();
+
+                          const iconClass =
+                            ext === 'pdf'
+                              ? 'fa-file-pdf text-red-600'
+                              : ext === 'doc' || ext === 'docx'
+                              ? 'fa-file-word text-blue-600'
+                              : ext === 'xls' || ext === 'xlsx'
+                              ? 'fa-file-excel text-green-600'
+                              : ext === 'ppt' || ext === 'pptx'
+                              ? 'fa-file-powerpoint text-orange-600'
+                              : ext === 'txt'
+                              ? 'fa-file-lines text-gray-600'
+                              : 'fa-file-alt text-gray-500';
+
+                          return (
+                            <div
+                              key={doc}
+                              className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                            >
+                              {/* Icon */}
+                              <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                                <i className={`fas ${iconClass} text-2xl`} />
+                              </div>
+
+                              {/* Name + meta */}
+                              <div className="min-w-0 flex-1">
+                                <p
+                                  className="text-sm font-medium text-gray-800 truncate"
+                                  title={fileName}
+                                >
+                                  {fileName}
+                                </p>
+                                <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                    {(ext || 'file').toUpperCase()}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Actions */}
+                              <div className="flex items-center gap-2">
+                                <a
+                                  href={doc}
+                                  download
+                                  className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                                >
+                                  {t('common.Download')}
+                                </a>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Contact Info */}
                   {selectedContractor.status === 'Approved' && (

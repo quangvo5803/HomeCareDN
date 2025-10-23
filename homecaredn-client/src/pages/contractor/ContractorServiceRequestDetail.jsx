@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
@@ -6,7 +6,7 @@ import { contractorApplicationService } from '../../services/contractorApplicati
 import { formatVND } from '../../utils/formatters';
 import { useAuth } from '../../hook/useAuth';
 import { numberToWordsByLang } from '../../utils/numberToWords';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import VenoBox from 'venobox';
@@ -16,21 +16,52 @@ import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
 import StatusBadge from '../../components/StatusBadge';
 
+const MAX_IMAGES = 5;
+const MAX_DOCUMENTS = 5;
+const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
+
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { getServiceRequestById, loading, deleteServiceRequestImage } =
-    useServiceRequest();
+  const {
+    getServiceRequestById,
+    loading,
+    deleteServiceRequestImage,
+    deleteServiceRequestDocument,
+  } = useServiceRequest();
+
   const [serviceRequest, setServiceRequest] = useState(null);
   const [existingApplication, setExistingApplication] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [images, setImages] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [description, setDescription] = useState('');
   const [estimatePrice, setEstimatePrice] = useState('');
-  const [uploadProgress, setUploadProgress] = useState(0);
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageProgress, setImageProgress] = useState({ loaded: 0, total: 0 });
+  const [documentProgress, setDocumentProgress] = useState({
+    loaded: 0,
+    total: 0,
+  });
+
+  // upload docs and imgs progress
+  useEffect(() => {
+    const totalLoaded = imageProgress.loaded + documentProgress.loaded;
+    const totalSize = imageProgress.total + documentProgress.total;
+
+    if (totalSize === 0) {
+      if (uploadProgress !== 1) setUploadProgress(0);
+      return;
+    }
+
+    const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
+    setUploadProgress(percent);
+  }, [imageProgress, documentProgress, uploadProgress]);
+
+  // Load data
   useEffect(() => {
     const loadData = async () => {
       if (!serviceRequestId || !user?.id) return;
@@ -53,130 +84,279 @@ export default function ContractorServiceRequestDetail() {
       }
     };
     loadData();
-  }, [serviceRequestId, getServiceRequestById, user, t]);
+  }, [serviceRequestId, getServiceRequestById, user?.id, t]);
 
+  // Init VenoBox khi gallery thay đổi
   useEffect(() => {
-    if (!serviceRequest) return;
     const vb = new VenoBox({ selector: '.venobox' });
     return () => vb.close();
-  }, [serviceRequest, existingApplication]);
+  }, [
+    serviceRequest?.imageUrls?.length,
+    existingApplication?.imageUrls?.length,
+  ]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!description) {
-      toast.error(t('ERROR.REQUIRED_CONTRACTOR_APPLY_DESCRIPTION'));
-      return;
-    }
-    if (!estimatePrice) {
-      toast.error(t('ERROR.REQUIRED_ESTIMATE_PRICE'));
-      return;
-    }
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
-    const payload = {
-      ServiceRequestID: serviceRequestId,
-      ContractorID: user.id,
-      Description: description,
-      EstimatePrice: estimatePrice,
+  // Clean up object URLs khi unmount
+  useEffect(() => {
+    return () => {
+      images.forEach(
+        (i) =>
+          i.isNew && i.url?.startsWith('blob:') && URL.revokeObjectURL(i.url)
+      );
+      documents.forEach(
+        (d) =>
+          d.isNew && d.url?.startsWith('blob:') && URL.revokeObjectURL(d.url)
+      );
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    if (images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
+  const baseArea = useMemo(
+    () => (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0),
+    [serviceRequest?.width, serviceRequest?.length]
+  );
+  const totalArea = useMemo(
+    () => baseArea * (serviceRequest?.floors ?? 1),
+    [baseArea, serviceRequest?.floors]
+  );
 
-    try {
-      if (newFiles.length > 0) {
-        setUploadProgress(1);
-        const uploaded = await uploadImageToCloudinary(
-          newFiles,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => setUploadProgress(percent),
-          'HomeCareDN/ContractorAppication'
-        );
-        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        payload.ImageUrls = uploadedArray.map((u) => u.url);
-        payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-        setUploadProgress(0);
+  const addressText = useMemo(
+    () =>
+      [
+        serviceRequest?.address?.detail,
+        serviceRequest?.address?.ward,
+        serviceRequest?.address?.district,
+        serviceRequest?.address?.city,
+      ]
+        .filter(Boolean)
+        .join(', '),
+    [
+      serviceRequest?.address?.detail,
+      serviceRequest?.address?.ward,
+      serviceRequest?.address?.district,
+      serviceRequest?.address?.city,
+    ]
+  );
+
+  const revokeIfBlob = (url) => {
+    if (url?.startsWith('blob:')) URL.revokeObjectURL(url);
+  };
+
+  const removeImageFromState = useCallback((img) => {
+    setImages((prev) => {
+      revokeIfBlob(img.url);
+      return prev.filter((i) => i.url !== img.url);
+    });
+  }, []);
+
+  const removeDocumentFromState = useCallback((doc) => {
+    setDocuments((prev) => {
+      revokeIfBlob(doc.url);
+      return prev.filter((d) => d.url !== doc.url);
+    });
+  }, []);
+
+  const handleImageChange = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length + images.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      const mapped = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+        name: file.name,
+      }));
+      setImages((prev) => [...prev, ...mapped]);
+    },
+    [images.length, t]
+  );
+
+  const handleDocumentChange = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length + documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        return;
+      }
+      const mapped = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+        name: file.name,
+      }));
+      setDocuments((prev) => [...prev, ...mapped]);
+    },
+    [documents.length, t]
+  );
+
+  const handleRemoveImage = useCallback(
+    (img) => {
+      if (img.isNew) {
+        removeImageFromState(img);
+      } else {
+        showDeleteModal({
+          t,
+          // giữ nguyên cách truyền tham số theo code gốc
+          titleKey: t('ModalPopup.DeleteImageModal.title'),
+          textKey: t('ModalPopup.DeleteImageModal.text'),
+          onConfirm: async () => {
+            try {
+              await deleteServiceRequestImage(serviceRequestId, img.url);
+              Swal.close();
+              toast.success(t('SUCCESS.DELETE'));
+              removeImageFromState(img);
+            } catch (err) {
+              toast.error(t(handleApiError(err)));
+            }
+          },
+        });
+      }
+    },
+    [deleteServiceRequestImage, removeImageFromState, serviceRequestId, t]
+  );
+
+  const handleRemoveDocument = useCallback(
+    (doc) => {
+      if (doc.isNew) {
+        removeDocumentFromState(doc);
+      } else {
+        showDeleteModal({
+          t,
+          // giữ nguyên như code gốc
+          titleKey: t('ModalPopup.DeleteDocumentModal.title'),
+          textKey: t('ModalPopup.DeleteDocumentModal.text'),
+          onConfirm: async () => {
+            try {
+              await deleteServiceRequestDocument(serviceRequestId, doc.url);
+              Swal.close();
+              toast.success(t('SUCCESS.DELETE'));
+              removeDocumentFromState(doc);
+            } catch (err) {
+              toast.error(t(handleApiError(err)));
+            }
+          },
+        });
+      }
+    },
+    [deleteServiceRequestDocument, removeDocumentFromState, serviceRequestId, t]
+  );
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (!description) {
+        toast.error(t('ERROR.REQUIRED_CONTRACTOR_APPLY_DESCRIPTION'));
+        return;
+      }
+      if (!estimatePrice) {
+        toast.error(t('ERROR.REQUIRED_ESTIMATE_PRICE'));
+        return;
+      }
+      if (images.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      if (documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        return;
       }
 
-      await contractorApplicationService.createContractorApplication(payload);
-      toast.success(t('SUCCESS.APPICATION_CREATE'));
+      const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
+      const newDocumentFiles = documents
+        .filter((i) => i.isNew)
+        .map((i) => i.file);
 
-      const appData = await contractorApplicationService.getApplication({
-        serviceRequestId: serviceRequestId,
-        contractorId: user.id,
-      });
-      setExistingApplication(appData);
-    } catch (error) {
-      setUploadProgress(0);
-      toast.error(t(handleApiError(error)));
-    }
-  };
+      const payload = {
+        ServiceRequestID: serviceRequestId,
+        ContractorID: user?.id,
+        Description: description,
+        EstimatePrice: estimatePrice,
+      };
 
-  const handleDeleteApplication = () => {
-    if (!existingApplication) return;
-    showDeleteModal({
-      t,
-      titleKey: 'ModalPopup.DeleteApplicationModal.title',
-      textKey: 'ModalPopup.DeleteApplicationModal.text',
-      onConfirm: async () => {
-        try {
-          await contractorApplicationService.deleteApplication(
-            existingApplication.contractorApplicationID
-          );
-          Swal.close();
-          toast.success(t('SUCCESS.DELETE_APPLICATION'));
-          setExistingApplication(null);
-          setDescription('');
-          setEstimatePrice('');
-          setImages([]);
-        } catch (err) {
-          toast.error(t(handleApiError(err)));
+      try {
+        setImageProgress({
+          loaded: 0,
+          total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
+        });
+        setDocumentProgress({
+          loaded: 0,
+          total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
+        });
+
+        if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
+          setUploadProgress(1);
         }
-      },
-    });
-  };
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-    const mapped = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-    }));
-    setImages((prev) => [...prev, ...mapped]);
-  };
+        const imageUploadPromise =
+          newImageFiles.length > 0
+            ? uploadToCloudinary(
+                newImageFiles,
+                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+                (progress) => setImageProgress(progress),
+                'HomeCareDN/ContractorAppication'
+              )
+            : Promise.resolve(null);
 
-  const handleRemoveImage = (img) => {
-    if (img.isNew) {
-      removeImageFromState(img);
-    } else {
-      showDeleteModal({
-        t,
-        titleKey: t('ModalPopup.DeleteImageModal.title'),
-        textKey: t('ModalPopup.DeleteImageModal.text'),
-        onConfirm: async () => {
-          try {
-            await deleteServiceRequestImage(serviceRequestId, img.url);
-            Swal.close();
-            toast.success(t('SUCCESS.DELETE'));
-            removeImageFromState(img);
-          } catch (err) {
-            handleApiError(err, t);
-          }
-        },
-      });
-    }
-  };
+        const documentUploadPromise =
+          newDocumentFiles.length > 0
+            ? uploadToCloudinary(
+                newDocumentFiles,
+                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+                (progress) => setDocumentProgress(progress),
+                'HomeCareDN/ContractorAppication/Documents',
+                'raw'
+              )
+            : Promise.resolve(null);
 
-  const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.url !== img.url));
-  };
+        const [imageResults, documentResults] = await Promise.all([
+          imageUploadPromise,
+          documentUploadPromise,
+        ]);
 
+        if (imageResults) {
+          const arr = Array.isArray(imageResults)
+            ? imageResults
+            : [imageResults];
+          payload.ImageUrls = arr.map((u) => u.url);
+          payload.ImagePublicIds = arr.map((u) => u.publicId);
+        }
+
+        if (documentResults) {
+          const arr = Array.isArray(documentResults)
+            ? documentResults
+            : [documentResults];
+          payload.DocumentUrls = arr.map((u) => u.url);
+          payload.DocumentPublicIds = arr.map((u) => u.publicId);
+        }
+
+        await contractorApplicationService.createContractorApplication(payload);
+        toast.success(t('SUCCESS.APPICATION_CREATE'));
+
+        const appData = await contractorApplicationService.getApplication({
+          serviceRequestId: serviceRequestId,
+          contractorId: user?.id,
+        });
+        setExistingApplication(appData);
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setUploadProgress(0);
+        setImageProgress({ loaded: 0, total: 0 });
+        setDocumentProgress({ loaded: 0, total: 0 });
+      }
+    },
+    [
+      description,
+      documents,
+      estimatePrice,
+      images,
+      serviceRequestId,
+      t,
+      user?.id,
+    ]
+  );
   if (loading || isChecking) return <Loading />;
   if (!serviceRequest)
     return (
@@ -186,17 +366,14 @@ export default function ContractorServiceRequestDetail() {
     );
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
-  const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
-  const totalArea = baseArea * (serviceRequest?.floors ?? 1);
-
-  const addressText = [
-    serviceRequest?.address?.detail,
-    serviceRequest?.address?.ward,
-    serviceRequest?.address?.district,
-    serviceRequest?.address?.city,
-  ]
-    .filter(Boolean)
-    .join(', ');
+  const {
+    serviceType,
+    packageOption,
+    buildingType,
+    mainStructureType,
+    designStyle,
+    floors,
+  } = serviceRequest || {};
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -237,7 +414,7 @@ export default function ContractorServiceRequestDetail() {
                     {t('contractorServiceRequestDetail.serviceType')}
                   </label>
                   <p className="text-gray-900 font-medium">
-                    {t(`Enums.ServiceType.${serviceRequest.serviceType}`)}
+                    {t(`Enums.ServiceType.${serviceType}`)}
                   </p>
                 </div>
                 <div>
@@ -246,7 +423,7 @@ export default function ContractorServiceRequestDetail() {
                     {t('contractorServiceRequestDetail.packageOption')}
                   </label>
                   <p className="text-gray-900 font-medium">
-                    {t(`Enums.PackageOption.${serviceRequest.packageOption}`)}
+                    {t(`Enums.PackageOption.${packageOption}`)}
                   </p>
                 </div>
                 <div>
@@ -255,7 +432,7 @@ export default function ContractorServiceRequestDetail() {
                     {t('contractorServiceRequestDetail.buildingType')}
                   </label>
                   <p className="text-gray-900 font-medium">
-                    {t(`Enums.BuildingType.${serviceRequest.buildingType}`)}
+                    {t(`Enums.BuildingType.${buildingType}`)}
                   </p>
                 </div>
                 <div>
@@ -264,19 +441,17 @@ export default function ContractorServiceRequestDetail() {
                     {t('contractorServiceRequestDetail.structureType')}
                   </label>
                   <p className="text-gray-900 font-medium">
-                    {t(
-                      `Enums.MainStructure.${serviceRequest.mainStructureType}`
-                    )}
+                    {t(`Enums.MainStructure.${mainStructureType}`)}
                   </p>
                 </div>
-                {serviceRequest.designStyle && (
+                {designStyle && (
                   <div>
                     <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
                       <i className="fas fa-palette mr-2 text-gray-400" />
                       {t('contractorServiceRequestDetail.designStyle')}
                     </label>
                     <p className="text-gray-900 font-medium">
-                      {t(`Enums.DesignStyle.${serviceRequest.designStyle}`)}
+                      {t(`Enums.DesignStyle.${designStyle}`)}
                     </p>
                   </div>
                 )}
@@ -286,8 +461,7 @@ export default function ContractorServiceRequestDetail() {
                     {t('contractorServiceRequestDetail.floors')}
                   </label>
                   <p className="text-gray-900 font-medium">
-                    {serviceRequest.floors}{' '}
-                    {t('contractorServiceRequestDetail.floorsUnit')}
+                    {floors} {t('contractorServiceRequestDetail.floorsUnit')}
                   </p>
                 </div>
               </div>
@@ -382,7 +556,7 @@ export default function ContractorServiceRequestDetail() {
           </div>
 
           {/* Images */}
-          {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && (
+          {serviceRequest.imageUrls?.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
               <div className="px-6 py-5">
                 <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
@@ -412,6 +586,81 @@ export default function ContractorServiceRequestDetail() {
                       />
                     </a>
                   ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Documents */}
+          {serviceRequest.documentUrls?.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
+              <div className="px-6 py-5">
+                {/* Tiêu đề (giữ nguyên) */}
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+                  <i className="fas fa-file-alt text-gray-500" />
+                  {t('contractorServiceRequestDetail.documents')}
+                </h3>
+
+                <div className="space-y-3">
+                  {serviceRequest.documentUrls.map((docUrl) => {
+                    const fileName = decodeURIComponent(
+                      docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                    );
+                    const ext = (
+                      fileName.includes('.') ? fileName.split('.').pop() : ''
+                    ).toLowerCase();
+
+                    const iconClass =
+                      ext === 'pdf'
+                        ? 'fa-file-pdf text-red-600'
+                        : ext === 'doc' || ext === 'docx'
+                        ? 'fa-file-word text-blue-600'
+                        : ext === 'xls' || ext === 'xlsx'
+                        ? 'fa-file-excel text-green-600'
+                        : ext === 'ppt' || ext === 'pptx'
+                        ? 'fa-file-powerpoint text-orange-600'
+                        : ext === 'txt'
+                        ? 'fa-file-lines text-gray-600'
+                        : 'fa-file-alt text-gray-500';
+
+                    return (
+                      <div
+                        key={docUrl}
+                        className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                      >
+                        {/* Icon */}
+                        <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                          <i className={`fas ${iconClass} text-2xl`} />
+                        </div>
+
+                        {/* Name + meta */}
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className="text-sm font-medium text-gray-800 truncate"
+                            title={fileName}
+                          >
+                            {fileName}
+                          </p>
+                          <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                              {(ext || 'file').toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={docUrl}
+                            download
+                            className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                          >
+                            {t('common.Download')}
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -467,48 +716,144 @@ export default function ContractorServiceRequestDetail() {
                 </p>
               </div>
 
-              {existingApplication.imageUrls &&
-                existingApplication.imageUrls.length > 0 && (
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-medium text-gray-600">
-                        <i className="fas fa-images mr-2" />
-                        {t('contractorServiceRequestDetail.yourImages')}
-                      </label>
-                      <span className="text-xs text-gray-500">
-                        {existingApplication.imageUrls.length} ảnh
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {existingApplication.imageUrls.map((url) => (
-                        <a
-                          key={url}
-                          href={url}
-                          className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-gray-200 bg-white p-1"
-                          data-gall="application-gallery"
-                          aria-label={t(
-                            'contractorServiceRequestDetail.appliedImage'
-                          )}
-                          title={t(
-                            'contractorServiceRequestDetail.viewFullSize'
-                          )}
-                        >
-                          <img
-                            src={url}
-                            alt={t(
-                              'contractorServiceRequestDetail.appliedImage'
-                            )}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                          />
-                        </a>
-                      ))}
-                    </div>
+              {existingApplication.imageUrls?.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-600">
+                      <i className="fas fa-images mr-2" />
+                      {t('contractorServiceRequestDetail.yourImages')}
+                    </label>
+                    <span className="text-xs text-gray-500">
+                      {existingApplication.imageUrls.length}
+                    </span>
                   </div>
-                )}
+                  <div className="grid grid-cols-3 gap-2">
+                    {existingApplication.imageUrls.map((url) => (
+                      <a
+                        key={url}
+                        href={url}
+                        className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-gray-200 bg-white p-1"
+                        data-gall="application-gallery"
+                        aria-label={t(
+                          'contractorServiceRequestDetail.appliedImage'
+                        )}
+                        title={t('contractorServiceRequestDetail.viewFullSize')}
+                      >
+                        <img
+                          src={url}
+                          alt={t('contractorServiceRequestDetail.appliedImage')}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {existingApplication.documentUrls?.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-medium text-gray-600">
+                      <i className="fas fa-file-alt mr-2" />
+                      {t('contractorServiceRequestDetail.yourDocuments')}
+                    </label>
+                    <span className="text-xs text-gray-500">
+                      {existingApplication.documentUrls.length}{' '}
+                      {t('common.files')}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {existingApplication.documentUrls.map((docUrl) => {
+                      const fileName = decodeURIComponent(
+                        docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+
+                      // Logic chọn icon từ UI mẫu
+                      const iconClass =
+                        ext === 'pdf'
+                          ? 'fa-file-pdf text-red-600'
+                          : ext === 'doc' || ext === 'docx'
+                          ? 'fa-file-word text-blue-600'
+                          : ext === 'xls' || ext === 'xlsx'
+                          ? 'fa-file-excel text-green-600'
+                          : ext === 'ppt' || ext === 'pptx'
+                          ? 'fa-file-powerpoint text-orange-600'
+                          : ext === 'txt'
+                          ? 'fa-file-lines text-gray-600'
+                          : 'fa-file-alt text-gray-500';
+
+                      return (
+                        <div
+                          key={docUrl}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition bg-white"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={docUrl}
+                              download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className="pt-4 border-t border-gray-200">
                 <button
-                  onClick={handleDeleteApplication}
+                  onClick={() => {
+                    if (!existingApplication) return;
+                    showDeleteModal({
+                      t,
+                      titleKey: 'ModalPopup.DeleteApplicationModal.title',
+                      textKey: 'ModalPopup.DeleteApplicationModal.text',
+                      onConfirm: async () => {
+                        try {
+                          await contractorApplicationService.deleteApplication(
+                            existingApplication.contractorApplicationID
+                          );
+                          Swal.close();
+                          toast.success(t('SUCCESS.DELETE_APPLICATION'));
+                          setExistingApplication(null);
+                          setDescription('');
+                          setEstimatePrice('');
+                          setImages([]);
+                          setDocuments([]);
+                        } catch (err) {
+                          toast.error(t(handleApiError(err)));
+                        }
+                      },
+                    });
+                  }}
                   className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
                 >
                   <i className="fas fa-trash-alt" />
@@ -545,8 +890,7 @@ export default function ContractorServiceRequestDetail() {
                     step={1000}
                     value={estimatePrice}
                     onChange={(e) => setEstimatePrice(e.target.value)}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg 
-               focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
@@ -610,7 +954,7 @@ export default function ContractorServiceRequestDetail() {
                       {t('userPage.createServiceRequest.form_images')}
                     </label>
                     <span className="text-xs text-gray-500">
-                      {images.length}/5
+                      {images.length}/{MAX_IMAGES}
                     </span>
                   </div>
 
@@ -657,6 +1001,70 @@ export default function ContractorServiceRequestDetail() {
                               onClick={() => handleRemoveImage(img)}
                               className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
                               aria-label="Remove image"
+                            >
+                              <i className="fas fa-trash-alt text-sm"></i>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Documents */}
+                <div className="space-y-3 lg:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                      <i className="fas fa-file-alt text-orange-500 mr-2"></i>
+                      {t('userPage.createServiceRequest.form_documents')}
+                    </label>
+                    <span className="text-xs text-gray-500">
+                      {documents.length}/{MAX_DOCUMENTS}
+                    </span>
+                  </div>
+
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept={ACCEPTED_DOC_TYPES}
+                      multiple
+                      onChange={handleDocumentChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      aria-label={t('upload.uploadDocuments')}
+                    />
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                      </div>
+                      <p className="text-gray-600 text-center mb-2">
+                        <span className="font-semibold text-orange-600">
+                          {t('upload.clickToUpload')}
+                        </span>{' '}
+                        {t('upload.orDragAndDrop')}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {t('upload.fileTypesHint')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {documents.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                      {documents.map((doc) => (
+                        <div
+                          key={doc.url}
+                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200 bg-gray-50 flex flex-col items-center justify-center p-2 text-center"
+                        >
+                          <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
+                          <p className="text-xs text-gray-600 break-all truncate">
+                            {doc.name || ''}
+                          </p>
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDocument(doc)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                              aria-label="Remove document"
                             >
                               <i className="fas fa-trash-alt text-sm"></i>
                             </button>
