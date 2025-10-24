@@ -127,6 +127,19 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
+            if (
+                await _unitOfWork
+                    .MaterialRepository.GetQueryable()
+                    .AnyAsync(m => m.Name == requestDto.Name)
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
             //check image
@@ -208,7 +221,19 @@ namespace BusinessLogic.Services
                 m => m.MaterialID == requestDto.MaterialID,
                 includeProperties: MATERIAL_INCLUDE
             );
-
+            if (
+                await _unitOfWork
+                    .MaterialRepository.GetQueryable()
+                    .AnyAsync(m => m.Name == requestDto.Name)
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" } },
+                    }
+                );
+            }
             //check image
             ValidateImages(requestDto.ImageUrls, material!.Images?.Count ?? 0);
 
