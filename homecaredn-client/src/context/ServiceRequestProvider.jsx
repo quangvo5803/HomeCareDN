@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { serviceRequestService } from '../services/serviceRequestService';
-import { contractorApplicationService } from '../services/contractorApplicationService';
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
 import { toast } from 'react-toastify';
@@ -11,9 +10,6 @@ export const ServiceRequestProvider = ({ children }) => {
   const { user } = useAuth();
   const [serviceRequests, setServiceRequests] = useState([]);
   const [totalServiceRequests, setTotalServiceRequests] = useState(0);
-
-  const [contractors, setContractors] = useState([]);
-  const [totalContractors, setTotalContractors] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // 📌 Public: fetch all service requests
@@ -50,28 +46,6 @@ export const ServiceRequestProvider = ({ children }) => {
     }
   }, []);
 
-  // 📌 Public: fetch all contractor by service requests id
-  const fetchContractorByServiceRequestId = useCallback(
-    async ({ PageNumber = 1, PageSize = 5, FilterID } = {}) => {
-      try {
-        setLoading(true);
-        const data = await contractorApplicationService.getAllContractorByServiceRequestId({
-          PageNumber,
-          PageSize,
-          FilterID,
-        });
-        setContractors(data.items || []);
-        setTotalContractors(data.totalCount || 0);
-        return data.items || [];
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return [];
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
   // 📌 Customer: get all by userId
   const fetchServiceRequestsByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 3, FilterID } = {}) => {
@@ -175,9 +149,9 @@ export const ServiceRequestProvider = ({ children }) => {
           prev.map((s) =>
             s.serviceRequestID === serviceRequestId
               ? {
-                ...s,
-                imageUrls: s.imageUrls.filter((img) => img !== imageUrl),
-              }
+                  ...s,
+                  imageUrls: s.imageUrls.filter((img) => img !== imageUrl),
+                }
               : s
           )
         );
@@ -234,11 +208,8 @@ export const ServiceRequestProvider = ({ children }) => {
     () => ({
       serviceRequests,
       totalServiceRequests,
-      contractors,
-      totalContractors,
       loading,
       fetchServiceRequests,
-      fetchContractorByServiceRequestId,
       fetchServiceRequestsByUserId,
       getServiceRequestById,
       createServiceRequest,
@@ -250,11 +221,8 @@ export const ServiceRequestProvider = ({ children }) => {
     [
       serviceRequests,
       totalServiceRequests,
-      contractors,
-      totalContractors,
       loading,
       fetchServiceRequests,
-      fetchContractorByServiceRequestId,
       fetchServiceRequestsByUserId,
       getServiceRequestById,
       createServiceRequest,

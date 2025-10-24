@@ -175,11 +175,6 @@ export default function ServiceRequestCreateUpdate() {
       .filter((d) => d.isNew)
       .map((d) => d.file);
 
-    if (!description) {
-      toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
-      return;
-    }
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const payload = {
       CustomerID: user.id,
       AddressID: addressID,

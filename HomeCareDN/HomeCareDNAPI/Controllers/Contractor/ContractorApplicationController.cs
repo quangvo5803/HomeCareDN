@@ -1,5 +1,4 @@
-﻿using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.ContractorApplication;
+﻿using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +14,6 @@ namespace HomeCareDNAPI.Controllers.Contractor
         public ContractorApplicationController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
-        }
-
-        [HttpGet("get-all-contractor-by-service-request-id")]
-        public async Task<IActionResult> GetAllContractorByServiceRequestId([FromQuery] QueryParameters parameters)
-        {
-            return Ok(await _facadeService.ContractorApplicationService
-                .GetAllContractorByServiceRequestIdAsync(parameters)
-            );
         }
 
         [HttpPost("create-contractor-request")]

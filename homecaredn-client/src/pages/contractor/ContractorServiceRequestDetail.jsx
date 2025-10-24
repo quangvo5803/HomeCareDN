@@ -15,8 +15,6 @@ import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
 import StatusBadge from '../../components/StatusBadge';
-import { PaymentService } from '../../services/paymentService';
-
 
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
@@ -69,30 +67,16 @@ export default function ContractorServiceRequestDetail() {
       if (!serviceRequestId || !user?.id) return;
       try {
         setIsChecking(true);
-        const serviceRequestData = await getServiceRequestById(serviceRequestId);
+        const serviceRequestData = await getServiceRequestById(
+          serviceRequestId
+        );
         setServiceRequest(serviceRequestData);
-
-        if (serviceRequestData.status === 'Pending' || !serviceRequestData.selectedContractorApplication) {
-          const existingApplicationData =
-            await contractorApplicationService.getApplication({
-              ServiceRequestID: serviceRequestId,
-              ContractorID: user.id,
-            });
-          setExistingApplication(existingApplicationData || null);
-        } else {
-          const selectedApp = serviceRequestData.selectedContractorApplication;
-
-          if (selectedApp.contractorID === user.id) {
-            setExistingApplication(selectedApp);
-          } else {
-            const existingApplicationData =
-              await contractorApplicationService.getApplication({
-                ServiceRequestID: serviceRequestId,
-                ContractorID: user.id,
-              });
-            setExistingApplication(existingApplicationData || null);
-          }
-        }
+        const existingApplicationData =
+          await contractorApplicationService.getApplication({
+            ServiceRequestID: serviceRequestId,
+            ContractorID: user.id,
+          });
+        setExistingApplication(existingApplicationData);
       } catch (error) {
         toast.error(t(handleApiError(error)));
       } finally {
@@ -170,42 +154,6 @@ export default function ContractorServiceRequestDetail() {
       return prev.filter((d) => d.url !== doc.url);
     });
   }, []);
-  const handlePayCommission = async () => {
-    try {
-      toast.info(t('contractorServiceRequestDetail.processingPayment'));
-
-      const result = await PaymentService.createPayCommission({
-        contractorApplicationID: existingApplication.contractorApplicationID,
-        serviceRequestID: serviceRequestId,
-        amount: existingApplication.estimatePrice * 0.006,
-        description: serviceRequestId.slice(0, 19),
-        itemName: "Service Request Commission"
-      });
-
-      if (result?.checkoutUrl) {
-        globalThis.location.href = result.checkoutUrl;
-      } else {
-        toast.error(t('contractorServiceRequestDetail.paymentFailed'));
-      }
-
-    } catch (err) {
-      toast.error(t(handleApiError(err)));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-    const mapped = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-    }));
-    setImages((prev) => [...prev, ...mapped]);
-  };
 
   const handleImageChange = useCallback(
     (e) => {
@@ -426,199 +374,6 @@ export default function ContractorServiceRequestDetail() {
     designStyle,
     floors,
   } = serviceRequest || {};
-
-  // Pending Commission
-  const renderApplicationContent = () => {
-    if (!existingApplication) return null;
-
-    if (existingApplication.status === 'PendingCommission') {
-      return (
-        // --- JSX của trạng thái PendingCommission ---
-        <div className="bg-white rounded-2xl shadow-lg ring-1 ring-green-200 p-6 lg:sticky lg:top-24 space-y-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-green-600 inline-flex items-center gap-2">
-              <i className="fas fa-trophy text-yellow-500" />
-              {t('contractorServiceRequestDetail.youAreSelected')}
-            </h3>
-            <StatusBadge
-              status={serviceRequest?.selectedContractorApplication?.status}
-              type="Application"
-            />
-          </div>
-
-          {/* Thông tin khách hàng */}
-          <div className="space-y-3 rounded-lg ring-1 ring-gray-200 p-4 bg-gray-50/70">
-            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-              <i className="fas fa-user text-green-600" />
-              {t('contractorServiceRequestDetail.customerInfo')}
-            </h4>
-            <p className="text-sm text-gray-700">
-              <i className="fas fa-user-circle mr-2 text-gray-400" />
-              <strong>{serviceRequest.customerName}</strong>
-            </p>
-            <p className="text-sm text-gray-700">
-              <i className="fas fa-envelope mr-2 text-gray-400" />
-              {serviceRequest.customerEmail}
-            </p>
-            <p className="text-sm text-gray-700">
-              <i className="fas fa-phone-alt mr-2 text-gray-400" />
-              {serviceRequest.customerPhone}
-            </p>
-          </div>
-
-          {/* Thông tin báo giá */}
-          <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              <i className="fas fa-coins mr-2" />
-              {t('contractorServiceRequestDetail.yourBid')}
-            </label>
-            <p className="text-lg font-bold text-gray-900">
-              {formatVND(existingApplication.estimatePrice)}
-            </p>
-          </div>
-
-          {/* Ghi chú */}
-          <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
-            <label className="block text-sm font-medium text-gray-600 mb-2">
-              <i className="fas fa-comment-alt mr-2" />
-              {t('contractorServiceRequestDetail.yourNote')}
-            </label>
-            <p className="text-gray-700 bg-white p-3 rounded-md whitespace-pre-wrap ring-1 ring-gray-200">
-              {existingApplication.description}
-            </p>
-          </div>
-
-          {/* Hình ảnh */}
-          {existingApplication.imageUrls?.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-gray-600">
-                  <i className="fas fa-images mr-2" />
-                  {t('contractorServiceRequestDetail.yourImages')}
-                </label>
-                <span className="text-xs text-gray-500">
-                  {existingApplication.imageUrls.length} ảnh
-                </span>
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {existingApplication.imageUrls.map((url) => (
-                  <a
-                    key={url}
-                    href={url}
-                    className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-green-500 ring-1 ring-gray-200 bg-white p-1"
-                    data-gall="application-gallery"
-                  >
-                    <img
-                      src={url}
-                      alt={t('contractorServiceRequestDetail.appliedImage')}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Nút thanh toán */}
-          <div className="pt-4 border-t border-gray-200">
-            <button
-              onClick={handlePayCommission}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
-            >
-              <i className="fas fa-hand-holding-usd" />
-              {t('contractorServiceRequestDetail.payCommission')}
-            </button>
-            <p className="mt-3 text-xs text-gray-500 text-center">
-              <i className="fas fa-info-circle mr-1" />
-              {t('contractorServiceRequestDetail.statusOpen')}?{' '}
-              {t('contractorServiceRequestDetail.selectedPendingCommissionNote')}
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    // --- Applied ---
-    return (
-      <div className="bg-white rounded-2xl shadow-lg ring-1 ring-blue-200 p-6 lg:sticky lg:top-24 space-y-5">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
-            <i className="fas fa-check-circle" />
-            {t('contractorServiceRequestDetail.appliedTitle')}
-          </h3>
-          <StatusBadge status={existingApplication.status} type="Application" />
-        </div>
-
-        <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
-          <label className="block text-sm font-medium text-gray-600 mb-1">
-            <i className="fas fa-coins mr-2" />
-            {t('contractorServiceRequestDetail.yourBid')}
-          </label>
-          <p className="text-lg font-bold text-gray-900">
-            {formatVND(existingApplication.estimatePrice)}
-          </p>
-        </div>
-
-        <div className="rounded-lg ring-1 ring-gray-200 p-3 bg-gray-50/50">
-          <label className="block text-sm font-medium text-gray-600 mb-2">
-            <i className="fas fa-comment-alt mr-2" />
-            {t('contractorServiceRequestDetail.yourNote')}
-          </label>
-          <p className="text-gray-700 bg-white p-3 rounded-md whitespace-pre-wrap ring-1 ring-gray-200">
-            {existingApplication.description}
-          </p>
-        </div>
-
-        {existingApplication.imageUrls?.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-600">
-                <i className="fas fa-images mr-2" />
-                {t('contractorServiceRequestDetail.yourImages')}
-              </label>
-              <span className="text-xs text-gray-500">
-                {existingApplication.imageUrls.length} ảnh
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {existingApplication.imageUrls.map((url) => (
-                <a
-                  key={url}
-                  href={url}
-                  className="venobox aspect-square rounded-md overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-blue-500 ring-1 ring-gray-200 bg-white p-1"
-                  data-gall="application-gallery"
-                >
-                  <img
-                    src={url}
-                    alt={t('contractorServiceRequestDetail.appliedImage')}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {existingApplication.status === 'Pending' && (
-          <div className="pt-4 border-t border-gray-200">
-            <button
-              onClick={handleDeleteApplication}
-              className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
-            >
-              <i className="fas fa-trash-alt" />
-              {t('contractorServiceRequestDetail.deleteApplication')}
-            </button>
-            <p className="mt-3 text-xs text-gray-500 text-center">
-              <i className="fas fa-info-circle mr-1" />
-              {t('contractorServiceRequestDetail.statusOpen')}?{' '}
-              {t('contractorServiceRequestDetail.applyFormTitle')}
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  };
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -919,7 +674,7 @@ export default function ContractorServiceRequestDetail() {
                 {t('contractorServiceRequestDetail.applicationStatus')}
               </h3>
               <div className="rounded-lg p-4 ring-1 ring-gray-200 bg-gray-50">
-                <StatusBadge status={serviceRequest.status} type="Request" />
+                <StatusBadge status={serviceRequest.status} />
               </div>
             </div>
           </div>
@@ -1113,8 +868,6 @@ export default function ContractorServiceRequestDetail() {
             </div>
           ) : (
             // Apply form
-          {/* Nếu chưa apply → hiện Apply Form */}
-          {!existingApplication && (
             <div className="bg-white rounded-2xl shadow-lg ring-1 ring-gray-200 p-6 lg:sticky lg:top-24">
               <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
                 <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-green-50 ring-4 ring-green-100">
@@ -1138,19 +891,17 @@ export default function ContractorServiceRequestDetail() {
                     value={estimatePrice}
                     onChange={(e) => setEstimatePrice(e.target.value)}
                     className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg 
-                      focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                          {
-                            est: formatVND(serviceRequest.estimatePrice),
-                          }
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                            {
+                              est: formatVND(serviceRequest.estimatePrice),
+                            }
+                          )
                         : t(
-                          'contractorServiceRequestDetail.bidPricePlaceholder'
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholder'
+                          )
                     }
                   />
 
@@ -1342,8 +1093,6 @@ export default function ContractorServiceRequestDetail() {
               </form>
             </div>
           )}
-          {/* Nếu đã apply (bất kỳ trạng thái nào) → hiện renderApplicationContent */}
-          {existingApplication && renderApplicationContent()}
         </div>
       </div>
     </div>

@@ -247,7 +247,7 @@ export default function ServiceRequestManager() {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <StatusBadge status={req.status} type="Request" />
+                      <StatusBadge status={req.status} />
                       {getPackageBadge(req.packageOption)}
                       {getContractorBadge(req.contractorApplyCount)}
                     </div>

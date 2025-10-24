@@ -199,8 +199,7 @@
     "buildingType": "Loại tòa nhà",
     "packageOption": "Tùy chọn gói",
     "mainStructure": "Loại cấu trúc chính",
-    "designStyle": "Phong cách thiết kế",
-    "updating": "Đang cập nhật"
+    "designStyle": "Phong cách thiết kế"
   },
   "login": {
     "title": "Đăng Nhập",
@@ -232,14 +231,14 @@
     "resend_otp": "Gửi lại",
     "not_receive_otp": "Không nhận được mã? "
   },
-  "partnerRequest": {
-    "partnerTypeSelection": {
+  "partnerRequest":{
+    "partnerTypeSelection":{
       "title": "Đăng ký trở thành đối tác",
       "subtitle": "Vui lòng lựa chọn vai trò bạn muốn đăng kí",
       "selectType": "Vui lòng chọn vai trò để tiếp tục",
       "continueWithType": "Tiếp tục đăng kí với vai trò "
     },
-    "partnerRegistration": {
+    "partnerRegistration":{
       "title": "Đăng ký trở thành đối tác",
       "subtitle": "Vui lòng điền đầy đủ thông tin bên dưới",
       "notSelectedType": "Vui lòng chọn vai trò",
@@ -248,7 +247,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
-      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
+      "process_infor":"Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
 
@@ -296,8 +295,6 @@
       "label_packageOption": "Gói xây dựng: ",
       "label_address": "Địa chỉ: ",
       "label_contractorApplyCount": "đơn ứng tuyển",
-      "label_open": "Đang mở",
-      "label_close": "Đã đóng",
       "label_contractorApplied": "nhà thầu"
     },
     "createServiceRequest": {
@@ -337,7 +334,7 @@
       "label_documents": "Đính kèm / Tài liệu:",
       "title": "Chi tiết yêu cầu dịch vụ",
       "label_open": "Đang mở",
-      "label_close": "Đã đóng",
+      "label_close":"Đã đóng",
       "label_serviceInfor": "Thông tin công trình",
       "label_serviceType": "Loại dịch vụ:",
       "label_packageOption": "Gói dịch vụ",
@@ -353,8 +350,8 @@
       "noEstimatePrice": "Không ước tính",
       "label_address": "Địa chỉ thi công:",
       "label_description": "Mô tả chi tiết:",
-      "label_images": "Hình ảnh minh họa / Hiện trạng:",
-      "section_contractor": "Nhà thầu ứng tuyển",
+      "label_images": "Hình ảnh minh họa / Hiện trạng:",     
+      "section_contractor": "Nhà thầu ứng tuyển",     
       "noContractor": "Chưa có nhà thầu nào ứng tuyển",
       "noContractorDesc": "Hiện tại chưa có nhà thầu nào ứng tuyển cho dự án của bạn. Vui lòng chờ thêm thời gian.",
       "label_avarageRating": "Đánh giá trung bình:",
@@ -368,7 +365,7 @@
       "section_chat": "Trò chuyện với nhà thầu",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
     },
-    "materialRequest": {
+    "materialRequest":{
       "title": "Yêu cầu vật liệu",
       "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
       "noRequest": "Chưa có yêu cầu vật liệu nào",
@@ -380,8 +377,8 @@
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
       "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
     }
-  },
-  "contractorServiceRequestManager": {
+  },  
+"contractorServiceRequestManager": {
     "title": "Quản lý yêu cầu dịch vụ",
     "subtitle": "Xem và quản lý các yêu cầu dịch vụ có sẵn",
     "noRequest": "Chưa có yêu cầu dịch vụ nào",
@@ -397,11 +394,11 @@
     "statusClosed": "Đóng",
     "searchPlaceholder": "Tìm kiếm yêu cầu dịch vụ...",
     "sortDefault": "Mặc định",
-    "sortOldest": "Cũ nhất",
+    "sortOldest": "Cũ nhất", 
     "sortNewest": "Mới nhất"
   },
   "contractorServiceRequestDetail": {
-    "privacyNotice": "Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
+    "privacyNotice":"Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
     "title": "Chi tiết yêu cầu dịch vụ",
     "dimensions": "Kích thước dự án",
     "totalArea": "Tổng diện tích",
@@ -448,12 +445,6 @@
     "viewDocument": "Xem tài liệu ",
     "yourDocuments": "Tài liệu của bạn"
 
-    "youAreSelected": "Bạn đã được chọn",
-    "customerInfo": "Thông tin khác hàng",
-    "payCommission": "Thanh toán hoa hồng",
-    "selectedPendingCommissionNote": "Đang đợi thanh toán hoa hồng",
-    "processingPayment": "Đang xử lý thanh toán",
-    "paymentFailed": "Thanh toán thất bại"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -590,7 +581,7 @@
       "service": "Dịch vụ",
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
-      "partner": "Đối tác",
+      "partner": "Đối tác", 
       "support": "Quản lý hỗ trợ"
     },
     "account": {
@@ -731,34 +722,6 @@
       "chooseFiles": "Chọn tệp tải lên"
     }
   },
-  "adminServiceRequestManager": {
-    "no": "STT",
-    "title": "Quản lý dịch vụ đã yêu cầu",
-    "subtitle": "Quản lý danh sách dịch vụ đã yêu cầu",
-    "serviceRequests": "dịch vụ đã yêu cầu",
-    "description": "Mô Tả",
-    "acreage": "Diện tích",
-    "numberOfFloors": "Số tầng",
-    "estimatePrice": "Giá ước tính",
-    "address": "Địa chỉ",
-    "label_open": "Đang mở",
-    "label_close": "Đã đóng",
-    "listCandidate": "Danh sách nhà thầu",
-    "totalCandidate": "nhà thầu",
-    "viewProfile": "Xem hồ sơ",
-    "empty": "Không có yêu cầu dịch vụ nào",
-    "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi.",
-    "noContractor": "Chưa có nhà thầu nào",
-    "noContractorYet": "Chưa có nhà thầu nào đăng ký.",
-    "contractorDetail": {
-      "title": "Chi tiết nhà thầu",
-      "completedProject": "Dữ án đã hoàn thành",
-      "project": "dự án",
-      "rating": "Đánh giá",
-      "createAt": "Ngày tạo",
-      "images": "Hình ảnh dự án"
-    }
-  },
   "adminMaterialManager": {
     "title": "Quản lý Vật Liệu",
     "subtitle": "Quản lý danh sách vật liệu",
@@ -798,8 +761,8 @@
       "noFile": "Chưa chọn tệp nào",
       "filesSelected": " tệp đã chọn"
     }
-  },
-  "adminPartnerManager": {
+  },  
+  "adminPartnerManager":{
     "empty": "Không có đối tác nào",
     "empty_description": "Chưa có đăng ký hợp tác nào.",
     "title": "Quản lý đối tác",
@@ -819,7 +782,7 @@
     "delete": "Xóa",
     "viewDetails": "Xem chi tiết",
     "total": "Tổng",
-    "partnerRequestModal": {
+    "partnerRequestModal":{
       "title": "Thông tin đăng kí",
       "companyName": "Tên công ty",
       "phoneNumber": "Số điện thoại",
@@ -833,7 +796,7 @@
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",
     "subtitle": "Yêu cầu từ khách hàng",
-    "no": "STT",
+    "no":"STT",
     "fullName": "Họ và tên",
     "email": "Email",
     "subject": "Chủ đề",
@@ -923,7 +886,7 @@
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
     "Accept": "Chấp nhận",
-    "Reject": "Từ chối",
+    "Reject" : "Từ chối",
     "Approve": "Phê duyệt",
     "BackToList": "Quay lại danh sách"
   },
@@ -969,14 +932,13 @@
       "title": "Bạn có chắc chắn?",
       "text": "Hình ảnh này sẽ bị xóa và không thể khôi phục!"
     },
-    "DeleteApplicationModal": {
+    "DeleteApplicationModal":{
       "title": "Bạn có chắc chắn?",
       "text":"Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
     },
     "DeleteDocumentModal":{
       "title": "Bạn có chắc chắn?",
       "text":"Tài liệu này sẽ bị xóa vĩnh viễn"
-      "text": "Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
     }
   },
   "ERROR": {
@@ -987,7 +949,7 @@
     "LOGIN_TOKEN_INVALID": "Phiên đăng nhập không hợp lệ, vui lòng đăng nhập lại.",
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
-    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
+    "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",   
 
     "NULL_NAME": "Vui lòng nhập họ và tên.",
     "NULL_PHONE": "Vui lòng nhập số điện thoại.",
@@ -1000,6 +962,7 @@
     "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
     "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "INVALID_EMAIL": "Email không hợp lệ.",
+    
 
     "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
@@ -1028,10 +991,10 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
-    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+    "REQUIRED_ADDRESS":"Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhất",
-    "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
+    "REQUIRD_REJECT_REASON":"Vui lòng nhập lí do từ chối",
 
     "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
     "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
@@ -1044,13 +1007,14 @@
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
 
     "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Yêu cầu mô tả",
 
-    "UNAUTHORIZED_ACCESS": "Không được phép truy cập",
-    "UNAUTHORIZED_ACCESS_DESCRIPTION": "Bạn không có quyền truy cập tài nguyên này",
+    "UNAUTHORIZED_ACCESS":"Không được phép truy cập",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"Bạn không có quyền truy cập tài nguyên này",
 
     "NOTFOUND": "Không tìm thấy tài nguyên",
     "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại"
+
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1074,8 +1038,9 @@
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
-    "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
+    "DELETE_APPLICATION":"Đã xóa thành công đơn ứng tuyển của bạn",
     "APPICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
+
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1126,29 +1091,20 @@
       "Other": "Khác"
     },
 
-    "PartnerType": {
-      "Distributor": "Nhà phân phối",
+    "PartnerType":{
+      "Distributor":"Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
       "Contractor": "Nhà thầu",
-      "ContractorDescription": "Cung cấp giải pháp xây dựng/sửa chửa"
+      "ContractorDescription" :"Cung cấp giải pháp xây dựng/sửa chửa"
     },
-    "ApplicationStatus": {
-      "Pending": "Đang chờ",
-      "PendingCommission": "Đang chờ xử lý",
-      "Approved": "Đã phê duyệt",
-      "Rejected": "Đã từ chối"
-    },
-    "RequestStatus": {
-      "Closed": "Đã đóng",
-      "Opening": "Đang mở",
-      "Pending": "Đang xử lý",
-      "Draft": "Bản nháp",
-      "Processed": "Đã xử lý"
-    },
-    "PartneRequestrStatus": {
-      "Pending": "Đang chờ",
-      "Approved": "Đã phê duyệt",
-      "Rejected": "Đã từ chối"
+    "Status":{
+      "Pending":"Đang chờ",
+      "Approved":"Đã phê duyệt",
+      "Rejected":"Đã từ chối",
+      "Closed":"Đã đóng",
+      "Opening":"Đang mở",
+      "Processed":"Đã xử lý",
+      "Draft":"Bản nháp"
     }
   },
   "toast": {
@@ -1164,16 +1120,9 @@
     "Download":"Tải xuống",
     "files":"tệp",
     "new":"Mới",
-  "upload": {
-    "clickToUpload": "Chọn để tải ảnh",
-    "orDragAndDrop": "hoặc kéo và thả",
-    "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
-  },
-  "common": {
-    "new": "mới",
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
-    "search": "Tìm kiếm...",
+    "search":"Tìm kiếm...",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
