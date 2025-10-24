@@ -586,11 +586,10 @@ export default function ContractorServiceRequestDetail() {
                   <i className="fas fa-dollar-sign text-orange-500" />
                   {t('contractorServiceRequestDetail.estimatePrice')}
                 </h3>
-                <p className="text-2xl font-bold text-orange-600 mb-1">
-                  {serviceRequest.estimatePrice != 0
-                    ? formatVND(serviceRequest.estimatePrice)
-                    : t('contractorServiceRequestManager.negotiable')}
-                </p>
+                {serviceRequest.estimatePrice === 0
+                  ? t('contractorServiceRequestManager.negotiable')
+                  : formatVND(serviceRequest.estimatePrice)}
+
                 {serviceRequest.estimatePrice != 0 && (
                   <p className="text-sm text-gray-600 mb-1">
                     {numberToWordsByLang(serviceRequest.estimatePrice)}
