@@ -13,13 +13,13 @@ let isRefreshing = false;
 let failedQueue = [];
 
 const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
+  for (const prom of failedQueue) {
     if (error) {
       prom.reject(error);
     } else {
       prom.resolve(token);
     }
-  });
+  }
   failedQueue = [];
 };
 

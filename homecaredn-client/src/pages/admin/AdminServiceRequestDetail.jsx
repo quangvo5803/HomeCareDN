@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { formatVND } from '../../utils/formatters';
 import { Pagination } from 'antd';
+import { adminService } from '../../services/adminService';
 import StatusBadge from '../../components/StatusBadge';
 import VenoBox from 'venobox';
 import 'venobox/dist/venobox.min.css';
@@ -17,49 +18,46 @@ export default function AdminServiceRequestDetail() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 3;
 
-  const [selectedContractorEmail, setSelectedContractorEmail] = useState(null);
+  const [selectedContractorApplicationID, setSelectedContractorApplicationID] =
+    useState(null);
+  const [contractorApplicationList, setcontractorApplicationList] = useState(
+    []
+  );
+  const [totalContractorApplication, setTotalContractorApplication] =
+    useState(0);
   const contractorDetailRef = useRef(null);
 
-  const {
-    getServiceRequestById,
-    fetchContractorByServiceRequestId,
-    totalContractors,
-    loading,
-    contractors,
-  } = useServiceRequest();
+  const { getServiceRequestById, loading } = useServiceRequest();
 
   useEffect(() => {
     const fetchData = async () => {
       const detailServiceRes = await getServiceRequestById(id);
       setDetail(detailServiceRes);
 
-      const selectedContractor =
-        !!detailServiceRes.selectedContractorApplication;
-      if (!selectedContractor) {
-        fetchContractorByServiceRequestId({
-          PageNumber: currentPage,
-          PageSize: pageSize,
-          FilterID: id,
-        });
+      if (detailServiceRes.selectedContractorApplication == null) {
+        const result =
+          await adminService.contractorApplication.getAllContractorByServiceRequestId(
+            {
+              PageNumber: currentPage,
+              PageSize: pageSize,
+              FilterID: id,
+            }
+          );
+        setcontractorApplicationList(result.items || []);
+        setTotalContractorApplication(result.totalCount || 0);
       }
     };
 
     fetchData();
-  }, [
-    id,
-    currentPage,
-    pageSize,
-    getServiceRequestById,
-    fetchContractorByServiceRequestId,
-  ]);
+  }, [id, currentPage, pageSize, getServiceRequestById]);
 
   const icons = {
     Repair: 'fa-drafting-compass',
     Construction: 'fa-hammer',
   };
 
-  const handleSelectContractor = (email) => {
-    setSelectedContractorEmail(email);
+  const handleSelectContractor = (contractorApplicationID) => {
+    setSelectedContractorApplicationID(contractorApplicationID);
     setTimeout(() => {
       contractorDetailRef.current?.scrollIntoView({
         behavior: 'smooth',
@@ -68,8 +66,8 @@ export default function AdminServiceRequestDetail() {
     }, 100);
   };
 
-  const selectedContractor = contractors?.find(
-    (c) => c.contractorEmail === selectedContractorEmail
+  const selectedContractor = contractorApplicationList?.find(
+    (c) => c.contractorApplicationID === selectedContractorApplicationID
   );
 
   useEffect(() => {
@@ -78,10 +76,6 @@ export default function AdminServiceRequestDetail() {
   }, [detail, selectedContractor]);
 
   if (loading || !detail) return <Loading />;
-
-  const isPendingStatus = detail.contractorApplications?.some(
-    (c) => c.status === 'Pending'
-  );
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-3xl">
       {/* Header tràn toàn bộ */}
@@ -282,12 +276,9 @@ export default function AdminServiceRequestDetail() {
           )}
         </div>
 
-        {/* Nếu status là Pending → hiển thị danh sách contractor */}
         {detail.contractorApplications === null ? (
           // ===== CHI TIẾT CONTRACTOR ĐƯỢC CHỌN =====
-          ['Approved', 'PendingCommission'].includes(
-            detail?.selectedContractorApplication?.status
-          ) && (
+          detail.selectedContractorApplication != null && (
             <div
               ref={contractorDetailRef}
               className="bg-white rounded-3xl shadow-2xl overflow-hidden"
@@ -430,23 +421,24 @@ export default function AdminServiceRequestDetail() {
                 {t('adminServiceRequestManager.listCandidate')}
               </h3>
               <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
-                {totalContractors || 0}{' '}
+                {totalContractorApplication || 0}{' '}
                 {t('adminServiceRequestManager.totalCandidate')}
               </span>
             </div>
 
             <div className="space-y-3">
-              {contractors && contractors.length > 0 ? (
+              {contractorApplicationList && totalContractorApplication > 0 ? (
                 <>
-                  {contractors.map((items) => {
+                  {contractorApplicationList.map((item) => {
                     const isSelected =
-                      items.contractorEmail === selectedContractorEmail;
+                      item.contractorApplicationID ===
+                      selectedContractorApplicationID;
 
                     return (
                       <div
-                        key={items.contractorApplicationID}
+                        key={item.contractorApplicationID}
                         onClick={() =>
-                          handleSelectContractor(items.contractorEmail)
+                          handleSelectContractor(item.contractorApplicationID)
                         }
                         role="button"
                         tabIndex={0}
@@ -468,7 +460,7 @@ export default function AdminServiceRequestDetail() {
                             >
                               <img
                                 src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                  items.contractorEmail || 'User'
+                                  item.contractorEmail || 'User'
                                 )}&background=${
                                   isSelected ? 'ffffff' : 'FB8C00'
                                 }&color=${isSelected ? 'FB8C00' : 'fff'}`}
@@ -484,7 +476,7 @@ export default function AdminServiceRequestDetail() {
                                     : 'text-gray-800 group-hover:text-orange-600'
                                 }`}
                               >
-                                {items.contractorName}
+                                {item.contractorName}
                               </p>
                               <p
                                 className={`text-sm ${
@@ -493,7 +485,7 @@ export default function AdminServiceRequestDetail() {
                                     : 'text-gray-500'
                                 }`}
                               >
-                                {items.contractorEmail}
+                                {item.contractorEmail}
                               </p>
                             </div>
                           </div>
@@ -505,7 +497,9 @@ export default function AdminServiceRequestDetail() {
                                 : 'text-orange-600'
                             }`}
                             onClick={() =>
-                              handleSelectContractor(items.contractorEmail)
+                              handleSelectContractor(
+                                item.contractorApplicationID
+                              )
                             }
                           >
                             {t('adminServiceRequestManager.viewProfile')}{' '}
@@ -516,12 +510,12 @@ export default function AdminServiceRequestDetail() {
                     );
                   })}
 
-                  {totalContractors > 0 && (
+                  {totalContractorApplication > pageSize && (
                     <div className="flex justify-center py-4">
                       <Pagination
                         current={currentPage}
                         pageSize={pageSize}
-                        total={totalContractors}
+                        total={totalContractorApplication}
                         onChange={(page) => setCurrentPage(page)}
                         showSizeChanger={false}
                         size="small"
@@ -545,7 +539,7 @@ export default function AdminServiceRequestDetail() {
         )}
 
         {/* Nếu Pending và có contractor tham gia thì vẫn hiển thị detail bên dưới */}
-        {isPendingStatus && selectedContractor && (
+        {selectedContractor && (
           <div
             ref={contractorDetailRef}
             className="bg-white rounded-3xl shadow-2xl overflow-hidden"
@@ -593,13 +587,14 @@ export default function AdminServiceRequestDetail() {
 
               {/* Grid Info */}
               <div className="grid grid-cols-2 gap-4 mb-8">
-                {/* Estimate Price */}
-                <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
-                  <p className="text-emerald-600 text-sm font-medium mb-1">
-                    {t('adminServiceRequestManager.estimatePrice')}
+                {/* Rating */}
+                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
+                  <p className="text-amber-600 text-sm font-medium mb-1">
+                    {t('adminServiceRequestManager.contractorDetail.rating')}
                   </p>
-                  <p className="font-bold text-lg text-emerald-700">
-                    {formatVND(selectedContractor.estimatePrice)}
+                  <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
+                    <i className="fa-solid fa-star"></i>
+                    {selectedContractor.averageRating}
                   </p>
                 </div>
 
@@ -615,15 +610,13 @@ export default function AdminServiceRequestDetail() {
                     {t('adminServiceRequestManager.contractorDetail.project')}
                   </p>
                 </div>
-
-                {/* Rating */}
-                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
-                  <p className="text-amber-600 text-sm font-medium mb-1">
-                    {t('adminServiceRequestManager.contractorDetail.rating')}
+                {/* Estimate Price */}
+                <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
+                  <p className="text-emerald-600 text-sm font-medium mb-1">
+                    {t('adminServiceRequestManager.estimatePrice')}
                   </p>
-                  <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
-                    <i className="fa-solid fa-star"></i>
-                    {selectedContractor.averageRating}
+                  <p className="font-bold text-lg text-emerald-700">
+                    {formatVND(selectedContractor.estimatePrice)}
                   </p>
                 </div>
 
@@ -656,12 +649,12 @@ export default function AdminServiceRequestDetail() {
                   <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
                     {t('adminServiceRequestManager.contractorDetail.images')}
                   </p>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-6 gap-1">
                     {selectedContractor.imageUrls.map((url, i) => (
                       <a
                         key={`${url}-${i}`}
                         href={url}
-                        className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                        className="venobox w-40 h-40 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
                         data-gall="contractor-gallery"
                         title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${
                           i + 1

@@ -11,8 +11,6 @@ export const ServiceRequestProvider = ({ children }) => {
   const { user } = useAuth();
   const [serviceRequests, setServiceRequests] = useState([]);
   const [totalServiceRequests, setTotalServiceRequests] = useState(0);
-  const [contractors, setContractors] = useState([]);
-  const [totalContractors, setTotalContractors] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // 📌 Execute fetch service requests
@@ -41,36 +39,6 @@ export const ServiceRequestProvider = ({ children }) => {
     async (params = {}) =>
       await withMinLoading(() => executeFetch(params), setLoading),
     [executeFetch]
-  );
-
-  // 📌 Execute fetch all contractors by request id
-  const executeFetchContractors = useCallback(
-    async ({ PageNumber = 1, PageSize = 5, FilterID } = {}) => {
-      try {
-        const service = getServiceByRole(user?.role);
-        const data =
-          await service.contractorApplication.getAllContractorByServiceRequestId(
-            {
-              PageNumber,
-              PageSize,
-              FilterID,
-            }
-          );
-        setContractors(data.items || []);
-        setTotalContractors(data.totalCount || 0);
-        return data;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
-      }
-    },
-    [user?.role]
-  );
-
-  const fetchContractorByServiceRequestId = useCallback(
-    async (params = {}) =>
-      await withMinLoading(() => executeFetchContractors(params), setLoading),
-    [executeFetchContractors]
   );
 
   // 📌 Execute fetch service requests by user id
@@ -208,11 +176,9 @@ export const ServiceRequestProvider = ({ children }) => {
     () => ({
       serviceRequests,
       totalServiceRequests,
-      contractors,
-      totalContractors,
+
       loading,
       fetchServiceRequests,
-      fetchContractorByServiceRequestId,
       fetchServiceRequestsByUserId,
       getServiceRequestById,
       createServiceRequest,
@@ -223,11 +189,9 @@ export const ServiceRequestProvider = ({ children }) => {
     [
       serviceRequests,
       totalServiceRequests,
-      contractors,
-      totalContractors,
+
       loading,
       fetchServiceRequests,
-      fetchContractorByServiceRequestId,
       fetchServiceRequestsByUserId,
       getServiceRequestById,
       createServiceRequest,

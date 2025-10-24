@@ -23,12 +23,13 @@ const buildServiceFormData = (service) => {
   appendIf(formData, 'DescriptionEN', service.DescriptionEN);
 
   // Images
-  (service.ImageUrls || []).forEach((ImageUrls) =>
-    formData.append('ImageUrls', ImageUrls)
-  );
-  (service.ImagePublicIds || []).forEach((ImagePublicIds) =>
-    formData.append('ImagePublicIds', ImagePublicIds)
-  );
+  for (const url of service.ImageUrls || []) {
+    formData.append('ImageUrls', url);
+  }
+
+  for (const id of service.ImagePublicIds || []) {
+    formData.append('ImagePublicIds', id);
+  }
 
   return formData;
 };
