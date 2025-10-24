@@ -5,18 +5,10 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
 import { withMinLoading } from '../utils/withMinLoading';
-
-const handleServiceError = (err, fallback = null) => {
-  toast.error(handleApiError(err));
-  return fallback;
-};
-
-const mapServiceItems = (data) => {
-  const items = data?.items ?? [];
-  return items.map((s) => ({ ...s, type: 'service' }));
-};
+import { useTranslation } from 'react-i18next';
 
 export const ServiceProvider = ({ children }) => {
+  const { t } = useTranslation();
   const [services, setServices] = useState([]);
   const [totalServices, setTotalServices] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -31,12 +23,12 @@ export const ServiceProvider = ({ children }) => {
   const executeFetch = useCallback(async (params = {}) => {
     try {
       const data = await fetchAllServices(params);
-      const mapped = mapServiceItems(data);
+      const mapped = (data.items || []).map((s) => ({ ...s, type: 'service' }));
       setServices(mapped);
       setTotalServices(data.totalCount || 0);
       return mapped;
     } catch (err) {
-      return handleServiceError(err, []);
+      toast.error(handleApiError(err));
     }
   }, []);
 
@@ -52,46 +44,58 @@ export const ServiceProvider = ({ children }) => {
       const service = getServiceByRole();
       return await service.service.getServiceById(id);
     } catch (err) {
-      return handleServiceError(err);
+      toast.error(handleApiError(err));
     }
   }, []);
 
   // --- Create (Admin-only) ---
-  const createService = useCallback(async (dto) => {
-    setLoading(true);
-    try {
-      const service = getServiceByRole('Admin');
-      const newService = await service.service.createService(dto);
-      setServices((prev) => [...prev, newService]);
-      setTotalServices((prev) => prev + 1);
-      return newService;
-    } catch (err) {
-      handleServiceError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createService = useCallback(
+    async (dto) => {
+      setLoading(true);
+      try {
+        const service = getServiceByRole('Admin');
+        const newService = await service.service.createService(dto);
+        setServices((prev) => [...prev, newService]);
+        setTotalServices((prev) => prev + 1);
+        toast.success(t('SUCCESS.SERVICE_ADD'));
+        return newService;
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // --- Update (Admin-only) ---
-  const updateService = useCallback(async (dto) => {
-    setLoading(true);
-    try {
-      const service = getServiceByRole();
-      const updated = await service.service.updateService(dto);
-      setServices((prev) =>
-        prev.map((s) =>
-          s.serviceID === updated.serviceID
-            ? { ...s, ...updated, imageUrls: updated.imageUrls ?? s.imageUrls }
-            : s
-        )
-      );
-      return updated;
-    } catch (err) {
-      handleServiceError(err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateService = useCallback(
+    async (dto) => {
+      setLoading(true);
+      try {
+        const service = getServiceByRole();
+        const updated = await service.service.updateService(dto);
+        setServices((prev) =>
+          prev.map((s) =>
+            s.serviceID === updated.serviceID
+              ? {
+                  ...s,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? s.imageUrls,
+                }
+              : s
+          )
+        );
+        toast.success(t('SUCCESS.SERVICE_UPDATE'));
+        return updated;
+      } catch (err) {
+        toast.error(handleApiError(err));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // --- Delete (Admin-only, no overlay) ---
   const deleteService = useCallback(async (id) => {
@@ -101,8 +105,7 @@ export const ServiceProvider = ({ children }) => {
       setServices((prev) => prev.filter((s) => s.serviceID !== id));
       setTotalServices((prev) => Math.max(0, prev - 1));
     } catch (err) {
-      handleServiceError(err);
-      throw err;
+      toast.error(handleApiError(err));
     }
   }, []);
 
@@ -119,7 +122,7 @@ export const ServiceProvider = ({ children }) => {
         )
       );
     } catch (err) {
-      handleServiceError(err);
+      toast.error(handleApiError(err));
     }
   }, []);
 

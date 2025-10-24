@@ -295,9 +295,11 @@ export default function ServiceRequestDetail() {
                     {t('userPage.serviceRequestDetail.label_area')}
                   </p>
                   <p className="text-2xl font-bold text-blue-900">
-                    {serviceRequest.width *
+                    {(
+                      serviceRequest.width *
                       serviceRequest.length *
-                      serviceRequest.floors}
+                      serviceRequest.floors
+                    ).toFixed(1)}
                     <span className="text-sm font-normal"> m²</span>
                   </p>
                 </div>

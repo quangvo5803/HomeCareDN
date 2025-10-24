@@ -86,10 +86,8 @@ export default function DistributorMaterialManager() {
   const handleSave = async (materialData) => {
     if (materialData.MaterialID) {
       await updateMaterial(materialData);
-      toast.success(t('SUCCESS.MATERIAL_UPDATE'));
     } else {
       await createMaterial(materialData);
-      toast.success(t('SUCCESS.MATERIAL_ADD'));
       const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
       setCurrentPage(lastPage);
     }
@@ -174,8 +172,9 @@ export default function DistributorMaterialManager() {
               materials.map((material, index) => (
                 <tr
                   key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                    }`}
+                  className={`hover:bg-sky-50 transition-colors duration-150 ${
+                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                  }`}
                 >
                   {/* STT */}
                   <td className="px-4 py-4 text-center align-middle">
@@ -300,6 +299,6 @@ export default function DistributorMaterialManager() {
           />
         </div>
       </div>
-    </div >
+    </div>
   );
 }

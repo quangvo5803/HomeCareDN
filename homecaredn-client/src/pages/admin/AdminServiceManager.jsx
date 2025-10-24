@@ -71,10 +71,8 @@ export default function AdminServiceManager() {
   const handleSave = async (serviceData) => {
     if (serviceData.ServiceID) {
       await updateService(serviceData);
-      toast.success(t('SUCCESS.SERVICE_UPDATE'));
     } else {
       await createService(serviceData);
-      toast.success(t('SUCCESS.SERVICE_ADD'));
       const lastPage = Math.ceil((totalServices + 1) / pageSize);
       setCurrentPage(lastPage);
     }

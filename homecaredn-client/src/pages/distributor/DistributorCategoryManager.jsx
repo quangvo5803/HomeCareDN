@@ -65,10 +65,8 @@ export default function DistributorCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_ADD'));
       const lastPage = Math.ceil((totalCategories + 1) / pageSize);
       setCurrentPage(lastPage);
     }

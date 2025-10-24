@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import { withMinLoading } from '../utils/withMinLoading';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 export const ServiceRequestProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [serviceRequests, setServiceRequests] = useState([]);
   const [totalServiceRequests, setTotalServiceRequests] = useState(0);
@@ -83,43 +85,53 @@ export const ServiceRequestProvider = ({ children }) => {
   );
 
   // 📌 Create
-  const createServiceRequest = useCallback(async (dto) => {
-    try {
-      setLoading(true);
-      const service = getServiceByRole('Customer');
-      const newRequest = await service.serviceRequest.createServiceRequest(dto);
-      setServiceRequests((prev) => [...prev, newRequest]);
-      setTotalServiceRequests((prev) => prev + 1);
-      return newRequest;
-    } catch (err) {
-      toast.error(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createServiceRequest = useCallback(
+    async (dto) => {
+      try {
+        setLoading(true);
+        const service = getServiceByRole('Customer');
+        const newRequest = await service.serviceRequest.createServiceRequest(
+          dto
+        );
+        setServiceRequests((prev) => [...prev, newRequest]);
+        setTotalServiceRequests((prev) => prev + 1);
+        toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
+        return newRequest;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // 📌 Update
-  const updateServiceRequest = useCallback(async (dto) => {
-    try {
-      setLoading(true);
-      const service = getServiceByRole('Customer');
-      const updated = await service.serviceRequest.updateServiceRequest(dto);
-      setServiceRequests((prev) =>
-        prev.map((s) =>
-          s.serviceRequestID === updated.serviceRequestID
-            ? { ...s, ...updated }
-            : s
-        )
-      );
-      return updated;
-    } catch (err) {
-      toast.error(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateServiceRequest = useCallback(
+    async (dto) => {
+      try {
+        setLoading(true);
+        const service = getServiceByRole('Customer');
+        const updated = await service.serviceRequest.updateServiceRequest(dto);
+        setServiceRequests((prev) =>
+          prev.map((s) =>
+            s.serviceRequestID === updated.serviceRequestID
+              ? { ...s, ...updated }
+              : s
+          )
+        );
+        toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
+        return updated;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // 📌 Delete
   const deleteServiceRequest = useCallback(async (id) => {
@@ -153,11 +165,11 @@ export const ServiceRequestProvider = ({ children }) => {
           )
         );
       } catch (err) {
-        toast.error(handleApiError(err));
+        toast.error(t(handleApiError(err)));
         throw err;
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Auto load if user is Customer

@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
 import { withMinLoading } from '../utils/withMinLoading';
+import { useTranslation } from 'react-i18next';
 
 export const BrandProvider = ({ children }) => {
+  const { t } = useTranslation();
   const [brands, setBrands] = useState([]);
   const [totalBrands, setTotalBrands] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -73,37 +75,45 @@ export const BrandProvider = ({ children }) => {
   );
 
   // 📌 Create brand (no min loading)
-  const createBrand = useCallback(async (dto) => {
-    try {
-      setLoading(true);
-      const newBrand = await adminService.brand.createBrand(dto);
-      setBrands((prev) => [...prev, newBrand]);
-      setTotalBrands((prev) => prev + 1);
-      return newBrand;
-    } catch (err) {
-      toast.error(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createBrand = useCallback(
+    async (dto) => {
+      try {
+        setLoading(true);
+        const newBrand = await adminService.brand.createBrand(dto);
+        setBrands((prev) => [...prev, newBrand]);
+        setTotalBrands((prev) => prev + 1);
+        toast.success(t('SUCCESS.BRAND_ADD'));
+        return newBrand;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // 📌 Update brand (no min loading)
-  const updateBrand = useCallback(async (dto) => {
-    try {
-      setLoading(true);
-      const updated = await adminService.brand.updateBrand(dto);
-      setBrands((prev) =>
-        prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
-      );
-      return updated;
-    } catch (err) {
-      toast.error(handleApiError(err));
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const updateBrand = useCallback(
+    async (dto) => {
+      try {
+        setLoading(true);
+        const updated = await adminService.brand.updateBrand(dto);
+        setBrands((prev) =>
+          prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
+        );
+        toast.success(t('SUCCESS.BRAND_UPDATE'));
+        return updated;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
 
   // 📌 Delete brand (no loading overlay)
   const deleteBrand = useCallback(async (id) => {

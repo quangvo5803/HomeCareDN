@@ -7,8 +7,9 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
 import { withMinLoading } from '../utils/withMinLoading';
-
+import { useTranslation } from 'react-i18next';
 export const MaterialProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [totalMaterials, setTotalMaterials] = useState(0);
@@ -118,6 +119,7 @@ export const MaterialProvider = ({ children }) => {
         // Tăng tổng số material
         setMaterials((prev) => [...prev, newMaterial]);
         setTotalMaterials((prev) => prev + 1);
+        toast.success(t('SUCCESS.MATERIAL_ADD'));
         return newMaterial;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -126,7 +128,7 @@ export const MaterialProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Distributor-only: update
@@ -147,6 +149,7 @@ export const MaterialProvider = ({ children }) => {
               : m
           )
         );
+        toast.success(t('SUCCESS.MATERIAL_UPDATE'));
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -155,7 +158,7 @@ export const MaterialProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Distributor-only: delete

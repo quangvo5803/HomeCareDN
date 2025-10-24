@@ -440,6 +440,14 @@ export default function AdminServiceRequestDetail() {
                         onClick={() =>
                           handleSelectContractor(item.contractorApplicationID)
                         }
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleSelectContractor(
+                              item.contractorApplicationID
+                            );
+                          }
+                        }}
                         role="button"
                         tabIndex={0}
                         className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group

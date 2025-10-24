@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
 import { withMinLoading } from '../utils/withMinLoading';
+import { useTranslation } from 'react-i18next';
 
 export const CategoryProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [categories, setCategories] = useState([]);
   const [totalCategories, setTotalCategories] = useState(0);
@@ -102,8 +104,6 @@ export const CategoryProvider = ({ children }) => {
   // 📌 Admin-only: create
   const createCategory = useCallback(
     async (categoryData) => {
-      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
-        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const service = getServiceByRole(user.role);
@@ -111,6 +111,7 @@ export const CategoryProvider = ({ children }) => {
         setCategories((prev) => [...prev, newCategory]);
         // Tăng tổng số category
         setTotalCategories((prev) => prev + 1);
+        toast.success(t('SUCCESS.CATEGORY_ADD'));
         return newCategory;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -119,14 +120,12 @@ export const CategoryProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Admin-only: update
   const updateCategory = useCallback(
     async (categoryData) => {
-      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
-        throw new Error('Unauthorized');
       try {
         setLoading(true);
         const service = getServiceByRole(user.role);
@@ -134,6 +133,8 @@ export const CategoryProvider = ({ children }) => {
         setCategories((prev) =>
           prev.map((c) => (c.categoryID === updated.categoryID ? updated : c))
         );
+        toast.success(t('SUCCESS.CATEGORY_UPDATE'));
+
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -142,14 +143,12 @@ export const CategoryProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Admin-only: delete
   const deleteCategory = useCallback(
     async (id) => {
-      if (user?.role !== 'Admin' && user?.role !== 'Distributor')
-        throw new Error('Unauthorized');
       try {
         const service = getServiceByRole(user.role);
         await service.category.deleteCategory(id);

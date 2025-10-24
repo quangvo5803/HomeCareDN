@@ -15,7 +15,7 @@ import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
 
 export default function ServiceRequestCreateUpdate() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
   const { serviceRequestId } = useParams();
@@ -160,11 +160,9 @@ export default function ServiceRequestCreateUpdate() {
     }
     if (serviceRequestId) {
       payload.ServiceRequestID = serviceRequestId;
-      updateServiceRequest(payload);
-      toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
+      await updateServiceRequest(payload);
     } else {
-      createServiceRequest(payload);
-      toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
+      await createServiceRequest(payload);
     }
     navigate('/Customer', {
       state: { tab: 'service_requests' },
@@ -452,16 +450,20 @@ export default function ServiceRequestCreateUpdate() {
                 </div>
                 {width && length && floors ? (
                   <p className="text-sm text-gray-600 mt-1 mb-2">
-                    {' '}
                     {t('userPage.createServiceRequest.calculatedArea')}:{' '}
                     <span className="font-semibold text-orange-600">
-                      {' '}
-                      {Number(width) * Number(length) * Number(floors)} m²{' '}
-                    </span>{' '}
+                      {(
+                        Number(width) *
+                        Number(length) *
+                        Number(floors)
+                      ).toFixed(1)}{' '}
+                      m²
+                    </span>
                   </p>
                 ) : (
                   <p></p>
                 )}
+
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -490,7 +492,10 @@ export default function ServiceRequestCreateUpdate() {
                       <p className="text-sm text-gray-500">
                         {t('userPage.createServiceRequest.estimateInWord')}
                         <span className="font-semibold">
-                          {numberToWordsByLang(Number(estimatePrice))}
+                          {numberToWordsByLang(
+                            Number(estimatePrice),
+                            i18n.language
+                          )}
                         </span>
                       </p>
                     </>

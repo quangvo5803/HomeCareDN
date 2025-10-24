@@ -69,10 +69,8 @@ export default function AdminBrandManager() {
   const handleSave = async (brandData) => {
     if (brandData.BrandID) {
       await updateBrand(brandData);
-      toast.success(t('SUCCESS.BRAND_UPDATE'));
     } else {
       await createBrand(brandData);
-      toast.success(t('SUCCESS.BRAND_ADD'));
       const lastPage = Math.ceil((totalBrands + 1) / pageSize);
       setCurrentPage(lastPage);
     }

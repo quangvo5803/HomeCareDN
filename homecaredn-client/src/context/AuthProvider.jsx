@@ -126,7 +126,7 @@ export default function AuthProvider({ children }) {
         }
         await logout(); // refresh thất bại → logout
       } catch {
-        await logout();
+        return;
       } finally {
         setLoading(false);
       }

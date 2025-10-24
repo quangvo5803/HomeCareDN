@@ -241,7 +241,7 @@ export default function ContractorServiceRequestDetail() {
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
-  const totalArea = baseArea * (serviceRequest?.floors ?? 1);
+  const totalArea = (baseArea * (serviceRequest?.floors ?? 1)).toFixed(1);
 
   const addressText = [
     serviceRequest?.address?.detail,
@@ -587,9 +587,11 @@ export default function ContractorServiceRequestDetail() {
                   {t('contractorServiceRequestDetail.estimatePrice')}
                 </h3>
                 <p className="text-2xl font-bold text-orange-600 mb-1">
-                  {formatVND(serviceRequest.estimatePrice)}
+                  {serviceRequest.estimatePrice != 0
+                    ? formatVND(serviceRequest.estimatePrice)
+                    : t('contractorServiceRequestManager.negotiable')}
                 </p>
-                {serviceRequest.estimatePrice && (
+                {serviceRequest.estimatePrice != 0 && (
                   <p className="text-sm text-gray-600 mb-1">
                     {numberToWordsByLang(serviceRequest.estimatePrice)}
                   </p>
