@@ -179,7 +179,7 @@ export default function Header() {
                       className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44"
                     >
                       <Link
-                        to="/Customer/Profile"
+                        to="/Customer"
                         relative="path"
                         onClick={() => setOpenAvatarMenu(false)}
                         className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
@@ -311,8 +311,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (
@@ -341,7 +342,7 @@ export default function Header() {
                 {user ? (
                   <div className="flex gap-2">
                     <Link
-                      to="Customer/Profile"
+                      to="Customer"
                       onClick={closeMobileNav}
                       className="flex-1 px-3 py-2 text-sm text-center text-gray-700 transition-colors duration-200 border border-gray-600 rounded-lg bg-gray-50 hover:bg-gray-100"
                     >

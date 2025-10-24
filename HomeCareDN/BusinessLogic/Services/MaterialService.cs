@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.Interfaces;
@@ -8,7 +9,6 @@ using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -59,7 +59,7 @@ namespace BusinessLogic.Services
             }
             var totalCount = await query.CountAsync();
 
-            query = parameters.SortBy?.ToLower() switch
+            query = parameters.SortBy switch
             {
                 "materialname" => query.OrderBy(m => m.Name),
                 "materialname_desc" => query.OrderByDescending(m => m.Name),
@@ -311,15 +311,36 @@ namespace BusinessLogic.Services
             return b =>
                 (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
                 || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
-                || (!string.IsNullOrEmpty(b.Description) && b.Description.ToUpper().Contains(searchUpper))
-                || (b.Brand != null && (
-                       (!string.IsNullOrEmpty(b.Brand.BrandName) && b.Brand.BrandName.ToUpper().Contains(searchUpper))
-                    || (!string.IsNullOrEmpty(b.Brand.BrandNameEN) && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper))
-                ))
-                || (b.Category != null && (
-                       (!string.IsNullOrEmpty(b.Category.CategoryName) && b.Category.CategoryName.ToUpper().Contains(searchUpper))
-                    || (!string.IsNullOrEmpty(b.Category.CategoryNameEN) && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper))
-                ));
+                || (
+                    !string.IsNullOrEmpty(b.Description)
+                    && b.Description.ToUpper().Contains(searchUpper)
+                )
+                || (
+                    b.Brand != null
+                    && (
+                        (
+                            !string.IsNullOrEmpty(b.Brand.BrandName)
+                            && b.Brand.BrandName.ToUpper().Contains(searchUpper)
+                        )
+                        || (
+                            !string.IsNullOrEmpty(b.Brand.BrandNameEN)
+                            && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper)
+                        )
+                    )
+                )
+                || (
+                    b.Category != null
+                    && (
+                        (
+                            !string.IsNullOrEmpty(b.Category.CategoryName)
+                            && b.Category.CategoryName.ToUpper().Contains(searchUpper)
+                        )
+                        || (
+                            !string.IsNullOrEmpty(b.Category.CategoryNameEN)
+                            && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper)
+                        )
+                    )
+                );
         }
     }
 }

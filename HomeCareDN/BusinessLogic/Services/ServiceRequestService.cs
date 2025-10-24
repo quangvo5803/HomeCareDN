@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BusinessLogic.Services.Interfaces
 {
@@ -17,22 +18,27 @@ namespace BusinessLogic.Services.Interfaces
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly AuthorizeDbContext _authorizeDbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private const string ERROR_SERVICE_REQUEST = "Service Request";
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
-        private const string INCLUDE = "Images";
+        private const string INCLUDE_LISTALL = "ContractorApplications";
+        private const string INCLUDE_DETAIL =
+            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            AuthorizeDbContext authorizeDbContext
+            AuthorizeDbContext authorizeDbContext,
+            UserManager<ApplicationUser> userManager
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authorizeDbContext = authorizeDbContext;
+            _userManager = userManager;
         }
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
@@ -40,7 +46,7 @@ namespace BusinessLogic.Services.Interfaces
         )
         {
             var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE_LISTALL
             );
 
             var totalCount = await query.CountAsync();
@@ -59,19 +65,8 @@ namespace BusinessLogic.Services.Interfaces
             var items = await query.ToListAsync();
             var dtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(items);
 
-            //Get Address
-            var addressIds = items.Select(i => i.AddressId).ToList();
-            var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
-                .ToListAsync();
-            foreach (var dto in dtos)
-            {
-                var address = addresses.FirstOrDefault(a => a.AddressID == dto.AddressID);
-                if (address != null)
-                {
-                    dto.Address = _mapper.Map<AddressDto>(address);
-                }
-            }
+            await MapServiceRequestListAllAsync(items, dtos);
+
             return new PagedResultDto<ServiceRequestDto>
             {
                 Items = dtos,
@@ -85,20 +80,16 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE_DETAIL
             );
             ValidateServiceRequest(serviceRequest);
 
             var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                a.AddressID == dto.AddressID
+            await MapServiceRequestDetailsAsync(
+                new List<ServiceRequest> { serviceRequest! },
+                new List<ServiceRequestDto> { dto }
             );
 
-            if (address != null)
-            {
-                dto.Address = _mapper.Map<AddressDto>(address);
-            }
             return dto;
         }
 
@@ -106,11 +97,10 @@ namespace BusinessLogic.Services.Interfaces
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
-                includeProperties: INCLUDE
-            );
+            var query = _unitOfWork
+                .ServiceRequestRepository.GetQueryable(includeProperties: INCLUDE_LISTALL)
+                .Where(sr => sr.CustomerID == parameters.FilterID);
 
-            query = query.Where(sr => sr.UserID == parameters.FilterID.ToString());
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
@@ -126,19 +116,9 @@ namespace BusinessLogic.Services.Interfaces
 
             var items = await query.ToListAsync();
             var dtos = _mapper.Map<IEnumerable<ServiceRequestDto>>(items);
-            //Get Address
-            var addressIds = items.Select(i => i.AddressId).ToList();
-            var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID.ToString()))
-                .ToListAsync();
-            foreach (var dto in dtos)
-            {
-                var address = addresses.FirstOrDefault(a => a.AddressID == dto.AddressID);
-                if (address != null)
-                {
-                    dto.Address = _mapper.Map<AddressDto>(address);
-                }
-            }
+
+            await MapServiceRequestListAllAsync(items, dtos);
+
             return new PagedResultDto<ServiceRequestDto>
             {
                 Items = dtos,
@@ -146,6 +126,129 @@ namespace BusinessLogic.Services.Interfaces
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
             };
+        }
+
+        // Helper method để map Address + Contractor info
+
+        private async Task MapServiceRequestListAllAsync(
+            IEnumerable<ServiceRequest> items,
+            IEnumerable<ServiceRequestDto> dtos
+        )
+        {
+            var itemDict = items.ToDictionary(i => i.ServiceRequestID);
+
+            var addressIds = items.Select(i => i.AddressId).Distinct().ToList();
+
+            var addresses = await _authorizeDbContext
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
+                .ToListAsync();
+
+            var addressDict = addresses.ToDictionary(a => a.AddressID);
+
+            foreach (var dto in dtos)
+            {
+                if (itemDict.TryGetValue(dto.ServiceRequestID, out var entity))
+                {
+                    dto.ContractorApplyCount = entity.ContractorApplications?.Count ?? 0;
+                }
+
+                if (addressDict.TryGetValue(dto.AddressID, out var address))
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                }
+            }
+        }
+
+        private async Task MapServiceRequestDetailsAsync(
+            IEnumerable<ServiceRequest> items,
+            IEnumerable<ServiceRequestDto> dtos
+        )
+        {
+            var itemDict = items.ToDictionary(i => i.ServiceRequestID);
+
+            var addressIds = items.Select(i => i.AddressId).Distinct().ToList();
+
+            var addresses = await _authorizeDbContext
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
+                .ToListAsync();
+
+            var addressDict = addresses.ToDictionary(a => a.AddressID);
+
+            var selectedContractorIds = items
+                .Where(i => i.SelectedContractorApplication != null)
+                .Select(i => i.SelectedContractorApplication!.ContractorID.ToString())
+                .Distinct()
+                .ToList();
+
+            var contractors = await _userManager
+                .Users.Where(u => selectedContractorIds.Contains(u.Id))
+                .ToListAsync();
+
+            var contractorDict = contractors.ToDictionary(c => c.Id);
+
+            foreach (var dto in dtos)
+            {
+                if (!itemDict.TryGetValue(dto.ServiceRequestID, out var entity))
+                    continue;
+
+                // Map Address
+                if (addressDict.TryGetValue(dto.AddressID, out var address))
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                }
+
+                // Số lượng đã ứng tuyển
+                dto.ContractorApplyCount = entity.ContractorApplications?.Count ?? 0;
+
+                // Nếu đã chọn thầu
+                if (entity.SelectedContractorApplication != null)
+                {
+                    var selected = entity.SelectedContractorApplication;
+                    contractorDict.TryGetValue(
+                        selected.ContractorID.ToString(),
+                        out var contractor
+                    );
+
+                    dto.SelectedContractorApplication = new ContractorApplicationFullDto
+                    {
+                        ContractorApplicationID = selected.ContractorApplicationID,
+                        Description = selected.Description,
+                        EstimatePrice = selected.EstimatePrice,
+                        ImageUrls =
+                            selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                        CompletedProjectCount = 0,
+                        AverageRating = 4.4,
+                        Status = selected.Status.ToString(),
+                        ContractorEmail = contractor?.Email ?? string.Empty,
+                        ContractorName = contractor?.FullName ?? string.Empty,
+                        ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
+                        CreatedAt = selected.CreatedAt,
+                    };
+
+                    dto.ContractorApplications = null;
+                }
+                else
+                {
+                    dto.ContractorApplications =
+                        entity
+                            .ContractorApplications?.Select(
+                                ca => new ContractorApplicationPendingDto
+                                {
+                                    ContractorApplicationID = ca.ContractorApplicationID,
+                                    Description = ca.Description,
+                                    EstimatePrice = ca.EstimatePrice,
+                                    ImageUrls =
+                                        ca.Images?.Select(i => i.ImageUrl).ToList()
+                                        ?? new List<string>(),
+                                    CompletedProjectCount = 0,
+                                    AverageRating = 0,
+                                    Status = ca.Status.ToString(),
+                                    CreatedAt = ca.CreatedAt,
+                                }
+                            )
+                            .ToList() ?? new List<ContractorApplicationPendingDto>();
+                }
+            }
         }
 
         public async Task<ServiceRequestDto> CreateServiceRequestAsync(
@@ -166,7 +269,7 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
             serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE_DETAIL
             );
 
             var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
@@ -189,7 +292,7 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE_DETAIL
             );
 
             ValidateServiceRequest(serviceRequest);
@@ -208,7 +311,7 @@ namespace BusinessLogic.Services.Interfaces
 
             serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE_DETAIL
             );
 
             var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);

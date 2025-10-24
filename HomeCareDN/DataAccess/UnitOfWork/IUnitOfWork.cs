@@ -15,6 +15,11 @@ namespace DataAccess.UnitOfWork
         IChatMessageRepository ChatMessageRepository { get; }
         IContactSupportRepository ContactSupportRepository { get; }
         IPartnerRequestRepository PartnerRequestRepository { get; }
+        IMaterialRequestRepository MaterialRequestRepository { get; }
+        IMaterialRequestItemRepository MaterialRequestItemRepository { get; }
+        IDistributorApplicationRepository DistributorApplicationRepository { get; }
+        IDistributorApplicationItemRepository DistributorApplicationItemRepository { get; }
+        IPaymentTransactionsRepository PaymentTransactionsRepository { get; }
         Task SaveAsync();
     }
 }

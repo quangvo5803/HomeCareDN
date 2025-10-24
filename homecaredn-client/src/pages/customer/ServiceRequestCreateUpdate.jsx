@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useEnums } from '../../hook/useEnums';
 import { useAuth } from '../../hook/useAuth';
@@ -15,11 +15,13 @@ import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
 
 export default function ServiceRequestCreateUpdate() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
   const { serviceRequestId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const passedService = location.state?.service;
   const {
     loading,
     createServiceRequest,
@@ -67,8 +69,21 @@ export default function ServiceRequestCreateUpdate() {
           );
         })
         .catch((err) => handleApiError(err, t));
+    } else if (passedService) {
+      // Nếu là tạo mới và có dữ liệu service truyền qua
+      setServiceType(passedService.serviceType || '');
+      setPackageOption(passedService.packageOption || '');
+      setBuildingType(passedService.buildingType || '');
+      setMainStructureType(passedService.mainStructureType || '');
+      setDesignStyle(passedService.designStyle || '');
     }
-  }, [serviceRequestId, fetchAddresses, getServiceRequestById, t]);
+  }, [
+    serviceRequestId,
+    passedService,
+    fetchAddresses,
+    getServiceRequestById,
+    t,
+  ]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -107,9 +122,13 @@ export default function ServiceRequestCreateUpdate() {
       toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
       return;
     }
+    if (!description) {
+      toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
+      return;
+    }
     const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const payload = {
-      UserID: user.id,
+      CustomerID: user.id,
       AddressID: addressID,
       ServiceType: serviceType,
       PackageOption: packageOption,
@@ -147,7 +166,7 @@ export default function ServiceRequestCreateUpdate() {
       createServiceRequest(payload);
       toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
     }
-    navigate('/Customer/Profile', {
+    navigate('/Customer', {
       state: { tab: 'service_requests' },
     });
   };
@@ -200,7 +219,7 @@ export default function ServiceRequestCreateUpdate() {
             <button
               type="button"
               onClick={() =>
-                navigate('/Customer/Profile', {
+                navigate('/Customer', {
                   state: { tab: 'service_requests' },
                 })
               }
@@ -377,6 +396,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-arrows-alt-h text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_width')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
@@ -396,6 +416,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-arrows-alt-v text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_length')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
@@ -415,6 +436,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-layer-group text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_floor')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <input
                     type="number"
@@ -468,10 +490,7 @@ export default function ServiceRequestCreateUpdate() {
                       <p className="text-sm text-gray-500">
                         {t('userPage.createServiceRequest.estimateInWord')}
                         <span className="font-semibold">
-                          {numberToWordsByLang(
-                            Number(estimatePrice),
-                            i18n.language
-                          )}
+                          {numberToWordsByLang(Number(estimatePrice))}
                         </span>
                       </p>
                     </>
@@ -544,18 +563,12 @@ export default function ServiceRequestCreateUpdate() {
                       </div>
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-orange-600">
-                          {i18n.language === 'vi'
-                            ? 'Bấm để tải lên'
-                            : 'Click to upload'}
+                          {t('upload.clickToUpload')}
                         </span>{' '}
-                        {i18n.language === 'vi'
-                          ? 'hoặc kéo và thả'
-                          : 'or drag and drop'}
+                        {t('upload.orDragAndDrop')}
                       </p>
                       <p className="text-sm text-gray-400">
-                        {i18n.language === 'vi'
-                          ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
-                          : 'PNG, JPG, GIF up to 5MB each'}
+                        {t('upload.fileTypesHint')}
                       </p>
                     </div>
                   </div>
@@ -585,7 +598,7 @@ export default function ServiceRequestCreateUpdate() {
                           {img.isNew && (
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                {i18n.language === 'vi' ? 'Mới' : 'New'}
+                                {t('common.New')}
                               </span>
                             </div>
                           )}

@@ -10,6 +10,7 @@ namespace DataAccess.Data
 
         public DbSet<ServiceRequest> ServiceRequests { get; set; }
         public DbSet<ContractorApplication> ContractorApplications { get; set; }
+        public DbSet<Document> Documents { get; set; }
         public DbSet<Image> Images { get; set; }
         public DbSet<Material> Materials { get; set; }
         public DbSet<Service> Services { get; set; }
@@ -19,6 +20,11 @@ namespace DataAccess.Data
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ContactSupport> ContactSupports { get; set; }
         public DbSet<PartnerRequest> PartnerRequests { get; set; }
+        public DbSet<MaterialRequest> MaterialRequests { get; set; }
+        public DbSet<MaterialRequestItem> MaterialRequestItems { get; set; }
+        public DbSet<DistributorApplication> DistributorApplications { get; set; }
+        public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +40,7 @@ namespace DataAccess.Data
                 entity.Property(e => e.MainStructureType).HasConversion<string>();
 
                 entity.Property(e => e.DesignStyle).HasConversion<string>();
+                entity.Property(e => e.Status).HasConversion<string>();
             });
 
             modelBuilder.Entity<ContractorApplication>(entity =>
@@ -60,6 +67,14 @@ namespace DataAccess.Data
             {
                 entity.Property(p => p.PartnerRequestType).HasConversion<string>();
                 entity.Property(p => p.Status).HasConversion<string>();
+            });
+            modelBuilder.Entity<MaterialRequest>(entity =>
+            {
+                entity.Property(mr => mr.Status).HasConversion<string>();
+            });
+            modelBuilder.Entity<PaymentTransaction>(entity =>
+            {
+                entity.Property(mr => mr.Status).HasConversion<string>();
             });
             base.OnModelCreating(modelBuilder);
         }

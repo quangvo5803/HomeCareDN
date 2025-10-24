@@ -1,233 +1,298 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using Ultitity.Extensions;
 
 namespace BusinessLogic.Services
 {
     public class ContractorApplicationService : IContractorApplicationService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
-        public ContractorApplicationService(IUnitOfWork unitOfWork, IMapper mapper)
+        private const string CONTRACTOR_APPLY = "ContractorApply";
+        private const string CONTRACTOR = "Contractor";
+        private const string APPLICATION = "Application";
+
+        private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
+        private const string ERROR_CONTRACTOR_NOT_FOUND = "CONTRACTOR_NOT_FOUND";
+        private const string ERROR_APPLICATION_APPLIED = "APPLYCATION_APPLIED";
+        private const string ERROR_APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND";
+        private const string ERROR_NOT_OWNER = "NOT_OWNER";
+
+        public ContractorApplicationService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager
+        )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
-        public async Task<ContractorApplicationDto> GetContractorApplicationByIdAsync(
-            Guid contractorApplicationId
+        public async Task<PagedResultDto<ContractorApplicationFullDto>> GetAllContractorByServiceRequestIdAsync(
+            QueryParameters parameters
         )
         {
-            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(
-                ca => ca.ContractorApplicationID == contractorApplicationId,
-                includeProperties: "Images"
+            var query = _unitOfWork
+                .ContractorApplicationRepository.GetQueryable(includeProperties: "Images")
+                .Where(sr => sr.ServiceRequestID == parameters.FilterID);
+
+            var totalCount = await query.CountAsync();
+
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<ContractorApplicationFullDto>>(items);
+
+            foreach (var dto in dtos)
+            {
+                var contractor = items.First(x => x.ContractorApplicationID == dto.ContractorApplicationID);
+
+                if (contractor.ContractorID != Guid.Empty)
+                {
+                    var user = await _userManager.FindByIdAsync(contractor.ContractorID.ToString());
+                    if (user != null)
+                    {
+                        dto.ContractorName = user.FullName ?? user.UserName ?? "";
+                        dto.ContractorEmail = user.Email ?? "";
+                        dto.ContractorPhone = user.PhoneNumber ?? "";
+                    }
+                }
+            }
+
+            return new PagedResultDto<ContractorApplicationFullDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
+
+        public async Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
+            ContractorCreateApplicationDto createRequest
+        )
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
+                s.ServiceRequestID == createRequest.ServiceRequestID
             );
-            if (application == null)
+
+            if (serviceRequest == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    {
-                        "ContractorApplicationID",
-                        new[]
-                        {
-                            $"Contractor application with ID {contractorApplicationId} not found.",
-                        }
-                    },
+                    { CONTRACTOR_APPLY, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<ContractorApplicationDto>(application);
-        }
-
-        public async Task<
-            List<ContractorApplicationDto>
-        > GetContractorApplicationByServiceRequestIDAsync(
-            ContractorApplicationGetByServiceRequestDto requestDto
-        )
-        {
-            var applications = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                ca => ca.ServiceRequestID == requestDto.ServiceRequestID,
-                includeProperties: "Images"
+            var contractor = await _userManager.FindByIdAsync(
+                createRequest.ContractorID.ToString()
             );
-            if (applications == null)
+
+            if (contractor == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    {
-                        "ServiceRequestID",
-                        new[]
-                        {
-                            $"No contractor applications found for service request ID {requestDto.ServiceRequestID}.",
-                        }
-                    },
+                    { CONTRACTOR, new[] { ERROR_CONTRACTOR_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
-            return _mapper.Map<List<ContractorApplicationDto>>(applications);
-        }
 
-        public async Task<ContractorApplicationDto> CreateContractorApplicationAsync(
-            ContractorApplicationCreateRequestDto createRequestDto
-        )
-        {
-            var errors = new Dictionary<string, string[]>();
-
-            if (createRequestDto.Images != null)
+            var existingApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                existingApplication =>
+                    existingApplication.ServiceRequestID == createRequest.ServiceRequestID
+                    && existingApplication.ContractorID == createRequest.ContractorID
+            );
+            if (existingApplication != null)
             {
-                if (createRequestDto.Images.Count > 5)
+                var errors = new Dictionary<string, string[]>
                 {
-                    errors.Add(
-                        nameof(createRequestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
-                    );
-                }
-
-                if (createRequestDto.Images.Any(image => image.Length > 5 * 1024 * 1024)) // 5 MB
-                {
-                    errors.Add(
-                        nameof(createRequestDto.Images),
-                        new[] { "Each image must be less than 5 MB." }
-                    );
-                }
-            }
-            if (errors.Any())
-            {
+                    { APPLICATION, new[] { ERROR_APPLICATION_APPLIED } },
+                };
                 throw new CustomValidationException(errors);
             }
-            var contractorApplication = _mapper.Map<ContractorApplication>(createRequestDto);
+
+            var contractorApplication = _mapper.Map<ContractorApplication>(createRequest);
+            contractorApplication.ContractorApplicationID = Guid.NewGuid();
+
+            if (createRequest.ImageUrls != null)
+            {
+                var ids = createRequest.ImagePublicIds?.ToList() ?? new List<string>();
+                var images = createRequest
+                    .ImageUrls.Select(
+                        (url, i) =>
+                            new Image
+                            {
+                                ImageID = Guid.NewGuid(),
+                                ImageUrl = url,
+                                PublicId = i < ids.Count ? ids[i] : string.Empty,
+                                ContractorApplicationID =
+                                    contractorApplication.ContractorApplicationID,
+                            }
+                    )
+                    .ToList();
+
+                await _unitOfWork.ImageRepository.AddRangeAsync(images);
+            }
             await _unitOfWork.ContractorApplicationRepository.AddAsync(contractorApplication);
             await _unitOfWork.SaveAsync();
-            if (createRequestDto.Images != null)
-            {
-                foreach (var image in createRequestDto.Images)
-                {
-                    Image imageUpload = new Image
-                    {
-                        ImageID = Guid.NewGuid(),
-                        ContractorApplicationID = contractorApplication.ContractorApplicationID,
-                        ImageUrl = "",
-                    };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/ContractorApplication",
-                        imageUpload
-                    );
-                }
-            }
-            return _mapper.Map<ContractorApplicationDto>(contractorApplication);
+            var dto = _mapper.Map<ContractorApplicationFullDto>(contractorApplication);
+            dto.ContractorEmail = contractor.Email ?? string.Empty;
+            dto.ContractorName = contractor.FullName ?? string.Empty;
+            dto.ContractorPhone = contractor.PhoneNumber ?? string.Empty;
+            return dto;
         }
 
-        public async Task<ContractorApplicationDto> UpdateContractorApplicationAsync(
-            ContractorApplicationUpdateRequestDto updateRequestDto
+        public async Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
+            ContractorGetApplicationDto getRequest
         )
         {
-            var errors = new Dictionary<string, string[]>();
-
-            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(
-                ca => ca.ContractorApplicationID == updateRequestDto.ContractorApplicationID,
+            var result = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                filter: app =>
+                    app.ServiceRequestID == getRequest.ServiceRequestID
+                    && app.ContractorID == getRequest.ContractorID,
                 includeProperties: "Images"
             );
-            if (application == null)
-            {
-                errors.Add(
-                    "ContractorApplication",
-                    new[] { "Contractor application update request cannot be null." }
-                );
-                throw new CustomValidationException(errors);
-            }
-            if (updateRequestDto.Images != null)
-            {
-                if (updateRequestDto.Images.Count > 5)
-                {
-                    errors.Add(
-                        nameof(updateRequestDto.Images),
-                        new[] { "You can only upload a maximum of 5 images." }
-                    );
-                }
 
-                if (updateRequestDto.Images.Any(image => image.Length > 5 * 1024 * 1024)) // 5 MB
-                {
-                    errors.Add(
-                        nameof(updateRequestDto.Images),
-                        new[] { "Each image must be less than 5 MB." }
-                    );
-                }
-            }
-            if (errors.Any())
+            if (result == null)
             {
-                throw new CustomValidationException(errors);
+                return null;
             }
+            var dto = _mapper.Map<ContractorApplicationFullDto>(result);
 
-            _mapper.Map(updateRequestDto, application);
-            await _unitOfWork.SaveAsync();
-            // Delete existing images
-            var existingImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.ContractorApplicationID == updateRequestDto.ContractorApplicationID
-            );
+            var contractor = await _userManager.FindByIdAsync(getRequest.ContractorID.ToString());
+            dto.ContractorEmail = contractor?.Email ?? string.Empty;
+            dto.ContractorName = contractor?.FullName ?? string.Empty;
+            dto.ContractorPhone = contractor?.PhoneNumber ?? string.Empty;
 
-            if (existingImages != null && existingImages.Any())
-            {
-                foreach (var image in existingImages)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-                }
-            }
-            if (updateRequestDto.Images != null)
-            {
-                foreach (var image in updateRequestDto.Images)
-                {
-                    Image imageUpload = new Image
-                    {
-                        ImageID = Guid.NewGuid(),
-                        ContractorApplicationID = updateRequestDto.ContractorApplicationID,
-                        ImageUrl = "",
-                    };
-                    await _unitOfWork.ImageRepository.UploadImageAsync(
-                        image,
-                        "HomeCareDN/ContractorApplication",
-                        imageUpload
-                    );
-                }
-            }
-            return _mapper.Map<ContractorApplicationDto>(application);
+            return dto;
         }
 
-        public async Task DeleteContractorApplicationAsync(Guid contractorApplicationId)
+        public async Task<ContractorApplicationPendingDto> AcceptContractorApplicationAsync(
+            Guid contractorApplicationID
+        )
+        {
+            var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == contractorApplicationID,
+                includeProperties: "Images"
+            );
+            if (contractorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == contractorApplication.ServiceRequestID,
+                includeProperties: "ContractorApplications"
+            );
+
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            contractorApplication.Status = ApplicationStatus.PendingCommission;
+            serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
+
+            if (serviceRequest.ContractorApplications != null)
+            {
+                foreach (var app in serviceRequest.ContractorApplications)
+                {
+                    if (app.ContractorApplicationID != contractorApplicationID)
+                    {
+                        app.Status = ApplicationStatus.Rejected;
+                    }
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<ContractorApplicationPendingDto>(contractorApplication);
+
+            return dto;
+        }
+
+        public async Task<ContractorApplicationPendingDto> RejectContractorApplicationAsync(
+            Guid contractorApplicationID
+        )
+        {
+            var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == contractorApplicationID
+            );
+
+            if (contractorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            if (contractorApplication.Status != ApplicationStatus.Pending)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { APPLICATION, new[] { "APPLICATION_NOT_PENDING" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            contractorApplication.Status = ApplicationStatus.Rejected;
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<ContractorApplicationPendingDto>(contractorApplication);
+            return dto;
+        }
+
+        public async Task DeleteContractorApplicationAsync(Guid id)
         {
             var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
-                ca.ContractorApplicationID == contractorApplicationId
+                ca.ContractorApplicationID == id
             );
+
             if (application == null)
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    {
-                        "ContractorApplicationID",
-                        new[]
-                        {
-                            $"Contractor application with ID {contractorApplicationId} not found.",
-                        }
-                    },
+                    { APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.ContractorApplicationID == contractorApplicationId
+
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(img =>
+                img.ContractorApplicationID == id
             );
             if (images != null && images.Any())
             {
                 foreach (var image in images)
                 {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                    if (!string.IsNullOrEmpty(image.PublicId))
+                    {
+                        await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                    }
                 }
             }
+
             _unitOfWork.ContractorApplicationRepository.Remove(application);
+
             await _unitOfWork.SaveAsync();
         }
     }

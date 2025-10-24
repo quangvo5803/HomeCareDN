@@ -12,22 +12,10 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to={getRedirectPath(user)} replace />;
+    return <Navigate to="/Unauthorized" replace />;
   }
 
   return children;
-}
-function getRedirectPath(user) {
-  switch (user?.role) {
-    case 'Admin':
-      return '/Admin';
-    case 'Contractor':
-      return '/ContractorDashboard';
-    case 'Distributor':
-      return '/Distributor';
-    default:
-      return '/Home';
-  }
 }
 
 ProtectedRoute.propTypes = {
