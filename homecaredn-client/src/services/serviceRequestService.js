@@ -36,6 +36,13 @@ const buildServiceRequestFormData = (serviceRequest) => {
   (serviceRequest.ImagePublicIds || []).forEach((id) =>
     formData.append('ImagePublicIds', id)
   );
+  // 🔹 Documents từ cloud (string list)
+  (serviceRequest.DocumentUrls || []).forEach((url) =>
+    formData.append('DocumentUrls', url)
+  );
+  (serviceRequest.DocumentPublicIds || []).forEach((id) =>
+    formData.append('DocumentPublicIds', id)
+  );
 
   return formData;
 };
@@ -93,6 +100,14 @@ export const serviceRequestService = {
   deleteServiceRequestImage: async (imageUrl) => {
     const res = await api.delete(
       `/Images/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`
+    );
+    return res.data;
+  },
+  deleteServiceRequestDocument: async (documentUrl) => {
+    const res = await api.delete(
+      `/Documents/delete-document?documentUrl=${encodeURIComponent(
+        documentUrl
+      )}`
     );
     return res.data;
   },

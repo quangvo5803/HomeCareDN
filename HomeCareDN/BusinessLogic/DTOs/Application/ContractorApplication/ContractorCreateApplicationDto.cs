@@ -20,5 +20,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         public double EstimatePrice { get; set; }
         public required List<string> ImageUrls { get; set; }
         public required List<string> ImagePublicIds { get; set; }
+        public required List<string> DocumentUrls { get; set; }
+        public required List<string> DocumentPublicIds { get; set; }
     }
 }

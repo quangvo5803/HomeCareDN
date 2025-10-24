@@ -30,18 +30,20 @@ const buildContractorFormData = (contractor) => {
   for (const publicId of contractor.ImagePublicIds ?? []) {
     formData.append('ImagePublicIds', publicId);
   }
+
+  //Documents
+  for (const url of contractor.DocumentUrls ?? []) {
+    formData.append('DocumentUrls', url);
+  }
+
+  for (const publicId of contractor.DocumentPublicIds ?? []) {
+    formData.append('DocumentPublicIds', publicId);
+  }
+
   return formData;
 };
 
 export const contractorApplicationService = {
-
-  getAllContractorByServiceRequestId: async (params = {}) => {
-    const res = await api.get('/ContractorApplication/get-all-contractor-by-service-request-id', {
-      params,
-    });
-    return res.data;
-  },
-
   createContractorApplication: async (contractorData) => {
     const formData = buildContractorFormData(contractorData);
     const response = await api.post(

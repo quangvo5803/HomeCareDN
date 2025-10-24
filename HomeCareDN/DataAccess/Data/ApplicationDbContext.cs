@@ -24,7 +24,6 @@ namespace DataAccess.Data
         public DbSet<MaterialRequestItem> MaterialRequestItems { get; set; }
         public DbSet<DistributorApplication> DistributorApplications { get; set; }
         public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
-        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -69,10 +68,6 @@ namespace DataAccess.Data
                 entity.Property(p => p.Status).HasConversion<string>();
             });
             modelBuilder.Entity<MaterialRequest>(entity =>
-            {
-                entity.Property(mr => mr.Status).HasConversion<string>();
-            });
-            modelBuilder.Entity<PaymentTransaction>(entity =>
             {
                 entity.Property(mr => mr.Status).HasConversion<string>();
             });

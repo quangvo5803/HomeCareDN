@@ -5,6 +5,7 @@ namespace DataAccess.UnitOfWork
     public interface IUnitOfWork
     {
         IImageRepository ImageRepository { get; }
+        IDocumentRepository DocumentRepository { get; }
         IServiceRequestRepository ServiceRequestRepository { get; }
         IMaterialRepository MaterialRepository { get; }
         IServiceRepository ServiceRepository { get; }
@@ -19,7 +20,6 @@ namespace DataAccess.UnitOfWork
         IMaterialRequestItemRepository MaterialRequestItemRepository { get; }
         IDistributorApplicationRepository DistributorApplicationRepository { get; }
         IDistributorApplicationItemRepository DistributorApplicationItemRepository { get; }
-        IPaymentTransactionsRepository PaymentTransactionsRepository { get; }
         Task SaveAsync();
     }
 }

@@ -134,11 +134,11 @@ export default function ContractorServiceRequestManager() {
                     return (
                       <div
                         key={request.serviceRequestID}
-                        className={`group relative bg-white border-2 rounded-xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-gray-300`}
+                        className={`group relative bg-white border rounded-xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-gray-200`}
                       >
                         {/* Left accent bar */}
                         <div
-                          className={`absolute inset-y-0 left-0 w-1 rounded-l-xl bg-gray-300`}
+                          className={`absolute inset-y-0 left-0 w-1 rounded-l-xl bg-gray-200`}
                         />
 
                         {/* Header row */}
@@ -167,9 +167,8 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} type="Request" />
+                          <StatusBadge status={request.status} />
                         </div>
-
                         {/* Meta chips */}
                         <div className="pl-3 mb-4 flex flex-wrap gap-2">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
@@ -187,9 +186,6 @@ export default function ContractorServiceRequestManager() {
                               {t('contractorServiceRequestDetail.floorsUnit')}
                             </span>
                           )}
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
-                            <i className="fa-solid fa-ruler-combined" />
-                          </span>
                           <span
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs
                                                         bg-orange-50 text-orange-700 ring-1 ring-orange-200"
@@ -275,7 +271,7 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} type="Request" />
+                          <StatusBadge status={request.status} />
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3 text-xs">

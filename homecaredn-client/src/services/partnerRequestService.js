@@ -25,6 +25,14 @@ export const partnerRequestService = {
       formData.append('ImagePublicIds', publicId);
     }
 
+    for (const documentUrl of partnerRequestData.DocumentUrls || []) {
+      formData.append('DocumentUrls', documentUrl);
+    }
+
+    for (const publicId of partnerRequestData.DocumentPublicIds || []) {
+      formData.append('DocumentPublicIds', publicId);
+    }
+
     const res = await api.post(
       '/PartnerRequests/create-partner-request',
       formData,

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.Services.Interfaces;
@@ -26,7 +25,7 @@ namespace BusinessLogic.Services
         private const string ERROR_PARTNER_REQUEST_NOT_FOUND = "PARTNER_REQUEST_NOT_FOUND";
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
         private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
-        private const string PARTNER_REQUEST_INCLUDES = "Images";
+        private const string PARTNER_REQUEST_INCLUDES = "Images,Documents";
 
         public PartnerRequestService(
             IUnitOfWork unitOfWork,
@@ -178,6 +177,25 @@ namespace BusinessLogic.Services
                     await _unitOfWork.ImageRepository.AddRangeAsync(images);
                 }
 
+                if (request.DocumentUrls != null)
+                {
+                    var ids = request.DocumentPublicIds?.ToList() ?? new List<string>();
+                    var documents = request
+                        .DocumentUrls.Select(
+                            (url, i) =>
+                                new Document
+                                {
+                                    DocumentID = Guid.NewGuid(),
+                                    PartnerRequestID = partnerRequest.PartnerRequestID,
+                                    DocumentUrl = url,
+                                    PublicId = i < ids.Count ? ids[i] : string.Empty,
+                                }
+                        )
+                        .ToList();
+
+                    await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+                }
+
                 await _unitOfWork.SaveAsync();
                 QueueEmailReceived(partnerRequest);
 
@@ -275,12 +293,24 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.PartnerRequestID == partnerRequestId);
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.PartnerRequestID == partnerRequestId
+            );
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(i =>
+                i.PartnerRequestID == partnerRequestId
+            );
             if (images != null && images.Any())
             {
                 foreach (var image in images)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+            if (documents != null && documents.Any())
+            {
+                foreach (var document in documents)
+                {
+                    await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
                 }
             }
 

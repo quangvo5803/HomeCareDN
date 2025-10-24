@@ -1,4 +1,6 @@
-﻿using BusinessLogic.Services;
+﻿using System.Security.Claims;
+using System.Text;
+using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
@@ -12,9 +14,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Net.payOS;
-using System.Security.Claims;
-using System.Text;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -82,13 +81,11 @@ namespace HomeCareDNAPI
             builder.Services.AddHttpContextAccessor();
 
             /// Register Options
-            /// 
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<CloudinaryOptions>(
                 builder.Configuration.GetSection("Cloudinary")
             );
             builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
-            builder.Services.Configure<PayOsOptions>(builder.Configuration.GetSection("PayOS"));
 
             /// Register services for Application
 
@@ -110,15 +107,6 @@ namespace HomeCareDNAPI
                 client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             });
-            //PayOS
-            builder.Services.AddSingleton(sp =>
-            {
-                var clientId = builder.Configuration["PayOS:ClientId"];
-                var apiKey = builder.Configuration["PayOS:ApiKey"];
-                var checksumKey = builder.Configuration["PayOS:ChecksumKey"];
-
-                return new PayOS(clientId!, apiKey!, checksumKey!);
-            });
 
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
@@ -135,7 +123,6 @@ namespace HomeCareDNAPI
             /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -11,6 +11,8 @@ namespace DataAccess.Entities.Application
         public required string DocumentUrl { get; set; }
         public Guid? ServiceRequestID { get; set; }
         public Guid? ContractorApplicationID { get; set; }
+        public Guid? PartnerRequestID { get; set; }
+
         public string PublicId { get; set; } = string.Empty;
     }
 }

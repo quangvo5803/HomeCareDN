@@ -1,6 +1,5 @@
 ﻿using BusinessLogic.Services.Interfaces;
 using DataAccess.UnitOfWork;
-using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {

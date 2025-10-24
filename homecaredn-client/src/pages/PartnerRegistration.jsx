@@ -1,17 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { uploadImageToCloudinary } from '../utils/uploadImage';
+import { uploadToCloudinary } from '../utils/uploadToCloudinary';
 import { usePartnerRequest } from '../hook/usePartnerRequest';
 import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import Loading from '../components/Loading';
+import { handleApiError } from '../utils/handleApiError';
 
 const MAX_IMAGES = 5;
-
+const MAX_DOCUMENTS = 5;
+const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
 export default function PartnerRegistration() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const partnerTypeFromUrl = searchParams.get('partnerRequestType');
@@ -24,8 +26,14 @@ export default function PartnerRegistration() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [documents, setDocuments] = useState([]);
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imageProgress, setImageProgress] = useState({ loaded: 0, total: 0 });
+  const [documentProgress, setDocumentProgress] = useState({
+    loaded: 0,
+    total: 0,
+  });
   //Reset form
   useEffect(() => {
     setPartnerRequestType(partnerTypeFromUrl);
@@ -35,82 +43,200 @@ export default function PartnerRegistration() {
     setDescription('');
     setImages([]);
     setUploadProgress(0);
-  }, [partnerTypeFromUrl, setUploadProgress]);
+    setImageProgress({ loaded: 0, total: 0 });
+    setDocumentProgress({ loaded: 0, total: 0 });
+  }, [partnerTypeFromUrl]);
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-    const mapped = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
-    setImages((prev) => [...prev, ...mapped]);
-  };
-  const handleRemoveImage = (img) => {
-    setImages((prev) => prev.filter((i) => i.url !== img.url));
-  };
+  // Progress calculation
+  useEffect(() => {
+    const totalLoaded = imageProgress.loaded + documentProgress.loaded;
+    const totalSize = imageProgress.total + documentProgress.total;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!partnerRequestType) {
-      toast.error(t('ERROR.NULL_PARTNERTYPE'));
-      return;
-    }
-    if (!email) {
-      toast.error(t('ERROR.NULL_EMAIL'));
-      return;
-    }
-    if (!companyName) {
-      toast.error(t('ERROR.NULL_COMPANYNAME'));
-      return;
-    }
-    if (!phoneNumber) {
-      toast.error(t('ERROR.NULL_PHONE'));
-      return;
-    }
-    if (images.length === 0) {
-      toast.error(t('ERROR.NULL_IMAGES'));
-      return;
-    }
-    if (!isSafeEmail(email)) {
-      toast.error(t('ERROR.INVALID_EMAIL'));
-      return;
-    }
-    if (!isSafePhone(phoneNumber)) {
-      toast.error(t('ERROR.INVALID_PHONE'));
-      return;
-    }
-    const payload = {
-      PartnerRequestType: partnerRequestType,
-      CompanyName: companyName,
-      Email: email,
-      PhoneNumber: phoneNumber,
-      Description: description,
-    };
-    if (images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+    if (totalSize === 0) {
+      if (uploadProgress !== 1) setUploadProgress(0);
       return;
     }
 
-    if (images.length > 0) {
-      const uploaded = await uploadImageToCloudinary(
-        images.map((i) => i.file),
-        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-        (percent) => setUploadProgress(percent),
-        'HomeCareDN/PartnerRequest'
+    const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
+    setUploadProgress(percent);
+  }, [imageProgress, documentProgress, uploadProgress]);
+
+  useEffect(() => {
+    return () => {
+      images.forEach(
+        (i) => i.url?.startsWith('blob:') && URL.revokeObjectURL(i.url)
       );
-      const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-      payload.ImageUrls = uploadedArray.map((u) => u.url);
-      payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-      setUploadProgress(0);
-    }
-    await createPartnerRequest(payload);
-    toast.success(t('SUCCESS.PARTNER_REQUEST_ADD'));
-    navigate('/Login');
-  };
+      documents.forEach(
+        (d) => d.url?.startsWith('blob:') && URL.revokeObjectURL(d.url)
+      );
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const handleImageChange = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length + images.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      const mapped = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+      }));
+      setImages((prev) => [...prev, ...mapped]);
+    },
+    [images.length, t]
+  );
+  const handleRemoveImage = useCallback((img) => {
+    URL.revokeObjectURL(img.url);
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
+  }, []);
+  const handleDocumentChange = useCallback(
+    (e) => {
+      const files = Array.from(e.target.files || []);
+      if (files.length + documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        return;
+      }
+      const mapped = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+      }));
+      setDocuments((prev) => [...prev, ...mapped]);
+    },
+    [documents.length, t]
+  );
+
+  const handleRemoveDocument = useCallback((doc) => {
+    URL.revokeObjectURL(doc.url);
+    setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+
+      if (!partnerRequestType) {
+        toast.error(t('ERROR.NULL_PARTNERTYPE'));
+        return;
+      }
+      if (!email || !isSafeEmail(email)) {
+        toast.error(!email ? t('ERROR.NULL_EMAIL') : t('ERROR.INVALID_EMAIL'));
+        return;
+      }
+      if (!companyName) {
+        toast.error(t('ERROR.NULL_COMPANYNAME'));
+        return;
+      }
+      if (!phoneNumber || !isSafePhone(phoneNumber)) {
+        toast.error(
+          !phoneNumber ? t('ERROR.NULL_PHONE') : t('ERROR.INVALID_PHONE')
+        );
+        return;
+      }
+      if (images.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+      if (documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        return;
+      }
+
+      // File filtering
+      const newImageFiles = images.filter((i) => i.file).map((i) => i.file); // Kiểm tra i.file tồn tại
+      const newDocumentFiles = documents
+        .filter((d) => d.file)
+        .map((d) => d.file);
+
+      const payload = {
+        PartnerRequestType: partnerRequestType,
+        CompanyName: companyName,
+        Email: email,
+        PhoneNumber: phoneNumber,
+        Description: description,
+      };
+
+      try {
+        setImageProgress({
+          loaded: 0,
+          total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
+        });
+        setDocumentProgress({
+          loaded: 0,
+          total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
+        });
+        if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
+          setUploadProgress(1);
+        }
+
+        // Tạo promises
+        const imageUploadPromise =
+          newImageFiles.length > 0
+            ? uploadToCloudinary(
+                newImageFiles,
+                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+                (progress) => setImageProgress(progress),
+                'HomeCareDN/PartnerRequest'
+              )
+            : Promise.resolve(null);
+
+        const documentUploadPromise =
+          newDocumentFiles.length > 0
+            ? uploadToCloudinary(
+                newDocumentFiles,
+                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+                (progress) => setDocumentProgress(progress),
+                'HomeCareDN/PartnerRequest/Documents',
+                'raw'
+              )
+            : Promise.resolve(null);
+
+        const [imageResults, documentResults] = await Promise.all([
+          imageUploadPromise,
+          documentUploadPromise,
+        ]);
+
+        // Gắn kết quả vào payload
+        if (imageResults) {
+          const arr = Array.isArray(imageResults)
+            ? imageResults
+            : [imageResults];
+          payload.ImageUrls = arr.map((u) => u.url);
+          payload.ImagePublicIds = arr.map((u) => u.publicId);
+        }
+        if (documentResults) {
+          const arr = Array.isArray(documentResults)
+            ? documentResults
+            : [documentResults];
+          payload.DocumentUrls = arr.map((u) => u.url);
+          payload.DocumentPublicIds = arr.map((u) => u.publicId);
+        }
+
+        await createPartnerRequest(payload);
+        toast.success(t('SUCCESS.PARTNER_REQUEST_ADD'));
+        navigate('/Login');
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setUploadProgress(0);
+        setImageProgress({ loaded: 0, total: 0 });
+        setDocumentProgress({ loaded: 0, total: 0 });
+      }
+    },
+    [
+      partnerRequestType,
+      email,
+      companyName,
+      phoneNumber,
+      description,
+      images,
+      documents,
+      t,
+      createPartnerRequest,
+      navigate,
+    ]
+  );
   if (loading) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
   return (
@@ -245,15 +371,19 @@ export default function PartnerRegistration() {
               </label>
             </div>
 
-            {/* Upload ảnh */}
             {/* Images Upload Section */}
-            <div className="space-y-4 lg:col-span-2">
-              <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                <i className="fas fa-images text-orange-500 mr-2"></i>
-                {t('partnerRequest.partnerRegistration.form_images')}
-                <span className="text-red-500">*</span>
-              </label>
-
+            <div className="space-y-3">
+              {' '}
+              <div className="flex items-center justify-between">
+                <label className="flex items-center text-sm font-medium text-gray-700">
+                  <i className="fas fa-images text-orange-500 mr-2"></i>
+                  {t('partnerRequest.partnerRegistration.form_images')}
+                </label>
+                {/* Display Image Count */}
+                <span className="text-xs text-gray-500">
+                  {images.length}/{MAX_IMAGES}
+                </span>
+              </div>
               {/* Upload Button */}
               <div className="relative">
                 <input
@@ -262,29 +392,21 @@ export default function PartnerRegistration() {
                   multiple
                   onChange={handleImageChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  aria-label={t('upload.uploadImages')}
                 />
                 <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
                   <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
                     <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
                   </div>
                   <p className="text-gray-600 text-center mb-2">
+                    {/* Use t function for upload text */}
                     <span className="font-semibold text-orange-600">
-                      {i18n.language === 'vi'
-                        ? 'Bấm để tải lên'
-                        : 'Click to upload'}
+                      {t('upload.clickToUpload')}
                     </span>{' '}
-                    {i18n.language === 'vi'
-                      ? 'hoặc kéo và thả'
-                      : 'or drag and drop'}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {i18n.language === 'vi'
-                      ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
-                      : 'PNG, JPG, GIF up to 5MB each'}
+                    {t('upload.orDragAndDrop')}
                   </p>
                 </div>
               </div>
-
               {/* Image Preview Grid */}
               {images.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -295,7 +417,7 @@ export default function PartnerRegistration() {
                     >
                       <img
                         src={img.url}
-                        alt={`Preview ${idx + 1}`}
+                        alt={img.name || `Preview ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -303,6 +425,7 @@ export default function PartnerRegistration() {
                           type="button"
                           onClick={() => handleRemoveImage(img)}
                           className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                          aria-label={t('upload.removeImage')}
                         >
                           <i className="fas fa-trash-alt text-sm"></i>
                         </button>
@@ -312,7 +435,65 @@ export default function PartnerRegistration() {
                 </div>
               )}
             </div>
-
+            {/* Upload Documents */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="flex items-center text-sm font-medium text-gray-700">
+                  <i className="fas fa-file-alt text-blue-500 mr-2"></i>
+                  {t('partnerRequest.partnerRegistration.form_documents')}
+                </label>
+                <span className="text-xs text-gray-500">
+                  {documents.length}/{MAX_DOCUMENTS}
+                </span>
+              </div>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept={ACCEPTED_DOC_TYPES}
+                  multiple
+                  onChange={handleDocumentChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  aria-label="Upload documents"
+                />
+                <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+                  <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+                    <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                  </div>
+                  <p className="text-gray-600 text-center mb-2">
+                    <span className="font-semibold text-blue-600">
+                      {t('upload.clickToUpload')}
+                    </span>{' '}
+                    {t('upload.orDragAndDrop')}
+                  </p>
+                </div>
+              </div>
+              {documents.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                  {documents.map((doc) => (
+                    <div
+                      key={doc.url}
+                      className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition-colors bg-gray-50 flex flex-col items-center justify-center p-2 text-center"
+                    >
+                      {/* Đổi màu hover */}
+                      <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
+                      <p className="text-xs text-gray-600 break-all truncate">
+                        {doc.name || ''}
+                      </p>
+                      <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument(doc)}
+                          className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                          aria-label="Remove document"
+                        >
+                          <i className="fas fa-trash-alt text-sm"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* Actions */}
             <div className="flex gap-4 pt-2">
               <button

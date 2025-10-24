@@ -31,9 +31,9 @@ export default function Sidebar() {
       link: '/Admin/ServiceManager',
     },
     {
-      icon: 'text-amber-600 fa-solid fa-clipboard-list',
+      icon: 'text-amber-600 fa-solid fa-truck',
       title: 'serviceRequest',
-      link: '/Admin/ServiceRequestManager',
+      link: '/Admin/ServiceRequest',
     },
     {
       icon: 'text-orange-600 fa-solid fa-suitcase',
@@ -78,9 +78,10 @@ export default function Sidebar() {
                   to={menuItem.link}
                   end={menuItem.link === '/Admin'} // chỉ active root dashboard
                   className={({ isActive }) =>
-                    `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${isActive
-                      ? 'bg-blue-500 text-white'
-                      : 'text-slate-700 hover:bg-blue-100'
+                    `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${
+                      isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'text-slate-700 hover:bg-blue-100'
                     }`
                   }
                 >
@@ -88,8 +89,9 @@ export default function Sidebar() {
                     <>
                       <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i
-                          className={`${menuItem.icon} ${isActive ? 'text-white' : ''
-                            } relative top-0 leading-normal`}
+                          className={`${menuItem.icon} ${
+                            isActive ? 'text-white' : ''
+                          } relative top-0 leading-normal`}
                         ></i>
                       </div>
                       <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">
