@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { addressService } from '../services/addressService';
+import { customerService } from '../services/customerService';
 import { useAuth } from '../hook/useAuth';
 import AddressContext from './AddressContext';
 import { toast } from 'react-toastify';
@@ -14,10 +14,9 @@ export const AddressProvider = ({ children }) => {
 
   // 📌 Public: fetch all address
   const fetchAddresses = useCallback(async () => {
-    if (!user) throw new Error('Unauthorized');
     try {
       setLoading(true);
-      const data = await addressService.getUserAddress(user.id);
+      const data = await customerService.address.getUserAddress(user.id);
       setAddresses(data || []);
       setTotalAddresses(data.length || 0);
       return data;
@@ -31,29 +30,25 @@ export const AddressProvider = ({ children }) => {
     }
   }, [user]);
 
-  const createAddress = useCallback(
-    async (dto) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        const newAddres = await addressService.createAddress(dto);
-        setAddresses((prev) => [...prev, newAddres]);
-        // Tăng tổng số address
-        setTotalAddresses((prev) => prev + 1);
-        return newAddres;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user]
-  );
+  const createAddress = useCallback(async (dto) => {
+    try {
+      const newAddres = await customerService.address.createAddress(dto);
+      setAddresses((prev) => [...prev, newAddres]);
+      // Tăng tổng số address
+      setTotalAddresses((prev) => prev + 1);
+      return newAddres;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
   const updateAddress = useCallback(
     async (dto) => {
       if (!user) throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await addressService.updateAddress(dto);
+        const updated = await customerService.address.updateAddress(dto);
         // Optimistic update
         setAddresses((prev) =>
           prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
@@ -68,21 +63,17 @@ export const AddressProvider = ({ children }) => {
     [user]
   );
 
-  const deleteAddress = useCallback(
-    async (id) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        await addressService.deleteAddress(id);
-        // Xoá khỏi local
-        setAddresses((prev) => prev.filter((a) => a.addressID !== id));
-        setTotalAddresses((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user]
-  );
+  const deleteAddress = useCallback(async (id) => {
+    try {
+      await customerService.address.deleteAddress(id);
+      // Xoá khỏi local
+      setAddresses((prev) => prev.filter((a) => a.addressID !== id));
+      setTotalAddresses((prev) => prev - 1);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
   useEffect(() => {
     if (!user) {
       setAddresses([]);

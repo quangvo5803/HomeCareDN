@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import SupportModal from '../../components/modal/SupportModal';
 import Loading from '../../components/Loading';
-import { contactService } from '../../services/contactService';
+import { adminService } from '../../services/adminService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import StatusBadge from '../../components/StatusBadge';
@@ -30,7 +30,7 @@ export default function AdminSupportManager() {
       setLoading(true);
       const isProcessedParam =
         filter === 'all' ? undefined : filter === 'processed';
-      const result = await contactService.listAll({
+      const result = await adminService.support.listAllSupport({
         PageNumber: currentPage,
         PageSize: pageSize,
         Search: debouncedSearch,
@@ -62,7 +62,7 @@ export default function AdminSupportManager() {
       titleKey: 'ModalPopup.DeleteSupportModal.title',
       textKey: 'ModalPopup.DeleteSupportModal.text',
       onConfirm: async () => {
-        await contactService.delete(id);
+        await adminService.support.deleteSupport(id);
         toast.success(t('SUCCESS.DELETE'));
 
         fetchSupports();
@@ -115,10 +115,11 @@ export default function AdminSupportManager() {
                 <button
                   key={key}
                   onClick={() => setFilter(key)}
-                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${filter === key
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
+                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${
+                    filter === key
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                  }`}
                 >
                   {t(`adminSupportManager.${key}`)}
                 </button>
@@ -167,15 +168,17 @@ export default function AdminSupportManager() {
                       <td className="py-3">{s.subject}</td>
                       <td className="text-center">
                         <StatusBadge
-                          status={s.isProcessed ? 'Processed' : 'Pending'} type="Request"
+                          status={s.isProcessed ? 'Processed' : 'Pending'}
+                          type="Request"
                         />
                       </td>
                       <td className="text-center space-x-2">
                         <button
-                          className={`px-3 py-1 text-sm rounded font-medium transition-colors duration-150 ${s.isProcessed
-                            ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                            : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                            }`}
+                          className={`px-3 py-1 text-sm rounded font-medium transition-colors duration-150 ${
+                            s.isProcessed
+                              ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                              : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                          }`}
                           onClick={() => {
                             setIsModalOpen(true);
                             setSupportID(s.id);

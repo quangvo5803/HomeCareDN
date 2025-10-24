@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAddress } from '../../hook/useAddress';
-import { profileService } from '../../services/profileService';
-import { geoService } from '../../services/geoService';
+import { customerService } from '../../services/customerService';
+import { publicService } from '../../services/publicService';
 import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
@@ -52,7 +52,7 @@ export default function Profile({ user }) {
 
     (async () => {
       try {
-        const { data } = await profileService.getProfile(user.id);
+        const { data } = await customerService.profile.getProfile(user.id);
         if (data) {
           setForm({
             fullName: data.fullName || '',
@@ -62,7 +62,7 @@ export default function Profile({ user }) {
           });
         }
         try {
-          const { data: provs } = await geoService.getProvinces(1);
+          const { data: provs } = await publicService.geo.getProvinces(1);
           setProvinces(Array.isArray(provs) ? provs : []);
         } catch {
           setProvinces([]);
@@ -97,7 +97,7 @@ export default function Profile({ user }) {
 
     setSaving(true);
     try {
-      await profileService.updateProfile({
+      await customerService.profile.updateProfile({
         UserId: user.id,
         FullName: form.fullName,
         PhoneNumber: form.phoneNumber || null,
@@ -165,7 +165,7 @@ export default function Profile({ user }) {
     try {
       let provs = provinces;
       if (!provs?.length) {
-        const { data: provData } = await geoService.getProvinces(1);
+        const { data: provData } = await publicService.geo.getProvinces(1);
         provs = Array.isArray(provData) ? provData : [];
         setProvinces(provs);
       }
@@ -177,9 +177,8 @@ export default function Profile({ user }) {
         const provCode = String(provinceMatch.code);
         setSelectedProvinceCode(provCode);
 
-        const { data: provObj } = await geoService.getDistrictsByProvince(
-          provinceMatch.code
-        );
+        const { data: provObj } =
+          await publicService.geo.getDistrictsByProvince(provinceMatch.code);
         const ds = provObj?.districts || [];
         setDistricts(ds);
 
@@ -190,7 +189,7 @@ export default function Profile({ user }) {
           const distCode = String(districtMatch.code);
           setSelectedDistrictCode(distCode);
 
-          const { data: distObj } = await geoService.getWardsByDistrict(
+          const { data: distObj } = await publicService.geo.getWardsByDistrict(
             districtMatch.code
           );
           const ws = distObj?.wards || [];
@@ -238,9 +237,8 @@ export default function Profile({ user }) {
 
       if (!code) return;
       try {
-        const { data: province } = await geoService.getDistrictsByProvince(
-          Number(code)
-        );
+        const { data: province } =
+          await publicService.geo.getDistrictsByProvince(Number(code));
         const ds = province?.districts || [];
         setDistricts(ds);
         setAddrForm((s) => ({ ...s, city: province?.name || '' }));
@@ -257,7 +255,7 @@ export default function Profile({ user }) {
 
       if (!code) return;
       try {
-        const { data: district } = await geoService.getWardsByDistrict(
+        const { data: district } = await publicService.geo.getWardsByDistrict(
           Number(code)
         );
         const ws = district?.wards || [];

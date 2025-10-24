@@ -972,6 +972,14 @@
     "DeleteApplicationModal": {
       "title": "Are you sure?",
       "text": "This application will be gone forever"
+    },
+    "PaymentSuccessModal": {
+      "title": "Payment Successful!",
+      "text": "Thank you for completing your commission payment."
+    },
+    "PaymentCancelModal": {
+      "title": "Payment Failed!",
+      "text": "An error occurred during payment. Please try again."
     }
   },
   "ERROR": {
@@ -1070,7 +1078,7 @@
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",
-    "APPICATION_CREATE": "Create Application Successful"
+    "APPLICATION_CREATE": "Create Application Successful"
   },
   "roles": {
     "Distributor": "Distributor",

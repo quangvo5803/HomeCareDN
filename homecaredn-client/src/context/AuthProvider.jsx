@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import AuthContext from './AuthContext';
-import { authService } from '../services/authService';
+import { authService } from '../services/auth/authService';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -72,7 +72,7 @@ export default function AuthProvider({ children }) {
               navigate('/AdminDashboard');
               break;
             case 'Contractor':
-              navigate('/ContractorDashboard');
+              navigate('/Contractor');
               break;
             case 'Distributor':
               navigate('/DistributorDashboard');

@@ -24,7 +24,7 @@ function getRedirectPath(user) {
     case 'Admin':
       return '/Admin';
     case 'Contractor':
-      return '/ContractorDashboard';
+      return '/Contractor';
     case 'Distributor':
       return '/Distributor';
     default:

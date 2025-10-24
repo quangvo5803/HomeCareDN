@@ -26,6 +26,13 @@ namespace HomeCareDNAPI.Controllers.Admin
             return Ok(list);
         }
 
+        [HttpGet("get-support/{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var item = await _facadeService.ContactSupportService.GetByIdAsync(id);
+            return Ok(item);
+        }
+
         [HttpPost("reply-support")]
         public async Task<IActionResult> ReplyContactSupport(
             [FromBody] ContactSupportReplyRequestDto dto

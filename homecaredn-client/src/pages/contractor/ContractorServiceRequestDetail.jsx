@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
-import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { contractorService } from '../../services/contractorService';
 import { formatVND } from '../../utils/formatters';
 import { useAuth } from '../../hook/useAuth';
 import { numberToWordsByLang } from '../../utils/numberToWords';
@@ -49,22 +49,18 @@ export default function ContractorServiceRequestDetail() {
         setServiceRequest(data);
 
         let appData = null;
-        const isPending =
-          data.status === 'Pending' || !data.selectedContractorApplication;
         const selectedApp = data.selectedContractorApplication;
 
-        if (isPending) {
-          appData = await contractorApplicationService.getApplication({
-            ServiceRequestID: serviceRequestId,
-            ContractorID: user.id,
-          });
-        } else if (selectedApp.contractorID === user.id) {
+        if (selectedApp != null && selectedApp.contractorID === user.id) {
           appData = selectedApp;
         } else {
-          appData = await contractorApplicationService.getApplication({
-            ServiceRequestID: serviceRequestId,
-            ContractorID: user.id,
-          });
+          appData =
+            await contractorService.contractorApplication.getContractorApplicationByServiceRequestIDAndContractorID(
+              {
+                ServiceRequestID: serviceRequestId,
+                ContractorID: user.id,
+              }
+            );
         }
 
         setExistingApplication(appData || null);
@@ -137,13 +133,12 @@ export default function ContractorServiceRequestDetail() {
         setUploadProgress(0);
       }
 
-      await contractorApplicationService.createContractorApplication(payload);
-      toast.success(t('SUCCESS.APPICATION_CREATE'));
+      const appData =
+        await contractorService.contractorApplication.createContractorApplication(
+          payload
+        );
+      toast.success(t('SUCCESS.APPLICATION_CREATE'));
 
-      const appData = await contractorApplicationService.getApplication({
-        serviceRequestId: serviceRequestId,
-        contractorId: user.id,
-      });
       setExistingApplication(appData);
     } catch (error) {
       setUploadProgress(0);
@@ -159,7 +154,7 @@ export default function ContractorServiceRequestDetail() {
       textKey: 'ModalPopup.DeleteApplicationModal.text',
       onConfirm: async () => {
         try {
-          await contractorApplicationService.deleteApplication(
+          await contractorService.contractorApplication.deleteApplication(
             existingApplication.contractorApplicationID
           );
           Swal.close();
@@ -833,7 +828,11 @@ export default function ContractorServiceRequestDetail() {
                   <button
                     type="submit"
                     className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    disabled={!estimatePrice.trim() || !description.trim()}
+                    disabled={
+                      !estimatePrice.trim() ||
+                      !description.trim() ||
+                      images.length == 0
+                    }
                   >
                     <i className="fas fa-paper-plane" />
                     {t('contractorServiceRequestDetail.applyForProject')}

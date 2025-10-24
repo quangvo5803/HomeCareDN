@@ -1072,7 +1072,7 @@
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
-    "APPICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
+    "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
   },
   "roles": {
     "Distributor": "Nhà phân phối",

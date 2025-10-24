@@ -1,4 +1,4 @@
-import api from '../api';
+import api from './api';
 
 // 🔹 Hàm dùng chung để build FormData cho Service
 const appendIf = (fd, key, value) => {
@@ -41,7 +41,7 @@ export const materialRequestService = {
   },
   getAllMaterialRequestByUserId: async (params = {}) => {
     const res = await api.get(
-      '/CustomerMaterialRequests/get-all-material-request-by-userid',
+      '/CustomerMaterialRequests/get-all-material-request-by-user-id',
       { params }
     );
     return res.data;

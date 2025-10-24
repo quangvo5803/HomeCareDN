@@ -42,7 +42,8 @@ namespace BusinessLogic.Services.Interfaces
         }
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            bool isContractor = false
         )
         {
             var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
@@ -76,7 +77,10 @@ namespace BusinessLogic.Services.Interfaces
             };
         }
 
-        public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id)
+        public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(
+            Guid id,
+            bool isContractor = false
+        )
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
@@ -127,8 +131,6 @@ namespace BusinessLogic.Services.Interfaces
                 PageSize = parameters.PageSize,
             };
         }
-
-        // Helper method để map Address + Contractor info
 
         private async Task MapServiceRequestListAllAsync(
             IEnumerable<ServiceRequest> items,

@@ -221,7 +221,6 @@ namespace BusinessLogic.Services
                 UserName = partnerRequest.Email,
                 FullName = partnerRequest.CompanyName,
                 PhoneNumber = partnerRequest.PhoneNumber,
-                EmailConfirmed = true,
             };
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(
