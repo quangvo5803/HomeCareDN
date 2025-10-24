@@ -22,12 +22,13 @@ const buildMaterialFormData = (material) => {
   appendIf(formData, 'DescriptionEN', material.DescriptionEN);
 
   // Mảng ảnh
-  (material.ImageUrls || []).forEach((url) =>
-    formData.append('ImageUrls', url)
-  );
-  (material.ImagePublicIds || []).forEach((id) =>
-    formData.append('ImagePublicIds', id)
-  );
+  for (const url of material.ImageUrls || []) {
+    formData.append('ImageUrls', url);
+  }
+
+  for (const id of material.ImagePublicIds || []) {
+    formData.append('ImagePublicIds', id);
+  }
 
   return formData;
 };

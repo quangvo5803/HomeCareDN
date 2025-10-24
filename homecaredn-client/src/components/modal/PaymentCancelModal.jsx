@@ -1,8 +1,11 @@
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
 export default function PaymentCancelModal({ open, onClose }) {
   const { t } = useTranslation();
+
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
@@ -23,3 +26,8 @@ export default function PaymentCancelModal({ open, onClose }) {
     </div>
   );
 }
+
+PaymentCancelModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};

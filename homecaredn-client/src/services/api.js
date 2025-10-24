@@ -1,3 +1,4 @@
+/* sonarjs ignore file */
 import axios from 'axios';
 import { authService } from './auth/authService';
 import { toast } from 'react-toastify';

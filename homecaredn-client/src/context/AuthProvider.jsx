@@ -105,7 +105,7 @@ export default function AuthProvider({ children }) {
       const parsed = parseToken(token);
 
       // Nếu token còn hạn → set user bình thường
-      if (parsed && parsed.exp && parsed.exp > Date.now()) {
+      if (parsed?.exp && parsed.exp > Date.now()) {
         setUser(parsed);
         setLoading(false);
         return;

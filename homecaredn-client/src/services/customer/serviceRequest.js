@@ -28,12 +28,13 @@ const buildServiceRequestFormData = (serviceRequest) => {
   appendIf(formData, 'Description', serviceRequest.Description);
 
   // 🔹 Images từ cloud (string list)
-  (serviceRequest.ImageUrls || []).forEach((url) =>
-    formData.append('ImageUrls', url)
-  );
-  (serviceRequest.ImagePublicIds || []).forEach((id) =>
-    formData.append('ImagePublicIds', id)
-  );
+  for (const url of serviceRequest.ImageUrls || []) {
+    formData.append('ImageUrls', url);
+  }
+
+  for (const id of serviceRequest.ImagePublicIds || []) {
+    formData.append('ImagePublicIds', id);
+  }
 
   return formData;
 };

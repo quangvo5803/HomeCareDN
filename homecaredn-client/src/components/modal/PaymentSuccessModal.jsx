@@ -1,5 +1,5 @@
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
-
 export default function PaymentSuccessModal({ open, onClose }) {
   const { t } = useTranslation();
   if (!open) return null;
@@ -23,3 +23,7 @@ export default function PaymentSuccessModal({ open, onClose }) {
     </div>
   );
 }
+PaymentSuccessModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};

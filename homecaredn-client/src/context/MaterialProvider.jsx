@@ -113,7 +113,7 @@ export const MaterialProvider = ({ children }) => {
     async (materialData) => {
       try {
         setLoading(true);
-        var service = getServiceByRole(user.role);
+        const service = getServiceByRole(user.role);
         const newMaterial = await service.material.createMaterial(materialData);
         // Tăng tổng số material
         setMaterials((prev) => [...prev, newMaterial]);
@@ -134,7 +134,7 @@ export const MaterialProvider = ({ children }) => {
     async (materialData) => {
       try {
         setLoading(true);
-        var service = getServiceByRole(user.role);
+        const service = getServiceByRole(user.role);
         const updated = await service.material.updateMaterial(materialData);
         setMaterials((prev) =>
           prev.map((m) =>
@@ -162,7 +162,7 @@ export const MaterialProvider = ({ children }) => {
   const deleteMaterial = useCallback(
     async (id) => {
       try {
-        var service = getServiceByRole(user.role);
+        const service = getServiceByRole(user.role);
         await service.material.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
         setTotalMaterials((prev) => prev - 1);
@@ -177,7 +177,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(async (materialId, imageUrl) => {
     try {
-      var service = getServiceByRole();
+      const service = getServiceByRole();
       await service.image.deleteMaterialImage(imageUrl);
 
       // update materials

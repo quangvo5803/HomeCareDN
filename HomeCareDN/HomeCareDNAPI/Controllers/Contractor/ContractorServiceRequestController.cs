@@ -12,7 +12,7 @@ namespace HomeCareDNAPI.Controllers.Contractor
         AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
         Roles = "Contractor"
     )]
-    public class ContractorServiceRequestController : Controller
+    public class ContractorServiceRequestController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
