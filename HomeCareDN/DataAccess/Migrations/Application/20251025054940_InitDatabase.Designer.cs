@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251021085305_UpdatePaymentTransaction")]
-    partial class UpdatePaymentTransaction
+    [Migration("20251025054940_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -543,6 +543,9 @@ namespace DataAccess.Migrations
                     b.Property<string>("PaymentLinkID")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ServiceRequestID")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Status")
                         .IsRequired()
