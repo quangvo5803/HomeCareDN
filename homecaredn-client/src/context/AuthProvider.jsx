@@ -1,9 +1,8 @@
-// AuthProvider.jsx
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import AuthContext from './AuthContext';
-import { authService } from '../services/authService';
+import { authService } from '../services/auth/authService';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -12,8 +11,7 @@ export default function AuthProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [pendingEmail, setPendingEmail] = useState(null);
-  const [loading, setLoading] = useState(true); // 👈 thêm loading
-  const refreshTimeoutRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   const parseToken = useCallback((token) => {
     try {
@@ -48,42 +46,15 @@ export default function AuthProvider({ children }) {
       setLoading(true);
       await authService.logout();
     } catch {
-      return;
+      // ignore
     } finally {
       localStorage.removeItem('accessToken');
       setUser(null);
       setPendingEmail(null);
       navigate('/Login');
       setLoading(false);
-      if (refreshTimeoutRef.current) clearTimeout(refreshTimeoutRef.current);
     }
   }, [navigate]);
-
-  const scheduleRefresh = useCallback(
-    (exp) => {
-      if (!exp) return;
-      const now = Date.now();
-      const timeout = exp - now - (30 + Math.floor(Math.random() * 10)) * 1000; // refresh trước 30-39s
-      if (timeout <= 0) return;
-
-      refreshTimeoutRef.current = setTimeout(async () => {
-        try {
-          const res = await authService.refreshToken();
-          if (res.data?.accessToken) {
-            localStorage.setItem('accessToken', res.data.accessToken);
-            const parsed = parseToken(res.data.accessToken);
-            if (parsed) {
-              setUser(parsed);
-              scheduleRefresh(parsed.exp);
-            }
-          }
-        } catch {
-          logout();
-        }
-      }, timeout);
-    },
-    [parseToken, logout]
-  );
 
   const login = useCallback(
     async (token) => {
@@ -91,18 +62,24 @@ export default function AuthProvider({ children }) {
       try {
         localStorage.setItem('accessToken', token);
         const parsed = parseToken(token);
-
         if (parsed) {
           setUser(parsed);
           setPendingEmail(null);
-          scheduleRefresh(parsed.exp);
 
-          if (parsed.role === 'Admin') navigate('/AdminDashboard');
-          else if (parsed.role === 'Contractor')
-            navigate('/ContractorDashboard');
-          else if (parsed.role === 'Distributor')
-            navigate('/DistributorDashboard');
-          else navigate('/');
+          // Điều hướng theo role
+          switch (parsed.role) {
+            case 'Admin':
+              navigate('/AdminDashboard');
+              break;
+            case 'Contractor':
+              navigate('/Contractor');
+              break;
+            case 'Distributor':
+              navigate('/DistributorDashboard');
+              break;
+            default:
+              navigate('/');
+          }
         }
       } catch (err) {
         toast.error(handleApiError(err));
@@ -110,30 +87,53 @@ export default function AuthProvider({ children }) {
         setLoading(false);
       }
     },
-    [navigate, parseToken, scheduleRefresh]
+    [navigate, parseToken]
   );
 
-  // Load token khi F5
+  // 🟢 Khi F5 hoặc mở lại tab → kiểm tra token, nếu hết hạn thì tự refresh
   useEffect(() => {
-    setLoading(true);
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      const parsed = parseToken(token);
-      if (parsed) {
-        setUser(parsed);
-        scheduleRefresh(parsed.exp);
-      } else {
-        logout();
-      }
-    }
-    setLoading(false);
+    const initAuth = async () => {
+      setLoading(true);
+      const token = localStorage.getItem('accessToken');
 
-    return () => {
-      if (refreshTimeoutRef.current) {
-        clearTimeout(refreshTimeoutRef.current);
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      const parsed = parseToken(token);
+
+      // Nếu token còn hạn → set user bình thường
+      if (parsed?.exp && parsed.exp > Date.now()) {
+        setUser(parsed);
+        setLoading(false);
+        return;
+      }
+
+      // Nếu token hết hạn → thử refresh
+      try {
+        const res = await authService.refreshToken();
+        const newAccessToken = res.data?.accessToken;
+        if (newAccessToken) {
+          localStorage.setItem('accessToken', newAccessToken);
+          const newParsed = parseToken(newAccessToken);
+          if (newParsed) {
+            setUser(newParsed);
+            setLoading(false);
+            return;
+          }
+        }
+        await logout(); // refresh thất bại → logout
+      } catch {
+        return;
+      } finally {
+        setLoading(false);
       }
     };
-  }, [parseToken, logout, scheduleRefresh]);
+
+    initAuth();
+  }, [parseToken, logout]);
 
   const value = useMemo(
     () => ({

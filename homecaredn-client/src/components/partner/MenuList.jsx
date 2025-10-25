@@ -1,7 +1,7 @@
 import { useMemo, useContext } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../../services/authService';
+import { authService } from '../../services/auth/authService';
 import AuthContext from '../../context/AuthContext';
 import PropTypes from 'prop-types';
 
@@ -19,8 +19,8 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { user, logout: ctxLogout } = useContext(AuthContext) || {};
 
- const menu = useMemo(() => {
-    // Menu cho Distributor 
+  const menu = useMemo(() => {
+    // Menu cho Distributor
     if (user?.role === 'Distributor') {
       return [
         {
@@ -60,7 +60,7 @@ export default function Sidebar({
         },
       ];
     }
-    
+
     // Menu cho Contractor
     if (user?.role === 'Contractor') {
       return [

@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private const string INCLUDE = "LogoImage,Materials";
 
         public BrandService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -38,6 +39,10 @@ namespace BusinessLogic.Services
             await _unitOfWork.BrandRepository.AddAsync(brand);
 
             await _unitOfWork.SaveAsync();
+            brand = await _unitOfWork.BrandRepository.GetAsync(
+                b => b.BrandID == brand.BrandID,
+                includeProperties: INCLUDE
+            );
             var brandDto = _mapper.Map<BrandDto>(brand);
             return brandDto;
         }

@@ -439,7 +439,7 @@
     "viewAttachment": "View attachment {{index}}",
     "serviceRequestNotFound": "Service request not found",
     "yourBid": "Your Bid",
-    "appliedTitle": "Applied title",
+    "appliedTitle": "You have applied",
     "yourNote": "Your note for customer",
     "yourImages": "Your Images",
     "deleteApplication": "Delete Application",
@@ -899,6 +899,7 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
+    "CreateMaterialRequest": "Create Material Request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -971,6 +972,14 @@
     "DeleteApplicationModal": {
       "title": "Are you sure?",
       "text": "This application will be gone forever"
+    },
+    "PaymentSuccessModal": {
+      "title": "Payment Successful!",
+      "text": "Thank you for completing your commission payment."
+    },
+    "PaymentCancelModal": {
+      "title": "Payment Failed",
+      "text": "An error occurred during payment. Please try again."
     }
   },
   "ERROR": {
@@ -1023,13 +1032,19 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
-    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
-    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
     "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
     "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
+
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address!",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide more description for better search results!",
+    "REQUIRED_SERVICE_TYPE": "Please select a service type!",
+    "REQUIRED_PACKAGE_OPTION": "Please select a package option!",
+    "REQUIRED_BUILDING_TYPE": "Please select a building type!",
+    "REQUIRED_STRUCTURE_TYPE": "Please select the main structure type!",
+
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
@@ -1069,7 +1084,7 @@
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",
-    "APPICATION_CREATE": "Create Application Successful"
+    "APPLICATION_CREATE": "Create Application Successful"
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1153,6 +1168,7 @@
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },
   "common": {
+    "new": "New",
     "noRequirement": "No requirements",
     "search": "Search...",
     "sortDefault": "Default",

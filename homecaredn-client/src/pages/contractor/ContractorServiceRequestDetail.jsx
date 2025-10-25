@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
-import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { contractorService } from '../../services/contractorService';
 import { formatVND } from '../../utils/formatters';
 import { useAuth } from '../../hook/useAuth';
 import { numberToWordsByLang } from '../../utils/numberToWords';
@@ -16,10 +16,14 @@ import { toast } from 'react-toastify';
 import Loading from '../../components/Loading';
 import StatusBadge from '../../components/StatusBadge';
 import { PaymentService } from '../../services/paymentService';
-
-
+import PaymentSuccessModal from '../../components/modal/PaymentSuccessModal';
+import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
+  const [searchParams] = useSearchParams();
+  const statusShownRef = useRef(false);
+
+  const status = searchParams.get('status');
   const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -33,48 +37,65 @@ export default function ContractorServiceRequestDetail() {
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
 
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
+
   useEffect(() => {
     const loadData = async () => {
       if (!serviceRequestId || !user?.id) return;
+
       try {
         setIsChecking(true);
-        const serviceRequestData = await getServiceRequestById(serviceRequestId);
-        setServiceRequest(serviceRequestData);
+        const data = await getServiceRequestById(serviceRequestId);
+        setServiceRequest(data);
 
-        if (serviceRequestData.status === 'Pending' || !serviceRequestData.selectedContractorApplication) {
-          const existingApplicationData =
-            await contractorApplicationService.getApplication({
-              ServiceRequestID: serviceRequestId,
-              ContractorID: user.id,
-            });
-          setExistingApplication(existingApplicationData || null);
+        let appData = null;
+        const selectedApp = data.selectedContractorApplication;
+
+        if (selectedApp != null && selectedApp.contractorID === user.id) {
+          appData = selectedApp;
         } else {
-          const selectedApp = serviceRequestData.selectedContractorApplication;
-
-          if (selectedApp.contractorID === user.id) {
-            setExistingApplication(selectedApp);
-          } else {
-            const existingApplicationData =
-              await contractorApplicationService.getApplication({
+          appData =
+            await contractorService.contractorApplication.getContractorApplicationByServiceRequestIDAndContractorID(
+              {
                 ServiceRequestID: serviceRequestId,
                 ContractorID: user.id,
-              });
-            setExistingApplication(existingApplicationData || null);
-          }
+              }
+            );
         }
+
+        setExistingApplication(appData || null);
       } catch (error) {
         toast.error(t(handleApiError(error)));
       } finally {
         setIsChecking(false);
       }
     };
-    loadData();
-  }, [serviceRequestId, getServiceRequestById, user, t]);
 
+    loadData();
+  }, [serviceRequestId, user?.id, getServiceRequestById, t]);
   useEffect(() => {
-    if (!serviceRequest) return;
-    const vb = new VenoBox({ selector: '.venobox' });
-    return () => vb.close();
+    if (!status || statusShownRef.current) return;
+
+    if (status.toLowerCase() === 'paid') setOpenSuccess(true);
+    if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
+
+    statusShownRef.current = true;
+
+    const timer = setTimeout(() => {
+      setOpenSuccess(false);
+      setOpenCancel(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [status]);
+  useEffect(() => {
+    if (serviceRequest) {
+      const vb = new VenoBox({ selector: '.venobox' });
+      return () => {
+        vb.close();
+      };
+    }
   }, [serviceRequest, existingApplication]);
 
   const handleSubmit = async (e) => {
@@ -115,13 +136,12 @@ export default function ContractorServiceRequestDetail() {
         setUploadProgress(0);
       }
 
-      await contractorApplicationService.createContractorApplication(payload);
-      toast.success(t('SUCCESS.APPICATION_CREATE'));
+      const appData =
+        await contractorService.contractorApplication.createContractorApplication(
+          payload
+        );
+      toast.success(t('SUCCESS.APPLICATION_CREATE'));
 
-      const appData = await contractorApplicationService.getApplication({
-        serviceRequestId: serviceRequestId,
-        contractorId: user.id,
-      });
       setExistingApplication(appData);
     } catch (error) {
       setUploadProgress(0);
@@ -137,7 +157,7 @@ export default function ContractorServiceRequestDetail() {
       textKey: 'ModalPopup.DeleteApplicationModal.text',
       onConfirm: async () => {
         try {
-          await contractorApplicationService.deleteApplication(
+          await contractorService.contractorApplication.deleteApplication(
             existingApplication.contractorApplicationID
           );
           Swal.close();
@@ -156,13 +176,24 @@ export default function ContractorServiceRequestDetail() {
   const handlePayCommission = async () => {
     try {
       toast.info(t('contractorServiceRequestDetail.processingPayment'));
+      const estimatePrice = Number(existingApplication.estimatePrice);
 
+      let commission = 0;
+
+      if (estimatePrice <= 500_000_000) {
+        commission = estimatePrice * 0.02;
+      } else if (estimatePrice <= 2_000_000_000) {
+        commission = estimatePrice * 0.015;
+      } else {
+        commission = estimatePrice * 0.01;
+        if (commission > 100_000_000) commission = 100_000_000;
+      }
       const result = await PaymentService.createPayCommission({
         contractorApplicationID: existingApplication.contractorApplicationID,
         serviceRequestID: serviceRequestId,
-        amount: existingApplication.estimatePrice * 0.006,
+        amount: commission,
         description: serviceRequestId.slice(0, 19),
-        itemName: "Service Request Commission"
+        itemName: 'Service Request Commission',
       });
 
       if (result?.checkoutUrl) {
@@ -170,9 +201,8 @@ export default function ContractorServiceRequestDetail() {
       } else {
         toast.error(t('contractorServiceRequestDetail.paymentFailed'));
       }
-
     } catch (err) {
-      toast.error(t(handleApiError(err)));
+      toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
 
@@ -226,7 +256,7 @@ export default function ContractorServiceRequestDetail() {
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
-  const totalArea = baseArea * (serviceRequest?.floors ?? 1);
+  const totalArea = (baseArea * (serviceRequest?.floors ?? 1)).toFixed(1);
 
   const addressText = [
     serviceRequest?.address?.detail,
@@ -332,7 +362,7 @@ export default function ContractorServiceRequestDetail() {
           {/* Nút thanh toán */}
           <div className="pt-4 border-t border-gray-200">
             <button
-              onClick={handlePayCommission}
+              onClick={() => handlePayCommission()}
               className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
             >
               <i className="fas fa-hand-holding-usd" />
@@ -341,7 +371,9 @@ export default function ContractorServiceRequestDetail() {
             <p className="mt-3 text-xs text-gray-500 text-center">
               <i className="fas fa-info-circle mr-1" />
               {t('contractorServiceRequestDetail.statusOpen')}?{' '}
-              {t('contractorServiceRequestDetail.selectedPendingCommissionNote')}
+              {t(
+                'contractorServiceRequestDetail.selectedPendingCommissionNote'
+              )}
             </p>
           </div>
         </div>
@@ -428,7 +460,6 @@ export default function ContractorServiceRequestDetail() {
       </div>
     );
   };
-
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
@@ -570,10 +601,11 @@ export default function ContractorServiceRequestDetail() {
                   <i className="fas fa-dollar-sign text-orange-500" />
                   {t('contractorServiceRequestDetail.estimatePrice')}
                 </h3>
-                <p className="text-2xl font-bold text-orange-600 mb-1">
-                  {formatVND(serviceRequest.estimatePrice)}
-                </p>
-                {serviceRequest.estimatePrice && (
+                {serviceRequest.estimatePrice === 0
+                  ? t('contractorServiceRequestManager.negotiable')
+                  : formatVND(serviceRequest.estimatePrice)}
+
+                {serviceRequest.estimatePrice != 0 && (
                   <p className="text-sm text-gray-600 mb-1">
                     {numberToWordsByLang(serviceRequest.estimatePrice)}
                   </p>
@@ -628,12 +660,6 @@ export default function ContractorServiceRequestDetail() {
                       href={imageUrl}
                       className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
                       data-gall="service-request-gallery"
-                      aria-label={`${t(
-                        'contractorServiceRequestDetail.viewFullSize'
-                      )} - ${t(
-                        'contractorServiceRequestDetail.serviceRequestImage'
-                      )}`}
-                      title={t('contractorServiceRequestDetail.viewFullSize')}
                     >
                       <img
                         src={imageUrl}
@@ -681,6 +707,7 @@ export default function ContractorServiceRequestDetail() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-coins text-orange-500 mr-2"></i>
                     {t('contractorServiceRequestDetail.bidPrice')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
 
                   <input
@@ -694,14 +721,14 @@ export default function ContractorServiceRequestDetail() {
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                          {
-                            est: formatVND(serviceRequest.estimatePrice),
-                          }
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                            {
+                              est: formatVND(serviceRequest.estimatePrice),
+                            }
+                          )
                         : t(
-                          'contractorServiceRequestDetail.bidPricePlaceholder'
-                        )
+                            'contractorServiceRequestDetail.bidPricePlaceholder'
+                          )
                     }
                   />
 
@@ -729,6 +756,7 @@ export default function ContractorServiceRequestDetail() {
                     <label className="block text-sm font-medium text-gray-700">
                       <i className="fas fa-comment-alt mr-2 text-gray-500" />
                       {t('contractorServiceRequestDetail.noteToOwner')}
+                      <span className="text-red-500 ml-1">*</span>
                     </label>
                     <span className="text-xs text-gray-400">
                       {description.length}
@@ -816,7 +844,11 @@ export default function ContractorServiceRequestDetail() {
                   <button
                     type="submit"
                     className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    disabled={!estimatePrice.trim() || !description.trim()}
+                    disabled={
+                      !estimatePrice.trim() ||
+                      !description.trim() ||
+                      images.length == 0
+                    }
                   >
                     <i className="fas fa-paper-plane" />
                     {t('contractorServiceRequestDetail.applyForProject')}
@@ -833,6 +865,14 @@ export default function ContractorServiceRequestDetail() {
           {existingApplication && renderApplicationContent()}
         </div>
       </div>
+      <PaymentSuccessModal
+        open={openSuccess}
+        onClose={() => setOpenSuccess(false)}
+      />
+      <PaymentCancelModal
+        open={openCancel}
+        onClose={() => setOpenCancel(false)}
+      />
     </div>
   );
 }

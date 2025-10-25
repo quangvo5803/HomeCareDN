@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application.Payment;
+﻿using System.Globalization;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
-using System.Globalization;
 using Ultitity.Exceptions;
 using Ultitity.Options;
 
@@ -22,32 +22,43 @@ namespace BusinessLogic.Services
         private readonly PayOS _payOS;
         private readonly IUnitOfWork _unitOfWork;
         private readonly PayOsOptions _payOsOptions;
-        public PaymentService(PayOS payOS, IUnitOfWork unitOfWork, IOptions<PayOsOptions> payOsOptions)
 
+        public PaymentService(
+            PayOS payOS,
+            IUnitOfWork unitOfWork,
+            IOptions<PayOsOptions> payOsOptions
+        )
         {
             _payOS = payOS;
             _unitOfWork = unitOfWork;
             _payOsOptions = payOsOptions.Value;
         }
 
-        public async Task<CreatePaymentResult> CreatePaymentAsync(PaymentCreateRequestDto requestDto)
+        public async Task<CreatePaymentResult> CreatePaymentAsync(
+            PaymentCreateRequestDto requestDto
+        )
         {
             var orderCode = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
             var items = new List<ItemData>
             {
-                new ItemData(requestDto.ItemName ?? "Thanh toán", 1, (int)requestDto.Amount)
+                new ItemData(requestDto.ItemName ?? "Thanh toán", 1, (int)requestDto.Amount),
             };
 
             var baseUrl = _payOsOptions.BaseUrl;
+
+            var cancelUrl =
+                $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}?status=cancelled";
+            var returnUrl =
+                $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}?status=paid";
 
             var paymentData = new PaymentData(
                 orderCode,
                 (int)requestDto.Amount,
                 requestDto.Description ?? "Thanh toán hoa hồng",
                 items,
-                cancelUrl: $"{baseUrl}/Contractor",
-                returnUrl: $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}"
+                cancelUrl: cancelUrl,
+                returnUrl: returnUrl
             );
 
             var result = await _payOS.createPaymentLink(paymentData);
@@ -58,11 +69,11 @@ namespace BusinessLogic.Services
                 ServiceRequestID = requestDto.ServiceRequestID,
                 Amount = requestDto.Amount,
                 Description = requestDto.Description ?? "Thanh toán hoa hồng",
-                ItemName =  "Thanh toán",
+                ItemName = "Thanh toán",
                 OrderCode = result.orderCode,
                 CheckoutUrl = result.checkoutUrl,
                 PaymentLinkID = result.paymentLinkId,
-                Status = PaymentStatus.Pending
+                Status = PaymentStatus.Pending,
             };
 
             await _unitOfWork.PaymentTransactionsRepository.AddAsync(payment);
@@ -77,37 +88,41 @@ namespace BusinessLogic.Services
             if (data == null)
             {
                 throw new CustomValidationException(
-                   new Dictionary<string, string[]>
-                   {
-                        { "Data", new[] { "Data not found" } },
-                   }
+                    new Dictionary<string, string[]> { { "Data", new[] { "Data not found" } } }
                 );
             }
-            var payment = await _unitOfWork.PaymentTransactionsRepository
-                .GetAsync(p => p.OrderCode == data.OrderCode, includeProperties: "ContractorApplication");
+            var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                p => p.OrderCode == data.OrderCode,
+                includeProperties: "ContractorApplication"
+            );
 
             if (payment == null)
             {
                 throw new CustomValidationException(
-                   new Dictionary<string, string[]>
-                   {
+                    new Dictionary<string, string[]>
+                    {
                         { "OrderCodeNull", new[] { "ERROR_SERVICE_NOT_FOUND" } },
-                   }
-               );
+                    }
+                );
             }
 
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
 
-                if (DateTime.TryParseExact(
+                if (
+                    DateTime.TryParseExact(
                         data.TransactionDateTime,
                         "yyyy-MM-dd HH:mm:ss",
                         CultureInfo.InvariantCulture,
                         DateTimeStyles.None,
-                        out var paidAt))
+                        out var paidAt
+                    )
+                )
                 {
-                    payment.PaidAt = DateTime.SpecifyKind(paidAt, DateTimeKind.Local).ToUniversalTime();
+                    payment.PaidAt = DateTime
+                        .SpecifyKind(paidAt, DateTimeKind.Local)
+                        .ToUniversalTime();
                 }
                 else
                 {
@@ -121,6 +136,5 @@ namespace BusinessLogic.Services
 
             await _unitOfWork.SaveAsync();
         }
-
     }
 }

@@ -275,7 +275,9 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i => i.PartnerRequestID == partnerRequestId);
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.PartnerRequestID == partnerRequestId
+            );
             if (images != null && images.Any())
             {
                 foreach (var image in images)

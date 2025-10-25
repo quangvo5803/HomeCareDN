@@ -1,8 +1,8 @@
-import api from "../api";
+import api from './api';
 
 export const PaymentService = {
-    createPayCommission: async (request) => {
-        const response = await api.post(`/Payment/create-payment`, request);
-        return response.data;
-    }
-}
+  createPayCommission: async (request) => {
+    const response = await api.post(`/Payment/create-payment`, request);
+    return response.data;
+  },
+};

@@ -75,12 +75,11 @@ export default function CategoryModal({
       CategoryName: categoryName,
       CategoryNameEN: categoryNameEN || null,
     };
+    data.IsActive = user?.role === 'Admin' ? isActive : false;
 
     if (category?.categoryID) {
       data.CategoryID = category.categoryID;
-      data.IsActive = user?.role === 'Admin' ? isActive : false;
     } else {
-      data.IsActive = user?.role === 'Admin';
       data.UserID = user?.id;
     }
     try {

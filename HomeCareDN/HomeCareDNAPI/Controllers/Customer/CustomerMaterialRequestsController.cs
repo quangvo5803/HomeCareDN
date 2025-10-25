@@ -19,7 +19,7 @@ namespace HomeCareDNAPI.Controllers.Customer
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-material-request-by-userid")]
+        [HttpGet("get-all-material-request-by-user-id")]
         public async Task<IActionResult> GetAllServiceRequestByUserId(
             [FromQuery] QueryParameters parameters
         )

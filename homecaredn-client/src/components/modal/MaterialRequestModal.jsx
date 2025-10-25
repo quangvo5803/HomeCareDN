@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
-import { materialService } from '../../services/materialService';
+import { publicService } from '../../services/publicService';
 import { Pagination } from 'antd';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
@@ -22,7 +22,7 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
     const fetchData = async () => {
       try {
         setModalLoading(true);
-        const data = await materialService.getAllMaterial({
+        const data = await publicService.material.getAllMaterial({
           PageNumber: currentPage,
           PageSize: pageSize,
           Search: debouncedSearch || null,

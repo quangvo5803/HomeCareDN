@@ -113,7 +113,7 @@ export default function AdminMaterialManager() {
   // Save (Create / Update)
   const handleSave = async (materialData) => {
     if (modalReadOnly) {
-      toast.info(t('common.viewOnly', { defaultValue: 'View only' }));
+      toast.info(t('common.viewOnly'));
       setIsModalOpen(false);
       setEditingMaterialID(null);
       return;
@@ -121,11 +121,8 @@ export default function AdminMaterialManager() {
 
     if (materialData.MaterialID) {
       await updateMaterial(materialData);
-      toast.success(t('SUCCESS.MATERIAL_UPDATE'));
-      await fetchMaterials({ PageNumber: currentPage, PageSize: pageSize });
     } else {
       await createMaterial(materialData);
-      toast.success(t('SUCCESS.MATERIAL_ADD'));
       const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
       setCurrentPage(lastPage);
     }

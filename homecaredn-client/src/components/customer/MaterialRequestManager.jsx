@@ -166,7 +166,7 @@ export default function MaterialRequestManager({ user }) {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <StatusBadge status={req.status} />
+                      <StatusBadge status={req.status} type="Request" />
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                         <i className="fas fa-truck mr-1"></i>
                         {req.distributorApplications.length}{' '}

@@ -38,9 +38,9 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<PagedResultDto<ContractorApplicationFullDto>> GetAllContractorByServiceRequestIdAsync(
-            QueryParameters parameters
-        )
+        public async Task<
+            PagedResultDto<ContractorApplicationFullDto>
+        > GetAllContractorByServiceRequestIdAsync(QueryParameters parameters)
         {
             var query = _unitOfWork
                 .ContractorApplicationRepository.GetQueryable(includeProperties: "Images")
@@ -57,7 +57,9 @@ namespace BusinessLogic.Services
 
             foreach (var dto in dtos)
             {
-                var contractor = items.First(x => x.ContractorApplicationID == dto.ContractorApplicationID);
+                var contractor = items.First(x =>
+                    x.ContractorApplicationID == dto.ContractorApplicationID
+                );
 
                 if (contractor.ContractorID != Guid.Empty)
                 {
@@ -154,7 +156,7 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
+        public async Task<ContractorApplicationFullDto?> GetApplicationByServiceRequestIDAndContractorIDAsync(
             ContractorGetApplicationDto getRequest
         )
         {
@@ -210,6 +212,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+            serviceRequest.Status = RequestStatus.Closed;
             contractorApplication.Status = ApplicationStatus.PendingCommission;
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 

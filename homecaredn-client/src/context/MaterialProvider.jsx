@@ -1,19 +1,21 @@
 import { useState, useCallback, useMemo } from 'react';
-import { materialService } from '../services/materialService';
+import getServiceByRole from '../services/getServiceByRole';
 import { useAuth } from '../hook/useAuth';
 import MaterialContext from './MaterialContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
-
+import { withMinLoading } from '../utils/withMinLoading';
+import { useTranslation } from 'react-i18next';
 export const MaterialProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [totalMaterials, setTotalMaterials] = useState(0);
   const [loading, setLoading] = useState(false);
 
   // 📌 Public: fetch all material
-  const fetchMaterials = useCallback(
+  const executeFetch = useCallback(
     async ({
       PageNumber = 1,
       PageSize = 10,
@@ -24,8 +26,8 @@ export const MaterialProvider = ({ children }) => {
       Search,
     } = {}) => {
       try {
-        setLoading(true);
-        const data = await materialService.getAllMaterial({
+        const service = getServiceByRole();
+        const data = await service.material.getAllMaterial({
           PageNumber,
           PageSize,
           SortBy,
@@ -34,10 +36,12 @@ export const MaterialProvider = ({ children }) => {
           FilterBrandID,
           Search,
         });
+
         const itemsWithType = (data.items || []).map((m) => ({
           ...m,
           type: 'material',
         }));
+
         setMaterials(itemsWithType);
         setTotalMaterials(data.totalCount || 0);
         return itemsWithType;
@@ -46,18 +50,24 @@ export const MaterialProvider = ({ children }) => {
         setMaterials([]);
         setTotalMaterials(0);
         return [];
-      } finally {
-        setLoading(false);
       }
     },
     []
   );
 
+  const fetchMaterials = useCallback(
+    async (params = {}) => {
+      return await withMinLoading(() => executeFetch(params), setLoading);
+    },
+    [executeFetch]
+  );
   // 📌 Public: get material by id
   const getMaterialById = useCallback(async (id) => {
     try {
       setLoading(true);
-      return await materialService.getMaterialById(id);
+      const service = getServiceByRole();
+      var result = await service.material.getMaterialById(id);
+      return result;
     } catch (err) {
       toast.error(handleApiError(err));
       return null;
@@ -66,13 +76,11 @@ export const MaterialProvider = ({ children }) => {
     }
   }, []);
   // 📌 Distributor-only: get all by user id
-  const fetchMaterialsByUserId = useCallback(
+  const executeFetchById = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
-      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
-        throw new Error('Unauthorized');
       try {
-        setLoading(true);
-        const data = await materialService.getAllMaterialByUserId({
+        const service = getServiceByRole(user.role);
+        const data = await service.material.getAllMaterialByUserId({
           PageNumber,
           PageSize,
           FilterID,
@@ -83,23 +91,29 @@ export const MaterialProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         return { items: [], totalCount: 0 };
-      } finally {
-        setLoading(false);
       }
     },
     [user?.role]
   );
+
+  // Gọi có min loading
+  const fetchMaterialsByUserId = useCallback(
+    async (params = {}) => {
+      return await withMinLoading(() => executeFetchById(params), setLoading);
+    },
+    [executeFetchById]
+  );
   // 📌 Distributor-only: create
   const createMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
-        throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const newMaterial = await materialService.createMaterial(materialData);
+        const service = getServiceByRole(user.role);
+        const newMaterial = await service.material.createMaterial(materialData);
         // Tăng tổng số material
         setMaterials((prev) => [...prev, newMaterial]);
         setTotalMaterials((prev) => prev + 1);
+        toast.success(t('SUCCESS.MATERIAL_ADD'));
         return newMaterial;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -108,28 +122,28 @@ export const MaterialProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Distributor-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
-      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
-        throw new Error('Unauthorized');
       try {
         setLoading(true);
-        const updated = await materialService.updateMaterial(materialData);
+        const service = getServiceByRole(user.role);
+        const updated = await service.material.updateMaterial(materialData);
         setMaterials((prev) =>
           prev.map((m) =>
             m.materialID === updated.materialID
               ? {
-                ...m,
-                ...updated,
-                imageUrls: updated.imageUrls ?? m.imageUrls,
-              }
+                  ...m,
+                  ...updated,
+                  imageUrls: updated.imageUrls ?? m.imageUrls,
+                }
               : m
           )
         );
+        toast.success(t('SUCCESS.MATERIAL_UPDATE'));
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -138,51 +152,45 @@ export const MaterialProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [user?.role, t]
   );
 
   // 📌 Distributor-only: delete
   const deleteMaterial = useCallback(
     async (id) => {
-      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
-        throw new Error('Unauthorized');
       try {
-        await materialService.deleteMaterial(id);
+        const service = getServiceByRole(user.role);
+        await service.material.deleteMaterial(id);
         setMaterials((prev) => prev.filter((b) => b.materialID !== id));
         setTotalMaterials((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
       }
     },
     [user?.role]
   );
 
   // 📌 Distributor-only: delete material image
-  const deleteMaterialImage = useCallback(
-    async (materialId, imageUrl) => {
-      if (user?.role !== 'Distributor' && user?.role !== 'Admin')
-        throw new Error('Unauthorized');
-      try {
-        await materialService.deleteMaterialImage(imageUrl);
+  const deleteMaterialImage = useCallback(async (materialId, imageUrl) => {
+    try {
+      const service = getServiceByRole();
+      await service.image.deleteImage(imageUrl);
 
-        // update materials
-        const updateImages = (m) => {
-          if (m.materialID !== materialId) return m;
-          return {
-            ...m,
-            imageUrls: m.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
-          };
+      // update materials
+      const updateImages = (m) => {
+        if (m.materialID !== materialId) return m;
+        return {
+          ...m,
+          imageUrls: m.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
         };
+      };
 
-        setMaterials((prev) => prev.map(updateImages));
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user?.role]
-  );
+      setMaterials((prev) => prev.map(updateImages));
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({
