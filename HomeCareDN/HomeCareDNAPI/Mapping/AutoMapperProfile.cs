@@ -5,6 +5,7 @@ using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
+using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
@@ -47,7 +48,9 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<CreateAddressDto, Address>();
             CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
                 .ForMember(d => d.Images, opt => opt.Ignore());
-
+            CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
@@ -101,7 +104,8 @@ namespace HomeCareDNAPI.Mapping
                                 ? src.Images.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
-                );
+                )
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -141,6 +145,7 @@ namespace HomeCareDNAPI.Mapping
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 );
+
             CreateMap<Material, MaterialDto>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand!.BrandName))
                 .ForMember(
@@ -303,6 +308,7 @@ namespace HomeCareDNAPI.Mapping
                                 : new List<string>()
                         )
                 );
+            CreateMap<MaterialRequest, MaterialRequestDto>();
         }
 
         // ------------------------
@@ -318,6 +324,7 @@ namespace HomeCareDNAPI.Mapping
             CreateMap<ApplicationStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<PartnerRequestType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<RequestStatus, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

@@ -1,3 +1,4 @@
+using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
 
 namespace BusinessLogic.Services.FacadeService
@@ -15,6 +16,8 @@ namespace BusinessLogic.Services.FacadeService
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
         public IPartnerRequestService PartnerService { get; }
+        public IPaymentService PaymentService { get; }
+        public IMaterialRequestService MaterialRequestService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -37,7 +40,8 @@ namespace BusinessLogic.Services.FacadeService
             ServiceService = new ServicesService(coreDeps.UnitOfWork, coreDeps.Mapper);
             ContractorApplicationService = new ContractorApplicationService(
                 coreDeps.UnitOfWork,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                identityDeps.UserManager
             );
             CategoryService = new CategoryService(coreDeps.UnitOfWork, coreDeps.Mapper);
             BrandService = new BrandService(coreDeps.UnitOfWork, coreDeps.Mapper);
@@ -60,6 +64,17 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 identityDeps.UserManager,
                 infraDeps.EmailQueue
+            );
+
+            PaymentService = new PaymentService(
+                coreDeps.PayOS,
+                coreDeps.UnitOfWork,
+                infraDeps.PayOsOptions
+            );
+
+            MaterialRequestService = new MaterialRequestService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper
             );
         }
     }

@@ -1,23 +1,26 @@
-import { useState, useCallback, useMemo } from 'react';
-import { serviceRequestService } from '../services/serviceRequestService';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import getServiceByRole from '../services/getServiceByRole';
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
+import { withMinLoading } from '../utils/withMinLoading';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 export const ServiceRequestProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [serviceRequests, setServiceRequests] = useState([]);
   const [totalServiceRequests, setTotalServiceRequests] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all service requests
-  const fetchServiceRequests = useCallback(
+  // 📌 Execute fetch service requests
+  const executeFetch = useCallback(
     async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
       try {
-        setLoading(true);
-        const data = await serviceRequestService.getAllServiceRequest({
+        const service = getServiceByRole(user?.role);
+        const data = await service.serviceRequest.getAllServiceRequest({
           PageNumber,
           PageSize,
           SortBy,
@@ -25,34 +28,27 @@ export const ServiceRequestProvider = ({ children }) => {
         });
         setServiceRequests(data.items || []);
         setTotalServiceRequests(data.totalCount || 0);
-        return data.items || [];
+        return data;
       } catch (err) {
         toast.error(handleApiError(err));
-        return [];
-      } finally {
-        setLoading(false);
+        return { items: [], totalCount: 0 };
       }
     },
-    []
+    [user?.role]
   );
 
-  // 📌 Public: get by id
-  const getServiceRequestById = useCallback(async (id) => {
-    try {
-      return await serviceRequestService.getServiceRequestById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
-  }, []);
+  const fetchServiceRequests = useCallback(
+    async (params = {}) =>
+      await withMinLoading(() => executeFetch(params), setLoading),
+    [executeFetch]
+  );
 
-  // 📌 Customer: get all by userId
-  const fetchServiceRequestsByUserId = useCallback(
+  // 📌 Execute fetch service requests by user id
+  const executeFetchByUserId = useCallback(
     async ({ PageNumber = 1, PageSize = 3, FilterID } = {}) => {
-      if (user?.role !== 'Customer') throw new Error('Unauthorized');
       try {
-        setLoading(true);
-        const data = await serviceRequestService.getAllServiceRequestByUserId({
+        const service = getServiceByRole(user?.role);
+        const data = await service.serviceRequest.getAllServiceRequestByUserId({
           PageNumber,
           PageSize,
           FilterID,
@@ -63,24 +59,43 @@ export const ServiceRequestProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         return { items: [], totalCount: 0 };
-      } finally {
-        setLoading(false);
       }
     },
     [user?.role]
   );
 
-  // 📌 Customer: create
+  const fetchServiceRequestsByUserId = useCallback(
+    async (params = {}) =>
+      await withMinLoading(() => executeFetchByUserId(params), setLoading),
+    [executeFetchByUserId]
+  );
+
+  // 📌 Get by ID
+  const getServiceRequestById = useCallback(
+    async (id) => {
+      try {
+        const service = getServiceByRole(user?.role);
+        return await service.serviceRequest.getServiceRequestById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    },
+    [user?.role]
+  );
+
+  // 📌 Create
   const createServiceRequest = useCallback(
-    async (requestData) => {
-      if (user?.role !== 'Customer') throw new Error('Unauthorized');
+    async (dto) => {
       try {
         setLoading(true);
-        const newRequest = await serviceRequestService.createServiceRequest(
-          requestData
+        const service = getServiceByRole('Customer');
+        const newRequest = await service.serviceRequest.createServiceRequest(
+          dto
         );
         setServiceRequests((prev) => [...prev, newRequest]);
         setTotalServiceRequests((prev) => prev + 1);
+        toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
         return newRequest;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -89,18 +104,16 @@ export const ServiceRequestProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [t]
   );
 
-  // 📌 Customer: update
+  // 📌 Update
   const updateServiceRequest = useCallback(
-    async (requestData) => {
-      if (user?.role !== 'Customer') throw new Error('Unauthorized');
+    async (dto) => {
       try {
         setLoading(true);
-        const updated = await serviceRequestService.updateServiceRequest(
-          requestData
-        );
+        const service = getServiceByRole('Customer');
+        const updated = await service.serviceRequest.updateServiceRequest(dto);
         setServiceRequests((prev) =>
           prev.map((s) =>
             s.serviceRequestID === updated.serviceRequestID
@@ -108,6 +121,7 @@ export const ServiceRequestProvider = ({ children }) => {
               : s
           )
         );
+        toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
@@ -116,35 +130,30 @@ export const ServiceRequestProvider = ({ children }) => {
         setLoading(false);
       }
     },
-    [user?.role]
+    [t]
   );
 
-  // 📌 Customer: delete
-  const deleteServiceRequest = useCallback(
-    async (id) => {
-      if (user?.role !== 'Customer') throw new Error('Unauthorized');
-      try {
-        await serviceRequestService.deleteServiceRequest(id);
-        setServiceRequests((prev) =>
-          prev.filter((s) => s.serviceRequestID !== id)
-        );
-        setTotalServiceRequests((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user?.role]
-  );
+  // 📌 Delete
+  const deleteServiceRequest = useCallback(async (id) => {
+    try {
+      const service = getServiceByRole('Customer');
+      await service.serviceRequest.deleteServiceRequest(id);
+      setServiceRequests((prev) =>
+        prev.filter((s) => s.serviceRequestID !== id)
+      );
+      setTotalServiceRequests((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
-  // 📌 Customer: delete image
+  // 📌 Delete image
   const deleteServiceRequestImage = useCallback(
     async (serviceRequestId, imageUrl) => {
-      if (user?.role !== 'Customer') throw new Error('Unauthorized');
       try {
-        await serviceRequestService.deleteServiceRequestImage(imageUrl);
-
-        // update local state
+        const service = getServiceByRole();
+        await service.image.deleteImage(imageUrl);
         setServiceRequests((prev) =>
           prev.map((s) =>
             s.serviceRequestID === serviceRequestId
@@ -160,13 +169,26 @@ export const ServiceRequestProvider = ({ children }) => {
         throw err;
       }
     },
-    [user?.role]
+    []
   );
+
+  // 📌 Auto load if user is Customer
+  useEffect(() => {
+    if (!user) {
+      setServiceRequests([]);
+      setTotalServiceRequests(0);
+      return;
+    }
+    if (user.role === 'Customer') {
+      fetchServiceRequestsByUserId({ FilterID: user.id });
+    }
+  }, [user, fetchServiceRequestsByUserId]);
 
   const contextValue = useMemo(
     () => ({
       serviceRequests,
       totalServiceRequests,
+
       loading,
       fetchServiceRequests,
       fetchServiceRequestsByUserId,
@@ -179,6 +201,7 @@ export const ServiceRequestProvider = ({ children }) => {
     [
       serviceRequests,
       totalServiceRequests,
+
       loading,
       fetchServiceRequests,
       fetchServiceRequestsByUserId,

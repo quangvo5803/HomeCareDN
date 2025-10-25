@@ -19,7 +19,7 @@ namespace HomeCareDNAPI.Controllers.Customer
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-servicerequest-byuserid")]
+        [HttpGet("get-all-service-request-by-user-id")]
         public async Task<IActionResult> GetAllServiceRequestByUserId(
             [FromQuery] QueryParameters parameters
         )
@@ -31,7 +31,13 @@ namespace HomeCareDNAPI.Controllers.Customer
             );
         }
 
-        [HttpPost("create-servicerequest")]
+        [HttpGet("get-service-request-by-id/{id:guid}")]
+        public async Task<IActionResult> GetServiceRequestById(Guid id)
+        {
+            return Ok(await _facadeService.ServiceRequestService.GetServiceRequestByIdAsync(id));
+        }
+
+        [HttpPost("create-service-request")]
         public async Task<IActionResult> CreateServiceRequest(
             [FromForm] ServiceRequestCreateRequestDto createRequest
         )
@@ -41,7 +47,7 @@ namespace HomeCareDNAPI.Controllers.Customer
             );
         }
 
-        [HttpPut("update-servicerequest")]
+        [HttpPut("update-service-request")]
         public async Task<IActionResult> UpdateServiceRequest(
             [FromForm] ServiceRequestUpdateRequestDto updateRequest
         )
@@ -51,7 +57,7 @@ namespace HomeCareDNAPI.Controllers.Customer
             );
         }
 
-        [HttpDelete("delete-servicerequest/{id:guid}")]
+        [HttpDelete("delete-service-request/{id:guid}")]
         public async Task<IActionResult> DeleteServiceRequest(Guid id)
         {
             await _facadeService.ServiceRequestService.DeleteServiceRequestAsync(id);

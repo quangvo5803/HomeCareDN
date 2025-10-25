@@ -122,6 +122,10 @@ export default function ServiceRequestCreateUpdate() {
       toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
       return;
     }
+    if (!description) {
+      toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
+      return;
+    }
     const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const payload = {
       CustomerID: user.id,
@@ -156,13 +160,11 @@ export default function ServiceRequestCreateUpdate() {
     }
     if (serviceRequestId) {
       payload.ServiceRequestID = serviceRequestId;
-      updateServiceRequest(payload);
-      toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
+      await updateServiceRequest(payload);
     } else {
-      createServiceRequest(payload);
-      toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
+      await createServiceRequest(payload);
     }
-    navigate('/Customer/Profile', {
+    navigate('/Customer', {
       state: { tab: 'service_requests' },
     });
   };
@@ -215,7 +217,7 @@ export default function ServiceRequestCreateUpdate() {
             <button
               type="button"
               onClick={() =>
-                navigate('/Customer/Profile', {
+                navigate('/Customer', {
                   state: { tab: 'service_requests' },
                 })
               }
@@ -448,16 +450,20 @@ export default function ServiceRequestCreateUpdate() {
                 </div>
                 {width && length && floors ? (
                   <p className="text-sm text-gray-600 mt-1 mb-2">
-                    {' '}
                     {t('userPage.createServiceRequest.calculatedArea')}:{' '}
                     <span className="font-semibold text-orange-600">
-                      {' '}
-                      {Number(width) * Number(length) * Number(floors)} m²{' '}
-                    </span>{' '}
+                      {(
+                        Number(width) *
+                        Number(length) *
+                        Number(floors)
+                      ).toFixed(1)}{' '}
+                      m²
+                    </span>
                   </p>
                 ) : (
                   <p></p>
                 )}
+
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -562,18 +568,12 @@ export default function ServiceRequestCreateUpdate() {
                       </div>
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-orange-600">
-                          {i18n.language === 'vi'
-                            ? 'Bấm để tải lên'
-                            : 'Click to upload'}
+                          {t('upload.clickToUpload')}
                         </span>{' '}
-                        {i18n.language === 'vi'
-                          ? 'hoặc kéo và thả'
-                          : 'or drag and drop'}
+                        {t('upload.orDragAndDrop')}
                       </p>
                       <p className="text-sm text-gray-400">
-                        {i18n.language === 'vi'
-                          ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
-                          : 'PNG, JPG, GIF up to 5MB each'}
+                        {t('upload.fileTypesHint')}
                       </p>
                     </div>
                   </div>
@@ -603,7 +603,7 @@ export default function ServiceRequestCreateUpdate() {
                           {img.isNew && (
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                {i18n.language === 'vi' ? 'Mới' : 'New'}
+                                {t('common.new')}
                               </span>
                             </div>
                           )}

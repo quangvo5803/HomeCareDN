@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
@@ -131,8 +131,8 @@ export default function ServiceModal({
             Swal.close();
             toast.success(t('SUCCESS.DELETE'));
             removeImageFromState(img);
-          } catch (err) {
-            handleApiError(err, t);
+          } catch {
+            toast.error(t('ERROR.DELETE'));
           }
         },
       });

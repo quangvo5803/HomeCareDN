@@ -1,18 +1,17 @@
-import api from '../api';
+import api from './api';
 
 export const aiChatService = {
   send: async (input) => {
-    const body = typeof input === 'string'
-      ? { prompt: input }
-      : { prompt: input?.prompt }; 
+    const body =
+      typeof input === 'string' ? { prompt: input } : { prompt: input?.prompt };
 
     const res = await api.post('/AiChat/send', body, { withCredentials: true });
-    return res.data; 
+    return res.data;
   },
 
   history: async () => {
     const res = await api.get('/AiChat/history', { withCredentials: true });
-    return res.data; 
+    return res.data;
   },
 
   clear: async () => {

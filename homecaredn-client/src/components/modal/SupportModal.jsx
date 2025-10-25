@@ -5,9 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
 import LoadingModal from './LoadingModal';
-import { contactService } from '../../services/contactService';
+import { adminService } from '../../services/adminService';
 
-export default function SupportModal({ isOpen, onClose, supportID }) {
+export default function SupportModal({
+  isOpen,
+  onClose,
+  supportID,
+  onReplySent,
+}) {
   const { t } = useTranslation();
 
   const [support, setSupport] = useState(null);
@@ -19,7 +24,7 @@ export default function SupportModal({ isOpen, onClose, supportID }) {
       if (isOpen && supportID) {
         try {
           setLoading(true);
-          const data = await contactService.getById(supportID);
+          const data = await adminService.support.getSupportById(supportID);
           setSupport(data);
         } catch (err) {
           toast.error(handleApiError(err));
@@ -37,8 +42,12 @@ export default function SupportModal({ isOpen, onClose, supportID }) {
       return;
     }
     try {
-      await contactService.reply({ id: supportID, replyContent: reply });
+      await adminService.support.replySupport({
+        id: supportID,
+        replyContent: reply,
+      });
       toast.success(t('SUCCESS.REPLY'));
+      onReplySent();
       onClose();
     } catch (err) {
       toast.error(handleApiError(err));
@@ -127,7 +136,7 @@ export default function SupportModal({ isOpen, onClose, supportID }) {
               onClick={handleSubmit}
               className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
             >
-              {t('BUTTON.SendReply')}
+              {t('BUTTON.Send')}
             </button>
           )}
         </div>
@@ -140,4 +149,5 @@ SupportModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   supportID: PropTypes.string,
+  onReplySent: PropTypes.func,
 };

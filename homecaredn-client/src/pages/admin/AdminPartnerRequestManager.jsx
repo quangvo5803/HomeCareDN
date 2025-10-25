@@ -127,13 +127,12 @@ export default function AdminPartnerRequestManager() {
                 <button
                   key={key}
                   onClick={() => setFilter(key)}
-                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${
-                    filter === key
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full text-sm border font-medium ${filter === key
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
+                    }`}
                 >
-                  {t(`common.${key}`)}
+                  {t(`adminPartnerManager.${key}`)}
                 </button>
               ))}
             </div>
@@ -175,9 +174,8 @@ export default function AdminPartnerRequestManager() {
                       return (
                         <tr
                           key={partnerRequest.partnerRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                            }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-blue-800 bg-blue-100 rounded-full">
@@ -204,11 +202,10 @@ export default function AdminPartnerRequestManager() {
                           {/* PartnerType enum */}
                           <td className="px-6 py-4 text-center align-middle">
                             <span
-                              className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                partnerTypeColors[
-                                  partnerRequest.partnerRequestType
-                                ] || 'bg-gray-100 text-gray-800'
-                              }`}
+                              className={`px-3 py-1 text-xs font-medium rounded-full ${partnerTypeColors[
+                                partnerRequest.partnerRequestType
+                              ] || 'bg-gray-100 text-gray-800'
+                                }`}
                             >
                               {t(
                                 `Enums.PartnerType.${partnerRequest.partnerRequestType}`
@@ -218,7 +215,7 @@ export default function AdminPartnerRequestManager() {
 
                           {/* Status enum */}
                           <td className="px-6 py-4 text-center align-middle">
-                            <StatusBadge status={partnerRequest.status} />
+                            <StatusBadge status={partnerRequest.status} type="PartnerRequest" />
                           </td>
 
                           <td className="px-4 py-4 text-center align-middle">
@@ -230,7 +227,7 @@ export default function AdminPartnerRequestManager() {
                                   partnerRequest.partnerRequestID
                                 );
                               }}
-                              className="mr-2 inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100 transition-colors duration-150"
+                              className="mr-2 inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 transition-colors duration-150"
                             >
                               {t('BUTTON.View')}
                             </button>

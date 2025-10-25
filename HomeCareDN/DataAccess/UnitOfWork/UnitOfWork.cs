@@ -27,6 +27,20 @@ namespace DataAccess.UnitOfWork
         public IChatMessageRepository ChatMessageRepository { get; private set; }
         public IContactSupportRepository ContactSupportRepository { get; private set; }
         public IPartnerRequestRepository PartnerRequestRepository { get; private set; }
+        public IMaterialRequestRepository MaterialRequestRepository { get; private set; }
+        public IMaterialRequestItemRepository MaterialRequestItemRepository { get; private set; }
+        public IDistributorApplicationRepository DistributorApplicationRepository
+        {
+            get;
+            private set;
+        }
+        public IDistributorApplicationItemRepository DistributorApplicationItemRepository
+        {
+            get;
+            private set;
+        }
+
+        public IPaymentTransactionsRepository PaymentTransactionsRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
         {
@@ -42,6 +56,11 @@ namespace DataAccess.UnitOfWork
             ChatMessageRepository = new ChatMessageRepository(_db);
             ContactSupportRepository = new ContactSupportRepository(_db);
             PartnerRequestRepository = new PartnerRequestRepository(_db);
+            MaterialRequestRepository = new MaterialRequestRepository(_db);
+            MaterialRequestItemRepository = new MaterialRequestItemRepository(_db);
+            DistributorApplicationRepository = new DistributorApplicationRepository(_db);
+            DistributorApplicationItemRepository = new DistributorApplicationItemRepository(_db);
+            PaymentTransactionsRepository = new PaymentTransactionsRepository(_db);
         }
 
         public async Task SaveAsync()

@@ -326,7 +326,11 @@ namespace BusinessLogic.Services
                 await _userManager.CreateAsync(user);
                 await _userManager.AddToRoleAsync(user, "Customer"); // default role
             }
-
+            if (!user.EmailConfirmed)
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+            }
             // Xóa refresh token cũ
             var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
             if (oldToken != null)
