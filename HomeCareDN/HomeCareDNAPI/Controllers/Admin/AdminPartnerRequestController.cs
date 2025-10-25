@@ -1,11 +1,9 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.Services.FacadeService;
-using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Ultitity.Exceptions;
 
 namespace HomeCareDNAPI.Controllers.Admin
 {

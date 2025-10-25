@@ -35,7 +35,7 @@ const buildMaterialFormData = (material) => {
 export const material = {
   getAllMaterialByUserId: async (params = {}) => {
     const response = await api.get(
-      '/DistributorMaterial/get-all-material-by-userid',
+      '/DistributorMaterial/get-all-material-by-user-id',
       {
         params,
       }

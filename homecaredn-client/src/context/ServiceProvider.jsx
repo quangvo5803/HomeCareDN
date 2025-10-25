@@ -73,7 +73,7 @@ export const ServiceProvider = ({ children }) => {
     async (dto) => {
       setLoading(true);
       try {
-        const service = getServiceByRole();
+        const service = getServiceByRole('Admin');
         const updated = await service.service.updateService(dto);
         setServices((prev) =>
           prev.map((s) =>
@@ -113,7 +113,7 @@ export const ServiceProvider = ({ children }) => {
   const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
     try {
       const service = getServiceByRole();
-      await service.image.deleteServiceImage(imageUrl);
+      await service.image.deleteImage(imageUrl);
       setServices((prev) =>
         prev.map((s) =>
           s.serviceID === serviceID

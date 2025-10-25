@@ -1,6 +1,6 @@
 import api from '../api';
 export const image = {
-  deleteOldImage: async (imageUrl) => {
+  deleteImage: async (imageUrl) => {
     const response = await api.delete(
       `/Public/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`
     );

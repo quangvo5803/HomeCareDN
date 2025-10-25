@@ -142,8 +142,7 @@ export default function MaterialModal({
       Swal.close();
       toast.success(t('SUCCESS.DELETE'));
       removeImageFromState(img);
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error(t('ERROR.DELETE'));
     }
   };

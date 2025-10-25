@@ -152,8 +152,8 @@ export const ServiceRequestProvider = ({ children }) => {
   const deleteServiceRequestImage = useCallback(
     async (serviceRequestId, imageUrl) => {
       try {
-        const service = getServiceByRole(user?.role);
-        await service.image.deleteServiceRequestImage(imageUrl);
+        const service = getServiceByRole();
+        await service.image.deleteImage(imageUrl);
         setServiceRequests((prev) =>
           prev.map((s) =>
             s.serviceRequestID === serviceRequestId
@@ -165,11 +165,11 @@ export const ServiceRequestProvider = ({ children }) => {
           )
         );
       } catch (err) {
-        toast.error(t(handleApiError(err)));
+        toast.error(handleApiError(err));
         throw err;
       }
     },
-    [user?.role, t]
+    []
   );
 
   // 📌 Auto load if user is Customer

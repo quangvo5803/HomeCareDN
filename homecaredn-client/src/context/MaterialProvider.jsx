@@ -181,7 +181,7 @@ export const MaterialProvider = ({ children }) => {
   const deleteMaterialImage = useCallback(async (materialId, imageUrl) => {
     try {
       const service = getServiceByRole();
-      await service.image.deleteMaterialImage(imageUrl);
+      await service.image.deleteImage(imageUrl);
 
       // update materials
       const updateImages = (m) => {
