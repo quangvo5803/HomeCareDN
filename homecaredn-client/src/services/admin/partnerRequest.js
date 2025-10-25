@@ -30,7 +30,7 @@ export const partnerRequest = {
 
   deletePartnerRequest: async (id) => {
     const res = await api.delete(
-      `/AdminPartnerRequests/delete-partner-request/${id}`
+      `/AdminPartnerRequest/delete-partner-request/${id}`
     );
     return res.data;
   },

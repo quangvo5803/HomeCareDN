@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
@@ -21,6 +21,7 @@ import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
   const [searchParams] = useSearchParams();
+  const statusShownRef = useRef(false);
 
   const status = searchParams.get('status');
   const { t } = useTranslation();
@@ -74,26 +75,28 @@ export default function ContractorServiceRequestDetail() {
     loadData();
   }, [serviceRequestId, user?.id, getServiceRequestById, t]);
   useEffect(() => {
-    let timer;
-    if (status) {
-      if (status.toLowerCase() === 'paid') setOpenSuccess(true);
-      if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
-      timer = setTimeout(() => {
-        setOpenSuccess(false);
-        setOpenCancel(false);
-      }, 3000);
-    }
+    if (!status || statusShownRef.current) return;
 
+    if (status.toLowerCase() === 'paid') setOpenSuccess(true);
+    if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
+
+    statusShownRef.current = true;
+
+    const timer = setTimeout(() => {
+      setOpenSuccess(false);
+      setOpenCancel(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [status]);
+  useEffect(() => {
     if (serviceRequest) {
       const vb = new VenoBox({ selector: '.venobox' });
       return () => {
-        clearTimeout(timer);
         vb.close();
       };
     }
-
-    return () => clearTimeout(timer);
-  }, [status, serviceRequest, existingApplication]);
+  }, [serviceRequest, existingApplication]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

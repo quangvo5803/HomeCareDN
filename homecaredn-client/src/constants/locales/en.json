@@ -1032,13 +1032,19 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
-    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
-    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
     "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
     "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
+
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address!",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide more description for better search results!",
+    "REQUIRED_SERVICE_TYPE": "Please select a service type!",
+    "REQUIRED_PACKAGE_OPTION": "Please select a package option!",
+    "REQUIRED_BUILDING_TYPE": "Please select a building type!",
+    "REQUIRED_STRUCTURE_TYPE": "Please select the main structure type!",
+
 
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
