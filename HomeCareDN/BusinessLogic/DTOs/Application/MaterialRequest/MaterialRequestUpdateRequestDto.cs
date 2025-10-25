@@ -3,7 +3,7 @@
     public class MaterialRequestUpdateRequestDto
     {
         public Guid MaterialRequestID { get; set; }
-        public required string Description { get; set; }
+        public string? Description { get; set; }
         public bool CanEditQuantity { get; set; }
         public List<MaterialRequestItemCreateDto>? AddItems { get; set; }
         public List<MaterialRequestItemUpdateDto>? UpdateItems { get; set; }

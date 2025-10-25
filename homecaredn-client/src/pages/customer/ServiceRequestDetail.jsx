@@ -147,7 +147,7 @@ export default function ServiceRequestDetail() {
                   </span>
                 </div>
                 <div className="flex gap-3">
-                  <StatusBadge status={serviceRequest.status} />
+                  <StatusBadge status={serviceRequest.status} type="Request" />
                 </div>
               </div>
 
@@ -369,9 +369,8 @@ export default function ServiceRequestDetail() {
                         {t('userPage.serviceRequestDetail.label_project')}
                       </span>
                     </div>
-                    <StatusBadge status={selectedContractor.status} />
+                    <StatusBadge status={selectedContractor.status} type="Application" />
                   </div>
-
                   {/* Price */}
                   <div className="bg-green-50 border-l-4 border-green-500 rounded-lg p-4 mb-6">
                     <p className="text-xs text-green-700 mb-1 uppercase tracking-wide font-medium">
@@ -391,27 +390,27 @@ export default function ServiceRequestDetail() {
                     {serviceRequest.estimatePrice && (
                       <p className="text-xs text-gray-600 mt-3 pt-3 border-t border-green-200">
                         {selectedContractor.estimatePrice <
-                        serviceRequest.estimatePrice
+                          serviceRequest.estimatePrice
                           ? t(
-                              'userPage.serviceRequestDetail.lowerThanEstimate',
-                              {
-                                value: (
-                                  (serviceRequest.estimatePrice -
-                                    selectedContractor.estimatePrice) /
-                                  1000000
-                                ).toFixed(0),
-                              }
-                            )
+                            'userPage.serviceRequestDetail.lowerThanEstimate',
+                            {
+                              value: (
+                                (serviceRequest.estimatePrice -
+                                  selectedContractor.estimatePrice) /
+                                1000000
+                              ).toFixed(0),
+                            }
+                          )
                           : t(
-                              'userPage.serviceRequestDetail.higherThanEstimate',
-                              {
-                                value: (
-                                  (selectedContractor.estimatePrice -
-                                    serviceRequest.estimatePrice) /
-                                  1000000
-                                ).toFixed(0),
-                              }
-                            )}
+                            'userPage.serviceRequestDetail.higherThanEstimate',
+                            {
+                              value: (
+                                (selectedContractor.estimatePrice -
+                                  serviceRequest.estimatePrice) /
+                                1000000
+                              ).toFixed(0),
+                            }
+                          )}
                       </p>
                     )}
                   </div>
@@ -561,7 +560,7 @@ export default function ServiceRequestDetail() {
 
                           <div className="flex items-center justify-between pt-3 border-t">
                             <span className="text-xs text-gray-500 tracking-wide">
-                              <StatusBadge status={c.status} />
+                              <StatusBadge status={c.status} type="Application" />
                             </span>
                             <span className="text-lg font-bold text-orange-600">
                               <span className="text-sm text-gray-500 font-normal">

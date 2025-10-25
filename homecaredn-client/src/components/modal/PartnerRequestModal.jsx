@@ -7,6 +7,7 @@ import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
 import LoadingModal from './LoadingModal';
+import StatusBadge from '../StatusBadge';
 
 export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
   const { t, i18n } = useTranslation();
@@ -131,7 +132,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                   {t('adminPartnerManager.partnerRequestModal.status')}
                 </div>
                 <div className="font-medium text-gray-900 break-words">
-                  {t(`Enums.PartnerStatus.${partnerRequest.status}`)}
+                  <StatusBadge status={partnerRequest.status} type="PartnerRequest" />
                 </div>
               </div>
               <div>
@@ -179,9 +180,8 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                       partnerRequest?.status !== 'Rejected' &&
                       setReason(e.target.value)
                     }
-                    className={`w-full border rounded-lg p-3 ${
-                      partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
-                    }`}
+                    className={`w-full border rounded-lg p-3 ${partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
+                      }`}
                     placeholder={t(
                       'adminPartnerManager.partnerRequestModal.rejectReasonPlaceHolder'
                     )}

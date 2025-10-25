@@ -1,5 +1,3 @@
-import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
@@ -10,28 +8,12 @@ import { showDeleteModal } from '../modal/DeleteModal';
 import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
 
-export default function ServiceRequestManager({ user }) {
+export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const {
-    loading,
-    serviceRequests,
-    fetchServiceRequestsByUserId,
-    deleteServiceRequest,
-  } = useServiceRequest();
-
-  useEffect(() => {
-    if (!user?.id) return;
-    (async () => {
-      try {
-        await fetchServiceRequestsByUserId({ FilterID: user.id });
-      } catch (err) {
-        toast.error(handleApiError(err, t('ERROR.LOAD_ERROR')));
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  const { loading, serviceRequests, deleteServiceRequest } =
+    useServiceRequest();
 
   const handleServiceRequestViewDetail = (serviceRequestId) => {
     navigate(`/Customer/ServiceRequestDetail/${serviceRequestId}`);
@@ -265,7 +247,7 @@ export default function ServiceRequestManager({ user }) {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <StatusBadge status={req.status} />
+                      <StatusBadge status={req.status} type="Request" />
                       {getPackageBadge(req.packageOption)}
                       {getContractorBadge(req.contractorApplyCount)}
                     </div>
@@ -315,7 +297,3 @@ export default function ServiceRequestManager({ user }) {
     </div>
   );
 }
-
-ServiceRequestManager.propTypes = {
-  user: PropTypes.object.isRequired,
-};
