@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from 'react';
-import { publicService } from '../services/publicService';
 import getServiceByRole from '../services/getServiceByRole';
 import { useAuth } from '../hook/useAuth';
 import MaterialContext from './MaterialContext';
@@ -27,7 +26,8 @@ export const MaterialProvider = ({ children }) => {
       Search,
     } = {}) => {
       try {
-        const data = await publicService.material.getAllMaterial({
+        const service = getServiceByRole();
+        const data = await service.material.getAllMaterial({
           PageNumber,
           PageSize,
           SortBy,
@@ -65,7 +65,9 @@ export const MaterialProvider = ({ children }) => {
   const getMaterialById = useCallback(async (id) => {
     try {
       setLoading(true);
-      return await publicService.material.getMaterialById(id);
+      const service = getServiceByRole();
+      var result = await service.material.getMaterialById(id);
+      return result;
     } catch (err) {
       toast.error(handleApiError(err));
       return null;
@@ -76,14 +78,6 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: get all by user id
   const executeFetchById = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
-      if (
-        !user?.role ||
-        (user.role !== 'Distributor' && user.role !== 'Admin')
-      ) {
-        toast.error('Unauthorized');
-        return { items: [], totalCount: 0 };
-      }
-
       try {
         const service = getServiceByRole(user.role);
         const data = await service.material.getAllMaterialByUserId({
@@ -171,7 +165,6 @@ export const MaterialProvider = ({ children }) => {
         setTotalMaterials((prev) => prev - 1);
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
       }
     },
     [user?.role]

@@ -76,7 +76,7 @@ export default function ContractorServiceRequestDetail() {
   useEffect(() => {
     let timer;
     if (status) {
-      if (status.toLowerCase() === 'success') setOpenSuccess(true);
+      if (status.toLowerCase() === 'paid') setOpenSuccess(true);
       if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
       timer = setTimeout(() => {
         setOpenSuccess(false);
@@ -173,10 +173,22 @@ export default function ContractorServiceRequestDetail() {
   const handlePayCommission = async () => {
     try {
       toast.info(t('contractorServiceRequestDetail.processingPayment'));
+      const estimatePrice = Number(existingApplication.estimatePrice);
+
+      let commission = 0;
+
+      if (estimatePrice <= 500_000_000) {
+        commission = estimatePrice * 0.02;
+      } else if (estimatePrice <= 2_000_000_000) {
+        commission = estimatePrice * 0.015;
+      } else {
+        commission = estimatePrice * 0.01;
+        if (commission > 100_000_000) commission = 100_000_000;
+      }
       const result = await PaymentService.createPayCommission({
         contractorApplicationID: existingApplication.contractorApplicationID,
         serviceRequestID: serviceRequestId,
-        amount: Number(existingApplication.estimatePrice) * 0.006,
+        amount: commission,
         description: serviceRequestId.slice(0, 19),
         itemName: 'Service Request Commission',
       });
@@ -347,7 +359,7 @@ export default function ContractorServiceRequestDetail() {
           {/* Nút thanh toán */}
           <div className="pt-4 border-t border-gray-200">
             <button
-              onClick={handlePayCommission}
+              onClick={() => handlePayCommission()}
               className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2"
             >
               <i className="fas fa-hand-holding-usd" />

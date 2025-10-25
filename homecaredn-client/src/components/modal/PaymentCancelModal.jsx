@@ -13,14 +13,16 @@ export default function PaymentCancelModal({ open, onClose }) {
           <i className="fas fa-times text-red-600 text-4xl"></i>
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          {t('PaymentCancelModal.title')}
+          {t('ModalPopup.PaymentCancelModal.title')}
         </h2>
-        <p className="text-gray-600 mb-6">{t('PaymentCancelModal.text')}</p>
+        <p className="text-gray-600 mb-6">
+          {t('ModalPopup.PaymentCancelModal.text')}
+        </p>
         <button
           onClick={onClose}
           className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          {t('Button.Close')}
+          {t('BUTTON.Close')}
         </button>
       </div>
     </div>

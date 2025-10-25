@@ -25,13 +25,9 @@ export const partnerRequest = {
       formData.append('ImagePublicIds', publicId);
     }
 
-    const res = await api.post(
-      '/PartnerRequests/create-partner-request',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
+    const res = await api.post('/Public/create-partner-request', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return res.data;
   },
 };

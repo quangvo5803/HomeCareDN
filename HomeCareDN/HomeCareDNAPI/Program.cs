@@ -1,4 +1,6 @@
-﻿using BusinessLogic.Services;
+﻿using System.Security.Claims;
+using System.Text;
+using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
@@ -13,8 +15,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
-using System.Security.Claims;
-using System.Text;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -82,7 +82,7 @@ namespace HomeCareDNAPI
             builder.Services.AddHttpContextAccessor();
 
             /// Register Options
-            /// 
+            ///
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<CloudinaryOptions>(
                 builder.Configuration.GetSection("Cloudinary")
@@ -135,7 +135,6 @@ namespace HomeCareDNAPI
             /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

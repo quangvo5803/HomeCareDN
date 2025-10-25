@@ -107,7 +107,7 @@ export const CategoryProvider = ({ children }) => {
       try {
         setLoading(true);
         const service = getServiceByRole(user.role);
-        const newCategory = service.category.createCategory(categoryData);
+        const newCategory = await service.category.createCategory(categoryData);
         setCategories((prev) => [...prev, newCategory]);
         // Tăng tổng số category
         setTotalCategories((prev) => prev + 1);
@@ -115,7 +115,6 @@ export const CategoryProvider = ({ children }) => {
         return newCategory;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
       } finally {
         setLoading(false);
       }

@@ -24,7 +24,6 @@ export default function DistributorMaterialManager() {
     totalMaterials,
     loading,
     fetchMaterialsByUserId,
-    getMaterialById,
     createMaterial,
     updateMaterial,
     deleteMaterial,
@@ -33,7 +32,7 @@ export default function DistributorMaterialManager() {
   const [categories, setCategories] = useState([]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingMaterial, setEditingMaterial] = useState(null);
+  const [editingMaterialID, setEditingMaterialID] = useState(null);
   useEffect(() => {
     (async () => {
       try {
@@ -92,10 +91,10 @@ export default function DistributorMaterialManager() {
       setCurrentPage(lastPage);
     }
     setIsModalOpen(false);
-    setEditingMaterial(null);
+    setEditingMaterialID(null);
   };
 
-  if (loading) return <Loading />;
+  if (loading && !isModalOpen) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
   return (
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
@@ -118,7 +117,7 @@ export default function DistributorMaterialManager() {
         <button
           className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
           onClick={() => {
-            setEditingMaterial(null);
+            setEditingMaterialID(null);
             setIsModalOpen(true);
           }}
         >
@@ -132,10 +131,10 @@ export default function DistributorMaterialManager() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setEditingMaterial(null);
+          setEditingMaterialID(null);
         }}
         onSave={handleSave}
-        material={editingMaterial}
+        materialID={editingMaterialID}
         brands={brands}
         categories={categories}
         setUploadProgress={setUploadProgress}
@@ -232,8 +231,7 @@ export default function DistributorMaterialManager() {
                       <button
                         className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                         onClick={async () => {
-                          var res = await getMaterialById(material.materialID);
-                          setEditingMaterial(res);
+                          setEditingMaterialID(material.materialID);
                           setIsModalOpen(true);
                         }}
                       >

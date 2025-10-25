@@ -133,7 +133,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         // ===== Image ======
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("delete-image")]
         public async Task<IActionResult> DeleteImage([FromQuery] string imageUrl)
         {

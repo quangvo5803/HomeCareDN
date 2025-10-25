@@ -50,7 +50,7 @@ namespace BusinessLogic.Services
             var cancelUrl =
                 $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}?status=cancelled";
             var returnUrl =
-                $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}?status=success";
+                $"{baseUrl}/Contractor/service-request/{requestDto.ServiceRequestID}?status=paid";
 
             var paymentData = new PaymentData(
                 orderCode,

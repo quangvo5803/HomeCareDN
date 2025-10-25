@@ -263,7 +263,8 @@ export default function MaterialModal({
               {/* Unit */}
               <div>
                 <label className="block mb-2 text-sm font-medium text-gray-700">
-                  {t('distributorMaterialManager.materialModal.unit')}
+                  {t('distributorMaterialManager.materialModal.unit')}{' '}
+                  <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -418,7 +419,10 @@ export default function MaterialModal({
                   </div>
                 )}
               </div>
-
+              <label className="block text-sm font-medium text-gray-700">
+                {t('adminMaterialManager.materialModal.images')}{' '}
+                {material ? '' : <span className="text-red-500">*</span>}
+              </label>
               {/* Images */}
               <div className="flex flex-wrap col-span-2 gap-3">
                 {images.map((img) => (
@@ -487,6 +491,13 @@ export default function MaterialModal({
               type="button"
               onClick={handleSubmit}
               className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600"
+              disabled={
+                !name.trim() ||
+                !unit.trim() ||
+                !brandID ||
+                !categoryID ||
+                images.length === 0
+              }
             >
               {material ? t('BUTTON.Update') : t('BUTTON.Add')}
             </button>

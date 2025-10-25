@@ -43,25 +43,21 @@ export const AddressProvider = ({ children }) => {
     }
   }, []);
 
-  const updateAddress = useCallback(
-    async (dto) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        setLoading(true);
-        const updated = await customerService.address.updateAddress(dto);
-        // Optimistic update
-        setAddresses((prev) =>
-          prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
-        );
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [user]
-  );
+  const updateAddress = useCallback(async (dto) => {
+    try {
+      setLoading(true);
+      const updated = await customerService.address.updateAddress(dto);
+      // Optimistic update
+      setAddresses((prev) =>
+        prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
+      );
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const deleteAddress = useCallback(async (id) => {
     try {

@@ -978,7 +978,7 @@
       "text": "Thank you for completing your commission payment."
     },
     "PaymentCancelModal": {
-      "title": "Payment Failed!",
+      "title": "Payment Failed",
       "text": "An error occurred during payment. Please try again."
     }
   },
