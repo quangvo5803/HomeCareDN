@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace DataAccess.Migrations.Application
 {
     /// <inheritdoc />
     public partial class InitDatabase : Migration
@@ -49,6 +49,22 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Conversations", x => x.ConversationId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DistributorApplicationItems",
+                schema: "app",
+                columns: table => new
+                {
+                    DistributorApplicationItemID = table.Column<Guid>(type: "uuid", nullable: false),
+                    DistributorApplicationID = table.Column<Guid>(type: "uuid", nullable: false),
+                    MaterialID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DistributorApplicationItems", x => x.DistributorApplicationItemID);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,6 +241,36 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentTransactions",
+                schema: "app",
+                columns: table => new
+                {
+                    PaymentTransactionID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ContractorApplicationID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ServiceRequestID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    ItemName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    OrderCode = table.Column<long>(type: "bigint", nullable: false),
+                    CheckoutUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    PaymentLinkID = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PaidAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentTransactions", x => x.PaymentTransactionID);
+                    table.ForeignKey(
+                        name: "FK_PaymentTransactions_ContractorApplications_ContractorApplic~",
+                        column: x => x.ContractorApplicationID,
+                        principalSchema: "app",
+                        principalTable: "ContractorApplications",
+                        principalColumn: "ContractorApplicationID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ServiceRequests",
                 schema: "app",
                 columns: table => new
@@ -243,7 +289,7 @@ namespace DataAccess.Migrations
                     EstimatePrice = table.Column<double>(type: "double precision", nullable: true),
                     Description = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsOpen = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     SelectedContractorApplicationID = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -308,6 +354,77 @@ namespace DataAccess.Migrations
                         principalColumn: "ServiceID");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "DistributorApplications",
+                schema: "app",
+                columns: table => new
+                {
+                    DistributorApplicationID = table.Column<Guid>(type: "uuid", nullable: false),
+                    MaterialRequestID = table.Column<Guid>(type: "uuid", nullable: false),
+                    DistributorID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Message = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DistributorApplications", x => x.DistributorApplicationID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MaterialRequests",
+                schema: "app",
+                columns: table => new
+                {
+                    MaterialRequestID = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerID = table.Column<Guid>(type: "uuid", nullable: false),
+                    SelectedDistributorApplicationID = table.Column<Guid>(type: "uuid", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CanEditQuantity = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    SelectedDistributorApplicationDistributorApplicationID = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MaterialRequests", x => x.MaterialRequestID);
+                    table.ForeignKey(
+                        name: "FK_MaterialRequests_DistributorApplications_SelectedDistributo~",
+                        column: x => x.SelectedDistributorApplicationDistributorApplicationID,
+                        principalSchema: "app",
+                        principalTable: "DistributorApplications",
+                        principalColumn: "DistributorApplicationID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MaterialRequestItems",
+                schema: "app",
+                columns: table => new
+                {
+                    MaterialRequestItemID = table.Column<Guid>(type: "uuid", nullable: false),
+                    MaterialRequestID = table.Column<Guid>(type: "uuid", nullable: false),
+                    MaterialID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MaterialRequestItems", x => x.MaterialRequestItemID);
+                    table.ForeignKey(
+                        name: "FK_MaterialRequestItems_MaterialRequests_MaterialRequestID",
+                        column: x => x.MaterialRequestID,
+                        principalSchema: "app",
+                        principalTable: "MaterialRequests",
+                        principalColumn: "MaterialRequestID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_MaterialRequestItems_Materials_MaterialID",
+                        column: x => x.MaterialID,
+                        principalSchema: "app",
+                        principalTable: "Materials",
+                        principalColumn: "MaterialID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Brands_BrandLogoID",
                 schema: "app",
@@ -331,6 +448,12 @@ namespace DataAccess.Migrations
                 schema: "app",
                 table: "ContractorApplications",
                 column: "ServiceRequestID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DistributorApplications_MaterialRequestID",
+                schema: "app",
+                table: "DistributorApplications",
+                column: "MaterialRequestID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ContractorApplicationID",
@@ -363,6 +486,24 @@ namespace DataAccess.Migrations
                 column: "ServiceRequestID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_MaterialRequestItems_MaterialID",
+                schema: "app",
+                table: "MaterialRequestItems",
+                column: "MaterialID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaterialRequestItems_MaterialRequestID",
+                schema: "app",
+                table: "MaterialRequestItems",
+                column: "MaterialRequestID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MaterialRequests_SelectedDistributorApplicationDistributorA~",
+                schema: "app",
+                table: "MaterialRequests",
+                column: "SelectedDistributorApplicationDistributorApplicationID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Materials_BrandID",
                 schema: "app",
                 table: "Materials",
@@ -373,6 +514,12 @@ namespace DataAccess.Migrations
                 schema: "app",
                 table: "Materials",
                 column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PaymentTransactions_ContractorApplicationID",
+                schema: "app",
+                table: "PaymentTransactions",
+                column: "ContractorApplicationID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceRequests_SelectedContractorApplicationID",
@@ -407,6 +554,16 @@ namespace DataAccess.Migrations
                 principalTable: "ServiceRequests",
                 principalColumn: "ServiceRequestID",
                 onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_DistributorApplications_MaterialRequests_MaterialRequestID",
+                schema: "app",
+                table: "DistributorApplications",
+                column: "MaterialRequestID",
+                principalSchema: "app",
+                principalTable: "MaterialRequests",
+                principalColumn: "MaterialRequestID",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
@@ -427,6 +584,11 @@ namespace DataAccess.Migrations
                 schema: "app",
                 table: "ContractorApplications");
 
+            migrationBuilder.DropForeignKey(
+                name: "FK_DistributorApplications_MaterialRequests_MaterialRequestID",
+                schema: "app",
+                table: "DistributorApplications");
+
             migrationBuilder.DropTable(
                 name: "ChatMessages",
                 schema: "app");
@@ -436,7 +598,19 @@ namespace DataAccess.Migrations
                 schema: "app");
 
             migrationBuilder.DropTable(
+                name: "DistributorApplicationItems",
+                schema: "app");
+
+            migrationBuilder.DropTable(
                 name: "Documents",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "MaterialRequestItems",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "PaymentTransactions",
                 schema: "app");
 
             migrationBuilder.DropTable(
@@ -473,6 +647,14 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "ContractorApplications",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "MaterialRequests",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "DistributorApplications",
                 schema: "app");
         }
     }
