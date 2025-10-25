@@ -143,7 +143,10 @@ export default function AdminServiceManager() {
             {/* Add New Service Button */}
             <button
               className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200 sm:w-auto w-full"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setIsModalOpen(true);
+                setEditingServiceID(null);
+              }}
             >
               <i className="fa-solid fa-plus"></i>
               {t('BUTTON.AddNewService')}
