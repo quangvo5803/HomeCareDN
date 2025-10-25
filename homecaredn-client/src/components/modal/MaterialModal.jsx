@@ -6,7 +6,6 @@ import { useMaterial } from '../../hook/useMaterial';
 import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
-import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import LoadingModal from './LoadingModal';
 
@@ -184,41 +183,39 @@ export default function MaterialModal({
       return;
     }
 
-    try {
-      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
+    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
 
-      const data = {
-        MaterialID: material?.materialID,
-        UserID: user?.id || null,
-        Name: name || null,
-        NameEN: nameEN || null,
-        Unit: unit || null,
-        UnitEN: unitEN || null,
-        BrandID: brandID || null,
-        CategoryID: categoryID || null,
-        Description: description || null,
-        DescriptionEN: descriptionEN || null,
-      };
+    const data = {
+      MaterialID: material?.materialID,
+      UserID: user?.id || null,
+      Name: name || null,
+      NameEN: nameEN || null,
+      Unit: unit || null,
+      UnitEN: unitEN || null,
+      BrandID: brandID || null,
+      CategoryID: categoryID || null,
+      Description: description || null,
+      DescriptionEN: descriptionEN || null,
+    };
 
-      if (newFiles.length > 0) {
-        const uploaded = await uploadImageToCloudinary(
-          newFiles,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => setUploadProgress(percent),
-          'HomeCareDN/Material'
-        );
-        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        data.ImageUrls = uploadedArray.map((u) => u.url);
-        data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-
-        onClose();
-        setUploadProgress(0);
-      }
-
-      await onSave(data);
-    } catch (err) {
-      toast.error(t(handleApiError(err)));
+    if (newFiles.length > 0) {
+      const uploaded = await uploadImageToCloudinary(
+        newFiles,
+        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+        (percent) => setUploadProgress(percent),
+        'HomeCareDN/Material'
+      );
+      const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
+      data.ImageUrls = uploadedArray.map((u) => u.url);
+      data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
+    } else {
+      data.ImageUrls = [];
+      data.ImagePublicIds = [];
     }
+    onClose();
+    setUploadProgress(0);
+
+    await onSave(data);
   };
 
   if (!isOpen) return null;
