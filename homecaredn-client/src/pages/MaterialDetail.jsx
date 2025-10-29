@@ -14,7 +14,9 @@ export default function MaterialDetail() {
   useEffect(() => {
     const fetchMaterial = async () => {
       const data = await getMaterialById(materialID);
-      data.type = 'material';
+      if (data) {
+        data.type = 'material';
+      }
       setMaterial(data || {});
     };
     fetchMaterial();

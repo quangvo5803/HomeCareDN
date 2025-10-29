@@ -131,8 +131,8 @@ export default function ServiceModal({
             Swal.close();
             toast.success(t('SUCCESS.DELETE'));
             removeImageFromState(img);
-          } catch (err) {
-            handleApiError(err, t);
+          } catch {
+            toast.error(t('ERROR.DELETE'));
           }
         },
       });

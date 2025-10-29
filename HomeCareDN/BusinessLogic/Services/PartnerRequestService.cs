@@ -296,9 +296,12 @@ namespace BusinessLogic.Services
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
                 i.PartnerRequestID == partnerRequestId
             );
+<<<<<<< HEAD
             var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(i =>
                 i.PartnerRequestID == partnerRequestId
             );
+=======
+>>>>>>> develop
             if (images != null && images.Any())
             {
                 foreach (var image in images)

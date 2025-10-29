@@ -934,11 +934,23 @@
     },
     "DeleteApplicationModal":{
       "title": "Bạn có chắc chắn?",
+<<<<<<< HEAD
       "text":"Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
     },
     "DeleteDocumentModal":{
       "title": "Bạn có chắc chắn?",
       "text":"Tài liệu này sẽ bị xóa vĩnh viễn"
+=======
+      "text": "Đơn ứng tuyển này sẽ bị xóa vĩnh viễn"
+    },
+    "PaymentSuccessModal": {
+      "title": "Thanh toán thành công!",
+      "text": "Cảm ơn bạn đã hoàn tất thanh toán hoa hồng."
+    },
+    "PaymentCancelModal": {
+      "title": "Thanh toán thất bại!",
+      "text": "Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại."
+>>>>>>> develop
     }
   },
   "ERROR": {
@@ -991,15 +1003,28 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
+<<<<<<< HEAD
     "REQUIRED_ADDRESS":"Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhất",
     "REQUIRD_REJECT_REASON":"Vui lòng nhập lí do từ chối",
+=======
+    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+
+    "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
+>>>>>>> develop
 
     "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
     "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
     "PARTNER_REQUEST_PENDING": "Email này đã tạo đơn yêu cầu và đang trong thời gian xét duyệt!",
 
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ!",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhấ!",
+    "REQUIRED_SERVICE_TYPE": "Vui lòng chọn loại dịch vụ!",
+    "REQUIRED_PACKAGE_OPTION":"Vui lòng chọn gọi dịch vụ!",
+    "REQUIRED_BUILDING_TYPE": "Vui lòng chọn loại công trình!",
+    "REQUIRED_STRUCTURE_TYPE": "Vui lòng chọn kết cấu chính!",
+    
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
@@ -1038,9 +1063,14 @@
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
+<<<<<<< HEAD
     "DELETE_APPLICATION":"Đã xóa thành công đơn ứng tuyển của bạn",
     "APPICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
 
+=======
+    "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
+    "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công  "
+>>>>>>> develop
   },
   "roles": {
     "Distributor": "Nhà phân phối",

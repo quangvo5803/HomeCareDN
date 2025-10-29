@@ -6,12 +6,13 @@ namespace BusinessLogic.Services.Interfaces
     public interface IServiceRequestService
     {
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            bool isContractor = false
         );
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestByUserIdAsync(
             QueryParameters parameters
         );
-        Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id);
+        Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id, bool isContractor = false);
         Task<ServiceRequestDto> CreateServiceRequestAsync(
             ServiceRequestCreateRequestDto createRequestDto
         );

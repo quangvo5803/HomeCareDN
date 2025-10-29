@@ -19,7 +19,7 @@ const MAX_DOCUMENTS = 5;
 const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
 
 export default function ServiceRequestCreateUpdate() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
   const { serviceRequestId } = useParams();
@@ -263,6 +263,18 @@ export default function ServiceRequestCreateUpdate() {
       setImageProgress({ loaded: 0, total: 0 });
       setDocumentProgress({ loaded: 0, total: 0 });
     }
+<<<<<<< HEAD
+=======
+    if (serviceRequestId) {
+      payload.ServiceRequestID = serviceRequestId;
+      await updateServiceRequest(payload);
+    } else {
+      await createServiceRequest(payload);
+    }
+    navigate('/Customer', {
+      state: { tab: 'service_requests' },
+    });
+>>>>>>> develop
   };
 
   // Xoá ảnh khỏi state
@@ -570,16 +582,20 @@ export default function ServiceRequestCreateUpdate() {
                 </div>
                 {width && length && floors ? (
                   <p className="text-sm text-gray-600 mt-1 mb-2">
-                    {' '}
                     {t('userPage.createServiceRequest.calculatedArea')}:{' '}
                     <span className="font-semibold text-orange-600">
-                      {' '}
-                      {Number(width) * Number(length) * Number(floors)} m²{' '}
-                    </span>{' '}
+                      {(
+                        Number(width) *
+                        Number(length) *
+                        Number(floors)
+                      ).toFixed(1)}{' '}
+                      m²
+                    </span>
                   </p>
                 ) : (
                   <p></p>
                 )}
+
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -608,7 +624,10 @@ export default function ServiceRequestCreateUpdate() {
                       <p className="text-sm text-gray-500">
                         {t('userPage.createServiceRequest.estimateInWord')}
                         <span className="font-semibold">
-                          {numberToWordsByLang(Number(estimatePrice))}
+                          {numberToWordsByLang(
+                            Number(estimatePrice),
+                            i18n.language
+                          )}
                         </span>
                       </p>
                     </>
@@ -717,6 +736,7 @@ export default function ServiceRequestCreateUpdate() {
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                                 {t('common.new')}
+<<<<<<< HEAD
                               </span>
                             </div>
                           )}
@@ -783,6 +803,8 @@ export default function ServiceRequestCreateUpdate() {
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                                 {t('common.new')}
+=======
+>>>>>>> develop
                               </span>
                             </div>
                           )}

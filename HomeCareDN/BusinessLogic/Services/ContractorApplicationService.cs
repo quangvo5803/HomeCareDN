@@ -36,6 +36,53 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
+<<<<<<< HEAD
+=======
+        public async Task<
+            PagedResultDto<ContractorApplicationFullDto>
+        > GetAllContractorByServiceRequestIdAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork
+                .ContractorApplicationRepository.GetQueryable(includeProperties: "Images")
+                .Where(sr => sr.ServiceRequestID == parameters.FilterID);
+
+            var totalCount = await query.CountAsync();
+
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<ContractorApplicationFullDto>>(items);
+
+            foreach (var dto in dtos)
+            {
+                var contractor = items.First(x =>
+                    x.ContractorApplicationID == dto.ContractorApplicationID
+                );
+
+                if (contractor.ContractorID != Guid.Empty)
+                {
+                    var user = await _userManager.FindByIdAsync(contractor.ContractorID.ToString());
+                    if (user != null)
+                    {
+                        dto.ContractorName = user.FullName ?? user.UserName ?? "";
+                        dto.ContractorEmail = user.Email ?? "";
+                        dto.ContractorPhone = user.PhoneNumber ?? "";
+                    }
+                }
+            }
+
+            return new PagedResultDto<ContractorApplicationFullDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
+
+>>>>>>> develop
         public async Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
             ContractorCreateApplicationDto createRequest
         )
@@ -130,7 +177,7 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
+        public async Task<ContractorApplicationFullDto?> GetApplicationByServiceRequestIDAndContractorIDAsync(
             ContractorGetApplicationDto getRequest
         )
         {
@@ -185,7 +232,12 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
+<<<<<<< HEAD
             contractorApplication.Status = ApplicationStatus.Approved;
+=======
+            serviceRequest.Status = RequestStatus.Closed;
+            contractorApplication.Status = ApplicationStatus.PendingCommission;
+>>>>>>> develop
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)

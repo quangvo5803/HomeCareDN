@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import SupportModal from '../../components/modal/SupportModal';
 import Loading from '../../components/Loading';
-import { contactService } from '../../services/contactService';
+import { adminService } from '../../services/adminService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import StatusBadge from '../../components/StatusBadge';
@@ -30,7 +30,7 @@ export default function AdminSupportManager() {
       setLoading(true);
       const isProcessedParam =
         filter === 'all' ? undefined : filter === 'processed';
-      const result = await contactService.listAll({
+      const result = await adminService.support.listAllSupport({
         PageNumber: currentPage,
         PageSize: pageSize,
         Search: debouncedSearch,
@@ -62,7 +62,7 @@ export default function AdminSupportManager() {
       titleKey: 'ModalPopup.DeleteSupportModal.title',
       textKey: 'ModalPopup.DeleteSupportModal.text',
       onConfirm: async () => {
-        await contactService.delete(id);
+        await adminService.support.deleteSupport(id);
         toast.success(t('SUCCESS.DELETE'));
 
         fetchSupports();
@@ -169,6 +169,10 @@ export default function AdminSupportManager() {
                       <td className="text-center">
                         <StatusBadge
                           status={s.isProcessed ? 'Processed' : 'Pending'}
+<<<<<<< HEAD
+=======
+                          type="Request"
+>>>>>>> develop
                         />
                       </td>
                       <td className="text-center space-x-2">

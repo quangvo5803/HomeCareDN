@@ -1,4 +1,4 @@
-export const withMinLoading = async (asyncFunc, setLoading, minTime = 500) => {
+export const withMinLoading = async (asyncFunc, setLoading, minTime = 1000) => {
   const startTime = Date.now();
   setLoading(true);
   try {

@@ -4,10 +4,16 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IContractorApplicationService
     {
+<<<<<<< HEAD
+=======
+        Task<PagedResultDto<ContractorApplicationFullDto>> GetAllContractorByServiceRequestIdAsync(
+            QueryParameters parameters
+        );
+>>>>>>> develop
         Task<ContractorApplicationFullDto> CreateContractorApplicationAsync(
             ContractorCreateApplicationDto createRequest
         );
-        Task<ContractorApplicationFullDto?> GetApplicationByRequestAndContractorAsync(
+        Task<ContractorApplicationFullDto?> GetApplicationByServiceRequestIDAndContractorIDAsync(
             ContractorGetApplicationDto getRequest
         );
         Task<ContractorApplicationPendingDto> AcceptContractorApplicationAsync(

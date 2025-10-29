@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
-import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { customerService } from '../../services/customerService';
 import StatusBadge from '../../components/StatusBadge';
 
 export default function ServiceRequestDetail() {
@@ -27,7 +27,7 @@ export default function ServiceRequestDetail() {
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
       const approvedContractor =
-        await contractorApplicationService.acceptContractorApplication(
+        await customerService.contractorApplication.acceptContractorApplication(
           contractorApplicationID
         );
       setSelectedContractor(approvedContractor);
@@ -50,7 +50,7 @@ export default function ServiceRequestDetail() {
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
       const rejectContractor =
-        await contractorApplicationService.rejectContractorApplication(
+        await customerService.contractorApplication.rejectContractorApplication(
           contractorApplicationID
         );
       setSelectedContractor(rejectContractor);
@@ -125,12 +125,12 @@ export default function ServiceRequestDetail() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Request Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Info Card */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white rounded-2xl shadow-sm border p-6">
               <div className="flex items-start gap-4 mb-6">
                 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                   <i className="fas fa-hammer text-orange-600 text-xl"></i>
@@ -366,9 +366,11 @@ export default function ServiceRequestDetail() {
                     {t('userPage.serviceRequestDetail.label_area')}
                   </p>
                   <p className="text-2xl font-bold text-blue-900">
-                    {serviceRequest.width *
+                    {(
+                      serviceRequest.width *
                       serviceRequest.length *
-                      serviceRequest.floors}
+                      serviceRequest.floors
+                    ).toFixed(1)}
                     <span className="text-sm font-normal"> m²</span>
                   </p>
                 </div>
@@ -402,7 +404,7 @@ export default function ServiceRequestDetail() {
 
           {/* Right Column - Contractors */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border p-6 sticky top-28">
+            <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-28">
               {selectedContractor ? (
                 <>
                   {/* Contractor Detail View */}
@@ -440,7 +442,14 @@ export default function ServiceRequestDetail() {
                         {t('userPage.serviceRequestDetail.label_project')}
                       </span>
                     </div>
+<<<<<<< HEAD
                     <StatusBadge status={selectedContractor.status} />
+=======
+                    <StatusBadge
+                      status={selectedContractor.status}
+                      type="Application"
+                    />
+>>>>>>> develop
                   </div>
 
                   {/* Price */}
@@ -711,7 +720,14 @@ export default function ServiceRequestDetail() {
 
                           <div className="flex items-center justify-between pt-3 border-t">
                             <span className="text-xs text-gray-500 tracking-wide">
+<<<<<<< HEAD
                               <StatusBadge status={c.status} />
+=======
+                              <StatusBadge
+                                status={c.status}
+                                type="Application"
+                              />
+>>>>>>> develop
                             </span>
                             <span className="text-lg font-bold text-orange-600">
                               <span className="text-sm text-gray-500 font-normal">
