@@ -1,11 +1,7 @@
-﻿using DataAccess.Entities.Application;
-using Microsoft.AspNetCore.Http;
-
-namespace DataAccess.Repositories.Interfaces
+﻿namespace DataAccess.Repositories.Interfaces
 {
-    public interface IDocumentRepository : IRepository<Document>
+    public interface IDocumentRepository
     {
-        Task UploadDocumentAsync(IFormFile file, string folder, Document document);
         Task<bool> DeleteDocumentAsync(string publicId);
     }
 }

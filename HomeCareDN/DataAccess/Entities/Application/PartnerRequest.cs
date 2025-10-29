@@ -28,8 +28,6 @@ namespace DataAccess.Entities.Application
         [MaxLength(500)]
         public string? RejectionReason { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public ICollection<Document>? Documents { get; set; } = new List<Document>();
-
         public ICollection<Image>? Images { get; set; } = new List<Image>();
     }
 

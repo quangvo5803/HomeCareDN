@@ -169,10 +169,7 @@ export default function AdminSupportManager() {
                       <td className="text-center">
                         <StatusBadge
                           status={s.isProcessed ? 'Processed' : 'Pending'}
-<<<<<<< HEAD
-=======
                           type="Request"
->>>>>>> develop
                         />
                       </td>
                       <td className="text-center space-x-2">

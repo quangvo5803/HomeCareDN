@@ -179,19 +179,11 @@ export default function ContractorServiceRequestManager() {
                     return (
                       <div
                         key={request.serviceRequestID}
-<<<<<<< HEAD
                         className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 hover:border-orange-200"
-=======
-                        className={`group relative bg-white border rounded-xl p-6 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 border-gray-200`}
->>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                       >
                         {/* Left gradient accent bar */}
                         <div
-<<<<<<< HEAD
                           className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
-=======
-                          className={`absolute inset-y-0 left-0 w-1 rounded-l-xl bg-gray-200`}
->>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                         />
 
                         {/* Header row */}
@@ -222,18 +214,12 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} />
+                          <StatusBadge status={request.status} type="Request" />
                         </div>
-<<<<<<< HEAD
 
                         {/* Meta chips - Improved */}
                         <div className="pl-4 mb-5 flex flex-wrap gap-2">
                           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200">
-=======
-                        {/* Meta chips */}
-                        <div className="pl-3 mb-4 flex flex-wrap gap-2">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
->>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                             <i className="fa-solid fa-box-open" />
                             {t(`Enums.PackageOption.${request.packageOption}`)}
                           </span>
@@ -248,7 +234,6 @@ export default function ContractorServiceRequestManager() {
                               {t('contractorServiceRequestDetail.floorsUnit')}
                             </span>
                           )}
-<<<<<<< HEAD
                           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 border border-teal-200">
                             <i className="fa-solid fa-ruler-combined" />
                             {(
@@ -259,12 +244,6 @@ export default function ContractorServiceRequestManager() {
                             m²
                           </span>
                           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border border-orange-200">
-=======
-                          <span
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs
-                                                        bg-orange-50 text-orange-700 ring-1 ring-orange-200"
-                          >
->>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                             <i className="fa-solid fa-coins" />
                             {request.estimatePrice
                               ? formatVND(request.estimatePrice)
@@ -366,7 +345,7 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} />
+                          <StatusBadge status={request.status} type="Request" />
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3 text-xs">

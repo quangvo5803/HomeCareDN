@@ -41,7 +41,5 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
 
         public List<string>? ImageUrls { get; set; }
         public List<string>? ImagePublicIds { get; set; }
-        public List<string>? DocumentUrls { get; set; }
-        public List<string>? DocumentPublicIds { get; set; }
     }
 }

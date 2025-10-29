@@ -15,13 +15,15 @@ namespace DataAccess.Entities.Application
         public DateTime? DueCommisionTime { get; set; }
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<Image>? Images { get; set; }
-        public ICollection<Document>? Documents { get; set; }
     }
 
     public enum ApplicationStatus
     {
         [Display(Name = "Pending")]
         Pending,
+
+        [Display(Name = "PendingCommission")]
+        PendingCommission,
 
         [Display(Name = "Approved")]
         Approved,

@@ -21,7 +21,5 @@ namespace BusinessLogic.DTOs.Application.Partner
         public string? Description { get; set; }
         public required List<string> ImageUrls { get; set; }
         public required List<string> ImagePublicIds { get; set; }
-        public required List<string> DocumentUrls { get; set; }
-        public required List<string> DocumentPublicIds { get; set; }
     }
 }

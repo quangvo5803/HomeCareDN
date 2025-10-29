@@ -289,9 +289,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("PartnerRequestID")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -300,12 +297,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.HasKey("DocumentID");
-
-                    b.HasIndex("ContractorApplicationID");
-
-                    b.HasIndex("PartnerRequestID");
-
-                    b.HasIndex("ServiceRequestID");
 
                     b.ToTable("Documents", "app");
                 });
@@ -513,6 +504,60 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("PartnerRequests", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.PaymentTransaction", b =>
+                {
+                    b.Property<Guid>("PaymentTransactionID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("CheckoutUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("ContractorApplicationID")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<long>("OrderCode")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("PaidAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PaymentLinkID")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<Guid>("ServiceRequestID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("PaymentTransactionID");
+
+                    b.HasIndex("ContractorApplicationID");
+
+                    b.ToTable("PaymentTransactions", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
                     b.Property<Guid>("ServiceID")
@@ -668,21 +713,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ContractorApplicationID");
-
-                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("PartnerRequestID");
-
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ServiceRequestID");
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -751,6 +781,17 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("Material");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.PaymentTransaction", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", "ContractorApplication")
+                        .WithMany()
+                        .HasForeignKey("ContractorApplicationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ContractorApplication");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
@@ -772,8 +813,6 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Images");
                 });
 
@@ -796,8 +835,6 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Images");
                 });
 
@@ -809,8 +846,6 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
-
-                    b.Navigation("Documents");
 
                     b.Navigation("Images");
                 });

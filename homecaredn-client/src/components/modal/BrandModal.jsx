@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useBrand } from '../../hook/useBrand';
 import LoadingModal from './LoadingModal';
 
@@ -85,7 +85,7 @@ export default function BrandModal({
       };
 
       if (logoFile) {
-        const result = await uploadToCloudinary(
+        const result = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => {

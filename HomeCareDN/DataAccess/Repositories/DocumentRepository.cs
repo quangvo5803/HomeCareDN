@@ -2,9 +2,7 @@
 using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
-using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Ultitity.Options;
@@ -29,32 +27,12 @@ namespace DataAccess.Repositories
             _cloudinary = new Cloudinary(account);
         }
 
-        public async Task UploadDocumentAsync(IFormFile file, string folder, Document document)
-        {
-            await using var stream = file.OpenReadStream();
-
-            var uploadParams = new RawUploadParams
-            {
-                File = new FileDescription(file.FileName, stream),
-                Folder = folder,
-                UseFilename = true,
-                UniqueFilename = true,
-                Overwrite = false,
-            };
-
-            var result = await _cloudinary.UploadAsync(uploadParams);
-            document.PublicId = result.PublicId;
-            document.DocumentUrl = result.SecureUrl.ToString();
-            _db.Documents.Add(document);
-        }
-
         public async Task<bool> DeleteDocumentAsync(string publicId)
         {
             if (string.IsNullOrEmpty(publicId))
                 return false;
 
-            var deletionParams = new DeletionParams(publicId) { ResourceType = ResourceType.Raw };
-            ;
+            var deletionParams = new DeletionParams(publicId);
             var result = await _cloudinary.DestroyAsync(deletionParams);
 
             if (result.Error != null)

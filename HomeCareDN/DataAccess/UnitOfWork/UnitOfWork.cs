@@ -13,7 +13,6 @@ namespace DataAccess.UnitOfWork
         private readonly ApplicationDbContext _db;
 
         public IImageRepository ImageRepository { get; private set; }
-        public IDocumentRepository DocumentRepository { get; private set; }
         public IServiceRequestRepository ServiceRequestRepository { get; private set; }
         public IMaterialRepository MaterialRepository { get; private set; }
         public IServiceRepository ServiceRepository { get; private set; }
@@ -41,20 +40,12 @@ namespace DataAccess.UnitOfWork
             private set;
         }
 
-<<<<<<< HEAD
         public IPaymentTransactionsRepository PaymentTransactionsRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudinaryOptions)
         {
             _db = db;
             ImageRepository = new ImageRepository(_db, cloudinaryOptions);
-=======
-        public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
-        {
-            _db = db;
-            ImageRepository = new ImageRepository(_db, cloudaryOptions);
-            DocumentRepository = new DocumentRepository(_db, cloudaryOptions);
->>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
             ServiceRequestRepository = new ServiceRequestRepository(_db);
             MaterialRepository = new MaterialRepository(_db);
             ServiceRepository = new ServiceRepository(_db);
@@ -69,6 +60,7 @@ namespace DataAccess.UnitOfWork
             MaterialRequestItemRepository = new MaterialRequestItemRepository(_db);
             DistributorApplicationRepository = new DistributorApplicationRepository(_db);
             DistributorApplicationItemRepository = new DistributorApplicationItemRepository(_db);
+            PaymentTransactionsRepository = new PaymentTransactionsRepository(_db);
         }
 
         public async Task SaveAsync()

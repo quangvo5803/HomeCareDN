@@ -7,7 +7,7 @@ import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
+import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import LoadingModal from './LoadingModal';
 
 //For TINY MCE
@@ -174,7 +174,7 @@ export default function ServiceModal({
       }
 
       if (newFiles.length > 0) {
-        const uploaded = await uploadToCloudinary(
+        const uploaded = await uploadImageToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
