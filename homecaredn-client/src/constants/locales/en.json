@@ -283,7 +283,7 @@
     },
     "serviceRequest": {
       "title": "Service Requests",
-      "subtitle": "View and manage your service requests.",
+      "subtitle": "View and manage your service requests. Requests are open ",
       "noRequest": "No service requests yet",
       "letStart": "Start by creating your first service request",
       "label_buildingType": "Buidling type:",
@@ -358,6 +358,7 @@
       "noContractorDesc": "Currently, no contractors have applied for your project. Please wait for more time.",
       "label_avarageRating": "Average Rating:",
       "contractorApplyCount": " contractor(s)",
+      "label_selectedContractor": "Contractor you selected",
       "label_contact": "Contact Information",
       "label_descriptionContractor": "Construction Proposal Description",
       "label_review": "Reviews",
@@ -365,6 +366,7 @@
       "lowerThanEstimate": "Lower than estimate by {{value}} million",
       "higherThanEstimate": "Higher than estimate by {{value}} million",
       "section_chat": "Chat with Contractor",
+      "noMessages" :"No message yet",
       "noChatFunction": "This feature is available only after you have selected a contractor"
     },
     "materialRequest": {
@@ -395,6 +397,7 @@
     "statusOpen": "Open",
     "statusClosed": "Closed",
     "searchPlaceholder": "Search service requests...",
+    "showAppliedOnly": "Service Requests Applied",
     "sortDefault": "Default",
     "sortOldest": "Oldest",
     "sortNewest": "Newest"
@@ -439,8 +442,9 @@
     "viewAttachment": "View attachment {{index}}",
     "serviceRequestNotFound": "Service request not found",
     "yourBid": "Your Bid",
-    "appliedTitle": "Applied title",
+    "appliedTitle": "You have applied",
     "yourNote": "Your note for customer",
+    "appliedDate": "Application date: ",
     "yourImages": "Your Images",
     "deleteApplication": "Delete Application",
     "youAreSelected": "You are selected",
@@ -448,7 +452,30 @@
     "payCommission": "Commission Payment",
     "selectedPendingCommissionNote": "Waiting for commission payment",
     "processingPayment": "Processing Payment",
-    "paymentFailed": "Payment Failed"
+    "paymentFailed": "Payment Failed",
+    "noChatFunction": "This feature is only available if you are a selected contractor and paid commision",
+    "createAt": "Request creation date",
+    "projectStatus": "Request Status",
+    "contractorsApplied": "Number of contractors applied",
+    "totalApplications": "Number: ",
+    "yourApplication": "Your application",
+    "canDeleteWhilePending": "You can delete the current application to create a new one",
+    "requestClosed": "Request Closed",
+    "cannotApplyAnymore": "This request is closed and no longer accepting applications",
+    "closedApplication": "Application Closed",
+    "requestAlreadyClosed": "This service request has been closed",
+    "requestApprovedNote": "This request has been approved and assigned to you.",
+    "requestClosedNote": "This request is closed. Your application will not be processed further.",
+    "chatSection": "Chat with customer",
+    "no_messages": "No messages yet",
+    "input_placeholder":"Aa",
+    "commissionCalculation": "Commission Calculation",
+    "commissionRate": "Commission Rate",
+    "commissionToPay": "Total Commission to Pay",
+    "tier1": "≤ 500 million",
+    "tier2": "500 million - 2 billion",
+    "tier3": "> 2 billion",
+    "maxCommissionNote": "Maximum Commission 100 million VND"
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -778,15 +805,15 @@
     "description": "Descriptions",
     "acreage": "Acreage",
     "numberOfFloors": "Number of floors",
+    "floors": "floor(s)",
     "estimatePrice": "Estimated price",
     "address": "Address",
-    "label_open": "Opening",
-    "label_close": "Closed",
+    "status":"Status",
+    "empty": "No service request",
+    "empty_description": "No service request have been submitted.",
     "listCandidate": "List of contractors",
     "totalCandidate": "contractors",
     "viewProfile": "View profile",
-    "empty": "No service request",
-    "empty_description": "No service request have been submitted.",
     "noContractor": "No contractor",
     "noContractorYet": "No contractor have registered yet.",
     "contractorDetail": {
@@ -899,6 +926,7 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
+    "CreateMaterialRequest": "Create Material Request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -971,6 +999,14 @@
     "DeleteApplicationModal": {
       "title": "Are you sure?",
       "text": "This application will be gone forever"
+    },
+    "PaymentSuccessModal": {
+      "title": "Payment Successful!",
+      "text": "Thank you for completing your commission payment."
+    },
+    "PaymentCancelModal": {
+      "title": "Payment Failed",
+      "text": "An error occurred during payment. Please try again."
     }
   },
   "ERROR": {
@@ -1023,20 +1059,26 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
-    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
-    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
     "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
     "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
 
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address!",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide more description for better search results!",
+    "REQUIRED_SERVICE_TYPE": "Please select a service type!",
+    "REQUIRED_PACKAGE_OPTION": "Please select a package option!",
+    "REQUIRED_BUILDING_TYPE": "Please select a building type!",
+    "REQUIRED_STRUCTURE_TYPE": "Please select the main structure type!",
+
+
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
     "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
     "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
-
+    
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description",
 
@@ -1044,7 +1086,10 @@
     "UNAUTHORIZED_ACCESS_DESCRIPTION": "You do not have permission to access this resource",
 
     "NOTFOUND": "Resource not found",
-    "NOTFOUND_DESCRIPTION": "The requested resource could not be found"
+    "NOTFOUND_DESCRIPTION": "The requested resource could not be found",
+    "FORBIDDEN": "You do not have permission to access this page!",
+    "NOT_FOUND": "Requested page not found!",
+    "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!"
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1065,11 +1110,14 @@
     "SERVICE_UPDATE": "Service updated successfully.",
     "SERVICE_REQUEST_ADD": "Add service request successfully.",
     "SERVICE_REQUEST_UPDATE": "Service request updated successfully.",
+    "MATERIAL_REQUEST_ADD": "Add material request successfully.",
+    "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",
-    "APPICATION_CREATE": "Create Application Successful"
+    "APPLICATION_CREATE": "Create Application Successful",
+    "RECONNECTED": "Reconnected to the server!"
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1153,6 +1201,7 @@
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },
   "common": {
+    "new": "New",
     "noRequirement": "No requirements",
     "search": "Search...",
     "sortDefault": "Default",
@@ -1160,6 +1209,25 @@
     "sortNameDesc": "Name: Z-A",
     "sortMaterialCount": "Product Quantity: Low -> High",
     "sortMaterialCountDesc": "Product Quantity: High -> Low",
+    "sortCreateDateNew": "Newest",
+    "sortCreateDateOld": "Oldest",
+    "Grid": "Grid",
+    "Table": "Table",
     "All": "All"
-  }
+  },
+  "commission": {
+    "expiredTitle": "You did not pay your commission on time",
+    "expiredMessage": "Your commission payment deadline has passed.",
+    "urgent": "Urgent payment deadline",
+    "less24h": "Less than 24 hours",
+    "deadline": "Payment deadline",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "completeNow": "⚠️ Complete payment now to secure the project!",
+    "under24h": "⏰ Less than 24 hours, please pay early.",
+    "payBeforeDeadline": "Pay your commission before the deadline to proceed with the project.",
+    "due": "Due"
+    }
 }

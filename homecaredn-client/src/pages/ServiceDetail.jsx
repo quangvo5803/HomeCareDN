@@ -15,7 +15,9 @@ export default function ServiceDetail() {
     const fetchService = async () => {
       try {
         const data = await getServiceById(serviceID);
-        data.type = 'service';
+        if (data) {
+          data.type = 'service';
+        }
         setService(data || {});
       } catch (err) {
         console.error('Error fetching service:', err);

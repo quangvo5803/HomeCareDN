@@ -18,14 +18,14 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpGet("get-all-categories")]
+        [HttpGet]
         public async Task<IActionResult> GetAllCategories([FromQuery] QueryParameters query)
         {
             var categories = await _facadeService.CategoryService.GetAllCategories(query);
             return Ok(categories);
         }
 
-        [HttpGet("get-category/{id:guid}")]
+        [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetCategory(Guid id)
         {
             var category = await _facadeService.CategoryService.GetCategoryByIdAsync(id);
@@ -36,9 +36,9 @@ namespace HomeCareDNAPI.Controllers
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             Roles = "Admin,Distributor"
         )]
-        [HttpPost("create-category")]
+        [HttpPost]
         public async Task<IActionResult> CreateCategory(
-            [FromForm] CategoryCreateRequestDto requestDto
+            [FromBody] CategoryCreateRequestDto requestDto
         )
         {
             var category = await _facadeService.CategoryService.CreateCategoryAsync(requestDto);
@@ -49,9 +49,9 @@ namespace HomeCareDNAPI.Controllers
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             Roles = "Admin,Distributor"
         )]
-        [HttpPut("update-category")]
+        [HttpPut]
         public async Task<IActionResult> UpdateCategory(
-            [FromForm] CategoryUpdateRequestDto requestDto
+            [FromBody] CategoryUpdateRequestDto requestDto
         )
         {
             var category = await _facadeService.CategoryService.UpdateCategoryAsync(requestDto);
@@ -62,7 +62,7 @@ namespace HomeCareDNAPI.Controllers
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             Roles = "Admin,Distributor"
         )]
-        [HttpDelete("delete-category/{id:guid}")]
+        [HttpDelete("{id:guid}")]
         public async Task<IActionResult> DeleteCategory(Guid id)
         {
             await _facadeService.CategoryService.DeleteCategoryAsync(id);

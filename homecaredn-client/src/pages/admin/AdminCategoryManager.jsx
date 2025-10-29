@@ -72,10 +72,8 @@ export default function AdminCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_ADD'));
       const lastPage = Math.ceil((totalCategories + 1) / pageSize);
       setCurrentPage(lastPage);
     }
@@ -381,7 +379,7 @@ export default function AdminCategoryManager() {
                         >
                           {t('BUTTON.Edit')}
                         </button>
-                        {cat.materials.length === 0 && !cat.isActive && (
+                        {cat.materials?.length === 0 && !cat.isActive && (
                           <button
                             className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
                             onClick={() => handleDelete(cat.categoryID)}

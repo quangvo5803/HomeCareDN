@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
@@ -46,7 +47,7 @@ namespace BusinessLogic.Services
             {
                 var searchUpper = parameters.Search.ToUpper();
 
-                query = query.Where(SearchMaterial(searchUpper));
+                query = query.Where(await SearchMaterialAsync(searchUpper));
             }
 
             if (parameters.FilterCategoryID.HasValue)
@@ -306,41 +307,47 @@ namespace BusinessLogic.Services
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private static Expression<Func<Material, bool>> SearchMaterial(string searchUpper)
+        private async Task<Expression<Func<Material, bool>>> SearchMaterialAsync(string searchUpper)
         {
-            return b =>
-                (!string.IsNullOrEmpty(b.Name) && b.Name.ToUpper().Contains(searchUpper))
-                || (!string.IsNullOrEmpty(b.NameEN) && b.NameEN.ToUpper().Contains(searchUpper))
+            var matchingUserIds = await _userManager
+                .Users.Where(u => u.FullName.ToUpper().Contains(searchUpper))
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            return m =>
+                (!string.IsNullOrEmpty(m.Name) && m.Name.ToUpper().Contains(searchUpper))
+                || (!string.IsNullOrEmpty(m.NameEN) && m.NameEN.ToUpper().Contains(searchUpper))
                 || (
-                    !string.IsNullOrEmpty(b.Description)
-                    && b.Description.ToUpper().Contains(searchUpper)
+                    !string.IsNullOrEmpty(m.Description)
+                    && m.Description.ToUpper().Contains(searchUpper)
                 )
                 || (
-                    b.Brand != null
+                    m.Brand != null
                     && (
                         (
-                            !string.IsNullOrEmpty(b.Brand.BrandName)
-                            && b.Brand.BrandName.ToUpper().Contains(searchUpper)
+                            !string.IsNullOrEmpty(m.Brand.BrandName)
+                            && m.Brand.BrandName.ToUpper().Contains(searchUpper)
                         )
                         || (
-                            !string.IsNullOrEmpty(b.Brand.BrandNameEN)
-                            && b.Brand.BrandNameEN.ToUpper().Contains(searchUpper)
+                            !string.IsNullOrEmpty(m.Brand.BrandNameEN)
+                            && m.Brand.BrandNameEN.ToUpper().Contains(searchUpper)
                         )
                     )
                 )
                 || (
-                    b.Category != null
+                    m.Category != null
                     && (
                         (
-                            !string.IsNullOrEmpty(b.Category.CategoryName)
-                            && b.Category.CategoryName.ToUpper().Contains(searchUpper)
+                            !string.IsNullOrEmpty(m.Category.CategoryName)
+                            && m.Category.CategoryName.ToUpper().Contains(searchUpper)
                         )
                         || (
-                            !string.IsNullOrEmpty(b.Category.CategoryNameEN)
-                            && b.Category.CategoryNameEN.ToUpper().Contains(searchUpper)
+                            !string.IsNullOrEmpty(m.Category.CategoryNameEN)
+                            && m.Category.CategoryNameEN.ToUpper().Contains(searchUpper)
                         )
                     )
-                );
+                )
+                || matchingUserIds.Contains(m.UserID);
         }
     }
 }

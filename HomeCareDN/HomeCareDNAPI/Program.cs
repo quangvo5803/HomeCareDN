@@ -1,4 +1,7 @@
-﻿using BusinessLogic.Services;
+﻿using System.Text;
+using System.Text.Json.Serialization;
+using BusinessLogic.Mapping;
+using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.FacadeService.Dependencies;
 using BusinessLogic.Services.Interfaces;
@@ -7,14 +10,13 @@ using DataAccess.Entities.Authorize;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.UnitOfWork;
-using HomeCareDNAPI.Mapping;
+using HomeCareDNAPI.Hubs;
+using HomeCareDNAPI.Realtime;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
-using System.Security.Claims;
-using System.Text;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -31,7 +33,13 @@ namespace HomeCareDNAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder
+                .Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
+            ;
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -80,9 +88,10 @@ namespace HomeCareDNAPI
             });
 
             builder.Services.AddHttpContextAccessor();
-
+            builder.Services.AddSignalR();
+            builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             /// Register Options
-            /// 
+            ///
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<CloudinaryOptions>(
                 builder.Configuration.GetSection("Cloudinary")
@@ -135,7 +144,6 @@ namespace HomeCareDNAPI
             /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
-            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -158,6 +166,7 @@ namespace HomeCareDNAPI
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<ApplicationHub>("/hubs/application");
 
             app.Run();
         }

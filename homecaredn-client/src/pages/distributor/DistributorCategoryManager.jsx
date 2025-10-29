@@ -27,7 +27,7 @@ export default function DistributorCategoryManager() {
   } = useCategory();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
+  const [editingCategoryID, setEditingCategoryID] = useState(null);
 
   useEffect(() => {
     fetchCategories({
@@ -65,16 +65,14 @@ export default function DistributorCategoryManager() {
   const handleSave = async (categoryData) => {
     if (categoryData.CategoryID) {
       await updateCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_UPDATE'));
     } else {
       await createCategory(categoryData);
-      toast.success(t('SUCCESS.CATEGORY_ADD'));
       const lastPage = Math.ceil((totalCategories + 1) / pageSize);
       setCurrentPage(lastPage);
     }
 
     setIsModalOpen(false);
-    setEditingCategory(null);
+    setEditingCategoryID(null);
   };
 
   if (loading) return <Loading />;
@@ -100,7 +98,7 @@ export default function DistributorCategoryManager() {
         <button
           className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
           onClick={() => {
-            setEditingCategory(null);
+            setEditingCategoryID(null);
             setIsModalOpen(true);
           }}
         >
@@ -114,10 +112,10 @@ export default function DistributorCategoryManager() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setEditingCategory(null);
+          setEditingCategoryID(null);
         }}
         onSave={handleSave}
-        category={editingCategory}
+        categoryID={editingCategoryID}
         setUploadProgress={setUploadProgress}
       />
 
@@ -206,7 +204,7 @@ export default function DistributorCategoryManager() {
                         <button
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
                           onClick={() => {
-                            setEditingCategory(category);
+                            setEditingCategoryID(category.categoryID);
                             setIsModalOpen(true);
                           }}
                         >

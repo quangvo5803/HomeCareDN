@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { contactService } from '../services/contactService';
+import { contactSupportService } from '../services/contactSupportService';
 import { toast } from 'react-toastify';
 import Reveal from '../components/Reveal';
 
@@ -30,7 +30,7 @@ export default function Contact() {
     if (loading) return;
     try {
       setLoading(true);
-      await contactService.create(form); // service trả thẳng data
+      await contactSupportService.create(form); // service trả thẳng data
       toast.success(t('contact.success_message'));
       setForm({ fullName: '', email: '', subject: '', message: '' });
     } catch (error) {

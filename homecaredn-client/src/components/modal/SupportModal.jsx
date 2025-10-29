@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
 import LoadingModal from './LoadingModal';
-import { contactService } from '../../services/contactService';
+import { contactSupportService } from '../../services/contactSupportService';
 
 export default function SupportModal({
   isOpen,
@@ -24,7 +24,7 @@ export default function SupportModal({
       if (isOpen && supportID) {
         try {
           setLoading(true);
-          const data = await contactService.getById(supportID);
+          const data = await contactSupportService.gettById(supportID);
           setSupport(data);
         } catch (err) {
           toast.error(handleApiError(err));
@@ -42,7 +42,10 @@ export default function SupportModal({
       return;
     }
     try {
-      await contactService.reply({ id: supportID, replyContent: reply });
+      await contactSupportService.reply({
+        id: supportID,
+        replyContent: reply,
+      });
       toast.success(t('SUCCESS.REPLY'));
       onReplySent();
       onClose();

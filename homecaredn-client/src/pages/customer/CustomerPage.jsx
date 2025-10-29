@@ -50,7 +50,7 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
                       : 'hover:bg-gray-50 text-gray-700'
                   }`}
                 >
-                  <i className="fas fa-user"></i>
+                  <i className="fas fa-user mr-2"></i>
                   {t('userPage.profile.title')}
                 </button>
                 <button
@@ -61,7 +61,7 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
                       : 'hover:bg-gray-50 text-gray-700'
                   }`}
                 >
-                  <i className="fas fa-clipboard-list"></i>
+                  <i className="fas fa-clipboard-list mr-2"></i>
                   {t('userPage.serviceRequest.title')}
                 </button>
                 <button

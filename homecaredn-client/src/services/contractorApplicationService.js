@@ -1,86 +1,85 @@
-import api from '../api';
-const appendIf = (fd, key, value) => {
-  if (value !== undefined && value !== null && value !== '') {
-    fd.append(key, value);
-  }
-};
-
-const buildContractorFormData = (contractor) => {
-  const formData = new FormData();
-
-  appendIf(
-    formData,
-    'ContractorApplicationID',
-    contractor.ContractorApplicationID
-  );
-
-  // Required fields
-  appendIf(formData, 'ServiceRequestID', contractor.ServiceRequestID);
-  appendIf(formData, 'ContractorID', contractor.ContractorID);
-  appendIf(formData, 'Description', contractor.Description);
-  appendIf(formData, 'EstimatePrice', contractor.EstimatePrice);
-  appendIf(formData, 'CreatedAt', contractor.CreatedAt);
-  appendIf(formData, 'Status', contractor.Status);
-
-  // Images
-  for (const url of contractor.ImageUrls ?? []) {
-    formData.append('ImageUrls', url);
-  }
-
-  for (const publicId of contractor.ImagePublicIds ?? []) {
-    formData.append('ImagePublicIds', publicId);
-  }
-  return formData;
-};
+import api from './public/api';
 
 export const contractorApplicationService = {
-
-  getAllContractorByServiceRequestId: async (params = {}) => {
-    const res = await api.get('/ContractorApplication/get-all-contractor-by-service-request-id', {
+  // ====================== ADMIN ======================
+  getAllForAdmin: async (params) => {
+    const response = await api.get('/contractor-applications/admin', {
       params,
     });
-    return res.data;
+    return response.data;
   },
 
-  createContractorApplication: async (contractorData) => {
-    const formData = buildContractorFormData(contractorData);
-    const response = await api.post(
-      '/ContractorApplication/create-contractor-request',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
+  getByIdForAdmin: async (id) => {
+    const response = await api.get(`/contractor-applications/admin/${id}`);
+    return response.data;
+  },
+
+  // ====================== CUSTOMER ======================
+  getAllForCustomer: async (params) => {
+    const response = await api.get('/contractor-applications/customer', {
+      params,
+    });
+    return response.data;
+  },
+
+  getByIdForCustomer: async (id) => {
+    const response = await api.get(`/contractor-applications/customer/${id}`);
+    return response.data;
+  },
+
+  accept: async (id) => {
+    const response = await api.put(
+      `/contractor-applications/customer/${id}/accept`
     );
     return response.data;
   },
 
-  getApplication: async (getRequest) => {
+  reject: async (id) => {
+    const response = await api.put(
+      `/contractor-applications/customer/${id}/reject`
+    );
+    return response.data;
+  },
+
+  // ====================== Contractor ======================
+  getAllForContractor: async (params) => {
+    const response = await api.get('/contractor-applications/contractor', {
+      params,
+    });
+    return response.data;
+  },
+  getByServiceRequestIdForContractor: async (dto) => {
     const response = await api.get(
-      '/ContractorApplication/get-contractor-application',
+      `/contractor-applications/contractor/get-applied/`,
       {
-        params: getRequest,
+        params: dto,
+      }
+    );
+    return response.data;
+  },
+  getByIdForContractor: async (id) => {
+    const response = await api.get(`/contractor-applications/contractor/${id}`);
+    return response.data;
+  },
+
+  create: async (dto) => {
+    // dto = ContractorCreateApplicationDto
+
+    const response = await api.post(
+      '/contractor-applications/contractor',
+      dto,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
     );
     return response.data;
   },
 
-  acceptContractorApplication: async (contractorApplicationId) => {
-    const res = await api.put(
-      `/ContractorApplication/accept-contractor-application/${contractorApplicationId}`
-    );
-    return res.data;
-  },
-
-  rejectContractorApplication: async (contractorApplicationId) => {
-    const res = await api.put(
-      `/ContractorApplication/reject-contractor-application/${contractorApplicationId}`
-    );
-    return res.data;
-  },
-
-  deleteApplication: async (id) => {
+  delete: async (id) => {
     const response = await api.delete(
-      `/ContractorApplication/delete-contractor-application/${id}`
+      `/contractor-applications/contractor/${id}`
     );
     return response.data;
   },

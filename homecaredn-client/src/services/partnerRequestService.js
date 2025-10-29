@@ -1,76 +1,53 @@
-import api from '../api';
-const appendIf = (fd, key, value) => {
-  if (value !== undefined && value !== null && value !== '') {
-    fd.append(key, value);
-  }
-};
+import api from './public/api';
+
 export const partnerRequestService = {
-  createPartnerRequest: async (partnerRequestData) => {
-    const formData = new FormData();
-    appendIf(
-      formData,
-      'PartnerRequestType',
-      partnerRequestData.PartnerRequestType
+  // ====================== ANONYMOUS ======================
+  create: async (dto) => {
+    // dto = {
+    //   PartnerRequestType: "Distributor" | "Contractor" | ...,
+    //   CompanyName: string,
+    //   Email: string,
+    //   PhoneNumber: string,
+    //   Description?: string,
+    //   ImageUrls: string[],
+    //   ImagePublicIds: string[]
+    // }
+    const response = await api.post(
+      '/partner-requests/create-partner-request',
+      dto
     );
-    appendIf(formData, 'CompanyName', partnerRequestData.CompanyName);
-    appendIf(formData, 'Email', partnerRequestData.Email);
-    appendIf(formData, 'PhoneNumber', partnerRequestData.PhoneNumber);
-    appendIf(formData, 'Description', partnerRequestData.Description);
-
-    for (const imageUrl of partnerRequestData.ImageUrls || []) {
-      formData.append('ImageUrls', imageUrl);
-    }
-
-    for (const publicId of partnerRequestData.ImagePublicIds || []) {
-      formData.append('ImagePublicIds', publicId);
-    }
-
-    const res = await api.post(
-      '/PartnerRequests/create-partner-request',
-      formData,
-      {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      }
-    );
-    return res.data;
+    return response.data;
   },
 
-  getAllPartnerRequests: async (params = {}) => {
-    const res = await api.get(
-      '/AdminPartnerRequests/get-all-partner-requests',
-      {
-        params,
-      }
-    );
-    return res.data;
+  // ====================== ADMIN ======================
+  getAll: async (params) => {
+    // params = { PageNumber, PageSize, SortBy, Search, FilterID, ... }
+    const response = await api.get('/partner-requests', { params });
+    return response.data;
   },
 
-  getPartnerRequestById: async (id) => {
-    const res = await api.get(
-      `/AdminPartnerRequests/get-partner-request/${id}`
-    );
-    return res.data;
+  getById: async (id) => {
+    const response = await api.get(`/partner-requests/${id}`);
+    return response.data;
   },
 
-  approvePartnerRequest: async (id) => {
-    const res = await api.put(
-      `/AdminPartnerRequests/approve-partner-request/${id}`
-    );
-    return res.data;
+  approve: async (id) => {
+    const response = await api.put(`/partner-requests/${id}/approve`);
+    return response.data;
   },
 
-  rejectPartnerRequest: async (rejectData) => {
-    const res = await api.put(
-      '/AdminPartnerRequests/reject-partner-request',
-      rejectData
-    );
-    return res.data;
+  reject: async (dto) => {
+    // dto = {
+    //   PartnerRequestID: string (guid),
+    //   RejectionReason: string
+    // }
+    const response = await api.put('/partner-requests/reject', dto);
+    return response.data;
   },
 
-  deletePartnerRequest: async (id) => {
-    const res = await api.delete(
-      `/AdminPartnerRequests/delete-partner-request/${id}`
-    );
-    return res.data;
+  // Delete partner request
+  delete: async (id) => {
+    const response = await api.delete(`/partner-requests/${id}`);
+    return response.data;
   },
 };

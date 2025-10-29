@@ -2,6 +2,7 @@ import { useAuth } from '../../hook/useAuth';
 import { useTranslation } from 'react-i18next';
 import ReactCountryFlag from 'react-country-flag';
 import React, { useState } from 'react';
+import Avatar from 'react-avatar';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
@@ -79,9 +80,11 @@ export default function Navbar() {
               onClick={() => setOpenAvatar(!openAvatar)}
               className="w-10 h-10 rounded-full overflow-hidden border border-gray-300 hover:border-blue-500 transition-all duration-300"
             >
-              <img
-                src="https://ui-avatars.com/api/?name=admin&background=random"
-                alt="avatar"
+              <Avatar
+                name="admin"
+                round={true}
+                size="100%"
+                color="orange"
                 className="w-full h-full object-cover"
               />
             </button>

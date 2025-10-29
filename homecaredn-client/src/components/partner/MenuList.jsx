@@ -19,8 +19,8 @@ export default function Sidebar({
   const navigate = useNavigate();
   const { user, logout: ctxLogout } = useContext(AuthContext) || {};
 
- const menu = useMemo(() => {
-    // Menu cho Distributor 
+  const menu = useMemo(() => {
+    // Menu cho Distributor
     if (user?.role === 'Distributor') {
       return [
         {
@@ -60,7 +60,7 @@ export default function Sidebar({
         },
       ];
     }
-    
+
     // Menu cho Contractor
     if (user?.role === 'Contractor') {
       return [

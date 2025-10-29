@@ -1,49 +1,41 @@
 import { useState, useCallback, useMemo } from 'react';
 import { serviceService } from '../services/serviceService';
-import { useAuth } from '../hook/useAuth';
+import { imageService } from '../services/public/imageService';
 import ServiceContext from './ServiceContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
+import { withMinLoading } from '../utils/withMinLoading';
+import { useTranslation } from 'react-i18next';
 
 export const ServiceProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { t } = useTranslation();
   const [services, setServices] = useState([]);
   const [totalServices, setTotalServices] = useState(0);
   const [loading, setLoading] = useState(false);
-  // 📌 Public: fetch all
-  const fetchServices = useCallback(
+
+  // ==================== FETCH ====================
+  const executeFetch = useCallback(
     async ({
       PageNumber = 1,
       PageSize = 10,
       SortBy,
       FilterID,
-      FilterServiceType,
-      FilterPackageOption,
-      FilterBuildingType,
-      FilterMainStructureType,
-      FilterDesignStyle,
       Search,
     } = {}) => {
       try {
-        setLoading(true);
-        const data = await serviceService.getAllService({
+        const data = await serviceService.getAll({
           PageNumber,
           PageSize,
           SortBy,
           FilterID,
-          FilterServiceType,
-          FilterPackageOption,
-          FilterBuildingType,
-          FilterMainStructureType,
-          FilterDesignStyle,
           Search,
         });
-        const itemsWithType = (data.items || []).map((m) => ({
-          ...m,
+        const itemsWithType = (data.items || []).map((s) => ({
+          ...s,
           type: 'service',
         }));
-        setServices(itemsWithType || []);
+        setServices(itemsWithType);
         setTotalServices(data.totalCount || 0);
         return itemsWithType;
       } catch (err) {
@@ -51,53 +43,49 @@ export const ServiceProvider = ({ children }) => {
         setServices([]);
         setTotalServices(0);
         return [];
-      } finally {
-        setLoading(false);
       }
     },
     []
   );
 
-  // 📌 Public: get by id
+  const fetchServices = useCallback(
+    async (params = {}) => {
+      return await withMinLoading(() => executeFetch(params), setLoading);
+    },
+    [executeFetch]
+  );
+
+  // ==================== GET BY ID ====================
   const getServiceById = useCallback(async (id) => {
     try {
-      setLoading(true);
-      return await serviceService.getServiceById(id);
+      return await serviceService.getById(id);
     } catch (err) {
       toast.error(handleApiError(err));
       return null;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
-  // 📌 Admin-only: create
+  // ==================== CREATE ====================
   const createService = useCallback(
-    async (serviceData) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
+    async (dto) => {
       try {
-        setLoading(true);
-        const newService = await serviceService.createService(serviceData);
+        const newService = await serviceService.create(dto);
         setServices((prev) => [...prev, newService]);
         setTotalServices((prev) => prev + 1);
+        toast.success(t('SUCCESS.SERVICE_ADD'));
         return newService;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role]
+    [t]
   );
 
-  // 📌 Admin-only: update
+  // ==================== UPDATE ====================
   const updateService = useCallback(
-    async (serviceData) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
+    async (dto) => {
       try {
-        setLoading(true);
-        const updated = await serviceService.updateService(serviceData);
+        const updated = await serviceService.update(dto);
         setServices((prev) =>
           prev.map((s) =>
             s.serviceID === updated.serviceID
@@ -109,52 +97,43 @@ export const ServiceProvider = ({ children }) => {
               : s
           )
         );
+        toast.success(t('SUCCESS.SERVICE_UPDATE'));
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role]
+    [t]
   );
 
-  // 📌 Admin-only: delete
-  const deleteService = useCallback(
-    async (id) => {
-      if (user?.role !== 'Admin') throw new Error('Unauthorized');
-      try {
-        await serviceService.deleteService(id);
-        setServices((prev) => prev.filter((s) => s.serviceID !== id));
-        setTotalServices((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user?.role]
-  );
-  const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
+  // ==================== DELETE ====================
+  const deleteService = useCallback(async (id) => {
     try {
-      await serviceService.deleteServiceImage(imageUrl);
-
-      // update materials
-      const updateImages = (s) => {
-        if (s.serviceID !== serviceID) return s;
-        return {
-          ...s,
-          imageUrls: s.imageUrls.filter((imgUrl) => imgUrl !== imageUrl),
-        };
-      };
-
-      setServices((prev) => prev.map(updateImages));
+      await serviceService.delete(id);
+      setServices((prev) => prev.filter((s) => s.serviceID !== id));
+      setTotalServices((prev) => prev - 1);
     } catch (err) {
       toast.error(handleApiError(err));
-      throw err;
     }
   }, []);
 
+  // ==================== DELETE IMAGE ====================
+  const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
+    try {
+      await imageService.deleteImage(imageUrl);
+      setServices((prev) =>
+        prev.map((s) =>
+          s.serviceID === serviceID
+            ? { ...s, imageUrls: s.imageUrls.filter((img) => img !== imageUrl) }
+            : s
+        )
+      );
+    } catch (err) {
+      toast.error(handleApiError(err));
+    }
+  }, []);
+
+  // ==================== CONTEXT VALUE ====================
   const contextValue = useMemo(
     () => ({
       services,

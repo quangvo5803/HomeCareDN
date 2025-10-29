@@ -4,20 +4,19 @@ import { useAuth } from '../hook/useAuth';
 import AddressContext from './AddressContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
+import { withMinLoading } from '../utils/withMinLoading';
 import PropTypes from 'prop-types';
 
 export const AddressProvider = ({ children }) => {
   const { user } = useAuth();
   const [addresses, setAddresses] = useState([]);
-  const [totalAddressess, setTotalAddresses] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [totalAddresses, setTotalAddresses] = useState(0);
+  const [loading, setLoading] = useState(false); // chỉ dùng cho fetch
 
-  // 📌 Public: fetch all address
-  const fetchAddresses = useCallback(async () => {
-    if (!user) throw new Error('Unauthorized');
+  // 📌 Fetch addresses (min loading để tránh giật UI)
+  const executeFetch = useCallback(async () => {
     try {
-      setLoading(true);
-      const data = await addressService.getUserAddress(user.id);
+      const data = await addressService.getAll(user.id);
       setAddresses(data || []);
       setTotalAddresses(data.length || 0);
       return data;
@@ -26,63 +25,53 @@ export const AddressProvider = ({ children }) => {
       setAddresses([]);
       setTotalAddresses(0);
       return [];
-    } finally {
-      setLoading(false);
     }
   }, [user]);
 
-  const createAddress = useCallback(
-    async (dto) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        const newAddres = await addressService.createAddress(dto);
-        setAddresses((prev) => [...prev, newAddres]);
-        // Tăng tổng số address
-        setTotalAddresses((prev) => prev + 1);
-        return newAddres;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user]
-  );
+  const fetchAddresses = useCallback(async () => {
+    return await withMinLoading(() => executeFetch(), setLoading);
+  }, [executeFetch]);
 
-  const updateAddress = useCallback(
-    async (dto) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        setLoading(true);
-        const updated = await addressService.updateAddress(dto);
-        // Optimistic update
-        setAddresses((prev) =>
-          prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
-        );
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [user]
-  );
+  // 📌 Create address (component tự quản lý loading)
+  const createAddress = useCallback(async (dto) => {
+    try {
+      const newAddress = await addressService.create(dto);
+      setAddresses((prev) => [...prev, newAddress]);
+      setTotalAddresses((prev) => prev + 1);
+      return newAddress;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
-  const deleteAddress = useCallback(
-    async (id) => {
-      if (!user) throw new Error('Unauthorized');
-      try {
-        await addressService.deleteAddress(id);
-        // Xoá khỏi local
-        setAddresses((prev) => prev.filter((a) => a.addressID !== id));
-        setTotalAddresses((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user]
-  );
+  // 📌 Update address
+  const updateAddress = useCallback(async (dto) => {
+    try {
+      const updated = await addressService.update(dto);
+      setAddresses((prev) =>
+        prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
+      );
+      return updated;
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
+
+  // 📌 Delete address
+  const deleteAddress = useCallback(async (id) => {
+    try {
+      await addressService.deleteAddress(id);
+      setAddresses((prev) => prev.filter((a) => a.addressID !== id));
+      setTotalAddresses((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
+
+  // 📌 Auto-fetch khi user thay đổi
   useEffect(() => {
     if (!user) {
       setAddresses([]);
@@ -97,8 +86,8 @@ export const AddressProvider = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       addresses,
-      totalAddressess,
-      loading,
+      totalAddresses,
+      loading, // chỉ dùng cho fetch
       fetchAddresses,
       createAddress,
       updateAddress,
@@ -106,7 +95,7 @@ export const AddressProvider = ({ children }) => {
     }),
     [
       addresses,
-      totalAddressess,
+      totalAddresses,
       loading,
       fetchAddresses,
       createAddress,

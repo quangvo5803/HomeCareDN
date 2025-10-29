@@ -1,7 +1,14 @@
-import api from '../api';
+import api from './public/api';
 
 export const profileService = {
-  getProfile: (userId) => api.get(`/CustomerProfile/get-profile/${userId}`),
-  updateProfile: (payload) =>
-    api.put(`/CustomerProfile/update-profile`, payload),
+  getById: async (userId) => {
+    const response = await api.get(`/profile/${userId}`);
+    return response.data;
+  },
+
+  update: async (dto) => {
+    //  dto = { userId, fullName, phoneNumber?, gender? }
+    const response = await api.put('/profile', dto);
+    return response.data;
+  },
 };

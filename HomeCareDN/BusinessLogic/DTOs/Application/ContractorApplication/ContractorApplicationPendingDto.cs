@@ -10,6 +10,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         public DateTime CreatedAt { get; set; }
         public required string Status { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
+        public ICollection<string>? DocumentUrls { get; set; }
 
         // Thông tin đánh giá nhà thầu
         public int CompletedProjectCount { get; set; } = 0;

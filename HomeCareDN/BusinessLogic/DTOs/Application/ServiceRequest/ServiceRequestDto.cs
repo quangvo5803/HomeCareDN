@@ -7,6 +7,9 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
     {
         public Guid ServiceRequestID { get; set; }
         public required Guid CustomerID { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerEmail { get; set; }
+        public string? CustomerPhone { get; set; }
         public required Guid AddressID { get; set; }
         public required AddressDto Address { get; set; }
 
@@ -29,10 +32,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
 
-        // Danh sách ứng tuyển khi chưa chọn nhà thầu
-        public ICollection<ContractorApplicationPendingDto>? ContractorApplications { get; set; }
-
         // Thông tin nhà thầu đã được chọn (chỉ có 1 khi chọn)
-        public ContractorApplicationFullDto? SelectedContractorApplication { get; set; }
+        public ContractorApplicationDto? SelectedContractorApplication { get; set; }
     }
 }

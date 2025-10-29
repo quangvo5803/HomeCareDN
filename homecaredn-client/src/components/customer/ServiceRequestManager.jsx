@@ -20,11 +20,13 @@ export default function ServiceRequestManager() {
   };
 
   const handleServiceRequestCreateUpdate = (serviceRequestId) => {
-    navigate(
-      serviceRequestId
-        ? `/Customer/ServiceRequest/${serviceRequestId}`
-        : '/Customer/ServiceRequest'
-    );
+    if (serviceRequestId) {
+      navigate(`/Customer/ServiceRequest/${serviceRequestId}`);
+    } else {
+      if (serviceRequests?.filter((s) => s.status != 'Closed').length === 3)
+        return;
+      navigate('/Customer/ServiceRequest');
+    }
   };
 
   const handleDeleteServiceRequest = (serviceRequestID) => {
@@ -47,7 +49,7 @@ export default function ServiceRequestManager() {
   const getServiceIcon = (type) => {
     switch (type) {
       case 'Repair':
-        return 'fa-drafting-compass';
+        return 'fa-screwdriver-wrench';
       case 'Construction':
         return 'fa-hammer';
       default:
@@ -106,12 +108,11 @@ export default function ServiceRequestManager() {
           </h2>
           <p className="text-sm text-gray-600">
             {t('userPage.serviceRequest.subtitle')} (
-            {serviceRequests?.length || 0}/3)
+            {serviceRequests.filter((s) => s.status != 'Closed').length || 0}/3)
           </p>
         </div>
         <button
           onClick={() => handleServiceRequestCreateUpdate()}
-          disabled={serviceRequests?.length >= 3}
           className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
         >
           <i className="fas fa-plus"></i>
@@ -277,15 +278,17 @@ export default function ServiceRequestManager() {
                         </button>
                       )}
 
-                      <button
-                        className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
-                        onClick={() =>
-                          handleDeleteServiceRequest(req.serviceRequestID)
-                        }
-                      >
-                        <i className="fas fa-xmark"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
+                      {req.status === 'Opening' && (
+                        <button
+                          className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                          onClick={() =>
+                            handleDeleteServiceRequest(req.serviceRequestID)
+                          }
+                        >
+                          <i className="fas fa-xmark"></i>
+                          {t('BUTTON.Delete')}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

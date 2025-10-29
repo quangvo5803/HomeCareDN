@@ -6,12 +6,16 @@ namespace BusinessLogic.Services.Interfaces
     public interface IServiceRequestService
     {
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            string role = "Admin"
         );
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestByUserIdAsync(
             QueryParameters parameters
         );
-        Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id);
+        Task<ServiceRequestDto> GetServiceRequestByIdAsync(
+            ServiceRequestGetByIdDto getByIdDto,
+            string role = "Admin"
+        );
         Task<ServiceRequestDto> CreateServiceRequestAsync(
             ServiceRequestCreateRequestDto createRequestDto
         );
