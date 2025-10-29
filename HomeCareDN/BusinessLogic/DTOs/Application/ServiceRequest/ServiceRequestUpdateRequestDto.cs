@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataAccess.Entities.Application;
-using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogic.DTOs.Application.ServiceRequest
 {
@@ -34,5 +33,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
 
         public List<string>? ImageUrls { get; set; }
         public List<string>? ImagePublicIds { get; set; }
+        public List<string>? DocumentUrls { get; set; }
+        public List<string>? DocumentPublicIds { get; set; }
     }
 }

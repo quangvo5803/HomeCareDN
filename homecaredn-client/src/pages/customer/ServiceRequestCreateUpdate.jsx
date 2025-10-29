@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -7,12 +7,16 @@ import { useAuth } from '../../hook/useAuth';
 import { useAddress } from '../../hook/useAddress';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { numberToWordsByLang } from '../../utils/numberToWords';
 import { formatVND } from '../../utils/formatters';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
+
+const MAX_IMAGES = 5;
+const MAX_DOCUMENTS = 5;
+const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
 
 export default function ServiceRequestCreateUpdate() {
   const { t, i18n } = useTranslation();
@@ -27,11 +31,16 @@ export default function ServiceRequestCreateUpdate() {
     updateServiceRequest,
     getServiceRequestById,
     deleteServiceRequestImage,
+    deleteServiceRequestDocument,
   } = useServiceRequest();
   const enums = useEnums();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-
+  const [imageProgress, setImageProgress] = useState({ loaded: 0, total: 0 });
+  const [documentProgress, setDocumentProgress] = useState({
+    loaded: 0,
+    total: 0,
+  });
   // Form state
   const [addressID, setAddressID] = useState('');
   const [serviceType, setServiceType] = useState('');
@@ -45,6 +54,21 @@ export default function ServiceRequestCreateUpdate() {
   const [estimatePrice, setEstimatePrice] = useState('');
   const [description, setDescription] = useState('');
   const [images, setImages] = useState([]);
+  const [documents, setDocuments] = useState([]);
+
+  // upload docs and imgs progress
+  useEffect(() => {
+    const totalLoaded = imageProgress.loaded + documentProgress.loaded;
+    const totalSize = imageProgress.total + documentProgress.total;
+
+    if (totalSize === 0) {
+      if (uploadProgress !== 1) setUploadProgress(0);
+      return;
+    }
+
+    const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
+    setUploadProgress(percent);
+  }, [imageProgress, documentProgress, uploadProgress]);
 
   // Load data khi edit
   useEffect(() => {
@@ -64,6 +88,9 @@ export default function ServiceRequestCreateUpdate() {
           setDescription(res.description || '');
           setImages(
             (res.imageUrls || []).map((url) => ({ url, isNew: false }))
+          );
+          setDocuments(
+            (res.documentUrls || []).map((url) => ({ url, isNew: false }))
           );
         })
         .catch((err) => handleApiError(err, t));
@@ -90,12 +117,155 @@ export default function ServiceRequestCreateUpdate() {
     }));
     setImages((prev) => [...prev, ...mapped]);
   };
-
+  const handleDocumentChange = (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length + documents.length > 5) {
+      toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+      return;
+    }
+    const mapped = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+      isNew: true,
+    }));
+    setDocuments((prev) => [...prev, ...mapped]);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
+<<<<<<< HEAD
     if (isSubmitting) return;
     if (images.filter((i) => i.isNew).length > 0) {
       setUploadProgress(1);
+=======
+
+    if (!addressID) {
+      toast.error(t('ERROR.REQUIRED_ADDRESS'));
+      return;
+    }
+    if (!serviceType) {
+      toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
+      return;
+    }
+    if (!packageOption) {
+      toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
+      return;
+    }
+    if (!buildingType) {
+      toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
+      return;
+    }
+    if (!mainStructureType) {
+      toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
+      return;
+    }
+    if (images.length > MAX_IMAGES) {
+      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+      return;
+    }
+    if (documents.length > MAX_DOCUMENTS) {
+      toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+      return;
+    }
+
+    const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
+    const newDocumentFiles = documents
+      .filter((d) => d.isNew)
+      .map((d) => d.file);
+
+    const payload = {
+      CustomerID: user.id,
+      AddressID: addressID,
+      ServiceType: serviceType,
+      PackageOption: packageOption,
+      BuildingType: buildingType,
+      MainStructureType: mainStructureType,
+      DesignStyle: designStyle,
+      Width: width,
+      Length: length,
+      Floors: floors,
+      EstimatePrice: estimatePrice,
+      Description: description,
+    };
+
+    try {
+      setImageProgress({
+        loaded: 0,
+        total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
+      });
+      setDocumentProgress({
+        loaded: 0,
+        total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
+      });
+
+      if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
+        setUploadProgress(1);
+      }
+
+      const imageUploadPromise =
+        newImageFiles.length > 0
+          ? uploadToCloudinary(
+              newImageFiles,
+              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+              (progress) => setImageProgress(progress),
+              'HomeCareDN/ServiceRequest'
+            )
+          : Promise.resolve(null);
+
+      const documentUploadPromise =
+        newDocumentFiles.length > 0
+          ? uploadToCloudinary(
+              newDocumentFiles,
+              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+              (progress) => setDocumentProgress(progress),
+              'HomeCareDN/ServiceRequest/Documents',
+              'raw'
+            )
+          : Promise.resolve(null);
+
+      const [imageResults, documentResults] = await Promise.all([
+        imageUploadPromise,
+        documentUploadPromise,
+      ]);
+
+      if (imageResults) {
+        const arr = Array.isArray(imageResults) ? imageResults : [imageResults];
+        payload.ImageUrls = arr.map((u) => u.url);
+        payload.ImagePublicIds = arr.map((u) => u.publicId);
+      }
+
+      if (documentResults) {
+        const arr = Array.isArray(documentResults)
+          ? documentResults
+          : [documentResults];
+        payload.DocumentUrls = arr.map((u) => u.url);
+        payload.DocumentPublicIds = arr.map((u) => u.publicId);
+      }
+
+      if (serviceRequestId) {
+        payload.ServiceRequestID = serviceRequestId;
+        await updateServiceRequest(payload);
+        toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
+      } else {
+        await createServiceRequest(payload);
+        toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
+      }
+
+      navigate('/Customer', {
+        state: { tab: 'service_requests' },
+      });
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
+    } finally {
+      setUploadProgress(0);
+      setImageProgress({ loaded: 0, total: 0 });
+      setDocumentProgress({ loaded: 0, total: 0 });
+    }
+<<<<<<< HEAD
+=======
+    if (serviceRequestId) {
+      payload.ServiceRequestID = serviceRequestId;
+      await updateServiceRequest(payload);
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
     } else {
       setIsSubmitting(true);
     }
@@ -170,6 +340,13 @@ export default function ServiceRequestCreateUpdate() {
     } finally {
       setIsSubmitting(false);
     }
+<<<<<<< HEAD
+=======
+    navigate('/Customer', {
+      state: { tab: 'service_requests' },
+    });
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   };
 
   // Xoá ảnh khỏi state
@@ -202,7 +379,35 @@ export default function ServiceRequestCreateUpdate() {
     }
   };
 
+<<<<<<< HEAD
   if (addressLoading || isSubmitting) return <Loading />;
+=======
+  const removeDocumentFromState = (doc) => {
+    setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
+  };
+  const handleRemoveDocument = (doc) => {
+    if (doc.isNew) {
+      removeDocumentFromState(doc);
+    } else {
+      showDeleteModal({
+        t,
+        titleKey: t('ModalPopup.DeleteDocumentModal.title'),
+        textKey: t('ModalPopup.DeleteDocumentModal.text'),
+        onConfirm: async () => {
+          try {
+            await deleteServiceRequestDocument(serviceRequestId, doc.url);
+            Swal.close();
+            toast.success(t('SUCCESS.DELETE'));
+            removeDocumentFromState(doc);
+          } catch (err) {
+            handleApiError(err, t);
+          }
+        },
+      });
+    }
+  };
+  if (loading || addressLoading) return <Loading />;
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
@@ -625,6 +830,75 @@ export default function ServiceRequestCreateUpdate() {
                             <div className="absolute top-2 left-2">
                               <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                                 {t('common.new')}
+<<<<<<< HEAD
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Documents Upload Section */}
+                <div className="space-y-4 lg:col-span-2">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <i className="fas fa-file-alt text-orange-500 mr-2"></i>
+                    {t('userPage.createServiceRequest.form_documents')}
+                  </label>
+
+                  {/* Document Upload Button */}
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept={ACCEPTED_DOC_TYPES} // Specify accepted types
+                      multiple
+                      onChange={handleDocumentChange} // Use new handler
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                        <i className="fas fa-file-upload text-orange-500 text-xl"></i>
+                      </div>
+                      <p className="text-gray-600 text-center mb-2">
+                        <span className="font-semibold text-orange-600">
+                          {t('upload.clickToUpload')}
+                        </span>{' '}
+                        {t('upload.orDragAndDrop')}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        PDF, DOC, DOCX, TXT {/* Hint for file types */}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Document Preview Grid */}
+                  {documents.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                      {documents.map((doc) => (
+                        <div
+                          key={doc.url}
+                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors bg-gray-50 flex flex-col items-center justify-center p-2"
+                        >
+                          <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
+                          <p className="text-xs text-gray-600 text-center break-all truncate">
+                            {doc.name}
+                          </p>
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDocument(doc)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                            >
+                              <i className="fas fa-trash-alt text-sm"></i>
+                            </button>
+                          </div>
+                          {doc.isNew && (
+                            <div className="absolute top-2 left-2">
+                              <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                                {t('common.new')}
+=======
+>>>>>>> develop
                               </span>
                             </div>
                           )}

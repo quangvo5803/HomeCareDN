@@ -36,9 +36,9 @@ export default function Sidebar() {
       link: '/Admin/ServiceManager',
     },
     {
-      icon: 'text-amber-600 fa-solid fa-clipboard-list',
+      icon: 'text-amber-600 fa-solid fa-truck',
       title: 'serviceRequest',
-      link: '/Admin/ServiceRequestManager',
+      link: '/Admin/ServiceRequest',
     },
 
     {

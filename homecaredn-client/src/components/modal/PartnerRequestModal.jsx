@@ -7,7 +7,6 @@ import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
 import LoadingModal from './LoadingModal';
-import StatusBadge from '../StatusBadge';
 
 export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
   const { t, i18n } = useTranslation();
@@ -132,7 +131,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                   {t('adminPartnerManager.partnerRequestModal.status')}
                 </div>
                 <div className="font-medium text-gray-900 break-words">
-                  <StatusBadge status={partnerRequest.status} type="PartnerRequest" />
+                  {t(`Enums.PartnerStatus.${partnerRequest.status}`)}
                 </div>
               </div>
               <div>
@@ -162,6 +161,84 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                   </div>
                 )}
 
+              {Array.isArray(partnerRequest.documentUrls) &&
+                partnerRequest.documentUrls.length > 0 && (
+                  <div className="space-y-3 pt-4 border-t mt-4">
+                    {' '}
+                    {/* Added border-top for separation */}
+                    <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <i className="fas fa-file-alt mr-2"></i>{' '}
+                      {/* Added icon */}
+                      {t(
+                        'adminPartnerManager.partnerRequestModal.documents',
+                        'Documents'
+                      )}{' '}
+                      {/* Add translation key */}
+                    </h4>
+                    {partnerRequest.documentUrls.map((docUrl) => {
+                      // Logic lấy tên file và extension
+                      const fileName = decodeURIComponent(
+                        docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+
+                      // Logic chọn icon
+                      const iconClass =
+                        ext === 'pdf'
+                          ? 'fa-file-pdf text-red-600'
+                          : ext === 'doc' || ext === 'docx'
+                          ? 'fa-file-word text-blue-600'
+                          : ext === 'xls' || ext === 'xlsx'
+                          ? 'fa-file-excel text-green-600'
+                          : ext === 'ppt' || ext === 'pptx'
+                          ? 'fa-file-powerpoint text-orange-600'
+                          : ext === 'txt'
+                          ? 'fa-file-lines text-gray-600'
+                          : 'fa-file-alt text-gray-500';
+
+                      return (
+                        // Cấu trúc UI
+                        <div
+                          key={docUrl}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition bg-white"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={docUrl}
+                              download={fileName} // Thêm tên gốc vào download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               {/* Rejection reason for admin */}
               {(isPending || partnerRequest?.status === 'Rejected') && (
                 <div>
@@ -180,8 +257,9 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                       partnerRequest?.status !== 'Rejected' &&
                       setReason(e.target.value)
                     }
-                    className={`w-full border rounded-lg p-3 ${partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
-                      }`}
+                    className={`w-full border rounded-lg p-3 ${
+                      partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
+                    }`}
                     placeholder={t(
                       'adminPartnerManager.partnerRequestModal.rejectReasonPlaceHolder'
                     )}

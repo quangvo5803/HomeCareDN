@@ -15,8 +15,8 @@ namespace BusinessLogic.Services.FacadeService
         public IConversationService ConversationService { get; }
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
+        public IDocumentService DocumentService { get; }
         public IPartnerRequestService PartnerService { get; }
-        public IPaymentService PaymentService { get; }
         public IMaterialRequestService MaterialRequestService { get; }
 
         public FacadeService(
@@ -60,13 +60,14 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.EmailQueue
             );
             ImageService = new ImageService(coreDeps.UnitOfWork);
-
+            DocumentService = new DocumentService(coreDeps.UnitOfWork);
             PartnerService = new PartnerRequestService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 identityDeps.UserManager,
                 infraDeps.EmailQueue
             );
+<<<<<<< HEAD
 
             PaymentService = new PaymentService(
                 coreDeps.PayOS,
@@ -75,6 +76,8 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.Notifier
             );
 
+=======
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
             MaterialRequestService = new MaterialRequestService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper

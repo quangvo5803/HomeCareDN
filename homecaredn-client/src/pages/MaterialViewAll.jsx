@@ -95,9 +95,8 @@ export default function MaterialViewAll() {
         </div>
         <div className="flex flex-col gap-6 md:flex-row">
           {/* Filter */}
-          <aside className="w-full md:w-1/5 space-y-6">
-            <div className="h-px bg-gray-300 w-16" />
-
+          <aside className="md:w-1/5 -ml-10 mr-16">
+            <div className="w-20 mb-4 border-b border-gray-400"></div>
             {/* Category */}
             <FilterItem
               itemType={{ type: 'material' }}

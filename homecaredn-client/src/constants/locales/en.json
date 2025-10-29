@@ -97,7 +97,7 @@
     "stat4_text": "Client Satisfaction",
     "stat5_title": "Experience Engineers",
     "stat5_text": "Our team of seasoned engineers brings decades of expertise to every project, ensuring the highest standards of quality and safety."
-  },
+  }, 
   "why": {
     "badge": "Why Choose Us",
     "title": "Why Builders Trust",
@@ -200,8 +200,7 @@
     "buildingType": "Building type",
     "packageOption": "Package option",
     "mainStructure": "Main structure type",
-    "designStyle": "Design style",
-    "updating": "Updating"
+    "designStyle": "Design style"
   },
   "login": {
     "title": "Login",
@@ -234,24 +233,25 @@
     "not_receive_otp": "Did not receive the code? "
   },
   "partnerRequest": {
-    "partnerTypeSelection": {
-      "title": "Register as a Partner",
-      "subtitle": "Please choose the role you want to register for",
-      "selectType": "Please select a role to continue",
-      "continueWithType": "Continue registration as "
-    },
-    "partnerRegistration": {
-      "title": "Register as a Partner",
-      "subtitle": "Please fill in all the information below",
-      "notSelectedType": "Please select a role",
-      "form_companyName": "Company Name",
-      "form_email": "Email",
-      "form_phoneNumber": "Phone Number",
-      "form_description": "Company Description",
-      "form_images": "Company Images",
-      "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
-    }
+  "partnerTypeSelection": {
+    "title": "Register as a Partner",
+    "subtitle": "Please choose the role you want to register for",
+    "selectType": "Please select a role to continue",
+    "continueWithType": "Continue registration as "
   },
+  "partnerRegistration": {
+    "form_documents":"Attachments / Documents (Maximum 5 documents)",  
+    "title": "Register as a Partner",
+    "subtitle": "Please fill in all the information below",
+    "notSelectedType": "Please select a role",
+    "form_companyName": "Company Name",
+    "form_email": "Email",
+    "form_phoneNumber": "Phone Number",
+    "form_description": "Company Description",
+    "form_images": "Company Images (Maximum 5 images)",
+    "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
+  }
+},
   "userPage": {
     "profile": {
       "title": "My Profile",
@@ -296,18 +296,16 @@
       "label_packageOption": "Package option: ",
       "label_address": "Address: ",
       "label_contractorApplyCount": "application form(s)",
-      "label_open": "Opening",
-      "label_close": "Closed",
       "label_contractorApplied": "contractor(s)"
     },
-    "createServiceRequest": {
+    "createServiceRequest":{
       "title": "Create Service Request",
       "subtitle": "Fill out the form below to submit your service request",
       "header": "Service Request Details",
       "form_serviceType": "Service Type",
       "form_selectServiceType": "Select service type",
       "form_packageOption": "Package Option",
-      "form_selectPackageOption": "Select package option",
+      "form_selectPackageOption":"Select package option",
       "form_buildingType": "Building Type",
       "form_selectBuildingType": "Select building type",
       "form_structureType": "Structure Type",
@@ -315,7 +313,7 @@
       "form_designStyle": "Design Style",
       "form_selectDesignStyle": "Select design style",
       "form_width": "Width (m)",
-      "form_widthPlaceholder": "Enter width in meters",
+      "form_widthPlaceholder":"Enter width in meters",
       "form_length": "Length (m)",
       "form_lengthPlaceholder": "Enter length in meters",
       "form_floor": "Number of Floors",
@@ -327,6 +325,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
+      "form_documents": "Attachments / Documents (Maximum 5 documents)",
       "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
@@ -334,6 +333,7 @@
       "footer": "You will receive notification as soon as a contractor/distributor applies."
     },
     "serviceRequestDetail": {
+      "label_documents": "Attachments / Documents:",
       "title": "Service Request Details",
       "label_open": "Open",
       "label_close": "Closed",
@@ -382,14 +382,14 @@
       "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
     }
   },
-  "contractorServiceRequestManager": {
+ "contractorServiceRequestManager": {
     "title": "Service Request Manager",
     "subtitle": "View and manage available service requests",
     "noRequest": "No service requests yet",
     "letStart": "Start by browsing available requests",
     "serviceRequests": "service requests",
     "packageOption": "Package Option",
-    "buildingType": "Building Type",
+    "buildingType": "Building Type", 
     "area": "Area",
     "estimatePrice": "Estimate Price",
     "createdAt": "Created",
@@ -403,7 +403,7 @@
     "sortNewest": "Newest"
   },
   "contractorServiceRequestDetail": {
-    "privacyNotice": "Your information is visible only to the project owner.",
+    "privacyNotice":"Your information is visible only to the project owner.",
     "title": "Service Request Details",
     "dimensions": "Project Dimensions",
     "totalArea": "Total Area",
@@ -417,7 +417,7 @@
     "floors": "Floors",
     "floorsUnit": "floors",
     "width": "Width",
-    "length": "Length",
+    "length": "Length", 
     "estimatePrice": "Estimate Price",
     "address": "Address",
     "description": "Description",
@@ -441,12 +441,18 @@
     "notePlaceholder": "Scope, warranty, timeline commitment...",
     "viewAttachment": "View attachment {{index}}",
     "serviceRequestNotFound": "Service request not found",
+<<<<<<< HEAD
+    "yourBid":"Your Bid",
+    "appliedTitle": "Applied title",
+=======
     "yourBid": "Your Bid",
     "appliedTitle": "You have applied",
+>>>>>>> develop
     "yourNote": "Your note for customer",
     "appliedDate": "Application date: ",
     "yourImages": "Your Images",
     "deleteApplication": "Delete Application",
+<<<<<<< HEAD
     "youAreSelected": "You are selected",
     "customerInfo": "Customer information",
     "payCommission": "Commission Payment",
@@ -476,6 +482,11 @@
     "tier2": "500 million - 2 billion",
     "tier3": "> 2 billion",
     "maxCommissionNote": "Maximum Commission 100 million VND"
+=======
+    "documents": "Documents",
+    "viewDocument": "View document",
+    "yourDocuments": "Your Documents"
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   },
   "partnerDashboard": {
     "title": "Contractor Dashboard",
@@ -596,7 +607,7 @@
       "filesSelected": " selected file"
     }
   },
-
+  
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -797,6 +808,7 @@
       "chooseFiles": "Choose files to upload"
     }
   },
+<<<<<<< HEAD
   "adminServiceRequestManager": {
     "no": "NO",
     "title": "Manage requested services",
@@ -825,6 +837,8 @@
       "images": "Project images"
     }
   },
+=======
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   "adminPartnerManager": {
     "empty": "No partners",
     "empty_description": "No partnership requests have been submitted.",
@@ -951,7 +965,7 @@
     "ViewDetail": "View detail",
     "RegisterPartner": "Register as Partner",
     "Accept": "Accept",
-    "Reject": "Reject",
+    "Reject" : "Reject",
     "Approve": "Approve"
   },
   "ModalPopup": {
@@ -996,8 +1010,16 @@
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
     },
-    "DeleteApplicationModal": {
+    "DeleteApplicationModal":{
       "title": "Are you sure?",
+<<<<<<< HEAD
+      "text":"This application will be gone forever"
+    },
+    "DeleteDocumentModal": {
+      "title": "Are you sure?",
+      "text": "This document will be deleted and cannot be restored!"
+    } 
+=======
       "text": "This application will be gone forever"
     },
     "PaymentSuccessModal": {
@@ -1008,6 +1030,7 @@
       "title": "Payment Failed",
       "text": "An error occurred during payment. Please try again."
     }
+>>>>>>> develop
   },
   "ERROR": {
     "UPLOAD_FAILED": "Image upload failed.",
@@ -1038,6 +1061,10 @@
 
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+    
+    "MAXIMUM_DOCUMENT": "You can only upload up to 5 documents.",
+    "MAXIMUM_DOCUMENT_SIZE": "Each document must be less than 25 MB.",
+
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
@@ -1059,7 +1086,13 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
+<<<<<<< HEAD
+    "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address.",
+    "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide additional description for the best search results.",
+    "REQUIRD_REJECT_REASON":"Please enter reject reason",
+=======
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
+>>>>>>> develop
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
     "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
@@ -1080,10 +1113,10 @@
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
     
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
-    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description",
+    "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION":"Required contractor apply description",
 
-    "UNAUTHORIZED_ACCESS": "Unauthorized access",
-    "UNAUTHORIZED_ACCESS_DESCRIPTION": "You do not have permission to access this resource",
+    "UNAUTHORIZED_ACCESS":"Unauthorized access",
+    "UNAUTHORIZED_ACCESS_DESCRIPTION":"You do not have permission to access this resource",
 
     "NOTFOUND": "Resource not found",
     "NOTFOUND_DESCRIPTION": "The requested resource could not be found",
@@ -1115,9 +1148,18 @@
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
+<<<<<<< HEAD
+    "DELETE_APPLICATION":"Delete Application Successful",
+    "APPICATION_CREATE": "Create Application Successful"
+=======
     "DELETE_APPLICATION": "Delete Application Successful",
+<<<<<<< HEAD
     "APPLICATION_CREATE": "Create Application Successful",
     "RECONNECTED": "Reconnected to the server!"
+=======
+    "APPLICATION_CREATE": "Create Application Successful"
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1167,43 +1209,44 @@
       "Rustic": "Rustic",
       "Other": "Other"
     },
-    "PartnerType": {
-      "Distributor": "Distributor",
-      "DistributorDescription": "Providing construction materials",
+    "PartnerType":{
+      "Distributor":"Distributor",
+      "DistributorDescription": "Providing construction materials",      
       "Contractor": "Contractor",
-      "ContractorDescription": "Providing construction/repair solutions"
+      "ContractorDescription" :"Providing construction/repair solutions"
     },
-    "ApplicationStatus": {
-      "Pending": "Pending",
-      "PendingCommission": "Pending",
-      "Approved": "Approved",
-      "Rejected": "Rejected"
-    },
-    "RequestStatus": {
-      "Closed": "Closed",
-      "Opening": "Opening",
-      "Pending": "Pending",
-      "Draft": "Draft",
-      "Processed": "Processed"
-    },
-    "PartneRequestrStatus": {
-      "Pending": "Pending",
-      "Approved": "Approved",
-      "Rejected": "Rejected"
+    "Status":{
+      "Pending":"Pending",
+      "Approved":"Approved",
+      "Rejected":"Rejected",
+      "Closed":"Closed",
+      "Opening":"Opening",
+      "Processed":"Processed",
+      "Draft":"Draft"
     }
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
-  "upload": {
-    "clickToUpload": "Click to upload",
-    "orDragAndDrop": "or drag and drop",
-    "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
+  "upload":{
+    "clickToUpload":"Click to upload",
+    "orDragAndDrop":"or drag and drop",
+    "fileTypesHint":"PNG, JPG, GIF up to 5MB each",
+    "fileTypesDocumentHint":"PDF, DOC, DOCX, TXT up to 25MB each"
   },
+<<<<<<< HEAD
+  "common":{
+    "Download":"Download",
+    "files":"Files",
+    "new":"New",
+    "noRequirement":"No requirements",
+    "search":"Search...",
+=======
   "common": {
     "new": "New",
     "noRequirement": "No requirements",
     "search": "Search...",
+>>>>>>> develop
     "sortDefault": "Default",
     "sortName": "Name: A-Z",
     "sortNameDesc": "Name: Z-A",

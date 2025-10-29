@@ -23,8 +23,6 @@ namespace DataAccess.Entities.Application
 
         [Display(Name = "Opening")]
         Opening,
-        [Display(Name = "Pending")]
-        Pending,
 
         [Display(Name = "Closed")]
         Closed,

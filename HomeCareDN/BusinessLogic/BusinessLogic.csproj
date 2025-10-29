@@ -15,8 +15,11 @@
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="CloudinaryDotNet" Version="1.27.6" />
     <PackageReference Include="Google.Apis.Auth" Version="1.70.0" />
+<<<<<<< HEAD
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.2.0" />
     <PackageReference Include="payOS" Version="1.0.9" />
+=======
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   </ItemGroup>
 
 </Project>

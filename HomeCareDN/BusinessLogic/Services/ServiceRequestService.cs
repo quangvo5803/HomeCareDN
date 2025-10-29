@@ -25,9 +25,11 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
+        private const string ERROR_MAXIMUM_DOCUMENT = "MAXIMUM_DOCUMENT";
+        private const string ERROR_MAXIMUM_DOCUMENT_SIZE = "MAXIMUM_DOCUMENT_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
+            "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -313,6 +315,7 @@ namespace BusinessLogic.Services.Interfaces
                 {
                     dto.SelectedContractorApplication = new ContractorApplicationDto
                     {
+<<<<<<< HEAD
                         ContractorID = "ANOTHER_CONTRACTOR",
                         ContractorName = "ANOTHER_CONTRACTOR",
                         ContractorEmail = string.Empty,
@@ -320,10 +323,28 @@ namespace BusinessLogic.Services.Interfaces
                         Status = item.SelectedContractorApplication.Status.ToString(),
                         EstimatePrice = 0,
                         ImageUrls = new List<string>(),
+=======
+                        ContractorApplicationID = selected.ContractorApplicationID,
+                        Description = selected.Description,
+                        EstimatePrice = selected.EstimatePrice,
+                        ImageUrls =
+                            selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                        DocumentUrls =
+                            selected.Documents?.Select(i => i.DocumentUrl).ToList()
+                            ?? new List<string>(),
+                        CompletedProjectCount = 0,
+                        AverageRating = 4.4,
+                        Status = selected.Status.ToString(),
+                        ContractorEmail = contractor?.Email ?? string.Empty,
+                        ContractorName = contractor?.FullName ?? string.Empty,
+                        ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
+                        CreatedAt = selected.CreatedAt,
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                     };
                 }
                 else
                 {
+<<<<<<< HEAD
                     var selected = item.SelectedContractorApplication;
                     var contractor = await _userManager.FindByIdAsync(
                         selected.ContractorID.ToString()
@@ -353,6 +374,29 @@ namespace BusinessLogic.Services.Interfaces
                             dto.CustomerPhone = customer.PhoneNumber ?? "";
                         }
                     }
+=======
+                    dto.ContractorApplications =
+                        entity
+                            .ContractorApplications?.Select(
+                                ca => new ContractorApplicationPendingDto
+                                {
+                                    ContractorApplicationID = ca.ContractorApplicationID,
+                                    Description = ca.Description,
+                                    EstimatePrice = ca.EstimatePrice,
+                                    ImageUrls =
+                                        ca.Images?.Select(i => i.ImageUrl).ToList()
+                                        ?? new List<string>(),
+                                    DocumentUrls =
+                                        ca.Documents?.Select(i => i.DocumentUrl).ToList()
+                                        ?? new List<string>(),
+                                    CompletedProjectCount = 0,
+                                    AverageRating = 0,
+                                    Status = ca.Status.ToString(),
+                                    CreatedAt = ca.CreatedAt,
+                                }
+                            )
+                            .ToList() ?? new List<ContractorApplicationPendingDto>();
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
                 }
             }
         }
@@ -362,6 +406,7 @@ namespace BusinessLogic.Services.Interfaces
         )
         {
             ValidateImages(createRequestDto.ImageUrls, 0);
+            ValidateDocuments(createRequestDto.DocumentUrls, 0);
 
             var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
             if (createRequestDto.Floors == 0)
@@ -374,6 +419,12 @@ namespace BusinessLogic.Services.Interfaces
                 serviceRequest.ServiceRequestID,
                 createRequestDto.ImageUrls,
                 createRequestDto.ImagePublicIds
+            );
+
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                createRequestDto.DocumentUrls,
+                createRequestDto.DocumentPublicIds
             );
 
             await _unitOfWork.SaveAsync();
@@ -433,8 +484,8 @@ namespace BusinessLogic.Services.Interfaces
             );
 
             ValidateServiceRequest(serviceRequest);
-
             ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
+            ValidateDocuments(updateRequestDto.DocumentUrls, serviceRequest!.Documents?.Count ?? 0);
 
             _mapper.Map(updateRequestDto, serviceRequest);
             if (updateRequestDto.Floors == 0)
@@ -445,6 +496,11 @@ namespace BusinessLogic.Services.Interfaces
                 serviceRequest.ServiceRequestID,
                 updateRequestDto.ImageUrls,
                 updateRequestDto.ImagePublicIds
+            );
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                updateRequestDto.DocumentUrls,
+                updateRequestDto.DocumentPublicIds
             );
 
             await _unitOfWork.SaveAsync();
@@ -486,7 +542,21 @@ namespace BusinessLogic.Services.Interfaces
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                 }
             }
+<<<<<<< HEAD
+
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                d.ServiceRequestID == id
+            );
+            if (documents != null && documents.Any())
+            {
+                foreach (var document in documents)
+                {
+                    await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
+                }
+            }
+=======
             await DeleteRelatedEntity(serviceRequest!);
+>>>>>>> develop
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
             await _notifier.SendToGroupAsync(
                 $"role_Contractor",
@@ -501,6 +571,18 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
         }
 
+<<<<<<< HEAD
+        private static void ValidateServiceRequest(ServiceRequest? serviceRequest)
+        {
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+=======
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)
         {
             if (
@@ -523,6 +605,7 @@ namespace BusinessLogic.Services.Interfaces
                 }
             }
             await _unitOfWork.SaveAsync();
+>>>>>>> develop
         }
 
         private async Task UploadServiceRequestImagesAsync(
@@ -552,18 +635,6 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
-        private static void ValidateServiceRequest(ServiceRequest? serviceRequest)
-        {
-            if (serviceRequest == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-        }
-
         private static void ValidateImages(ICollection<string>? images, int existingCount = 0)
         {
             var errors = new Dictionary<string, string[]>();
@@ -580,6 +651,57 @@ namespace BusinessLogic.Services.Interfaces
             if (images.Any(i => i.Length > 5 * 1024 * 1024))
             {
                 errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+        }
+
+        private async Task UploadServiceRequestDocumentsAsync(
+            Guid? serviceRequestId,
+            ICollection<string>? documentUrls,
+            ICollection<string>? publicIds
+        )
+        {
+            if (documentUrls == null || !documentUrls.Any())
+                return;
+
+            var ids = publicIds?.ToList() ?? new List<string>();
+
+            var documents = documentUrls
+                .Select(
+                    (url, i) =>
+                        new Document
+                        {
+                            DocumentID = Guid.NewGuid(),
+                            ServiceRequestID = serviceRequestId,
+                            DocumentUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
+
+            await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+        }
+
+        private static void ValidateDocuments(ICollection<string>? documents, int existingCount = 0)
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            if (documents == null)
+                return;
+
+            var totalCount = existingCount + documents.Count;
+            if (totalCount > 5)
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT });
+            }
+
+            if (documents.Any(i => i.Length > 5 * 1024 * 1024)) //25MB
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT_SIZE });
             }
 
             if (errors.Any())

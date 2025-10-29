@@ -1,6 +1,14 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+<<<<<<< HEAD
 import { serviceRequestService } from '../services/serviceRequestService';
 import { imageService } from '../services/public/imageService';
+=======
+<<<<<<< HEAD
+import { serviceRequestService } from '../services/serviceRequestService';
+=======
+import getServiceByRole from '../services/getServiceByRole';
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
 import { toast } from 'react-toastify';
@@ -62,13 +70,59 @@ export const ServiceRequestProvider = ({ children }) => {
     [user]
   );
 
+<<<<<<< HEAD
+  // 📌 Public: get by id
+  const getServiceRequestById = useCallback(async (id) => {
+    try {
+      return await serviceRequestService.getServiceRequestById(id);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return null;
+    }
+  }, []);
+
+  // 📌 Customer: get all by userId
+  const fetchServiceRequestsByUserId = useCallback(
+=======
   const fetchServiceRequests = useCallback(
     async (params = {}) =>
       withMinLoading(() => executeFetch(params), setLoading),
     [executeFetch]
   );
 
+<<<<<<< HEAD
   // ==================== GET BY ID ====================
+=======
+  // 📌 Execute fetch service requests by user id
+  const executeFetchByUserId = useCallback(
+>>>>>>> develop
+    async ({ PageNumber = 1, PageSize = 3, FilterID } = {}) => {
+      try {
+        const service = getServiceByRole(user?.role);
+        const data = await service.serviceRequest.getAllServiceRequestByUserId({
+          PageNumber,
+          PageSize,
+          FilterID,
+        });
+        setServiceRequests(data.items || []);
+        setTotalServiceRequests(data.totalCount || 0);
+        return data;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return { items: [], totalCount: 0 };
+      }
+    },
+    [user?.role]
+  );
+
+  const fetchServiceRequestsByUserId = useCallback(
+    async (params = {}) =>
+      await withMinLoading(() => executeFetchByUserId(params), setLoading),
+    [executeFetchByUserId]
+  );
+
+  // 📌 Get by ID
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   const getServiceRequestById = useCallback(
     async (id) => {
       if (!user) return null;
@@ -177,7 +231,45 @@ export const ServiceRequestProvider = ({ children }) => {
     []
   );
 
+<<<<<<< HEAD
   // ==================== AUTO LOAD ====================
+=======
+<<<<<<< HEAD
+  const deleteServiceRequestDocument = useCallback(
+    async (serviceRequestId, documentUrl) => {
+      if (user?.role !== 'Customer') throw new Error('Unauthorized');
+      try {
+        // 1. Call the service
+        await serviceRequestService.deleteServiceRequestDocument(documentUrl);
+
+        // 2. Update local state
+        setServiceRequests((prev) =>
+          prev.map((s) =>
+            s.serviceRequestID === serviceRequestId
+              ? {
+                  ...s,
+                  // Filter out the deleted document URL
+                  documentUrls: s.documentUrls.filter(
+                    (doc) => doc !== documentUrl
+                  ),
+                  // Optionally filter publicIds if you store them in state
+                  // documentPublicIds: s.documentPublicIds.filter(...)
+                }
+              : s
+          )
+        );
+      } catch (err) {
+        toast.error(handleApiError(err));
+        throw err;
+      }
+    },
+    [user?.role]
+  );
+
+=======
+  // 📌 Auto load if user is Customer
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
   useEffect(() => {
     if (!user) {
       setServiceRequests([]);
@@ -195,6 +287,13 @@ export const ServiceRequestProvider = ({ children }) => {
     () => ({
       serviceRequests,
       totalServiceRequests,
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
       loading,
       fetchServiceRequests,
       setServiceRequests,
@@ -204,10 +303,18 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     }),
     [
       serviceRequests,
       totalServiceRequests,
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
+>>>>>>> 9135d9f9ecfa922da36234d8cb0327f0a86c11f2
       loading,
       fetchServiceRequests,
       setServiceRequests,
@@ -217,6 +324,7 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     ]
   );
 

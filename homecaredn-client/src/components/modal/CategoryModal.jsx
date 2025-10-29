@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { useCategory } from '../../hook/useCategory';
 import LoadingModal from './LoadingModal';
 
@@ -84,7 +84,7 @@ export default function CategoryModal({
     }
     try {
       if (logoFile) {
-        const result = await uploadImageToCloudinary(
+        const result = await uploadToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => {
