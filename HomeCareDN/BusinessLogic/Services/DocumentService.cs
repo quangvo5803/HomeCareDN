@@ -11,7 +11,6 @@ namespace BusinessLogic.Services
         {
             _unitOfWork = unitOfWork;
         }
-
         //public async Task DeleteDocumentAsync(string documentUrl)
         //{
         //    var document = await _unitOfWork.DocumentRepository.GetAsync(doc =>
