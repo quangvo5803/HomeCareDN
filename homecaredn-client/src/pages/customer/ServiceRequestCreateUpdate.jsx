@@ -17,20 +17,19 @@ import Loading from '../../components/Loading';
 export default function ServiceRequestCreateUpdate() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { loading: addressLoading, addresses, fetchAddresses } = useAddress();
+  const { addressLoading, addresses } = useAddress();
   const { serviceRequestId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const passedService = location.state?.service;
   const {
-    loading,
     createServiceRequest,
     updateServiceRequest,
     getServiceRequestById,
     deleteServiceRequestImage,
   } = useServiceRequest();
   const enums = useEnums();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // Form state
@@ -49,7 +48,6 @@ export default function ServiceRequestCreateUpdate() {
 
   // Load data khi edit
   useEffect(() => {
-    fetchAddresses();
     if (serviceRequestId) {
       getServiceRequestById(serviceRequestId)
         .then((res) => {
@@ -77,13 +75,7 @@ export default function ServiceRequestCreateUpdate() {
       setMainStructureType(passedService.mainStructureType || '');
       setDesignStyle(passedService.designStyle || '');
     }
-  }, [
-    serviceRequestId,
-    passedService,
-    fetchAddresses,
-    getServiceRequestById,
-    t,
-  ]);
+  }, [serviceRequestId, passedService, getServiceRequestById, t]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -101,72 +93,83 @@ export default function ServiceRequestCreateUpdate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!addressID) {
-      toast.error(t('ERROR.REQUIRED_ADDRESS'));
-      return;
-    }
-    if (!serviceType) {
-      toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
-      return;
-    }
-    if (!packageOption) {
-      toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
-      return;
-    }
-    if (!buildingType) {
-      toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
-      return;
-    }
-    if (!mainStructureType) {
-      toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
-      return;
-    }
-    if (!description) {
-      toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
-      return;
-    }
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
-    const payload = {
-      CustomerID: user.id,
-      AddressID: addressID,
-      ServiceType: serviceType,
-      PackageOption: packageOption,
-      BuildingType: buildingType,
-      MainStructureType: mainStructureType,
-      DesignStyle: designStyle,
-      Width: width,
-      Length: length,
-      Floors: floors,
-      EstimatePrice: estimatePrice,
-      Description: description,
-    };
-    if (images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-
-    if (newFiles.length > 0) {
-      const uploaded = await uploadImageToCloudinary(
-        newFiles,
-        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-        (percent) => setUploadProgress(percent),
-        'HomeCareDN/ServiceRequest'
-      );
-      const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-      payload.ImageUrls = uploadedArray.map((u) => u.url);
-      payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-      setUploadProgress(0);
-    }
-    if (serviceRequestId) {
-      payload.ServiceRequestID = serviceRequestId;
-      await updateServiceRequest(payload);
+    if (isSubmitting) return;
+    if (images.filter((i) => i.isNew).length > 0) {
+      setUploadProgress(1);
     } else {
-      await createServiceRequest(payload);
+      setIsSubmitting(true);
     }
-    navigate('/Customer', {
-      state: { tab: 'service_requests' },
-    });
+    try {
+      if (!addressID) {
+        toast.error(t('ERROR.REQUIRED_ADDRESS'));
+        return;
+      }
+      if (!serviceType) {
+        toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
+        return;
+      }
+      if (!packageOption) {
+        toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
+        return;
+      }
+      if (!buildingType) {
+        toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
+        return;
+      }
+      if (!mainStructureType) {
+        toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
+        return;
+      }
+      if (!description) {
+        toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
+        return;
+      }
+      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
+      const payload = {
+        CustomerID: user.id,
+        AddressID: addressID,
+        ServiceType: serviceType,
+        PackageOption: packageOption,
+        BuildingType: buildingType,
+        MainStructureType: mainStructureType,
+        DesignStyle: designStyle,
+        Width: width,
+        Length: length,
+        Floors: floors,
+        EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
+        Description: description,
+      };
+      if (images.length > 5) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        return;
+      }
+
+      if (newFiles.length > 0) {
+        const uploaded = await uploadImageToCloudinary(
+          newFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => setUploadProgress(percent),
+          'HomeCareDN/ServiceRequest'
+        );
+        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
+        payload.ImageUrls = uploadedArray.map((u) => u.url);
+        payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
+        setUploadProgress(0);
+      }
+      if (serviceRequestId) {
+        payload.ServiceRequestID = serviceRequestId;
+        await updateServiceRequest(payload);
+      } else {
+        await createServiceRequest(payload);
+      }
+      navigate('/Customer', {
+        state: { tab: 'service_requests' },
+      });
+    } catch {
+      /// Handle in context
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Xoá ảnh khỏi state
@@ -199,7 +202,7 @@ export default function ServiceRequestCreateUpdate() {
     }
   };
 
-  if (loading || addressLoading) return <Loading />;
+  if (addressLoading || isSubmitting) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
@@ -438,7 +441,7 @@ export default function ServiceRequestCreateUpdate() {
                   </label>
                   <input
                     type="number"
-                    min={0}
+                    min={1}
                     step={1}
                     value={floors}
                     onChange={(e) => setFloors(e.target.value)}
@@ -481,6 +484,24 @@ export default function ServiceRequestCreateUpdate() {
                       'userPage.createServiceRequest.form_estimatePricePlaceholder'
                     )}
                   />
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {[10, 100, 1000, 10000, 100000].map((factor) => (
+                      <button
+                        type="button"
+                        key={factor}
+                        onClick={() =>
+                          setEstimatePrice(
+                            ((Number(estimatePrice) || 1) * factor).toString()
+                          )
+                        }
+                        className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md hover:bg-orange-50 hover:border-orange-300 text-sm font-medium text-gray-700 transition-colors"
+                      >
+                        {((Number(estimatePrice) || 1) * factor)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                      </button>
+                    ))}
+                  </div>
                   {estimatePrice && (
                     <>
                       <p className="text-sm text-gray-500">

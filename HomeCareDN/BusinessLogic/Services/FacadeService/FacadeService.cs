@@ -29,7 +29,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 coreDeps.AuthorizeDbContext,
-                coreDeps.UserManager
+                coreDeps.UserManager,
+                infraDeps.Notifier
             );
 
             MaterialService = new MaterialService(
@@ -41,7 +42,8 @@ namespace BusinessLogic.Services.FacadeService
             ContractorApplicationService = new ContractorApplicationService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
-                identityDeps.UserManager
+                identityDeps.UserManager,
+                infraDeps.Notifier
             );
             CategoryService = new CategoryService(coreDeps.UnitOfWork, coreDeps.Mapper);
             BrandService = new BrandService(coreDeps.UnitOfWork, coreDeps.Mapper);
@@ -69,7 +71,8 @@ namespace BusinessLogic.Services.FacadeService
             PaymentService = new PaymentService(
                 coreDeps.PayOS,
                 coreDeps.UnitOfWork,
-                infraDeps.PayOsOptions
+                infraDeps.PayOsOptions,
+                infraDeps.Notifier
             );
 
             MaterialRequestService = new MaterialRequestService(

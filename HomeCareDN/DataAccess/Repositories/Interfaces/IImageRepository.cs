@@ -7,5 +7,6 @@ namespace DataAccess.Repositories.Interfaces
     {
         Task UploadImageAsync(IFormFile file, string folder, Image image);
         Task<bool> DeleteImageAsync(string publicId);
+        Task<bool> DeleteImagesAsync(List<string> publicIds);
     }
 }

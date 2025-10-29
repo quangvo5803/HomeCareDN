@@ -1,6 +1,7 @@
 import SalesChart from '../../components/LineChart';
 import PieChart from '../../components/PieChart';
 import { useTranslation } from 'react-i18next';
+import Avatar from 'react-avatar';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -35,12 +36,7 @@ export default function AdminDashboard() {
       serviceRequest: 2000,
       values: 195600,
     },
-  ].map((c) => ({
-    ...c,
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      c.email
-    )}&background=random`,
-  }));
+  ];
 
   const distributorsList = [
     {
@@ -73,12 +69,7 @@ export default function AdminDashboard() {
       serviceRequest: 2000,
       values: 195600,
     },
-  ].map((c) => ({
-    ...c,
-    avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      c.email
-    )}&background=random`,
-  }));
+  ];
 
   return (
     <div className="w-full px-6 py-6 mx-auto">
@@ -207,9 +198,10 @@ export default function AdminDashboard() {
                       <tr key={contractor.email}>
                         <td className="p-3">
                           <div className="flex items-center">
-                            <img
-                              src={contractor.avatar}
-                              alt="Logo"
+                            <Avatar
+                              name={contractor?.email || 'User'}
+                              round={true}
+                              size="48"
                               className="w-12 h-12 rounded-full"
                             />
                             <div className="ml-4">
@@ -275,10 +267,11 @@ export default function AdminDashboard() {
                       <tr key={distributor.email}>
                         <td className="p-3">
                           <div className="flex items-center">
-                            <img
-                              src={distributor.avatar}
-                              alt="Logo"
-                              className="w-12 h-12"
+                            <Avatar
+                              name={distributor?.email || 'User'}
+                              round={true}
+                              size="48"
+                              className="w-12 h-12 rounded-full"
                             />
                             <div className="ml-4">
                               <p className="text-xs font-semibold text-gray-500">

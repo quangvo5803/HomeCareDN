@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import getServiceByRole from '../services/getServiceByRole';
-import { useAuth } from '../hook/useAuth';
+import { materialService } from '../services/materialService';
+import { imageService } from '../services/public/imageService';
 import MaterialContext from './MaterialContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -9,7 +9,6 @@ import { withMinLoading } from '../utils/withMinLoading';
 import { useTranslation } from 'react-i18next';
 export const MaterialProvider = ({ children }) => {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [totalMaterials, setTotalMaterials] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -26,8 +25,7 @@ export const MaterialProvider = ({ children }) => {
       Search,
     } = {}) => {
       try {
-        const service = getServiceByRole();
-        const data = await service.material.getAllMaterial({
+        const data = await materialService.getAll({
           PageNumber,
           PageSize,
           SortBy,
@@ -64,23 +62,18 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Public: get material by id
   const getMaterialById = useCallback(async (id) => {
     try {
-      setLoading(true);
-      const service = getServiceByRole();
-      var result = await service.material.getMaterialById(id);
+      var result = await materialService.getById(id);
       return result;
     } catch (err) {
       toast.error(handleApiError(err));
       return null;
-    } finally {
-      setLoading(false);
     }
   }, []);
   // 📌 Distributor-only: get all by user id
   const executeFetchById = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
       try {
-        const service = getServiceByRole(user.role);
-        const data = await service.material.getAllMaterialByUserId({
+        const data = await materialService.getAllMaterialByUserId({
           PageNumber,
           PageSize,
           FilterID,
@@ -93,7 +86,7 @@ export const MaterialProvider = ({ children }) => {
         return { items: [], totalCount: 0 };
       }
     },
-    [user?.role]
+    []
   );
 
   // Gọi có min loading
@@ -107,9 +100,7 @@ export const MaterialProvider = ({ children }) => {
   const createMaterial = useCallback(
     async (materialData) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole(user.role);
-        const newMaterial = await service.material.createMaterial(materialData);
+        const newMaterial = await materialService.create(materialData);
         // Tăng tổng số material
         setMaterials((prev) => [...prev, newMaterial]);
         setTotalMaterials((prev) => prev + 1);
@@ -117,21 +108,16 @@ export const MaterialProvider = ({ children }) => {
         return newMaterial;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role, t]
+    [t]
   );
 
   // 📌 Distributor-only: update
   const updateMaterial = useCallback(
     async (materialData) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole(user.role);
-        const updated = await service.material.updateMaterial(materialData);
+        const updated = await materialService.update(materialData);
         setMaterials((prev) =>
           prev.map((m) =>
             m.materialID === updated.materialID
@@ -147,35 +133,26 @@ export const MaterialProvider = ({ children }) => {
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role, t]
+    [t]
   );
 
   // 📌 Distributor-only: delete
-  const deleteMaterial = useCallback(
-    async (id) => {
-      try {
-        const service = getServiceByRole(user.role);
-        await service.material.deleteMaterial(id);
-        setMaterials((prev) => prev.filter((b) => b.materialID !== id));
-        setTotalMaterials((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-      }
-    },
-    [user?.role]
-  );
+  const deleteMaterial = useCallback(async (id) => {
+    try {
+      await materialService.deleteMaterial(id);
+      setMaterials((prev) => prev.filter((b) => b.materialID !== id));
+      setTotalMaterials((prev) => prev - 1);
+    } catch (err) {
+      toast.error(handleApiError(err));
+    }
+  }, []);
 
   // 📌 Distributor-only: delete material image
   const deleteMaterialImage = useCallback(async (materialId, imageUrl) => {
     try {
-      const service = getServiceByRole();
-      await service.image.deleteImage(imageUrl);
-
+      await imageService.delete(imageUrl);
       // update materials
       const updateImages = (m) => {
         if (m.materialID !== materialId) return m;

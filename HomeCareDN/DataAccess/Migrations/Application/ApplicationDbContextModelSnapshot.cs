@@ -177,6 +177,9 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("DueCommisionTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<double>("EstimatePrice")
                         .HasColumnType("double precision");
 

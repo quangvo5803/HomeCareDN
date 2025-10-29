@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BusinessLogic.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -16,13 +17,16 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public IHttpContextAccessor Http { get; }
         public IGroqClient GroqClient { get; }
         public IOptions<PayOsOptions> PayOsOptions { get; }
+        public ISignalRNotifier Notifier { get; }
+
         public InfraDependencies(
             IConfiguration configuration,
             IEmailQueue emailQueue,
             IDistributedCache cache,
             IHttpContextAccessor http,
             IGroqClient groqClient,
-            IOptions<PayOsOptions> payOsOptions
+            IOptions<PayOsOptions> payOsOptions,
+            ISignalRNotifier notifier
         )
         {
             Configuration = configuration;
@@ -31,6 +35,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             Http = http;
             GroqClient = groqClient;
             PayOsOptions = payOsOptions;
+            Notifier = notifier;
         }
     }
 }

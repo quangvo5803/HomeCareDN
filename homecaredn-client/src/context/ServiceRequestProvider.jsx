@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import getServiceByRole from '../services/getServiceByRole';
+import { serviceRequestService } from '../services/serviceRequestService';
+import { imageService } from '../services/public/imageService';
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
 import { toast } from 'react-toastify';
@@ -15,153 +16,157 @@ export const ServiceRequestProvider = ({ children }) => {
   const [totalServiceRequests, setTotalServiceRequests] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Execute fetch service requests
+  // ==================== FETCH ====================
   const executeFetch = useCallback(
     async ({ PageNumber = 1, PageSize = 10, SortBy, FilterID } = {}) => {
       try {
-        const service = getServiceByRole(user?.role);
-        const data = await service.serviceRequest.getAllServiceRequest({
-          PageNumber,
-          PageSize,
-          SortBy,
-          FilterID,
-        });
-        setServiceRequests(data.items || []);
+        let data;
+        if (user?.role === 'Admin') {
+          data = await serviceRequestService.getAllForAdmin({
+            PageNumber,
+            PageSize,
+            SortBy,
+            FilterID,
+          });
+        } else if (user?.role === 'Customer') {
+          data = await serviceRequestService.getAllForCustomer({
+            PageNumber,
+            PageSize,
+            FilterID: user.id,
+          });
+        } else if (user?.role === 'Contractor') {
+          data = await serviceRequestService.getAllForContractor({
+            PageNumber,
+            PageSize,
+            SortBy,
+            FilterID,
+          });
+        } else {
+          return { items: [], totalCount: 0 };
+        }
+
+        const itemsWithType = (data.items || []).map((r) => ({
+          ...r,
+          type: 'serviceRequest',
+        }));
+        setServiceRequests(itemsWithType);
         setTotalServiceRequests(data.totalCount || 0);
-        return data;
+        return itemsWithType;
       } catch (err) {
         toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
+        setServiceRequests([]);
+        setTotalServiceRequests(0);
+        return [];
       }
     },
-    [user?.role]
+    [user]
   );
 
   const fetchServiceRequests = useCallback(
     async (params = {}) =>
-      await withMinLoading(() => executeFetch(params), setLoading),
+      withMinLoading(() => executeFetch(params), setLoading),
     [executeFetch]
   );
 
-  // 📌 Execute fetch service requests by user id
-  const executeFetchByUserId = useCallback(
-    async ({ PageNumber = 1, PageSize = 3, FilterID } = {}) => {
-      try {
-        const service = getServiceByRole(user?.role);
-        const data = await service.serviceRequest.getAllServiceRequestByUserId({
-          PageNumber,
-          PageSize,
-          FilterID,
-        });
-        setServiceRequests(data.items || []);
-        setTotalServiceRequests(data.totalCount || 0);
-        return data;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
-      }
-    },
-    [user?.role]
-  );
-
-  const fetchServiceRequestsByUserId = useCallback(
-    async (params = {}) =>
-      await withMinLoading(() => executeFetchByUserId(params), setLoading),
-    [executeFetchByUserId]
-  );
-
-  // 📌 Get by ID
+  // ==================== GET BY ID ====================
   const getServiceRequestById = useCallback(
     async (id) => {
+      if (!user) return null;
+
       try {
-        const service = getServiceByRole(user?.role);
-        return await service.serviceRequest.getServiceRequestById(id);
+        const dto = {
+          ServiceRequestID: id,
+          ContractorID: user.role === 'Contractor' ? user.id : undefined,
+        };
+
+        let result;
+        if (user.role === 'Admin') {
+          result = await serviceRequestService.getByIdForAdmin(dto);
+        } else if (user.role === 'Customer') {
+          result = await serviceRequestService.getByIdForCustomer(dto);
+        } else if (user.role === 'Contractor') {
+          result = await serviceRequestService.getByIdForContractor(dto);
+        } else return null;
+
+        return result;
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
       }
     },
-    [user?.role]
+    [user]
   );
 
-  // 📌 Create
+  // ==================== CREATE ====================
   const createServiceRequest = useCallback(
     async (dto) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole('Customer');
-        const newRequest = await service.serviceRequest.createServiceRequest(
-          dto
-        );
-        setServiceRequests((prev) => [...prev, newRequest]);
+        if (!user) return null;
+        const newRequest = await serviceRequestService.createForCustomer(dto);
+        setServiceRequests((prev) => [newRequest, ...prev]);
         setTotalServiceRequests((prev) => prev + 1);
         toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
         return newRequest;
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [t]
+    [t, user]
   );
 
-  // 📌 Update
+  // ==================== UPDATE ====================
   const updateServiceRequest = useCallback(
     async (dto) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole('Customer');
-        const updated = await service.serviceRequest.updateServiceRequest(dto);
+        if (!user) return null;
+        const updated = await serviceRequestService.updateForCustomer(dto);
         setServiceRequests((prev) =>
-          prev.map((s) =>
-            s.serviceRequestID === updated.serviceRequestID
-              ? { ...s, ...updated }
-              : s
+          prev.map((r) =>
+            r.serviceRequestID === updated.serviceRequestID
+              ? { ...r, ...updated }
+              : r
           )
         );
         toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [t]
+    [t, user]
   );
 
-  // 📌 Delete
-  const deleteServiceRequest = useCallback(async (id) => {
-    try {
-      const service = getServiceByRole('Customer');
-      await service.serviceRequest.deleteServiceRequest(id);
-      setServiceRequests((prev) =>
-        prev.filter((s) => s.serviceRequestID !== id)
-      );
-      setTotalServiceRequests((prev) => Math.max(0, prev - 1));
-    } catch (err) {
-      toast.error(handleApiError(err));
-      throw err;
-    }
-  }, []);
+  // ==================== DELETE ====================
+  const deleteServiceRequest = useCallback(
+    async (id) => {
+      try {
+        if (!user) return;
+        await serviceRequestService.deleteForCustomer(id);
+        setServiceRequests((prev) =>
+          prev.filter((r) => r.serviceRequestID !== id)
+        );
+        setTotalServiceRequests((prev) => Math.max(0, prev - 1));
+      } catch (err) {
+        toast.error(handleApiError(err));
+      }
+    },
+    [user]
+  );
 
-  // 📌 Delete image
+  // ==================== DELETE IMAGE ====================
   const deleteServiceRequestImage = useCallback(
     async (serviceRequestId, imageUrl) => {
       try {
-        const service = getServiceByRole();
-        await service.image.deleteImage(imageUrl);
+        await imageService.delete(imageUrl);
         setServiceRequests((prev) =>
-          prev.map((s) =>
-            s.serviceRequestID === serviceRequestId
+          prev.map((r) =>
+            r.serviceRequestID === serviceRequestId
               ? {
-                  ...s,
-                  imageUrls: s.imageUrls.filter((img) => img !== imageUrl),
+                  ...r,
+                  imageUrls: r.imageUrls.filter((img) => img !== imageUrl),
                 }
-              : s
+              : r
           )
         );
       } catch (err) {
@@ -172,26 +177,28 @@ export const ServiceRequestProvider = ({ children }) => {
     []
   );
 
-  // 📌 Auto load if user is Customer
+  // ==================== AUTO LOAD ====================
   useEffect(() => {
     if (!user) {
       setServiceRequests([]);
       setTotalServiceRequests(0);
       return;
     }
-    if (user.role === 'Customer') {
-      fetchServiceRequestsByUserId({ FilterID: user.id });
+    if (user.role === 'Customer' && serviceRequests.length === 0 && !loading) {
+      fetchServiceRequests({ PageNumber: 1, PageSize: 10, FilterID: user.id });
     }
-  }, [user, fetchServiceRequestsByUserId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, fetchServiceRequests]);
 
+  // ==================== CONTEXT VALUE ====================
   const contextValue = useMemo(
     () => ({
       serviceRequests,
       totalServiceRequests,
-
       loading,
       fetchServiceRequests,
-      fetchServiceRequestsByUserId,
+      setServiceRequests,
+      setTotalServiceRequests,
       getServiceRequestById,
       createServiceRequest,
       updateServiceRequest,
@@ -201,10 +208,10 @@ export const ServiceRequestProvider = ({ children }) => {
     [
       serviceRequests,
       totalServiceRequests,
-
       loading,
       fetchServiceRequests,
-      fetchServiceRequestsByUserId,
+      setServiceRequests,
+      setTotalServiceRequests,
       getServiceRequestById,
       createServiceRequest,
       updateServiceRequest,

@@ -71,5 +71,17 @@ namespace WebApi.Repositories
 
             return false;
         }
+
+        public async Task<bool> DeleteImagesAsync(List<string> publicIds)
+        {
+            if (publicIds == null || !publicIds.Any())
+                return false;
+
+            var deleteTasks = publicIds.Select(publicId => DeleteImageAsync(publicId));
+
+            var results = await Task.WhenAll(deleteTasks);
+
+            return results.All(r => r);
+        }
     }
 }

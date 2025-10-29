@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
-import getServiceByRole from '../services/getServiceByRole';
+import { partnerRequestService } from '../services/partnerRequestService';
 import { withMinLoading } from '../utils/withMinLoading';
 import PartnerRequestContext from './PartnerRequestContext';
 
@@ -22,8 +22,7 @@ export const PartnerRequestProvider = ({ children }) => {
       Search,
     } = {}) => {
       try {
-        const service = getServiceByRole('Admin');
-        const data = await service.partnerRequest.getAllPartnerRequests({
+        const data = await partnerRequestService.getAll({
           PageNumber,
           PageSize,
           SortBy,
@@ -58,8 +57,7 @@ export const PartnerRequestProvider = ({ children }) => {
       try {
         const local = partnerRequests.find((p) => p.partnerRequestID === id);
         if (local) return local;
-        const service = getServiceByRole('Admin');
-        return await service.partnerRequest.getPartnerRequestById(id);
+        return await partnerRequestService.getById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
@@ -71,18 +69,13 @@ export const PartnerRequestProvider = ({ children }) => {
   // 📌 Create (public)
   const createPartnerRequest = useCallback(async (dto) => {
     try {
-      setLoading(true);
-      const service = getServiceByRole();
-      const newPartnerRequest =
-        await service.partnerRequest.createPartnerRequest(dto);
+      const newPartnerRequest = await partnerRequestService.create(dto);
       setPartnerRequests((prev) => [...prev, newPartnerRequest]);
       setTotalPartnerRequests((prev) => prev + 1);
       return newPartnerRequest;
     } catch (err) {
       toast.error(handleApiError(err));
       throw err;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
@@ -90,8 +83,7 @@ export const PartnerRequestProvider = ({ children }) => {
   const approvePartnerRequest = useCallback(async (id) => {
     try {
       setLoading(true);
-      const service = getServiceByRole('Admin');
-      const updated = await service.partnerRequest.approvePartnerRequest(id);
+      const updated = await partnerRequestService.approve(id);
       setPartnerRequests((prev) =>
         prev.map((p) =>
           p.partnerRequestID === updated.partnerRequestID ? updated : p
@@ -110,10 +102,7 @@ export const PartnerRequestProvider = ({ children }) => {
   const rejectPartnerRequest = useCallback(async (rejectData) => {
     try {
       setLoading(true);
-      const service = getServiceByRole('Admin');
-      const updated = await service.partnerRequest.rejectPartnerRequest(
-        rejectData
-      );
+      const updated = await partnerRequestService.reject(rejectData);
       setPartnerRequests((prev) =>
         prev.map((p) =>
           p.partnerRequestID === updated.partnerRequestID ? updated : p
@@ -131,8 +120,7 @@ export const PartnerRequestProvider = ({ children }) => {
   const deletePartnerRequest = useCallback(async (id) => {
     try {
       setLoading(true);
-      const service = getServiceByRole('Admin');
-      await service.partnerRequest.deletePartnerRequest(id);
+      await partnerRequestService.delete(id);
       setPartnerRequests((prev) =>
         prev.filter((p) => p.partnerRequestID !== id)
       );
