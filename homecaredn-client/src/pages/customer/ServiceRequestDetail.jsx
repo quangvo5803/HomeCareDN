@@ -44,6 +44,16 @@ export default function ServiceRequestDetail() {
   // Use realtime
   useRealtime(user, 'Customer', {
     onNewContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
+            : sr
+        )
+      );
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplications((prev) => {
           if (
@@ -60,6 +70,9 @@ export default function ServiceRequestDetail() {
       }
     },
     onDeleteContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
+      );
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplications((prev) =>
           prev.filter(

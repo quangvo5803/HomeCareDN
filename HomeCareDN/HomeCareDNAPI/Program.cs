@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
+using StackExchange.Redis;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -91,7 +92,18 @@ namespace HomeCareDNAPI
             });
 
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddSignalR();
+
+            var redisConnection = builder.Configuration["Redis:ConnectionString"];
+            builder
+                .Services.AddSignalR()
+                .AddStackExchangeRedis(
+                    redisConnection,
+                    options =>
+                    {
+                        options.Configuration.ChannelPrefix = "homecare";
+                    }
+                );
+
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             /// Register Options
             ///
