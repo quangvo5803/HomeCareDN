@@ -8,7 +8,7 @@ namespace HomeCareDNAPI.Controllers
     [ApiController]
     public class EnumsController : ControllerBase
     {
-        [HttpGet("all")]
+        [HttpGet]
         [ProducesResponseType(typeof(AllEnumsResponse), StatusCodes.Status200OK)]
         public IActionResult GetAllEnums()
         {

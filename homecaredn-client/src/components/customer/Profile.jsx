@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useAddress } from '../../hook/useAddress';
-import { profileService } from '../../services/profileService';
-import { geoService } from '../../services/geoService';
+import { useProfile } from '../../hook/useProfile';
+import { geoService } from '../../services/public/geoService';
 import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
@@ -39,7 +39,7 @@ export default function Profile({ user }) {
     updateAddress,
     deleteAddress,
   } = useAddress();
-
+  const { profile, updateProfile } = useProfile();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -52,13 +52,12 @@ export default function Profile({ user }) {
 
     (async () => {
       try {
-        const { data } = await profileService.getProfile(user.id);
-        if (data) {
+        if (profile) {
           setForm({
-            fullName: data.fullName || '',
-            phoneNumber: data.phoneNumber || '',
-            gender: data.gender ?? null,
-            email: data.email || data.userName || '',
+            fullName: profile.fullName || '',
+            phoneNumber: profile.phoneNumber || '',
+            gender: profile.gender ?? null,
+            email: profile.email || profile.userName || '',
           });
         }
         try {
@@ -71,8 +70,7 @@ export default function Profile({ user }) {
         handleApiError(err, t('ERROR.LOAD_ERROR'));
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, profile, t]);
 
   const onChange = (e) =>
     setForm((s) => ({ ...s, [e.target.name]: e.target.value }));
@@ -97,7 +95,7 @@ export default function Profile({ user }) {
 
     setSaving(true);
     try {
-      await profileService.updateProfile({
+      await updateProfile({
         UserId: user.id,
         FullName: form.fullName,
         PhoneNumber: form.phoneNumber || null,
@@ -313,7 +311,7 @@ export default function Profile({ user }) {
         </div>
 
         <div className="flex items-center gap-4 mb-6 p-4 bg-orange-50 rounded-lg">
-          <div className="h-16 w-16 rounded-full bg-orange-600 text-white flex items-center justify-center text-xl font-semibold">
+          <div className="h-16 w-16 rounded-full bg-orange-300 text-white flex items-center justify-center text-xl font-semibold">
             {avatarChar}
           </div>
           <div>

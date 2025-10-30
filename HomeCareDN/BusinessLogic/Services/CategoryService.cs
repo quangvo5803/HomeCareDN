@@ -15,6 +15,8 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        private const string INCLUDE = "Materials,LogoImage";
+
         public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
@@ -23,9 +25,7 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<CategoryDto>> GetAllCategories(QueryParameters parameters)
         {
-            var query = _unitOfWork.CategoryRepository.GetQueryable(
-                includeProperties: "Materials,LogoImage"
-            );
+            var query = _unitOfWork.CategoryRepository.GetQueryable(includeProperties: INCLUDE);
 
             if (!string.IsNullOrEmpty(parameters.Search))
             {
@@ -83,7 +83,7 @@ namespace BusinessLogic.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetAsync(
                 c => c.CategoryID == id,
-                includeProperties: "Materials,LogoImage"
+                includeProperties: INCLUDE
             );
 
             if (category == null)
@@ -128,6 +128,10 @@ namespace BusinessLogic.Services
             await _unitOfWork.CategoryRepository.AddAsync(category);
 
             await _unitOfWork.SaveAsync();
+            category = await _unitOfWork.CategoryRepository.GetAsync(
+                c => c.CategoryID == category.CategoryID,
+                includeProperties: INCLUDE
+            );
             var categoryDto = _mapper.Map<CategoryDto>(category);
             return categoryDto;
         }
@@ -136,7 +140,7 @@ namespace BusinessLogic.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetAsync(
                 c => c.CategoryID == requestDto.CategoryID,
-                includeProperties: "LogoImage,Materials"
+                includeProperties: INCLUDE
             );
             var errors = new Dictionary<string, string[]>();
 

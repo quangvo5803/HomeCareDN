@@ -22,7 +22,7 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
     const fetchData = async () => {
       try {
         setModalLoading(true);
-        const data = await materialService.getAllMaterial({
+        const data = await materialService.getAll({
           PageNumber: currentPage,
           PageSize: pageSize,
           Search: debouncedSearch || null,

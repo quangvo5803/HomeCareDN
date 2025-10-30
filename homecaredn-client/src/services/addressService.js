@@ -1,33 +1,25 @@
-import api from '../api';
+import api from './public/api';
 
 export const addressService = {
-  getUserAddress: async (userId) => {
-    const response = await api.get(
-      `/CustomerAddresses/get-user-address/${userId}`
-    );
+  // ====================== CUSTOMER ======================
+  getAll: async (userId) => {
+    const response = await api.get(`/addresses`, { params: { userId } });
     return response.data;
   },
 
-  createAddress: async (payload) => {
-    const response = await api.post(
-      `/CustomerAddresses/create-address`,
-      payload
-    );
+  create: async (dto) => {
+    //  dto = { userId, city, district, ward, detail }
+    const response = await api.post('/addresses', dto);
     return response.data;
   },
 
-  updateAddress: async (payload) => {
-    const response = await api.put(
-      `/CustomerAddresses/update-address`,
-      payload
-    );
+  update: async (dto) => {
+    //  dto = { userId, addressID, city, district, ward, detail }
+    const response = await api.put(`/addresses/${dto.AddressID}`, dto);
     return response.data;
   },
-
-  deleteAddress: async (id) => {
-    const response = await api.delete(
-      `/CustomerAddresses/delete-address/${id}`
-    );
+  delete: async (id) => {
+    const response = await api.delete(`/addresses/${id}`);
     return response.data;
   },
 };

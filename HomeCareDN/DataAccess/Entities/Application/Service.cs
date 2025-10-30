@@ -29,9 +29,6 @@ namespace DataAccess.Entities.Application
 
         [Display(Name = "Repair")]
         Repair,
-
-        [Display(Name = "MaterialOrder")]
-        MaterialOrder,
     }
 
     public enum PackageOption

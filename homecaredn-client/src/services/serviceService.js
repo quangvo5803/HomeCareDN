@@ -1,79 +1,44 @@
-import api from '../api';
-
-// 🔹 Hàm dùng chung để build FormData cho Service
-const appendIf = (fd, key, value) => {
-  if (value !== undefined && value !== null && value !== '') {
-    fd.append(key, value);
-  }
-};
-
-const buildServiceFormData = (service) => {
-  const formData = new FormData();
-
-  // ID (chỉ dùng khi update)
-  appendIf(formData, 'ServiceID', service.ServiceID);
-
-  // Required fields
-  appendIf(formData, 'Name', service.Name);
-  appendIf(formData, 'ServiceType', service.ServiceType);
-  appendIf(formData, 'BuildingType', service.BuildingType);
-  // Optional fields
-  appendIf(formData, 'NameEN', service.NameEN);
-  appendIf(formData, 'PackageOption', service.PackageOption);
-  appendIf(formData, 'MainStructureType', service.MainStructureType);
-  appendIf(formData, 'DesignStyle', service.DesignStyle);
-  appendIf(formData, 'Description', service.Description);
-  appendIf(formData, 'DescriptionEN', service.DescriptionEN);
-
-  // Images
-  (service.ImageUrls || []).forEach((ImageUrls) =>
-    formData.append('ImageUrls', ImageUrls)
-  );
-  (service.ImagePublicIds || []).forEach((ImagePublicIds) =>
-    formData.append('ImagePublicIds', ImagePublicIds)
-  );
-
-  return formData;
-};
+import api from './public/api';
 
 export const serviceService = {
-  // 🔹 Public APIs
-  getAllService: async (params = {}) => {
-    const response = await api.get('/Services/get-all-services', { params });
+  // ====================== ANONYMOUS ======================
+  getAll: async (params) => {
+    const response = await api.get('/services/get-all-services', { params });
     return response.data;
   },
 
-  getServiceById: async (id) => {
-    const response = await api.get(`/Services/get-service/${id}`);
+  getById: async (id) => {
+    const response = await api.get(`/services/get-service/${id}`);
+    return response.data;
+  },
+  // ====================== ADMIN ======================
+  create: async (dto) => {
+    // dto
+    // {
+    //   Name: string,
+    //   NameEN?: string,
+    //   ServiceType: number,
+    //   PackageOption?: number,
+    //   BuildingType: number,
+    //   MainStructureType?: number,
+    //   DesignStyle?: number,
+    //   Description?: string,
+    //   DescriptionEN?: string,
+    //   ImageUrls: string[],
+    //   ImagePublicIds: string[]
+    // }
+    const response = await api.post('/services', dto);
     return response.data;
   },
 
-  // 🔹 Admin-only APIs
-  createService: async (data) => {
-    const formData = buildServiceFormData(data);
-    const response = await api.post('/AdminService/create-service', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+  update: async (dto) => {
+    // dto khớp với ServiceUpdateRequestDto
+    const response = await api.put('/services', dto);
     return response.data;
   },
 
-  updateService: async (data) => {
-    const formData = buildServiceFormData(data);
-    const response = await api.put('/AdminService/update-service', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data;
-  },
-
-  deleteService: async (id) => {
-    const response = await api.delete(`/AdminService/delete-service/${id}`);
-    return response.data;
-  },
-
-  deleteServiceImage: async (imageUrl) => {
-    const response = await api.delete(
-      `/Images/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`
-    );
+  delete: async (id) => {
+    const response = await api.delete(`/services/${id}`);
     return response.data;
   },
 };

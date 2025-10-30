@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.Services.Interfaces;
@@ -14,6 +15,7 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
+        private const string INCLUDE_DELETE = "MaterialRequestItems,DistributorApplications";
         private const string INCLUDE =
             "MaterialRequestItems,DistributorApplications,SelectedDistributorApplication";
         private const string ERROR_MATERIAL_SERVICE = "MATERIAL_SERVICE";
@@ -26,7 +28,8 @@ namespace BusinessLogic.Services
         }
 
         public async Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            string role = "Admin"
         )
         {
             var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
@@ -109,7 +112,10 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(Guid materialRequestID)
+        public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(
+            Guid materialRequestID,
+            string role = "Admin"
+        )
         {
             var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
                 m => m.MaterialRequestID == materialRequestID,
@@ -203,14 +209,41 @@ namespace BusinessLogic.Services
 
         public async Task DeleteMaterialRequest(Guid materialRequestID)
         {
-            var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(m =>
-                m.MaterialRequestID == materialRequestID
+            var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                m => m.MaterialRequestID == materialRequestID,
+                includeProperties: INCLUDE_DELETE
             );
-            if (materialRequest != null)
+            if (materialRequest == null)
             {
-                _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
-                await _unitOfWork.SaveAsync();
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_MATERIAL_SERVICE, new[] { ERROR_MATERIAL_SERVICE_NOT_FOUND } },
+                    }
+                );
             }
+            await DeleteRelatedEntity(materialRequest);
+            _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
+            await _unitOfWork.SaveAsync();
+        }
+
+        private async Task DeleteRelatedEntity(MaterialRequest materialRequest)
+        {
+            if (materialRequest.MaterialRequestItems != null)
+            {
+                foreach (var item in materialRequest.MaterialRequestItems)
+                {
+                    _unitOfWork.MaterialRequestItemRepository.Remove(item);
+                }
+            }
+            if (materialRequest.DistributorApplications != null)
+            {
+                foreach (var app in materialRequest.DistributorApplications)
+                {
+                    _unitOfWork.DistributorApplicationRepository.Remove(app);
+                }
+            }
+            await _unitOfWork.SaveAsync();
         }
     }
 }

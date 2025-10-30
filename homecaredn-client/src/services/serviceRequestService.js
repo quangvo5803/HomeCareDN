@@ -1,99 +1,72 @@
-import api from '../api';
-
-// 🔹 Hàm append an toàn
-const appendIf = (fd, key, value) => {
-  if (value !== undefined && value !== null && value !== '') {
-    fd.append(key, value);
-  }
-};
-
-// 🔹 Build FormData cho ServiceRequest
-const buildServiceRequestFormData = (serviceRequest) => {
-  const formData = new FormData();
-
-  // ID (chỉ dùng khi update)
-  appendIf(formData, 'ServiceRequestID', serviceRequest.ServiceRequestID);
-
-  // Required fields
-  appendIf(formData, 'CustomerID', serviceRequest.CustomerID);
-  appendIf(formData, 'AddressID', serviceRequest.AddressID);
-  appendIf(formData, 'ServiceType', serviceRequest.ServiceType);
-  appendIf(formData, 'PackageOption', serviceRequest.PackageOption);
-  appendIf(formData, 'BuildingType', serviceRequest.BuildingType);
-  appendIf(formData, 'MainStructureType', serviceRequest.MainStructureType);
-  appendIf(formData, 'Width', serviceRequest.Width);
-  appendIf(formData, 'Length', serviceRequest.Length);
-  appendIf(formData, 'Floors', serviceRequest.Floors);
-  // Optional fields
-  appendIf(formData, 'DesignStyle', serviceRequest.DesignStyle);
-  appendIf(formData, 'EstimatePrice', serviceRequest.EstimatePrice);
-  appendIf(formData, 'Description', serviceRequest.Description);
-
-  // 🔹 Images từ cloud (string list)
-  (serviceRequest.ImageUrls || []).forEach((url) =>
-    formData.append('ImageUrls', url)
-  );
-  (serviceRequest.ImagePublicIds || []).forEach((id) =>
-    formData.append('ImagePublicIds', id)
-  );
-
-  return formData;
-};
+import api from './public/api';
 
 export const serviceRequestService = {
-  // ================== Public APIs ==================
-  getAllServiceRequest: async (params = {}) => {
-    const res = await api.get('/ServiceRequest/get-all-servicerequest', {
+  // ====================== ADMIN ======================
+  getAllForAdmin: async (params) => {
+    const response = await api.get('/service-requests/admin/all', { params });
+    return response.data;
+  },
+
+  getByIdForAdmin: async (dto) => {
+    // dto = { ServiceRequestID: string }
+    const response = await api.get('/service-requests/admin/detail', {
+      params: dto,
+    });
+    return response.data;
+  },
+
+  // ====================== CUSTOMER ======================
+  getAllForCustomer: async (params) => {
+    const response = await api.get('/service-requests/customer/all', {
       params,
     });
-    return res.data;
+    return response.data;
   },
 
-  getServiceRequestById: async (id) => {
-    const res = await api.get(`/ServiceRequest/get-servicerequest-byid/${id}`);
-    return res.data;
+  getByIdForCustomer: async (dto) => {
+    // dto = { ServiceRequestID: string }
+    const response = await api.get('/service-requests/customer/detail', {
+      params: dto,
+    });
+    return response.data;
   },
 
-  // ================== Customer APIs ==================
-  getAllServiceRequestByUserId: async (params = {}) => {
-    const res = await api.get(
-      '/CustomerServiceRequest/get-all-servicerequest-byuserid',
-      {
-        params,
-      }
-    );
-    return res.data;
+  createForCustomer: async (dto) => {
+    const response = await api.post('/service-requests', dto, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
   },
 
-  createServiceRequest: async (data) => {
-    const formData = buildServiceRequestFormData(data);
-    const res = await api.post(
-      '/CustomerServiceRequest/create-servicerequest',
-      formData
-    );
-    return res.data;
+  updateForCustomer: async (dto) => {
+    const response = await api.put('/service-requests', dto, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.data;
   },
 
-  updateServiceRequest: async (data) => {
-    const formData = buildServiceRequestFormData(data);
-    const res = await api.put(
-      '/CustomerServiceRequest/update-servicerequest',
-      formData
-    );
-    return res.data;
+  deleteForCustomer: async (id) => {
+    const response = await api.delete(`/service-requests/${id}`);
+    return response.data;
   },
 
-  deleteServiceRequest: async (id) => {
-    const res = await api.delete(
-      `/CustomerServiceRequest/delete-servicerequest/${id}`
-    );
-    return res.data;
+  // ====================== DISTRIBUTOR ======================
+  getAllForContractor: async (params) => {
+    const response = await api.get('/service-requests/contractor/all', {
+      params,
+    });
+    return response.data;
   },
 
-  deleteServiceRequestImage: async (imageUrl) => {
-    const res = await api.delete(
-      `/Images/delete-image?imageUrl=${encodeURIComponent(imageUrl)}`
-    );
-    return res.data;
+  getByIdForContractor: async (dto) => {
+    // dto = { ServiceRequestID: string, ContractorID?: string }
+    const response = await api.get('/service-requests/contractor/detail', {
+      params: dto,
+    });
+    return response.data;
   },
 };
