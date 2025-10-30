@@ -4,8 +4,6 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import { useAuth } from '../hook/useAuth';
 import { withMinLoading } from '../utils/withMinLoading';
-import { isSafeText } from '../utils/validateText';
-import { isSafePhone } from '../utils/validatePhone';
 import PropTypes from 'prop-types';
 import ProfileContext from './ProfileContext';
 
@@ -34,41 +32,11 @@ export const ProfileProvider = ({ children }) => {
 
   // 📌 Update profile
   const updateProfile = useCallback(
-    async (form) => {
-      if (!user?.id) {
-        toast.error('Không xác định được người dùng');
-        return;
-      }
-
-      const fullName = (form.fullName || '').trim();
-      if (!fullName) {
-        toast.error('Tên không được để trống');
-        return;
-      }
-      if (!isSafeText(fullName)) {
-        toast.error('Tên không hợp lệ');
-        return;
-      }
-      if (!isSafePhone(form.phoneNumber)) {
-        toast.error('Số điện thoại không hợp lệ');
-        return;
-      }
-
-      try {
-        const dto = {
-          UserId: user.id,
-          FullName: form.fullName,
-          PhoneNumber: form.phoneNumber || null,
-          Gender: form.gender === '' ? null : Number(form.gender),
-        };
-        await profileService.update(dto);
-        toast.success('Cập nhật hồ sơ thành công');
-        await fetchProfile();
-      } catch (err) {
-        toast.error(handleApiError(err, 'Cập nhật hồ sơ thất bại'));
-      }
+    async (dto) => {
+      await profileService.update(dto);
+      await fetchProfile();
     },
-    [user, fetchProfile]
+    [fetchProfile]
   );
 
   // 📌 Tự động load khi user thay đổi

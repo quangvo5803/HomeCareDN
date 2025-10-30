@@ -1,4 +1,6 @@
-﻿using DataAccess.Entities.Authorize;
+﻿using System.Reflection.Emit;
+using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -45,6 +47,10 @@ namespace DataAccess.Data
                         NormalizedName = "DISTRIBUTOR",
                     }
                 );
+            builder.Entity<ApplicationUser>(entity =>
+            {
+                entity.Property(mr => mr.Gender).HasConversion<string>();
+            });
             builder.Entity<Address>(e =>
             {
                 e.HasKey(a => a.AddressID);

@@ -9,13 +9,21 @@ export const addressService = {
 
   create: async (dto) => {
     //  dto = { userId, city, district, ward, detail }
-    const response = await api.post('/addresses', dto);
+    const response = await api.post('/addresses', dto, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   },
 
   update: async (dto) => {
     //  dto = { userId, addressID, city, district, ward, detail }
-    const response = await api.put(`/addresses/${dto.AddressID}`, dto);
+    const response = await api.put(`/addresses/`, dto, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
     return response.data;
   },
   delete: async (id) => {

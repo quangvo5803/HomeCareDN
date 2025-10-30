@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataAccess.Entities.Authorize
 {
@@ -15,8 +16,13 @@ namespace DataAccess.Entities.Authorize
 
     public enum Gender
     {
+        [Display(Name = "Male")]
         Male,
+
+        [Display(Name = "Female")]
         Female,
+
+        [Display(Name = "Other")]
         Other,
     }
 }

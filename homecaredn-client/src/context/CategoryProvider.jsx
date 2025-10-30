@@ -110,7 +110,7 @@ export const CategoryProvider = ({ children }) => {
   const updateCategory = useCallback(
     async (categoryData) => {
       try {
-        const updated = await categoryService.updateCategory(categoryData);
+        const updated = await categoryService.update(categoryData);
         setCategories((prev) =>
           prev.map((c) => (c.categoryID === updated.categoryID ? updated : c))
         );
