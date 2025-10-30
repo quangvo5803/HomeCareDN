@@ -1,5 +1,9 @@
 import { useEffect } from 'react';
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {
+  HubConnectionBuilder,
+  LogLevel,
+  HttpTransportType,
+} from '@microsoft/signalr';
 
 export default function useRealtime(user, role, handlers = {}) {
   useEffect(() => {
