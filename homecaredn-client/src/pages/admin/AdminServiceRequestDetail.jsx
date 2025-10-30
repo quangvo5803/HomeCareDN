@@ -138,10 +138,23 @@ export default function AdminServiceRequestDetail() {
     },
   });
   useEffect(() => {
+    if (!contractorApplicationList.length) return;
+
     const selected = contractorApplicationList.find(
       (ca) => ca.status === 'PendingCommission'
     );
-    if (selected) setSelectedContractor(selected);
+
+    if (selected) {
+      setSelectedContractor((prev) => {
+        if (
+          !prev ||
+          prev.contractorApplicationID !== selected.contractorApplicationID
+        ) {
+          return selected;
+        }
+        return prev;
+      });
+    }
   }, [contractorApplicationList]);
   // ===== FETCH SERVICE REQUEST DETAIL =====
   useEffect(() => {
@@ -459,7 +472,7 @@ export default function AdminServiceRequestDetail() {
           {selectedContractor ? (
             <>
               {/* Back button - only show if not from server (user manually selected) */}
-              {!serviceRequestDetail.selectedContractor && (
+              {serviceRequestDetail.status !== 'Closed' && (
                 <button
                   onClick={() => setSelectedContractor(null)}
                   className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"

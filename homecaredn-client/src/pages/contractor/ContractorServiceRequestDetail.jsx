@@ -350,6 +350,9 @@ export default function ContractorServiceRequestDetail() {
 
     setImages((prev) => [...prev, ...mapped]);
   };
+  const handleRemoveImage = (img) => {
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
+  };
 
   if (loading || isChecking || !serviceRequest) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
@@ -745,6 +748,15 @@ export default function ContractorServiceRequestDetail() {
                             alt={`Preview ${idx + 1}`}
                             className="w-full h-full object-cover"
                           />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(img)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                            >
+                              <i className="fas fa-trash-alt text-sm"></i>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
