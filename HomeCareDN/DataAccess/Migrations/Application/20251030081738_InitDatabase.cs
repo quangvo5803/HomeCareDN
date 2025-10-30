@@ -233,6 +233,7 @@ namespace DataAccess.Migrations.Application
                     Description = table.Column<string>(type: "text", nullable: false),
                     EstimatePrice = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    DueCommisionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Status = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

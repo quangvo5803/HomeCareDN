@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251025054940_InitDatabase")]
+    [Migration("20251030081738_InitDatabase")]
     partial class InitDatabase
     {
         /// <inheritdoc />
@@ -179,6 +179,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("DueCommisionTime")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("EstimatePrice")
                         .HasColumnType("double precision");
