@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace DataAccess.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class Add_Ref_Documents : Migration
+    public partial class Add_Ref_Document : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

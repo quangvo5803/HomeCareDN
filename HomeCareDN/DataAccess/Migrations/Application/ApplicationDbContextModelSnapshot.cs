@@ -289,6 +289,9 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("PartnerRequestID")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -297,6 +300,12 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.HasKey("DocumentID");
+
+                    b.HasIndex("ContractorApplicationID");
+
+                    b.HasIndex("PartnerRequestID");
+
+                    b.HasIndex("ServiceRequestID");
 
                     b.ToTable("Documents", "app");
                 });
@@ -713,6 +722,21 @@ namespace DataAccess.Migrations.Application
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ContractorApplicationID");
+
+                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("PartnerRequestID");
+
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceRequestID");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -813,6 +837,8 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
@@ -835,6 +861,8 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
@@ -846,6 +874,8 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
+
+                    b.Navigation("Documents");
 
                     b.Navigation("Images");
                 });

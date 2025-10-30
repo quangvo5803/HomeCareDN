@@ -11,17 +11,18 @@ namespace BusinessLogic.Services
         {
             _unitOfWork = unitOfWork;
         }
-        //public async Task DeleteDocumentAsync(string documentUrl)
-        //{
-        //    var document = await _unitOfWork.DocumentRepository.GetAsync(doc =>
-        //        doc.DocumentUrl == documentUrl
-        //    );
 
-        //    if (document != null)
-        //    {
-        //        await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
-        //        await _unitOfWork.SaveAsync();
-        //    }
-        //}
+        public async Task DeleteDocumentAsync(string documentUrl)
+        {
+            var document = await _unitOfWork.DocumentRepository.GetAsync(doc =>
+                doc.DocumentUrl == documentUrl
+            );
+
+            if (document != null)
+            {
+                await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
+                await _unitOfWork.SaveAsync();
+            }
+        }
     }
 }

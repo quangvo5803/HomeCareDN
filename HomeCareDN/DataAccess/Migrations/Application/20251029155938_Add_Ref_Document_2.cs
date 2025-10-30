@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DataAccess.Migrations
+namespace DataAccess.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class Add_Ref_Document_Partner : Migration
+    public partial class Add_Ref_Document_2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -5,6 +5,7 @@ namespace DataAccess.UnitOfWork
     public interface IUnitOfWork
     {
         IImageRepository ImageRepository { get; }
+        IDocumentRepository DocumentRepository { get; }
         IServiceRequestRepository ServiceRequestRepository { get; }
         IMaterialRepository MaterialRepository { get; }
         IServiceRepository ServiceRepository { get; }
