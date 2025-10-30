@@ -24,6 +24,8 @@ namespace BusinessLogic.Services
         private const string CONTRACTOR_APPLY = "ContractorApply";
         private const string CONTRACTOR = "Contractor";
         private const string APPLICATION = "Application";
+        private const string IMAGES = "Images";
+        private const string CONTRACTOR_APPLICATION_REJECT = "ContractorApplication.Rejected";
 
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_CONTRACTOR_NOT_FOUND = "CONTRACTOR_NOT_FOUND";
@@ -51,7 +53,7 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork
-                .ContractorApplicationRepository.GetQueryable(includeProperties: "Images")
+                .ContractorApplicationRepository.GetQueryable(includeProperties: IMAGES)
                 .Where(ca => ca.ServiceRequestID == parameters.FilterID)
                 .AsSingleQuery()
                 .AsNoTracking();
@@ -96,7 +98,7 @@ namespace BusinessLogic.Services
                 ca =>
                     ca.ServiceRequestID == contractorApplicationGetDto.ServiceRequestID
                     && ca.ContractorID == contractorApplicationGetDto.ContractorID,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -123,7 +125,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == id,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -251,7 +253,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == contractorApplicationID,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -298,7 +300,7 @@ namespace BusinessLogic.Services
                         notifyTasks.Add(
                             _notifier.SendToGroupAsync(
                                 $"user_{app.ContractorID}",
-                                "ContractorApplication.Rejected",
+                                CONTRACTOR_APPLICATION_REJECT,
                                 payload
                             )
                         );
@@ -307,7 +309,7 @@ namespace BusinessLogic.Services
                 notifyTasks.Add(
                     _notifier.SendToGroupAsync(
                         $"role_Admin",
-                        "ContractorApplication.Rejected",
+                        CONTRACTOR_APPLICATION_REJECT,
                         new
                         {
                             contractorApplication.ContractorApplicationID,
@@ -390,7 +392,7 @@ namespace BusinessLogic.Services
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             await _notifier.SendToGroupAsync(
                 $"user_{dto.ContractorID}",
-                "ContractorApplication.Rejected",
+                CONTRACTOR_APPLICATION_REJECT,
                 new
                 {
                     contractorApplication.ContractorApplicationID,
@@ -400,7 +402,7 @@ namespace BusinessLogic.Services
             );
             await _notifier.SendToGroupAsync(
                 $"role_Admin",
-                "ContractorApplication.Rejected",
+                CONTRACTOR_APPLICATION_REJECT,
                 new
                 {
                     contractorApplication.ContractorApplicationID,

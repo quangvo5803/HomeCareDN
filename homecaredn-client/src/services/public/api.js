@@ -105,13 +105,13 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         authService.logout();
-        return Promise.resolve();
+        return;
       } finally {
         isRefreshing = false;
       }
     }
     if (error.response?.status === 401 && error.config?._retry) {
-      return Promise.resolve();
+      return;
     }
     throw error;
   }

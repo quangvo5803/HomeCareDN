@@ -503,7 +503,18 @@ export default function ServiceRequestDetail() {
         {/* CONTRACTOR LIST */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h4 className="font-semibold text-orange-600 mb-4 flex items-center justify-between">
-            {!hasSelectedContractor ? (
+            {hasSelectedContractor ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <i className="fas fa-hard-hat"></i>
+                  <span>
+                    {t(
+                      'userPage.serviceRequestDetail.label_selectedContractor'
+                    )}
+                  </span>
+                </span>
+              </>
+            ) : (
               <>
                 <span className="flex items-center gap-2">
                   <i className="fas fa-hard-hat"></i>
@@ -514,17 +525,6 @@ export default function ServiceRequestDetail() {
                 <span className="ml-2 px-4 py-1 bg-orange-100 text-orange-600 font-bold text-lg rounded-full">
                   {totalCount}{' '}
                   {t('userPage.serviceRequestDetail.contractorApplyCount')}
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="flex items-center gap-2">
-                  <i className="fas fa-hard-hat"></i>
-                  <span>
-                    {t(
-                      'userPage.serviceRequestDetail.label_selectedContractor'
-                    )}
-                  </span>
                 </span>
               </>
             )}

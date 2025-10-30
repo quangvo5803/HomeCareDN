@@ -367,11 +367,11 @@ export default function ServiceRequest() {
                               {t('adminServiceRequestManager.estimatePrice')}
                             </div>
                             <div className="text-base font-bold text-orange-600">
-                              {item.estimatePrice != 0
-                                ? formatVND(Number(item.estimatePrice))
-                                : t(
+                              {item.estimatePrice == 0
+                                ? t(
                                     'contractorServiceRequestManager.negotiable'
-                                  )}
+                                  )
+                                : formatVND(Number(item.estimatePrice))}
                             </div>
                           </div>
                         </div>

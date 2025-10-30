@@ -444,9 +444,9 @@ export default function AdminServiceRequestDetail() {
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-xl font-bold text-gray-800">
-              {!hasSelectedContractor
-                ? t('adminServiceRequestManager.listCandidate')
-                : t('adminServiceRequestManager.contractorDetail.title')}
+              {hasSelectedContractor
+                ? t('adminServiceRequestManager.contractorDetail.title')
+                : t('adminServiceRequestManager.listCandidate')}
             </h3>
             {!hasSelectedContractor && (
               <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
@@ -470,13 +470,149 @@ export default function AdminServiceRequestDetail() {
               )}
 
               <div ref={contractorDetailRef}>
-                <ContractorDetailView
-                  contractor={selectedContractor}
-                  t={t}
-                  i18n={i18n}
-                  formatVND={formatVND}
-                  he={he}
-                />
+                <div>
+                  <div className="flex items-center justify-between mb-6 pb-6 border-b">
+                    <div className="flex items-start gap-5">
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
+                        <Avatar
+                          name={selectedContractor?.contractorName || 'User'}
+                          round={false}
+                          size="80"
+                          color="#f97316"
+                          fgColor="#fff"
+                          textSizeRatio={2.5}
+                          className="!w-full !h-full !object-cover !rounded-2xl !flex !items-center !justify-center !text-3xl !font-bold"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-xl text-gray-800 mb-2">
+                          {selectedContractor.contractorName}
+                        </h4>
+                        <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
+                          <i className="fa-solid fa-envelope text-orange-500"></i>
+                          {selectedContractor.contractorEmail}
+                        </p>
+                        <p className="text-gray-600 text-sm flex items-center gap-2">
+                          <i className="fa-solid fa-phone text-orange-500"></i>
+                          {selectedContractor.contractorPhone}
+                        </p>
+                      </div>
+                    </div>
+                    <StatusBadge
+                      status={selectedContractor.status}
+                      type="Application"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 mb-8">
+                    <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
+                      <p className="text-emerald-600 text-sm font-medium mb-1">
+                        {t('adminServiceRequestManager.estimatePrice')}
+                      </p>
+                      <p className="font-bold text-lg text-emerald-700">
+                        {formatVND(selectedContractor.estimatePrice)}
+                      </p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
+                      <p className="text-blue-600 text-sm font-medium mb-1">
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.completedProject'
+                        )}
+                      </p>
+                      <p className="font-bold text-lg text-blue-700">
+                        {selectedContractor.completedProjectCount ?? 0}{' '}
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.project'
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
+                      <p className="text-amber-600 text-sm font-medium mb-1">
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.rating'
+                        )}
+                      </p>
+                      <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
+                        <i className="fa-solid fa-star"></i>
+                        {selectedContractor.averageRating}
+                      </p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
+                      <p className="text-purple-600 text-sm font-medium mb-1">
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.createAt'
+                        )}
+                      </p>
+                      <p className="font-bold text-lg text-purple-700">
+                        {new Date(
+                          selectedContractor.createdAt
+                        ).toLocaleDateString('vi-VN')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Commission Countdown - Show when PendingCommission */}
+                  {selectedContractor.status === 'PendingCommission' &&
+                    selectedContractor.dueCommisionTime && (
+                      <div className="mb-6">
+                        <CommissionCountdown
+                          dueCommisionTime={selectedContractor.dueCommisionTime}
+                          onExpired={() => {
+                            toast.warning(
+                              t(
+                                'contractorServiceRequestDetail.paymentDeadlineExpired'
+                              )
+                            );
+                          }}
+                          role="admin"
+                        />
+                      </div>
+                    )}
+
+                  <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+                      {t('adminServiceRequestManager.description')}
+                    </p>
+                    <div
+                      className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+                      dangerouslySetInnerHTML={{
+                        __html: he.decode(selectedContractor.description || ''),
+                      }}
+                    />
+                  </div>
+
+                  {selectedContractor.imageUrls?.length > 0 && (
+                    <div>
+                      <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.images'
+                        )}
+                      </p>
+                      <div className="grid grid-cols-5 gap-3">
+                        {selectedContractor.imageUrls.map((url, i) => (
+                          <a
+                            key={`${url}-${i}`}
+                            href={url}
+                            className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                            data-gall="contractor-gallery"
+                            title={`${
+                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                            } ${i + 1}`}
+                          >
+                            <img
+                              src={url}
+                              alt={`contractor-${i}`}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </>
           ) : contractorApplicationList.length === 0 ? (
@@ -545,138 +681,6 @@ export default function AdminServiceRequestDetail() {
           )}
         </div>
       </div>
-    </div>
-  );
-}
-
-// ===== CONTRACTOR DETAIL VIEW COMPONENT =====
-function ContractorDetailView({ contractor, t, i18n, formatVND, he }) {
-  if (!contractor) return null;
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6 pb-6 border-b">
-        <div className="flex items-start gap-5">
-          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
-            <Avatar
-              name={contractor?.contractorName || 'User'}
-              round={false}
-              size="80"
-              color="#f97316"
-              fgColor="#fff"
-              textSizeRatio={2.5}
-              className="!w-full !h-full !object-cover !rounded-2xl !flex !items-center !justify-center !text-3xl !font-bold"
-            />
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-xl text-gray-800 mb-2">
-              {contractor.contractorName}
-            </h4>
-            <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
-              <i className="fa-solid fa-envelope text-orange-500"></i>
-              {contractor.contractorEmail}
-            </p>
-            <p className="text-gray-600 text-sm flex items-center gap-2">
-              <i className="fa-solid fa-phone text-orange-500"></i>
-              {contractor.contractorPhone}
-            </p>
-          </div>
-        </div>
-        <StatusBadge status={contractor.status} type="Application" />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
-          <p className="text-emerald-600 text-sm font-medium mb-1">
-            {t('adminServiceRequestManager.estimatePrice')}
-          </p>
-          <p className="font-bold text-lg text-emerald-700">
-            {formatVND(contractor.estimatePrice)}
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
-          <p className="text-blue-600 text-sm font-medium mb-1">
-            {t('adminServiceRequestManager.contractorDetail.completedProject')}
-          </p>
-          <p className="font-bold text-lg text-blue-700">
-            {contractor.completedProjectCount ?? 0}{' '}
-            {t('adminServiceRequestManager.contractorDetail.project')}
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
-          <p className="text-amber-600 text-sm font-medium mb-1">
-            {t('adminServiceRequestManager.contractorDetail.rating')}
-          </p>
-          <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
-            <i className="fa-solid fa-star"></i>
-            {contractor.averageRating}
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
-          <p className="text-purple-600 text-sm font-medium mb-1">
-            {t('adminServiceRequestManager.contractorDetail.createAt')}
-          </p>
-          <p className="font-bold text-lg text-purple-700">
-            {new Date(contractor.createdAt).toLocaleDateString('vi-VN')}
-          </p>
-        </div>
-      </div>
-
-      {/* Commission Countdown - Show when PendingCommission */}
-      {contractor.status === 'PendingCommission' &&
-        contractor.dueCommisionTime && (
-          <div className="mb-6">
-            <CommissionCountdown
-              dueCommisionTime={contractor.dueCommisionTime}
-              onExpired={() => {
-                toast.warning(
-                  t('contractorServiceRequestDetail.paymentDeadlineExpired')
-                );
-              }}
-              role="admin"
-            />
-          </div>
-        )}
-
-      <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-        <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-          {t('adminServiceRequestManager.description')}
-        </p>
-        <div
-          className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-          dangerouslySetInnerHTML={{
-            __html: he.decode(contractor.description || ''),
-          }}
-        />
-      </div>
-
-      {contractor.imageUrls?.length > 0 && (
-        <div>
-          <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
-            {t('adminServiceRequestManager.contractorDetail.images')}
-          </p>
-          <div className="grid grid-cols-5 gap-3">
-            {contractor.imageUrls.map((url, i) => (
-              <a
-                key={`${url}-${i}`}
-                href={url}
-                className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
-                data-gall="contractor-gallery"
-                title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${i + 1}`}
-              >
-                <img
-                  src={url}
-                  alt={`contractor-${i}`}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

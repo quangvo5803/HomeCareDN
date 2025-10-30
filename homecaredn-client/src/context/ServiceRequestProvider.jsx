@@ -159,16 +159,19 @@ export const ServiceRequestProvider = ({ children }) => {
     async (serviceRequestId, imageUrl) => {
       try {
         await imageService.delete(imageUrl);
-        setServiceRequests((prev) =>
-          prev.map((r) =>
-            r.serviceRequestID === serviceRequestId
-              ? {
-                  ...r,
-                  imageUrls: r.imageUrls.filter((img) => img !== imageUrl),
-                }
-              : r
-          )
-        );
+
+        setServiceRequests((prev) => {
+          const updatedRequests = prev.map((req) => {
+            if (req.serviceRequestID !== serviceRequestId) return req;
+
+            const updatedImages = req.imageUrls.filter(
+              (img) => img !== imageUrl
+            );
+            return { ...req, imageUrls: updatedImages };
+          });
+
+          return updatedRequests;
+        });
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;

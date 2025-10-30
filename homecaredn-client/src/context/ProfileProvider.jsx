@@ -73,7 +73,7 @@ export const ProfileProvider = ({ children }) => {
 
   // 📌 Tự động load khi user thay đổi
   useEffect(() => {
-    if (user && user.role === 'Customer') {
+    if (user?.role === 'Customer') {
       fetchProfile();
     } else {
       setProfile(null);
