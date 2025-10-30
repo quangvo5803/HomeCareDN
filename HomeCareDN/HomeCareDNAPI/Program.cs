@@ -71,6 +71,22 @@ namespace HomeCareDNAPI
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (
+                                !string.IsNullOrEmpty(accessToken)
+                                && path.StartsWithSegments("/hubs/application")
+                            )
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        },
+                    };
                 });
             builder.Services.AddCors(options =>
             {
@@ -93,16 +109,7 @@ namespace HomeCareDNAPI
 
             builder.Services.AddHttpContextAccessor();
 
-            var redisConnection = builder.Configuration["Redis:ConnectionString"];
-            builder
-                .Services.AddSignalR()
-                .AddStackExchangeRedis(
-                    redisConnection,
-                    options =>
-                    {
-                        options.Configuration.ChannelPrefix = "homecare";
-                    }
-                );
+            builder.Services.AddSignalR();
 
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             /// Register Options
