@@ -18,7 +18,6 @@ namespace BusinessLogic.Services
         private const string ACCOUNT_STR = "Account";
         private const string ERROR_ACCOUNT_NOT_FOUND = "ACCOUNT_NOT_FOUND";
         private const string ERROR_USER_ID_MISMATCH = "USER_ID_MISMATCH";
-        private const string ERROR_UPDATE_FAIL = "UPDATE_FAIL";
 
         public ProfileService(UserManager<ApplicationUser> userManager, IMapper mapper)
         {
@@ -68,20 +67,8 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(dict);
             }
 
-            _mapper.Map(dto, user); // AutoMapper already ignores overwrite
-            var result = await _userManager.UpdateAsync(user);
-
-            if (!result.Succeeded)
-            {
-                var errors = result
-                    .Errors.GroupBy(e => e.Code ?? ACCOUNT_STR)
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.Description ?? ERROR_UPDATE_FAIL).ToArray()
-                    );
-
-                throw new CustomValidationException(errors);
-            }
+            _mapper.Map(dto, user);
+            await _userManager.UpdateAsync(user);
         }
     }
 }
