@@ -51,7 +51,7 @@ export default function ContractorServiceRequestDetail() {
   const [description, setDescription] = useState('');
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [totalApplications, setTotalApplication] = useState(0);
+  const [totalApplications, setTotalApplications] = useState(0);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
 
@@ -123,7 +123,7 @@ export default function ContractorServiceRequestDetail() {
         setIsChecking(true);
         const data = await getServiceRequestById(serviceRequestId);
         setServiceRequest(data);
-        setTotalApplication(data?.contractorApplyCount ?? 0);
+        setTotalApplications(data?.contractorApplyCount ?? 0);
         let appliedContractorApplication =
           await contractorApplicationService.getByServiceRequestIdForContractor(
             {
@@ -268,7 +268,7 @@ export default function ContractorServiceRequestDetail() {
       const appData = await contractorApplicationService.create(payload);
       toast.success(t('SUCCESS.APPLICATION_CREATE'));
       setExistingApplication(appData);
-      setTotalApplication(totalApplications + 1);
+      setTotalApplications(totalApplications + 1);
     } catch (error) {
       setUploadProgress(0);
       toast.error(t(handleApiError(error)));
@@ -294,7 +294,7 @@ export default function ContractorServiceRequestDetail() {
           setDescription('');
           setEstimatePrice('');
           setImages([]);
-          setTotalApplication(totalApplications - 1);
+          setTotalApplications(totalApplications - 1);
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }

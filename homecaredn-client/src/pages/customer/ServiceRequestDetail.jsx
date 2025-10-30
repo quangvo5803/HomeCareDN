@@ -710,8 +710,7 @@ export default function ServiceRequestDetail() {
             <span>{t('userPage.serviceRequestDetail.section_chat')}</span>
           </h4>
 
-          {(!selectedContractor ||
-            selectedContractor.status !== 'Approved') && (
+          {selectedContractor?.status !== 'Approved' && (
             <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
               <div className="text-center text-white px-6">
                 <i className="fas fa-lock text-4xl mb-4"></i>
@@ -734,9 +733,9 @@ export default function ServiceRequestDetail() {
                 </div>
               </div>
             ) : (
-              messages.map((m, idx) => (
+              messages.map((m) => (
                 <div
-                  key={idx}
+                  key={m.messageID}
                   className={`flex ${
                     m.sender === 'user' ? 'justify-end' : 'justify-start'
                   }`}

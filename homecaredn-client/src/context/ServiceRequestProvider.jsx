@@ -160,26 +160,32 @@ export const ServiceRequestProvider = ({ children }) => {
       try {
         await imageService.delete(imageUrl);
 
-        setServiceRequests((prev) => {
-          const updatedRequests = prev.map((req) => {
-            if (req.serviceRequestID !== serviceRequestId) return req;
-
-            const updatedImages = req.imageUrls.filter(
-              (img) => img !== imageUrl
-            );
-            return { ...req, imageUrls: updatedImages };
-          });
-
-          return updatedRequests;
-        });
+        setServiceRequests((prev) =>
+          updateServiceRequestAfterDeleteImages(
+            prev,
+            serviceRequestId,
+            imageUrl
+          )
+        );
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
       }
     },
     []
   );
-
+  function updateServiceRequestAfterDeleteImages(
+    prevRequests,
+    serviceRequestId,
+    imageUrl
+  ) {
+    return prevRequests.map((req) => {
+      if (req.serviceRequestID !== serviceRequestId) return req;
+      return {
+        ...req,
+        imageUrls: req.imageUrls.filter((img) => img !== imageUrl),
+      };
+    });
+  }
   // ==================== AUTO LOAD ====================
   useEffect(() => {
     if (!user) {

@@ -108,7 +108,6 @@ export const MaterialRequestProvider = ({ children }) => {
 
   const updateMaterialRequest = useCallback(
     async (dto) => {
-      if (!user || user.role !== 'Customer') return null;
       try {
         const updated = await materialRequestService.updateForCustomer(dto);
         setMaterialRequests((prev) =>
@@ -125,7 +124,7 @@ export const MaterialRequestProvider = ({ children }) => {
         throw err;
       }
     },
-    [user, t]
+    [t]
   );
 
   const deleteMaterialRequest = useCallback(async (id) => {

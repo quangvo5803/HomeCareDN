@@ -15,7 +15,7 @@ export default function CommissionCountdown({
     if (!dueCommisionTime) return;
 
     const calculateTimeLeft = () => {
-      const total = new Date(dueCommisionTime) - new Date();
+      const total = new Date(dueCommisionTime) - new Date().now();
       if (total <= 0) {
         setTimeLeft(null);
         onExpired?.();
@@ -90,9 +90,9 @@ export default function CommissionCountdown({
   }
 
   const titleMap = {
-    critical: `🚨 ${t(`${prefix}.urgent`)}`,
-    urgent: `⚠️ ${t(`${prefix}.less24h`)}`,
-    normal: `⏰ ${t(`${prefix}.deadline`)}`,
+    critical: '🚨 ' + t(prefix + '.urgent'),
+    urgent: '⚠️ ' + t(prefix + '.less24h'),
+    normal: '⏰ ' + t(prefix + '.deadline'),
   };
 
   const noteMap = {
