@@ -653,7 +653,7 @@ export default function ContractorServiceRequestDetail() {
                       >
                         {((Number(estimatePrice) || 1) * factor)
                           .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                          .replaceAll(/\B(?=(\d{3})+(?!\d))/g, '.')}
                       </button>
                     ))}
                   </div>
@@ -843,32 +843,31 @@ export default function ContractorServiceRequestDetail() {
               )}
 
               {/* Images */}
-              {existingApplication.imageUrls &&
-                existingApplication.imageUrls.length > 0 && (
-                  <div className="border-t pt-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <i className="fas fa-images text-gray-400"></i>
-                      {t('contractorServiceRequestDetail.images')} (
-                      {existingApplication.imageUrls.length})
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {existingApplication.imageUrls.map((imageUrl, idx) => (
-                        <a
-                          key={imageUrl}
-                          href={imageUrl}
-                          className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
-                          data-gall="application-gallery"
-                        >
-                          <img
-                            src={imageUrl}
-                            alt={`Application ${idx + 1}`}
-                            className="object-cover w-full h-full group-hover:scale-105 transition-transform"
-                          />
-                        </a>
-                      ))}
-                    </div>
+              {existingApplication.imageUrls?.length > 0 && (
+                <div className="border-t pt-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i className="fas fa-images text-gray-400"></i>
+                    {t('contractorServiceRequestDetail.images')} (
+                    {existingApplication.imageUrls.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {existingApplication.imageUrls.map((imageUrl, idx) => (
+                      <a
+                        key={imageUrl}
+                        href={imageUrl}
+                        className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
+                        data-gall="application-gallery"
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`Application ${idx + 1}`}
+                          className="object-cover w-full h-full group-hover:scale-105 transition-transform"
+                        />
+                      </a>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
               {/* Applied Date */}
               {existingApplication.createdAt && (
@@ -1121,8 +1120,7 @@ export default function ContractorServiceRequestDetail() {
             </h4>
 
             {/* Overlay when not approved */}
-            {(!existingApplication ||
-              existingApplication.status !== 'Approved') && (
+            {existingApplication?.status !== 'Approved' && (
               <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
                 <div className="text-center text-white px-6">
                   <i className="fas fa-lock text-4xl mb-4"></i>
@@ -1145,9 +1143,9 @@ export default function ContractorServiceRequestDetail() {
                   </div>
                 </div>
               ) : (
-                messages.map((m, idx) => (
+                messages.map((m) => (
                   <div
-                    key={idx}
+                    key={m.messageID}
                     className={`flex ${
                       m.sender === 'contractor'
                         ? 'justify-end'
@@ -1238,45 +1236,7 @@ export default function ContractorServiceRequestDetail() {
               </h3>
 
               {/* No application from current contractor */}
-              {!existingApplication ? (
-                <div className="bg-gray-50 rounded-lg p-4 ring-1 ring-gray-200 text-center">
-                  {isRequestClosed ? (
-                    <>
-                      <i className="fas fa-ban text-gray-400 text-3xl mb-2" />
-                      <p className="text-sm font-semibold text-gray-700 mb-1">
-                        {t('contractorServiceRequestDetail.closedApplication')}
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        {t(
-                          'contractorServiceRequestDetail.requestAlreadyClosed'
-                        )}
-                      </p>
-
-                      {/* If request closed and selected contractor is someone else -> show note */}
-                      {serviceRequest.selectedContractorApplication
-                        ?.contractorID &&
-                        serviceRequest.selectedContractorApplication
-                          .contractorID !== user.id && (
-                          <div className="bg-yellow-50 rounded-lg p-3 ring-1 ring-yellow-200 mt-2">
-                            <p className="text-xs text-yellow-700 flex items-center gap-2">
-                              <i className="fas fa-info-circle" />
-                              {t(
-                                'contractorServiceRequestDetail.requestClosedNote'
-                              )}
-                            </p>
-                          </div>
-                        )}
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-file-contract text-gray-400 text-3xl mb-2" />
-                      <p className="text-sm text-gray-600">
-                        {t('contractorServiceRequestDetail.notAppliedYet')}
-                      </p>
-                    </>
-                  )}
-                </div>
-              ) : (
+              {existingApplication ? (
                 /* existingApplication exists -> show details */
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-2">
@@ -1324,6 +1284,44 @@ export default function ContractorServiceRequestDetail() {
                             </p>
                           </div>
                         )}
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 ring-1 ring-gray-200 text-center">
+                  {isRequestClosed ? (
+                    <>
+                      <i className="fas fa-ban text-gray-400 text-3xl mb-2" />
+                      <p className="text-sm font-semibold text-gray-700 mb-1">
+                        {t('contractorServiceRequestDetail.closedApplication')}
+                      </p>
+                      <p className="text-xs text-gray-500 mb-3">
+                        {t(
+                          'contractorServiceRequestDetail.requestAlreadyClosed'
+                        )}
+                      </p>
+
+                      {/* If request closed and selected contractor is someone else -> show note */}
+                      {serviceRequest.selectedContractorApplication
+                        ?.contractorID &&
+                        serviceRequest.selectedContractorApplication
+                          .contractorID !== user.id && (
+                          <div className="bg-yellow-50 rounded-lg p-3 ring-1 ring-yellow-200 mt-2">
+                            <p className="text-xs text-yellow-700 flex items-center gap-2">
+                              <i className="fas fa-info-circle" />
+                              {t(
+                                'contractorServiceRequestDetail.requestClosedNote'
+                              )}
+                            </p>
+                          </div>
+                        )}
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-file-contract text-gray-400 text-3xl mb-2" />
+                      <p className="text-sm text-gray-600">
+                        {t('contractorServiceRequestDetail.notAppliedYet')}
+                      </p>
                     </>
                   )}
                 </div>

@@ -173,19 +173,7 @@ export const ServiceRequestProvider = ({ children }) => {
     },
     []
   );
-  function updateServiceRequestAfterDeleteImages(
-    prevRequests,
-    serviceRequestId,
-    imageUrl
-  ) {
-    return prevRequests.map((req) => {
-      if (req.serviceRequestID !== serviceRequestId) return req;
-      return {
-        ...req,
-        imageUrls: req.imageUrls.filter((img) => img !== imageUrl),
-      };
-    });
-  }
+
   // ==================== AUTO LOAD ====================
   useEffect(() => {
     if (!user) {
@@ -235,7 +223,19 @@ export const ServiceRequestProvider = ({ children }) => {
     </ServiceRequestContext.Provider>
   );
 };
-
+function updateServiceRequestAfterDeleteImages(
+  prevRequests,
+  serviceRequestId,
+  imageUrl
+) {
+  return prevRequests.map((req) => {
+    if (req.serviceRequestID !== serviceRequestId) return req;
+    return {
+      ...req,
+      imageUrls: req.imageUrls.filter((img) => img !== imageUrl),
+    };
+  });
+}
 ServiceRequestProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

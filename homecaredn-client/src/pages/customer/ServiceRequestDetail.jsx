@@ -504,16 +504,12 @@ export default function ServiceRequestDetail() {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h4 className="font-semibold text-orange-600 mb-4 flex items-center justify-between">
             {hasSelectedContractor ? (
-              <>
-                <span className="flex items-center gap-2">
-                  <i className="fas fa-hard-hat"></i>
-                  <span>
-                    {t(
-                      'userPage.serviceRequestDetail.label_selectedContractor'
-                    )}
-                  </span>
+              <span className="flex items-center gap-2">
+                <i className="fas fa-hard-hat"></i>
+                <span>
+                  {t('userPage.serviceRequestDetail.label_selectedContractor')}
                 </span>
-              </>
+              </span>
             ) : (
               <>
                 <span className="flex items-center gap-2">
