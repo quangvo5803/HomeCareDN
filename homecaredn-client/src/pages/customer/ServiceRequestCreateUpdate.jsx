@@ -94,7 +94,7 @@ export default function ServiceRequestCreateUpdate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (images.filter((i) => i.isNew).length > 0) {
+    if (images.some((i) => i.isNew)) {
       setUploadProgress(1);
     } else {
       setIsSubmitting(true);
@@ -498,7 +498,7 @@ export default function ServiceRequestCreateUpdate() {
                       >
                         {((Number(estimatePrice) || 1) * factor)
                           .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                          .replaceAll(/\B(?=(\d{3})+(?!\d))/g, '.')}
                       </button>
                     ))}
                   </div>

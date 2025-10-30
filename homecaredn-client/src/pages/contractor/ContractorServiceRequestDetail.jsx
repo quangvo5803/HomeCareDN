@@ -42,7 +42,8 @@ export default function ContractorServiceRequestDetail() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { getServiceRequestById, loading } = useServiceRequest();
+  const { setServiceRequests, getServiceRequestById, loading } =
+    useServiceRequest();
   const [serviceRequest, setServiceRequest] = useState(null);
   const [existingApplication, setExistingApplication] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -50,7 +51,7 @@ export default function ContractorServiceRequestDetail() {
   const [description, setDescription] = useState('');
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [totalApplications, setTotalApplication] = useState(0);
+  const [totalApplications, setTotalApplications] = useState(0);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
 
@@ -67,12 +68,50 @@ export default function ContractorServiceRequestDetail() {
         status: 'PendingCommission',
         dueCommisionTime: payload?.dueCommisionTime || null,
       }));
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
     },
-    onRejectedContractorApplication: () => {
+    onRejectedContractorApplication: (payload) => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',
       }));
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+    onServiceRequestClosed: (payload) => {
+      if (payload?.serviceRequestID === serviceRequestId) {
+        setServiceRequests((prev) =>
+          prev.map((sr) =>
+            sr.serviceRequestID === payload.serviceRequestID
+              ? {
+                  ...sr,
+                  status: 'Closed',
+                }
+              : sr
+          )
+        );
+        setServiceRequest((prev) => ({
+          ...prev,
+          status: 'Closed',
+        }));
+      }
     },
   });
   // Load service request & existing application
@@ -84,7 +123,7 @@ export default function ContractorServiceRequestDetail() {
         setIsChecking(true);
         const data = await getServiceRequestById(serviceRequestId);
         setServiceRequest(data);
-        setTotalApplication(data.contractorApplyCount || 0);
+        setTotalApplications(data?.contractorApplyCount ?? 0);
         let appliedContractorApplication =
           await contractorApplicationService.getByServiceRequestIdForContractor(
             {
@@ -229,7 +268,7 @@ export default function ContractorServiceRequestDetail() {
       const appData = await contractorApplicationService.create(payload);
       toast.success(t('SUCCESS.APPLICATION_CREATE'));
       setExistingApplication(appData);
-      setTotalApplication(totalApplications + 1);
+      setTotalApplications(totalApplications + 1);
     } catch (error) {
       setUploadProgress(0);
       toast.error(t(handleApiError(error)));
@@ -255,7 +294,7 @@ export default function ContractorServiceRequestDetail() {
           setDescription('');
           setEstimatePrice('');
           setImages([]);
-          setTotalApplication(totalApplications - 1);
+          setTotalApplications(totalApplications - 1);
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }
@@ -310,6 +349,9 @@ export default function ContractorServiceRequestDetail() {
     }));
 
     setImages((prev) => [...prev, ...mapped]);
+  };
+  const handleRemoveImage = (img) => {
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
   if (loading || isChecking || !serviceRequest) return <Loading />;
@@ -554,7 +596,17 @@ export default function ContractorServiceRequestDetail() {
           )}
 
           {/* Apply Form OR Application Details */}
-          {!existingApplication ? (
+          {isRequestClosed && !existingApplication ? (
+            <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
+              <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
+              <p className="text-gray-700 font-semibold mb-1">
+                {t('contractorServiceRequestDetail.closedApplication')}
+              </p>
+              <p className="text-sm text-gray-500">
+                {t('contractorServiceRequestDetail.requestAlreadyClosed')}
+              </p>
+            </div>
+          ) : !existingApplication && !isRequestClosed ? (
             // Apply Form - Show when NOT applied yet and request is not closed
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
               <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
@@ -604,7 +656,7 @@ export default function ContractorServiceRequestDetail() {
                       >
                         {((Number(estimatePrice) || 1) * factor)
                           .toString()
-                          .replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                          .replaceAll(/\B(?=(\d{3})+(?!\d))/g, '.')}
                       </button>
                     ))}
                   </div>
@@ -696,6 +748,15 @@ export default function ContractorServiceRequestDetail() {
                             alt={`Preview ${idx + 1}`}
                             className="w-full h-full object-cover"
                           />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(img)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                            >
+                              <i className="fas fa-trash-alt text-sm"></i>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -794,32 +855,31 @@ export default function ContractorServiceRequestDetail() {
               )}
 
               {/* Images */}
-              {existingApplication.imageUrls &&
-                existingApplication.imageUrls.length > 0 && (
-                  <div className="border-t pt-6">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                      <i className="fas fa-images text-gray-400"></i>
-                      {t('contractorServiceRequestDetail.images')} (
-                      {existingApplication.imageUrls.length})
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {existingApplication.imageUrls.map((imageUrl, idx) => (
-                        <a
-                          key={imageUrl}
-                          href={imageUrl}
-                          className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
-                          data-gall="application-gallery"
-                        >
-                          <img
-                            src={imageUrl}
-                            alt={`Application ${idx + 1}`}
-                            className="object-cover w-full h-full group-hover:scale-105 transition-transform"
-                          />
-                        </a>
-                      ))}
-                    </div>
+              {existingApplication.imageUrls?.length > 0 && (
+                <div className="border-t pt-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i className="fas fa-images text-gray-400"></i>
+                    {t('contractorServiceRequestDetail.images')} (
+                    {existingApplication.imageUrls.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {existingApplication.imageUrls.map((imageUrl, idx) => (
+                      <a
+                        key={imageUrl}
+                        href={imageUrl}
+                        className="venobox aspect-square rounded-lg overflow-hidden block group focus:outline-none focus:ring-2 focus:ring-orange-500 ring-1 ring-gray-200"
+                        data-gall="application-gallery"
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`Application ${idx + 1}`}
+                          className="object-cover w-full h-full group-hover:scale-105 transition-transform"
+                        />
+                      </a>
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
 
               {/* Applied Date */}
               {existingApplication.createdAt && (
@@ -839,7 +899,7 @@ export default function ContractorServiceRequestDetail() {
                 {existingApplication.status === 'PendingCommission' && (
                   <>
                     {/* Commission Calculation Info Box */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-3">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
                       <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                         <i className="fas fa-calculator text-blue-600"></i>
                         {t(
@@ -847,6 +907,54 @@ export default function ContractorServiceRequestDetail() {
                         )}
                       </h4>
 
+                      {/* 🟢 Hiển thị bảng các mức commission tier */}
+                      <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          {t(
+                            'contractorServiceRequestDetail.publicCommissionTiers'
+                          )}
+                        </p>
+                        <table className="w-full text-xs text-gray-700">
+                          <thead>
+                            <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
+                              <th className="py-1">
+                                {t('contractorServiceRequestDetail.priceRange')}
+                              </th>
+                              <th className="py-1">
+                                {t('contractorServiceRequestDetail.rate')}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier1')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                2%
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier2')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                1.5%
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier3')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                1%
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* 🔵 Phần tính toán riêng cho application hiện tại */}
                       {(() => {
                         const estimatePrice = Number(
                           existingApplication.estimatePrice
@@ -858,17 +966,17 @@ export default function ContractorServiceRequestDetail() {
                         if (estimatePrice <= 500_000_000) {
                           commission = estimatePrice * 0.02;
                           rate = 2;
-                          tierInfo = t('contractorServiceRequestDetail.tier1'); // "≤ 500 triệu"
+                          tierInfo = t('contractorServiceRequestDetail.tier1');
                         } else if (estimatePrice <= 2_000_000_000) {
                           commission = estimatePrice * 0.015;
                           rate = 1.5;
-                          tierInfo = t('contractorServiceRequestDetail.tier2'); // "500 triệu - 2 tỷ"
+                          tierInfo = t('contractorServiceRequestDetail.tier2');
                         } else {
                           commission = estimatePrice * 0.01;
                           if (commission > 100_000_000)
                             commission = 100_000_000;
                           rate = 1;
-                          tierInfo = t('contractorServiceRequestDetail.tier3'); // "> 2 tỷ"
+                          tierInfo = t('contractorServiceRequestDetail.tier3');
                         }
 
                         return (
@@ -896,7 +1004,6 @@ export default function ContractorServiceRequestDetail() {
                               </span>
                             </div>
 
-                            {/* Divider */}
                             <div className="border-t border-blue-200 my-2"></div>
 
                             {/* Total Commission */}
@@ -920,7 +1027,7 @@ export default function ContractorServiceRequestDetail() {
                               </div>
                             </div>
 
-                            {/* Max cap notice for tier 3 */}
+                            {/* Max cap note */}
                             {estimatePrice > 2_000_000_000 &&
                               commission >= 100_000_000 && (
                                 <div className="bg-yellow-50 rounded p-2 ring-1 ring-yellow-200">
@@ -936,6 +1043,7 @@ export default function ContractorServiceRequestDetail() {
                         );
                       })()}
                     </div>
+
                     <button
                       onClick={handlePayCommission}
                       className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
@@ -1024,8 +1132,7 @@ export default function ContractorServiceRequestDetail() {
             </h4>
 
             {/* Overlay when not approved */}
-            {(!existingApplication ||
-              existingApplication.status !== 'Approved') && (
+            {existingApplication?.status !== 'Approved' && (
               <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
                 <div className="text-center text-white px-6">
                   <i className="fas fa-lock text-4xl mb-4"></i>
@@ -1048,9 +1155,9 @@ export default function ContractorServiceRequestDetail() {
                   </div>
                 </div>
               ) : (
-                messages.map((m, idx) => (
+                messages.map((m) => (
                   <div
-                    key={idx}
+                    key={m.messageID}
                     className={`flex ${
                       m.sender === 'contractor'
                         ? 'justify-end'
@@ -1141,45 +1248,7 @@ export default function ContractorServiceRequestDetail() {
               </h3>
 
               {/* No application from current contractor */}
-              {!existingApplication ? (
-                <div className="bg-gray-50 rounded-lg p-4 ring-1 ring-gray-200 text-center">
-                  {isRequestClosed ? (
-                    <>
-                      <i className="fas fa-ban text-gray-400 text-3xl mb-2" />
-                      <p className="text-sm font-semibold text-gray-700 mb-1">
-                        {t('contractorServiceRequestDetail.closedApplication')}
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        {t(
-                          'contractorServiceRequestDetail.requestAlreadyClosed'
-                        )}
-                      </p>
-
-                      {/* If request closed and selected contractor is someone else -> show note */}
-                      {serviceRequest.selectedContractorApplication
-                        ?.contractorID &&
-                        serviceRequest.selectedContractorApplication
-                          .contractorID !== user.id && (
-                          <div className="bg-yellow-50 rounded-lg p-3 ring-1 ring-yellow-200 mt-2">
-                            <p className="text-xs text-yellow-700 flex items-center gap-2">
-                              <i className="fas fa-info-circle" />
-                              {t(
-                                'contractorServiceRequestDetail.requestClosedNote'
-                              )}
-                            </p>
-                          </div>
-                        )}
-                    </>
-                  ) : (
-                    <>
-                      <i className="fas fa-file-contract text-gray-400 text-3xl mb-2" />
-                      <p className="text-sm text-gray-600">
-                        {t('contractorServiceRequestDetail.notAppliedYet')}
-                      </p>
-                    </>
-                  )}
-                </div>
-              ) : (
+              {existingApplication ? (
                 /* existingApplication exists -> show details */
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-2">
@@ -1227,6 +1296,44 @@ export default function ContractorServiceRequestDetail() {
                             </p>
                           </div>
                         )}
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4 ring-1 ring-gray-200 text-center">
+                  {isRequestClosed ? (
+                    <>
+                      <i className="fas fa-ban text-gray-400 text-3xl mb-2" />
+                      <p className="text-sm font-semibold text-gray-700 mb-1">
+                        {t('contractorServiceRequestDetail.closedApplication')}
+                      </p>
+                      <p className="text-xs text-gray-500 mb-3">
+                        {t(
+                          'contractorServiceRequestDetail.requestAlreadyClosed'
+                        )}
+                      </p>
+
+                      {/* If request closed and selected contractor is someone else -> show note */}
+                      {serviceRequest.selectedContractorApplication
+                        ?.contractorID &&
+                        serviceRequest.selectedContractorApplication
+                          .contractorID !== user.id && (
+                          <div className="bg-yellow-50 rounded-lg p-3 ring-1 ring-yellow-200 mt-2">
+                            <p className="text-xs text-yellow-700 flex items-center gap-2">
+                              <i className="fas fa-info-circle" />
+                              {t(
+                                'contractorServiceRequestDetail.requestClosedNote'
+                              )}
+                            </p>
+                          </div>
+                        )}
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-file-contract text-gray-400 text-3xl mb-2" />
+                      <p className="text-sm text-gray-600">
+                        {t('contractorServiceRequestDetail.notAppliedYet')}
+                      </p>
                     </>
                   )}
                 </div>

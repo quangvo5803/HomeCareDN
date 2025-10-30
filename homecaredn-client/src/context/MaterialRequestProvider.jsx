@@ -92,7 +92,6 @@ export const MaterialRequestProvider = ({ children }) => {
   // ================== CRUD ==================
   const createMaterialRequest = useCallback(
     async (dto) => {
-      if (!user || user.role !== 'Customer') return null;
       try {
         const created = await materialRequestService.createForCustomer(dto);
         setMaterialRequests((prev) => [created, ...prev]);
@@ -104,12 +103,11 @@ export const MaterialRequestProvider = ({ children }) => {
         throw err;
       }
     },
-    [user, t]
+    [t]
   );
 
   const updateMaterialRequest = useCallback(
     async (dto) => {
-      if (!user || user.role !== 'Customer') return null;
       try {
         const updated = await materialRequestService.updateForCustomer(dto);
         setMaterialRequests((prev) =>
@@ -126,26 +124,22 @@ export const MaterialRequestProvider = ({ children }) => {
         throw err;
       }
     },
-    [user, t]
+    [t]
   );
 
-  const deleteMaterialRequest = useCallback(
-    async (id) => {
-      if (!user || user.role !== 'Customer') return null;
-      try {
-        await materialRequestService.deleteForCustomer(id);
-        setMaterialRequests((prev) =>
-          prev.filter((m) => m.materialRequestID !== id)
-        );
-        setTotalMaterialRequests((prev) => Math.max(prev - 1, 0));
-        toast.success('Xóa yêu cầu thành công');
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user]
-  );
+  const deleteMaterialRequest = useCallback(async (id) => {
+    try {
+      await materialRequestService.deleteForCustomer(id);
+      setMaterialRequests((prev) =>
+        prev.filter((m) => m.materialRequestID !== id)
+      );
+      setTotalMaterialRequests((prev) => Math.max(prev - 1, 0));
+      toast.success('Xóa yêu cầu thành công');
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
   // ================== TỰ ĐỘNG LOAD THEO USER ==================
   useEffect(() => {

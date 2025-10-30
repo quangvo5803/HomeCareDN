@@ -25,6 +25,9 @@ export default function useRealtime(user, role, handlers = {}) {
     connection.on('ServiceRequest.Delete', (payload) => {
       handlers.onDeleteServiceRequest?.(payload);
     });
+    connection.on('ServiceRequest.Closed', (payload) =>
+      handlers.onServiceRequestClosed?.(payload)
+    );
     connection.on('ContractorApplication.Created', (payload) => {
       handlers.onNewContractorApplication?.(payload);
     });

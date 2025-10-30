@@ -62,7 +62,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Public: get material by id
   const getMaterialById = useCallback(async (id) => {
     try {
-      var result = await materialService.getById(id);
+      const result = await materialService.getById(id);
       return result;
     } catch (err) {
       toast.error(handleApiError(err));

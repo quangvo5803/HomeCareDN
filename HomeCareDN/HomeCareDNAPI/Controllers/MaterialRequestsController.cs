@@ -60,7 +60,8 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetByIdForCustomer(Guid id)
         {
             var result = await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(
-                id
+                id,
+                "Customer"
             );
             return Ok(result);
         }
@@ -113,7 +114,8 @@ namespace HomeCareDNAPI.Controllers
         )
         {
             var result = await _facadeService.MaterialRequestService.GetAllMaterialRequestsAsync(
-                parameters
+                parameters,
+                "Distributor"
             );
             return Ok(result);
         }
@@ -126,7 +128,8 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetByIdForDistributor(Guid id)
         {
             var result = await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(
-                id
+                id,
+                "Distributor"
             );
             return Ok(result);
         }

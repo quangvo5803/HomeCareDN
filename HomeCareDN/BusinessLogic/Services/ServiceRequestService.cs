@@ -21,6 +21,9 @@ namespace BusinessLogic.Services.Interfaces
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
 
+        private const string ADMIN = "Admin";
+        private const string CONTRACTOR = "Contractor";
+
         private const string ERROR_SERVICE_REQUEST = "Service Request";
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
@@ -46,7 +49,7 @@ namespace BusinessLogic.Services.Interfaces
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
             QueryParameters parameters,
-            string role = "Admin"
+            string role = ADMIN
         )
         {
             var query = _unitOfWork
@@ -55,7 +58,7 @@ namespace BusinessLogic.Services.Interfaces
                 .AsNoTracking();
 
             var totalCount = await query.CountAsync();
-            if (role == "Contractor" && parameters.FilterID != null)
+            if (role == CONTRACTOR && parameters.FilterID != null)
             {
                 query = query.Where(s =>
                     s.ContractorApplications != null
@@ -89,7 +92,7 @@ namespace BusinessLogic.Services.Interfaces
 
         public async Task<ServiceRequestDto> GetServiceRequestByIdAsync(
             ServiceRequestGetByIdDto getByIdDto,
-            string role = "Admin"
+            string role = ADMIN
         )
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
@@ -144,7 +147,7 @@ namespace BusinessLogic.Services.Interfaces
         private async Task MapServiceRequestListAllAsync(
             IEnumerable<ServiceRequest> items,
             IEnumerable<ServiceRequestDto> dtos,
-            string? role = "Admin"
+            string? role = ADMIN
         )
         {
             var itemDict = items.ToDictionary(i => i.ServiceRequestID);
@@ -162,7 +165,7 @@ namespace BusinessLogic.Services.Interfaces
                 if (addressDict.TryGetValue(dto.AddressID, out var address))
                 {
                     dto.Address = _mapper.Map<AddressDto>(address);
-                    if (role == "Contractor")
+                    if (role == CONTRACTOR)
                     {
                         dto.Address.Detail = string.Empty;
                         dto.Address.Ward = string.Empty;
@@ -174,7 +177,7 @@ namespace BusinessLogic.Services.Interfaces
         private async Task MapServiceRequestDetailAsync(
             ServiceRequest item,
             ServiceRequestDto dto,
-            string role = "Admin",
+            string role = ADMIN,
             Guid? currentContractorId = null
         )
         {
@@ -185,13 +188,13 @@ namespace BusinessLogic.Services.Interfaces
 
             switch (role)
             {
-                case "Admin":
+                case ADMIN:
                     await MapForAdminAsync(item, dto);
                     break;
                 case "Customer":
                     await MapForCustomerAsync(item, dto);
                     break;
-                case "Contractor":
+                case CONTRACTOR:
                     await MapForContractorAsync(item, dto, currentContractorId);
                     break;
             }
@@ -205,7 +208,7 @@ namespace BusinessLogic.Services.Interfaces
             Guid? currentContractorId
         )
         {
-            if (role == "Contractor")
+            if (role == CONTRACTOR)
             {
                 var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
                     a.AddressID == item.AddressId
@@ -254,6 +257,7 @@ namespace BusinessLogic.Services.Interfaces
                     ImageUrls =
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Description = selected.Description,
+                    DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = 0,
                     AverageRating = 0,
@@ -405,12 +409,12 @@ namespace BusinessLogic.Services.Interfaces
             await MapServiceRequestListAllAsync(
                 new[] { serviceRequest },
                 new[] { adminDto },
-                "Admin"
+                ADMIN
             );
             await MapServiceRequestListAllAsync(
                 new[] { serviceRequest },
                 new[] { contractorDto },
-                "Contractor"
+                CONTRACTOR
             );
 
             await _notifier.SendToGroupAsync("role_Admin", "ServiceRequest.Created", adminDto);

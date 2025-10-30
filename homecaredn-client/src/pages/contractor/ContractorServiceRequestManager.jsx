@@ -44,10 +44,76 @@ export default function ContractorServiceRequestManager() {
       );
       setTotalServiceRequests((prev) => Math.max(0, prev - 1));
     },
+    onServiceRequestClosed: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+
+    onNewContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
+            : sr
+        )
+      );
+    },
+    onAcceptedContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+    onDeleteContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: Math.max(
+                  0,
+                  (sr.contractorApplyCount || 1) - 1
+                ),
+              }
+            : sr
+        )
+      );
+    },
+
+    // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
+    onPaymentUpdate: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
   });
   useEffect(() => {
-    // chỉ fetch khi có user và list hiện tại rỗng
-    if (user?.role === 'Contractor' && serviceRequests.length === 0) {
+    // chỉ fetch khi có user
+    if (user?.role === 'Contractor') {
       fetchServiceRequests({
         PageNumber: currentPage,
         PageSize: pageSize,

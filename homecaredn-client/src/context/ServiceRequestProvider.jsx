@@ -159,19 +159,16 @@ export const ServiceRequestProvider = ({ children }) => {
     async (serviceRequestId, imageUrl) => {
       try {
         await imageService.delete(imageUrl);
+
         setServiceRequests((prev) =>
-          prev.map((r) =>
-            r.serviceRequestID === serviceRequestId
-              ? {
-                  ...r,
-                  imageUrls: r.imageUrls.filter((img) => img !== imageUrl),
-                }
-              : r
+          updateServiceRequestAfterDeleteImages(
+            prev,
+            serviceRequestId,
+            imageUrl
           )
         );
       } catch (err) {
         toast.error(handleApiError(err));
-        throw err;
       }
     },
     []
@@ -226,7 +223,19 @@ export const ServiceRequestProvider = ({ children }) => {
     </ServiceRequestContext.Provider>
   );
 };
-
+function updateServiceRequestAfterDeleteImages(
+  prevRequests,
+  serviceRequestId,
+  imageUrl
+) {
+  return prevRequests.map((req) => {
+    if (req.serviceRequestID !== serviceRequestId) return req;
+    return {
+      ...req,
+      imageUrls: req.imageUrls.filter((img) => img !== imageUrl),
+    };
+  });
+}
 ServiceRequestProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

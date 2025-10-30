@@ -2,73 +2,64 @@
 using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
-public class ContractorApplicationMonitor : BackgroundService
+namespace HomeCareDNAPI.BackgroundServices
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<ContractorApplicationMonitor> _logger;
-
-    public ContractorApplicationMonitor(
-        IServiceProvider serviceProvider,
-        ILogger<ContractorApplicationMonitor> logger
-    )
+    public class ContractorApplicationMonitor : BackgroundService
     {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
-    }
+        private readonly IServiceProvider _serviceProvider;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("ContractorApplicationMonitor started.");
-
-        while (!stoppingToken.IsCancellationRequested)
+        public ContractorApplicationMonitor(IServiceProvider serviceProvider)
         {
-            await CheckExpiredApplications();
-            await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+            _serviceProvider = serviceProvider;
         }
-    }
 
-    private async Task CheckExpiredApplications()
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-        var now = DateTime.UtcNow;
-        var expired = await db
-            .ContractorApplications.Where(ca =>
-                ca.Status == ApplicationStatus.Pending && ca.DueCommisionTime < now
-            )
-            .ToListAsync();
-
-        if (expired.Count == 0)
-            return;
-
-        foreach (var app in expired)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            app.Status = ApplicationStatus.Rejected;
-
-            var serviceRequest = await db.ServiceRequests.FirstOrDefaultAsync(sr =>
-                sr.ServiceRequestID == app.ServiceRequestID
-            );
-
-            if (serviceRequest != null && serviceRequest.Status == RequestStatus.Closed)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                bool hasApproved = await db.ContractorApplications.AnyAsync(ca =>
-                    ca.ServiceRequestID == serviceRequest.ServiceRequestID
-                    && ca.Status == ApplicationStatus.Approved
-                );
-
-                if (!hasApproved)
-                {
-                    serviceRequest.Status = RequestStatus.Opening;
-                    _logger.LogInformation(
-                        "Reopened ServiceRequest {id} because all applications expired.",
-                        serviceRequest.ServiceRequestID
-                    );
-                }
+                await CheckExpiredApplications();
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
             }
         }
 
-        await db.SaveChangesAsync();
-        _logger.LogInformation("Updated {count} expired contractor applications.", expired.Count);
+        private async Task CheckExpiredApplications()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            var now = DateTime.UtcNow;
+            var expired = await db
+                .ContractorApplications.Where(ca =>
+                    ca.Status == ApplicationStatus.Pending && ca.DueCommisionTime < now
+                )
+                .ToListAsync();
+
+            if (expired.Count == 0)
+                return;
+
+            foreach (var app in expired)
+            {
+                app.Status = ApplicationStatus.Rejected;
+
+                var serviceRequest = await db.ServiceRequests.FirstOrDefaultAsync(sr =>
+                    sr.ServiceRequestID == app.ServiceRequestID
+                );
+
+                if (serviceRequest != null && serviceRequest.Status == RequestStatus.Closed)
+                {
+                    bool hasApproved = await db.ContractorApplications.AnyAsync(ca =>
+                        ca.ServiceRequestID == serviceRequest.ServiceRequestID
+                        && ca.Status == ApplicationStatus.Approved
+                    );
+
+                    if (!hasApproved)
+                    {
+                        serviceRequest.Status = RequestStatus.Opening;
+                    }
+                }
+            }
+
+            await db.SaveChangesAsync();
+        }
     }
 }

@@ -125,20 +125,26 @@ namespace BusinessLogic.Services
                 {
                     payment.PaidAt = DateTime.UtcNow;
                 }
+
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
+                    s.ServiceRequestID == payment.ServiceRequestID
+                );
+                await _notifier.SendToGroupAsync(
+                    $"user_{serviceRequest?.CustomerID}",
+                    "PaymentTransation.Updated",
+                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                );
+                await _notifier.SendToGroupAsync(
+                    $"role_Admin",
+                    "PaymentTransation.Updated",
+                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                );
             }
             else
             {
                 _unitOfWork.PaymentTransactionsRepository.Remove(payment);
             }
-            await _notifier.SendToGroupAsync(
-                $"serviceRequest_{payment.ServiceRequestID}",
-                "PaymentTransation.Updated",
-                new
-                {
-                    ContractorApplicationID = payment.ContractorApplicationID,
-                    Status = payment.Status.ToString(),
-                }
-            );
+
             await _unitOfWork.SaveAsync();
         }
     }

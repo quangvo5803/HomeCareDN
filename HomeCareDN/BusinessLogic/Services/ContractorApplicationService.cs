@@ -24,6 +24,8 @@ namespace BusinessLogic.Services
         private const string CONTRACTOR_APPLY = "ContractorApply";
         private const string CONTRACTOR = "Contractor";
         private const string APPLICATION = "Application";
+        private const string IMAGES = "Images";
+        private const string CONTRACTOR_APPLICATION_REJECT = "ContractorApplication.Rejected";
 
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_CONTRACTOR_NOT_FOUND = "CONTRACTOR_NOT_FOUND";
@@ -51,7 +53,7 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork
-                .ContractorApplicationRepository.GetQueryable(includeProperties: "Images")
+                .ContractorApplicationRepository.GetQueryable(includeProperties: IMAGES)
                 .Where(ca => ca.ServiceRequestID == parameters.FilterID)
                 .AsSingleQuery()
                 .AsNoTracking();
@@ -96,7 +98,7 @@ namespace BusinessLogic.Services
                 ca =>
                     ca.ServiceRequestID == contractorApplicationGetDto.ServiceRequestID
                     && ca.ContractorID == contractorApplicationGetDto.ContractorID,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -123,7 +125,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == id,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -157,9 +159,15 @@ namespace BusinessLogic.Services
             ContractorCreateApplicationDto createRequest
         )
         {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
+            var serviceRequestTask = _unitOfWork.ServiceRequestRepository.GetAsync(s =>
                 s.ServiceRequestID == createRequest.ServiceRequestID
             );
+
+            var contractorTask = _userManager.FindByIdAsync(createRequest.ContractorID.ToString());
+
+            await Task.WhenAll(serviceRequestTask, contractorTask);
+            var serviceRequest = serviceRequestTask.Result;
+            var contractor = contractorTask.Result;
 
             if (serviceRequest == null)
             {
@@ -169,10 +177,6 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            var contractor = await _userManager.FindByIdAsync(
-                createRequest.ContractorID.ToString()
-            );
-
             if (contractor == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -181,11 +185,10 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-
             var existingApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
-                existingApplication =>
-                    existingApplication.ServiceRequestID == createRequest.ServiceRequestID
-                    && existingApplication.ContractorID == createRequest.ContractorID
+                e =>
+                    e.ServiceRequestID == createRequest.ServiceRequestID
+                    && e.ContractorID == createRequest.ContractorID
             );
             if (existingApplication != null)
             {
@@ -195,7 +198,6 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-
             var contractorApplication = _mapper.Map<ContractorApplication>(createRequest);
             contractorApplication.ContractorApplicationID = Guid.NewGuid();
 
@@ -232,14 +234,16 @@ namespace BusinessLogic.Services
             customerDto.ContractorEmail = string.Empty;
             customerDto.ContractorPhone = string.Empty;
             customerDto.Status = ApplicationStatus.Pending.ToString();
-
-            await _notifier.SendToGroupAsync($"role_Admin", "ContractorApplication.Created", dto);
-
-            await _notifier.SendToGroupAsync(
-                $"user_{serviceRequest.CustomerID}",
-                "ContractorApplication.Created",
-                customerDto
-            );
+            var notifyTasks = new List<Task>
+            {
+                _notifier.SendToGroupAsync($"role_Admin", "ContractorApplication.Created", dto),
+                _notifier.SendToGroupAsync(
+                    $"user_{serviceRequest.CustomerID}",
+                    "ContractorApplication.Created",
+                    customerDto
+                ),
+            };
+            await Task.WhenAll(notifyTasks);
             return dto;
         }
 
@@ -249,7 +253,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == contractorApplicationID,
-                includeProperties: "Images"
+                includeProperties: IMAGES
             );
             if (contractorApplication == null)
             {
@@ -279,6 +283,7 @@ namespace BusinessLogic.Services
             contractorApplication.DueCommisionTime = DateTime.UtcNow.AddDays(7);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
+            var notifyTasks = new List<Task>();
             if (serviceRequest.ContractorApplications != null)
             {
                 foreach (var app in serviceRequest.ContractorApplications)
@@ -286,34 +291,73 @@ namespace BusinessLogic.Services
                     if (app.ContractorApplicationID != contractorApplicationID)
                     {
                         app.Status = ApplicationStatus.Rejected;
-                        await _notifier.SendToGroupAsync(
-                            $"user_{app.ContractorID}",
-                            "ContractorApplication.Rejected",
-                            new
-                            {
-                                ContractorApplicationID = contractorApplication.ContractorApplicationID,
-                                ServiceRequestID = contractorApplication.ServiceRequestID,
-                                Status = ApplicationStatus.PendingCommission.ToString(),
-                                DueCommisionTime = contractorApplication.DueCommisionTime,
-                            }
+                        var payload = new
+                        {
+                            contractorApplication.ContractorApplicationID,
+                            contractorApplication.ServiceRequestID,
+                            Status = ApplicationStatus.Rejected.ToString(),
+                        };
+                        notifyTasks.Add(
+                            _notifier.SendToGroupAsync(
+                                $"user_{app.ContractorID}",
+                                CONTRACTOR_APPLICATION_REJECT,
+                                payload
+                            )
                         );
                     }
                 }
+                notifyTasks.Add(
+                    _notifier.SendToGroupAsync(
+                        $"role_Admin",
+                        CONTRACTOR_APPLICATION_REJECT,
+                        new
+                        {
+                            contractorApplication.ContractorApplicationID,
+                            contractorApplication.ServiceRequestID,
+                            Status = ApplicationStatus.Rejected.ToString(),
+                        }
+                    )
+                );
             }
+            notifyTasks.Add(
+                _notifier.SendToGroupAsync(
+                    "role_Contractor",
+                    "ServiceRequest.Closed",
+                    new { serviceRequest.ServiceRequestID }
+                )
+            );
 
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
-            await _notifier.SendToGroupAsync(
-                $"user_{dto.ContractorID}",
-                "ContractorApplication.Accept",
-                new
-                {
-                    ContractorApplicationID = contractorApplication.ContractorApplicationID,
-                    ServiceRequestID = contractorApplication.ServiceRequestID,
-                    Status = ApplicationStatus.PendingCommission.ToString(),
-                    DueCommisionTime = contractorApplication.DueCommisionTime,
-                }
+            var payloadAccept = new
+            {
+                contractorApplication.ContractorApplicationID,
+                contractorApplication.ServiceRequestID,
+                Status = ApplicationStatus.PendingCommission.ToString(),
+                contractorApplication.DueCommisionTime,
+            };
+            notifyTasks.Add(
+                _notifier.SendToGroupAsync(
+                    $"user_{serviceRequest.CustomerID}",
+                    "ContractorApplication.Accept",
+                    payloadAccept
+                )
             );
+            notifyTasks.Add(
+                _notifier.SendToGroupAsync(
+                    $"user_{dto.ContractorID}",
+                    "ContractorApplication.Accept",
+                    payloadAccept
+                )
+            );
+            notifyTasks.Add(
+                _notifier.SendToGroupAsync(
+                    $"role_Admin",
+                    "ContractorApplication.Accept",
+                    payloadAccept
+                )
+            );
+            await Task.WhenAll(notifyTasks);
             return dto;
         }
 
@@ -348,11 +392,21 @@ namespace BusinessLogic.Services
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             await _notifier.SendToGroupAsync(
                 $"user_{dto.ContractorID}",
-                "ContractorApplication.Rejected",
+                CONTRACTOR_APPLICATION_REJECT,
                 new
                 {
-                    ContractorApplicationID = contractorApplication.ContractorApplicationID,
-                    ServiceRequestID = contractorApplication.ServiceRequestID,
+                    contractorApplication.ContractorApplicationID,
+                    contractorApplication.ServiceRequestID,
+                    Status = ApplicationStatus.Rejected.ToString(),
+                }
+            );
+            await _notifier.SendToGroupAsync(
+                $"role_Admin",
+                CONTRACTOR_APPLICATION_REJECT,
+                new
+                {
+                    contractorApplication.ContractorApplicationID,
+                    contractorApplication.ServiceRequestID,
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
