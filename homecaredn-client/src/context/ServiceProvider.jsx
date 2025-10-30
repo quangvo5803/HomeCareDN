@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import getServiceByRole from '../services/getServiceByRole';
+import { serviceService } from '../services/serviceService';
+import { imageService } from '../services/public/imageService';
 import ServiceContext from './ServiceContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -13,68 +14,78 @@ export const ServiceProvider = ({ children }) => {
   const [totalServices, setTotalServices] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // --- Internal helper: fetch data from API ---
-  const fetchAllServices = async (params = {}) => {
-    const service = getServiceByRole();
-    return await service.service.getAllService(params);
-  };
-
-  // --- Execute Fetch with Loading Overlay ---
-  const executeFetch = useCallback(async (params = {}) => {
-    try {
-      const data = await fetchAllServices(params);
-      const mapped = (data.items || []).map((s) => ({ ...s, type: 'service' }));
-      setServices(mapped);
-      setTotalServices(data.totalCount || 0);
-      return mapped;
-    } catch (err) {
-      toast.error(handleApiError(err));
-    }
-  }, []);
+  // ==================== FETCH ====================
+  const executeFetch = useCallback(
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy,
+      FilterID,
+      Search,
+    } = {}) => {
+      try {
+        const data = await serviceService.getAll({
+          PageNumber,
+          PageSize,
+          SortBy,
+          FilterID,
+          Search,
+        });
+        const itemsWithType = (data.items || []).map((s) => ({
+          ...s,
+          type: 'service',
+        }));
+        setServices(itemsWithType);
+        setTotalServices(data.totalCount || 0);
+        return itemsWithType;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        setServices([]);
+        setTotalServices(0);
+        return [];
+      }
+    },
+    []
+  );
 
   const fetchServices = useCallback(
-    async (params = {}) =>
-      withMinLoading(() => executeFetch(params), setLoading),
+    async (params = {}) => {
+      return await withMinLoading(() => executeFetch(params), setLoading);
+    },
     [executeFetch]
   );
 
-  // --- Get by ID ---
+  // ==================== GET BY ID ====================
   const getServiceById = useCallback(async (id) => {
     try {
-      const service = getServiceByRole();
-      return await service.service.getServiceById(id);
+      return await serviceService.getById(id);
     } catch (err) {
       toast.error(handleApiError(err));
+      return null;
     }
   }, []);
 
-  // --- Create (Admin-only) ---
+  // ==================== CREATE ====================
   const createService = useCallback(
     async (dto) => {
-      setLoading(true);
       try {
-        const service = getServiceByRole('Admin');
-        const newService = await service.service.createService(dto);
+        const newService = await serviceService.create(dto);
         setServices((prev) => [...prev, newService]);
         setTotalServices((prev) => prev + 1);
         toast.success(t('SUCCESS.SERVICE_ADD'));
         return newService;
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
-        setLoading(false);
       }
     },
     [t]
   );
 
-  // --- Update (Admin-only) ---
+  // ==================== UPDATE ====================
   const updateService = useCallback(
     async (dto) => {
-      setLoading(true);
       try {
-        const service = getServiceByRole('Admin');
-        const updated = await service.service.updateService(dto);
+        const updated = await serviceService.update(dto);
         setServices((prev) =>
           prev.map((s) =>
             s.serviceID === updated.serviceID
@@ -90,30 +101,26 @@ export const ServiceProvider = ({ children }) => {
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
-        setLoading(false);
       }
     },
     [t]
   );
 
-  // --- Delete (Admin-only, no overlay) ---
+  // ==================== DELETE ====================
   const deleteService = useCallback(async (id) => {
     try {
-      const service = getServiceByRole('Admin');
-      await service.service.deleteService(id);
+      await serviceService.delete(id);
       setServices((prev) => prev.filter((s) => s.serviceID !== id));
-      setTotalServices((prev) => Math.max(0, prev - 1));
+      setTotalServices((prev) => prev - 1);
     } catch (err) {
       toast.error(handleApiError(err));
     }
   }, []);
 
-  // --- Delete Image ---
+  // ==================== DELETE IMAGE ====================
   const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
     try {
-      const service = getServiceByRole();
-      await service.image.deleteImage(imageUrl);
+      await imageService.deleteImage(imageUrl);
       setServices((prev) =>
         prev.map((s) =>
           s.serviceID === serviceID
@@ -126,7 +133,7 @@ export const ServiceProvider = ({ children }) => {
     }
   }, []);
 
-  // --- Context Value ---
+  // ==================== CONTEXT VALUE ====================
   const contextValue = useMemo(
     () => ({
       services,

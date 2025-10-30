@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import SupportModal from '../../components/modal/SupportModal';
 import Loading from '../../components/Loading';
-import { adminService } from '../../services/adminService';
+import { contactSupportService } from '../../services/contactSupportService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import StatusBadge from '../../components/StatusBadge';
@@ -30,7 +30,7 @@ export default function AdminSupportManager() {
       setLoading(true);
       const isProcessedParam =
         filter === 'all' ? undefined : filter === 'processed';
-      const result = await adminService.support.listAllSupport({
+      const result = await contactSupportService.getAll({
         PageNumber: currentPage,
         PageSize: pageSize,
         Search: debouncedSearch,
@@ -62,7 +62,7 @@ export default function AdminSupportManager() {
       titleKey: 'ModalPopup.DeleteSupportModal.title',
       textKey: 'ModalPopup.DeleteSupportModal.text',
       onConfirm: async () => {
-        await adminService.support.deleteSupport(id);
+        await contactSupportService.delete(id);
         toast.success(t('SUCCESS.DELETE'));
 
         fetchSupports();

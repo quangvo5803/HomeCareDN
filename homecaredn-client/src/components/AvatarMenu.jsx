@@ -2,21 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hook/useAuth';
+import Avatar from 'react-avatar';
 
 export default function AvatarMenu() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [imgError, setImgError] = useState(false);
   const { user, logout } = useAuth();
   const menuRef = useRef(null);
-
-  const name = user?.email || 'User';
-  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    name
-  )}&background=orange&color=fff`;
-  const primary = user?.photoURL || user?.avatarUrl || fallback;
-  const avatarSrc = imgError ? fallback : primary;
 
   const handleLogout = () => {
     try {
@@ -55,12 +48,13 @@ export default function AvatarMenu() {
         aria-expanded={open}
         aria-haspopup="menu"
       >
-        <img
-          src={avatarSrc}
-          onError={() => setImgError(true)}
-          alt={name}
-          className="w-full h-full object-cover block"
-          loading="lazy"
+        <Avatar
+          name={user.email}
+          round={true}
+          size="100%"
+          color="#FB8C00"
+          fgColor="#fff"
+          textSizeRatio={2}
         />
       </button>
 

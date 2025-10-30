@@ -42,10 +42,10 @@ namespace DataAccess.UnitOfWork
 
         public IPaymentTransactionsRepository PaymentTransactionsRepository { get; private set; }
 
-        public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudaryOptions)
+        public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudinaryOptions)
         {
             _db = db;
-            ImageRepository = new ImageRepository(_db, cloudaryOptions);
+            ImageRepository = new ImageRepository(_db, cloudinaryOptions);
             ServiceRequestRepository = new ServiceRequestRepository(_db);
             MaterialRepository = new MaterialRepository(_db);
             ServiceRepository = new ServiceRepository(_db);

@@ -1,7 +1,7 @@
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../services/auth/authService';
+import { authService } from '../services/authService';
 import PropTypes from 'prop-types';
 
 export default function GoogleLoginButton({ onLoginSuccess }) {

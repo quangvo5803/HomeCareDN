@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect, useRef, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { authService } from '../services/auth/authService';
+import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
 import Loading from '../components/Loading';
 import AuthContext from '../context/AuthContext';

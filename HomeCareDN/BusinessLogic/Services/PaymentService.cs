@@ -1,14 +1,9 @@
 ﻿using System.Globalization;
 using BusinessLogic.DTOs.Application.Payment;
-using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
@@ -22,16 +17,19 @@ namespace BusinessLogic.Services
         private readonly PayOS _payOS;
         private readonly IUnitOfWork _unitOfWork;
         private readonly PayOsOptions _payOsOptions;
+        private readonly ISignalRNotifier _notifier;
 
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
-            IOptions<PayOsOptions> payOsOptions
+            IOptions<PayOsOptions> payOsOptions,
+            ISignalRNotifier notifier
         )
         {
             _payOS = payOS;
             _unitOfWork = unitOfWork;
             _payOsOptions = payOsOptions.Value;
+            _notifier = notifier;
         }
 
         public async Task<CreatePaymentResult> CreatePaymentAsync(
@@ -98,18 +96,17 @@ namespace BusinessLogic.Services
 
             if (payment == null)
             {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "OrderCodeNull", new[] { "ERROR_SERVICE_NOT_FOUND" } },
-                    }
-                );
+                return;
             }
 
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
-
+                if (payment.ContractorApplication != null)
+                {
+                    payment.ContractorApplication.Status = ApplicationStatus.Approved;
+                    payment.ContractorApplication.DueCommisionTime = null;
+                }
                 if (
                     DateTime.TryParseExact(
                         data.TransactionDateTime,
@@ -128,10 +125,24 @@ namespace BusinessLogic.Services
                 {
                     payment.PaidAt = DateTime.UtcNow;
                 }
+
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
+                    s.ServiceRequestID == payment.ServiceRequestID
+                );
+                await _notifier.SendToGroupAsync(
+                    $"user_{serviceRequest?.CustomerID}",
+                    "PaymentTransation.Updated",
+                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                );
+                await _notifier.SendToGroupAsync(
+                    $"role_Admin",
+                    "PaymentTransation.Updated",
+                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                );
             }
             else
             {
-                payment.Status = PaymentStatus.Failed;
+                _unitOfWork.PaymentTransactionsRepository.Remove(payment);
             }
 
             await _unitOfWork.SaveAsync();

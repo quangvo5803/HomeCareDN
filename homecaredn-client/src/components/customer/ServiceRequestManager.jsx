@@ -7,24 +7,88 @@ import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
-
+import useRealtime from '../../hook/useRealtime';
+import { useAuth } from '../../hook/useAuth';
+import { useAddress } from '../../hook/useAddress';
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  const { loading, serviceRequests, deleteServiceRequest } =
+  const { user } = useAuth();
+  const { addresses } = useAddress();
+  const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
     useServiceRequest();
-
+  useRealtime(user, 'Customer', {
+    onNewContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
+            : sr
+        )
+      );
+    },
+    onAcceptedContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+    onDeleteContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: Math.max(
+                  0,
+                  (sr.contractorApplyCount || 1) - 1
+                ),
+              }
+            : sr
+        )
+      );
+    },
+    // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
+    onPaymentUpdate: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+  });
   const handleServiceRequestViewDetail = (serviceRequestId) => {
     navigate(`/Customer/ServiceRequestDetail/${serviceRequestId}`);
   };
 
   const handleServiceRequestCreateUpdate = (serviceRequestId) => {
-    navigate(
-      serviceRequestId
-        ? `/Customer/ServiceRequest/${serviceRequestId}`
-        : '/Customer/ServiceRequest'
-    );
+    if (serviceRequestId) {
+      navigate(`/Customer/ServiceRequest/${serviceRequestId}`);
+    } else {
+      if (serviceRequests?.filter((s) => s.status != 'Closed').length === 3) {
+        toast.error('ERROR.MAXIMUM_SERVICE_REQUEST');
+        return;
+      }
+      if (addresses.length == 0) {
+        toast.error('ERROR.REQUIRED_ADDRESS');
+        return;
+      }
+      navigate('/Customer/ServiceRequest');
+    }
   };
 
   const handleDeleteServiceRequest = (serviceRequestID) => {
@@ -47,7 +111,7 @@ export default function ServiceRequestManager() {
   const getServiceIcon = (type) => {
     switch (type) {
       case 'Repair':
-        return 'fa-drafting-compass';
+        return 'fa-screwdriver-wrench';
       case 'Construction':
         return 'fa-hammer';
       default:
@@ -106,12 +170,11 @@ export default function ServiceRequestManager() {
           </h2>
           <p className="text-sm text-gray-600">
             {t('userPage.serviceRequest.subtitle')} (
-            {serviceRequests?.length || 0}/3)
+            {serviceRequests.filter((s) => s.status != 'Closed').length || 0}/3)
           </p>
         </div>
         <button
           onClick={() => handleServiceRequestCreateUpdate()}
-          disabled={serviceRequests?.length >= 3}
           className="bg-orange-600 text-white px-4 py-2 rounded-lg shadow hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
         >
           <i className="fas fa-plus"></i>
@@ -277,15 +340,18 @@ export default function ServiceRequestManager() {
                         </button>
                       )}
 
-                      <button
-                        className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
-                        onClick={() =>
-                          handleDeleteServiceRequest(req.serviceRequestID)
-                        }
-                      >
-                        <i className="fas fa-xmark"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
+                      {req.status === 'Opening' &&
+                        req.contractorApplyCount == 0 && (
+                          <button
+                            className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                            onClick={() =>
+                              handleDeleteServiceRequest(req.serviceRequestID)
+                            }
+                          >
+                            <i className="fas fa-xmark"></i>
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
                     </div>
                   </div>
                 </div>

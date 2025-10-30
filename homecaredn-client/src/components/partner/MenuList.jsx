@@ -1,7 +1,7 @@
 import { useMemo, useContext } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../../services/auth/authService';
+import { authService } from '../../services/authService';
 import AuthContext from '../../context/AuthContext';
 import PropTypes from 'prop-types';
 

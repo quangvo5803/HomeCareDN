@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import api from './../services/api';
+import api from './../services/public/api';
 
 const CACHE_KEY = 'enumData';
 
@@ -22,7 +22,7 @@ export function useEnums() {
       }
 
       try {
-        const res = await api.get('/Public/enums-all');
+        const res = await api.get('/enums');
         const data = res.data;
 
         setEnums(data);
