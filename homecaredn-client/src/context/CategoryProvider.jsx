@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import getServiceByRole from '../services/getServiceByRole';
-import { useAuth } from '../hook/useAuth';
+import { categoryService } from '../services/categoryService';
 import CategoryContext from './CategoryContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -10,12 +9,11 @@ import { useTranslation } from 'react-i18next';
 
 export const CategoryProvider = ({ children }) => {
   const { t } = useTranslation();
-  const { user } = useAuth();
   const [categories, setCategories] = useState([]);
   const [totalCategories, setTotalCategories] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  // 📌 Public: fetch all categories pagination
+  // 📌 Fetch paginated categories
   const executeFetch = useCallback(
     async ({
       PageNumber = 1,
@@ -26,8 +24,7 @@ export const CategoryProvider = ({ children }) => {
       Search,
     } = {}) => {
       try {
-        const service = getServiceByRole();
-        const data = await service.category.getAllCategories({
+        const data = await categoryService.getAll({
           PageNumber,
           PageSize,
           FilterID,
@@ -35,7 +32,6 @@ export const CategoryProvider = ({ children }) => {
           SortBy,
           Search,
         });
-
         setCategories(data.items || []);
         setTotalCategories(data.totalCount || 0);
         return data;
@@ -56,43 +52,36 @@ export const CategoryProvider = ({ children }) => {
     [executeFetch]
   );
 
-  const executeFetchAllCategories = useCallback(
-    async ({ FilterID, FilterBool } = {}) => {
-      try {
-        const service = getServiceByRole();
-        const data = await service.category.getAllCategories({
-          PageNumber: 1,
-          PageSize: 9999,
-          FilterID,
-          FilterBool,
-        });
-        return data.items || [];
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return [];
-      }
-    },
-    []
-  );
+  // 📌 Fetch all categories (dropdown)
+  const executeFetchAll = useCallback(async ({ FilterID, FilterBool } = {}) => {
+    try {
+      const data = await categoryService.getAll({
+        PageNumber: 1,
+        PageSize: 9999,
+        FilterID,
+        FilterBool,
+      });
+      return data.items || [];
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return [];
+    }
+  }, []);
 
   const fetchAllCategories = useCallback(
     async (filters = {}) => {
-      return await withMinLoading(
-        () => executeFetchAllCategories(filters),
-        setLoading
-      );
+      return await withMinLoading(() => executeFetchAll(filters), setLoading);
     },
-    [executeFetchAllCategories]
+    [executeFetchAll]
   );
 
-  // 📌 Public: get category by id
+  // 📌 Get category by id
   const getCategoryById = useCallback(
     async (id) => {
       try {
         const local = categories.find((c) => c.categoryID === id);
         if (local) return local;
-        const service = getServiceByRole();
-        return await service.category.getCategoryById(id);
+        return await categoryService.getById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
@@ -101,66 +90,50 @@ export const CategoryProvider = ({ children }) => {
     [categories]
   );
 
-  // 📌 Admin-only: create
+  // 📌 Admin-only CUD (component tự handle loading)
   const createCategory = useCallback(
     async (categoryData) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole(user.role);
-        const newCategory = await service.category.createCategory(categoryData);
+        const newCategory = await categoryService.create(categoryData);
         setCategories((prev) => [...prev, newCategory]);
-        // Tăng tổng số category
         setTotalCategories((prev) => prev + 1);
         toast.success(t('SUCCESS.CATEGORY_ADD'));
         return newCategory;
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
-        setLoading(false);
+        throw err;
       }
     },
-    [user?.role, t]
+    [t]
   );
 
-  // 📌 Admin-only: update
   const updateCategory = useCallback(
     async (categoryData) => {
       try {
-        setLoading(true);
-        const service = getServiceByRole(user.role);
-        const updated = await service.category.updateCategory(categoryData);
+        const updated = await categoryService.updateCategory(categoryData);
         setCategories((prev) =>
           prev.map((c) => (c.categoryID === updated.categoryID ? updated : c))
         );
         toast.success(t('SUCCESS.CATEGORY_UPDATE'));
-
         return updated;
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user?.role, t]
+    [t]
   );
 
-  // 📌 Admin-only: delete
-  const deleteCategory = useCallback(
-    async (id) => {
-      try {
-        const service = getServiceByRole(user.role);
-        await service.category.deleteCategory(id);
-        // Xoá khỏi local
-        setCategories((prev) => prev.filter((c) => c.categoryID !== id));
-        setTotalCategories((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      }
-    },
-    [user?.role]
-  );
+  const deleteCategory = useCallback(async (id) => {
+    try {
+      await categoryService.delete(id);
+      setCategories((prev) => prev.filter((c) => c.categoryID !== id));
+      setTotalCategories((prev) => prev - 1);
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({
@@ -194,6 +167,4 @@ export const CategoryProvider = ({ children }) => {
   );
 };
 
-CategoryProvider.propTypes = {
-  children: PropTypes.node.isRequired,
-};
+CategoryProvider.propTypes = { children: PropTypes.node.isRequired };

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities.Application
 {
@@ -11,6 +12,7 @@ namespace DataAccess.Entities.Application
         public required string Description { get; set; }
         public required double EstimatePrice { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? DueCommisionTime { get; set; }
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<Image>? Images { get; set; }
     }

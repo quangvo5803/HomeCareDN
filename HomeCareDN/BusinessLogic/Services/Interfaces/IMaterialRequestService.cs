@@ -6,12 +6,16 @@ namespace BusinessLogic.Services.Interfaces
     public interface IMaterialRequestService
     {
         Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            string role = "Admin"
         );
         Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestByUserIdAsync(
             QueryParameters parameters
         );
-        Task<MaterialRequestDto> GetMaterialRequestByIdAsync(Guid materialRequestID);
+        Task<MaterialRequestDto> GetMaterialRequestByIdAsync(
+            Guid materialRequestID,
+            string role = "Admin"
+        );
         Task<MaterialRequestDto> CreateNewMaterialRequestAsync(
             MaterialRequestCreateRequestDto materialRequestCreateDto
         );

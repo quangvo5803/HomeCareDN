@@ -296,7 +296,7 @@ function Layout() {
             element={<AdminServiceRequestManager />}
           />
           <Route
-            path="ServiceRequest/:id"
+            path="ServiceRequest/:serviceRequestId"
             element={<AdminServiceRequestDetail />}
           />
           <Route path="SupportManager" element={<AdminSupportManager />} />

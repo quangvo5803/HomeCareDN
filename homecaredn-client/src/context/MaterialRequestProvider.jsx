@@ -5,22 +5,56 @@ import MaterialRequestContext from './MaterialRequestContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import PropTypes from 'prop-types';
+import { withMinLoading } from '../utils/withMinLoading';
+import { useTranslation } from 'react-i18next';
 
 export const MaterialRequestProvider = ({ children }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [materialRequests, setMaterialRequests] = useState([]);
   const [totalMaterialRequests, setTotalMaterialRequests] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  const fetchMaterialRequests = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
+  // ================== CHỌN API THEO ROLE ==================
+  const getAllByRole = useCallback(
+    async (params = {}) => {
+      if (!user) return { items: [], totalCount: 0 };
+      switch (user.role) {
+        case 'Admin':
+          return await materialRequestService.getAllForAdmin(params);
+        case 'Distributor':
+          return await materialRequestService.getAllForDistributor(params);
+        case 'Customer':
+          return await materialRequestService.getAllForCustomer(params);
+        default:
+          return { items: [], totalCount: 0 };
+      }
+    },
+    [user]
+  );
+
+  const getByIdByRole = useCallback(
+    async (id) => {
+      if (!user) return null;
+      switch (user.role) {
+        case 'Admin':
+          return await materialRequestService.getByIdForAdmin(id);
+        case 'Distributor':
+          return await materialRequestService.getByIdForDistributor(id);
+        case 'Customer':
+          return await materialRequestService.getByIdForCustomer(id);
+        default:
+          return null;
+      }
+    },
+    [user]
+  );
+
+  // ================== FETCH ==================
+  const executeFetch = useCallback(
+    async (params = {}) => {
       try {
-        setLoading(true);
-        const data = await materialRequestService.getAllMaterialRequest({
-          PageNumber,
-          PageSize,
-          FilterID,
-        });
+        const data = await getAllByRole(params);
         setMaterialRequests(data.items || []);
         setTotalMaterialRequests(data.totalCount || 0);
         return data.items || [];
@@ -29,144 +63,101 @@ export const MaterialRequestProvider = ({ children }) => {
         setMaterialRequests([]);
         setTotalMaterialRequests(0);
         return [];
-      } finally {
-        setLoading(false);
       }
     },
-    []
+    [getAllByRole]
   );
 
+  const fetchMaterialRequests = useCallback(
+    async (params = {}) =>
+      await withMinLoading(() => executeFetch(params), setLoading),
+    [executeFetch]
+  );
+
+  // ================== GET BY ID ==================
   const getMaterialRequestById = useCallback(
     async (id) => {
       const local = materialRequests.find((m) => m.materialRequestID === id);
       if (local) return local;
       try {
-        setLoading(true);
-        return await materialRequestService.getMaterialRequestById(id);
+        return await getByIdByRole(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
-    [materialRequests]
+    [materialRequests, getByIdByRole]
   );
 
-  const fetchMaterialRequestsByUserId = useCallback(
-    async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
-      if (!user) return { items: [], totalCount: 0 };
-      try {
-        setLoading(true);
-        const data = await materialRequestService.getAllMaterialRequestByUserId(
-          {
-            PageNumber,
-            PageSize,
-            FilterID,
-          }
-        );
-        setMaterialRequests(data.items || []);
-        setTotalMaterialRequests(data.totalCount || 0);
-        return data;
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return { items: [], totalCount: 0 };
-      } finally {
-        setLoading(false);
-      }
-    },
-    [user]
-  );
-
+  // ================== CRUD ==================
   const createMaterialRequest = useCallback(
-    async (materialData) => {
-      if (!user) return null;
+    async (dto) => {
       try {
-        setLoading(true);
-        const newMaterial = await materialRequestService.createMaterialRequest(
-          materialData
-        );
-        // Tăng tổng số material
-        setMaterialRequests((prev) => [...prev, newMaterial]);
+        const created = await materialRequestService.createForCustomer(dto);
+        setMaterialRequests((prev) => [created, ...prev]);
         setTotalMaterialRequests((prev) => prev + 1);
-        return newMaterial;
+        toast.success(t('SUCCESS.MATERIAL_REQUEST_ADD'));
+        return created;
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
-    [user]
+    [t]
   );
 
-  // 📌 Distributor-only: update
   const updateMaterialRequest = useCallback(
-    async (materialData) => {
-      if (!user) return null;
+    async (dto) => {
       try {
-        setLoading(true);
-        const updated = await materialRequestService.updateMaterialRequest(
-          materialData
-        );
+        const updated = await materialRequestService.updateForCustomer(dto);
         setMaterialRequests((prev) =>
           prev.map((m) =>
-            m.materialID === updated.materialID
-              ? {
-                  ...m,
-                  ...updated,
-                  imageUrls: updated.imageUrls ?? m.imageUrls,
-                }
+            m.materialRequestID === updated.materialRequestID
+              ? { ...m, ...updated }
               : m
           )
         );
+        toast.success('Cập nhật yêu cầu thành công');
         return updated;
       } catch (err) {
-        toast.error(handleApiError(err));
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [user]
-  );
-
-  const deleteMaterialRequest = useCallback(
-    async (id) => {
-      if (!user) return null;
-
-      try {
-        await materialRequestService.deleteMaterialRequest(id);
-        setMaterialRequests((prev) =>
-          prev.filter((b) => b.materialRequestID !== id)
-        );
-        setTotalMaterialRequests((prev) => prev - 1);
-      } catch (err) {
-        toast.error(handleApiError(err));
+        toast.error(t('SUCCESS.MATERIAL_REQUEST_UPDATE'));
         throw err;
       }
     },
-    [user]
+    [t]
   );
-  //Load data
+
+  const deleteMaterialRequest = useCallback(async (id) => {
+    try {
+      await materialRequestService.deleteForCustomer(id);
+      setMaterialRequests((prev) =>
+        prev.filter((m) => m.materialRequestID !== id)
+      );
+      setTotalMaterialRequests((prev) => Math.max(prev - 1, 0));
+      toast.success('Xóa yêu cầu thành công');
+    } catch (err) {
+      toast.error(handleApiError(err));
+      throw err;
+    }
+  }, []);
+
+  // ================== TỰ ĐỘNG LOAD THEO USER ==================
   useEffect(() => {
     if (!user) {
       setMaterialRequests([]);
       setTotalMaterialRequests(0);
       return;
     }
-    if (user.role === 'Customer') {
-      fetchMaterialRequestsByUserId({ FilterID: user?.id });
-    }
-  }, [user, fetchMaterialRequestsByUserId]);
+    fetchMaterialRequests();
+  }, [user, fetchMaterialRequests]);
 
+  // ================== CONTEXT VALUE ==================
   const contextValue = useMemo(
     () => ({
       materialRequests,
       totalMaterialRequests,
       loading,
-      fetchMaterials: fetchMaterialRequests,
-      fetchMaterialRequestsByUserId,
+      fetchMaterialRequests,
       getMaterialRequestById,
       createMaterialRequest,
       updateMaterialRequest,
@@ -177,7 +168,6 @@ export const MaterialRequestProvider = ({ children }) => {
       totalMaterialRequests,
       loading,
       fetchMaterialRequests,
-      fetchMaterialRequestsByUserId,
       getMaterialRequestById,
       createMaterialRequest,
       updateMaterialRequest,
@@ -191,6 +181,7 @@ export const MaterialRequestProvider = ({ children }) => {
     </MaterialRequestContext.Provider>
   );
 };
+
 MaterialRequestProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };
