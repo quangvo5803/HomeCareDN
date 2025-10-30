@@ -437,7 +437,7 @@
     "notePlaceholder": "Phạm vi công việc, bảo hành, cam kết tiến độ...",
     "viewAttachment": "Xem tệp đính kèm {{index}}",
     "serviceRequestNotFound": "Không tìm thấy yêu cầu dịch vụ",
-    "yourBid": "Giá bạn chào",
+    "yourBid": "Giá thầu của bạn",
     "appliedTitle": "Bạn đã ứng tuyển",
     "yourNote": "Ghi chú của bạn cho khách hàng",
     "appliedDate": "Ngày ứng tuyển: ",
@@ -464,13 +464,18 @@
     "requestClosedNote": "Yêu cầu này đã đóng. Đơn ứng tuyển của bạn sẽ không được xử lý thêm.",
     "chatSection": "Chat với khách hàng",
     "no_messages": "Chưa có tin nhắn nào",
-    "input_placeholder":"Aa", "commissionCalculation": "Cách tính hoa hồng",
-    "commissionRate": "Tỷ lệ hoa hồng",
-    "commissionToPay": "Tổng hoa hồng cần trả",
+    "input_placeholder":"Aa", 
+    "publicCommissionTiers": "Bảng mức hoa hồng công khai",
+    "priceRange": "Khoảng giá trị gói thầu",
+    "rate": "Tỷ lệ hoa hồng",
+    "note": "Ghi chú",
     "tier1": "≤ 500 triệu",
-    "tier2": "500 triệu - 2 tỷ",
-    "tier3": "> 2 tỷ",
-    "maxCommissionNote": "Hoa hồng tối đa 100 triệu đồng"
+    "tier2": "Từ 500 triệu đến 2 tỷ",
+    "tier3": "> 2 tỷ (tối đa 100 triệu)",
+    "commissionCalculation": "Tính toán hoa hồng",
+    "commissionRate": "Tỷ lệ hoa hồng áp dụng",
+    "commissionToPay": "Hoa hồng phải trả",
+    "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
   },
   "partnerDashboard": {
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -1209,19 +1214,40 @@
     "All": "Tất cả"
   },  
   "commission": {
-    "expiredTitle": "Bạn đã không đóng phí hoa hồng đúng thời hạn",
-    "expiredMessage": "Hạn thanh toán hoa hồng đã qua.",
-    "urgent": "Hạn thanh toán gấp",
-    "less24h": "Còn dưới 24 giờ",
-    "deadline": "Hạn thanh toán",
+    "partner": {
+      "expiredTitle": "Bạn đã không đóng phí hoa hồng đúng thời hạn",
+      "expiredMessage": "Hạn thanh toán hoa hồng đã qua.",
+      "urgent": "Hạn thanh toán gấp",
+      "less24h": "Còn dưới 24 giờ",
+      "deadline": "Hạn thanh toán",
+      "completeNow": "⚠️ Hoàn tất thanh toán ngay để đảm bảo dự án!",
+      "under24h": "⏰ Còn dưới 24 giờ, hãy thanh toán sớm.",
+      "payBeforeDeadline": "Thanh toán hoa hồng trước hạn để tiến hành dự án."
+    },
+    "admin": {
+      "expiredTitle": "Đối tác chưa thanh toán hoa hồng đúng hạn",
+      "expiredMessage": "Đơn ứng tuyển này sẽ bị từ chối và dịch vụ sẽ được mở lại để nhà thầu khác có thể ứng tuyển.",
+      "urgent": "Theo dõi hạn thanh toán của đối tác",
+      "less24h": "Đối tác còn dưới 24 giờ để hoàn tất thanh toán",
+      "deadline": "Hạn thanh toán hoa hồng của đối tác",
+      "completeNow": "⚠️ Nhắc đối tác thanh toán ngay để tránh bị hủy đơn ứng tuyển.",
+      "under24h": "⏰ Cảnh báo: Còn dưới 24 giờ, đơn có thể bị từ chối nếu không thanh toán.",
+      "payBeforeDeadline": "Theo dõi và xử lý kịp thời các đơn sắp quá hạn để tránh mở lại dịch vụ."
+    },
+    "customer": {
+      "expiredTitle": "Đơn ứng tuyển của đối tác đã bị từ chối",
+      "expiredMessage": "Do đối tác chưa hoàn tất phí hoa hồng, dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
+      "urgent": "Đang chờ đối tác hoàn tất thanh toán hoa hồng",
+      "less24h": "Nếu đối tác không thanh toán trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
+      "deadline": "Theo dõi tiến trình thanh toán hoa hồng của đối tác",
+      "completeNow": "⏳ Vui lòng chờ hệ thống cập nhật lại danh sách nhà thầu.",
+      "under24h": "⚠️ Đối tác sắp hết thời gian thanh toán, dịch vụ có thể sẽ được mở lại.",
+      "payBeforeDeadline": "Dịch vụ của bạn sẽ được mở lại tự động nếu đối tác không hoàn tất thanh toán đúng hạn."
+    },
     "days": "Ngày",
     "hours": "Giờ",
     "minutes": "Phút",
     "seconds": "Giây",
-    "completeNow": "⚠️ Hoàn tất thanh toán ngay để đảm bảo dự án!",
-    "under24h": "⏰ Còn dưới 24 giờ, hãy thanh toán sớm.",
-    "payBeforeDeadline": "Thanh toán hoa hồng trước hạn để tiến hành dự án.",
     "due": "Hạn"
   }
-
 }

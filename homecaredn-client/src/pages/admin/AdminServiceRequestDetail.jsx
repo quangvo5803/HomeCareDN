@@ -15,6 +15,7 @@ import he from 'he';
 import Avatar from 'react-avatar';
 import useRealtime from '../../hook/useRealtime';
 import { useAuth } from '../../hook/useAuth';
+import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
 export default function AdminServiceRequestDetail() {
   const { serviceRequestId } = useParams();
@@ -22,22 +23,22 @@ export default function AdminServiceRequestDetail() {
   const navigate = useNavigate();
   const contractorDetailRef = useRef(null);
 
-  const { getServiceRequestById } = useServiceRequest();
+  const { setServiceRequests, getServiceRequestById } = useServiceRequest();
+  const { user } = useAuth();
 
   const [serviceRequestDetail, setServiceRequestDetail] = useState(null);
-  const [selectedContractorApplicationID, setSelectedContractorApplicationID] =
-    useState(null);
   const [selectedContractor, setSelectedContractor] = useState(null);
-
-  // Pagination states
   const [contractorApplicationList, setContractorApplicationList] = useState(
     []
   );
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 5;
-  const { user } = useAuth();
 
+  // Check if contractor is already selected (from server or user selection)
+  const hasSelectedContractor = Boolean(selectedContractor);
+
+  // Realtime updates
   useRealtime(user, 'Admin', {
     onNewContractorApplication: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
@@ -48,13 +49,14 @@ export default function AdminServiceRequestDetail() {
                 r.contractorApplicationID === payload.contractorApplicationID
             )
           ) {
-            return prev; // tránh duplicate
+            return prev;
           }
           return [payload, ...prev];
         });
         setTotalCount((prev) => prev + 1);
       }
     },
+
     onDeleteContractorApplication: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplicationList((prev) =>
@@ -63,37 +65,97 @@ export default function AdminServiceRequestDetail() {
               ca.contractorApplicationID !== payload.contractorApplicationID
           )
         );
+
+        // Clear selected contractor if it was deleted
         if (
-          selectedContractor.contractorApplicationID ==
+          selectedContractor?.contractorApplicationID ===
           payload.contractorApplicationID
         ) {
           setSelectedContractor(null);
         }
+
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
+
+    onAcceptedContractorApplication: (payload) => {
+      setServiceRequestDetail((prev) => prev && { ...prev, status: 'Closed' });
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? { ...sr, status: 'Closed' }
+            : sr
+        )
+      );
+      setContractorApplicationList((prev) =>
+        prev.map((ca) =>
+          ca.contractorApplicationID === payload.contractorApplicationID
+            ? {
+                ...ca,
+                status: 'PendingCommission',
+                dueCommisionTime: payload?.dueCommisionTime || null,
+              }
+            : { ...ca, status: 'Rejected' }
+        )
+      );
+    },
+
+    onRejectedContractorApplication: (payload) => {
+      if (serviceRequestId == payload.serviceRequestID) {
+        // Update contractor list
+        setContractorApplicationList((prev) =>
+          prev.map((ca) =>
+            ca.contractorApplicationID === payload.contractorApplicationID
+              ? { ...ca, status: 'Rejected' }
+              : ca
+          )
+        );
+
+        // Update selected contractor if viewing the rejected one
+        if (
+          selectedContractor?.contractorApplicationID ===
+          payload.contractorApplicationID
+        ) {
+          setSelectedContractor((prev) => ({
+            ...prev,
+            status: 'Rejected',
+          }));
+        }
+      }
+    },
+
+    onPaymentUpdate: (payload) => {
+      if (
+        payload.contractorApplicationID ===
+        selectedContractor?.contractorApplicationID
+      ) {
+        setSelectedContractor((prev) => ({
+          ...prev,
+          status: 'Approved',
+          dueCommisionTime: null,
+        }));
+      }
+    },
   });
+  useEffect(() => {
+    const selected = contractorApplicationList.find(
+      (ca) => ca.status === 'PendingCommission'
+    );
+    if (selected) setSelectedContractor(selected);
+  }, [contractorApplicationList]);
   // ===== FETCH SERVICE REQUEST DETAIL =====
   useEffect(() => {
-    const fetchData = async () => {
-      if (!serviceRequestId) return;
-      try {
-        const detailServiceRequest = await getServiceRequestById(
-          serviceRequestId
-        );
-        setServiceRequestDetail(detailServiceRequest);
+    if (!serviceRequestId) return;
 
-        // Nếu đã có contractor được chọn
-        if (detailServiceRequest.selectedContractorApplication) {
-          setSelectedContractorApplicationID(
-            detailServiceRequest.selectedContractorApplication
-              .contractorApplicationID
-          );
-          setSelectedContractor(
-            detailServiceRequest.selectedContractorApplication
-          );
-        } else {
-          setSelectedContractor(null);
+    const fetchData = async () => {
+      try {
+        const result = await getServiceRequestById(serviceRequestId);
+        if (result) {
+          setServiceRequestDetail(result);
+          // Initialize selectedContractor from server data if exists
+          if (result.selectedContractorApplication) {
+            setSelectedContractor(result.selectedContractorApplication);
+          }
         }
       } catch (err) {
         toast.error(t(handleApiError(err)));
@@ -105,8 +167,8 @@ export default function AdminServiceRequestDetail() {
 
   // ===== FETCH CONTRACTOR LIST WITH PAGINATION =====
   const fetchContractors = useCallback(async () => {
-    // Nếu đã có contractor được chọn thì không load list
-    if (serviceRequestDetail?.selectedContractorApplication) return;
+    // Don't fetch list if contractor already selected
+    if (hasSelectedContractor) return;
 
     try {
       const res = await contractorApplicationService.getAllForAdmin({
@@ -120,7 +182,7 @@ export default function AdminServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  }, [serviceRequestId, currentPage, serviceRequestDetail, t]);
+  }, [serviceRequestId, currentPage, hasSelectedContractor, t]);
 
   useEffect(() => {
     if (serviceRequestDetail) {
@@ -134,7 +196,6 @@ export default function AdminServiceRequestDetail() {
       const fullContractor = await contractorApplicationService.getByIdForAdmin(
         contractorApplicationID
       );
-      setSelectedContractorApplicationID(contractorApplicationID);
       setSelectedContractor(fullContractor);
 
       setTimeout(() => {
@@ -380,420 +441,242 @@ export default function AdminServiceRequestDetail() {
         </div>
 
         {/* Contractor Section */}
-        {serviceRequestDetail.selectedContractorApplication ? (
-          // ===== SELECTED CONTRACTOR DETAIL (APPROVED) =====
-          <div
-            ref={contractorDetailRef}
-            className="bg-white rounded-3xl shadow-2xl overflow-hidden"
-          >
-            <div className="bg-gradient-to-r px-8 py-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-black">
-                  {t('adminServiceRequestManager.contractorDetail.title')}
-                </h3>
-                <StatusBadge
-                  status={
-                    serviceRequestDetail.selectedContractorApplication.status
-                  }
-                  type="Application"
-                />
-              </div>
-            </div>
-
-            <div className="p-8">
-              <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
-                <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
-                  <Avatar
-                    name={selectedContractor?.contractorName || 'User'}
-                    round={false}
-                    size="80"
-                    color="#f97316"
-                    fgColor="#fff"
-                    textSizeRatio={2.5}
-                    className="!w-full !h-full !object-cover !rounded-2xl !flex !items-center !justify-center !text-3xl !font-bold"
-                  />
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-bold text-xl text-gray-800 mb-2">
-                    {
-                      serviceRequestDetail.selectedContractorApplication
-                        .contractorName
-                    }
-                  </h4>
-                  <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
-                    <i className="fa-solid fa-envelope text-orange-500"></i>
-                    {
-                      serviceRequestDetail.selectedContractorApplication
-                        .contractorEmail
-                    }
-                  </p>
-                  <p className="text-gray-600 text-sm flex items-center gap-2">
-                    <i className="fa-solid fa-phone text-orange-500"></i>
-                    {
-                      serviceRequestDetail.selectedContractorApplication
-                        .contractorPhone
-                    }
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
-                  <p className="text-emerald-600 text-sm font-medium mb-1">
-                    {t('adminServiceRequestManager.estimatePrice')}
-                  </p>
-                  <p className="font-bold text-lg text-emerald-700">
-                    {formatVND(
-                      serviceRequestDetail.selectedContractorApplication
-                        .estimatePrice
-                    )}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
-                  <p className="text-blue-600 text-sm font-medium mb-1">
-                    {t(
-                      'adminServiceRequestManager.contractorDetail.completedProject'
-                    )}
-                  </p>
-                  <p className="font-bold text-lg text-blue-700">
-                    {serviceRequestDetail.selectedContractorApplication
-                      .completedProjectCount ?? 0}{' '}
-                    {t('adminServiceRequestManager.contractorDetail.project')}
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
-                  <p className="text-amber-600 text-sm font-medium mb-1">
-                    {t('adminServiceRequestManager.contractorDetail.rating')}
-                  </p>
-                  <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
-                    <i className="fa-solid fa-star"></i>
-                    {
-                      serviceRequestDetail.selectedContractorApplication
-                        .averageRating
-                    }
-                  </p>
-                </div>
-
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
-                  <p className="text-purple-600 text-sm font-medium mb-1">
-                    {t('adminServiceRequestManager.contractorDetail.createAt')}
-                  </p>
-                  <p className="font-bold text-lg text-purple-700">
-                    {new Date(
-                      serviceRequestDetail.selectedContractorApplication.createdAt
-                    ).toLocaleDateString('vi-VN')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-                <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-                  {t('adminServiceRequestManager.description')}
-                </p>
-                <div
-                  className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-                  dangerouslySetInnerHTML={{
-                    __html: he.decode(
-                      serviceRequestDetail.selectedContractorApplication
-                        .description || ''
-                    ),
-                  }}
-                />
-              </div>
-
-              {serviceRequestDetail.selectedContractorApplication.imageUrls
-                ?.length > 0 && (
-                <div>
-                  <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
-                    {t('adminServiceRequestManager.contractorDetail.images')}
-                  </p>
-                  <div className="grid grid-cols-5 gap-3">
-                    {serviceRequestDetail.selectedContractorApplication.imageUrls.map(
-                      (url, i) => (
-                        <a
-                          key={`${url}-${i}`}
-                          href={url}
-                          className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
-                          data-gall="contractor-gallery"
-                          title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${
-                            i + 1
-                          }`}
-                        >
-                          <img
-                            src={url}
-                            alt={`contractor-${i}`}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </a>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          // ===== CONTRACTOR LIST WITH PAGINATION =====
-          <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h3 className="text-xl font-bold text-gray-800">
-                {t('adminServiceRequestManager.listCandidate')}
-              </h3>
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="text-xl font-bold text-gray-800">
+              {!hasSelectedContractor
+                ? t('adminServiceRequestManager.listCandidate')
+                : t('adminServiceRequestManager.contractorDetail.title')}
+            </h3>
+            {!hasSelectedContractor && (
               <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
                 {totalCount || 0}{' '}
                 {t('adminServiceRequestManager.totalCandidate')}
               </span>
+            )}
+          </div>
+
+          {selectedContractor ? (
+            <>
+              {/* Back button - only show if not from server (user manually selected) */}
+              {!serviceRequestDetail.selectedContractor && (
+                <button
+                  onClick={() => setSelectedContractor(null)}
+                  className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
+                >
+                  <i className="fas fa-arrow-left"></i>
+                  <span>{t('BUTTON.Back')}</span>
+                </button>
+              )}
+
+              <div ref={contractorDetailRef}>
+                <ContractorDetailView
+                  contractor={selectedContractor}
+                  t={t}
+                  i18n={i18n}
+                  formatVND={formatVND}
+                  he={he}
+                />
+              </div>
+            </>
+          ) : contractorApplicationList.length === 0 ? (
+            <div className="flex flex-col items-center mt-5 mb-5">
+              <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
+              <h3 className="mb-1 text-lg font-medium text-gray-900">
+                {t('adminServiceRequestManager.noContractor')}
+              </h3>
+              <p className="text-gray-500">
+                {t('adminServiceRequestManager.noContractorYet')}
+              </p>
             </div>
-
+          ) : (
             <div className="space-y-3">
-              {contractorApplicationList &&
-              contractorApplicationList.length > 0 ? (
-                <>
-                  {contractorApplicationList.map((item) => {
-                    const isSelected =
-                      item.contractorApplicationID ===
-                      selectedContractorApplicationID;
-
-                    return (
-                      <div
-                        key={item.contractorApplicationID}
-                        onClick={() =>
-                          handleSelectContractor(item.contractorApplicationID)
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleSelectContractor(
-                              item.contractorApplicationID
-                            );
-                          }
-                        }}
-                        role="button"
-                        tabIndex={0}
-                        className={`w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group
-                          ${
-                            isSelected
-                              ? 'bg-orange-500 border-orange-600 text-white'
-                              : 'bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]'
-                          }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`w-12 h-12 rounded-full overflow-hidden ring-2 ${
-                                isSelected
-                                  ? 'ring-white bg-white'
-                                  : 'ring-transparent group-hover:ring-orange-400'
-                              }`}
-                            >
-                              <Avatar
-                                name={item?.contractorEmail || 'User'}
-                                round
-                                size="48"
-                                color={isSelected ? '#FFFFFF' : '#FB8C00'}
-                                fgColor={isSelected ? '#FB8C00' : '#FFFFFF'}
-                                className="!w-full !h-full !rounded-full !object-cover"
-                              />
-                            </div>
-                            <div>
-                              <p
-                                className={`font-semibold ${
-                                  isSelected
-                                    ? 'text-white'
-                                    : 'text-gray-800 group-hover:text-orange-600'
-                                }`}
-                              >
-                                {item.contractorName}
-                              </p>
-                              <p
-                                className={`text-sm ${
-                                  isSelected
-                                    ? 'text-orange-100'
-                                    : 'text-gray-500'
-                                }`}
-                              >
-                                {item.contractorEmail}
-                              </p>
-                            </div>
-                          </div>
-
-                          <button
-                            className={`px-4 py-2 rounded-lg font-medium ${
-                              isSelected
-                                ? 'bg-orange-500 border-orange-600 text-white'
-                                : 'text-orange-600'
-                            }`}
-                          >
-                            {t('adminServiceRequestManager.viewProfile')}{' '}
-                            <i className="fa-solid fa-arrow-right ms-1"></i>
-                          </button>
-                        </div>
+              {contractorApplicationList.map((item) => (
+                <button
+                  key={item.contractorApplicationID}
+                  onClick={() =>
+                    handleSelectContractor(item.contractorApplicationID)
+                  }
+                  className="w-full text-left p-4 border rounded-xl transition-all duration-200 cursor-pointer group bg-white border-gray-300 hover:shadow-lg hover:scale-[1.02]"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-transparent group-hover:ring-orange-400">
+                        <Avatar
+                          name={item?.contractorEmail || 'User'}
+                          round
+                          size="48"
+                          color="#FB8C00"
+                          fgColor="#FFFFFF"
+                          className="!w-full !h-full !rounded-full !object-cover"
+                        />
                       </div>
-                    );
-                  })}
-
-                  {/* Pagination */}
-                  {totalCount > pageSize && (
-                    <div className="flex justify-center pt-4">
-                      <Pagination
-                        current={currentPage}
-                        pageSize={pageSize}
-                        total={totalCount}
-                        onChange={(page) => setCurrentPage(page)}
-                        showSizeChanger={false}
-                      />
+                      <div>
+                        <p className="font-semibold text-gray-800 group-hover:text-orange-600">
+                          {item.contractorName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {item.contractorEmail}
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </>
-              ) : (
-                <div className="flex flex-col items-center mt-5 mb-5">
-                  <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
-                  <h3 className="mb-1 text-lg font-medium text-gray-900">
-                    {t('adminServiceRequestManager.noContractor')}
-                  </h3>
-                  <p className="text-gray-500">
-                    {t('adminServiceRequestManager.noContractorYet')}
-                  </p>
+
+                    <span className="text-orange-600 font-medium">
+                      {t('adminServiceRequestManager.viewProfile')}{' '}
+                      <i className="fa-solid fa-arrow-right ms-1"></i>
+                    </span>
+                  </div>
+                </button>
+              ))}
+
+              {/* Pagination */}
+              {totalCount > pageSize && (
+                <div className="flex justify-center pt-4">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalCount}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                  />
                 </div>
               )}
             </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== CONTRACTOR DETAIL VIEW COMPONENT =====
+function ContractorDetailView({ contractor, t, i18n, formatVND, he }) {
+  if (!contractor) return null;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6 pb-6 border-b">
+        <div className="flex items-start gap-5">
+          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
+            <Avatar
+              name={contractor?.contractorName || 'User'}
+              round={false}
+              size="80"
+              color="#f97316"
+              fgColor="#fff"
+              textSizeRatio={2.5}
+              className="!w-full !h-full !object-cover !rounded-2xl !flex !items-center !justify-center !text-3xl !font-bold"
+            />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-bold text-xl text-gray-800 mb-2">
+              {contractor.contractorName}
+            </h4>
+            <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
+              <i className="fa-solid fa-envelope text-orange-500"></i>
+              {contractor.contractorEmail}
+            </p>
+            <p className="text-gray-600 text-sm flex items-center gap-2">
+              <i className="fa-solid fa-phone text-orange-500"></i>
+              {contractor.contractorPhone}
+            </p>
+          </div>
+        </div>
+        <StatusBadge status={contractor.status} type="Application" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
+          <p className="text-emerald-600 text-sm font-medium mb-1">
+            {t('adminServiceRequestManager.estimatePrice')}
+          </p>
+          <p className="font-bold text-lg text-emerald-700">
+            {formatVND(contractor.estimatePrice)}
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
+          <p className="text-blue-600 text-sm font-medium mb-1">
+            {t('adminServiceRequestManager.contractorDetail.completedProject')}
+          </p>
+          <p className="font-bold text-lg text-blue-700">
+            {contractor.completedProjectCount ?? 0}{' '}
+            {t('adminServiceRequestManager.contractorDetail.project')}
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
+          <p className="text-amber-600 text-sm font-medium mb-1">
+            {t('adminServiceRequestManager.contractorDetail.rating')}
+          </p>
+          <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
+            <i className="fa-solid fa-star"></i>
+            {contractor.averageRating}
+          </p>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
+          <p className="text-purple-600 text-sm font-medium mb-1">
+            {t('adminServiceRequestManager.contractorDetail.createAt')}
+          </p>
+          <p className="font-bold text-lg text-purple-700">
+            {new Date(contractor.createdAt).toLocaleDateString('vi-VN')}
+          </p>
+        </div>
+      </div>
+
+      {/* Commission Countdown - Show when PendingCommission */}
+      {contractor.status === 'PendingCommission' &&
+        contractor.dueCommisionTime && (
+          <div className="mb-6">
+            <CommissionCountdown
+              dueCommisionTime={contractor.dueCommisionTime}
+              onExpired={() => {
+                toast.warning(
+                  t('contractorServiceRequestDetail.paymentDeadlineExpired')
+                );
+              }}
+              role="admin"
+            />
           </div>
         )}
 
-        {/* Selected Contractor Detail (when viewing from list) */}
-        {selectedContractor &&
-          !serviceRequestDetail.selectedContractorApplication && (
-            <div
-              ref={contractorDetailRef}
-              className="bg-white rounded-3xl shadow-2xl overflow-hidden"
-            >
-              <div className="bg-gradient-to-r px-8 py-6">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-black">
-                    {t('adminServiceRequestManager.contractorDetail.title')}
-                  </h3>
-                  <StatusBadge
-                    status={selectedContractor.status}
-                    type="Application"
-                  />
-                </div>
-              </div>
-
-              <div className="p-8">
-                <div className="flex items-start gap-5 mb-8 pb-8 border-b border-gray-100">
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden ring-4 ring-orange-100 flex-shrink-0">
-                    <Avatar
-                      name={selectedContractor?.contractorName || 'User'}
-                      round={false}
-                      size="80"
-                      color="#f97316"
-                      fgColor="#fff"
-                      textSizeRatio={2.5}
-                      className="!w-full !h-full !object-cover !rounded-2xl !flex !items-center !justify-center !text-3xl !font-bold"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-xl text-gray-800 mb-2">
-                      {selectedContractor.contractorName}
-                    </h4>
-                    <p className="text-gray-600 text-sm flex items-center gap-2 mb-1">
-                      <i className="fa-solid fa-envelope text-orange-500"></i>
-                      {selectedContractor.contractorEmail}
-                    </p>
-                    <p className="text-gray-600 text-sm flex items-center gap-2">
-                      <i className="fa-solid fa-phone text-orange-500"></i>
-                      {selectedContractor.contractorPhone}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-gradient-to-br from-amber-50 to-yellow-50 p-4 rounded-2xl border border-amber-100">
-                    <p className="text-amber-600 text-sm font-medium mb-1">
-                      {t('adminServiceRequestManager.contractorDetail.rating')}
-                    </p>
-                    <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
-                      <i className="fa-solid fa-star"></i>
-                      {selectedContractor.averageRating}
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-2xl border border-blue-100">
-                    <p className="text-blue-600 text-sm font-medium mb-1">
-                      {t(
-                        'adminServiceRequestManager.contractorDetail.completedProject'
-                      )}
-                    </p>
-                    <p className="font-bold text-lg text-blue-700">
-                      {selectedContractor.completedProjectCount}{' '}
-                      {t('adminServiceRequestManager.contractorDetail.project')}
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
-                    <p className="text-emerald-600 text-sm font-medium mb-1">
-                      {t('adminServiceRequestManager.estimatePrice')}
-                    </p>
-                    <p className="font-bold text-lg text-emerald-700">
-                      {formatVND(selectedContractor.estimatePrice)}
-                    </p>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
-                    <p className="text-purple-600 text-sm font-medium mb-1">
-                      {t(
-                        'adminServiceRequestManager.contractorDetail.createAt'
-                      )}
-                    </p>
-                    <p className="font-bold text-lg text-purple-700">
-                      {new Date(
-                        selectedContractor.createdAt
-                      ).toLocaleDateString('vi-VN')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-                  <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-                    {t('adminServiceRequestManager.description')}
-                  </p>
-                  <div
-                    className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-                    dangerouslySetInnerHTML={{
-                      __html: he.decode(selectedContractor.description || ''),
-                    }}
-                  />
-                </div>
-
-                {selectedContractor.imageUrls?.length > 0 && (
-                  <div>
-                    <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
-                      {t('adminServiceRequestManager.contractorDetail.images')}
-                    </p>
-                    <div className="grid grid-cols-6 gap-1">
-                      {selectedContractor.imageUrls.map((url, i) => (
-                        <a
-                          key={`${url}-${i}`}
-                          href={url}
-                          className="venobox w-40 h-40 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
-                          data-gall="contractor-gallery"
-                        >
-                          <img
-                            src={url}
-                            alt={`contractor-${i}`}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+      <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+        <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+          {t('adminServiceRequestManager.description')}
+        </p>
+        <div
+          className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+          dangerouslySetInnerHTML={{
+            __html: he.decode(contractor.description || ''),
+          }}
+        />
       </div>
+
+      {contractor.imageUrls?.length > 0 && (
+        <div>
+          <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
+            {t('adminServiceRequestManager.contractorDetail.images')}
+          </p>
+          <div className="grid grid-cols-5 gap-3">
+            {contractor.imageUrls.map((url, i) => (
+              <a
+                key={`${url}-${i}`}
+                href={url}
+                className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                data-gall="contractor-gallery"
+                title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'} ${i + 1}`}
+              >
+                <img
+                  src={url}
+                  alt={`contractor-${i}`}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

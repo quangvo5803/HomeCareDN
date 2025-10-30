@@ -254,6 +254,7 @@ namespace BusinessLogic.Services.Interfaces
                     ImageUrls =
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Description = selected.Description,
+                    DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = 0,
                     AverageRating = 0,

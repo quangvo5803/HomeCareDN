@@ -14,12 +14,14 @@ import { Pagination } from 'antd';
 import useRealtime from '../../hook/useRealtime';
 import { useAuth } from '../../hook/useAuth';
 import he from 'he';
+import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
 export default function ServiceRequestDetail() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { serviceRequestId } = useParams();
-  const { loading, getServiceRequestById } = useServiceRequest();
+  const { loading, setServiceRequests, getServiceRequestById } =
+    useServiceRequest();
 
   const [serviceRequest, setServiceRequest] = useState(null);
   const [selectedContractor, setSelectedContractor] = useState(null);
@@ -36,7 +38,10 @@ export default function ServiceRequestDetail() {
   const chatEndRef = useRef(null);
 
   const { user } = useAuth();
-  //Use realtime
+
+  const hasSelectedContractor = Boolean(selectedContractor);
+
+  // Use realtime
   useRealtime(user, 'Customer', {
     onNewContractorApplication: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
@@ -47,12 +52,12 @@ export default function ServiceRequestDetail() {
                 r.contractorApplicationID === payload.contractorApplicationID
             )
           ) {
-            return prev; // tránh duplicate
+            return prev;
           }
           return [payload, ...prev];
         });
+        setTotalCount((prev) => prev + 1);
       }
-      setTotalCount((prev) => prev + 1);
     },
     onDeleteContractorApplication: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
@@ -63,7 +68,7 @@ export default function ServiceRequestDetail() {
           )
         );
         if (
-          selectedContractor.contractorApplicationID ==
+          selectedContractor?.contractorApplicationID ===
           payload.contractorApplicationID
         ) {
           setSelectedContractor(null);
@@ -71,7 +76,54 @@ export default function ServiceRequestDetail() {
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
+    onAcceptedContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+      setServiceRequest((prev) => {
+        if (serviceRequestId == payload.serviceRequestID) {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            status: 'Closed',
+          };
+        }
+      });
+      setSelectedContractor((prev) => {
+        if (
+          selectedContractor?.contractorApplicationID ==
+          payload.contractorApplicationID
+        ) {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            status: 'PendingCommission',
+            dueCommisionTime: payload?.dueCommisionTime || null,
+          };
+        }
+      });
+    },
+    onPaymentUpdate: (payload) => {
+      if (
+        payload.contractorApplicationID ===
+        selectedContractor?.contractorApplicationID
+      ) {
+        setSelectedContractor((prev) => ({
+          ...prev,
+          status: 'Approved',
+          dueCommisionTime: null,
+        }));
+      }
+    },
   });
+
   // ---- CONTRACTOR ACTIONS ----
   const handleAcceptContractor = async () => {
     if (!selectedContractor) return;
@@ -80,7 +132,9 @@ export default function ServiceRequestDetail() {
       const approvedContractor = await contractorApplicationService.accept(
         contractorApplicationID
       );
+      // Update selectedContractor as single source of truth
       setSelectedContractor(approvedContractor);
+      // Also update in the list for consistency
       setContractorApplications((prev) =>
         prev.map((c) =>
           c.contractorApplicationID === contractorApplicationID
@@ -88,10 +142,6 @@ export default function ServiceRequestDetail() {
             : c
         )
       );
-      setServiceRequest((prev) => ({
-        ...prev,
-        selectedContractorApplication: approvedContractor,
-      }));
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
@@ -104,7 +154,9 @@ export default function ServiceRequestDetail() {
       const rejected = await contractorApplicationService.reject(
         contractorApplicationID
       );
+      // Update selectedContractor as single source of truth
       setSelectedContractor(rejected);
+      // Also update in the list for consistency
       setContractorApplications((prev) =>
         prev.map((c) =>
           c.contractorApplicationID === contractorApplicationID ? rejected : c
@@ -136,6 +188,7 @@ export default function ServiceRequestDetail() {
       handleSend();
     }
   };
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!serviceRequest && !loading) {
@@ -144,8 +197,8 @@ export default function ServiceRequestDetail() {
     }, 3000);
     return () => clearTimeout(timeout);
   }, [serviceRequest, loading, navigate]);
-  // ---- FETCH DATA ----
 
+  // ---- FETCH DATA ----
   useEffect(() => {
     if (!serviceRequestId) return;
     const fetchServiceRequest = async () => {
@@ -153,6 +206,7 @@ export default function ServiceRequestDetail() {
         const result = await getServiceRequestById(serviceRequestId);
         if (result) {
           setServiceRequest(result);
+          // Initialize selectedContractor from server data if exists
           if (result.selectedContractorApplication) {
             setSelectedContractor(result.selectedContractorApplication);
           }
@@ -165,7 +219,8 @@ export default function ServiceRequestDetail() {
   }, [serviceRequestId, getServiceRequestById, t]);
 
   const fetchContractors = useCallback(async () => {
-    if (serviceRequest.selectedContractorApplication) return;
+    // Don't fetch list if contractor already selected
+    if (hasSelectedContractor) return;
     try {
       const res = await contractorApplicationService.getAllForCustomer({
         PageNumber: currentApplicationPage,
@@ -177,7 +232,14 @@ export default function ServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  }, [serviceRequestId, t, pageSize, currentApplicationPage, serviceRequest]);
+  }, [
+    serviceRequestId,
+    t,
+    pageSize,
+    currentApplicationPage,
+    hasSelectedContractor,
+  ]);
+
   const handleSelectContractor = async (c) => {
     try {
       const fullContractor =
@@ -189,6 +251,7 @@ export default function ServiceRequestDetail() {
       toast.error(t(handleApiError(error)));
     }
   };
+
   useEffect(() => {
     if (serviceRequest) fetchContractors();
   }, [serviceRequest, fetchContractors]);
@@ -231,7 +294,13 @@ export default function ServiceRequestDetail() {
           <div className="bg-white rounded-2xl shadow-sm border p-6">
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <i className="fas fa-hammer text-orange-600 text-xl"></i>
+                <i
+                  className={`text-orange-600 text-xl fas ${
+                    serviceRequest.serviceType === 'Construction'
+                      ? 'fa-hammer'
+                      : 'fa-screwdriver-wrench'
+                  }`}
+                />{' '}
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -434,7 +503,7 @@ export default function ServiceRequestDetail() {
         {/* CONTRACTOR LIST */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h4 className="font-semibold text-orange-600 mb-4 flex items-center justify-between">
-            {!serviceRequest.selectedContractorApplication ? (
+            {!hasSelectedContractor ? (
               <>
                 <span className="flex items-center gap-2">
                   <i className="fas fa-hard-hat"></i>
@@ -463,7 +532,7 @@ export default function ServiceRequestDetail() {
 
           {selectedContractor ? (
             <>
-              {!serviceRequest.selectedContractorApplication && (
+              {!serviceRequest.selectedContractor && (
                 <button
                   onClick={() => setSelectedContractor(null)}
                   className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
@@ -498,6 +567,24 @@ export default function ServiceRequestDetail() {
                   type="Application"
                 />
               </div>
+
+              {/* Commission Countdown - Show when PendingCommission */}
+              {selectedContractor.status === 'PendingCommission' &&
+                selectedContractor.dueCommisionTime && (
+                  <div className="mb-6">
+                    <CommissionCountdown
+                      dueCommisionTime={selectedContractor.dueCommisionTime}
+                      onExpired={() => {
+                        toast.warning(
+                          t(
+                            'contractorServiceRequestDetail.paymentDeadlineExpired'
+                          )
+                        );
+                      }}
+                      role="customer"
+                    />
+                  </div>
+                )}
 
               {/* Description + Images */}
               <div className="mb-6">

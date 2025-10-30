@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
 
-export default function CommissionCountdown({ dueCommisionTime, onExpired }) {
+export default function CommissionCountdown({
+  dueCommisionTime,
+  onExpired,
+  role = 'partner',
+}) {
   const { t, i18n } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
 
@@ -41,6 +45,9 @@ export default function CommissionCountdown({ dueCommisionTime, onExpired }) {
     return () => clearInterval(timer);
   }, [dueCommisionTime, onExpired]);
 
+  // Đường dẫn i18n theo role
+  const prefix = `commission.${role || 'partner'}`;
+
   if (!timeLeft) {
     return (
       <div className="bg-red-50 rounded-lg p-4 ring-2 ring-red-200">
@@ -48,10 +55,10 @@ export default function CommissionCountdown({ dueCommisionTime, onExpired }) {
           <i className="fas fa-exclamation-triangle text-red-500 text-2xl"></i>
           <div>
             <p className="font-bold text-red-700">
-              {t('commission.expiredTitle')}
+              {t(`${prefix}.expiredTitle`)}
             </p>
             <p className="text-sm text-red-600 mt-1">
-              {t('commission.expiredMessage')}
+              {t(`${prefix}.expiredMessage`)}
             </p>
           </div>
         </div>
@@ -92,10 +99,10 @@ export default function CommissionCountdown({ dueCommisionTime, onExpired }) {
         <div className="flex-1">
           <p className={`font-bold ${textColor} mb-2`}>
             {isCritical
-              ? `🚨 ${t('commission.urgent')}`
+              ? `🚨 ${t(`${prefix}.urgent`)}`
               : isUrgent
-              ? `⚠️ ${t('commission.less24h')}`
-              : `⏰ ${t('commission.deadline')}`}
+              ? `⚠️ ${t(`${prefix}.less24h`)}`
+              : `⏰ ${t(`${prefix}.deadline`)}`}
           </p>
 
           {/* Countdown */}
@@ -137,14 +144,14 @@ export default function CommissionCountdown({ dueCommisionTime, onExpired }) {
           <p className="text-sm text-gray-600">
             {isCritical ? (
               <span className="font-semibold text-red-600">
-                {t('commission.completeNow')}
+                {t(`${prefix}.completeNow`)}
               </span>
             ) : isUrgent ? (
               <span className="font-semibold text-orange-600">
-                {t('commission.under24h')}
+                {t(`${prefix}.under24h`)}
               </span>
             ) : (
-              <span>{t('commission.payBeforeDeadline')}</span>
+              <span>{t(`${prefix}.payBeforeDeadline`)}</span>
             )}
           </p>
 

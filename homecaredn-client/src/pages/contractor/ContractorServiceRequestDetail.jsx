@@ -42,7 +42,8 @@ export default function ContractorServiceRequestDetail() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { getServiceRequestById, loading } = useServiceRequest();
+  const { setServiceRequests, getServiceRequestById, loading } =
+    useServiceRequest();
   const [serviceRequest, setServiceRequest] = useState(null);
   const [existingApplication, setExistingApplication] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
@@ -67,12 +68,50 @@ export default function ContractorServiceRequestDetail() {
         status: 'PendingCommission',
         dueCommisionTime: payload?.dueCommisionTime || null,
       }));
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
     },
-    onRejectedContractorApplication: () => {
+    onRejectedContractorApplication: (payload) => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',
       }));
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+    onServiceRequestClosed: (payload) => {
+      if (payload?.serviceRequestID === serviceRequestId) {
+        setServiceRequests((prev) =>
+          prev.map((sr) =>
+            sr.serviceRequestID === payload.serviceRequestID
+              ? {
+                  ...sr,
+                  status: 'Closed',
+                }
+              : sr
+          )
+        );
+        setServiceRequest((prev) => ({
+          ...prev,
+          status: 'Closed',
+        }));
+      }
     },
   });
   // Load service request & existing application
@@ -84,7 +123,7 @@ export default function ContractorServiceRequestDetail() {
         setIsChecking(true);
         const data = await getServiceRequestById(serviceRequestId);
         setServiceRequest(data);
-        setTotalApplication(data.contractorApplyCount || 0);
+        setTotalApplication(data?.contractorApplyCount ?? 0);
         let appliedContractorApplication =
           await contractorApplicationService.getByServiceRequestIdForContractor(
             {
@@ -554,7 +593,17 @@ export default function ContractorServiceRequestDetail() {
           )}
 
           {/* Apply Form OR Application Details */}
-          {!existingApplication ? (
+          {isRequestClosed && !existingApplication ? (
+            <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
+              <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
+              <p className="text-gray-700 font-semibold mb-1">
+                {t('contractorServiceRequestDetail.closedApplication')}
+              </p>
+              <p className="text-sm text-gray-500">
+                {t('contractorServiceRequestDetail.requestAlreadyClosed')}
+              </p>
+            </div>
+          ) : !existingApplication && !isRequestClosed ? (
             // Apply Form - Show when NOT applied yet and request is not closed
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
               <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
@@ -839,7 +888,7 @@ export default function ContractorServiceRequestDetail() {
                 {existingApplication.status === 'PendingCommission' && (
                   <>
                     {/* Commission Calculation Info Box */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-3">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
                       <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                         <i className="fas fa-calculator text-blue-600"></i>
                         {t(
@@ -847,6 +896,54 @@ export default function ContractorServiceRequestDetail() {
                         )}
                       </h4>
 
+                      {/* 🟢 Hiển thị bảng các mức commission tier */}
+                      <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                          {t(
+                            'contractorServiceRequestDetail.publicCommissionTiers'
+                          )}
+                        </p>
+                        <table className="w-full text-xs text-gray-700">
+                          <thead>
+                            <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
+                              <th className="py-1">
+                                {t('contractorServiceRequestDetail.priceRange')}
+                              </th>
+                              <th className="py-1">
+                                {t('contractorServiceRequestDetail.rate')}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier1')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                2%
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier2')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                1.5%
+                              </td>
+                            </tr>
+                            <tr>
+                              <td className="py-1 text-gray-500">
+                                {t('contractorServiceRequestDetail.tier3')}
+                              </td>
+                              <td className="py-1 text-blue-600 font-medium">
+                                1%
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+
+                      {/* 🔵 Phần tính toán riêng cho application hiện tại */}
                       {(() => {
                         const estimatePrice = Number(
                           existingApplication.estimatePrice
@@ -858,17 +955,17 @@ export default function ContractorServiceRequestDetail() {
                         if (estimatePrice <= 500_000_000) {
                           commission = estimatePrice * 0.02;
                           rate = 2;
-                          tierInfo = t('contractorServiceRequestDetail.tier1'); // "≤ 500 triệu"
+                          tierInfo = t('contractorServiceRequestDetail.tier1');
                         } else if (estimatePrice <= 2_000_000_000) {
                           commission = estimatePrice * 0.015;
                           rate = 1.5;
-                          tierInfo = t('contractorServiceRequestDetail.tier2'); // "500 triệu - 2 tỷ"
+                          tierInfo = t('contractorServiceRequestDetail.tier2');
                         } else {
                           commission = estimatePrice * 0.01;
                           if (commission > 100_000_000)
                             commission = 100_000_000;
                           rate = 1;
-                          tierInfo = t('contractorServiceRequestDetail.tier3'); // "> 2 tỷ"
+                          tierInfo = t('contractorServiceRequestDetail.tier3');
                         }
 
                         return (
@@ -896,7 +993,6 @@ export default function ContractorServiceRequestDetail() {
                               </span>
                             </div>
 
-                            {/* Divider */}
                             <div className="border-t border-blue-200 my-2"></div>
 
                             {/* Total Commission */}
@@ -920,7 +1016,7 @@ export default function ContractorServiceRequestDetail() {
                               </div>
                             </div>
 
-                            {/* Max cap notice for tier 3 */}
+                            {/* Max cap note */}
                             {estimatePrice > 2_000_000_000 &&
                               commission >= 100_000_000 && (
                                 <div className="bg-yellow-50 rounded p-2 ring-1 ring-yellow-200">
@@ -936,6 +1032,7 @@ export default function ContractorServiceRequestDetail() {
                         );
                       })()}
                     </div>
+
                     <button
                       onClick={handlePayCommission}
                       className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"

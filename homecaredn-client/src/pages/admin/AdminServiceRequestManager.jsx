@@ -13,7 +13,7 @@ import { useAuth } from '../../hook/useAuth';
 export default function ServiceRequest() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 5;
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const [sortOption, setSortOption] = useState('');
@@ -45,16 +45,68 @@ export default function ServiceRequest() {
       );
       setTotalServiceRequests((prev) => Math.max(0, prev - 1));
     },
+    onNewContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
+            : sr
+        )
+      );
+    },
+    onAcceptedContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
+    onDeleteContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: Math.max(
+                  0,
+                  (sr.contractorApplyCount || 1) - 1
+                ),
+              }
+            : sr
+        )
+      );
+    },
+
+    // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
+    onPaymentUpdate: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+    },
   });
   useEffect(() => {
-    if (serviceRequests.length === 0 || sortOption || debouncedSearch) {
-      fetchServiceRequests({
-        PageNumber: currentPage,
-        PageSize: pageSize,
-        SortBy: sortOption,
-        Search: debouncedSearch || '',
-      });
-    }
+    fetchServiceRequests({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: sortOption,
+      Search: debouncedSearch || '',
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentPage, sortOption, debouncedSearch]);
 
@@ -505,19 +557,18 @@ export default function ServiceRequest() {
                 </tbody>
               </table>
             </div>
-
-            {/* Pagination */}
-            {totalServiceRequests > 0 && (
-              <div className="border-t border-gray-200 px-6 py-5 bg-gradient-to-r from-gray-50 to-orange-50/30">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalServiceRequests}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                />
-              </div>
-            )}
+          </div>
+        )}
+        {/* Pagination */}
+        {totalServiceRequests > 0 && (
+          <div className="border-t border-gray-200 px-6 py-5 bg-gradient-to-r from-gray-50 to-orange-50/30">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalServiceRequests}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+            />
           </div>
         )}
       </div>
