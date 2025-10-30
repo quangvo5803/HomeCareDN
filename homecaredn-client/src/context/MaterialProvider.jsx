@@ -141,7 +141,7 @@ export const MaterialProvider = ({ children }) => {
   // 📌 Distributor-only: delete
   const deleteMaterial = useCallback(async (id) => {
     try {
-      await materialService.deleteMaterial(id);
+      await materialService.delete(id);
       setMaterials((prev) => prev.filter((b) => b.materialID !== id));
       setTotalMaterials((prev) => prev - 1);
     } catch (err) {
