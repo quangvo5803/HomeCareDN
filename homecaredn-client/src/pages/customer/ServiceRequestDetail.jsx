@@ -109,19 +109,6 @@ export default function ServiceRequestDetail() {
           };
         }
       });
-      setSelectedContractor((prev) => {
-        if (
-          selectedContractor?.contractorApplicationID ==
-          payload.contractorApplicationID
-        ) {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            status: 'PendingCommission',
-            dueCommisionTime: payload?.dueCommisionTime || null,
-          };
-        }
-      });
     },
     onPaymentUpdate: (payload) => {
       if (
@@ -552,7 +539,8 @@ export default function ServiceRequestDetail() {
               )}
               <div className="text-center mb-6 pb-6 border-b">
                 <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                  {selectedContractor.contractorApplicationID.charAt(0)}
+                  {selectedContractor.contractorName?.charAt(0) ||
+                    selectedContractor.contractorApplicationID.charAt(0)}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
                   {selectedContractor.contractorApplicationID.substring(0, 12)}
@@ -576,6 +564,95 @@ export default function ServiceRequestDetail() {
                   type="Application"
                 />
               </div>
+
+              {/* Contractor Contact Information - Show when Approved */}
+              {selectedContractor.status === 'Approved' && (
+                <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i className="fas fa-user-tie text-orange-600"></i>
+                    <span>
+                      {t(
+                        'userPage.serviceRequestDetail.label_contractorInfo'
+                      ) || 'Thông tin nhà thầu'}
+                    </span>
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-user text-orange-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {t(
+                            'userPage.serviceRequestDetail.label_contractorName'
+                          )}
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedContractor.contractorName}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-envelope text-blue-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          Email
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedContractor.contractorEmail || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {selectedContractor.contractorPhone && (
+                      <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <i className="fas fa-phone text-green-600"></i>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            {t('userPage.serviceRequestDetail.label_phone') ||
+                              'Số điện thoại'}
+                          </p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedContractor.contractorPhone}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-tag text-purple-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {t(
+                            'userPage.serviceRequestDetail.label_estimatePrice'
+                          )}
+                        </p>
+                        <p className="font-semibold text-gray-900 text-lg">
+                          {(selectedContractor.estimatePrice / 1000000).toFixed(
+                            0
+                          )}{' '}
+                          <span className="text-sm">
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {selectedContractor.estimatePrice?.toLocaleString(
+                            'vi-VN'
+                          )}{' '}
+                          VNĐ
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Commission Countdown - Show when PendingCommission */}
               {selectedContractor.status === 'PendingCommission' &&

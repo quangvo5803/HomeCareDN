@@ -35,8 +35,8 @@ export default function AdminServiceRequestDetail() {
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 5;
 
-  // Check if contractor is already selected (from server or user selection)
-  const hasSelectedContractor = Boolean(selectedContractor);
+  // Track if we're viewing contractor detail (user can toggle back to list)
+  const [viewingContractorDetail, setViewingContractorDetail] = useState(false);
 
   // Realtime updates
   useRealtime(user, 'Admin', {
@@ -72,6 +72,7 @@ export default function AdminServiceRequestDetail() {
           payload.contractorApplicationID
         ) {
           setSelectedContractor(null);
+          setViewingContractorDetail(false);
         }
 
         setTotalCount((prev) => Math.max(0, prev - 1));
@@ -79,7 +80,6 @@ export default function AdminServiceRequestDetail() {
     },
 
     onAcceptedContractorApplication: (payload) => {
-      setServiceRequestDetail((prev) => prev && { ...prev, status: 'Closed' });
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -87,17 +87,34 @@ export default function AdminServiceRequestDetail() {
             : sr
         )
       );
-      setContractorApplicationList((prev) =>
-        prev.map((ca) =>
-          ca.contractorApplicationID === payload.contractorApplicationID
-            ? {
-                ...ca,
-                status: 'PendingCommission',
-                dueCommisionTime: payload?.dueCommisionTime || null,
-              }
-            : { ...ca, status: 'Rejected' }
-        )
-      );
+      if (serviceRequestId == payload.serviceRequestID) {
+        setServiceRequestDetail(
+          (prev) => prev && { ...prev, status: 'Closed' }
+        );
+        setContractorApplicationList((prev) => {
+          const newList = prev.map((ca) =>
+            ca.contractorApplicationID === payload.contractorApplicationID
+              ? {
+                  ...ca,
+                  status: 'PendingCommission',
+                  dueCommisionTime: payload?.dueCommisionTime || null,
+                }
+              : { ...ca, status: 'Rejected' }
+          );
+
+          const selected = newList.find(
+            (ca) =>
+              ca.contractorApplicationID === payload.contractorApplicationID
+          );
+
+          if (selected) {
+            setSelectedContractor(selected);
+            setViewingContractorDetail(true);
+          }
+
+          return newList;
+        });
+      }
     },
 
     onRejectedContractorApplication: (payload) => {
@@ -111,7 +128,6 @@ export default function AdminServiceRequestDetail() {
           )
         );
 
-        // Update selected contractor if viewing the rejected one
         if (
           selectedContractor?.contractorApplicationID ===
           payload.contractorApplicationID
@@ -137,25 +153,7 @@ export default function AdminServiceRequestDetail() {
       }
     },
   });
-  useEffect(() => {
-    if (!contractorApplicationList.length) return;
 
-    const selected = contractorApplicationList.find(
-      (ca) => ca.status === 'PendingCommission'
-    );
-
-    if (selected) {
-      setSelectedContractor((prev) => {
-        if (
-          !prev ||
-          prev.contractorApplicationID !== selected.contractorApplicationID
-        ) {
-          return selected;
-        }
-        return prev;
-      });
-    }
-  }, [contractorApplicationList]);
   // ===== FETCH SERVICE REQUEST DETAIL =====
   useEffect(() => {
     if (!serviceRequestId) return;
@@ -168,6 +166,7 @@ export default function AdminServiceRequestDetail() {
           // Initialize selectedContractor from server data if exists
           if (result.selectedContractorApplication) {
             setSelectedContractor(result.selectedContractorApplication);
+            setViewingContractorDetail(true);
           }
         }
       } catch (err) {
@@ -180,9 +179,6 @@ export default function AdminServiceRequestDetail() {
 
   // ===== FETCH CONTRACTOR LIST WITH PAGINATION =====
   const fetchContractors = useCallback(async () => {
-    // Don't fetch list if contractor already selected
-    if (hasSelectedContractor) return;
-
     try {
       const res = await contractorApplicationService.getAllForAdmin({
         PageNumber: currentPage,
@@ -195,7 +191,7 @@ export default function AdminServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  }, [serviceRequestId, currentPage, hasSelectedContractor, t]);
+  }, [serviceRequestId, currentPage, t]);
 
   useEffect(() => {
     if (serviceRequestDetail) {
@@ -210,6 +206,7 @@ export default function AdminServiceRequestDetail() {
         contractorApplicationID
       );
       setSelectedContractor(fullContractor);
+      setViewingContractorDetail(true);
 
       setTimeout(() => {
         contractorDetailRef.current?.scrollIntoView({
@@ -220,6 +217,11 @@ export default function AdminServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
+  };
+
+  // ===== HANDLE BACK TO LIST =====
+  const handleBackToList = () => {
+    setViewingContractorDetail(false);
   };
 
   // ===== INIT VENOBOX =====
@@ -457,11 +459,11 @@ export default function AdminServiceRequestDetail() {
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-xl font-bold text-gray-800">
-              {hasSelectedContractor
+              {viewingContractorDetail && selectedContractor
                 ? t('adminServiceRequestManager.contractorDetail.title')
                 : t('adminServiceRequestManager.listCandidate')}
             </h3>
-            {!hasSelectedContractor && (
+            {!viewingContractorDetail && (
               <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
                 {totalCount || 0}{' '}
                 {t('adminServiceRequestManager.totalCandidate')}
@@ -469,18 +471,16 @@ export default function AdminServiceRequestDetail() {
             )}
           </div>
 
-          {selectedContractor ? (
+          {viewingContractorDetail && selectedContractor ? (
             <>
-              {/* Back button - only show if not from server (user manually selected) */}
-              {serviceRequestDetail.status !== 'Closed' && (
-                <button
-                  onClick={() => setSelectedContractor(null)}
-                  className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
-                >
-                  <i className="fas fa-arrow-left"></i>
-                  <span>{t('BUTTON.Back')}</span>
-                </button>
-              )}
+              {/* Back button - always show when viewing detail */}
+              <button
+                onClick={handleBackToList}
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
+              >
+                <i className="fas fa-arrow-left"></i>
+                <span>{t('BUTTON.Back')}</span>
+              </button>
 
               <div ref={contractorDetailRef}>
                 <div>

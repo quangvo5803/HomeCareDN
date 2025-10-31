@@ -303,22 +303,7 @@ namespace BusinessLogic.Services
                         );
                     }
                 }
-                await _notifier.SendToGroupAsync(
-                    $"role_Admin",
-                    CONTRACTOR_APPLICATION_REJECT,
-                    new
-                    {
-                        contractorApplication.ContractorApplicationID,
-                        contractorApplication.ServiceRequestID,
-                        Status = ApplicationStatus.Rejected.ToString(),
-                    }
-                );
             }
-            await _notifier.SendToGroupAsync(
-                "role_Contractor",
-                "ServiceRequest.Closed",
-                new { serviceRequest.ServiceRequestID }
-            );
 
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
