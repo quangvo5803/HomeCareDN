@@ -71,22 +71,6 @@ namespace HomeCareDNAPI
                         ValidAudience = builder.Configuration["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                     };
-                    options.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = context =>
-                        {
-                            var accessToken = context.Request.Query["access_token"];
-                            var path = context.HttpContext.Request.Path;
-                            if (
-                                !string.IsNullOrEmpty(accessToken)
-                                && path.StartsWithSegments("/hubs/application")
-                            )
-                            {
-                                context.Token = accessToken;
-                            }
-                            return Task.CompletedTask;
-                        },
-                    };
                 });
             builder.Services.AddCors(options =>
             {
@@ -178,6 +162,7 @@ namespace HomeCareDNAPI
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+            app.UseWebSockets();
 
             app.UseRouting();
 
