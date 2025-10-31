@@ -18,8 +18,6 @@ namespace HomeCareDNAPI.Hubs
             if (!string.IsNullOrEmpty(role))
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"role_{role}");
 
-            Console.WriteLine($"Connected user {userId} in role {role}");
-
             await base.OnConnectedAsync();
         }
     }
