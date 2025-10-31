@@ -62,56 +62,34 @@ export default function ContractorServiceRequestDetail() {
 
   // Realtime SignalR
   useRealtime(user, 'Contractor', {
+    //Accept
     onAcceptedContractorApplication: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+      setServiceRequest((prev) => ({
+        ...prev,
+        status: 'Closed',
+      }));
       setExistingApplication((prev) => ({
         ...prev,
         status: 'PendingCommission',
         dueCommisionTime: payload?.dueCommisionTime || null,
       }));
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-                ...sr,
-                status: 'Closed',
-              }
-            : sr
-        )
-      );
     },
-    onRejectedContractorApplication: (payload) => {
+    //Reject
+    onRejectedContractorApplication: () => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',
       }));
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-                ...sr,
-                status: 'Closed',
-              }
-            : sr
-        )
-      );
-    },
-    onServiceRequestClosed: (payload) => {
-      if (payload?.serviceRequestID === serviceRequestId) {
-        setServiceRequests((prev) =>
-          prev.map((sr) =>
-            sr.serviceRequestID === payload.serviceRequestID
-              ? {
-                  ...sr,
-                  status: 'Closed',
-                }
-              : sr
-          )
-        );
-        setServiceRequest((prev) => ({
-          ...prev,
-          status: 'Closed',
-        }));
-      }
     },
   });
   // Load service request & existing application
