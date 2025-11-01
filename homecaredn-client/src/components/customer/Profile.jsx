@@ -9,6 +9,7 @@ import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
+import { useServiceRequest } from '../../hook/useServiceRequest';
 
 const emptyAddrForm = {
   id: null,
@@ -20,7 +21,7 @@ const emptyAddrForm = {
 
 export default function Profile({ user }) {
   const { t } = useTranslation();
-
+  const { serviceRequests } = useServiceRequest();
   const [form, setForm] = useState({
     fullName: '',
     phoneNumber: '',
@@ -211,6 +212,10 @@ export default function Profile({ user }) {
   };
 
   const deleteAddrItem = async (id) => {
+    if (serviceRequests.some((sr) => sr.addressId == id)) {
+      toast.error(t('ERROR.IN_USE_ADDRESS'));
+      return;
+    }
     showDeleteModal({
       t,
       titleKey: 'ModalPopup.DeleteAddressModal.title',
