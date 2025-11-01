@@ -84,7 +84,7 @@ export default function ServiceRequestManager() {
         return;
       }
       if (addresses.length == 0) {
-        toast.error('ERROR.REQUIRED_ADDRESS');
+        toast.error(t('ERROR.REQUIRED_ADDRESS'));
         return;
       }
       navigate('/Customer/ServiceRequest');
@@ -287,7 +287,7 @@ export default function ServiceRequestManager() {
                       <i className="fa-solid fa-location-dot text-orange-500"></i>
                       {t('userPage.serviceRequest.label_address')}
                       <span className="font-semibold">
-                        {req.address.detail}, {req.address.ward},{' '}
+                        {req.address?.detail}, {req.address.ward},{' '}
                         {req.address.district}, {req.address.city}
                       </span>
                     </div>
