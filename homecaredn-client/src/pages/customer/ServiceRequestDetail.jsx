@@ -110,16 +110,16 @@ export default function ServiceRequestDetail() {
         }
       });
     },
-    onPaymentUpdate: (payload) => {
+    onPaymentUpdate: async (payload) => {
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID
       ) {
-        setSelectedContractor((prev) => ({
-          ...prev,
-          status: 'Approved',
-          dueCommisionTime: null,
-        }));
+        const fullContractor =
+          await contractorApplicationService.getByIdForCustomer(
+            payload.contractorApplicationID
+          );
+        setSelectedContractor(fullContractor);
       }
     },
   });
@@ -219,8 +219,6 @@ export default function ServiceRequestDetail() {
   }, [serviceRequestId, getServiceRequestById, t]);
 
   const fetchContractors = useCallback(async () => {
-    // Don't fetch list if contractor already selected
-    if (hasSelectedContractor) return;
     try {
       const res = await contractorApplicationService.getAllForCustomer({
         PageNumber: currentApplicationPage,
@@ -232,13 +230,7 @@ export default function ServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  }, [
-    serviceRequestId,
-    t,
-    pageSize,
-    currentApplicationPage,
-    hasSelectedContractor,
-  ]);
+  }, [serviceRequestId, t, pageSize, currentApplicationPage]);
 
   const handleSelectContractor = async (c) => {
     try {
