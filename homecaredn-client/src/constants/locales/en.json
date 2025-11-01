@@ -1065,6 +1065,8 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
+    "IN_USE_ADDRESS":"This address is in use and cannot be deleted!",
+
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
