@@ -5,7 +5,6 @@ import {
   LogLevel,
   HttpTransportType,
 } from '@microsoft/signalr';
-import { toast } from 'react-toastify';
 import { useAuth } from '../hook/useAuth';
 import RealtimeContext from './RealtimeContext';
 
@@ -51,10 +50,9 @@ export const RealtimeProvider = ({ children }) => {
       try {
         await connection.start();
         if (!isCancelled) setConnectionState('connected');
-      } catch (err) {
+      } catch {
         if (!isCancelled) {
           setConnectionState('error');
-          toast.error(`SignalR connection failed: ${err.message}`);
         }
       }
     };
