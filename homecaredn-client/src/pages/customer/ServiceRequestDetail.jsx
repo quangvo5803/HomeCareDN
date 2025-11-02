@@ -11,8 +11,8 @@ import { toast } from 'react-toastify';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
 import StatusBadge from '../../components/StatusBadge';
 import { Pagination } from 'antd';
-import useRealtime from '../../hook/useRealtime';
-import { useAuth } from '../../hook/useAuth';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import he from 'he';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
@@ -37,13 +37,11 @@ export default function ServiceRequestDetail() {
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
 
-  const { user } = useAuth();
-
   const hasSelectedContractor = Boolean(selectedContractor);
 
   // Use realtime
-  useRealtime(user, 'Customer', {
-    onNewContractorApplication: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -69,7 +67,7 @@ export default function ServiceRequestDetail() {
         setTotalCount((prev) => prev + 1);
       }
     },
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
       );
@@ -89,7 +87,7 @@ export default function ServiceRequestDetail() {
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -110,7 +108,7 @@ export default function ServiceRequestDetail() {
         }
       });
     },
-    onPaymentUpdate: async (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: async (payload) => {
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID

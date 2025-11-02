@@ -19,8 +19,8 @@ import { paymentService } from '../../services/paymentService';
 import PaymentSuccessModal from '../../components/modal/PaymentSuccessModal';
 import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
-import useRealtime from '../../hook/useRealtime';
-
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
 import 'tinymce/tinymce';
@@ -61,9 +61,9 @@ export default function ContractorServiceRequestDetail() {
   const chatEndRef = useRef(null);
 
   // Realtime SignalR
-  useRealtime(user, 'Contractor', {
+  useRealtime({
     //Accept
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -85,7 +85,7 @@ export default function ContractorServiceRequestDetail() {
       }));
     },
     //Reject
-    onRejectedContractorApplication: () => {
+    [RealtimeEvents.ContractorApplicationRejected]: () => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',
