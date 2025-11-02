@@ -5,7 +5,6 @@ import {
   LogLevel,
   HttpTransportType,
 } from '@microsoft/signalr';
-import { toast } from 'react-toastify';
 import { useAuth } from '../hook/useAuth';
 import RealtimeContext from './RealtimeContext';
 
@@ -15,8 +14,10 @@ export const RealtimeProvider = ({ children }) => {
   const [connectionState, setConnectionState] = useState('disconnected');
 
   useEffect(() => {
+    let isCancelled = false;
+
+    // Nếu chưa đăng nhập thì ngắt kết nối
     if (!user?.id) {
-      // Khi logout -> ngắt kết nối
       if (connectionRef.current) {
         connectionRef.current.stop();
         connectionRef.current = null;
@@ -25,7 +26,7 @@ export const RealtimeProvider = ({ children }) => {
       return;
     }
 
-    // Nếu đã có connection rồi thì không tạo lại
+    // Nếu đã có connection thì không tạo lại
     if (connectionRef.current) return;
 
     const connection = new HubConnectionBuilder()
@@ -44,22 +45,32 @@ export const RealtimeProvider = ({ children }) => {
 
     connectionRef.current = connection;
 
-    connection
-      .start()
-      .then(() => setConnectionState('connected'))
-      .catch((err) => {
-        setConnectionState('error');
-        toast.error(`SignalR connection failed: ${err.message}`);
-      });
+    // Dùng async function để tránh race condition
+    const startConnection = async () => {
+      try {
+        await connection.start();
+        if (!isCancelled) setConnectionState('connected');
+      } catch {
+        if (!isCancelled) {
+          setConnectionState('error');
+        }
+      }
+    };
+
+    startConnection();
 
     connection.onreconnecting(() => setConnectionState('reconnecting'));
     connection.onreconnected(() => setConnectionState('connected'));
     connection.onclose(() => setConnectionState('disconnected'));
 
+    // Cleanup
     return () => {
-      connection.stop();
-      connectionRef.current = null;
-      setConnectionState('disconnected');
+      isCancelled = true;
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        connectionRef.current = null;
+        setConnectionState('disconnected');
+      }
     };
   }, [user]);
 
