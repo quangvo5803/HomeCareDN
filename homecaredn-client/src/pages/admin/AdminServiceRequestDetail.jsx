@@ -13,8 +13,8 @@ import VenoBox from 'venobox';
 import 'venobox/dist/venobox.min.css';
 import he from 'he';
 import Avatar from 'react-avatar';
-import useRealtime from '../../hook/useRealtime';
-import { useAuth } from '../../hook/useAuth';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
 export default function AdminServiceRequestDetail() {
@@ -24,7 +24,6 @@ export default function AdminServiceRequestDetail() {
   const contractorDetailRef = useRef(null);
 
   const { setServiceRequests, getServiceRequestById } = useServiceRequest();
-  const { user } = useAuth();
 
   const [serviceRequestDetail, setServiceRequestDetail] = useState(null);
   const [selectedContractor, setSelectedContractor] = useState(null);
@@ -39,8 +38,8 @@ export default function AdminServiceRequestDetail() {
   const [viewingContractorDetail, setViewingContractorDetail] = useState(false);
 
   // Realtime updates
-  useRealtime(user, 'Admin', {
-    onNewContractorApplication: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplicationList((prev) => {
           if (
@@ -57,7 +56,7 @@ export default function AdminServiceRequestDetail() {
       }
     },
 
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplicationList((prev) =>
           prev.filter(
@@ -79,7 +78,7 @@ export default function AdminServiceRequestDetail() {
       }
     },
 
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -117,7 +116,7 @@ export default function AdminServiceRequestDetail() {
       }
     },
 
-    onRejectedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
         // Update contractor list
         setContractorApplicationList((prev) =>
@@ -140,7 +139,7 @@ export default function AdminServiceRequestDetail() {
       }
     },
 
-    onPaymentUpdate: (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID
