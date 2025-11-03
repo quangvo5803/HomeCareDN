@@ -81,7 +81,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 cursor-pointer"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
@@ -194,7 +194,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
 
         {/* Footer */}
         <div className="flex items-center justify-end p-6 border-t bg-gray-50 gap-2">
-          <button onClick={onClose} className="px-4 py-2 rounded-lg border">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border cursor-pointer">
             {t('BUTTON.Close', 'Close')}
           </button>
 
@@ -202,13 +202,13 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
             <>
               <button
                 onClick={() => handleSubmit('reject')}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 cursor-pointer"
               >
                 {t('BUTTON.Reject')}
               </button>
               <button
                 onClick={() => handleSubmit('approve')}
-                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+                className="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 cursor-pointer"
               >
                 {t('BUTTON.Approve')}
               </button>

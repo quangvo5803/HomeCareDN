@@ -740,7 +740,7 @@
     "listCandidate": "Danh sách nhà thầu",
     "totalCandidate": "nhà thầu",
     "viewProfile": "Xem hồ sơ",
-    "empty": "Không có yêu cầu dịch vụ nào",
+    "empty": "Chưa có yêu cầu dịch vụ nào",
     "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi.",
     "noContractor": "Chưa có nhà thầu nào",
     "noContractorYet": "Chưa có nhà thầu nào đăng ký.",
@@ -1036,10 +1036,10 @@
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ!",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhấ!",
     "REQUIRED_SERVICE_TYPE": "Vui lòng chọn loại dịch vụ!",
-    "REQUIRED_PACKAGE_OPTION":"Vui lòng chọn gọi dịch vụ!",
+    "REQUIRED_PACKAGE_OPTION": "Vui lòng chọn gọi dịch vụ!",
     "REQUIRED_BUILDING_TYPE": "Vui lòng chọn loại công trình!",
     "REQUIRED_STRUCTURE_TYPE": "Vui lòng chọn kết cấu chính!",
-    
+
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",

@@ -17,7 +17,7 @@ export default function PaymentSuccessModal({ open, onClose }) {
         </p>
         <button
           onClick={onClose}
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 cursor-pointer"
         >
           {t('BUTTON.Close')}
         </button>

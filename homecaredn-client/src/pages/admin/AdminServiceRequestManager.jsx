@@ -159,10 +159,10 @@ export default function ServiceRequest() {
                                                 <div className="flex flex-col items-center mt-5 mb-5">
                                                     <i className="text-4xl mb-2 mt-2 fa-solid fa-clipboard-list"></i>
                                                     <h3 className="mb-1 text-lg font-medium text-gray-900">
-                                                        {t('adminPartnerManager.empty')}
+                                                        {t('adminServiceRequestManager.empty')}
                                                     </h3>
                                                     <p className="text-gray-500">
-                                                        {t('adminPartnerManager.empty_description')}
+                                                        {t('adminServiceRequestManager.empty_description')}
                                                     </p>
                                                 </div>
                                             </td>

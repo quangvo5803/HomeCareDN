@@ -66,7 +66,7 @@ export default function SupportModal({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
+            className="text-gray-500 hover:text-gray-700 cursor-pointer"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
@@ -127,14 +127,14 @@ export default function SupportModal({
         <div className="flex justify-end p-4 border-t bg-gray-50 gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border text-gray-700 hover:bg-gray-100"
+            className="px-4 py-2 rounded-lg border text-gray-700 hover:bg-gray-100 cursor-pointer"
           >
             {t('BUTTON.Close')}
           </button>
           {!support?.isProcessed && (
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
             >
               {t('BUTTON.Send')}
             </button>

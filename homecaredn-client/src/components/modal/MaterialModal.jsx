@@ -232,7 +232,7 @@ export default function MaterialModal({
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100"
+            className="p-2 text-gray-400 transition-colors duration-200 rounded-full hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
           >
             <i className="text-lg fa-solid fa-xmark"></i>
           </button>
@@ -356,7 +356,7 @@ export default function MaterialModal({
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700"
+                  className="flex items-center gap-2 mb-3 text-sm font-medium text-gray-700 cursor-pointer"
                 >
                   <i className="fas fa-globe text-emerald-500"></i>
                   {t(
@@ -441,7 +441,7 @@ export default function MaterialModal({
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(img)}
-                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
                           >
                             <i className="fa-solid fa-xmark"></i>
                           </button>
@@ -467,8 +467,8 @@ export default function MaterialModal({
                   <span className="ml-3 text-sm text-gray-500">
                     {images.filter((i) => i.isNew).length > 0
                       ? `${images.filter((i) => i.isNew).length} ${t(
-                          'distributorMaterialManager.materialModal.filesSelected'
-                        )}`
+                        'distributorMaterialManager.materialModal.filesSelected'
+                      )}`
                       : t('distributorMaterialManager.materialModal.noFile')}
                   </span>
                 </div>
@@ -482,7 +482,7 @@ export default function MaterialModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 font-medium text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300"
+            className="px-6 py-2 font-medium text-gray-700 bg-gray-200 rounded-xl hover:bg-gray-300 cursor-pointer"
           >
             {t('BUTTON.Cancel')}
           </button>
@@ -490,7 +490,7 @@ export default function MaterialModal({
             <button
               type="button"
               onClick={handleSubmit}
-              className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600"
+              className="px-6 py-2 font-medium text-white bg-emerald-500 rounded-xl hover:bg-emerald-600 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
               disabled={
                 !name.trim() ||
                 !unit.trim() ||
