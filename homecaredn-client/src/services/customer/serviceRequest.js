@@ -27,22 +27,6 @@ const buildServiceRequestFormData = (serviceRequest) => {
   appendIf(formData, 'EstimatePrice', serviceRequest.EstimatePrice);
   appendIf(formData, 'Description', serviceRequest.Description);
 
-  // 🔹 Images từ cloud (string list)
-<<<<<<< HEAD:homecaredn-client/src/services/serviceRequestService.js
-  (serviceRequest.ImageUrls || []).forEach((url) =>
-    formData.append('ImageUrls', url)
-  );
-  (serviceRequest.ImagePublicIds || []).forEach((id) =>
-    formData.append('ImagePublicIds', id)
-  );
-  // 🔹 Documents từ cloud (string list)
-  (serviceRequest.DocumentUrls || []).forEach((url) =>
-    formData.append('DocumentUrls', url)
-  );
-  (serviceRequest.DocumentPublicIds || []).forEach((id) =>
-    formData.append('DocumentPublicIds', id)
-  );
-=======
   for (const url of serviceRequest.ImageUrls || []) {
     formData.append('ImageUrls', url);
   }
@@ -50,7 +34,14 @@ const buildServiceRequestFormData = (serviceRequest) => {
   for (const id of serviceRequest.ImagePublicIds || []) {
     formData.append('ImagePublicIds', id);
   }
->>>>>>> develop:homecaredn-client/src/services/customer/serviceRequest.js
+
+  for (const url of serviceRequest.DocumentUrls || []) {
+    formData.append('DocumentUrls', url);
+  }
+
+  for (const id of serviceRequest.DocumentPublicIds || []) {
+    formData.append('DocumentPublicIds', id);
+  }
 
   return formData;
 };

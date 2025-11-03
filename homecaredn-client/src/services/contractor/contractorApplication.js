@@ -42,10 +42,6 @@ const buildContractorFormData = (contractor) => {
 
   return formData;
 };
-<<<<<<< HEAD:homecaredn-client/src/services/contractorApplicationService.js
-
-export const contractorApplicationService = {
-=======
 export const contractorApplication = {
   // Contractor Service Request
   getAllServiceRequest: async (params = {}) => {
@@ -58,7 +54,6 @@ export const contractorApplication = {
     return res.data;
   },
   ///Contractor Application
->>>>>>> develop:homecaredn-client/src/services/contractor/constactorApplication.js
   createContractorApplication: async (contractorData) => {
     const formData = buildContractorFormData(contractorData);
     const response = await api.post(
