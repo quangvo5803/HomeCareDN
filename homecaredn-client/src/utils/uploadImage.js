@@ -1,4 +1,5 @@
 import axios from 'axios';
+import imageCompression from 'browser-image-compression';
 
 export const uploadImageToCloudinary = async (
   files,
@@ -8,27 +9,29 @@ export const uploadImageToCloudinary = async (
 ) => {
   if (!files) throw new Error('No file provided');
 
-  // Nếu chỉ là 1 file thì convert thành mảng
   const fileArray = Array.isArray(files) ? files : [files];
 
-  const MAX_SIZE = 5 * 1024 * 1024;
-  const oversizedFile = fileArray.find((f) => f.size > MAX_SIZE);
-  if (oversizedFile) {
-    const error = new Error('ERROR.MAXIMUM_IMAGE_SIZE');
-    error.code = 'ERROR.MAXIMUM_IMAGE_SIZE';
-    throw error;
-  }
-
-  const totalSize = fileArray.reduce((sum, f) => sum + f.size, 0);
+  const totalSizeBefore = fileArray.reduce((sum, f) => sum + f.size, 0);
   let uploadedBytes = 0;
 
-  const uploadPromises = fileArray.map((file) => {
+  // Hàm nén ảnh
+  const compressFile = async (file) => {
+    return await imageCompression(file, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    });
+  };
+
+  const uploadPromises = fileArray.map(async (file) => {
+    const compressedFile = await compressFile(file);
+
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', compressedFile);
     formData.append('upload_preset', uploadPreset);
     if (folder) formData.append('folder', folder);
 
-    return axios.post(
+    const res = await axios.post(
       `https://api.cloudinary.com/v1_1/${
         import.meta.env.VITE_CLOUDINARY_CLOUD_NAME
       }/image/upload`,
@@ -43,23 +46,19 @@ export const uploadImageToCloudinary = async (
             uploadedBytes += fileProgress;
             const percent = Math.min(
               100,
-              Math.round((uploadedBytes * 100) / totalSize)
+              Math.round((uploadedBytes * 100) / totalSizeBefore)
             );
             onProgress(percent);
           }
         },
       }
     );
+
+    return { url: res.data.secure_url, publicId: res.data.public_id };
   });
 
   try {
-    const responses = await Promise.all(uploadPromises);
-
-    const results = responses.map((res) => ({
-      url: res.data.secure_url,
-      publicId: res.data.public_id,
-    }));
-
+    const results = await Promise.all(uploadPromises);
     return Array.isArray(files) ? results : results[0];
   } catch (error) {
     console.error('Upload to Cloudinary failed:', error);

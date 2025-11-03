@@ -86,8 +86,8 @@ namespace DataAccess.Migrations.Authorize
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("Gender")
-                        .HasColumnType("integer");
+                    b.Property<string>("Gender")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("LastOTPSentAt")
                         .HasColumnType("timestamp with time zone");

@@ -1,22 +1,22 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { customerService } from '../services/customerService';
+import { addressService } from '../services/addressService';
 import { useAuth } from '../hook/useAuth';
 import AddressContext from './AddressContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
+import { withMinLoading } from '../utils/withMinLoading';
 import PropTypes from 'prop-types';
 
 export const AddressProvider = ({ children }) => {
   const { user } = useAuth();
   const [addresses, setAddresses] = useState([]);
-  const [totalAddressess, setTotalAddresses] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [totalAddresses, setTotalAddresses] = useState(0);
+  const [loading, setLoading] = useState(false); // chỉ dùng cho fetch
 
-  // 📌 Public: fetch all address
-  const fetchAddresses = useCallback(async () => {
+  // 📌 Fetch addresses (min loading để tránh giật UI)
+  const executeFetch = useCallback(async () => {
     try {
-      setLoading(true);
-      const data = await customerService.address.getUserAddress(user.id);
+      const data = await addressService.getAll(user.id);
       setAddresses(data || []);
       setTotalAddresses(data.length || 0);
       return data;
@@ -25,51 +25,53 @@ export const AddressProvider = ({ children }) => {
       setAddresses([]);
       setTotalAddresses(0);
       return [];
-    } finally {
-      setLoading(false);
     }
   }, [user]);
 
+  const fetchAddresses = useCallback(async () => {
+    return await withMinLoading(() => executeFetch(), setLoading);
+  }, [executeFetch]);
+
+  // 📌 Create address (component tự quản lý loading)
   const createAddress = useCallback(async (dto) => {
     try {
-      const newAddres = await customerService.address.createAddress(dto);
-      setAddresses((prev) => [...prev, newAddres]);
-      // Tăng tổng số address
+      const newAddress = await addressService.create(dto);
+      setAddresses((prev) => [...prev, newAddress]);
       setTotalAddresses((prev) => prev + 1);
-      return newAddres;
+      return newAddress;
     } catch (err) {
       toast.error(handleApiError(err));
       throw err;
     }
   }, []);
 
+  // 📌 Update address
   const updateAddress = useCallback(async (dto) => {
     try {
-      setLoading(true);
-      const updated = await customerService.address.updateAddress(dto);
-      // Optimistic update
+      const updated = await addressService.update(dto);
       setAddresses((prev) =>
         prev.map((a) => (a.addressID === dto.AddressId ? updated : a))
       );
+      return updated;
     } catch (err) {
       toast.error(handleApiError(err));
       throw err;
-    } finally {
-      setLoading(false);
     }
   }, []);
 
+  // 📌 Delete address
   const deleteAddress = useCallback(async (id) => {
     try {
-      await customerService.address.deleteAddress(id);
-      // Xoá khỏi local
+      await addressService.delete(id);
       setAddresses((prev) => prev.filter((a) => a.addressID !== id));
-      setTotalAddresses((prev) => prev - 1);
+      setTotalAddresses((prev) => Math.max(0, prev - 1));
     } catch (err) {
       toast.error(handleApiError(err));
       throw err;
     }
   }, []);
+
+  // 📌 Auto-fetch khi user thay đổi
   useEffect(() => {
     if (!user) {
       setAddresses([]);
@@ -84,8 +86,8 @@ export const AddressProvider = ({ children }) => {
   const contextValue = useMemo(
     () => ({
       addresses,
-      totalAddressess,
-      loading,
+      totalAddresses,
+      loading, // chỉ dùng cho fetch
       fetchAddresses,
       createAddress,
       updateAddress,
@@ -93,7 +95,7 @@ export const AddressProvider = ({ children }) => {
     }),
     [
       addresses,
-      totalAddressess,
+      totalAddresses,
       loading,
       fetchAddresses,
       createAddress,

@@ -7,12 +7,15 @@ namespace BusinessLogic.Services.Interfaces
     {
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
             QueryParameters parameters,
-            bool isContractor = false
+            string role = "Admin"
         );
         Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestByUserIdAsync(
             QueryParameters parameters
         );
-        Task<ServiceRequestDto> GetServiceRequestByIdAsync(Guid id, bool isContractor = false);
+        Task<ServiceRequestDto> GetServiceRequestByIdAsync(
+            ServiceRequestGetByIdDto getByIdDto,
+            string role = "Admin"
+        );
         Task<ServiceRequestDto> CreateServiceRequestAsync(
             ServiceRequestCreateRequestDto createRequestDto
         );

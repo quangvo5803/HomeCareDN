@@ -19,7 +19,7 @@ namespace DataAccess.Entities.Application
 
         public double Width { get; set; }
         public double Length { get; set; }
-        public int Floors { get; set; }
+        public int Floors { get; set; } = 1;
         public double? EstimatePrice { get; set; }
         public required string Description { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { authService } from '../services/auth/authService';
+import { authService } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import { toast } from 'react-toastify';

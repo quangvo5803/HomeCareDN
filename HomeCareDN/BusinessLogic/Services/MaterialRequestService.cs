@@ -28,7 +28,8 @@ namespace BusinessLogic.Services
         }
 
         public async Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
-            QueryParameters parameters
+            QueryParameters parameters,
+            string role = "Admin"
         )
         {
             var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
@@ -111,7 +112,10 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-        public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(Guid materialRequestID)
+        public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(
+            Guid materialRequestID,
+            string role = "Admin"
+        )
         {
             var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
                 m => m.MaterialRequestID == materialRequestID,

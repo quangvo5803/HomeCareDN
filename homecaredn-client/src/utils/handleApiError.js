@@ -4,6 +4,9 @@ export const handleApiError = (
   err,
   defaultMsg = 'Có lỗi xảy ra, vui lòng thử lại'
 ) => {
+  // 🛑 Nếu lỗi đã được interceptor xử lý (ví dụ lỗi mạng), bỏ qua
+  if (err?._handledByInterceptor) return null;
+
   let message = err?.response?.data?.message || err?.message || defaultMsg;
 
   if (err?.response?.data?.errors) {

@@ -1,4 +1,4 @@
-import api from './api';
+import api from '../services/public/api';
 
 export const aiChatService = {
   send: async (input) => {

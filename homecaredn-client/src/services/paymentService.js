@@ -1,6 +1,6 @@
-import api from './api';
+import api from './public/api';
 
-export const PaymentService = {
+export const paymentService = {
   createPayCommission: async (request) => {
     const response = await api.post(`/Payment/create-payment`, request);
     return response.data;

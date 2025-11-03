@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hook/useAuth';
 import ReactCountryFlag from 'react-country-flag';
+import Avatar from 'react-avatar';
 
 // Navigation data
 const navItems = [
@@ -165,12 +166,12 @@ export default function Header() {
                     aria-expanded={openAvatarMenu}
                     title={t('partnerDashboard.account')}
                   >
-                    <img
-                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                        user.email || 'User'
-                      )}&background=random`}
-                      alt="avatar"
+                    <Avatar
+                      name={user?.email || 'User'}
+                      round={true}
+                      size="100%"
                       className="object-cover w-full h-full"
+                      color="orange"
                     />
                   </button>
                   {openAvatarMenu && (

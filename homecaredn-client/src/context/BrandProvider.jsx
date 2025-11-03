@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { publicService } from '../services/publicService';
-import { adminService } from '../services/adminService';
+import { brandService } from '../services/brandService';
 import BrandContext from './BrandContext';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -10,11 +9,12 @@ import { useTranslation } from 'react-i18next';
 
 export const BrandProvider = ({ children }) => {
   const { t } = useTranslation();
+
   const [brands, setBrands] = useState([]);
   const [totalBrands, setTotalBrands] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // chỉ dùng cho fetch
 
-  // 📌 Fetch brands (có min loading)
+  // 📌 Fetch brands (có min loading để UX mượt)
   const executeFetch = async ({
     PageNumber = 1,
     PageSize = 10,
@@ -22,7 +22,7 @@ export const BrandProvider = ({ children }) => {
     Search,
   } = {}) => {
     try {
-      const data = await publicService.brand.getAllBrands({
+      const data = await brandService.getAll({
         PageNumber,
         PageSize,
         SortBy,
@@ -44,10 +44,7 @@ export const BrandProvider = ({ children }) => {
   // 📌 Fetch all brands (dropdown)
   const executeFetchAllBrands = async () => {
     try {
-      const data = await publicService.brand.getAllBrands({
-        PageNumber: 1,
-        PageSize: 9999,
-      });
+      const data = await brandService.getAll({ PageNumber: 1, PageSize: 9999 });
       return data.items || [];
     } catch (err) {
       toast.error(handleApiError(err));
@@ -59,13 +56,13 @@ export const BrandProvider = ({ children }) => {
     return await withMinLoading(() => executeFetchAllBrands(), setLoading);
   }, []);
 
-  // 📌 Get by ID
+  // 📌 Get brand by ID
   const getBrandById = useCallback(
     async (id) => {
       try {
         const local = brands.find((b) => b.brandID === id);
         if (local) return local;
-        return await publicService.brand.getBrandById(id);
+        return await brandService.getById(id);
       } catch (err) {
         toast.error(handleApiError(err));
         return null;
@@ -74,12 +71,11 @@ export const BrandProvider = ({ children }) => {
     [brands]
   );
 
-  // 📌 Create brand (no min loading)
+  // 📌 Create brand (component sẽ tự quản lý loading nếu cần)
   const createBrand = useCallback(
     async (dto) => {
       try {
-        setLoading(true);
-        const newBrand = await adminService.brand.createBrand(dto);
+        const newBrand = await brandService.create(dto);
         setBrands((prev) => [...prev, newBrand]);
         setTotalBrands((prev) => prev + 1);
         toast.success(t('SUCCESS.BRAND_ADD'));
@@ -87,19 +83,16 @@ export const BrandProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     [t]
   );
 
-  // 📌 Update brand (no min loading)
+  // 📌 Update brand
   const updateBrand = useCallback(
     async (dto) => {
       try {
-        setLoading(true);
-        const updated = await adminService.brand.updateBrand(dto);
+        const updated = await brandService.update(dto);
         setBrands((prev) =>
           prev.map((b) => (b.brandID === dto.BrandID ? updated : b))
         );
@@ -108,17 +101,15 @@ export const BrandProvider = ({ children }) => {
       } catch (err) {
         toast.error(handleApiError(err));
         throw err;
-      } finally {
-        setLoading(false);
       }
     },
     [t]
   );
 
-  // 📌 Delete brand (no loading overlay)
+  // 📌 Delete brand
   const deleteBrand = useCallback(async (id) => {
     try {
-      await adminService.brand.deleteBrand(id);
+      await brandService.delete(id);
       setBrands((prev) => prev.filter((b) => b.brandID !== id));
       setTotalBrands((prev) => Math.max(0, prev - 1));
     } catch (err) {
@@ -131,7 +122,7 @@ export const BrandProvider = ({ children }) => {
     () => ({
       brands,
       totalBrands,
-      loading,
+      loading, // chỉ dùng cho fetch
       fetchBrands,
       fetchAllBrands,
       getBrandById,

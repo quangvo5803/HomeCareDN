@@ -1,5 +1,6 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
+using System.Text.Json.Serialization;
+using BusinessLogic.Mapping;
 using BusinessLogic.Services;
 using BusinessLogic.Services.FacadeService;
 using BusinessLogic.Services.FacadeService.Dependencies;
@@ -9,12 +10,14 @@ using DataAccess.Entities.Authorize;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.UnitOfWork;
-using HomeCareDNAPI.Mapping;
+using HomeCareDNAPI.Hubs;
+using HomeCareDNAPI.Realtime;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
+using StackExchange.Redis;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -31,7 +34,12 @@ namespace HomeCareDNAPI
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder
+                .Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -71,7 +79,11 @@ namespace HomeCareDNAPI
                     policy =>
                     {
                         policy
-                            .WithOrigins("http://localhost:5173", "https://homecaredn.onrender.com") // domain React
+                            .WithOrigins(
+                                "http://localhost:5173",
+                                "https://homecaredn.onrender.com",
+                                "https://home-care-dn.vercel.app"
+                            ) // domain React
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // nếu dùng cookie/session
@@ -81,6 +93,9 @@ namespace HomeCareDNAPI
 
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddSignalR();
+
+            builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             /// Register Options
             ///
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
@@ -147,6 +162,7 @@ namespace HomeCareDNAPI
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+            app.UseWebSockets();
 
             app.UseRouting();
 
@@ -157,6 +173,7 @@ namespace HomeCareDNAPI
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<ApplicationHub>("/hubs/application");
 
             app.Run();
         }
