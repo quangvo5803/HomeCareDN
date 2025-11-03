@@ -126,7 +126,7 @@ export default function CommissionCountdown({
                   {timeLeft[unit]}
                 </span>
                 <span className="text-xs text-gray-500">
-                  {t(`time.${unit}`)}
+                  {t(`commission.${unit}`)}
                 </span>
               </div>
             ))}

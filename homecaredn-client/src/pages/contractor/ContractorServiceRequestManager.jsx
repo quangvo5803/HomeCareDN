@@ -7,8 +7,8 @@ import { formatVND, formatDate } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/StatusBadge';
 import { useAuth } from '../../hook/useAuth';
-import useRealtime from '../../hook/useRealtime';
-
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 export default function ContractorServiceRequestManager() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -28,8 +28,8 @@ export default function ContractorServiceRequestManager() {
   } = useServiceRequest();
 
   //Realtime
-  useRealtime(user, 'Contractor', {
-    onNewServiceRequest: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ServiceRequestCreated]: (payload) => {
       setServiceRequests((prev) => {
         if (prev.some((r) => r.serviceRequestID === payload.serviceRequestID)) {
           return prev; // tránh duplicate
@@ -38,13 +38,13 @@ export default function ContractorServiceRequestManager() {
       });
       setTotalServiceRequests((prev) => prev + 1);
     },
-    onDeleteServiceRequest: (payload) => {
+    [RealtimeEvents.ServiceRequestDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
       );
       setTotalServiceRequests((prev) => Math.max(0, prev - 1));
     },
-    onServiceRequestClosed: (payload) => {
+    [RealtimeEvents.ServiceRequestClosed]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID

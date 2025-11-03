@@ -7,7 +7,8 @@ import { Pagination } from 'antd';
 import { formatVND } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/StatusBadge';
-import useRealtime from '../../hook/useRealtime';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useAuth } from '../../hook/useAuth';
 
 export default function ServiceRequest() {
@@ -29,8 +30,8 @@ export default function ServiceRequest() {
     loading,
     serviceRequests,
   } = useServiceRequest();
-  useRealtime(user, 'Admin', {
-    onNewServiceRequest: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ServiceRequestCreated]: (payload) => {
       setServiceRequests((prev) => {
         if (prev.some((r) => r.serviceRequestID === payload.serviceRequestID)) {
           return prev; // tránh duplicate
@@ -39,13 +40,13 @@ export default function ServiceRequest() {
       });
       setTotalServiceRequests((prev) => prev + 1);
     },
-    onDeleteServiceRequest: (payload) => {
+    [RealtimeEvents.ServiceRequestDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
       );
       setTotalServiceRequests((prev) => Math.max(0, prev - 1));
     },
-    onNewContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -57,7 +58,7 @@ export default function ServiceRequest() {
         )
       );
     },
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -69,7 +70,7 @@ export default function ServiceRequest() {
         )
       );
     },
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -86,7 +87,7 @@ export default function ServiceRequest() {
     },
 
     // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
-    onPaymentUpdate: (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID

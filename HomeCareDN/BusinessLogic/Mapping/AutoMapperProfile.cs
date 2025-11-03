@@ -320,6 +320,7 @@ namespace BusinessLogic.Mapping
             CreateMap<PartnerRequestType, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<RequestStatus, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<Gender, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

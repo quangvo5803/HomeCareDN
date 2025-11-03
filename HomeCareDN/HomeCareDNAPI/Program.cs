@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
+using StackExchange.Redis;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -78,7 +79,11 @@ namespace HomeCareDNAPI
                     policy =>
                     {
                         policy
-                            .WithOrigins("http://localhost:5173", "https://homecaredn.onrender.com") // domain React
+                            .WithOrigins(
+                                "http://localhost:5173",
+                                "https://homecaredn.onrender.com",
+                                "https://home-care-dn.vercel.app"
+                            ) // domain React
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // nếu dùng cookie/session
@@ -87,7 +92,9 @@ namespace HomeCareDNAPI
             });
 
             builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddSignalR();
+
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             /// Register Options
             ///
@@ -155,6 +162,7 @@ namespace HomeCareDNAPI
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();
+            app.UseWebSockets();
 
             app.UseRouting();
 

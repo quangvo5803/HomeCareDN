@@ -19,8 +19,8 @@ import { paymentService } from '../../services/paymentService';
 import PaymentSuccessModal from '../../components/modal/PaymentSuccessModal';
 import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
-import useRealtime from '../../hook/useRealtime';
-
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
 import 'tinymce/tinymce';
@@ -61,57 +61,35 @@ export default function ContractorServiceRequestDetail() {
   const chatEndRef = useRef(null);
 
   // Realtime SignalR
-  useRealtime(user, 'Contractor', {
-    onAcceptedContractorApplication: (payload) => {
+  useRealtime({
+    //Accept
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+      setServiceRequest((prev) => ({
+        ...prev,
+        status: 'Closed',
+      }));
       setExistingApplication((prev) => ({
         ...prev,
         status: 'PendingCommission',
         dueCommisionTime: payload?.dueCommisionTime || null,
       }));
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-                ...sr,
-                status: 'Closed',
-              }
-            : sr
-        )
-      );
     },
-    onRejectedContractorApplication: (payload) => {
+    //Reject
+    [RealtimeEvents.ContractorApplicationRejected]: () => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',
       }));
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-                ...sr,
-                status: 'Closed',
-              }
-            : sr
-        )
-      );
-    },
-    onServiceRequestClosed: (payload) => {
-      if (payload?.serviceRequestID === serviceRequestId) {
-        setServiceRequests((prev) =>
-          prev.map((sr) =>
-            sr.serviceRequestID === payload.serviceRequestID
-              ? {
-                  ...sr,
-                  status: 'Closed',
-                }
-              : sr
-          )
-        );
-        setServiceRequest((prev) => ({
-          ...prev,
-          status: 'Closed',
-        }));
-      }
     },
   });
   // Load service request & existing application
