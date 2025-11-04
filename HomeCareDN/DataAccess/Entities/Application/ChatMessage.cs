@@ -10,21 +10,23 @@ namespace DataAccess.Entities.Application
 {
     public class ChatMessage
     {
-        [Key] 
-        public Guid ChatMessageId { get; set; }
-        [Required] 
-        public Guid ConversationId { get; set; }
+        [Key]
+        public Guid ChatMessageID { get; set; }
 
-        [ForeignKey(nameof(ConversationId))]
+        [Required]
+        public Guid ConversationID { get; set; }
+
+        [ForeignKey(nameof(ConversationID))]
         public Conversation? Conversation { get; set; }
 
-        [Required] 
-        public string SenderId { get; set; } = null!;
-        [Required] 
-        public string ReceiverId { get; set; } = null!;
-        [Required] 
+        [Required]
+        public string SenderID { get; set; } = null!;
+
+        [Required]
+        public string ReceiverID { get; set; } = null!;
+
+        [Required]
         public string Content { get; set; } = "";
-        public bool IsRead { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
     }
 }

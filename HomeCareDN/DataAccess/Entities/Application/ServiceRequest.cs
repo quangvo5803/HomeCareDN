@@ -30,7 +30,7 @@ namespace DataAccess.Entities.Application
         public ContractorApplication? SelectedContractorApplication { get; set; }
         public ICollection<Image>? Images { get; set; }
         public ICollection<Document>? Documents { get; set; }
-
+        public ICollection<Conversation>? Conversations { get; set; }
         public ICollection<ContractorApplication>? ContractorApplications { get; set; }
     }
 }

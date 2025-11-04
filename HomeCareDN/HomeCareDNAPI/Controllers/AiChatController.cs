@@ -9,11 +9,11 @@ namespace HomeCareDNAPI.Controllers
     [ApiController]
     public class AiChatController : ControllerBase
     {
-        private readonly IFacadeService _facade;
+        private readonly IFacadeService _facadeService;
 
-        public AiChatController(IFacadeService facade)
+        public AiChatController(IFacadeService facadeService)
         {
-            _facade = facade;
+            _facadeService = facadeService;
         }
 
         [HttpPost("send")]
@@ -22,7 +22,7 @@ namespace HomeCareDNAPI.Controllers
         {
             if (string.IsNullOrWhiteSpace(dto.Prompt))
                 return BadRequest("PROMPT_REQUIRED");
-            var result = await _facade.AiChatService.SendAsync(dto);
+            var result = await _facadeService.AiChatService.SendAsync(dto);
             return Ok(result);
         }
 
@@ -30,7 +30,7 @@ namespace HomeCareDNAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> History()
         {
-            var history = await _facade.AiChatService.GetHistoryAsync();
+            var history = await _facadeService.AiChatService.GetHistoryAsync();
             return Ok(history);
         }
 
@@ -38,7 +38,7 @@ namespace HomeCareDNAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Clear()
         {
-            await _facade.AiChatService.ClearHistoryAsync();
+            await _facadeService.AiChatService.ClearHistoryAsync();
             return NoContent();
         }
     }

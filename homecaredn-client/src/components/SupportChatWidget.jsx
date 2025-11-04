@@ -1,18 +1,18 @@
 // src/components/SupportChatWidget.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { useTranslation } from "react-i18next";
-import { aiChatService } from "../services/aiChatService";
-import { getSupportPrompt } from "../prompts/supportPrompt";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
+import { aiChatService } from '../services/aiChatService';
+import { getSupportPrompt } from '../prompts/supportPrompt';
 
 /* ===== Helpers ===== */
-const ROLES = { USER: "user", BOT: "assistant" };
-const cn = (...xs) => xs.filter(Boolean).join(" ");
+const ROLES = { USER: 'user', BOT: 'assistant' };
+const cn = (...xs) => xs.filter(Boolean).join(' ');
 
 const uid = (() => {
   let seq = 0; // fallback đếm tăng dần để không đụng Math.random
   return () => {
-    const c = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+    const c = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
 
     // 1) Tốt nhất: UUID v4 native (Node >= 16.15 / Browser hiện đại)
     if (c?.randomUUID) return c.randomUUID();
@@ -24,8 +24,13 @@ const uid = (() => {
       // set version & variant cho UUID v4
       bytes[6] = (bytes[6] & 0x0f) | 0x40;
       bytes[8] = (bytes[8] & 0x3f) | 0x80;
-      const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
-      return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+      const hex = Array.from(bytes, (b) =>
+        b.toString(16).padStart(2, '0')
+      ).join('');
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(
+        12,
+        16
+      )}-${hex.slice(16, 20)}-${hex.slice(20)}`;
     }
 
     // 3) Fallback cuối (môi trường rất cũ/không có crypto): không ngẫu nhiên,
@@ -37,8 +42,8 @@ const uid = (() => {
 
 const toUiMessage = (m) => ({
   id: uid(),
-  role: m.role === "assistant" ? ROLES.BOT : ROLES.USER,
-  text: m.content ?? m.text ?? "",
+  role: m.role === 'assistant' ? ROLES.BOT : ROLES.USER,
+  text: m.content ?? m.text ?? '',
   time:
     m.time ??
     (m.timestamp
@@ -59,7 +64,9 @@ function useAutoScroll(dep) {
 function BotAvatar() {
   return (
     <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
-      <span className="text-xs"><i className="fa-solid fa-robot" /></span>
+      <span className="text-xs">
+        <i className="fa-solid fa-robot" />
+      </span>
     </div>
   );
 }
@@ -86,23 +93,33 @@ const MessageShape = PropTypes.exact({
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
   return (
-    <div className={cn("flex w-full gap-2", isUser ? "justify-end" : "justify-start")}>
+    <div
+      className={cn(
+        'flex w-full gap-2',
+        isUser ? 'justify-end' : 'justify-start'
+      )}
+    >
       {!isUser && <BotAvatar />}
-      <div className={cn("max-w-[75%] md:max-w-[65%]", isUser ? "items-end" : "items-start")}>
+      <div
+        className={cn(
+          'max-w-[75%] md:max-w-[65%]',
+          isUser ? 'items-end' : 'items-start'
+        )}
+      >
         <div
           className={cn(
-            "rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border",
+            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border',
             isUser
-              ? "bg-indigo-600 text-white border-indigo-500/30"
-              : "bg-white text-gray-900 border-gray-200"
+              ? 'bg-indigo-600 text-white border-indigo-500/30'
+              : 'bg-white text-gray-900 border-gray-200'
           )}
         >
           {message.text}
         </div>
         <div
           className={cn(
-            "mt-1 text-[10px] opacity-60",
-            isUser ? "text-right text-white/80" : "text-left text-gray-500"
+            'mt-1 text-[10px] opacity-60',
+            isUser ? 'text-right text-white/80' : 'text-left text-gray-500'
           )}
         >
           {message.time}
@@ -120,7 +137,7 @@ function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
     return messages.filter((m) =>
-      (m.text || "").toLowerCase().includes(filter.toLowerCase())
+      (m.text || '').toLowerCase().includes(filter.toLowerCase())
     );
   }, [messages, filter]);
   const ref = useAutoScroll(filtered.length);
@@ -140,7 +157,12 @@ MessageList.propTypes = {
   filter: PropTypes.string,
 };
 
-function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) {
+function ChatHeader({
+  onClose,
+  onMinimize,
+  isMinimized,
+  brand = 'HomeCareDN',
+}) {
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between">
@@ -153,10 +175,10 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
         </div>
         <div>
           <div className="text-sm font-semibold">
-            {t("supportChat.headerTitle", { brand })}
+            {t('supportChat.headerTitle', { brand })}
           </div>
           <div className="text-xs text-green-500">
-            {t("supportChat.headerStatusReady")}
+            {t('supportChat.headerStatusReady')}
           </div>
         </div>
       </div>
@@ -165,10 +187,14 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
           onClick={onMinimize}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
           title={
-            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+            isMinimized
+              ? t('supportChat.action.expand')
+              : t('supportChat.action.minimize')
           }
           aria-label={
-            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+            isMinimized
+              ? t('supportChat.action.expand')
+              : t('supportChat.action.minimize')
           }
         >
           {isMinimized ? (
@@ -180,8 +206,8 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
         <button
           onClick={onClose}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
-          title={t("supportChat.action.close")}
-          aria-label={t("supportChat.action.close")}
+          title={t('supportChat.action.close')}
+          aria-label={t('supportChat.action.close')}
         >
           <i className="fa-solid fa-xmark" />
         </button>
@@ -198,20 +224,20 @@ ChatHeader.propTypes = {
 
 function ChatInput({ onSend, disabled }) {
   const { t } = useTranslation();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const submit = (e) => {
     e.preventDefault();
     const v = value.trim();
     if (!v) return;
     onSend(v);
-    setValue("");
+    setValue('');
   };
   return (
     <form onSubmit={submit} className="flex w-full items-center gap-2">
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={t("supportChat.inputPlaceholder")}
+        placeholder={t('supportChat.inputPlaceholder')}
         className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         disabled={disabled}
       />
@@ -220,7 +246,7 @@ function ChatInput({ onSend, disabled }) {
         disabled={disabled || !value.trim()}
         className="rounded-md bg-indigo-600 px-3 py-2 text-white disabled:opacity-50"
       >
-        {t("supportChat.send")}
+        {t('supportChat.send')}
       </button>
     </form>
   );
@@ -233,7 +259,7 @@ ChatInput.propTypes = {
 function ChatWindow({ open, onClose, brand }) {
   const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState([]);
-  const [filter, setFilter] = useState("");
+  const [filter, setFilter] = useState('');
   const [typing, setTyping] = useState(false);
   const [minimized, setMinimized] = useState(false);
 
@@ -243,7 +269,7 @@ function ChatWindow({ open, onClose, brand }) {
       const list = Array.isArray(raw) ? raw.map(toUiMessage) : [];
       setMessages(list);
     } catch (e) {
-      console.warn("Load history failed", e);
+      console.warn('Load history failed', e);
     }
   };
 
@@ -252,7 +278,8 @@ function ChatWindow({ open, onClose, brand }) {
     loadHistory();
   }, [open]);
 
-  const parseErr = (err) => err?.response?.data ?? err?.message ?? "Bad request";
+  const parseErr = (err) =>
+    err?.response?.data ?? err?.message ?? 'Bad request';
 
   const send = async (text) => {
     try {
@@ -298,7 +325,7 @@ function ChatWindow({ open, onClose, brand }) {
               <input
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                placeholder={t("supportChat.searchPlaceholder")}
+                placeholder={t('supportChat.searchPlaceholder')}
                 className="bg-transparent text-sm outline-none w-full"
               />
             </div>
@@ -309,15 +336,11 @@ function ChatWindow({ open, onClose, brand }) {
               {typing ? (
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <span className="inline-block h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
-                  {t("supportChat.typing")}
+                  {t('supportChat.typing')}
                 </div>
               ) : (
                 <span />
               )}
-
-              <span className="text-[10px] rounded-full border px-2 py-0.5 text-gray-500">
-                Cookie-backed
-              </span>
             </div>
 
             <ChatInput onSend={send} disabled={typing} />
@@ -339,13 +362,17 @@ function ChatLauncherButton({ open, setOpen }) {
     <button
       onClick={() => setOpen((v) => !v)}
       className={cn(
-        "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl border",
-        "bg-indigo-600 text-white grid place-items-center hover:scale-105 transition"
+        'fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl border',
+        'bg-indigo-600 text-white grid place-items-center hover:scale-105 transition'
       )}
-      title={t("supportChat.launcherTitle")}
-      aria-label={t("supportChat.launcherTitle")}
+      title={t('supportChat.launcherTitle')}
+      aria-label={t('supportChat.launcherTitle')}
     >
-      {open ? <i className="fa-solid fa-xmark" /> : <i className="fa-solid fa-comment" />}
+      {open ? (
+        <i className="fa-solid fa-xmark" />
+      ) : (
+        <i className="fa-solid fa-comment" />
+      )}
     </button>
   );
 }
@@ -355,7 +382,7 @@ ChatLauncherButton.propTypes = {
 };
 
 /* ===== Default export ===== */
-export default function SupportChatWidget({ brand = "HomeCareDN" }) {
+export default function SupportChatWidget({ brand = 'HomeCareDN' }) {
   const [open, setOpen] = useState(false);
   return (
     <>

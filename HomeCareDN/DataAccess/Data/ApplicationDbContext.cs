@@ -61,7 +61,7 @@ namespace DataAccess.Data
                 .Entity<Conversation>()
                 .HasMany(c => c.Messages)
                 .WithOne(m => m.Conversation!)
-                .HasForeignKey(m => m.ConversationId)
+                .HasForeignKey(m => m.ConversationID)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PartnerRequest>(entity =>
             {
