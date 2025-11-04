@@ -62,7 +62,7 @@ export const AddressProvider = ({ children }) => {
   // 📌 Delete address
   const deleteAddress = useCallback(async (id) => {
     try {
-      await addressService.deleteAddress(id);
+      await addressService.delete(id);
       setAddresses((prev) => prev.filter((a) => a.addressID !== id));
       setTotalAddresses((prev) => Math.max(0, prev - 1));
     } catch (err) {

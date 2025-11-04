@@ -9,6 +9,7 @@ import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
+import { useServiceRequest } from '../../hook/useServiceRequest';
 
 const emptyAddrForm = {
   id: null,
@@ -20,7 +21,7 @@ const emptyAddrForm = {
 
 export default function Profile({ user }) {
   const { t } = useTranslation();
-
+  const { serviceRequests } = useServiceRequest();
   const [form, setForm] = useState({
     fullName: '',
     phoneNumber: '',
@@ -79,12 +80,11 @@ export default function Profile({ user }) {
     e.preventDefault();
     if (saving) return;
 
-    const fullName = (form.fullName || '').trim();
-    if (!fullName) {
+    if (!form.fullName) {
       toast.error(t('ERROR.NULL_NAME'));
       return;
     }
-    if (!isSafeText(fullName)) {
+    if (!isSafeText(form.fullName)) {
       toast.error(t('ERROR.INVALID_FULLNAME'));
       return;
     }
@@ -99,7 +99,7 @@ export default function Profile({ user }) {
         UserId: user.id,
         FullName: form.fullName,
         PhoneNumber: form.phoneNumber || null,
-        Gender: form.gender === '' ? null : Number(form.gender),
+        Gender: form.gender || null,
       });
       toast.success(t('SUCCESS.PROFILE_UPDATE'));
     } catch (err) {
@@ -212,6 +212,10 @@ export default function Profile({ user }) {
   };
 
   const deleteAddrItem = async (id) => {
+    if (serviceRequests.some((sr) => sr.addressId == id)) {
+      toast.error(t('ERROR.IN_USE_ADDRESS'));
+      return;
+    }
     showDeleteModal({
       t,
       titleKey: 'ModalPopup.DeleteAddressModal.title',
@@ -374,13 +378,13 @@ export default function Profile({ user }) {
               <option value="">
                 {t('userPage.profile.form.gender_choice')}
               </option>
-              <option value="0">
+              <option value="Male">
                 {t('userPage.profile.form.gender_male')}
               </option>
-              <option value="1">
+              <option value="Female">
                 {t('userPage.profile.form.gender_female')}
               </option>
-              <option value="2">
+              <option value="Other">
                 {t('userPage.profile.form.gender_other')}
               </option>
             </select>

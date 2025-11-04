@@ -283,7 +283,6 @@ namespace BusinessLogic.Services
             contractorApplication.DueCommisionTime = DateTime.UtcNow.AddDays(7);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
-            var notifyTasks = new List<Task>();
             if (serviceRequest.ContractorApplications != null)
             {
                 foreach (var app in serviceRequest.ContractorApplications)
@@ -297,35 +296,14 @@ namespace BusinessLogic.Services
                             contractorApplication.ServiceRequestID,
                             Status = ApplicationStatus.Rejected.ToString(),
                         };
-                        notifyTasks.Add(
-                            _notifier.SendToGroupAsync(
-                                $"user_{app.ContractorID}",
-                                CONTRACTOR_APPLICATION_REJECT,
-                                payload
-                            )
+                        await _notifier.SendToGroupAsync(
+                            $"user_{app.ContractorID}",
+                            CONTRACTOR_APPLICATION_REJECT,
+                            payload
                         );
                     }
                 }
-                notifyTasks.Add(
-                    _notifier.SendToGroupAsync(
-                        $"role_Admin",
-                        CONTRACTOR_APPLICATION_REJECT,
-                        new
-                        {
-                            contractorApplication.ContractorApplicationID,
-                            contractorApplication.ServiceRequestID,
-                            Status = ApplicationStatus.Rejected.ToString(),
-                        }
-                    )
-                );
             }
-            notifyTasks.Add(
-                _notifier.SendToGroupAsync(
-                    "role_Contractor",
-                    "ServiceRequest.Closed",
-                    new { serviceRequest.ServiceRequestID }
-                )
-            );
 
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
@@ -336,28 +314,21 @@ namespace BusinessLogic.Services
                 Status = ApplicationStatus.PendingCommission.ToString(),
                 contractorApplication.DueCommisionTime,
             };
-            notifyTasks.Add(
-                _notifier.SendToGroupAsync(
-                    $"user_{serviceRequest.CustomerID}",
-                    "ContractorApplication.Accept",
-                    payloadAccept
-                )
+            await _notifier.SendToGroupAsync(
+                $"user_{serviceRequest.CustomerID}",
+                "ContractorApplication.Accept",
+                payloadAccept
             );
-            notifyTasks.Add(
-                _notifier.SendToGroupAsync(
-                    $"user_{dto.ContractorID}",
-                    "ContractorApplication.Accept",
-                    payloadAccept
-                )
+            await _notifier.SendToGroupAsync(
+                $"user_{dto.ContractorID}",
+                "ContractorApplication.Accept",
+                payloadAccept
             );
-            notifyTasks.Add(
-                _notifier.SendToGroupAsync(
-                    $"role_Admin",
-                    "ContractorApplication.Accept",
-                    payloadAccept
-                )
+            await _notifier.SendToGroupAsync(
+                $"role_Admin",
+                "ContractorApplication.Accept",
+                payloadAccept
             );
-            await Task.WhenAll(notifyTasks);
             return dto;
         }
 

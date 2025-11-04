@@ -7,18 +7,17 @@ import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
-import useRealtime from '../../hook/useRealtime';
-import { useAuth } from '../../hook/useAuth';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useAddress } from '../../hook/useAddress';
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { addresses } = useAddress();
   const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
     useServiceRequest();
-  useRealtime(user, 'Customer', {
-    onNewContractorApplication: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -30,7 +29,7 @@ export default function ServiceRequestManager() {
         )
       );
     },
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -42,7 +41,7 @@ export default function ServiceRequestManager() {
         )
       );
     },
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -57,8 +56,7 @@ export default function ServiceRequestManager() {
         )
       );
     },
-    // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
-    onPaymentUpdate: (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -84,7 +82,7 @@ export default function ServiceRequestManager() {
         return;
       }
       if (addresses.length == 0) {
-        toast.error('ERROR.REQUIRED_ADDRESS');
+        toast.error(t('ERROR.REQUIRED_ADDRESS'));
         return;
       }
       navigate('/Customer/ServiceRequest');
@@ -287,7 +285,7 @@ export default function ServiceRequestManager() {
                       <i className="fa-solid fa-location-dot text-orange-500"></i>
                       {t('userPage.serviceRequest.label_address')}
                       <span className="font-semibold">
-                        {req.address.detail}, {req.address.ward},{' '}
+                        {req.address?.detail}, {req.address.ward},{' '}
                         {req.address.district}, {req.address.city}
                       </span>
                     </div>

@@ -11,8 +11,8 @@ import { toast } from 'react-toastify';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
 import StatusBadge from '../../components/StatusBadge';
 import { Pagination } from 'antd';
-import useRealtime from '../../hook/useRealtime';
-import { useAuth } from '../../hook/useAuth';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import he from 'he';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
@@ -37,13 +37,21 @@ export default function ServiceRequestDetail() {
   const [input, setInput] = useState('');
   const chatEndRef = useRef(null);
 
-  const { user } = useAuth();
-
   const hasSelectedContractor = Boolean(selectedContractor);
 
   // Use realtime
-  useRealtime(user, 'Customer', {
-    onNewContractorApplication: (payload) => {
+  useRealtime({
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
+            : sr
+        )
+      );
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplications((prev) => {
           if (
@@ -59,7 +67,10 @@ export default function ServiceRequestDetail() {
         setTotalCount((prev) => prev + 1);
       }
     },
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
+      );
       if (serviceRequestId == payload.serviceRequestID) {
         setContractorApplications((prev) =>
           prev.filter(
@@ -76,7 +87,7 @@ export default function ServiceRequestDetail() {
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -96,30 +107,17 @@ export default function ServiceRequestDetail() {
           };
         }
       });
-      setSelectedContractor((prev) => {
-        if (
-          selectedContractor?.contractorApplicationID ==
-          payload.contractorApplicationID
-        ) {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            status: 'PendingCommission',
-            dueCommisionTime: payload?.dueCommisionTime || null,
-          };
-        }
-      });
     },
-    onPaymentUpdate: (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: async (payload) => {
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID
       ) {
-        setSelectedContractor((prev) => ({
-          ...prev,
-          status: 'Approved',
-          dueCommisionTime: null,
-        }));
+        const fullContractor =
+          await contractorApplicationService.getByIdForCustomer(
+            payload.contractorApplicationID
+          );
+        setSelectedContractor(fullContractor);
       }
     },
   });
@@ -219,8 +217,6 @@ export default function ServiceRequestDetail() {
   }, [serviceRequestId, getServiceRequestById, t]);
 
   const fetchContractors = useCallback(async () => {
-    // Don't fetch list if contractor already selected
-    if (hasSelectedContractor) return;
     try {
       const res = await contractorApplicationService.getAllForCustomer({
         PageNumber: currentApplicationPage,
@@ -232,13 +228,7 @@ export default function ServiceRequestDetail() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  }, [
-    serviceRequestId,
-    t,
-    pageSize,
-    currentApplicationPage,
-    hasSelectedContractor,
-  ]);
+  }, [serviceRequestId, t, pageSize, currentApplicationPage]);
 
   const handleSelectContractor = async (c) => {
     try {
@@ -539,7 +529,8 @@ export default function ServiceRequestDetail() {
               )}
               <div className="text-center mb-6 pb-6 border-b">
                 <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                  {selectedContractor.contractorApplicationID.charAt(0)}
+                  {selectedContractor.contractorName?.charAt(0) ||
+                    selectedContractor.contractorApplicationID.charAt(0)}
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
                   {selectedContractor.contractorApplicationID.substring(0, 12)}
@@ -563,6 +554,95 @@ export default function ServiceRequestDetail() {
                   type="Application"
                 />
               </div>
+
+              {/* Contractor Contact Information - Show when Approved */}
+              {selectedContractor.status === 'Approved' && (
+                <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
+                  <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i className="fas fa-user-tie text-orange-600"></i>
+                    <span>
+                      {t(
+                        'userPage.serviceRequestDetail.label_contractorInfo'
+                      ) || 'Thông tin nhà thầu'}
+                    </span>
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-user text-orange-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {t(
+                            'userPage.serviceRequestDetail.label_contractorName'
+                          )}
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedContractor.contractorName}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-envelope text-blue-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          Email
+                        </p>
+                        <p className="font-semibold text-gray-900">
+                          {selectedContractor.contractorEmail || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {selectedContractor.contractorPhone && (
+                      <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                          <i className="fas fa-phone text-green-600"></i>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase tracking-wide">
+                            {t('userPage.serviceRequestDetail.label_phone') ||
+                              'Số điện thoại'}
+                          </p>
+                          <p className="font-semibold text-gray-900">
+                            {selectedContractor.contractorPhone}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 shadow-sm">
+                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i className="fas fa-tag text-purple-600"></i>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">
+                          {t(
+                            'userPage.serviceRequestDetail.label_estimatePrice'
+                          )}
+                        </p>
+                        <p className="font-semibold text-gray-900 text-lg">
+                          {(selectedContractor.estimatePrice / 1000000).toFixed(
+                            0
+                          )}{' '}
+                          <span className="text-sm">
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                          </span>
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {selectedContractor.estimatePrice?.toLocaleString(
+                            'vi-VN'
+                          )}{' '}
+                          VNĐ
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Commission Countdown - Show when PendingCommission */}
               {selectedContractor.status === 'PendingCommission' &&
