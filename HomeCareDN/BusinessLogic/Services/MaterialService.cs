@@ -40,9 +40,10 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.MaterialRepository.GetQueryable(
-                includeProperties: MATERIAL_INCLUDE
-            );
+            var query = _unitOfWork
+                .MaterialRepository.GetQueryable(includeProperties: MATERIAL_INCLUDE)
+                .AsSingleQuery()
+                .AsNoTracking();
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
@@ -126,29 +127,6 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
-        {
-            var material = _mapper.Map<Material>(requestDto);
-            await _unitOfWork.MaterialRepository.AddAsync(material);
-            //check image
-            ValidateImages(requestDto.ImageUrls, 0);
-
-            //upload image
-            await UploadMaterialImagesAsync(
-                material.MaterialID,
-                requestDto.ImageUrls,
-                requestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-
-            material = await _unitOfWork.MaterialRepository.GetAsync(
-                m => m.MaterialID == material.MaterialID,
-                includeProperties: MATERIAL_INCLUDE
-            );
-            return _mapper.Map<MaterialDto>(material);
-        }
-
         public async Task<MaterialDetailDto> GetMaterialByIdAsync(Guid id)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
@@ -200,6 +178,29 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+            return _mapper.Map<MaterialDto>(material);
+        }
+
+        public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
+        {
+            var material = _mapper.Map<Material>(requestDto);
+            await _unitOfWork.MaterialRepository.AddAsync(material);
+            //check image
+            ValidateImages(requestDto.ImageUrls, 0);
+
+            //upload image
+            await UploadMaterialImagesAsync(
+                material.MaterialID,
+                requestDto.ImageUrls,
+                requestDto.ImagePublicIds
+            );
+
+            await _unitOfWork.SaveAsync();
+
+            material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == material.MaterialID,
+                includeProperties: MATERIAL_INCLUDE
+            );
             return _mapper.Map<MaterialDto>(material);
         }
 
