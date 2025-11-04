@@ -93,8 +93,14 @@ export default function Sidebar() {
       {/* Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="xl:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
+          role="button"
+          tabIndex={0}
+          aria-label="Close mobile menu overlay"
           onClick={closeMobileMenu}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') closeMobileMenu();
+          }}
+          className="xl:hidden fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 cursor-pointer"
         ></div>
       )}
 

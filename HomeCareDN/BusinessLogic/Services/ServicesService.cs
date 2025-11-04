@@ -36,7 +36,6 @@ namespace BusinessLogic.Services
                 .ServiceRepository.GetQueryable(SERVICE_INCLUDE)
                 .AsSingleQuery()
                 .AsNoTracking();
-            ;
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();

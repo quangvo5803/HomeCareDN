@@ -122,7 +122,6 @@ export default function Home() {
       setRandomMaterials(data || []);
     };
     const loadServices = async () => {
-      true;
       const data = await fetchServices({
         PageNumber: 1,
         PageSize: 6,
