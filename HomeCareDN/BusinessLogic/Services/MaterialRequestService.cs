@@ -32,9 +32,10 @@ namespace BusinessLogic.Services
             string role = "Admin"
         )
         {
-            var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
-                includeProperties: INCLUDE
-            );
+            var query = _unitOfWork
+                .MaterialRequestRepository.GetQueryable(includeProperties: INCLUDE)
+                .AsSingleQuery()
+                .AsNoTracking();
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch

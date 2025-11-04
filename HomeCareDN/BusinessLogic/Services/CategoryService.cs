@@ -25,7 +25,10 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<CategoryDto>> GetAllCategories(QueryParameters parameters)
         {
-            var query = _unitOfWork.CategoryRepository.GetQueryable(includeProperties: INCLUDE);
+            var query = _unitOfWork
+                .CategoryRepository.GetQueryable(includeProperties: INCLUDE)
+                .AsSingleQuery()
+                .AsNoTracking();
 
             if (!string.IsNullOrEmpty(parameters.Search))
             {

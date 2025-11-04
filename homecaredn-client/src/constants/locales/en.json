@@ -502,7 +502,7 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "dashboard": "Dashboard",
-    "category": "Material Category",
+    "category": "Category",
     "UI sample for": "UI Sample For",
     "latest_applications": "Latest Applications",
     "view_all": "View All",
@@ -554,7 +554,7 @@
     }
   },
   "distributorCategoryManager": {
-    "title": "Material Category Manager",
+    "title": "Category Manager",
     "subtitle": "Manage material category list",
     "categories": "category(es)",
     "no": "NO",
@@ -615,7 +615,7 @@
     "menu": {
       "dashboard": "Dashboard",
       "brand": "Brands",
-      "category": "Material Category",
+      "category": "Category",
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material",
@@ -699,7 +699,7 @@
     }
   },
   "adminCategoryManager": {
-    "title": "Material Category Manager",
+    "title": "Category Manager",
     "subtitle": "Manage material category list",
     "categories": "category(es)",
     "no": "NO",

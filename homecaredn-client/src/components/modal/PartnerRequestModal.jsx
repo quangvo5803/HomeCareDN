@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 import StatusBadge from '../StatusBadge';
 
 export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
@@ -91,7 +91,7 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
         <div className="flex-1 p-6 space-y-4 overflow-y-auto">
           {loading || !partnerRequest ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>
@@ -132,7 +132,10 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                   {t('adminPartnerManager.partnerRequestModal.status')}
                 </div>
                 <div className="font-medium text-gray-900 break-words">
-                  <StatusBadge status={partnerRequest.status} type="PartnerRequest" />
+                  <StatusBadge
+                    status={partnerRequest.status}
+                    type="PartnerRequest"
+                  />
                 </div>
               </div>
               <div>
@@ -180,8 +183,9 @@ export default function PartnerModal({ isOpen, onClose, partnerRequestID }) {
                       partnerRequest?.status !== 'Rejected' &&
                       setReason(e.target.value)
                     }
-                    className={`w-full border rounded-lg p-3 ${partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
-                      }`}
+                    className={`w-full border rounded-lg p-3 ${
+                      partnerRequest?.status === 'Rejected' ? 'bg-gray-100' : ''
+                    }`}
                     placeholder={t(
                       'adminPartnerManager.partnerRequestModal.rejectReasonPlaceHolder'
                     )}

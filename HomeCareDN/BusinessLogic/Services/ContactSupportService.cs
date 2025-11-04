@@ -31,7 +31,10 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.ContactSupportRepository.GetQueryable();
+            var query = _unitOfWork
+                .ContactSupportRepository.GetQueryable()
+                .AsSingleQuery()
+                .AsNoTracking();
             if (parameters.FilterBool != null)
             {
                 query = query.Where(s => s.IsProcessed == parameters.FilterBool);

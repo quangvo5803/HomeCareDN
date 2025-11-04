@@ -45,9 +45,10 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.PartnerRequestRepository.GetQueryable(
-                includeProperties: PARTNER_REQUEST_INCLUDES
-            );
+            var query = _unitOfWork
+                .PartnerRequestRepository.GetQueryable(includeProperties: PARTNER_REQUEST_INCLUDES)
+                .AsSingleQuery()
+                .AsNoTracking();
             if (parameters.FilterPartnerRequestStatus.HasValue)
             {
                 query = query.Where(p => p.Status == parameters.FilterPartnerRequestStatus.Value);
