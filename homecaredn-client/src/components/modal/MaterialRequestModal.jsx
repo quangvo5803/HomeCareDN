@@ -4,7 +4,7 @@ import { materialService } from '../../services/materialService';
 import { Pagination } from 'antd';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 import PropTypes from 'prop-types';
 
 export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
@@ -48,7 +48,7 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
     if (modalLoading)
       return (
         <div className="flex justify-center py-12">
-          <LoadingModal />
+          <LoadingComponent />
         </div>
       );
     if (materials.length === 0) {
