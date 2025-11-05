@@ -1,9 +1,13 @@
-﻿namespace BusinessLogic.DTOs.Application.Chat.User
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BusinessLogic.DTOs.Application.Chat.User
 {
     public class ConversationCreateRequestDto
     {
+        [Required]
         public Guid ServiceRequestID { get; set; }
-        public string CustomerID { get; set; } = null!;
-        public string ContractorID { get; set; } = null!;
+
+        [Required]
+        public Guid ContractorApplicationID { get; set; }
     }
 }

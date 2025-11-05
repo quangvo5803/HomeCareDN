@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Entities.Application
 {
@@ -22,12 +16,15 @@ namespace DataAccess.Entities.Application
         [Required]
         public Guid ServiceRequestID { get; set; }
 
-        [ForeignKey(nameof(ServiceRequestID))]
-        public ServiceRequest? ServiceRequest { get; set; }
+        [Required]
+        public Guid ContractorApplicationID { get; set; }
+        public bool IsLocked { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime LastMessageAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<ChatMessage>? Messages { get; set; }
+        public ServiceRequest? ServiceRequest { get; set; }
+        public ContractorApplication? ContractorApplication { get; set; }
+        public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }
 }

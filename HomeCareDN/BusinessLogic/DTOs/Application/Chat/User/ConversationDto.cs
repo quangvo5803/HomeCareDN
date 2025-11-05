@@ -6,6 +6,8 @@
         public string CustomerID { get; set; } = null!;
         public string ContractorID { get; set; } = null!;
         public Guid ServiceRequestID { get; set; }
+        public Guid ContractorApplicationID { get; set; }
+        public bool IsLocked { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastMessageAt { get; set; }
     }

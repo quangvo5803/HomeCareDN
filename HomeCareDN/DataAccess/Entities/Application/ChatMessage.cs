@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DataAccess.Entities.Application
 {
@@ -16,7 +10,6 @@ namespace DataAccess.Entities.Application
         [Required]
         public Guid ConversationID { get; set; }
 
-        [ForeignKey(nameof(ConversationID))]
         public Conversation? Conversation { get; set; }
 
         [Required]

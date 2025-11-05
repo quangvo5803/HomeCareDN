@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using BusinessLogic.DTOs.Application.Chat.User;
-using BusinessLogic.Services.FacadeService;
+﻿using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +13,11 @@ namespace HomeCareDNAPI.Controllers
     )]
     public class ConversationsController : ControllerBase
     {
-        private readonly IFacadeService _facade;
+        private readonly IFacadeService _facadeService;
 
-        public ConversationsController(IFacadeService facade)
+        public ConversationsController(IFacadeService facadeService)
         {
-            _facade = facade;
+            _facadeService = facadeService;
         }
     }
 }

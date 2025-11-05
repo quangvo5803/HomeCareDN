@@ -1,8 +1,6 @@
 ﻿using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.FacadeService;
-using DataAccess.Entities;
 using DataAccess.Entities.Payment;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers

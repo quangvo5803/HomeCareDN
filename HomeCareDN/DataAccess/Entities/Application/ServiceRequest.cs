@@ -28,9 +28,7 @@ namespace DataAccess.Entities.Application
 
         [ForeignKey("SelectedContractorApplicationID")]
         public ContractorApplication? SelectedContractorApplication { get; set; }
-
-        [ForeignKey("ConversationID")]
-        public Conversation? Conversations { get; set; }
+        public Conversation? Conversation { get; set; }
         public ICollection<Image>? Images { get; set; }
         public ICollection<Document>? Documents { get; set; }
         public ICollection<ContractorApplication>? ContractorApplications { get; set; }

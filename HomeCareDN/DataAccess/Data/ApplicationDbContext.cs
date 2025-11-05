@@ -76,6 +76,7 @@ namespace DataAccess.Data
             {
                 entity.Property(mr => mr.Status).HasConversion<string>();
             });
+            modelBuilder.Entity<Conversation>().HasIndex(c => c.ServiceRequestID).IsUnique();
             base.OnModelCreating(modelBuilder);
         }
     }

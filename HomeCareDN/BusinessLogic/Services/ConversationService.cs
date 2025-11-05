@@ -25,8 +25,7 @@ namespace BusinessLogic.Services
             // 1. Check existing conversation
             var existingConversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ServiceRequestID == dto.ServiceRequestID
-                && c.CustomerID == dto.CustomerID
-                && c.ContractorID == dto.ContractorID
+                && c.ContractorApplicationID == dto.ContractorApplicationID
             );
 
             if (existingConversation != null)

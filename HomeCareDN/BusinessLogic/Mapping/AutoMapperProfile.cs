@@ -51,6 +51,7 @@ namespace BusinessLogic.Mapping
             CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
             CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
+
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
@@ -238,38 +239,6 @@ namespace BusinessLogic.Mapping
                 .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty));
 
-            //Chat DTOs
-            CreateMap<ConversationCreateRequestDto, Conversation>()
-                .ForMember(d => d.ConversationID, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                .ForMember(d => d.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(d => d.LastMessageAt, opt => opt.Ignore())
-                .ForMember(d => d.Messages, opt => opt.Ignore());
-
-            CreateMap<ConversationCreateRequestDto, ChatMessage>()
-                .ForMember(d => d.ChatMessageID, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                .ForMember(
-                    d => d.ConversationID,
-                    opt => opt.MapFrom((src, _, __, ctx) => (Guid)ctx.Items["ConversationID"])
-                )
-                .ForMember(d => d.SentAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
-
-            CreateMap<SendMessageRequestDto, ChatMessage>()
-                .ForMember(d => d.ConversationID, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                .ForMember(
-                    d => d.SenderID,
-                    opt =>
-                        opt.MapFrom(
-                            (src, _, __, ctx) =>
-                                ctx.Items.TryGetValue("SenderID", out var v)
-                                    ? v?.ToString()!
-                                    : string.Empty
-                        )
-                )
-                .ForMember(d => d.SentAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
-
-            CreateMap<Conversation, ConversationDto>();
-            CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
-
             // ContactSupport
             CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
@@ -295,6 +264,10 @@ namespace BusinessLogic.Mapping
                         )
                 );
             CreateMap<MaterialRequest, MaterialRequestDto>();
+
+            CreateMap<Conversation, ConversationDto>();
+            CreateMap<ChatMessage, ChatMessageDto>()
+                .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
         }
 
         // ------------------------
