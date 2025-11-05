@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251104090043_Restructure_Chat")]
+    partial class Restructure_Chat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -623,9 +626,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ConversationID")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -671,9 +671,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("double precision");
 
                     b.HasKey("ServiceRequestID");
-
-                    b.HasIndex("ConversationID")
-                        .IsUnique();
 
                     b.HasIndex("SelectedContractorApplicationID");
 
@@ -721,7 +718,7 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
-                        .WithMany()
+                        .WithMany("Conversations")
                         .HasForeignKey("ServiceRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -834,15 +831,9 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversations")
-                        .WithOne()
-                        .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "ConversationID");
-
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
                         .WithMany()
                         .HasForeignKey("SelectedContractorApplicationID");
-
-                    b.Navigation("Conversations");
 
                     b.Navigation("SelectedContractorApplication");
                 });
@@ -896,6 +887,8 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
+
+                    b.Navigation("Conversations");
 
                     b.Navigation("Documents");
 
