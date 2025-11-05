@@ -6,34 +6,33 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize(
         AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
         Roles = "Customer,Contractor"
     )]
-    public class ConversationsController : ControllerBase
+    public class ChatMessagesController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
 
-        public ConversationsController(IFacadeService facadeService)
+        public ChatMessagesController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
         }
 
-        [HttpPost()]
-        public async Task<IActionResult> CreateConversation(
-            [FromBody] ConversationCreateRequestDto dto
-        )
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetMessagesByConversation(Guid id)
         {
-            var result = await _facadeService.ConversationService.CreateConversationAsync(dto);
+            var result =
+                await _facadeService.ChatMessageService.GetAllMessagesByConversationIdAsync(id);
             return Ok(result);
         }
 
-        [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetConversationByID(Guid id)
+        [HttpPost]
+        public async Task<IActionResult> SendMessage([FromBody] SendMessageRequestDto dto)
         {
-            var result = await _facadeService.ConversationService.GetConversationByIdAsync(id);
+            var result = await _facadeService.ChatMessageService.SendMessageAsync(dto);
             return Ok(result);
         }
     }

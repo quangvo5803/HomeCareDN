@@ -17,6 +17,8 @@ namespace BusinessLogic.Services
 
         private const string CONVERSATION = "Conversation";
         private const string MESSAGE = "Message";
+        private const string SERVICE_REQUEST = "ServiceRequest";
+
         private const string ERROR_CONVERSATION_NOT_FOUND = "CONVERSATION_NOT_FOUND";
         private const string ERROR_PERMISSION_DENIED = "PERMISSION_DENIED";
         private const string ERROR_EMPTY_MESSAGE = "EMPTY_MESSAGE";
