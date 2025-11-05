@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -174,6 +174,7 @@ export default function ServiceModal({
       }
 
       if (newFiles.length > 0) {
+        setUploadProgress(1);
         const uploaded = await uploadImageToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
@@ -220,7 +221,7 @@ export default function ServiceModal({
         <div className="flex-1 p-6 space-y-6 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>

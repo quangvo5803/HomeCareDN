@@ -6,7 +6,7 @@ import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useCategory } from '../../hook/useCategory';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 
 export default function CategoryModal({
   isOpen,
@@ -84,6 +84,7 @@ export default function CategoryModal({
     }
     try {
       if (logoFile) {
+        setUploadProgress(1);
         const result = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
@@ -105,7 +106,6 @@ export default function CategoryModal({
   };
 
   if (!isOpen) return null;
-  if (loading) return <Loading />;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
@@ -129,7 +129,7 @@ export default function CategoryModal({
         <div className="p-6 space-y-6">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>

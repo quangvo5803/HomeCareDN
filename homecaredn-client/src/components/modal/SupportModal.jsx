@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 import { contactSupportService } from '../../services/contactSupportService';
 
 export default function SupportModal({
@@ -76,7 +76,7 @@ export default function SupportModal({
         <div className="flex-1 overflow-y-auto p-5">
           {loading || !support ? (
             <div className="flex justify-center py-8">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>

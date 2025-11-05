@@ -1,6 +1,6 @@
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { useEffect, useState } from 'react';
-import Loading from '../../components/Loading';
+import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'use-debounce';
 import { Pagination } from 'antd';
@@ -34,7 +34,7 @@ export default function ServiceRequest() {
     [RealtimeEvents.ServiceRequestCreated]: (payload) => {
       setServiceRequests((prev) => {
         if (prev.some((r) => r.serviceRequestID === payload.serviceRequestID)) {
-          return prev; // tránh duplicate
+          return prev;
         }
         return [payload, ...prev];
       });
@@ -85,8 +85,6 @@ export default function ServiceRequest() {
         )
       );
     },
-
-    // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
@@ -107,14 +105,13 @@ export default function ServiceRequest() {
       SortBy: sortOption,
       Search: debouncedSearch || '',
     });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentPage, sortOption, debouncedSearch]);
 
   const serviceTypeStyle = {
     Construction: {
       icon: 'fa-hammer',
-      gradient: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-500',
       lightBg: 'bg-orange-50',
       textColor: 'text-orange-700',
       borderColor: 'border-orange-200',
@@ -122,15 +119,13 @@ export default function ServiceRequest() {
     },
     Repair: {
       icon: 'fa-screwdriver-wrench',
-      gradient: 'from-blue-500 to-indigo-600',
+      bgColor: 'bg-blue-500',
       lightBg: 'bg-blue-50',
       textColor: 'text-blue-700',
       borderColor: 'border-blue-200',
       ringColor: 'ring-blue-300',
     },
   };
-
-  if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen p-6 bg-white">
@@ -139,11 +134,8 @@ export default function ServiceRequest() {
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl blur-lg opacity-40 animate-pulse"></div>
-                <div className="relative w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
-                  <i className="fa-solid fa-clipboard-list text-white text-2xl" />
-                </div>
+              <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
+                <i className="fa-solid fa-clipboard-list text-white text-2xl" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-1">
@@ -160,7 +152,7 @@ export default function ServiceRequest() {
               <button
                 onClick={() => setViewMode('table')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${viewMode === 'table'
-                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    ? 'bg-orange-500 text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                   }`}
               >
@@ -170,7 +162,7 @@ export default function ServiceRequest() {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${viewMode === 'grid'
-                    ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-md'
+                    ? 'bg-orange-500 text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
                   }`}
               >
@@ -186,15 +178,14 @@ export default function ServiceRequest() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Stats Cards */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="relative overflow-hidden px-5 py-3 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl shadow-lg shadow-orange-500/30">
-                <div className="absolute inset-0 bg-white opacity-10"></div>
-                <div className="relative flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+              <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                     <i className="fa-solid fa-clipboard-list text-white text-lg" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-white">
-                      {totalServiceRequests || 0}
+                      {loading ? 0 : totalServiceRequests || 0}
                     </div>
                     <div className="text-xs text-white/90 font-medium">
                       {t('adminServiceRequestManager.serviceRequests')}
@@ -241,11 +232,15 @@ export default function ServiceRequest() {
         {viewMode === 'grid' ? (
           // Grid View
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {serviceRequests && serviceRequests.length > 0 ? (
+            {loading ? (
+              <div className="col-span-full py-10 text-center">
+                <LoadingComponent />
+              </div>
+            ) : serviceRequests && serviceRequests.length > 0 ? (
               serviceRequests.map((item) => {
                 const ui = serviceTypeStyle[item?.serviceType] || {
                   icon: 'fa-wrench',
-                  gradient: 'from-gray-400 to-gray-500',
+                  bgColor: 'bg-gray-400',
                   lightBg: 'bg-gray-50',
                   textColor: 'text-gray-700',
                   borderColor: 'border-gray-200',
@@ -265,13 +260,9 @@ export default function ServiceRequest() {
                     key={item.serviceRequestID}
                     className="group relative bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-orange-300"
                   >
-                    {/* Gradient Header */}
-                    <div
-                      className={`h-2 bg-gradient-to-r ${ui.gradient}`}
-                    ></div>
+                    <div className={`h-2 ${ui.bgColor}`}></div>
 
                     <div className="p-6">
-                      {/* Service Type Icon & Title */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div
@@ -298,9 +289,7 @@ export default function ServiceRequest() {
                         <StatusBadge status={item.status} type="Request" />
                       </div>
 
-                      {/* Details Grid */}
                       <div className="space-y-3 mb-4">
-                        {/* Building Type */}
                         <div className="flex items-center gap-2 text-sm">
                           <div className="w-8 h-8 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i className="fa-solid fa-building text-purple-600 text-sm" />
@@ -315,7 +304,6 @@ export default function ServiceRequest() {
                           </div>
                         </div>
 
-                        {/* Location */}
                         <div className="flex items-center gap-2 text-sm">
                           <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i className="fa-solid fa-location-dot text-blue-600 text-sm" />
@@ -333,7 +321,6 @@ export default function ServiceRequest() {
                           </div>
                         </div>
 
-                        {/* Area & Floors */}
                         {item.floors > 0 && (
                           <div className="flex items-center gap-2 text-sm">
                             <div className="w-8 h-8 bg-teal-50 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -356,7 +343,6 @@ export default function ServiceRequest() {
                           </div>
                         )}
 
-                        {/* Price */}
                         <div className="flex items-center gap-2 text-sm">
                           <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
                             <i className="fa-solid fa-coins text-amber-600 text-sm" />
@@ -376,7 +362,6 @@ export default function ServiceRequest() {
                         </div>
                       </div>
 
-                      {/* Action Button */}
                       <button
                         type="button"
                         onClick={() =>
@@ -384,7 +369,7 @@ export default function ServiceRequest() {
                             `/Admin/ServiceRequest/${item.serviceRequestID}`
                           )
                         }
-                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-xl hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md shadow-orange-500/30 hover:shadow-lg hover:shadow-orange-500/40"
+                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md"
                       >
                         <i className="fa-solid fa-eye" />
                         {t('BUTTON.View')}
@@ -397,7 +382,7 @@ export default function ServiceRequest() {
               <div className="col-span-full">
                 <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-16">
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-6">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6">
                       <i className="fa-solid fa-clipboard-list text-gray-400 text-4xl" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900 mb-2">
@@ -413,39 +398,52 @@ export default function ServiceRequest() {
           </div>
         ) : (
           // Table View
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gradient-to-r from-gray-50 to-orange-50/30 border-b-2 border-orange-200">
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                  <tr className="h-12 bg-gray-50 border-b-1">
+                    <th className="w-[60px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceRequestManager.no')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('sharedEnums.serviceType')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('sharedEnums.buildingType')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceRequestManager.address')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceRequestManager.acreage')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      {t('adminServiceRequestManager.floors')}
+                    </th>
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceRequestManager.estimatePrice')}
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceRequestManager.status')}
                     </th>
-                    <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="w-[120px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                       {t('adminServiceManager.action')}
                     </th>
                   </tr>
                 </thead>
+
                 <tbody className="divide-y divide-gray-100">
-                  {serviceRequests && serviceRequests.length > 0 ? (
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan="9"
+                        className="py-10 text-center align-middle"
+                      >
+                        <LoadingComponent />
+                      </td>
+                    </tr>
+                  ) : serviceRequests && serviceRequests.length > 0 ? (
                     serviceRequests.map((item, idx) => {
                       const ui = serviceTypeStyle[item?.serviceType] || {
                         icon: 'fa-wrench',
@@ -454,8 +452,6 @@ export default function ServiceRequest() {
                       };
 
                       const addressParts = [
-                        item?.address?.detail,
-                        item?.address?.ward,
                         item?.address?.district,
                         item?.address?.city,
                       ].filter(Boolean);
@@ -464,40 +460,44 @@ export default function ServiceRequest() {
                       return (
                         <tr
                           key={item.serviceRequestID}
-                          className="hover:bg-orange-50/50 transition-colors"
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center justify-center w-10 h-10 text-sm font-bold text-white bg-gradient-to-br from-orange-500 to-red-500 rounded-full shadow-sm">
+                          <td className="px-4 py-4 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
                               {(currentPage - 1) * pageSize + idx + 1}
                             </span>
                           </td>
-                          <td className="px-6 py-4">
+
+                          <td className="px-4 py-4 text-sm text-gray-900 font-medium">
                             <div className="flex items-center gap-3">
                               <div
-                                className={`w-10 h-10 ${ui.lightBg} rounded-lg flex items-center justify-center`}
+                                className={`w-9 h-9 ${ui.lightBg} rounded-md flex items-center justify-center`}
                               >
                                 <i
                                   className={`fa-solid ${ui.icon} ${ui.textColor}`}
                                 />
                               </div>
-                              <span className="text-sm font-semibold text-gray-900">
+                              <span>
                                 {t(`Enums.ServiceType.${item.serviceType}`)}
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+
+                          <td className="px-4 py-4 text-sm text-gray-900">
                             {t(`Enums.BuildingType.${item.buildingType}`)}
                           </td>
+
                           <td
-                            className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate"
+                            className="px-4 py-4 text-sm text-gray-600 truncate max-w-xs"
                             title={addressText}
                           >
-                            <i className="fa-solid fa-location-dot text-orange-500 mr-2" />
                             {addressText}
                           </td>
-                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+
+                          <td className="px-4 py-4 text-sm text-gray-900">
                             {item.floors > 0 && (
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="px-2 py-1 bg-teal-50 text-teal-700 rounded-lg text-xs font-semibold">
                                   {(
                                     item.length *
@@ -506,20 +506,28 @@ export default function ServiceRequest() {
                                   ).toFixed(1)}{' '}
                                   m²
                                 </span>
-                                <span className="px-2 py-1 bg-gray-50 text-gray-700 rounded-lg text-xs font-semibold">
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 text-sm text-gray-900">
+                            {item.floors > 0 && (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="px-2 py-1 text-gray-700 text-sm font-semibold">
                                   {item.floors}{' '}
-                                  {t('adminServiceRequestManager.floors')}
                                 </span>
                               </div>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-sm font-bold text-orange-600">
+
+                          <td className="px-4 py-4 text-sm font-bold text-orange-600">
                             {formatVND(Number(item.estimatePrice))}
                           </td>
-                          <td className="px-6 py-4">
+
+                          <td className="px-4 py-4">
                             <StatusBadge status={item.status} type="Request" />
                           </td>
-                          <td className="px-6 py-4 text-center">
+
+                          <td className="px-4 py-4 text-center">
                             <button
                               type="button"
                               onClick={() =>
@@ -527,7 +535,7 @@ export default function ServiceRequest() {
                                   `/Admin/ServiceRequest/${item.serviceRequestID}`
                                 )
                               }
-                              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-lg hover:from-orange-600 hover:to-red-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md shadow-orange-500/25"
+                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
                             >
                               <i className="fa-solid fa-eye" />
                               {t('BUTTON.View')}
@@ -538,9 +546,9 @@ export default function ServiceRequest() {
                     })
                   ) : (
                     <tr>
-                      <td colSpan="8" className="px-6 py-16">
+                      <td colSpan="9" className="px-6 py-16 text-center">
                         <div className="flex flex-col items-center text-center mt-5 mb-5">
-                          <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mb-4">
+                          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                             <i className="fa-solid fa-clipboard-list text-gray-400 text-3xl" />
                           </div>
                           <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -558,15 +566,24 @@ export default function ServiceRequest() {
             </div>
           </div>
         )}
+
         {/* Pagination */}
-        {totalServiceRequests > 0 && (
-          <div className="border-t border-gray-200 px-6 py-5 bg-gradient-to-r from-gray-50 to-orange-50/30">
+        {!loading && totalServiceRequests > 0 && (
+          <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+              <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+              <span>
+                {totalServiceRequests}{' '}
+                {t('adminServiceRequestManager.serviceRequests')}
+              </span>
+            </div>
             <Pagination
               current={currentPage}
               pageSize={pageSize}
               total={totalServiceRequests}
               onChange={(page) => setCurrentPage(page)}
               showSizeChanger={false}
+              size="small"
             />
           </div>
         )}

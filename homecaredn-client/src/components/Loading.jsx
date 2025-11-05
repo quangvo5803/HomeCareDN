@@ -13,7 +13,7 @@ const Loading = ({ progress }) => {
         style={{ color: '#FDA12B', fontSize: '48px' }}
       ></i>
 
-      {progress >= 0 && (
+      {progress > 0 && (
         <div className="w-full max-w-md">
           {/* Progress Bar Container */}
           <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
