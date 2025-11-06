@@ -646,6 +646,9 @@
       "sales": "Sales",
       "sinceLastMonth": " since last month"
     },
+    "construction": "Construction",
+    "repair": "Repair",
+    "material": "Material",
     "lineChart": {
       "salesOverview": "Sales overview",
       "months": {
@@ -664,10 +667,7 @@
       }
     },
     "pieChart": {
-      "serviceRequests": "Service Requested",
-      "construction": "Construction",
-      "repair": "Repair",
-      "material": "Material"
+      "serviceRequests": "Service Requested"
     },
     "contractors": {
       "title": "Top Contractors",

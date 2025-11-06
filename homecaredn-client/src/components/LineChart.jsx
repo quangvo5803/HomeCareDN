@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import PropTypes from "prop-types";
 
 ChartJS.register(
   CategoryScale,
@@ -36,11 +37,11 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
 
 
   const defaultData = {
-    labels: Array(12).fill(""),
+    labels: new Array(12).fill(""),
     datasets: [
       {
         label: "No Data",
-        data: Array(12).fill(0),
+        data: new Array(12).fill(0),
         borderColor: "#ccc",
         backgroundColor: "rgba(200,200,200,0.3)",
         borderWidth: 2,
@@ -50,6 +51,7 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
       },
     ],
   };
+
   // cho admin
   if (type === "Admin") {
     return (
@@ -61,7 +63,7 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
           {onYearChange && (
             <select
               value={year}
-              onChange={(e) => onYearChange(parseInt(e.target.value))}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
               className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
             >
               {Array.from({ length: 6 }, (_, i) => {
@@ -93,7 +95,7 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
           {onYearChange && (
             <select
               value={year}
-              onChange={(e) => onYearChange(parseInt(e.target.value))}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
               className="border border-green-400 rounded px-2 py-1 text-sm bg-white"
             >
               {Array.from({ length: 6 }, (_, i) => {
@@ -126,3 +128,11 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
     </div>
   );
 }
+
+LineChart.propTypes = {
+  title: PropTypes.string.isRequired,
+  data: PropTypes.object.isRequired,
+  year: PropTypes.number.isRequired,
+  onYearChange: PropTypes.func.isRequired,
+  type: PropTypes.string,
+};

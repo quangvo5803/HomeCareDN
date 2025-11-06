@@ -7,10 +7,11 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import PropTypes from "prop-types";
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-export default function PieChartBase({ title, year, onYearChange, data, type }) {
+export default function PieChart({ title, year, onYearChange, data, type }) {
   console.log("🔍 Received type:", type);
 
   const options = {
@@ -44,7 +45,7 @@ export default function PieChartBase({ title, year, onYearChange, data, type }) 
           {onYearChange && (
             <select
               value={year}
-              onChange={(e) => onYearChange(parseInt(e.target.value))}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
               className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
             >
               {Array.from({ length: 6 }, (_, i) => {
@@ -73,7 +74,7 @@ export default function PieChartBase({ title, year, onYearChange, data, type }) 
           {onYearChange && (
             <select
               value={year}
-              onChange={(e) => onYearChange(parseInt(e.target.value))}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
               className="border border-green-400 rounded px-2 py-1 text-sm bg-white"
             >
               {Array.from({ length: 6 }, (_, i) => {
@@ -104,3 +105,10 @@ export default function PieChartBase({ title, year, onYearChange, data, type }) 
     </div>
   );
 }
+PieChart.propTypes = {
+  title: PropTypes.string.isRequired,
+  year: PropTypes.number.isRequired,
+  onYearChange: PropTypes.func,
+  data: PropTypes.object.isRequired,
+  type: PropTypes.string,
+};

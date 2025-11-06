@@ -641,6 +641,9 @@
       "sales": "Doanh thu",
       "sinceLastMonth": " so với tháng trước"
     },
+    "construction": "Xây dựng",
+    "repair": "Sửa chữa",
+    "material": "Vật liệu",
     "lineChart": {
       "salesOverview": "Tổng quan doanh số",
       "months": {
@@ -659,10 +662,7 @@
       }
     },
     "pieChart": {
-      "serviceRequests": "Tổng dịch vụ đã yêu cầu",
-      "construction": "Xây dựng",
-      "repair": "Sửa chữa",
-      "material": "Vật liệu"
+      "serviceRequests": "Tổng dịch vụ đã yêu cầu"
     },
     "contractors": {
       "title": "Nhà thầu hàng đầu",

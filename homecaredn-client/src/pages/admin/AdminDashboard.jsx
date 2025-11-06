@@ -17,6 +17,20 @@ export default function AdminDashboard() {
   const [topStats, setTopStats] = useState({ topContractors: [], topDistributors: [] });
 
   // đường
+  // 👉 Hàm xử lý dữ liệu tách riêng
+  const processLineChartData = (data, labels) => {
+    const getMonthlyValues = (key) =>
+      labels.map((_, i) => {
+        const found = data.find((d) => d.month === i + 1);
+        return found ? found[key] : 0;
+      });
+
+    return {
+      repair: getMonthlyValues("repairCount"),
+      construction: getMonthlyValues("constructionCount"),
+    };
+  };
+
   useEffect(() => {
     const fetchLineChartData = async () => {
       try {
@@ -38,41 +52,33 @@ export default function AdminDashboard() {
           t("adminDashboard.lineChart.months.dec"),
         ];
 
-        const repairData = labels.map((_, i) => {
-          const found = data.find((d) => d.month === i + 1);
-          return found ? found.repairCount : 0;
-        });
-
-        const constructionData = labels.map((_, i) => {
-          const found = data.find((d) => d.month === i + 1);
-          return found ? found.constructionCount : 0;
-        });
+        // 👉 Dữ liệu đã được xử lý gọn gàng hơn
+        const { repair, construction } = processLineChartData(data, labels);
 
         setLineChartData({
           labels,
           datasets: [
             {
-              label: t("adminDashboard.pieChart.repair"),
-              data: repairData,
-              borderColor: "rgb(255,99,132)",
-              backgroundColor: "rgba(255,99,132,0.3)",
-              tension: 0.4,
+              label: t("adminDashboard.repair"),
+              data: repair,
+              borderColor: "#3b82f6",
+              backgroundColor: "rgba(59,130,246,0.2)",
               fill: true,
             },
             {
-              label: t("adminDashboard.pieChart.construction"),
-              data: constructionData,
-              borderColor: "rgb(59,130,246)",
-              backgroundColor: "rgba(59,130,246,0.3)",
-              tension: 0.4,
+              label: t("adminDashboard.construction"),
+              data: construction,
+              borderColor: "#10b981",
+              backgroundColor: "rgba(16,185,129,0.2)",
               fill: true,
             },
           ],
         });
-      } catch (err) {
-        toast.error(t(handleApiError(err)));
+      } catch (error) {
+        console.error("Error fetching line chart data:", error);
       }
     };
+
     fetchLineChartData();
   }, [lineYear, t]);
 
@@ -86,16 +92,16 @@ export default function AdminDashboard() {
 
         let construction = 0, repair = 0, material = 0;
 
-        rawData.forEach((item) => {
+        for (const item of rawData) {
           if (item.serviceType === "Construction") construction = item.count;
           if (item.serviceType === "Repair") repair = item.count;
           if (item.serviceType === "Material") material = item.count;
-        });
+        }
 
         const labels = [
-          t("adminDashboard.pieChart.construction"),
-          t("adminDashboard.pieChart.repair"),
-          t("adminDashboard.pieChart.material"),
+          t("adminDashboard.construction"),
+          t("adminDashboard.repair"),
+          t("adminDashboard.material"),
         ];
 
         const values = [construction, repair, material];
