@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace HomeCareDNAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/chat-messages")]
     [Authorize(
         AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
         Roles = "Customer,Contractor"

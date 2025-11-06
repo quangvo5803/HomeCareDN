@@ -13,7 +13,6 @@ namespace DataAccess.Entities.Application
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? DueCommisionTime { get; set; }
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
-        public Conversation? Conversation { get; set; }
         public ICollection<Image>? Images { get; set; }
         public ICollection<Document>? Documents { get; set; }
     }

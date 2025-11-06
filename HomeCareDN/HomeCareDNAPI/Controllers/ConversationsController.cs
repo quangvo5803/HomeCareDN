@@ -21,7 +21,7 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpPost()]
+        [HttpPost]
         public async Task<IActionResult> CreateConversation(
             [FromBody] ConversationCreateRequestDto dto
         )
