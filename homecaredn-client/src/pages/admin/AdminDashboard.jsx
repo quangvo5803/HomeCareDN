@@ -17,19 +17,18 @@ export default function AdminDashboard() {
   const [topStats, setTopStats] = useState({ topContractors: [], topDistributors: [] });
 
   // đường
-  // 👉 Hàm xử lý dữ liệu tách riêng
-  const processLineChartData = (data, labels) => {
-    const getMonthlyValues = (key) =>
-      labels.map((_, i) => {
-        const found = data.find((d) => d.month === i + 1);
-        return found ? found[key] : 0;
-      });
-
-    return {
-      repair: getMonthlyValues("repairCount"),
-      construction: getMonthlyValues("constructionCount"),
-    };
+  const getMonthlyValue = (data, month, key) => {
+    const found = data.find((d) => d.month === month);
+    return found ? found[key] : 0;
   };
+
+  const getMonthlyDataset = (data, labels, key) =>
+    labels.map((_, i) => getMonthlyValue(data, i + 1, key));
+
+  const processLineChartData = (data, labels) => ({
+    repair: getMonthlyDataset(data, labels, "repairCount"),
+    construction: getMonthlyDataset(data, labels, "constructionCount"),
+  });
 
   useEffect(() => {
     const fetchLineChartData = async () => {
