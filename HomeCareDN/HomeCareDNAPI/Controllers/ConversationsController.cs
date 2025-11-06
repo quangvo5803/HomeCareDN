@@ -21,19 +21,10 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateConversation(
-            [FromBody] ConversationCreateRequestDto dto
-        )
-        {
-            var result = await _facadeService.ConversationService.CreateConversationAsync(dto);
-            return Ok(result);
-        }
-
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetConversationByID(Guid id)
         {
-            var result = await _facadeService.ConversationService.GetConversationByIdAsync(id);
+            var result = await _facadeService.ConversationService.GetConversationByIDAsync(id);
             return Ok(result);
         }
     }

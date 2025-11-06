@@ -200,33 +200,22 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ContractorApplicationID")
+                    b.Property<Guid>("ContractorID")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("ContractorID")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CustomerID")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("CustomerID")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsLocked")
                         .HasColumnType("boolean");
-
-                    b.Property<DateTime>("LastMessageAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ServiceRequestID")
                         .HasColumnType("uuid");
 
                     b.HasKey("ConversationID");
-
-                    b.HasIndex("ContractorApplicationID")
-                        .IsUnique();
 
                     b.HasIndex("ServiceRequestID")
                         .IsUnique();
@@ -724,19 +713,11 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", "ContractorApplication")
-                        .WithOne("Conversation")
-                        .HasForeignKey("DataAccess.Entities.Application.Conversation", "ContractorApplicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
                         .WithOne("Conversation")
                         .HasForeignKey("DataAccess.Entities.Application.Conversation", "ServiceRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ContractorApplication");
 
                     b.Navigation("ServiceRequest");
                 });
@@ -865,8 +846,6 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
-                    b.Navigation("Conversation");
-
                     b.Navigation("Documents");
 
                     b.Navigation("Images");

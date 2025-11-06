@@ -20,28 +20,7 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<ConversationDto> CreateConversationAsync(ConversationCreateRequestDto dto)
-        {
-            // 1. Check existing conversation
-            var existingConversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ServiceRequestID == dto.ServiceRequestID
-                && c.ContractorApplicationID == dto.ContractorApplicationID
-            );
-
-            if (existingConversation != null)
-                return _mapper.Map<ConversationDto>(existingConversation);
-
-            // 2. Create new
-            var conversation = _mapper.Map<Conversation>(dto);
-            await _unitOfWork.ConversationRepository.AddAsync(conversation);
-            await _unitOfWork.SaveAsync();
-
-            var result = _mapper.Map<ConversationDto>(conversation);
-
-            return result;
-        }
-
-        public async Task<ConversationDto?> GetConversationByIdAsync(Guid id)
+        public async Task<ConversationDto?> GetConversationByIDAsync(Guid id)
         {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationID == id

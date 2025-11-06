@@ -17,7 +17,6 @@ namespace BusinessLogic.Services
 
         private const string CONVERSATION = "Conversation";
         private const string MESSAGE = "Message";
-        private const string SERVICE_REQUEST = "ServiceRequest";
 
         private const string ERROR_CONVERSATION_NOT_FOUND = "CONVERSATION_NOT_FOUND";
         private const string ERROR_PERMISSION_DENIED = "PERMISSION_DENIED";
@@ -70,19 +69,20 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var entity = new ChatMessage
+            var message = new ChatMessage
             {
                 ChatMessageID = Guid.NewGuid(),
                 ConversationID = dto.ConversationID,
                 SenderID = dto.SenderID,
+                ReceiverID = dto.ReceiverID,
                 Content = dto.Content.Trim(),
                 SentAt = DateTime.UtcNow,
             };
 
-            await _unitOfWork.ChatMessageRepository.AddAsync(entity);
+            await _unitOfWork.ChatMessageRepository.AddAsync(message);
             await _unitOfWork.SaveAsync();
 
-            var result = _mapper.Map<ChatMessageDto>(entity);
+            var result = _mapper.Map<ChatMessageDto>(message);
 
             // realtime
             await _signalRNotifier.SendToGroupAsync(

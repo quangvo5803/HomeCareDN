@@ -106,7 +106,8 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 )
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,

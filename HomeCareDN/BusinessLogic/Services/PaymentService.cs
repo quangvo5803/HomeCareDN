@@ -126,6 +126,15 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
+                var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                    c.ServiceRequestID == payment.ServiceRequestID
+                );
+
+                if (conversation != null)
+                {
+                    conversation.IsLocked = false;
+                }
+
                 var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
                     s.ServiceRequestID == payment.ServiceRequestID
                 );

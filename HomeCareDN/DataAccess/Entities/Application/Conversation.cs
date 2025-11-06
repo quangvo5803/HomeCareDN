@@ -8,10 +8,10 @@ namespace DataAccess.Entities.Application
         public Guid ConversationID { get; set; }
 
         [Required]
-        public string CustomerID { get; set; } = null!;
+        public Guid CustomerID { get; set; }
 
         [Required]
-        public string ContractorID { get; set; } = null!;
+        public Guid ContractorID { get; set; }
 
         [Required]
         public Guid ServiceRequestID { get; set; }
@@ -19,7 +19,6 @@ namespace DataAccess.Entities.Application
         public bool IsLocked { get; set; } = true;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime LastMessageAt { get; set; } = DateTime.UtcNow;
 
         public ServiceRequest? ServiceRequest { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();

@@ -10,8 +10,6 @@ namespace DataAccess.Entities.Application
         [Required]
         public Guid ConversationID { get; set; }
 
-        public Conversation? Conversation { get; set; }
-
         [Required]
         public string SenderID { get; set; } = null!;
 
@@ -21,5 +19,6 @@ namespace DataAccess.Entities.Application
         [Required]
         public string Content { get; set; } = "";
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public Conversation? Conversation { get; set; }
     }
 }

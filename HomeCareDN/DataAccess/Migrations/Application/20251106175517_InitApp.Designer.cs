@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251030081738_InitDatabase")]
-    partial class InitDatabase
+    [Migration("20251106175517_InitApp")]
+    partial class InitApp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -93,7 +93,7 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
                 {
-                    b.Property<Guid>("ChatMessageId")
+                    b.Property<Guid>("ChatMessageID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -101,26 +101,23 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ConversationId")
+                    b.Property<Guid>("ConversationID")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ReceiverId")
+                    b.Property<string>("ReceiverID")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("SenderId")
+                    b.Property<string>("SenderID")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("SentAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("ChatMessageId");
+                    b.HasKey("ChatMessageID");
 
-                    b.HasIndex("ConversationId");
+                    b.HasIndex("ConversationID");
 
                     b.ToTable("ChatMessages", "app");
                 });
@@ -202,28 +199,29 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
-                    b.Property<Guid>("ConversationId")
+                    b.Property<Guid>("ConversationID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ContractorId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("ContractorID")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("CustomerID")
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTime>("LastMessageAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsLocked")
+                        .HasColumnType("boolean");
 
-                    b.HasKey("ConversationId");
+                    b.Property<Guid>("ServiceRequestID")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ConversationID");
+
+                    b.HasIndex("ServiceRequestID")
+                        .IsUnique();
 
                     b.ToTable("Conversations", "app");
                 });
@@ -292,6 +290,9 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("PartnerRequestID")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("PublicId")
                         .IsRequired()
                         .HasColumnType("text");
@@ -300,6 +301,12 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.HasKey("DocumentID");
+
+                    b.HasIndex("ContractorApplicationID");
+
+                    b.HasIndex("PartnerRequestID");
+
+                    b.HasIndex("ServiceRequestID");
 
                     b.ToTable("Documents", "app");
                 });
@@ -691,7 +698,7 @@ namespace DataAccess.Migrations.Application
                 {
                     b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
                         .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
+                        .HasForeignKey("ConversationID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -707,6 +714,17 @@ namespace DataAccess.Migrations.Application
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
+                        .WithOne("Conversation")
+                        .HasForeignKey("DataAccess.Entities.Application.Conversation", "ServiceRequestID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ServiceRequest");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.MaterialRequest", null)
@@ -714,6 +732,21 @@ namespace DataAccess.Migrations.Application
                         .HasForeignKey("MaterialRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ContractorApplicationID");
+
+                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("PartnerRequestID");
+
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceRequestID");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -816,6 +849,8 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
@@ -838,6 +873,8 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
@@ -849,6 +886,10 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Documents");
 
                     b.Navigation("Images");
                 });

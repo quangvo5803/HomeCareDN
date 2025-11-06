@@ -306,6 +306,17 @@ namespace BusinessLogic.Services
             }
 
             await _unitOfWork.SaveAsync();
+
+            var conversation = new Conversation
+            {
+                ConversationID = Guid.NewGuid(),
+                ServiceRequestID = serviceRequest.ServiceRequestID,
+                CustomerID = serviceRequest.CustomerID,
+                ContractorID = contractorApplication.ContractorID,
+            };
+            await _unitOfWork.ConversationRepository.AddAsync(conversation);
+            await _unitOfWork.SaveAsync();
+
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             var payloadAccept = new
             {
