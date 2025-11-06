@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105145944_UpdateContractorApplication")]
+    partial class UpdateContractorApplication
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -272,8 +275,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("integer");
 
                     b.HasKey("DistributorApplicationItemID");
-
-                    b.HasIndex("DistributorApplicationID");
 
                     b.ToTable("DistributorApplicationItems", "app");
                 });
@@ -718,15 +719,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplicationItem", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.DistributorApplication", null)
-                        .WithMany("Items")
-                        .HasForeignKey("DistributorApplicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -833,11 +825,6 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
                     b.Navigation("Messages");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
