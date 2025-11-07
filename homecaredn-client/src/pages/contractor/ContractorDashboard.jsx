@@ -10,6 +10,7 @@ import { useAuth } from '../../hook/useAuth';
 import Loading from '../../components/Loading';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import PropTypes from 'prop-types';
 
 const INITIAL_KPI_STATE = {
   totalRequests: 0,
@@ -61,6 +62,22 @@ const ServiceRequestRow = React.memo(function ServiceRequestRow({
   );
 });
 
+ServiceRequestRow.propTypes = {
+  serviceRequestID: PropTypes.string.isRequired,
+  serviceType: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired,
+  estimatePrice: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.oneOf([null]),
+  ]),
+  createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
+    .isRequired,
+  status: PropTypes.string.isRequired,
+  t: PropTypes.func.isRequired,
+  i18n: PropTypes.shape({ language: PropTypes.string.isRequired }).isRequired,
+  onView: PropTypes.func.isRequired,
+};
+
 export default function ContractorDashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -86,7 +103,6 @@ export default function ContractorDashboard() {
     setTotalServiceRequests,
   } = useServiceRequest();
 
-  // Load KPI từ endpoint mới
   const fetchDashboard = useCallback(async () => {
     if (!isContractor) return;
     setIsLoadingKpi(true);
@@ -252,7 +268,6 @@ export default function ContractorDashboard() {
     },
   });
 
-  // Render body bảng tối ưu, không ternary lồng nhau
   const tableBody = useMemo(() => {
     if (isLoadingTable) {
       return (
