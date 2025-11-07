@@ -18,11 +18,9 @@ export default function AdminUserManager() {
     } = useUser();
 
     const [currentPage, setCurrentPage] = useState(1);
-    //const [isModalOpen, setIsModalOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [sortBy, setSortBy] = useState('');
     const [debouncedSearch] = useDebounce(search, 1000);
-    //const [userID, setUserID] = useState(null);
     const [filter, setFilter] = useState('all');
 
     useEffect(() => {
@@ -162,79 +160,87 @@ export default function AdminUserManager() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
-                                        {loading ? (
-                                            <tr>
-                                                <td colSpan="7" className="py-10 text-center align-middle">
-                                                    <LoadingComponent />
-                                                </td>
-                                            </tr>
-                                        ) : users && users.length > 0 ? (
-                                            users.map((item, index) => {
-
-                                                const firstAddress = item?.address?.[0];
-                                                const addressText = firstAddress
-                                                    ? [firstAddress.district, firstAddress.city].filter(Boolean).join(', ')
-                                                    : '—';
-
+                                        {(() => {
+                                            if (loading) {
                                                 return (
-                                                    <tr
-                                                        key={item.userID}
-                                                        className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                                                            }`}
-                                                    >
-                                                        <td className="px-4 py-4 text-center align-middle">
-                                                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
-                                                                {(currentPage - 1) * pageSize + index + 1}
-                                                            </span>
-                                                        </td>
-                                                        <td className="px-6 py-4 align-middle">
-                                                            <div className="text-sm font-medium text-gray-900">{item.fullName}</div>
-                                                        </td>
-                                                        <td className="px-6 py-4 align-middle">
-                                                            <div className="text-sm text-gray-900">{item.email}</div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center align-middle">
-                                                            <div className="text-sm text-gray-900">
-                                                                {item.phoneNumber !== null ? item.phoneNumber : '—'}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center align-middle">
-                                                            <div className="text-sm text-gray-900">
-                                                                {item.projectCount > 0 ? item.projectCount : '—'}
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-4 text-center align-middle">
-                                                            <div className="text-sm text-gray-900">{addressText}</div>
-                                                        </td>
-                                                        <td className="px-4 py-4 text-center align-middle">
-                                                            <div className="flex items-center justify-center space-x-1">
-                                                                <button
-                                                                    className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                                                                >
-                                                                    {t('BUTTON.View')}
-                                                                </button>
-                                                            </div>
+                                                    <tr>
+                                                        <td colSpan="7" className="py-10 text-center align-middle">
+                                                            <LoadingComponent />
                                                         </td>
                                                     </tr>
                                                 );
-                                            })
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="7" className="px-6 py-16 text-center">
-                                                    <div className="flex flex-col items-center text-center mt-5 mb-5">
-                                                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                            <i className="fa-solid fa-users text-gray-400 text-3xl" />
+                                            }
+
+                                            if (users && users.length > 0) {
+                                                return users.map((item, index) => {
+                                                    const firstAddress = item?.address?.[0];
+                                                    const addressText = firstAddress
+                                                        ? [firstAddress.district, firstAddress.city].filter(Boolean).join(', ')
+                                                        : '—';
+
+                                                    return (
+                                                        <tr
+                                                            key={item.userID}
+                                                            className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                                                                }`}
+                                                        >
+                                                            <td className="px-4 py-4 text-center align-middle">
+                                                                <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
+                                                                    {(currentPage - 1) * pageSize + index + 1}
+                                                                </span>
+                                                            </td>
+                                                            <td className="px-6 py-4 align-middle">
+                                                                <div className="text-sm font-medium text-gray-900">{item.fullName}</div>
+                                                            </td>
+                                                            <td className="px-6 py-4 align-middle">
+                                                                <div className="text-sm text-gray-900">{item.email}</div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center align-middle">
+                                                                <div className="text-sm text-gray-900">
+                                                                    {item.phoneNumber ?? '—'}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center align-middle">
+                                                                <div className="text-sm text-gray-900">
+                                                                    {item.projectCount > 0 ? item.projectCount : '—'}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-center align-middle">
+                                                                <div className="text-sm text-gray-900">{addressText}</div>
+                                                            </td>
+                                                            <td className="px-4 py-4 text-center align-middle">
+                                                                <div className="flex items-center justify-center space-x-1">
+                                                                    <button
+                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                                                    >
+                                                                        {t('BUTTON.View')}
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            }
+
+                                            // Empty state
+                                            return (
+                                                <tr>
+                                                    <td colSpan="7" className="px-6 py-16 text-center">
+                                                        <div className="flex flex-col items-center text-center mt-5 mb-5">
+                                                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                                <i className="fa-solid fa-users text-gray-400 text-3xl" />
+                                                            </div>
+                                                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                                                {t('adminUserManager.empty')}
+                                                            </h3>
+                                                            <p className="text-sm text-gray-500">
+                                                                {t('adminUserManager.empty_description')}
+                                                            </p>
                                                         </div>
-                                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                                            {t('adminUserManager.empty')}
-                                                        </h3>
-                                                        <p className="text-sm text-gray-500">
-                                                            {t('adminUserManager.empty_description')}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })()}
                                     </tbody>
 
                                 </table>
@@ -244,81 +250,84 @@ export default function AdminUserManager() {
                         {/* Mobile/Tablet Card Layout */}
                         <div className="lg:hidden">
                             <div className="p-4 space-y-4">
-                                {loading ? (
-                                    <div className="py-10 text-center">
-                                        <LoadingComponent />
-                                    </div>
-                                ) : users && users.length > 0 ? (
-                                    users.map((item, index) => {
-
-                                        const firstAddress = item?.address?.[0];
-                                        const addressText = firstAddress
-                                            ? [firstAddress.district, firstAddress.city].filter(Boolean).join(', ')
-                                            : '—';
-
+                                {(() => {
+                                    if (loading) {
                                         return (
-                                            <div
-                                                key={item.userID}
-                                                className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
-                                            >
-                                                <div className="flex items-start justify-between mb-3">
-                                                    <div className="flex items-center space-x-3">
-                                                        <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-orange-800 bg-orange-100 rounded-full">
-                                                            {(currentPage - 1) * pageSize + index + 1}
-                                                        </span>
-                                                        <div>
-                                                            <h3 className="text-sm font-medium text-gray-900">
-                                                                {item.fullName}
-                                                            </h3>
-                                                            <p className="text-xs text-gray-500">{item.email}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-3 space-y-2">
-                                                    <div className="flex items-center text-xs text-gray-600">
-                                                        <i className="fa-solid fa-phone w-4 mr-2" />
-                                                        {item.phoneNumber !== null ? item.phoneNumber : '—'}
-                                                    </div>
-                                                    <div className="flex items-center text-xs text-gray-600">
-                                                        <i className="fa-solid fa-diagram-project w-4 mr-2"></i>
-                                                        {item.projectCount > 0 ? item.projectCount : '—'}
-                                                    </div>
-                                                </div>
-
-                                                <div className="mb-3 space-y-2">
-                                                    <div className="flex items-center text-xs text-gray-600">
-                                                        <i className="fa-solid fa-location-dot w-4 mr-2"></i>
-                                                        {addressText}
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex space-x-2">
-                                                    <button
-                                                        className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                                                    >
-                                                        {t('BUTTON.View')}
-                                                    </button>
-                                                </div>
+                                            <div className="py-10 text-center">
+                                                <LoadingComponent />
                                             </div>
                                         );
-                                    })
-                                ) : (
-                                    <div className="py-16 text-center">
-                                        <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                            <i className="fa-solid fa-users text-gray-400 text-3xl" />
+                                    }
+
+                                    if (users && users.length > 0) {
+                                        return users.map((item, index) => {
+                                            const firstAddress = item?.address?.[0];
+                                            const addressText = firstAddress
+                                                ? [firstAddress.district, firstAddress.city].filter(Boolean).join(', ')
+                                                : '—';
+
+                                            return (
+                                                <div
+                                                    key={item.userID}
+                                                    className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
+                                                >
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <div className="flex items-center space-x-3">
+                                                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-medium text-orange-800 bg-orange-100 rounded-full">
+                                                                {(currentPage - 1) * pageSize + index + 1}
+                                                            </span>
+                                                            <div>
+                                                                <h3 className="text-sm font-medium text-gray-900">{item.fullName}</h3>
+                                                                <p className="text-xs text-gray-500">{item.email}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mb-3 space-y-2">
+                                                        <div className="flex items-center text-xs text-gray-600">
+                                                            <i className="fa-solid fa-phone w-4 mr-2" />
+                                                            {item.phoneNumber ?? '—'}
+                                                        </div>
+                                                        <div className="flex items-center text-xs text-gray-600">
+                                                            <i className="fa-solid fa-diagram-project w-4 mr-2" />
+                                                            {item.projectCount > 0 ? item.projectCount : '—'}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mb-3 space-y-2">
+                                                        <div className="flex items-center text-xs text-gray-600">
+                                                            <i className="fa-solid fa-location-dot w-4 mr-2" />
+                                                            {addressText}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex space-x-2">
+                                                        <button className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100">
+                                                            {t('BUTTON.View')}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    }
+
+                                    // Empty state
+                                    return (
+                                        <div className="py-16 text-center">
+                                            <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                                <i className="fa-solid fa-users text-gray-400 text-3xl" />
+                                            </div>
+                                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                                {t('adminUserManager.empty')}
+                                            </h3>
+                                            <p className="text-sm text-gray-500">
+                                                {t('adminUserManager.empty_description')}
+                                            </p>
                                         </div>
-                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                            {t('adminUserManager.empty')}
-                                        </h3>
-                                        <p className="text-sm text-gray-500">
-                                            {t('adminUserManager.empty_description')}
-                                        </p>
-                                    </div>
-                                )}
+                                    );
+                                })()}
                             </div>
                         </div>
-
 
                         {/* Pagination */}
                         {totalUsers > 0 && (
