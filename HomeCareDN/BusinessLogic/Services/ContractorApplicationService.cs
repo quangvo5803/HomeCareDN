@@ -54,9 +54,7 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork
                 .ContractorApplicationRepository.GetQueryable(includeProperties: IMAGES)
-                .Where(ca => ca.ServiceRequestID == parameters.FilterID)
-                .AsSingleQuery()
-                .AsNoTracking();
+                .Where(ca => ca.ServiceRequestID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
             query = query
@@ -290,7 +288,8 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == contractorApplicationID,
-                includeProperties: IMAGES
+                includeProperties: IMAGES,
+                false
             );
             if (contractorApplication == null)
             {
@@ -303,7 +302,8 @@ namespace BusinessLogic.Services
 
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == contractorApplication.ServiceRequestID,
-                includeProperties: "ContractorApplications"
+                includeProperties: "ContractorApplications",
+                false
             );
 
             if (serviceRequest == null)
@@ -374,7 +374,8 @@ namespace BusinessLogic.Services
         )
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
-                ca => ca.ContractorApplicationID == contractorApplicationID
+                ca => ca.ContractorApplicationID == contractorApplicationID,
+                asNoTracking: false
             );
 
             if (contractorApplication == null)

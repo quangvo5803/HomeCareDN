@@ -8,7 +8,7 @@ namespace DataAccess.Repositories
     public class Repository<T> : IRepository<T>
         where T : class
     {
-        internal DbSet<T> dbSet;
+        internal readonly DbSet<T> dbSet;
 
         public Repository(ApplicationDbContext db)
         {
@@ -27,16 +27,20 @@ namespace DataAccess.Repositories
 
         public async Task<T?> GetAsync(
             Expression<Func<T, bool>> filter,
-            string? includeProperties = null
+            string? includeProperties = null,
+            bool asNoTracking = true
         )
         {
-            IQueryable<T> query = dbSet;
-            query = query.Where(filter);
+            IQueryable<T> query = dbSet.Where(filter);
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
+
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (
                     var includeProp in includeProperties.Split(
-                        new char[] { ',' },
+                        ',',
                         StringSplitOptions.RemoveEmptyEntries
                     )
                 )
@@ -44,22 +48,26 @@ namespace DataAccess.Repositories
                     query = query.Include(includeProp);
                 }
             }
+
             return await query.FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<T>> GetRangeAsync(
             Expression<Func<T, bool>> filter,
-            string? includeProperties = null
+            string? includeProperties = null,
+            bool asNoTracking = true
         )
         {
-            IQueryable<T> query = dbSet.AsNoTracking();
-            query = query.Where(filter);
+            IQueryable<T> query = dbSet.Where(filter);
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (
                     var includeProp in includeProperties.Split(
-                        new char[] { ',' },
+                        ',',
                         StringSplitOptions.RemoveEmptyEntries
                     )
                 )
@@ -67,18 +75,25 @@ namespace DataAccess.Repositories
                     query = query.Include(includeProp);
                 }
             }
+
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetAllAsync(
+            string? includeProperties = null,
+            bool asNoTracking = true
+        )
         {
-            IQueryable<T> query = dbSet.AsNoTracking();
+            IQueryable<T> query = dbSet;
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (
                     var includeProp in includeProperties.Split(
-                        new char[] { ',' },
+                        ',',
                         StringSplitOptions.RemoveEmptyEntries
                     )
                 )
@@ -86,18 +101,25 @@ namespace DataAccess.Repositories
                     query = query.Include(includeProp);
                 }
             }
+
             return await query.ToListAsync();
         }
 
-        public IQueryable<T> GetQueryable(string? includeProperties = null)
+        public IQueryable<T> GetQueryable(
+            string? includeProperties = null,
+            bool asNoTracking = true
+        )
         {
-            IQueryable<T> query = dbSet.AsNoTracking();
+            IQueryable<T> query = dbSet;
+
+            if (asNoTracking)
+                query = query.AsNoTracking();
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (
                     var includeProp in includeProperties.Split(
-                        new char[] { ',' },
+                        ',',
                         StringSplitOptions.RemoveEmptyEntries
                     )
                 )

@@ -52,10 +52,9 @@ namespace BusinessLogic.Services.Interfaces
             string role = ADMIN
         )
         {
-            var query = _unitOfWork
-                .ServiceRequestRepository.GetQueryable(includeProperties: INCLUDE_LISTALL)
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.ServiceRequestRepository.GetQueryable(
+                includeProperties: INCLUDE_LISTALL
+            );
 
             var totalCount = await query.CountAsync();
             if (role == CONTRACTOR && parameters.FilterID != null)
@@ -113,9 +112,7 @@ namespace BusinessLogic.Services.Interfaces
         {
             var query = _unitOfWork
                 .ServiceRequestRepository.GetQueryable(includeProperties: INCLUDE_LISTALL)
-                .Where(sr => sr.CustomerID == parameters.FilterID)
-                .AsSingleQuery()
-                .AsNoTracking();
+                .Where(sr => sr.CustomerID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
 
@@ -433,7 +430,8 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL
+                includeProperties: INCLUDE_DETAIL,
+                false
             );
 
             ValidateServiceRequest(serviceRequest);

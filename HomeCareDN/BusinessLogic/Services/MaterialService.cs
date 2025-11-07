@@ -40,10 +40,9 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork
-                .MaterialRepository.GetQueryable(includeProperties: MATERIAL_INCLUDE)
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.MaterialRepository.GetQueryable(
+                includeProperties: MATERIAL_INCLUDE
+            );
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
@@ -208,7 +207,8 @@ namespace BusinessLogic.Services
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: MATERIAL_INCLUDE
+                includeProperties: MATERIAL_INCLUDE,
+                false
             );
 
             //check image

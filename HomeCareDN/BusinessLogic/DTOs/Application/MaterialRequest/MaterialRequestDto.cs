@@ -9,6 +9,8 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public Guid? SelectedDistributorApplicationID { get; set; }
         public required string Description { get; set; }
         public bool CanEditQuantity { get; set; }
+        public bool CanAddMaterial { get; set; }
+
         public DateTime CreatedAt { get; set; }
         public required string Status { get; set; }
         public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }

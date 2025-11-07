@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const {
     loading,
     materialRequests,
@@ -44,7 +44,7 @@ export default function MaterialRequestManager({ user }) {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 mb-1">
-            <i className="fas fa-truck text-orange-600 mr-2"></i>
+            <i className="fas fa-boxes text-orange-600 mr-2"></i>
             {t('userPage.materialRequest.title')}
           </h2>
           <p className="text-sm text-gray-600">
@@ -127,7 +127,7 @@ export default function MaterialRequestManager({ user }) {
                           <i className="fas fa-list text-orange-500"></i>
                           {t('userPage.materialRequest.lbl_materialList')} (
                           {req.materialRequestItems.length}{' '}
-                          {t('userPage.materialRequest.lbl_material')})
+                          {t('userPage.materialRequest.lbl_materialUnit')})
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
@@ -138,7 +138,11 @@ export default function MaterialRequestManager({ user }) {
                             >
                               <i className="fas fa-cube text-orange-400 text-xs"></i>
                               <span className="font-medium">
-                                {item.materialName}:
+                                {i18n.language === 'vi'
+                                  ? item.material?.name
+                                  : item.material?.nameEN ||
+                                    item.material?.name}
+                                :
                               </span>
                               <span className="text-black font-semibold">
                                 {item.quantity} {item.unit}
@@ -168,16 +172,10 @@ export default function MaterialRequestManager({ user }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <StatusBadge status={req.status} type="Request" />
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        <i className="fas fa-truck mr-1"></i>
+                        <i className="fas fa-boxes mr-1"></i>
                         {req.distributorApplications.length}{' '}
                         {t('userPage.materialRequest.lbl_distributor')}
                       </span>
-                      {req.canEditQuantity && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                          <i className="fas fa-edit mr-1"></i>
-                          {t('userPage.materialRequest.lbl_canEditQuantity')}
-                        </span>
-                      )}
                     </div>
 
                     <div className="flex items-center gap-2">
