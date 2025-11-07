@@ -45,13 +45,9 @@ export const ServiceRequestProvider = ({ children }) => {
           return { items: [], totalCount: 0 };
         }
 
-        const itemsWithType = (data.items || []).map((r) => ({
-          ...r,
-          type: 'serviceRequest',
-        }));
-        setServiceRequests(itemsWithType);
+        setServiceRequests(data.items || []);
         setTotalServiceRequests(data.totalCount || 0);
-        return itemsWithType;
+        return data.items || [];
       } catch (err) {
         toast.error(handleApiError(err));
         setServiceRequests([]);

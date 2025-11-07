@@ -32,10 +32,7 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork
-                .ServiceRepository.GetQueryable(SERVICE_INCLUDE)
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
@@ -142,7 +139,8 @@ namespace BusinessLogic.Services
         {
             var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == serviceUpdateDto.ServiceID,
-                includeProperties: SERVICE_INCLUDE
+                includeProperties: SERVICE_INCLUDE,
+                false
             );
             if (service == null)
             {

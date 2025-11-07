@@ -31,10 +31,7 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork
-                .ContactSupportRepository.GetQueryable()
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.ContactSupportRepository.GetQueryable();
             if (parameters.FilterBool != null)
             {
                 query = query.Where(s => s.IsProcessed == parameters.FilterBool);
@@ -100,8 +97,9 @@ namespace BusinessLogic.Services
 
         public async Task<ContactSupportDto> ReplyAsync(ContactSupportReplyRequestDto dto)
         {
-            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(x =>
-                x.Id == dto.ID
+            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(
+                x => x.Id == dto.ID,
+                asNoTracking: false
             );
 
             if (customerSupportRequest == null)
