@@ -1104,12 +1104,12 @@ export default function ContractorServiceRequestDetail() {
           )}
 
           {/* Chat Section */}
-          {
-            <ChatSection
-              conversationId={serviceRequest.conversation.conversationID}
-              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
-            />
-          }
+
+          <ChatSection
+            conversationId={serviceRequest.conversation.conversationID}
+            isLocked={serviceRequest.conversation.isLocked}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+          />
         </div>
 
         {/* RIGHT: Summary Sidebar */}

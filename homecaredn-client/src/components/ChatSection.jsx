@@ -22,10 +22,10 @@ export default function ChatSection({
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
+
   // Load messages
   const loadMessages = useCallback(async () => {
     if (!conversationId) return;
-
     try {
       const data = await chatMessageService.getMessagesByConversation(
         conversationId
@@ -36,9 +36,11 @@ export default function ChatSection({
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } catch (error) {
+      console.error('Load messages error:', error);
       toast.error(t(handleApiError(error)));
     }
   }, [conversationId, t]);
+
   // Load conversation details
   useEffect(() => {
     if (!conversationId) {
@@ -53,7 +55,7 @@ export default function ChatSection({
         );
         setConversation(conv);
 
-        if (!conv.isLocked) {
+        if (conv && conv.isLocked === false) {
           await loadMessages();
         }
       } catch (error) {
@@ -68,8 +70,6 @@ export default function ChatSection({
 
   // Send message
   const handleSend = async () => {
-    if (!input.trim() || !conversation || conversation.isLocked) return;
-
     try {
       const receiverId =
         user.id === conversation.customerID.toString()
@@ -116,7 +116,7 @@ export default function ChatSection({
         payload.conversationID === conversation.conversationID
       ) {
         setConversation((prev) => ({ ...prev, isLocked: false }));
-        toast.success(t('chat.unlocked') || 'Chat đã được mở khóa!');
+        toast.success(t('chat.unlocked')); // <- Đã xoá fallback
         loadMessages();
       }
     },
@@ -129,7 +129,7 @@ export default function ChatSection({
         <div className="flex items-center justify-center h-96">
           <div className="text-center text-gray-400">
             <i className="fas fa-spinner fa-spin text-3xl mb-2"></i>
-            <p className="text-sm">Đang tải...</p>
+            <p className="text-sm">{t('loading')}</p>
           </div>
         </div>
       </div>
@@ -142,19 +142,19 @@ export default function ChatSection({
       <div className={`bg-white rounded-lg shadow-sm border p-6 ${className}`}>
         <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
           <i className="fas fa-comments"></i>
-          <span>{t('chat.title') || 'Trò chuyện'}</span>
+          <span>{t('chat.title')}</span>
         </h4>
         <div className="flex items-center justify-center h-96 text-gray-400">
           <div className="text-center">
             <i className="fas fa-comment-slash text-4xl mb-2"></i>
-            <p className="text-sm">Chưa có cuộc trò chuyện</p>
+            <p className="text-sm">{t('chat.noConversation')}</p>
           </div>
         </div>
       </div>
     );
   }
 
-  const chatIsLocked = conversation.isLocked || isLocked;
+  const chatIsLocked = conversation.isLocked === true || isLocked === true;
 
   return (
     <div
@@ -162,17 +162,16 @@ export default function ChatSection({
     >
       <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
         <i className="fas fa-comments"></i>
-        <span>{t('chat.title') || 'Trò chuyện'}</span>
-        {chatIsLocked && (
+        <span>{t('chat.title')}</span>
+        {chatIsLocked ? (
           <span className="ml-2 px-3 py-1 bg-red-100 text-red-600 text-xs rounded-full">
             <i className="fas fa-lock mr-1"></i>
-            {t('chat.locked') || 'Đang khóa'}
+            {t('chat.locked')}
           </span>
-        )}
-        {!chatIsLocked && (
+        ) : (
           <span className="ml-2 px-3 py-1 bg-green-100 text-green-600 text-xs rounded-full">
             <i className="fas fa-unlock mr-1"></i>
-            {t('chat.active') || 'Đang hoạt động'}
+            {t('chat.active')}
           </span>
         )}
       </h4>
@@ -183,11 +182,10 @@ export default function ChatSection({
           <div className="text-center text-white px-6">
             <i className="fas fa-lock text-4xl mb-4"></i>
             <p className="text-lg font-semibold mb-2">
-              {t('chat.locked.title') || 'Chat đang bị khóa'}
+              {t('chat.locked_des.title')}
             </p>
             <p className="text-sm opacity-80">
-              {t('chat.locked.description') ||
-                'Chat sẽ được mở sau khi nhà thầu thanh toán phí hợp tác'}
+              {t('chat.locked_des.description')}
             </p>
           </div>
         </div>
@@ -201,8 +199,8 @@ export default function ChatSection({
               <i className="fas fa-comment-dots text-4xl mb-2"></i>
               <p className="text-sm">
                 {chatIsLocked
-                  ? t('chat.locked.noMessages') || 'Chat đang bị khóa'
-                  : t('chat.noMessages') || 'Chưa có tin nhắn'}
+                  ? t('chat.locked_des.noMessages')
+                  : t('chat.noMessages')}
               </p>
             </div>
           </div>
@@ -224,7 +222,9 @@ export default function ChatSection({
                         : 'bg-gray-200 text-gray-800'
                     }`}
                   >
-                    <p className="text-sm break-words">{m.content}</p>
+                    <p className="text-sm break-words whitespace-pre-wrap">
+                      {m.content}
+                    </p>
                   </div>
                   <p
                     className={`text-xs opacity-70 mt-1 ${
@@ -254,8 +254,8 @@ export default function ChatSection({
           disabled={chatIsLocked}
           placeholder={
             chatIsLocked
-              ? t('chat.locked.placeholder') || 'Chat đang bị khóa...'
-              : t('chat.placeholder') || 'Nhập tin nhắn...'
+              ? t('chat.locked_des.placeholder')
+              : t('chat.placeholder')
           }
           className="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
         />
@@ -265,7 +265,7 @@ export default function ChatSection({
           className="px-6 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
           <i className="fas fa-paper-plane mr-2"></i>
-          {t('BUTTON.Send') || 'Gửi'}
+          {t('BUTTON.Send')}
         </button>
       </div>
     </div>
