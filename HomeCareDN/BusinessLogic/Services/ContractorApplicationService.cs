@@ -155,6 +155,43 @@ namespace BusinessLogic.Services
             return dto;
         }
 
+        public async Task<ContractorDashBoardDto> GetContractorDashboardDataAsync(Guid contractorID)
+        {
+            var openRequests = await _unitOfWork
+                .ServiceRequestRepository.GetQueryable()
+                .AsNoTracking()
+                .CountAsync(sr =>
+                    sr.Status != RequestStatus.Closed && sr.SelectedContractorApplicationID == null
+                );
+
+            var statusCounts = await _unitOfWork
+                .ContractorApplicationRepository.GetQueryable()
+                .AsNoTracking()
+                .Where(ca => ca.ContractorID == contractorID)
+                .GroupBy(ca => ca.Status)
+                .Select(g => new { g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var dict = statusCounts.ToDictionary(x => x.Key, x => x.Count);
+
+            return new ContractorDashBoardDto
+            {
+                OpenRequests = dict.TryGetValue((ApplicationStatus)(-1), out _)
+                    ? openRequests
+                    : openRequests,
+                Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)
+                    ? pending
+                    : 0,
+                PendingPayments = dict.TryGetValue(
+                    ApplicationStatus.PendingCommission,
+                    out var pendingCom
+                )
+                    ? pendingCom
+                    : 0,
+                Won = dict.TryGetValue(ApplicationStatus.Approved, out var approved) ? approved : 0,
+            };
+        }
+
         public async Task<ContractorApplicationDto> CreateContractorApplicationAsync(
             ContractorCreateApplicationDto createRequest
         )
