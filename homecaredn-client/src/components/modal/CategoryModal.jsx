@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useCategory } from '../../hook/useCategory';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 
 export default function CategoryModal({
   isOpen,
@@ -81,26 +81,32 @@ export default function CategoryModal({
     } else {
       data.UserID = user?.id;
     }
-    if (logoFile) {
-      const result = await uploadImageToCloudinary(
-        logoFile,
-        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-        (percent) => {
-          setUploadProgress(percent);
-        },
-        'HomeCareDN/CategoryLogo'
-      );
-      data.CategoryLogoUrl = result.url;
-      data.CategoryLogoPublicId = result.publicId;
-      onClose();
-      setUploadProgress(0);
+    try {
+      if (logoFile) {
+        setUploadProgress(1);
+        const result = await uploadImageToCloudinary(
+          logoFile,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => {
+            setUploadProgress(percent);
+          },
+          'HomeCareDN/CategoryLogo'
+        );
+        data.CategoryLogoUrl = result.url;
+        data.CategoryLogoPublicId = result.publicId;
+        onClose();
+        setUploadProgress(0);
+      }
+
+      await onSave(data);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
     }
 
     await onSave(data);
   };
 
   if (!isOpen) return null;
-  if (loading) return <Loading />;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[9999] p-4 bg-black/40">
@@ -124,7 +130,7 @@ export default function CategoryModal({
         <div className="p-6 space-y-6">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>

@@ -7,7 +7,7 @@ import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -182,20 +182,37 @@ export default function MaterialModal({
       return;
     }
 
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
+    try {
+      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
 
-    const data = {
-      MaterialID: material?.materialID,
-      UserID: user?.id || null,
-      Name: name || null,
-      NameEN: nameEN || null,
-      Unit: unit || null,
-      UnitEN: unitEN || null,
-      BrandID: brandID || null,
-      CategoryID: categoryID || null,
-      Description: description || null,
-      DescriptionEN: descriptionEN || null,
-    };
+      const data = {
+        MaterialID: material?.materialID,
+        UserID: user?.id || null,
+        Name: name || null,
+        NameEN: nameEN || null,
+        Unit: unit || null,
+        UnitEN: unitEN || null,
+        BrandID: brandID || null,
+        CategoryID: categoryID || null,
+        Description: description || null,
+        DescriptionEN: descriptionEN || null,
+      };
+
+      if (newFiles.length > 0) {
+        setUploadProgress(1);
+        const uploaded = await uploadImageToCloudinary(
+          newFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (percent) => setUploadProgress(percent),
+          'HomeCareDN/Material'
+        );
+        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
+        data.ImageUrls = uploadedArray.map((u) => u.url);
+        data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
+
+        onClose();
+        setUploadProgress(0);
+      }
 
     if (newFiles.length > 0) {
       const uploaded = await uploadImageToCloudinary(
@@ -239,7 +256,7 @@ export default function MaterialModal({
         <div className="flex-1 pr-2 mt-4 space-y-6 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-x-8 gap-y-6">

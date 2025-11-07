@@ -32,7 +32,10 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
+            var query = _unitOfWork
+                .ServiceRepository.GetQueryable(SERVICE_INCLUDE)
+                .AsSingleQuery()
+                .AsNoTracking();
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
@@ -93,6 +96,25 @@ namespace BusinessLogic.Services
             };
         }
 
+        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: SERVICE_INCLUDE
+            );
+
+            if (service == null)
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
+                    }
+                );
+            }
+            return _mapper.Map<ServiceDetailDto>(service);
+        }
+
         public async Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto)
         {
             ValidateImages(serviceCreateDto.ImageUrls);
@@ -114,25 +136,6 @@ namespace BusinessLogic.Services
             );
             var serviceDto = _mapper.Map<ServiceDto>(rsServiceCreate);
             return serviceDto;
-        }
-
-        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
-        {
-            var service = await _unitOfWork.ServiceRepository.GetAsync(
-                s => s.ServiceID == id,
-                includeProperties: SERVICE_INCLUDE
-            );
-
-            if (service == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
-                    }
-                );
-            }
-            return _mapper.Map<ServiceDetailDto>(service);
         }
 
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
