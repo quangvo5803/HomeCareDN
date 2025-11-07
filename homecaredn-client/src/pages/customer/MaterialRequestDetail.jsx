@@ -51,9 +51,9 @@ export default function MaterialRequestDetail() {
 
   const handleSelectMaterial = (selectedMaterials) => {
     setItems((prevItems) => {
-      let updatedItems = [...prevItems];
+      const updatedItems = [...prevItems];
 
-      selectedMaterials.forEach((material) => {
+      for (const material of selectedMaterials) {
         const existingItemIndex = updatedItems.findIndex(
           (item) => item.material.materialID === material.materialID
         );
@@ -70,7 +70,7 @@ export default function MaterialRequestDetail() {
             quantity: 1,
           });
         }
-      });
+      }
 
       return updatedItems;
     });
@@ -215,7 +215,12 @@ export default function MaterialRequestDetail() {
               <div className="space-y-4">
                 {/* Can Edit Quantity */}
                 <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
-                  <label className="flex items-start gap-4 cursor-pointer">
+                  <label
+                    className="flex items-start gap-4 cursor-pointer"
+                    aria-label={t(
+                      'userPage.materialRequestDetail.allowEditQuantity'
+                    )}
+                  >
                     <div className="flex items-center h-6 mt-1">
                       <input
                         type="checkbox"
@@ -248,7 +253,12 @@ export default function MaterialRequestDetail() {
 
                 {/* Can Add Material */}
                 <div className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
-                  <label className="flex items-start gap-4 cursor-pointer">
+                  <label
+                    className="flex items-start gap-4 cursor-pointer "
+                    aria-label={t(
+                      'userPage.materialRequestDetail.allowAddMaterial'
+                    )}
+                  >
                     <div className="flex items-center h-6 mt-1">
                       <input
                         type="checkbox"
