@@ -8,6 +8,7 @@ namespace HomeCareDNAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class StatisticsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -16,6 +17,7 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin/line-chart/{year:int}")]
         public async Task<IActionResult> GetLineStatistics(int year)
         {
@@ -23,6 +25,7 @@ namespace HomeCareDNAPI.Controllers
             return Ok(statistics);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin/pie-chart/{year:int}")]
         public async Task<IActionResult> GetPieStatistics(int year)
         {
@@ -30,6 +33,7 @@ namespace HomeCareDNAPI.Controllers
             return Ok(statistics);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin/top-statistics")]
         public async Task<IActionResult> GetTopStatistics()
         {

@@ -6,5 +6,6 @@
         public int Year { get; set; }
         public int RepairCount { get; set; }
         public int ConstructionCount { get; set; }
+        public int MaterialCount { get; set; }
     }
 }

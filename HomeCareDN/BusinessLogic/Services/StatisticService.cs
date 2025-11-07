@@ -23,12 +23,17 @@ namespace BusinessLogic.Services
 
         public async Task<IEnumerable<AdminLineChartDto>> GetLineStatisticsAsync(int year)
         {
-            var statisticsLine = await _unitOfWork.ContractorApplicationRepository
+            var contractor = await _unitOfWork.ContractorApplicationRepository
                 .GetRangeAsync(sta => sta.Status == ApplicationStatus.Approved && 
                     sta.CreatedAt.Year == year, includeProperties:"ServiceRequest"
                 );
 
-            if (statisticsLine == null)
+            var distributor = await _unitOfWork.DistributorApplicationRepository
+                .GetRangeAsync(sta => sta.Status == ApplicationStatus.Approved && 
+                    sta.CreatedAt.Year == year, includeProperties:"Items"
+                );
+
+            if (contractor == null || distributor == null)
             {
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
@@ -38,7 +43,7 @@ namespace BusinessLogic.Services
                 );
             }
 
-            var grouped = statisticsLine
+            var groupedContractor = contractor
             .GroupBy(ca => new { ca.CreatedAt.Month, ca.ServiceRequest!.ServiceType })
             .Select(g => new
             {
@@ -48,17 +53,30 @@ namespace BusinessLogic.Services
             })
             .ToList();
 
+            var groupedDistributor = distributor
+            .GroupBy(d => d.CreatedAt.Month)
+            .Select(g => new
+            {
+                Month = g.Key,
+                Count = g.Count()
+            })
+            .ToList();
+
             var result = Enumerable.Range(1, 12)
                 .Select(m => new AdminLineChartDto
                 {
                     Month = m,
                     Year = year,
-                    RepairCount = grouped
+                    RepairCount = groupedContractor
                         .Where(x => x.Month == m && x.ServiceType == ServiceType.Repair)
                         .Select(x => x.Count)
                         .FirstOrDefault(),
-                    ConstructionCount = grouped
+                    ConstructionCount = groupedContractor
                         .Where(x => x.Month == m && x.ServiceType == ServiceType.Construction)
+                        .Select(x => x.Count)
+                        .FirstOrDefault(),
+                    MaterialCount = groupedDistributor
+                        .Where(x => x.Month == m)
                         .Select(x => x.Count)
                         .FirstOrDefault()
                 })
@@ -69,11 +87,15 @@ namespace BusinessLogic.Services
 
         public async Task<IEnumerable<AdminPieChartDto>> GetPieStatisticsAsync(int year)
         {
-            var statisticsPie = await _unitOfWork.ContractorApplicationRepository
-                .GetRangeAsync(ca => ca.Status == ApplicationStatus.Approved 
-                    && ca.CreatedAt.Year == year, includeProperties:"ServiceRequest");
+            var contractor = await _unitOfWork.ContractorApplicationRepository
+                .GetRangeAsync(ca => ca.Status == ApplicationStatus.Approved
+                    && ca.CreatedAt.Year == year, includeProperties: "ServiceRequest");
 
-            if (statisticsPie == null)
+            var distributor = await _unitOfWork.DistributorApplicationRepository
+                .GetRangeAsync(da => da.Status == ApplicationStatus.Approved
+                    && da.CreatedAt.Year == year, includeProperties: "Items");
+
+            if (contractor == null || distributor == null)
             {
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
@@ -82,17 +104,28 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            var resultGrouped = statisticsPie
+
+            // === Repair & Construction ===
+            var resultGrouped = contractor
                 .GroupBy(ca => ca.ServiceRequest!.ServiceType)
                 .Select(g => new AdminPieChartDto
                 {
-                    ServiceType = g.Key,
+                    Label = g.Key.ToString(),
                     Count = g.Count()
                 })
                 .ToList();
 
+            // === Material ===
+            var materialCount = distributor.Count();
+            resultGrouped.Add(new AdminPieChartDto
+            {
+                Label = "Material",
+                Count = materialCount
+            });
+
             return resultGrouped;
         }
+
 
         public async Task<AdminTopStatisticsDto> GetTopStatisticsAsync()
         {

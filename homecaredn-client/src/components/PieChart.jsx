@@ -8,10 +8,11 @@ import {
   ArcElement,
 } from "chart.js";
 import PropTypes from "prop-types";
+import LoadingComponent from '../components/LoadingComponent';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
-export default function PieChart({ title, year, onYearChange, data, type }) {
+export default function PieChart({ title, year, onYearChange, data, type, loading }) {
   console.log("🔍 Received type:", type);
 
   const options = {
@@ -60,7 +61,15 @@ export default function PieChart({ title, year, onYearChange, data, type }) {
           )}
         </div>
 
-        <Pie data={data} options={options} />
+        <div className="relative flex justify-center items-center p-2">
+          <Pie data={data} options={options} />
+
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-xl">
+              <LoadingComponent />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -89,7 +98,15 @@ export default function PieChart({ title, year, onYearChange, data, type }) {
           )}
         </div>
 
-        <Pie data={data} options={options} />
+        <div className="relative flex justify-center items-center p-2">
+          <Pie data={data} options={options} />
+
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-xl">
+              <LoadingComponent />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -111,4 +128,5 @@ PieChart.propTypes = {
   onYearChange: PropTypes.func,
   data: PropTypes.object.isRequired,
   type: PropTypes.string,
+  loading: PropTypes.bool,
 };

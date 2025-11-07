@@ -223,7 +223,7 @@ export default function AdminUserManager() {
                                                 <td colSpan="7" className="px-6 py-16 text-center">
                                                     <div className="flex flex-col items-center text-center mt-5 mb-5">
                                                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                            <i className="fa-solid fa-handshake text-gray-400 text-3xl" />
+                                                            <i className="fa-solid fa-users text-gray-400 text-3xl" />
                                                         </div>
                                                         <h3 className="text-xl font-bold text-gray-900 mb-2">
                                                             {t('adminUserManager.empty')}
@@ -306,7 +306,7 @@ export default function AdminUserManager() {
                                 ) : (
                                     <div className="py-16 text-center">
                                         <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                            <i className="fa-solid fa-handshake text-gray-400 text-3xl" />
+                                            <i className="fa-solid fa-users text-gray-400 text-3xl" />
                                         </div>
                                         <h3 className="text-xl font-bold text-gray-900 mb-2">
                                             {t('adminUserManager.empty')}

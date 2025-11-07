@@ -4,7 +4,7 @@ namespace BusinessLogic.DTOs.Application.Statistic
 {
     public class AdminPieChartDto
     {
-        public ServiceType ServiceType { get; set; }
+        public string Label { get; set; } = default!;
         public int Count { get; set; }
     }
 }

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { StatisticService } from '../../services/statisticService';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
+import LoadingComponent from '../../components/LoadingComponent';
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
@@ -15,8 +16,10 @@ export default function AdminDashboard() {
   const [lineChartData, setLineChartData] = useState({ labels: [], datasets: [] });
   const [pieChartData, setPieChartData] = useState({ labels: [], datasets: [] });
   const [topStats, setTopStats] = useState({ topContractors: [], topDistributors: [] });
-
-  // đường
+  const [loadingLineChart, setLoadingLineChart] = useState(false);
+  const [loadingPieChart, setLoadingPieChart] = useState(false);
+  const [loadingTop, setLoadingTop] = useState(false);
+  //Line
   const getMonthlyValue = (data, month, key) => {
     const found = data.find((d) => d.month === month);
     return found ? found[key] : 0;
@@ -28,10 +31,12 @@ export default function AdminDashboard() {
   const processLineChartData = (data, labels) => ({
     repair: getMonthlyDataset(data, labels, "repairCount"),
     construction: getMonthlyDataset(data, labels, "constructionCount"),
+    material: getMonthlyDataset(data, labels, "materialCount")
   });
 
   useEffect(() => {
     const fetchLineChartData = async () => {
+      setLoadingLineChart(true);
       try {
         const res = await StatisticService.getLineChart(lineYear);
         const data = res.data;
@@ -51,8 +56,7 @@ export default function AdminDashboard() {
           t("adminDashboard.lineChart.months.dec"),
         ];
 
-        // 👉 Dữ liệu đã được xử lý gọn gàng hơn
-        const { repair, construction } = processLineChartData(data, labels);
+        const { repair, construction, material } = processLineChartData(data, labels);
 
         setLineChartData({
           labels,
@@ -71,20 +75,31 @@ export default function AdminDashboard() {
               backgroundColor: "rgba(16,185,129,0.2)",
               fill: true,
             },
+            {
+              label: t("adminDashboard.material"),
+              data: material,
+              borderColor: "#f97316",
+              backgroundColor: "rgba(249,115,22,0.2)",
+              fill: true,
+            }
           ],
         });
-      } catch (error) {
-        console.error("Error fetching line chart data:", error);
+      } catch (err) {
+        toast.error(t(handleApiError(err)));
+      } finally {
+        setLoadingLineChart(false);
       }
     };
 
     fetchLineChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineYear, t]);
 
 
-  //tròn
+  //Pie
   useEffect(() => {
     const fetchPieChartChart = async () => {
+      setLoadingPieChart(true)
       try {
         const res = await StatisticService.getPieChart(pieYear);
         const rawData = res.data;
@@ -92,9 +107,9 @@ export default function AdminDashboard() {
         let construction = 0, repair = 0, material = 0;
 
         for (const item of rawData) {
-          if (item.serviceType === "Construction") construction = item.count;
-          if (item.serviceType === "Repair") repair = item.count;
-          if (item.serviceType === "Material") material = item.count;
+          if (item.label === "Construction") construction = item.count;
+          if (item.label === "Repair") repair = item.count;
+          if (item.label === "Material") material = item.count;
         }
 
         const labels = [
@@ -128,20 +143,24 @@ export default function AdminDashboard() {
         });
       } catch (err) {
         toast.error(t(handleApiError(err)));
+      } finally {
+        setLoadingPieChart(false);
       }
     };
     fetchPieChartChart();
   }, [pieYear, t]);
 
-
-
+  //top
   useEffect(() => {
     const fetchStats = async () => {
+      setLoadingTop(true);
       try {
         const response = await StatisticService.getTopStatistic();
         setTopStats(response.data);
       } catch (err) {
         toast.error(t(handleApiError(err)));
+      } finally {
+        setLoadingTop(false);
       }
     };
     fetchStats();
@@ -247,6 +266,7 @@ export default function AdminDashboard() {
       {/* biểu đồ*/}
       <div className="flex flex-wrap mt-6 -mx-3">
         {/* biểu đồ đường*/}
+
         <div className="w-full max-w-full px-3 mt-0 lg:w-7/12 lg:flex-none">
           <LineChart
             type='Admin'
@@ -254,6 +274,7 @@ export default function AdminDashboard() {
             data={lineChartData}
             year={lineYear}
             onYearChange={setLineYear}
+            loading={loadingLineChart}
           />
         </div>
 
@@ -265,167 +286,171 @@ export default function AdminDashboard() {
             data={pieChartData}
             year={pieYear}
             onYearChange={setPieYear}
+            loading={loadingPieChart}
           />
         </div>
       </div>
-      <div className="flex flex-wrap items-stretch mt-6 -mx-3">
-        {/* Card 1 */}
-        <div className="w-full px-3 mb-6 lg:mb-0 lg:w-6/12 flex">
-          <div className="flex flex-col flex-1 bg-white border border-gray-200 shadow-xl rounded-2xl">
-            {/* Header */}
-            <div className="p-4 border-b border-gray-200 rounded-t-2xl">
-              <h6 className="text-base font-semibold text-black">
-                {t('adminDashboard.contractors.title')}
-              </h6>
-            </div>
 
-            {/* Body + nút */}
-            <div className="flex flex-col justify-between flex-1 p-4 overflow-x-auto">
-              <div>
-                {/* Bảng nội dung */}
-                <table className="w-full text-left border-collapse">
-                  <tbody className="divide-y divide-gray-200">
-                    {topStats?.topContractors?.length > 0 ? (
-                      topStats.topContractors.map((contractor) => (
-                        <tr key={contractor.email}>
-                          <td className="p-3">
-                            <div className="flex items-center">
-                              <Avatar
-                                name={contractor?.email || 'User'}
-                                round={true}
-                                size="48"
-                                className="w-12 h-12 rounded-full"
-                              />
-                              <div className="ml-4">
-                                <p className="text-xs font-semibold text-gray-500">
-                                  {t('adminDashboard.contractors.email')}
-                                </p>
-                                <h6 className="text-sm font-medium text-black">
-                                  {contractor.email}
-                                </h6>
+      {/* Top Contractor & Distributor */}
+      {loadingTop ? (
+        <div className="flex flex-wrap items-stretch mt-6 -mx-3">
+          <LoadingComponent />
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-stretch mt-6 -mx-3">
+          <div className="w-full px-3 mb-6 lg:mb-0 lg:w-6/12 flex">
+            <div className="flex flex-col flex-1 bg-white border border-gray-200 shadow-xl rounded-2xl">
+              {/* Header */}
+              <div className="p-4 border-b border-gray-200 rounded-t-2xl">
+                <h6 className="text-base font-semibold text-black">
+                  {t('adminDashboard.contractors.title')}
+                </h6>
+              </div>
+              {/* Contractor */}
+              <div className="flex flex-col justify-between flex-1 p-4 overflow-x-auto">
+                <div>
+                  <table className="w-full text-left border-collapse">
+                    <tbody className="divide-y divide-gray-200">
+                      {topStats?.topContractors?.length > 0 ? (
+                        topStats.topContractors.map((contractor) => (
+                          <tr key={contractor.email}>
+                            <td className="p-3">
+                              <div className="flex items-center">
+                                <Avatar
+                                  name={contractor?.email || 'User'}
+                                  round={true}
+                                  size="48"
+                                  className="w-12 h-12 rounded-full"
+                                />
+                                <div className="ml-4">
+                                  <p className="text-xs font-semibold text-gray-500">
+                                    {t('adminDashboard.contractors.email')}
+                                  </p>
+                                  <h6 className="text-sm font-medium text-black">
+                                    {contractor.email}
+                                  </h6>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="p-3 text-center">
-                            <p className="text-xs font-semibold text-gray-500">
-                              {t('adminDashboard.contractors.serviceRequest')}
-                            </p>
-                            <h6 className="text-sm text-black">{contractor.approvedCount}</h6>
-                          </td>
-                          <td className="p-3 text-center">
-                            <p className="text-xs font-semibold text-gray-500">
-                              {t('adminDashboard.contractors.revenue')}
-                            </p>
-                            <h6 className="text-sm text-black">
-                              {new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                              }).format(contractor.totalRevenue)}
-                            </h6>
+                            </td>
+                            <td className="p-3 text-center">
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('adminDashboard.contractors.serviceRequest')}
+                              </p>
+                              <h6 className="text-sm text-black">{contractor.approvedCount}</h6>
+                            </td>
+                            <td className="p-3 text-center">
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('adminDashboard.contractors.revenue')}
+                              </p>
+                              <h6 className="text-sm text-black">
+                                {new Intl.NumberFormat('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND',
+                                }).format(contractor.totalRevenue)}
+                              </h6>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td className="p-3 text-center text-gray-500 italic">
+                            {t('adminDashboard.contractors.noTop')}
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td className="p-3 text-center text-gray-500 italic">
-                          {t('adminDashboard.contractors.noTop')}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => console.log('View all clicked')}
+                    className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-3 py-1"
+                  >
+                    {t('adminDashboard.viewAll')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Distributor */}
+          <div className="w-full px-3 mb-6 lg:mb-0 lg:w-6/12 flex">
+            <div className="flex flex-col flex-1 bg-white border border-gray-200 shadow-xl rounded-2xl">
+              <div className="p-4 border-b border-gray-200 rounded-t-2xl">
+                <h6 className="text-base font-semibold text-black">
+                  {t('adminDashboard.distributors.title')}
+                </h6>
               </div>
 
-              {/* Button luôn ở đáy */}
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={() => console.log('View all clicked')}
-                  className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-3 py-1"
-                >
-                  {t('adminDashboard.viewAll')}
-                </button>
+              <div className="flex flex-col justify-between flex-1 p-4 overflow-x-auto">
+                <div>
+                  <table className="w-full text-left border-collapse">
+                    <tbody className="divide-y divide-gray-200">
+                      {topStats?.topDistributors?.length > 0 ? (
+                        topStats.topDistributors.map((distributor) => (
+                          <tr key={distributor.email}>
+                            <td className="p-3">
+                              <div className="flex items-center">
+                                <Avatar
+                                  name={distributor?.email || 'User'}
+                                  round={true}
+                                  size="48"
+                                  className="w-12 h-12 rounded-full"
+                                />
+                                <div className="ml-4">
+                                  <p className="text-xs font-semibold text-gray-500">
+                                    {t('adminDashboard.distributors.email')}
+                                  </p>
+                                  <h6 className="text-sm font-medium text-black">
+                                    {distributor.email}
+                                  </h6>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-3 text-center">
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('adminDashboard.distributors.materialRequest')}
+                              </p>
+                              <h6 className="text-sm text-black">{distributor.approvedCount}</h6>
+                            </td>
+                            <td className="p-3 text-center">
+                              <p className="text-xs font-semibold text-gray-500">
+                                {t('adminDashboard.distributors.revenue')}
+                              </p>
+                              <h6 className="text-sm text-black">
+                                {new Intl.NumberFormat('vi-VN', {
+                                  style: 'currency',
+                                  currency: 'VND',
+                                }).format(distributor.totalRevenue)}
+                              </h6>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td className="p-3 text-center text-gray-500 italic">
+                            {t('adminDashboard.distributors.noTop')}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex justify-center mt-4">
+                  <button
+                    onClick={() => console.log('View all clicked')}
+                    className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-3 py-1"
+                  >
+                    {t('adminDashboard.viewAll')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Card 2 */}
-        <div className="w-full px-3 mb-6 lg:mb-0 lg:w-6/12 flex">
-          <div className="flex flex-col flex-1 bg-white border border-gray-200 shadow-xl rounded-2xl">
-            <div className="p-4 border-b border-gray-200 rounded-t-2xl">
-              <h6 className="text-base font-semibold text-black">
-                {t('adminDashboard.distributors.title')}
-              </h6>
-            </div>
-
-            <div className="flex flex-col justify-between flex-1 p-4 overflow-x-auto">
-              <div>
-                <table className="w-full text-left border-collapse">
-                  <tbody className="divide-y divide-gray-200">
-                    {topStats?.topDistributors?.length > 0 ? (
-                      topStats.topDistributors.map((distributor) => (
-                        <tr key={distributor.email}>
-                          <td className="p-3">
-                            <div className="flex items-center">
-                              <Avatar
-                                name={distributor?.email || 'User'}
-                                round={true}
-                                size="48"
-                                className="w-12 h-12 rounded-full"
-                              />
-                              <div className="ml-4">
-                                <p className="text-xs font-semibold text-gray-500">
-                                  {t('adminDashboard.distributors.email')}
-                                </p>
-                                <h6 className="text-sm font-medium text-black">
-                                  {distributor.email}
-                                </h6>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-3 text-center">
-                            <p className="text-xs font-semibold text-gray-500">
-                              {t('adminDashboard.distributors.materialRequest')}
-                            </p>
-                            <h6 className="text-sm text-black">{distributor.approvedCount}</h6>
-                          </td>
-                          <td className="p-3 text-center">
-                            <p className="text-xs font-semibold text-gray-500">
-                              {t('adminDashboard.distributors.revenue')}
-                            </p>
-                            <h6 className="text-sm text-black">
-                              {new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                currency: 'VND',
-                              }).format(distributor.totalRevenue)}
-                            </h6>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td className="p-3 text-center text-gray-500 italic">
-                          {t('adminDashboard.distributors.noTop')}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="flex justify-center mt-4">
-                <button
-                  onClick={() => console.log('View all clicked')}
-                  className="text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-3 py-1"
-                >
-                  {t('adminDashboard.viewAll')}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      )}
     </div>
   );
 }

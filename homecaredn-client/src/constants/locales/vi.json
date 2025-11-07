@@ -615,7 +615,8 @@
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
       "partner": "Đối tác",
-      "support": "Quản lý hỗ trợ"
+      "user": "Người dùng",
+      "support": "Hỗ trợ"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -876,7 +877,7 @@
   "adminUserManager": {
     "title": "Quản lý người dùng",
     "subtitle": "Xem danh sách tất cả người dùng trong hệ thống.",
-    "users": "users",
+    "users": "người dùng",
     "all": "Tất cả",
     "customer": "Khách hàng",
     "contractor": "Nhà thầu",

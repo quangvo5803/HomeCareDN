@@ -11,6 +11,7 @@ import {
   Legend,
 } from "chart.js";
 import PropTypes from "prop-types";
+import LoadingComponent from '../components/LoadingComponent';
 
 ChartJS.register(
   CategoryScale,
@@ -22,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-export default function LineChart({ title, data, year, onYearChange, type }) {
+export default function LineChart({ title, data, year, onYearChange, type, loading }) {
   const options = {
     responsive: true,
     plugins: {
@@ -80,6 +81,12 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
 
         <div className="flex-auto p-4">
           <Line data={data} options={options} height={200} />
+
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+              <LoadingComponent />
+            </div>
+          )}
         </div>
       </div>
     );
@@ -111,6 +118,12 @@ export default function LineChart({ title, data, year, onYearChange, type }) {
         </div>
 
         <Line data={data} options={options} height={180} />
+
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <LoadingComponent />
+          </div>
+        )}
       </div>
     );
   }
@@ -135,4 +148,5 @@ LineChart.propTypes = {
   year: PropTypes.number.isRequired,
   onYearChange: PropTypes.func.isRequired,
   type: PropTypes.string,
+  loading: PropTypes.bool,
 };

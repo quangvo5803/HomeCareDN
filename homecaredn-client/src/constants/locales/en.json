@@ -849,7 +849,7 @@
   "adminPartnerManager": {
     "empty": "No partners",
     "empty_description": "No partnership requests have been submitted.",
-    "title": "Partner Management",
+    "title": "Partner Manager",
     "subtitle": "Review, approve, or reject partner requests.",
     "partners": "partners",
     "no": "No",
@@ -880,7 +880,7 @@
     }
   },
   "adminUserManager": {
-    "title": "User Management",
+    "title": "User Manager",
     "subtitle": "View a list of all users in the system.",
     "users": "users",
     "all": "All",
