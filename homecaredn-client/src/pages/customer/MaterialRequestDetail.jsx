@@ -58,17 +58,17 @@ export default function MaterialRequestDetail() {
           (item) => item.material.materialID === material.materialID
         );
 
-        if (existingItemIndex !== -1) {
-          updatedItems[existingItemIndex] = {
-            ...updatedItems[existingItemIndex],
-            quantity: updatedItems[existingItemIndex].quantity + 1,
-          };
-        } else {
+        if (existingItemIndex === -1) {
           updatedItems.push({
             materialRequestItemID: crypto.randomUUID(),
             material,
             quantity: 1,
           });
+        } else {
+          updatedItems[existingItemIndex] = {
+            ...updatedItems[existingItemIndex],
+            quantity: updatedItems[existingItemIndex].quantity + 1,
+          };
         }
       }
 
