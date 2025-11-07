@@ -25,10 +25,7 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<CategoryDto>> GetAllCategories(QueryParameters parameters)
         {
-            var query = _unitOfWork
-                .CategoryRepository.GetQueryable(includeProperties: INCLUDE)
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.CategoryRepository.GetQueryable(includeProperties: INCLUDE);
 
             if (!string.IsNullOrEmpty(parameters.Search))
             {
@@ -130,7 +127,8 @@ namespace BusinessLogic.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetAsync(
                 c => c.CategoryID == requestDto.CategoryID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE,
+                false
             );
             var errors = new Dictionary<string, string[]>();
 

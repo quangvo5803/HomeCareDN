@@ -54,6 +54,7 @@ namespace BusinessLogic.Mapping
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
+            CreateMap<MaterialRequestUpdateRequestDto, MaterialRequest>();
             CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
