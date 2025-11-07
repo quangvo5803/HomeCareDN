@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application;
+﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -103,6 +104,26 @@ namespace HomeCareDNAPI.Controllers
                     parameters,
                     "Contractor"
                 );
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Contractor")]
+        [HttpGet("contractor/kpi")]
+        public async Task<IActionResult> GetKpiDataForContractor()
+        {
+            var contractorIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (
+                string.IsNullOrEmpty(contractorIdString)
+                || !Guid.TryParse(contractorIdString, out var contractorId)
+            )
+            {
+                return Unauthorized("Invalid contractor ID.");
+            }
+
+            var result = await _facadeService.ContractorApplicationService.GetKpiDataAsync(
+                contractorId
+            );
             return Ok(result);
         }
 

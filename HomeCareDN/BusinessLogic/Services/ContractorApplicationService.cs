@@ -155,6 +155,39 @@ namespace BusinessLogic.Services
             return dto;
         }
 
+        public async Task<ContractorKpiDto> GetKpiDataAsync(Guid contractorId)
+        {
+            var openRequests = await _unitOfWork
+                .ServiceRequestRepository.GetQueryable()
+                .AsNoTracking()
+                .CountAsync(sr =>
+                    sr.Status != RequestStatus.Closed && sr.SelectedContractorApplicationID == null
+                );
+
+            var agg = await _unitOfWork
+                .ContractorApplicationRepository.GetQueryable()
+                .AsNoTracking()
+                .Where(ca => ca.ContractorID == contractorId)
+                .GroupBy(_ => 1)
+                .Select(g => new
+                {
+                    Applied = g.Count(ca => ca.Status == ApplicationStatus.Pending),
+                    PendingPayments = g.Count(ca =>
+                        ca.Status == ApplicationStatus.PendingCommission
+                    ),
+                    Won = g.Count(ca => ca.Status == ApplicationStatus.Approved),
+                })
+                .FirstOrDefaultAsync();
+
+            return new ContractorKpiDto
+            {
+                OpenRequests = openRequests,
+                Applied = agg?.Applied ?? 0,
+                PendingPayments = agg?.PendingPayments ?? 0,
+                Won = agg?.Won ?? 0,
+            };
+        }
+
         public async Task<ContractorApplicationDto> CreateContractorApplicationAsync(
             ContractorCreateApplicationDto createRequest
         )

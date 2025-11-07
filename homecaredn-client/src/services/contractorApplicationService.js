@@ -48,6 +48,10 @@ export const contractorApplicationService = {
     });
     return response.data;
   },
+  getKpiData: async () => {
+    const response = await api.get('/contractor-applications/contractor/kpi');
+    return response.data;
+  },
   getByServiceRequestIdForContractor: async (dto) => {
     const response = await api.get(
       `/contractor-applications/contractor/get-applied/`,
