@@ -23,10 +23,9 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<BrandDto>> GetAllBrands(QueryParameters parameters)
         {
-            var query = _unitOfWork
-                .BrandRepository.GetQueryable(includeProperties: "LogoImage,Materials")
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.BrandRepository.GetQueryable(
+                includeProperties: "LogoImage,Materials"
+            );
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 string searchLower = parameters.Search.ToLower();
@@ -119,7 +118,8 @@ namespace BusinessLogic.Services
             var errors = new Dictionary<string, string[]>();
             var brand = await _unitOfWork.BrandRepository.GetAsync(
                 b => b.BrandID == requestDto.BrandID,
-                includeProperties: "LogoImage,Materials"
+                includeProperties: "LogoImage,Materials",
+                false
             );
 
             if (brand == null)

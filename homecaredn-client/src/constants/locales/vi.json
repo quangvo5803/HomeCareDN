@@ -378,9 +378,29 @@
       "lbl_distributor": "nhà cung cấp",
       "lbl_canEditQuantity": "Cho phép nhà cung cấp chỉnh sửa số lượng",
       "lbl_materialList": "Danh sách vật liệu",
-      "lbl_materialUnit": "loại",
+      "lbl_materialUnit": "vật liệu",
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
       "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
+    },
+    "materialRequestDetail":{
+      "title": "Chi tiết yêu cầu vật liệu",
+      "description": "Mô Tả",
+      "descriptionsPlaceholder":"Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
+      "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
+      "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
+      "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
+      "allowAddMaterialDes": "Bật tùy chọn này để cho phép nhà phân phối thêm vật liệu cần thiết khi nộp đơn ứng tuyển",
+      "materialList": "Danh sách vật liệu muốn mua",
+      "itemsCount": "vật liệu",
+      "noMaterial": "Danh sách trống",
+      "addMaterial": "Thêm vật liệu vào danh sách của bạn",
+      "image": "Hình ảnh",
+      "infor": "Thông tin",
+      "quantity": "Số lượng",
+      "unit": "Đơn Vị",
+      "action":"Hành Động",
+      "cancleModalTitle": "Trở về ban đầu?",
+      "cancleModalText": "Bạn không thể hoàn tác thao tác này"
     }
   },
   "contractorServiceRequestManager": {
@@ -1033,6 +1053,15 @@
     "PaymentCancelModal": {
       "title": "Thanh toán thất bại!",
       "text": "Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại."
+    },
+    "MaterialRequestModal": {
+      "title": "Chọn vật liệu",
+      "found": "Tìm thấy {{count}} vật liệu",
+      "noMaterials": "Không tìm thấy vật liệu",
+      "noResults": "Không có kết quả cho \"{{search}}\"",
+      "selectedCount": "{{count}} vật liệu được chọn",
+      "searchPlaceholder": "Tìm kiếm theo tên, danh mục, thương hiệu...",
+      "clearSearch": "Xóa tìm kiếm"
     }
   },
   "ERROR": {

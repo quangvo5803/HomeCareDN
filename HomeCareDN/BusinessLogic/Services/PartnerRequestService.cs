@@ -45,10 +45,9 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork
-                .PartnerRequestRepository.GetQueryable(includeProperties: PARTNER_REQUEST_INCLUDES)
-                .AsSingleQuery()
-                .AsNoTracking();
+            var query = _unitOfWork.PartnerRequestRepository.GetQueryable(
+                includeProperties: PARTNER_REQUEST_INCLUDES
+            );
             if (parameters.FilterPartnerRequestStatus.HasValue)
             {
                 query = query.Where(p => p.Status == parameters.FilterPartnerRequestStatus.Value);
@@ -202,7 +201,8 @@ namespace BusinessLogic.Services
         {
             var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
                 m => m.PartnerRequestID == partnerRequestID,
-                includeProperties: PARTNER_REQUEST_INCLUDES
+                includeProperties: PARTNER_REQUEST_INCLUDES,
+                false
             );
 
             if (partnerRequest == null)
@@ -240,7 +240,8 @@ namespace BusinessLogic.Services
         {
             var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
                 m => m.PartnerRequestID == request.PartnerRequestID,
-                includeProperties: PARTNER_REQUEST_INCLUDES
+                includeProperties: PARTNER_REQUEST_INCLUDES,
+                false
             );
 
             if (partnerRequest == null)
