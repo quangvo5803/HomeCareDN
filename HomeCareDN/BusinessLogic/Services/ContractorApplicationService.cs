@@ -174,9 +174,7 @@ namespace BusinessLogic.Services
 
             return new ContractorDashBoardDto
             {
-                OpenRequests = dict.TryGetValue((ApplicationStatus)(-1), out _)
-                    ? openRequests
-                    : openRequests,
+                OpenRequests = openRequests,
                 Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)
                     ? pending
                     : 0,
