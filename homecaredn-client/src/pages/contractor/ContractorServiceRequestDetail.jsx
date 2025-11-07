@@ -21,6 +21,7 @@ import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import ChatSection from '../../components/ChatSection';
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
 import 'tinymce/tinymce';
@@ -56,9 +57,9 @@ export default function ContractorServiceRequestDetail() {
   const [openCancel, setOpenCancel] = useState(false);
 
   // Chat states
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const chatEndRef = useRef(null);
+  // const [messages, setMessages] = useState([]);
+  // const [input, setInput] = useState('');
+  // const chatEndRef = useRef(null);
 
   // Realtime SignalR
   useRealtime({
@@ -175,29 +176,29 @@ export default function ContractorServiceRequestDetail() {
   }, [serviceRequest, existingApplication]);
 
   // Chat handlers
-  const handleSend = () => {
-    if (input.trim() === '') return;
+  // const handleSend = () => {
+  //   if (input.trim() === '') return;
 
-    const newMessage = {
-      sender: 'contractor',
-      text: input,
-      timestamp: new Date(),
-    };
+  //   const newMessage = {
+  //     sender: 'contractor',
+  //     text: input,
+  //     timestamp: new Date(),
+  //   };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setInput('');
+  //   setMessages((prev) => [...prev, newMessage]);
+  //   setInput('');
 
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+  //   setTimeout(() => {
+  //     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  //   }, 100);
+  // };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+  // const handleKeyPress = (e) => {
+  //   if (e.key === 'Enter' && !e.shiftKey) {
+  //     e.preventDefault();
+  //     handleSend();
+  //   }
+  // };
 
   // Submit contractor application
   const handleSubmit = async (e) => {
@@ -1103,82 +1104,12 @@ export default function ContractorServiceRequestDetail() {
           )}
 
           {/* Chat Section */}
-          <div className="bg-white rounded-lg shadow-sm ring-1 ring-gray-200 p-6 relative">
-            <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
-              <i className="fas fa-comments"></i>
-              <span>{t('contractorServiceRequestDetail.chatSection')}</span>
-            </h4>
-
-            {/* Overlay when not approved */}
-            {existingApplication?.status !== 'Approved' && (
-              <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
-                <div className="text-center text-white px-6">
-                  <i className="fas fa-lock text-4xl mb-4"></i>
-                  <p className="text-lg font-semibold mb-2">
-                    {t('contractorServiceRequestDetail.noChatFunction')}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Messages Area */}
-            <div className="h-96 overflow-y-auto bg-gray-50 p-4 rounded-lg mb-4 space-y-3">
-              {messages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-gray-400">
-                  <div className="text-center">
-                    <i className="fas fa-comment-dots text-4xl mb-2"></i>
-                    <p className="text-sm">
-                      {t('contractorServiceRequestDetail.no_messages')}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                messages.map((m) => (
-                  <div
-                    key={m.messageID}
-                    className={`flex ${
-                      m.sender === 'contractor'
-                        ? 'justify-end'
-                        : 'justify-start'
-                    }`}
-                  >
-                    <div
-                      className={`px-4 py-2 rounded-lg max-w-[70%] ${
-                        m.sender === 'contractor'
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-200 text-gray-800'
-                      }`}
-                    >
-                      <p className="text-sm">{m.text}</p>
-                    </div>
-                  </div>
-                ))
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Input Area */}
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
-                placeholder={t(
-                  'contractorServiceRequestDetail.input_placeholder'
-                )}
-              />
-              <button
-                onClick={handleSend}
-                disabled={input.trim() === ''}
-                className="px-6 py-2 rounded-lg transition bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <i className="fas fa-paper-plane mr-2"></i>
-                {t('BUTTON.Send')}
-              </button>
-            </div>
-          </div>
+          {
+            <ChatSection
+              conversationId={serviceRequest.conversation.conversationID}
+              className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+            />
+          }
         </div>
 
         {/* RIGHT: Summary Sidebar */}

@@ -622,6 +622,9 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("ConversationID")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -668,6 +671,9 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("ServiceRequestID");
 
+                    b.HasIndex("ConversationID")
+                        .IsUnique();
+
                     b.HasIndex("SelectedContractorApplicationID");
 
                     b.ToTable("ServiceRequests", "app");
@@ -709,17 +715,6 @@ namespace DataAccess.Migrations.Application
                         .HasForeignKey("ServiceRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
-                        .WithOne("Conversation")
-                        .HasForeignKey("DataAccess.Entities.Application.Conversation", "ServiceRequestID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
@@ -827,9 +822,15 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
+                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
+                        .WithOne("ServiceRequest")
+                        .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "ConversationID");
+
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
                         .WithMany()
                         .HasForeignKey("SelectedContractorApplicationID");
+
+                    b.Navigation("Conversation");
 
                     b.Navigation("SelectedContractorApplication");
                 });
@@ -854,6 +855,8 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -883,8 +886,6 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
                     b.Navigation("ContractorApplications");
-
-                    b.Navigation("Conversation");
 
                     b.Navigation("Documents");
 

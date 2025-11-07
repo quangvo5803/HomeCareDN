@@ -305,8 +305,6 @@ namespace BusinessLogic.Services
                 }
             }
 
-            await _unitOfWork.SaveAsync();
-
             var conversation = new Conversation
             {
                 ConversationID = Guid.NewGuid(),
@@ -314,6 +312,8 @@ namespace BusinessLogic.Services
                 CustomerID = serviceRequest.CustomerID,
                 ContractorID = contractorApplication.ContractorID,
             };
+            serviceRequest.ConversationID = conversation.ConversationID;
+
             await _unitOfWork.ConversationRepository.AddAsync(conversation);
             await _unitOfWork.SaveAsync();
 

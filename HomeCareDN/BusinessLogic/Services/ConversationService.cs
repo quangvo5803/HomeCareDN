@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.User;
 using BusinessLogic.Services.Interfaces;
-using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
-using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {

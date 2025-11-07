@@ -35,6 +35,23 @@ namespace DataAccess.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
+                name: "Conversations",
+                schema: "app",
+                columns: table => new
+                {
+                    ConversationID = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ContractorID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ServiceRequestID = table.Column<Guid>(type: "uuid", nullable: false),
+                    IsLocked = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Conversations", x => x.ConversationID);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DistributorApplicationItems",
                 schema: "app",
                 columns: table => new
@@ -90,6 +107,30 @@ namespace DataAccess.Migrations.Application
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Services", x => x.ServiceID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ChatMessages",
+                schema: "app",
+                columns: table => new
+                {
+                    ChatMessageID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ConversationID = table.Column<Guid>(type: "uuid", nullable: false),
+                    SenderID = table.Column<string>(type: "text", nullable: false),
+                    ReceiverID = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "text", nullable: false),
+                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ChatMessages", x => x.ChatMessageID);
+                    table.ForeignKey(
+                        name: "FK_ChatMessages_Conversations_ConversationID",
+                        column: x => x.ConversationID,
+                        principalSchema: "app",
+                        principalTable: "Conversations",
+                        principalColumn: "ConversationID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -165,23 +206,6 @@ namespace DataAccess.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatMessages",
-                schema: "app",
-                columns: table => new
-                {
-                    ChatMessageID = table.Column<Guid>(type: "uuid", nullable: false),
-                    ConversationID = table.Column<Guid>(type: "uuid", nullable: false),
-                    SenderID = table.Column<string>(type: "text", nullable: false),
-                    ReceiverID = table.Column<string>(type: "text", nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChatMessages", x => x.ChatMessageID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ContractorApplications",
                 schema: "app",
                 columns: table => new
@@ -250,7 +274,8 @@ namespace DataAccess.Migrations.Application
                     Description = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    SelectedContractorApplicationID = table.Column<Guid>(type: "uuid", nullable: true)
+                    SelectedContractorApplicationID = table.Column<Guid>(type: "uuid", nullable: true),
+                    ConversationID = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -261,30 +286,12 @@ namespace DataAccess.Migrations.Application
                         principalSchema: "app",
                         principalTable: "ContractorApplications",
                         principalColumn: "ContractorApplicationID");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Conversations",
-                schema: "app",
-                columns: table => new
-                {
-                    ConversationID = table.Column<Guid>(type: "uuid", nullable: false),
-                    CustomerID = table.Column<Guid>(type: "uuid", nullable: false),
-                    ContractorID = table.Column<Guid>(type: "uuid", nullable: false),
-                    ServiceRequestID = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsLocked = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Conversations", x => x.ConversationID);
                     table.ForeignKey(
-                        name: "FK_Conversations_ServiceRequests_ServiceRequestID",
-                        column: x => x.ServiceRequestID,
+                        name: "FK_ServiceRequests_Conversations_ConversationID",
+                        column: x => x.ConversationID,
                         principalSchema: "app",
-                        principalTable: "ServiceRequests",
-                        principalColumn: "ServiceRequestID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalTable: "Conversations",
+                        principalColumn: "ConversationID");
                 });
 
             migrationBuilder.CreateTable(
@@ -566,6 +573,13 @@ namespace DataAccess.Migrations.Application
                 column: "ContractorApplicationID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ServiceRequests_ConversationID",
+                schema: "app",
+                table: "ServiceRequests",
+                column: "ConversationID",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServiceRequests_SelectedContractorApplicationID",
                 schema: "app",
                 table: "ServiceRequests",
@@ -588,16 +602,6 @@ namespace DataAccess.Migrations.Application
                 principalSchema: "app",
                 principalTable: "Images",
                 principalColumn: "ImageID");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_ChatMessages_Conversations_ConversationID",
-                schema: "app",
-                table: "ChatMessages",
-                column: "ConversationID",
-                principalSchema: "app",
-                principalTable: "Conversations",
-                principalColumn: "ConversationID",
-                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_ContractorApplications_ServiceRequests_ServiceRequestID",
@@ -634,6 +638,11 @@ namespace DataAccess.Migrations.Application
                 table: "Categories");
 
             migrationBuilder.DropForeignKey(
+                name: "FK_ServiceRequests_Conversations_ConversationID",
+                schema: "app",
+                table: "ServiceRequests");
+
+            migrationBuilder.DropForeignKey(
                 name: "FK_ContractorApplications_ServiceRequests_ServiceRequestID",
                 schema: "app",
                 table: "ContractorApplications");
@@ -668,10 +677,6 @@ namespace DataAccess.Migrations.Application
                 schema: "app");
 
             migrationBuilder.DropTable(
-                name: "Conversations",
-                schema: "app");
-
-            migrationBuilder.DropTable(
                 name: "Images",
                 schema: "app");
 
@@ -693,6 +698,10 @@ namespace DataAccess.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Categories",
+                schema: "app");
+
+            migrationBuilder.DropTable(
+                name: "Conversations",
                 schema: "app");
 
             migrationBuilder.DropTable(

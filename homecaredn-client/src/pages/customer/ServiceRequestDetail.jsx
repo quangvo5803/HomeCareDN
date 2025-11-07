@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import VenoBox from 'venobox';
@@ -15,6 +15,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import he from 'he';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
+import ChatSection from '../../components/ChatSection';
 
 export default function ServiceRequestDetail() {
   const navigate = useNavigate();
@@ -33,9 +34,9 @@ export default function ServiceRequestDetail() {
   const [totalCount, setTotalCount] = useState(0);
 
   // Chat states
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const chatEndRef = useRef(null);
+  // const [messages, setMessages] = useState([]);
+  // const [input, setInput] = useState('');
+  // const chatEndRef = useRef(null);
 
   const hasSelectedContractor = Boolean(selectedContractor);
 
@@ -166,26 +167,26 @@ export default function ServiceRequestDetail() {
   };
 
   // ---- CHAT HANDLERS ----
-  const handleSend = () => {
-    if (input.trim() === '') return;
-    const newMessage = {
-      sender: 'user',
-      text: input,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput('');
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+  // const handleSend = () => {
+  //   if (input.trim() === '') return;
+  //   const newMessage = {
+  //     sender: 'user',
+  //     text: input,
+  //     timestamp: new Date(),
+  //   };
+  //   setMessages((prev) => [...prev, newMessage]);
+  //   setInput('');
+  //   setTimeout(() => {
+  //     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  //   }, 100);
+  // };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
+  // const handleKeyPress = (e) => {
+  //   if (e.key === 'Enter' && !e.shiftKey) {
+  //     e.preventDefault();
+  //     handleSend();
+  //   }
+  // };
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -778,78 +779,13 @@ export default function ServiceRequestDetail() {
             </div>
           )}
         </div>
-
-        {/* CHAT SECTION */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 relative">
-          <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
-            <i className="fas fa-comments"></i>
-            <span>{t('userPage.serviceRequestDetail.section_chat')}</span>
-          </h4>
-
-          {selectedContractor?.status !== 'Approved' && (
-            <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
-              <div className="text-center text-white px-6">
-                <i className="fas fa-lock text-4xl mb-4"></i>
-                <p className="text-lg font-semibold mb-2">
-                  {t('userPage.serviceRequestDetail.noChatFunction')}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className="h-96 overflow-y-auto bg-gray-50 p-4 rounded-lg mb-4 space-y-3">
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <div className="text-center">
-                  <i className="fas fa-comment-dots text-4xl mb-2"></i>
-                  <p className="text-sm">
-                    {t('userPage.serviceRequestDetail.noMessages')}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              messages.map((m) => (
-                <div
-                  key={m.messageID}
-                  className={`flex ${
-                    m.sender === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`px-4 py-2 rounded-lg max-w-[70%] ${
-                      m.sender === 'user'
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-200 text-gray-800'
-                    }`}
-                  >
-                    <p className="text-sm">{m.text}</p>
-                  </div>
-                </div>
-              ))
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
-            />
-            <button
-              onClick={handleSend}
-              disabled={input.trim() === ''}
-              className="px-6 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm disabled:opacity-50"
-            >
-              <i className="fas fa-paper-plane mr-2"></i>
-              {t('BUTTON.Send')}
-            </button>
-          </div>
-        </div>
+        {/* Chat Section */}
+        {
+          <ChatSection
+            conversationId={serviceRequest.conversation.conversationID}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+          />
+        }
       </div>
     </div>
   );
