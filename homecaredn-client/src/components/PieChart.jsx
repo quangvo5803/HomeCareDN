@@ -1,4 +1,3 @@
-// components/PieChartBase.jsx
 import { Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -17,13 +16,13 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { position: "bottom", labels: { color: "#333" } },
-      title: { display: !!title, text: title },
+      title: { display: false },
     },
   };
 
-  // không có type
   const defaultData = {
     labels: ["No Data"],
     datasets: [
@@ -61,7 +60,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           )}
         </div>
 
-        <div className="relative flex justify-center items-center p-2">
+        <div className="relative flex justify-center items-center p-2 h-[430px]">
           <Pie data={data} options={options} />
 
           {loading && (
@@ -98,7 +97,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           )}
         </div>
 
-        <div className="relative flex justify-center items-center p-2">
+        <div className="relative flex justify-center items-center p-2 h-[430px]">
           <Pie data={data} options={options} />
 
           {loading && (

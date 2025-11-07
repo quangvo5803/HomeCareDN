@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.DTOs.Application.Statistic
+﻿namespace BusinessLogic.DTOs.Application.Statistic.AdminStatistic
 {
     public class AdminLineChartDto
     {

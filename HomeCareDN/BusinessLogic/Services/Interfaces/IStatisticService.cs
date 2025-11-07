@@ -1,12 +1,12 @@
-﻿using BusinessLogic.DTOs.Application.Static;
-using BusinessLogic.DTOs.Application.Statistic;
+﻿using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface IStatisticService
     {
-        Task<IEnumerable<AdminLineChartDto>> GetLineStatisticsAsync(int year);
-        Task<IEnumerable<AdminPieChartDto>> GetPieStatisticsAsync(int year);
+        Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year);
+        Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year);
         Task<AdminTopStatisticsDto> GetTopStatisticsAsync();
+        Task<AdminStatStatisticDto> GetStatStatisticAsync();
     }
 }

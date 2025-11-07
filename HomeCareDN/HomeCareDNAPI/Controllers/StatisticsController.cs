@@ -21,7 +21,7 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("admin/line-chart/{year:int}")]
         public async Task<IActionResult> GetLineStatistics(int year)
         {
-            var statistics = await _facadeService.StatisticService.GetLineStatisticsAsync(year);
+            var statistics = await _facadeService.StatisticService.GetLineChartStatisticsAsync(year);
             return Ok(statistics);
         }
 
@@ -29,7 +29,7 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("admin/pie-chart/{year:int}")]
         public async Task<IActionResult> GetPieStatistics(int year)
         {
-            var statistics = await _facadeService.StatisticService.GetPieStatisticsAsync(year);
+            var statistics = await _facadeService.StatisticService.GetPieChartStatisticsAsync(year);
             return Ok(statistics);
         }
 
@@ -39,6 +39,14 @@ namespace HomeCareDNAPI.Controllers
         {
             var statistics = await _facadeService.StatisticService.GetTopStatisticsAsync();
             return Ok(statistics);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin/stat-statistics")]
+        public async Task<IActionResult> GetStatStatistics()
+        {
+            var stats = await _facadeService.StatisticService.GetStatStatisticAsync();
+            return Ok(stats);
         }
     }
 }

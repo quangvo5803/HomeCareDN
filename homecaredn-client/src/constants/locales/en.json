@@ -631,27 +631,19 @@
     }
   },
   "adminDashboard": {
-    "statisticMoney": {
-      "todayMoney": "Today's Money",
-      "sinceLastMonth": " since last month"
-    },
-    "statisticUser": {
-      "todayUsers": "This month's Users",
-      "sinceLastMonth": " since last month"
-    },
-    "statisticServiceRequest": {
-      "newServiceRequest": "New Service Requests",
-      "sinceLastMonth": " since last month"
-    },
-    "statisticSales": {
-      "sales": "Sales",
-      "sinceLastMonth": " since last month"
-    },
+    "totalUser": "Customers",
+    "totalPartner": "Partner",
+    "contractor": "Contractor",
+    "distributor": "Distributor",
+    "serviceRequest": "Service requested",
+    "pending": "Pending",
+    "PendingCommission": "Commission",
+    "totalCommission": "Total Commission",
     "construction": "Construction",
     "repair": "Repair",
     "material": "Material",
     "lineChart": {
-      "salesOverview": "Sales overview",
+      "salesOverview": "Sales for the year",
       "months": {
         "jan": "Jan",
         "feb": "Feb",

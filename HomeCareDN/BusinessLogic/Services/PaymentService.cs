@@ -96,7 +96,7 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication,ContractorApplication.ServiceRequest"
+                includeProperties: "ContractorApplication"
             );
 
             if (payment == null)

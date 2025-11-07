@@ -14,5 +14,10 @@ export const StatisticService = {
     getTopStatistic: async () => {
         const response = await api.get('/Statistics/admin/top-statistics');
         return response;
+    },
+
+    getStatStatistic: async () => {
+        const response = await api.get('/Statistics/admin/stat-statistics');
+        return response;
     }
 }

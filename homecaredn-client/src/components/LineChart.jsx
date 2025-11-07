@@ -1,4 +1,3 @@
-// components/LineChartBase.jsx
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -26,9 +25,10 @@ ChartJS.register(
 export default function LineChart({ title, data, year, onYearChange, type, loading }) {
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: { display: true, labels: { color: "#333" } },
-      title: { display: !!title, text: title },
+      title: { display: false },
     },
     scales: {
       x: { ticks: { color: "#666" } },
@@ -58,7 +58,7 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
     return (
       <div className="border-black/12.5 dark:bg-slate-850 dark:shadow-dark-xl shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
         <div className="border-black/12.5 mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-solid p-6 pt-4 pb-0">
-          <h6 className="capitalize dark:text-white">{title}</h6>
+          <h6 className="capitalize dark:text-white text-xl">{title}</h6>
 
           {/* Dropdown chọn năm */}
           {onYearChange && (
@@ -79,7 +79,7 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
           )}
         </div>
 
-        <div className="flex-auto p-4">
+        <div className="flex-auto p-4 h-[450px] relative">
           <Line data={data} options={options} height={200} />
 
           {loading && (
@@ -117,18 +117,19 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
           )}
         </div>
 
-        <Line data={data} options={options} height={180} />
+        <div className="flex-auto p-4 h-[450px] relative">
+          <Line data={data} options={options} height={200} />
 
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
-            <LoadingComponent />
-          </div>
-        )}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+              <LoadingComponent />
+            </div>
+          )}
+        </div>
       </div>
     );
   }
 
-  // 🔹 Mặc định nếu không có type
   return (
     <div className="bg-gray-100 p-4 rounded-xl">
       <h6 className="text-gray-700 mb-2">

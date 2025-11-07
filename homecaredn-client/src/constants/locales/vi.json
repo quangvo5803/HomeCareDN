@@ -626,27 +626,19 @@
     }
   },
   "adminDashboard": {
-    "statisticMoney": {
-      "todayMoney": "Thu nhập hôm nay",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "statisticUser": {
-      "todayUsers": "Tổng số người dùng tháng này",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "statisticServiceRequest": {
-      "newServiceRequest": "Yêu cầu dịch vụ mới",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "statisticSales": {
-      "sales": "Doanh thu",
-      "sinceLastMonth": " so với tháng trước"
-    },
+    "totalUser": "Khách hàng",
+    "totalPartner": "Đối tác",
+    "contractor": "Thầu",
+    "distributor": "Phân phối",
+    "serviceRequest": "Dịch vụ đã yêu cầu",
+    "pending": "Đang chờ",
+    "PendingCommission": "Đang xử lý",
+    "totalCommission": "Tổng tiền hoa hồng",
     "construction": "Xây dựng",
     "repair": "Sửa chữa",
     "material": "Vật liệu",
     "lineChart": {
-      "salesOverview": "Tổng quan doanh số",
+      "salesOverview": "Doanh số trong năm",
       "months": {
         "jan": "Th 1",
         "feb": "Th 2",

@@ -1,6 +1,6 @@
 ﻿using DataAccess.Entities.Application;
 
-namespace BusinessLogic.DTOs.Application.Statistic
+namespace BusinessLogic.DTOs.Application.Statistic.AdminStatistic
 {
     public class AdminPieChartDto
     {

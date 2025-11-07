@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using BusinessLogic.DTOs.Application.Static;
 using BusinessLogic.DTOs.Application.Statistic;
+using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -21,7 +21,7 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<AdminLineChartDto>> GetLineStatisticsAsync(int year)
+        public async Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year)
         {
             var contractor = await _unitOfWork.ContractorApplicationRepository
                 .GetRangeAsync(sta => sta.Status == ApplicationStatus.Approved && 
@@ -85,9 +85,9 @@ namespace BusinessLogic.Services
             return result;
         }
 
-        public async Task<IEnumerable<AdminPieChartDto>> GetPieStatisticsAsync(int year)
+        public async Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year)
         {
-            var contractor = await _unitOfWork.ContractorApplicationRepository
+             var contractor = await _unitOfWork.ContractorApplicationRepository
                 .GetRangeAsync(ca => ca.Status == ApplicationStatus.Approved
                     && ca.CreatedAt.Year == year, includeProperties: "ServiceRequest");
 
@@ -126,7 +126,6 @@ namespace BusinessLogic.Services
             return resultGrouped;
         }
 
-
         public async Task<AdminTopStatisticsDto> GetTopStatisticsAsync()
         {
             var result = new AdminTopStatisticsDto();
@@ -158,12 +157,12 @@ namespace BusinessLogic.Services
                 var email = contractorUsers.TryGetValue(p.ContractorID.ToString(), out var e)
                     ? e : "Unknown";
 
-                return new AdminTopContractorDto
+                return new AdminTopPartnerDto
                 {
                     ContractorID = p.ContractorID,
-                    Email = email!,
-                    ApprovedCount = p.ApprovedCount,
-                    TotalRevenue = p.TotalRevenue
+                    ContractorEmail = email!,
+                    ContractorApprovedCount = p.ApprovedCount,
+                    ContractorTotalRevenue = p.TotalRevenue
                 };
             }).ToList();
 
@@ -195,16 +194,48 @@ namespace BusinessLogic.Services
                 var email = distributorUsers.TryGetValue(g.DistributorID.ToString(), out var e)
                     ? e : "Unknown";
 
-                return new AdminTopDistributorDto
+                return new AdminTopPartnerDto
                 {
                     DistributorID = g.DistributorID,
-                    Email = email!,
-                    ApprovedCount = g.ApprovedCount,
-                    TotalRevenue = g.TotalRevenue
+                    DistributorEmail = email!,
+                    DistributorApprovedCount = g.ApprovedCount,
+                    DistributorTotalRevenue = g.TotalRevenue
                 };
             }).ToList();
 
             return result;
         }
+
+        public async Task<AdminStatStatisticDto> GetStatStatisticAsync()
+        {
+            var dto = new AdminStatStatisticDto();
+
+            var customers = await _userManager.GetUsersInRoleAsync("Customer");
+            var contractors = await _userManager.GetUsersInRoleAsync("Contractor");
+            var distributors = await _userManager.GetUsersInRoleAsync("Distributor");
+
+            dto.TotalCustomer = customers.Count;
+            dto.TotalContactor = contractors.Count;
+            dto.TotalDistributor = distributors.Count;
+
+            var contractorQuery = _unitOfWork.ContractorApplicationRepository.GetQueryable();
+            var distributorQuery = _unitOfWork.DistributorApplicationRepository.GetQueryable();
+
+            dto.TotalPending =
+                await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.Pending) +
+                await distributorQuery.CountAsync(x => x.Status == ApplicationStatus.Pending);
+
+            dto.TotalPendingCommission =
+                await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.PendingCommission) +
+                await distributorQuery.CountAsync(x => x.Status == ApplicationStatus.PendingCommission);
+
+            var commissionQuery = _unitOfWork.PaymentTransactionsRepository.GetQueryable();
+            dto.TotalCommission = await commissionQuery
+                .Where(x => x.Status == PaymentStatus.Paid)
+                .SumAsync(x => x.Amount);
+
+            return dto;
+        }
+
     }
 }
