@@ -620,7 +620,8 @@
       "serviceRequest": "Service Request",
       "material": "Material",
       "partner": "Partner",
-      "support": "Support Manager"
+      "user": "User",
+      "support": "Support"
     },
     "account": {
       "title": "Account pages",
@@ -877,6 +878,23 @@
       "rejectReason": "Rejection Reason",
       "rejectReasonPlaceHolder": "Enter rejection reason"
     }
+  },
+  "adminUserManager": {
+    "title": "User Management",
+    "subtitle": "View a list of all users in the system.",
+    "users": "users",
+    "all": "All",
+    "customer": "Customer",
+    "contractor": "Contractor",
+    "distributor": "Distributor",
+    "no": "No",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "projectCount": "Project Count",
+    "address": "Address",
+    "action": "Action",
+    "empty": "No users yet",
+    "empty_description": "No users registered yet."
   },
   "adminSupportManager": {
     "title": "Support Manager",

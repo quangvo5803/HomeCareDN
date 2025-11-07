@@ -108,7 +108,7 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-
+            dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -139,7 +139,7 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-
+            dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";

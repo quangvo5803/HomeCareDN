@@ -2,8 +2,10 @@
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Net.payOS;
 using Net.payOS.Types;
@@ -18,18 +20,21 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly PayOsOptions _payOsOptions;
         private readonly ISignalRNotifier _notifier;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
             IOptions<PayOsOptions> payOsOptions,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            UserManager<ApplicationUser> userManager
         )
         {
             _payOS = payOS;
             _unitOfWork = unitOfWork;
             _payOsOptions = payOsOptions.Value;
             _notifier = notifier;
+            _userManager = userManager;
         }
 
         public async Task<CreatePaymentResult> CreatePaymentAsync(
@@ -91,7 +96,7 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication"
+                includeProperties: "ContractorApplication,ContractorApplication.ServiceRequest"
             );
 
             if (payment == null)
@@ -106,6 +111,15 @@ namespace BusinessLogic.Services
                 {
                     payment.ContractorApplication.Status = ApplicationStatus.Approved;
                     payment.ContractorApplication.DueCommisionTime = null;
+
+                    var contractorID = payment.ContractorApplication.ContractorID;
+                    var contractor = await _userManager.FindByIdAsync(contractorID.ToString());
+                    if(contractor != null)
+                    {
+                        contractor.ProjectCount += 1;
+                        await _userManager.UpdateAsync(contractor);
+                    }
+
                 }
                 if (
                     DateTime.TryParseExact(

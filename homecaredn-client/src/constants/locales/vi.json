@@ -844,6 +844,10 @@
     "title": "Quản lý đối tác",
     "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
     "partners": "đối tác",
+    "all": "Tất cả",
+    "pending": "Đang Chờ",
+    "approved": "Đã Phê Duyệt",
+    "rejected": "Đã Từ Chối",
     "no": "STT",
     "companyName": "Tên công ty",
     "phoneNumber": "Số điện thoại",
@@ -868,6 +872,23 @@
       "rejectReason": "Lí do từ chối",
       "rejectReasonPlaceHolder": "Nhập lí do từ chối"
     }
+  },
+  "adminUserManager": {
+    "title": "Quản lý người dùng",
+    "subtitle": "Xem danh sách tất cả người dùng trong hệ thống.",
+    "users": "users",
+    "all": "Tất cả",
+    "customer": "Khách hàng",
+    "contractor": "Nhà thầu",
+    "distributor": "Nhà phân phối",
+    "no": "Không",
+    "fullName": "Họ và tên",
+    "phoneNumber": "Số điện thoại",
+    "projectCount": "Số lượng dự án",
+    "address": "Địa chỉ",
+    "action": "Hành động",
+    "empty": "Chưa có người dùng nào",
+    "empty_description": "Chưa có người dùng nào đăng ký."
   },
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",

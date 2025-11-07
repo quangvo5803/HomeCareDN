@@ -259,7 +259,7 @@ namespace BusinessLogic.Services.Interfaces
                     Description = selected.Description,
                     DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = 0,
+                    CompletedProjectCount = contractor!.ProjectCount,
                     AverageRating = 0,
                 };
             }
@@ -285,7 +285,7 @@ namespace BusinessLogic.Services.Interfaces
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = 0, // hoặc dữ liệu thực tế nếu có
+                    CompletedProjectCount = contractor!.ProjectCount, // hoặc dữ liệu thực tế nếu có
                     AverageRating = 0,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =

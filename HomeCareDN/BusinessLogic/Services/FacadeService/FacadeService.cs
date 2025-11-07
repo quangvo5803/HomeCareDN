@@ -19,6 +19,7 @@ namespace BusinessLogic.Services.FacadeService
         public IPaymentService PaymentService { get; }
         public IMaterialRequestService MaterialRequestService { get; }
         public IStatisticService StatisticService { get; }
+        public IUserService UserService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -73,7 +74,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.PayOS,
                 coreDeps.UnitOfWork,
                 infraDeps.PayOsOptions,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.UserManager
             );
 
             MaterialRequestService = new MaterialRequestService(
@@ -83,6 +85,11 @@ namespace BusinessLogic.Services.FacadeService
 
             StatisticService = new StatisticService(
                 coreDeps.UnitOfWork,
+                identityDeps.UserManager
+            );
+
+            UserService = new UserService(
+                coreDeps.Mapper,
                 identityDeps.UserManager
             );
         }
