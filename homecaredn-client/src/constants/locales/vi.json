@@ -536,10 +536,13 @@
     "applications": "Đơn Xin",
     "profile": "Hồ Sơ",
     "kpi_meta": {
-      "open_requests": "▲ +2 tuần này",
-      "applied": "↺ 3 đang chờ",
-      "won": "▲ Tỉ lệ 36%",
-      "pending_payments": "▼ 1 quá hạn"
+      "open_requests": "▲ +2 tuần này"
+    },
+    "retry": "Thử lại",
+    "no_requests": "Không có yêu cầu nào",
+    "access_denied": "Từ chối truy cập. Cần quyền Nhà thầu.",
+    "errors": {
+      "kpi_load_failed": "Không thể tải dữ liệu KPI"
     }
   },
   "supportChat": {

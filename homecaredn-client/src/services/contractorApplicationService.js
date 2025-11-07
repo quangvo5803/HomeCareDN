@@ -48,6 +48,12 @@ export const contractorApplicationService = {
     });
     return response.data;
   },
+  getDashboardData: async () => {
+    const { data } = await api.get(
+      '/contractor-applications/contractor/dashboard'
+    );
+    return data;
+  },
   getByServiceRequestIdForContractor: async (dto) => {
     const response = await api.get(
       `/contractor-applications/contractor/get-applied/`,

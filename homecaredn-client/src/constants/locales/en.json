@@ -541,10 +541,13 @@
     "applications": "Applications",
     "profile": "Profile",
     "kpi_meta": {
-      "open_requests": "▲ +2 this week",
-      "applied": "↺ 3 pending",
-      "won": "▲ 36% rate",
-      "pending_payments": "▼ 1 overdue"
+      "open_requests": "▲ +2 this week"
+    },
+    "retry": "Retry",
+    "no_requests": "No requests",
+    "access_denied": "Access denied. Contractor role required.",
+    "errors": {
+      "kpi_load_failed": "Unable to load KPI data"
     }
   },
   "supportChat": {

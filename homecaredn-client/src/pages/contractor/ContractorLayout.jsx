@@ -10,10 +10,10 @@ export default function ContractorLayout() {
 
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-gray-50">
-      <MenuList 
-        serviceRequestsCount={10} 
+      <MenuList
         brand={{
-          logoUrl: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png',
+          logoUrl:
+            'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png',
           title: 'HomeCareDN',
           subtitleKey: 'partnerDashboard.contractor_portal',
         }}
@@ -35,7 +35,7 @@ export default function ContractorLayout() {
             <AvatarMenu />
           </div>
         </header>
-        
+
         {/* Main content */}
         <main className="p-6 space-y-6">
           {/* Nơi render các trang con của contractor */}
