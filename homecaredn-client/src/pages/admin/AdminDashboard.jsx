@@ -1,5 +1,6 @@
 import LineChart from '../../components/LineChart';
 import PieChart from '../../components/PieChart';
+import BarChart from '../../components/BarChart';
 import { useTranslation } from 'react-i18next';
 import Avatar from 'react-avatar';
 import { useEffect, useState } from "react";
@@ -13,8 +14,10 @@ export default function AdminDashboard() {
 
   const [lineYear, setLineYear] = useState(new Date().getFullYear());
   const [pieYear, setPieYear] = useState(new Date().getFullYear());
+  const [barYear, setBarYear] = useState(new Date().getFullYear());
   const [lineChartData, setLineChartData] = useState({ labels: [], datasets: [] });
   const [pieChartData, setPieChartData] = useState({ labels: [], datasets: [] });
+  const [barChartData, setBarChartData] = useState({ labels: [], datasets: [] });
   const [topStats, setTopStats] = useState({ topContractors: [], topDistributors: [] });
   const [stats, setStats] = useState({
     totalCustomer: 0,
@@ -24,26 +27,88 @@ export default function AdminDashboard() {
     totalPendingCommission: 0,
     totalCommission: 0,
   });
-  const [loadingStat, setLoadingStat] = useState(false);
+
   const [loadingLineChart, setLoadingLineChart] = useState(false);
   const [loadingPieChart, setLoadingPieChart] = useState(false);
+  const [loadingBarChart, setLoadingBarChart] = useState(false);
   const [loadingTop, setLoadingTop] = useState(false);
 
-  //Line
-  const getMonthlyValue = (data, month, key) => {
-    const found = data.find((d) => d.month === month);
-    return found ? found[key] : 0;
-  };
+  const getMonthlyValue = (data, month, key) =>
+    data.find((d) => d.month === month)?.[key] ?? 0;
 
   const getMonthlyDataset = (data, labels, key) =>
     labels.map((_, i) => getMonthlyValue(data, i + 1, key));
 
-  const processLineChartData = (data, labels) => ({
+  const processBarChartData = (data, labels) => ({
     repair: getMonthlyDataset(data, labels, "repairCount"),
     construction: getMonthlyDataset(data, labels, "constructionCount"),
-    material: getMonthlyDataset(data, labels, "materialCount")
+    material: getMonthlyDataset(data, labels, "materialCount"),
   });
 
+  const processLineChartData = (data, labels) => ({
+    commission: getMonthlyDataset(data, labels, "totalCommission"),
+  });
+
+  //Bar
+  useEffect(() => {
+    const fetchBarChartData = async () => {
+      setLoadingBarChart(true);
+      try {
+        const res = await StatisticService.getBarChart(barYear);
+        const data = res.data;
+
+        const labels = [
+          t("adminDashboard.months.jan"),
+          t("adminDashboard.months.feb"),
+          t("adminDashboard.months.mar"),
+          t("adminDashboard.months.apr"),
+          t("adminDashboard.months.may"),
+          t("adminDashboard.months.jun"),
+          t("adminDashboard.months.jul"),
+          t("adminDashboard.months.aug"),
+          t("adminDashboard.months.sep"),
+          t("adminDashboard.months.oct"),
+          t("adminDashboard.months.nov"),
+          t("adminDashboard.months.dec"),
+        ];
+
+        const { repair, construction, material } = processBarChartData(data, labels);
+
+        setBarChartData({
+          labels,
+          datasets: [
+            {
+              label: t("adminDashboard.repair"),
+              data: repair,
+              backgroundColor: "rgba(59,130,246,0.8)",
+            },
+            {
+              label: t("adminDashboard.construction"),
+              data: construction,
+              backgroundColor: "rgba(249,115,22,0.8)",
+            },
+            {
+              label: t("adminDashboard.material"),
+              data: material,
+              backgroundColor: "rgba(139,92,246,0.8)",
+              borderRadius: {
+                topLeft: 6,
+                topRight: 6,
+              },
+            }
+          ],
+        });
+      } catch (err) {
+        toast.error(t(handleApiError(err)));
+      } finally {
+        setLoadingBarChart(false);
+      }
+    };
+    fetchBarChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barYear, t]);
+
+  //Line
   useEffect(() => {
     const fetchLineChartData = async () => {
       setLoadingLineChart(true);
@@ -52,46 +117,33 @@ export default function AdminDashboard() {
         const data = res.data;
 
         const labels = [
-          t("adminDashboard.lineChart.months.jan"),
-          t("adminDashboard.lineChart.months.feb"),
-          t("adminDashboard.lineChart.months.mar"),
-          t("adminDashboard.lineChart.months.apr"),
-          t("adminDashboard.lineChart.months.may"),
-          t("adminDashboard.lineChart.months.jun"),
-          t("adminDashboard.lineChart.months.jul"),
-          t("adminDashboard.lineChart.months.aug"),
-          t("adminDashboard.lineChart.months.sep"),
-          t("adminDashboard.lineChart.months.oct"),
-          t("adminDashboard.lineChart.months.nov"),
-          t("adminDashboard.lineChart.months.dec"),
+          t("adminDashboard.months.jan"),
+          t("adminDashboard.months.feb"),
+          t("adminDashboard.months.mar"),
+          t("adminDashboard.months.apr"),
+          t("adminDashboard.months.may"),
+          t("adminDashboard.months.jun"),
+          t("adminDashboard.months.jul"),
+          t("adminDashboard.months.aug"),
+          t("adminDashboard.months.sep"),
+          t("adminDashboard.months.oct"),
+          t("adminDashboard.months.nov"),
+          t("adminDashboard.months.dec"),
         ];
 
-        const { repair, construction, material } = processLineChartData(data, labels);
+        const { commission } = processLineChartData(data, labels);
 
         setLineChartData({
           labels,
           datasets: [
             {
-              label: t("adminDashboard.repair"),
-              data: repair,
-              borderColor: "#3b82f6",
-              backgroundColor: "rgba(59,130,246,0.2)",
-              fill: true,
-            },
-            {
-              label: t("adminDashboard.construction"),
-              data: construction,
+              label: t("adminDashboard.lineChart.commission"),
+              data: commission,
               borderColor: "#10b981",
               backgroundColor: "rgba(16,185,129,0.2)",
               fill: true,
             },
-            {
-              label: t("adminDashboard.material"),
-              data: material,
-              borderColor: "#f97316",
-              backgroundColor: "rgba(249,115,22,0.2)",
-              fill: true,
-            }
+
           ],
         });
       } catch (err) {
@@ -104,7 +156,6 @@ export default function AdminDashboard() {
     fetchLineChartData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineYear, t]);
-
 
   //Pie
   useEffect(() => {
@@ -182,8 +233,6 @@ export default function AdminDashboard() {
         setStats(response.data);
       } catch (err) {
         toast.error(t(handleApiError(err)));
-      } finally {
-        setLoadingStat(false)
       }
     }
     fetchStats();
@@ -192,121 +241,123 @@ export default function AdminDashboard() {
   return (
     <div className="w-full px-6 py-6 mx-auto">
       {/* Stats Cards */}
-      {loadingStat ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 -mt-4">
-          <LoadingComponent />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 -mt-4">
+        {/* Card 1 - Total Users */}
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-blue-100 relative">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('adminDashboard.totalUser')}</p>
+              <h5 className="text-3xl font-bold text-gray-900 mb-1">{stats.totalCustomer}</h5>
+            </div>
+
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg hover:scale-105 transition-transform">
+                <i className="fas fa-user-friends text-white text-2xl"></i>
+              </div>
+            </div>
+          </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 -mt-4">
-          {/* Card 1 - Total Users */}
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-blue-100 relative">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('adminDashboard.totalUser')}</p>
-                <h5 className="text-3xl font-bold text-gray-900 mb-1">{stats.totalCustomer}</h5>
-              </div>
 
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg hover:scale-105 transition-transform">
-                  <i className="fas fa-user-friends text-white text-2xl"></i>
-                </div>
-              </div>
-            </div>
+
+        {/* Card 2 - Total Partners */}
+        <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-xs font-semibold text-gray-500 uppercase">
+              {t('adminDashboard.totalPartner')}
+            </p>
           </div>
 
-
-          {/* Card 2 - Total Partners */}
-          <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
-            <div className="flex items-center justify-between mb-2.5">
-              <p className="text-xs font-semibold text-gray-500 uppercase">
-                {t('adminDashboard.totalPartner')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500 mb-0.5">
-                    <i className="fas fa-hard-hat text-white text-base"></i>
-                  </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
-                    {t('adminDashboard.contractor')}
-                  </p>
-                  <h6 className="text-xl font-bold text-gray-900">{stats.totalContactor}</h6>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500 mb-0.5">
+                  <i className="fas fa-hard-hat text-white text-base"></i>
                 </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500 mb-0.5">
-                    <i className="fas fa-truck text-white text-base"></i>
-                  </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
-                    {t('adminDashboard.distributor')}
-                  </p>
-                  <h6 className="text-xl font-bold text-gray-900">{stats.totalDistributor}</h6>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Card 3 - Service Requests */}
-          <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
-            <div className="flex items-center justify-between mb-2.5">
-              <p className="text-xs font-semibold text-gray-500 uppercase">
-                {t('adminDashboard.serviceRequest')}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 rounded-xl p-4 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-orange-500 mb-0.5">
-                    <i className="fas fa-clock text-white text-base"></i>
-                  </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.pending')}</p>
-                  <h6 className="text-xl font-bold text-gray-900">{stats.totalPending}</h6>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 hover:border-yellow-500 hover:shadow-md transition-all cursor-pointer">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-yellow-500 mb-0.5">
-                    <i className="fas fa-dollar-sign text-white text-base"></i>
-                  </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.PendingCommission')}</p>
-                  <h6 className="text-xl font-bold text-gray-900">{stats.totalPendingCommission}</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4 - Total Commission */}
-          <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
-                  {t('adminDashboard.totalCommission')}
+                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
+                  {t('adminDashboard.contractor')}
                 </p>
-                <h5 className="text-3xl font-bold text-gray-900 mb-2">
-                  {new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND',
-                  }).format(stats.totalCommission)}
-                </h5>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalContactor}</h6>
               </div>
+            </div>
 
-              <div className="flex-shrink-0">
-                <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg hover:scale-105 transition-transform">
-                  <i className="fas fa-hand-holding-dollar text-white text-2xl"></i>
+            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500 mb-0.5">
+                  <i className="fas fa-truck text-white text-base"></i>
                 </div>
+                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
+                  {t('adminDashboard.distributor')}
+                </p>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalDistributor}</h6>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Card 3 - Service Requests */}
+        <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <p className="text-xs font-semibold text-gray-500 uppercase">
+              {t('adminDashboard.serviceRequest')}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 rounded-xl p-4 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-orange-500 mb-0.5">
+                  <i className="fas fa-clock text-white text-base"></i>
+                </div>
+                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.pending')}</p>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalPending}</h6>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 hover:border-yellow-500 hover:shadow-md transition-all cursor-pointer">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-yellow-500 mb-0.5">
+                  <i className="fas fa-dollar-sign text-white text-base"></i>
+                </div>
+                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.PendingCommission')}</p>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalPendingCommission}</h6>
               </div>
             </div>
           </div>
         </div>
-      )
-      }
+
+        {/* Card 4 - Total Commission */}
+        <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                {t('adminDashboard.totalCommission')}
+              </p>
+
+              <h5
+                className="text-2xl font-bold text-gray-900 mb-2 truncate max-w-[180px] sm:max-w-[220px] md:max-w-[260px]"
+                title={new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(stats.totalCommission)}
+              >
+                {new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: 'VND',
+                }).format(stats.totalCommission)}
+              </h5>
+            </div>
+
+            <div className="flex-shrink-0">
+              <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg hover:scale-105 transition-transform">
+                <i className="fas fa-hand-holding-dollar text-white text-2xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
@@ -314,7 +365,7 @@ export default function AdminDashboard() {
         <div className="lg:col-span-7">
           <LineChart
             type='Admin'
-            title={t("adminDashboard.lineChart.salesOverview")}
+            title={t("adminDashboard.lineChart.commissionRevenue")}
             data={lineChartData}
             year={lineYear}
             onYearChange={setLineYear}
@@ -332,6 +383,22 @@ export default function AdminDashboard() {
             onYearChange={setPieYear}
             loading={loadingPieChart}
           />
+        </div>
+      </div>
+
+      {/* Bar Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+        <div className="col-span-12 bg-white rounded-xl p-4">
+          <div className="h-full w-full">
+            <BarChart
+              type="Admin"
+              title={t("adminDashboard.barChart.salesOverview")}
+              data={barChartData}
+              year={barYear}
+              onYearChange={setBarYear}
+              loading={loadingBarChart}
+            />
+          </div>
         </div>
       </div>
 

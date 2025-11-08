@@ -652,7 +652,7 @@
   },
   "adminDashboard": {
     "totalUser": "Customers",
-    "totalPartner": "Partner",
+    "totalPartner": "Partners",
     "contractor": "Contractor",
     "distributor": "Distributor",
     "serviceRequest": "Service requested",
@@ -662,25 +662,29 @@
     "construction": "Construction",
     "repair": "Repair",
     "material": "Material",
+    "months": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
+    },
     "lineChart": {
-      "salesOverview": "Sales for the year",
-      "months": {
-        "jan": "Jan",
-        "feb": "Feb",
-        "mar": "Mar",
-        "apr": "Apr",
-        "may": "May",
-        "jun": "Jun",
-        "jul": "Jul",
-        "aug": "Aug",
-        "sep": "Sep",
-        "oct": "Oct",
-        "nov": "Nov",
-        "dec": "Dec"
-      }
+      "commissionRevenue": "Commission revenue for the year",
+      "commission": "Commission"
     },
     "pieChart": {
       "serviceRequests": "Service Requested"
+    },
+    "barChart": {
+      "salesOverview": "Sales for the year"
     },
     "contractors": {
       "title": "Top Contractors",
@@ -906,7 +910,14 @@
     "address": "Address",
     "action": "Action",
     "empty": "No users yet",
-    "empty_description": "No users registered yet."
+    "empty_description": "No users registered yet.",
+    "userDetail": {
+      "address": "No addresses yet",
+      "rating": "Rating",
+      "historyTitle": "Service Requests History",
+      "historyTitle1": "Participated Service History",
+      "history": "No history yet"
+    }
   },
   "adminSupportManager": {
     "title": "Support Manager",

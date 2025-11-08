@@ -657,25 +657,29 @@
     "construction": "Xây dựng",
     "repair": "Sửa chữa",
     "material": "Vật liệu",
+    "months": {
+      "jan": "Th 1",
+      "feb": "Th 2",
+      "mar": "Th 3",
+      "apr": "Th 4",
+      "may": "Th 5",
+      "jun": "Th 6",
+      "jul": "Th 7",
+      "aug": "Th 8",
+      "sep": "Th 9",
+      "oct": "Th 10",
+      "nov": "Th 11",
+      "dec": "Th 12"
+    },
     "lineChart": {
-      "salesOverview": "Doanh số trong năm",
-      "months": {
-        "jan": "Th 1",
-        "feb": "Th 2",
-        "mar": "Th 3",
-        "apr": "Th 4",
-        "may": "Th 5",
-        "jun": "Th 6",
-        "jul": "Th 7",
-        "aug": "Th 8",
-        "sep": "Th 9",
-        "oct": "Th 10",
-        "nov": "Th 11",
-        "dec": "Th 12"
-      }
+      "commissionRevenue": "Doanh thu hoa hồng trong năm",
+      "commission": "Tiền hoa hồng"
     },
     "pieChart": {
       "serviceRequests": "Tổng dịch vụ đã yêu cầu"
+    },
+    "barChart": {
+      "salesOverview": "Doanh số trong năm"
     },
     "contractors": {
       "title": "Nhà thầu hàng đầu",
@@ -901,7 +905,14 @@
     "address": "Địa chỉ",
     "action": "Hành động",
     "empty": "Chưa có người dùng nào",
-    "empty_description": "Chưa có người dùng nào đăng ký."
+    "empty_description": "Chưa có người dùng nào đăng ký.",
+    "userDetail": {
+      "address": "Chưa có địa chỉ nào",
+      "rating": "Đánh giá",
+      "historyTitle": "Lịch sử dịch vụ đã yêu cầu",
+      "historyTitle1": "Lịch sử dịch vụ đã tham gia",
+      "history": "Chưa có lịch sử nào"
+    }
   },
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",

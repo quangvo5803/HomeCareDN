@@ -27,7 +27,8 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<UserDto>> GetAllUserAsync(QueryParameters parameters)
         {
-            var query = _userManager.Users.Include(a => a.Addresses).AsQueryable().AsSingleQuery().AsNoTracking();
+            var query = _userManager.Users.Include(a => a.Addresses)
+                .AsQueryable().AsSingleQuery().AsNoTracking();
 
             if(!string.IsNullOrEmpty(parameters.FilterRoleName))
             {
@@ -88,15 +89,11 @@ namespace BusinessLogic.Services
             }
             var serviceRequests = await _unitOfWork.ServiceRequestRepository
                 .GetRangeAsync(sr => sr.CustomerID.ToString() == userID);
-            var contractorApplications = await _unitOfWork.ContractorApplicationRepository
-                .GetRangeAsync(ca => ca.ContractorID.ToString() == userID);
 
             var dto = _mapper.Map<UserDto>(user);
 
             dto.ServiceRequests = 
                 _mapper.Map<List<ServiceRequestDto>>(serviceRequests);
-            dto.ContractorApplications = 
-                _mapper.Map<List<ContractorApplicationDto>>(contractorApplications);
             dto.Address = _mapper.Map<List<AddressDto>>(user.Addresses);
             return dto;
         }

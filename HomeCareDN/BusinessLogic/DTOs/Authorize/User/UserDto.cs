@@ -14,7 +14,6 @@ namespace BusinessLogic.DTOs.Authorize.User
         public int ProjectCount { get; set; }
         public double AverageRating { get; set; }
         public List<ServiceRequestDto>? ServiceRequests { get; set; }
-        public List<ContractorApplicationDto>? ContractorApplications { get; set; }
         public List<AddressDto>? Address { get; set; }
     }
 }

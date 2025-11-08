@@ -21,7 +21,7 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year)
+        public async Task<IEnumerable<AdminBarChartDto>> GetBarChartStatisticsAsync(int year)
         {
             var contractor = await _unitOfWork.ContractorApplicationRepository
                 .GetRangeAsync(sta => sta.Status == ApplicationStatus.Approved && 
@@ -38,7 +38,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Line Chart Null", new[] { "Line Chart Not Found" } },
+                        { "Bar Chart Null", new[] { "Bar Chart Not Found" } },
                     }
                 );
             }
@@ -63,7 +63,7 @@ namespace BusinessLogic.Services
             .ToList();
 
             var result = Enumerable.Range(1, 12)
-                .Select(m => new AdminLineChartDto
+                .Select(m => new AdminBarChartDto
                 {
                     Month = m,
                     Year = year,
@@ -126,6 +126,44 @@ namespace BusinessLogic.Services
             return resultGrouped;
         }
 
+        public async Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year)
+        {
+            var payments = await _unitOfWork.PaymentTransactionsRepository
+                .GetRangeAsync(p => p.Status == PaymentStatus.Paid 
+                    && p.PaidAt.HasValue 
+                    && p.PaidAt.Value.Year == year
+                );
+
+            if (payments == null)
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Line Chart Null", new[] { "Line Chart Not Found" } },
+                    }
+                );
+            }
+            var groupedPayments = payments
+                .GroupBy(p => p.PaidAt!.Value.Month)
+                .Select(g => new
+                {
+                    Month = g.Key,
+                    TotalAmount = g.Sum(x => x.Amount),
+                })
+                .ToList();
+            var result = Enumerable.Range(1, 12)
+                .Select(m => new AdminLineChartDto
+                {
+                    Month = m,
+                    Year = year,
+                    TotalCommission = groupedPayments
+                        .Where(x => x.Month == m)
+                        .Select(x => x.TotalAmount)
+                        .FirstOrDefault()
+                })
+                .ToList();
+            return result;
+        }
         public async Task<AdminTopStatisticsDto> GetTopStatisticsAsync()
         {
             var result = new AdminTopStatisticsDto();

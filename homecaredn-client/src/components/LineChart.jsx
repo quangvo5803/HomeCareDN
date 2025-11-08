@@ -8,9 +8,11 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler
 } from "chart.js";
 import PropTypes from "prop-types";
 import LoadingComponent from '../components/LoadingComponent';
+import { formatVND } from "../utils/formatters";
 
 ChartJS.register(
   CategoryScale,
@@ -19,7 +21,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export default function LineChart({ title, data, year, onYearChange, type, loading }) {
@@ -27,12 +30,36 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: true, labels: { color: "#333" } },
+      legend: {
+        display: true,
+        labels: { color: "#333" },
+      },
       title: { display: false },
+      tooltip: {
+        callbacks: {
+          // Khi hover lên từng điểm hoặc cột
+          label: function (context) {
+            const value = context.parsed.y || 0;
+            return `${context.dataset.label}: ${formatVND(value)}`;
+          },
+        },
+      },
     },
     scales: {
-      x: { ticks: { color: "#666" } },
-      y: { ticks: { color: "#666" } },
+      x: {
+        ticks: { color: "#666" },
+        grid: { display: false },
+      },
+      y: {
+        min: 0,
+        suggestedMax: data?.datasets?.[0]?.data?.some(v => v > 0) ? undefined : 1000000,
+        ticks: {
+          color: "#666",
+          callback: (value) => formatVND(value),
+          stepSize: undefined, // hoặc đặt giá trị cố định nếu muốn
+        },
+        grid: { color: "rgba(0,0,0,0.05)" },
+      },
     },
   };
 

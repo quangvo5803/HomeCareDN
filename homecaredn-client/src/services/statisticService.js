@@ -1,13 +1,18 @@
 import api from './public/api';
 
 export const StatisticService = {
-    getLineChart: async (year) => {
-        const response = await api.get(`/Statistics/admin/line-chart/${year}`);
+    getBarChart: async (year) => {
+        const response = await api.get(`/Statistics/admin/bar-chart/${year}`);
         return response;
     },
 
     getPieChart: async (year) => {
         const response = await api.get(`/Statistics/admin/pie-chart/${year}`);
+        return response;
+    },
+
+    getLineChart: async (year) => {
+        const response = await api.get(`/Statistics/admin/line-chart/${year}`);
         return response;
     },
 
