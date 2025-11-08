@@ -11,6 +11,7 @@ import Loading from '../../components/Loading';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import PropTypes from 'prop-types';
+import LoadingComponent from '../../components/LoadingComponent';
 
 const INITIAL_KPI_STATE = {
   totalRequests: 0,
@@ -87,8 +88,9 @@ export default function ContractorDashboard() {
 
   // KPI State
   const [kpiData, setKpiData] = useState(INITIAL_KPI_STATE);
-  const [isLoadingKpi, setIsLoadingKpi] = useState(true);
   const [kpiError, setKpiError] = useState(null);
+  const [loadingDashboardStats, setLoadingDashboardStats] = useState(false);
+  const [loadingApplications, setLoadingApplications] = useState(false);
 
   // Table State
   const [currentPage, setCurrentPage] = useState(1);
@@ -105,7 +107,7 @@ export default function ContractorDashboard() {
 
   const fetchDashboard = useCallback(async () => {
     if (!isContractor) return;
-    setIsLoadingKpi(true);
+    setLoadingDashboardStats(true);
     setKpiError(null);
     try {
       const data = await contractorApplicationService.getDashboardData();
@@ -124,15 +126,24 @@ export default function ContractorDashboard() {
           t('partnerDashboard.errors.kpi_load_failed')
       );
     } finally {
-      setIsLoadingKpi(false);
+      setLoadingDashboardStats(false);
     }
   }, [isContractor, t]);
 
   // Initial load
   useEffect(() => {
     if (!isContractor) return;
-    fetchDashboard();
-    fetchServiceRequests({ PageNumber: currentPage, PageSize: pageSize });
+
+    const loadData = async () => {
+      setLoadingApplications(true);
+      await Promise.all([
+        fetchDashboard(),
+        fetchServiceRequests({ PageNumber: currentPage, PageSize: pageSize }),
+      ]);
+      setLoadingApplications(false);
+    };
+
+    loadData();
   }, [isContractor, currentPage, fetchDashboard, fetchServiceRequests]);
 
   // Realtime
@@ -342,9 +353,9 @@ export default function ContractorDashboard() {
               <button
                 onClick={fetchDashboard}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-                disabled={isLoadingKpi}
+                disabled={loadingDashboardStats}
               >
-                {isLoadingKpi ? (
+                {loadingDashboardStats ? (
                   <i className="fas fa-spinner fa-spin" />
                 ) : (
                   t('partnerDashboard.retry')
@@ -355,94 +366,84 @@ export default function ContractorDashboard() {
         )}
 
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Open Requests */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  {t('partnerDashboard.kpi.open_requests')}
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {isLoadingKpi ? (
-                    <span className="text-gray-400">...</span>
-                  ) : (
-                    kpiData.totalRequests
-                  )}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {t('partnerDashboard.kpi_meta.open_requests')}
-                </p>
-              </div>
-              <div className="p-4 bg-blue-100 rounded-full">
-                <i className="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+        {loadingDashboardStats ? (
+          <div className="flex justify-center py-8">
+            <LoadingComponent />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* Open Requests */}
+            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {t('partnerDashboard.kpi.open_requests')}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {kpiData.totalRequests}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('partnerDashboard.kpi_meta.open_requests')}
+                  </p>
+                </div>
+                <div className="p-4 bg-blue-100 rounded-full">
+                  <i className="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Applied */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  {t('partnerDashboard.kpi.applied')}
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {isLoadingKpi ? (
-                    <span className="text-gray-400">...</span>
-                  ) : (
-                    kpiData.pendingApplications
-                  )}
-                </p>
-              </div>
-              <div className="p-4 bg-yellow-100 rounded-full">
-                <i className="fas fa-clock text-yellow-600 text-2xl"></i>
+            {/* Applied */}
+            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {t('partnerDashboard.kpi.applied')}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {kpiData.pendingApplications}
+                  </p>
+                </div>
+                <div className="p-4 bg-yellow-100 rounded-full">
+                  <i className="fas fa-clock text-yellow-600 text-2xl"></i>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Pending Payments */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  {t('partnerDashboard.kpi.pending_payments')}
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {isLoadingKpi ? (
-                    <span className="text-gray-400">...</span>
-                  ) : (
-                    kpiData.pendingCommissions
-                  )}
-                </p>
-              </div>
-              <div className="p-4 bg-orange-100 rounded-full">
-                <i className="fas fa-credit-card text-orange-600 text-2xl"></i>
+            {/* Pending Payments */}
+            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {t('partnerDashboard.kpi.pending_payments')}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {kpiData.pendingCommissions}
+                  </p>
+                </div>
+                <div className="p-4 bg-orange-100 rounded-full">
+                  <i className="fas fa-credit-card text-orange-600 text-2xl"></i>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Won */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  {t('partnerDashboard.kpi.won')}
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {isLoadingKpi ? (
-                    <span className="text-gray-400">...</span>
-                  ) : (
-                    kpiData.approvedApplications
-                  )}
-                </p>
-              </div>
-              <div className="p-4 bg-green-100 rounded-full">
-                <i className="fas fa-trophy text-green-600 text-2xl"></i>
+            {/* Won */}
+            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    {t('partnerDashboard.kpi.won')}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {kpiData.approvedApplications}
+                  </p>
+                </div>
+                <div className="p-4 bg-green-100 rounded-full">
+                  <i className="fas fa-trophy text-green-600 text-2xl"></i>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
@@ -455,37 +456,41 @@ export default function ContractorDashboard() {
               </div>
             </div>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.id')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.description')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.estimate')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.last_update')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.status')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.action')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {tableBody}
-              </tbody>
-            </table>
-          </div>
-
+          {loadingApplications ? (
+            <div className="flex justify-center py-8">
+              <LoadingComponent />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.id')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.description')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.estimate')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.last_update')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.status')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.action')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {tableBody}
+                </tbody>
+              </table>
+            </div>
+          )}
           {totalServiceRequests > 0 && (
             <div className="flex justify-center py-6 border-t border-gray-100 bg-gray-50/50">
               <Pagination
