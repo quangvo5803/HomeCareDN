@@ -21,52 +21,6 @@ namespace BusinessLogic.Services
             _mapper = mapper;
         }
 
-        public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
-        {
-            var brand = _mapper.Map<Brand>(requestDto);
-            brand.BrandID = Guid.NewGuid();
-
-            Image imageUpload = new Image
-            {
-                ImageID = Guid.NewGuid(),
-                BrandID = brand.BrandID,
-                ImageUrl = requestDto.BrandLogoUrl,
-                PublicId = requestDto.BrandLogoPublicId,
-            };
-            brand.BrandLogoID = imageUpload.ImageID;
-
-            await _unitOfWork.ImageRepository.AddAsync(imageUpload);
-            await _unitOfWork.BrandRepository.AddAsync(brand);
-
-            await _unitOfWork.SaveAsync();
-            brand = await _unitOfWork.BrandRepository.GetAsync(
-                b => b.BrandID == brand.BrandID,
-                includeProperties: INCLUDE
-            );
-            var brandDto = _mapper.Map<BrandDto>(brand);
-            return brandDto;
-        }
-
-        public async Task DeleteBrandAsync(Guid id)
-        {
-            var brand = await _unitOfWork.BrandRepository.GetAsync(brand => brand.BrandID == id);
-            if (brand == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "BrandID", new[] { "BRAND_NOT_FOUND" } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            var image = await _unitOfWork.ImageRepository.GetAsync(image => image.BrandID == id);
-            if (image != null)
-            {
-                await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-            }
-            _unitOfWork.BrandRepository.Remove(brand);
-            await _unitOfWork.SaveAsync();
-        }
-
         public async Task<PagedResultDto<BrandDto>> GetAllBrands(QueryParameters parameters)
         {
             var query = _unitOfWork.BrandRepository.GetQueryable(
@@ -133,12 +87,39 @@ namespace BusinessLogic.Services
             return brandDto;
         }
 
+        public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
+        {
+            var brand = _mapper.Map<Brand>(requestDto);
+            brand.BrandID = Guid.NewGuid();
+
+            Image imageUpload = new Image
+            {
+                ImageID = Guid.NewGuid(),
+                BrandID = brand.BrandID,
+                ImageUrl = requestDto.BrandLogoUrl,
+                PublicId = requestDto.BrandLogoPublicId,
+            };
+            brand.BrandLogoID = imageUpload.ImageID;
+
+            await _unitOfWork.ImageRepository.AddAsync(imageUpload);
+            await _unitOfWork.BrandRepository.AddAsync(brand);
+
+            await _unitOfWork.SaveAsync();
+            brand = await _unitOfWork.BrandRepository.GetAsync(
+                b => b.BrandID == brand.BrandID,
+                includeProperties: INCLUDE
+            );
+            var brandDto = _mapper.Map<BrandDto>(brand);
+            return brandDto;
+        }
+
         public async Task<BrandDto> UpdateBrandAsync(BrandUpdateRequestDto requestDto)
         {
             var errors = new Dictionary<string, string[]>();
             var brand = await _unitOfWork.BrandRepository.GetAsync(
                 b => b.BrandID == requestDto.BrandID,
-                includeProperties: "LogoImage,Materials"
+                includeProperties: "LogoImage,Materials",
+                false
             );
 
             if (brand == null)
@@ -179,6 +160,26 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
 
             return _mapper.Map<BrandDto>(brand);
+        }
+
+        public async Task DeleteBrandAsync(Guid id)
+        {
+            var brand = await _unitOfWork.BrandRepository.GetAsync(brand => brand.BrandID == id);
+            if (brand == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "BrandID", new[] { "BRAND_NOT_FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var image = await _unitOfWork.ImageRepository.GetAsync(image => image.BrandID == id);
+            if (image != null)
+            {
+                await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+            }
+            _unitOfWork.BrandRepository.Remove(brand);
+            await _unitOfWork.SaveAsync();
         }
     }
 }

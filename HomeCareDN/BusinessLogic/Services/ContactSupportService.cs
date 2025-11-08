@@ -97,8 +97,9 @@ namespace BusinessLogic.Services
 
         public async Task<ContactSupportDto> ReplyAsync(ContactSupportReplyRequestDto dto)
         {
-            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(x =>
-                x.Id == dto.ID
+            var customerSupportRequest = await _unitOfWork.ContactSupportRepository.GetAsync(
+                x => x.Id == dto.ID,
+                asNoTracking: false
             );
 
             if (customerSupportRequest == null)

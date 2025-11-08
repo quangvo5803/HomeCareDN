@@ -4,6 +4,7 @@ import { useServiceRequest } from '../../hook/useServiceRequest';
 import VenoBox from 'venobox';
 import 'venobox/dist/venobox.min.css';
 import Loading from '../../components/Loading';
+import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
@@ -29,6 +30,8 @@ export default function ServiceRequestDetail() {
   // Contractor list pagination
   const [contractorApplications, setContractorApplications] = useState([]);
   const [currentApplicationPage, setCurrentApplicationPage] = useState(1);
+  const [loadingContractorApplications, setLoadingContractorApplications] =
+    useState(false);
   const pageSize = 5;
   const [totalCount, setTotalCount] = useState(0);
 
@@ -218,6 +221,7 @@ export default function ServiceRequestDetail() {
 
   const fetchContractors = useCallback(async () => {
     try {
+      setLoadingContractorApplications(true);
       const res = await contractorApplicationService.getAllForCustomer({
         PageNumber: currentApplicationPage,
         PageSize: pageSize,
@@ -227,6 +231,8 @@ export default function ServiceRequestDetail() {
       setTotalCount(res.totalCount);
     } catch (error) {
       toast.error(t(handleApiError(error)));
+    } finally {
+      setLoadingContractorApplications(false);
     }
   }, [serviceRequestId, t, pageSize, currentApplicationPage]);
 
@@ -722,57 +728,69 @@ export default function ServiceRequestDetail() {
             </div>
           ) : (
             <div className="space-y-3">
-              {contractorApplications.map((c) => (
-                <button
-                  key={c.contractorApplicationID}
-                  onClick={() => handleSelectContractor(c)}
-                  className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {c.contractorApplicationID.charAt(0)}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 truncate mb-1">
-                        {c.contractorApplicationID.substring(0, 12)}
-                      </h4>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <i className="fas fa-star text-yellow-500"></i>
-                          <span>{c.averageRating}</span>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                          {c.completedProjectCount}{' '}
-                          {t('userPage.serviceRequestDetail.label_project')}
+              {loadingContractorApplications ? (
+                <div className="flex justify-center py-10">
+                  <LoadingComponent />
+                </div>
+              ) : contractorApplications.length > 0 ? (
+                <>
+                  {contractorApplications.map((c) => (
+                    <button
+                      key={c.contractorApplicationID}
+                      onClick={() => handleSelectContractor(c)}
+                      className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
+                    >
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                          {c.contractorApplicationID.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 truncate mb-1">
+                            {c.contractorApplicationID.substring(0, 12)}
+                          </h4>
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <i className="fas fa-star text-yellow-500"></i>
+                              <span>{c.averageRating}</span>
+                            </span>
+                            <span>•</span>
+                            <span>
+                              <i className="fas fa-check-circle text-green-500 mr-1"></i>
+                              {c.completedProjectCount}{' '}
+                              {t('userPage.serviceRequestDetail.label_project')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between pt-3 border-t">
+                        <StatusBadge status={c.status} type="Application" />
+                        <span className="text-lg font-bold text-orange-600">
+                          {(c.estimatePrice / 1000000).toFixed(0)}{' '}
+                          <span className="text-sm">
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                          </span>
                         </span>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <StatusBadge status={c.status} type="Application" />
-                    <span className="text-lg font-bold text-orange-600">
-                      {(c.estimatePrice / 1000000).toFixed(0)}{' '}
-                      <span className="text-sm">
-                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
-                      </span>
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    </button>
+                  ))}
 
-              {/* Pagination */}
-              {totalCount > 0 && (
-                <div className="flex justify-center py-4">
-                  <Pagination
-                    current={currentApplicationPage}
-                    pageSize={pageSize}
-                    total={totalCount}
-                    onChange={(page) => setCurrentApplicationPage(page)}
-                    showSizeChanger={false}
-                    size="small"
-                  />
+                  {/* Pagination */}
+                  {totalCount > 0 && (
+                    <div className="flex justify-center py-4">
+                      <Pagination
+                        current={currentApplicationPage}
+                        pageSize={pageSize}
+                        total={totalCount}
+                        onChange={(page) => setCurrentApplicationPage(page)}
+                        showSizeChanger={false}
+                        size="small"
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-6 text-gray-500">
+                  {t('common.noData')}
                 </div>
               )}
             </div>

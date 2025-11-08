@@ -127,7 +127,8 @@ namespace BusinessLogic.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetAsync(
                 c => c.CategoryID == requestDto.CategoryID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE,
+                false
             );
             var errors = new Dictionary<string, string[]>();
 

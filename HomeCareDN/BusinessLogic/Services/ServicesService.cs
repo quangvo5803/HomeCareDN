@@ -93,6 +93,25 @@ namespace BusinessLogic.Services
             };
         }
 
+        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                includeProperties: SERVICE_INCLUDE
+            );
+
+            if (service == null)
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
+                    }
+                );
+            }
+            return _mapper.Map<ServiceDetailDto>(service);
+        }
+
         public async Task<ServiceDto> CreateServiceAsync(ServiceCreateRequestDto serviceCreateDto)
         {
             ValidateImages(serviceCreateDto.ImageUrls);
@@ -116,30 +135,12 @@ namespace BusinessLogic.Services
             return serviceDto;
         }
 
-        public async Task<ServiceDetailDto> GetServiceByIdAsync(Guid id)
-        {
-            var service = await _unitOfWork.ServiceRepository.GetAsync(
-                s => s.ServiceID == id,
-                includeProperties: SERVICE_INCLUDE
-            );
-
-            if (service == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { ERROR_SERVICE, new[] { ERROR_SERVICE_NOT_FOUND } },
-                    }
-                );
-            }
-            return _mapper.Map<ServiceDetailDto>(service);
-        }
-
         public async Task<ServiceDto> UpdateServiceAsync(ServiceUpdateRequestDto serviceUpdateDto)
         {
             var service = await _unitOfWork.ServiceRepository.GetAsync(
                 s => s.ServiceID == serviceUpdateDto.ServiceID,
-                includeProperties: SERVICE_INCLUDE
+                includeProperties: SERVICE_INCLUDE,
+                false
             );
             if (service == null)
             {

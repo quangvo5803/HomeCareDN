@@ -17,7 +17,7 @@ namespace BusinessLogic.Services
 
         private const string INCLUDE_DELETE = "MaterialRequestItems,DistributorApplications";
         private const string INCLUDE =
-            "MaterialRequestItems,DistributorApplications,SelectedDistributorApplication";
+            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication";
         private const string ERROR_MATERIAL_SERVICE = "MATERIAL_SERVICE";
         private const string ERROR_MATERIAL_SERVICE_NOT_FOUND = "MATERIAL_SERVICE_NOT_FOUND";
 
@@ -92,26 +92,6 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<MaterialRequestDto> CreateNewMaterialRequestAsync(
-            MaterialRequestCreateRequestDto materialRequestCreateDto
-        )
-        {
-            var materialRequest = new MaterialRequest();
-            materialRequest.MaterialRequestID = Guid.NewGuid();
-            materialRequest.CustomerID = materialRequestCreateDto.CustomerID;
-            if (materialRequestCreateDto.FirstMaterialID.HasValue)
-            {
-                var materialRequestItem = new MaterialRequestItem();
-                materialRequestItem.MaterialRequestID = materialRequest.MaterialRequestID;
-                materialRequestItem.MaterialID = materialRequestCreateDto.FirstMaterialID.Value;
-                await _unitOfWork.MaterialRequestItemRepository.AddAsync(materialRequestItem);
-            }
-            await _unitOfWork.MaterialRequestRepository.AddAsync(materialRequest);
-            await _unitOfWork.SaveAsync();
-            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
-            return dto;
-        }
-
         public async Task<MaterialRequestDto> GetMaterialRequestByIdAsync(
             Guid materialRequestID,
             string role = "Admin"
@@ -134,15 +114,37 @@ namespace BusinessLogic.Services
             return dto;
         }
 
+        public async Task<MaterialRequestDto> CreateNewMaterialRequestAsync(
+            MaterialRequestCreateRequestDto materialRequestCreateDto
+        )
+        {
+            var materialRequest = new MaterialRequest();
+            materialRequest.MaterialRequestID = Guid.NewGuid();
+            materialRequest.CustomerID = materialRequestCreateDto.CustomerID;
+            if (materialRequestCreateDto.FirstMaterialID.HasValue)
+            {
+                var materialRequestItem = new MaterialRequestItem();
+                materialRequestItem.MaterialRequestID = materialRequest.MaterialRequestID;
+                materialRequestItem.MaterialID = materialRequestCreateDto.FirstMaterialID.Value;
+                await _unitOfWork.MaterialRequestItemRepository.AddAsync(materialRequestItem);
+            }
+            await _unitOfWork.MaterialRequestRepository.AddAsync(materialRequest);
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
+            return dto;
+        }
+
         public async Task<MaterialRequestDto> UpdateMaterialRequestAsync(
             MaterialRequestUpdateRequestDto materialRequestUpdateRequestDto
         )
         {
             var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
                 m => m.MaterialRequestID == materialRequestUpdateRequestDto.MaterialRequestID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE,
+                false
             );
 
+            _mapper.Map(materialRequestUpdateRequestDto, materialRequest);
             if (materialRequest == null)
             {
                 throw new CustomValidationException(
@@ -155,6 +157,10 @@ namespace BusinessLogic.Services
             await UpdateMaterialListAsync(materialRequestUpdateRequestDto, materialRequest);
 
             await _unitOfWork.SaveAsync();
+            materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                m => m.MaterialRequestID == materialRequestUpdateRequestDto.MaterialRequestID,
+                includeProperties: INCLUDE
+            );
             var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
             return dto;
         }

@@ -5,7 +5,7 @@ import { useMaterial } from '../hook/useMaterial';
 import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
 import CardItem from '../components/CardItem';
-import Loading from '../components/Loading';
+import LoadingComponent from '../components/LoadingComponent';
 
 const slides = [
   {
@@ -113,31 +113,21 @@ export default function Home() {
 
   useEffect(() => {
     const loadMaterials = async () => {
-      try {
-        const data = await fetchMaterials({
-          PageNumber: 1,
-          PageSize: 6,
-          SortBy: 'random',
-        });
+      const data = await fetchMaterials({
+        PageNumber: 1,
+        PageSize: 6,
+        SortBy: 'random',
+      });
 
-        setRandomMaterials(data || []);
-      } catch (err) {
-        console.error(err);
-        setRandomMaterials([]);
-      }
+      setRandomMaterials(data || []);
     };
     const loadServices = async () => {
-      try {
-        const data = await fetchServices({
-          PageNumber: 1,
-          PageSize: 6,
-          SortBy: 'random',
-        });
-        setRandomServices(data || []);
-      } catch (err) {
-        console.error(err);
-        setRandomServices([]);
-      }
+      const data = await fetchServices({
+        PageNumber: 1,
+        PageSize: 6,
+        SortBy: 'random',
+      });
+      setRandomServices(data || []);
     };
     loadMaterials();
     loadServices();
@@ -205,7 +195,6 @@ export default function Home() {
     const id = setTimeout(tNext, 5000);
     return () => clearTimeout(id);
   }, [idx, tNext, hasMany]);
-  if (loadingMaterial || loadingService) return <Loading />;
   return (
     <div>
       {/* Carousel */}
@@ -499,12 +488,18 @@ export default function Home() {
 
             {/* grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {randomServices.length === 0 ? (
-                <p></p>
+              {loadingService ? (
+                <LoadingComponent />
               ) : (
-                randomServices?.map((item) => (
-                  <CardItem key={item.serviceID} item={item} />
-                ))
+                <>
+                  {randomServices.length === 0 ? (
+                    <p></p>
+                  ) : (
+                    randomServices?.map((item) => (
+                      <CardItem key={item.serviceID} item={item} />
+                    ))
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -540,12 +535,18 @@ export default function Home() {
 
             {/* Grid */}
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {randomMaterials.length === 0 ? (
-                <p></p>
+              {loadingMaterial ? (
+                <LoadingComponent />
               ) : (
-                randomMaterials?.map((item) => (
-                  <CardItem key={item.materialID} item={item} />
-                ))
+                <>
+                  {randomMaterials.length === 0 ? (
+                    <p></p>
+                  ) : (
+                    randomMaterials?.map((item) => (
+                      <CardItem key={item.materialID} item={item} />
+                    ))
+                  )}
+                </>
               )}
             </div>
           </div>

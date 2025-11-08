@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
 import { useBrand } from '../../hook/useBrand';
-import LoadingModal from './LoadingModal';
+import LoadingComponent from '../LoadingComponent';
 
 export default function BrandModal({
   isOpen,
@@ -13,6 +13,7 @@ export default function BrandModal({
   onSave,
   brandID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [brandName, setBrandName] = useState('');
@@ -71,6 +72,7 @@ export default function BrandModal({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
 
@@ -85,6 +87,7 @@ export default function BrandModal({
       };
 
       if (logoFile) {
+        setUploadProgress(1);
         const result = await uploadImageToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
@@ -133,7 +136,7 @@ export default function BrandModal({
         <div className="p-6 space-y-6 flex-1 overflow-y-auto">
           {loading ? (
             <div className="flex items-center justify-center py-10">
-              <LoadingModal />
+              <LoadingComponent />
             </div>
           ) : (
             <>
@@ -281,6 +284,7 @@ BrandModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   brandID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
+  setSubmitting: PropTypes.func.isRequired,
 };
 // Default props
 BrandModal.defaultProps = {
