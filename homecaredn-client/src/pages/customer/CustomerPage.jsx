@@ -72,7 +72,7 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
                       : 'hover:bg-gray-50 text-gray-700'
                   }`}
                 >
-                  <i className="fas fa-truck"></i>
+                  <i className="fas fa-boxes"></i>
                   {t('userPage.materialRequest.title')}
                 </button>
               </nav>

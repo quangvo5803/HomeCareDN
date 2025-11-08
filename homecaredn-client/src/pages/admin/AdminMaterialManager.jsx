@@ -66,7 +66,8 @@ export default function AdminMaterialManager() {
       SortBy: sortBy,
       Search: debouncedSearch || '',
     });
-  }, [currentPage, pageSize, sortBy, debouncedSearch, fetchMaterials]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, pageSize, sortBy, debouncedSearch]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);

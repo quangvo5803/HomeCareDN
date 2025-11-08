@@ -36,23 +36,39 @@ export default function MaterialCatalog() {
 
   if (loadingCategories || loadingBrands) return <Loading />;
 
+  // Hàm xáo trộn ngẫu nhiên (Fisher–Yates shuffle)
+  const shuffleArray = (array) => {
+    const newArr = [...array];
+    for (let i = newArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+    }
+    return newArr;
+  };
+
+  // Tạo danh sách
+  const categoryItems = (categories || []).map((c) => ({
+    id: c.categoryID,
+    title: c.categoryName,
+    titleEN: c.categoryNameEN,
+    desc: c.categoryNameEN,
+    img: c.categoryLogo,
+    type: 'category',
+  }));
+
+  const brandItems = (brands || []).map((b) => ({
+    id: b.brandID,
+    title: b.brandName,
+    titleEN: b.brandNameEN,
+    desc: b.brandNameEN,
+    img: b.brandLogo,
+    type: 'brand',
+  }));
+
+  // Xáo trộn riêng từng nhóm trước khi gộp
   const allItems = [
-    ...(categories || []).map((c) => ({
-      id: c.categoryID,
-      title: c.categoryName,
-      titleEN: c.categoryNameEN,
-      desc: c.categoryNameEN,
-      img: c.categoryLogo,
-      type: 'category',
-    })),
-    ...(brands || []).map((b) => ({
-      id: b.brandID,
-      title: b.brandName,
-      titleEN: b.brandNameEN,
-      desc: b.brandNameEN,
-      img: b.brandLogo,
-      type: 'brand',
-    })),
+    ...shuffleArray(categoryItems),
+    ...shuffleArray(brandItems),
   ];
 
   // Filter
@@ -136,14 +152,16 @@ export default function MaterialCatalog() {
                 <button
                   key={tg.id}
                   onClick={() => setTag(tg.id)}
-                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${active
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-600'
-                    }`}
+                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
+                    active
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-600'
+                  }`}
                 >
                   <i
-                    className={`fas ${tg.icon} mr-2 ${active ? 'text-white' : 'text-blue-600'
-                      }`}
+                    className={`fas ${tg.icon} mr-2 ${
+                      active ? 'text-white' : 'text-blue-600'
+                    }`}
                   ></i>
                   {t(tg.i18n)}
                 </button>
@@ -178,22 +196,27 @@ export default function MaterialCatalog() {
                   {/* Image */}
                   <div className="relative h-52 bg-gradient-to-br from-gray-50 to-white">
                     <img
-                      src={m.img || "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"}
-                      alt={m.title || "No image"}
+                      src={
+                        m.img ||
+                        'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                      }
+                      alt={m.title || 'No image'}
                       className="object-contain w-full h-full p-3 transition-transform duration-300 group-hover:scale-105"
                       loading="lazy"
                     />
                     {/* Badge */}
                     <div className="absolute top-3 left-3">
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${m.type === 'category'
-                          ? 'bg-blue-600'
-                          : 'bg-orange-600'
-                          }`}
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${
+                          m.type === 'category'
+                            ? 'bg-blue-600'
+                            : 'bg-orange-600'
+                        }`}
                       >
                         <i
-                          className={`fas ${m.type === 'category' ? 'fa-tags' : 'fa-star'
-                            }`}
+                          className={`fas ${
+                            m.type === 'category' ? 'fa-tags' : 'fa-star'
+                          }`}
                         ></i>
                         {m.type === 'category' ? 'Danh mục' : 'Thương hiệu'}
                       </span>

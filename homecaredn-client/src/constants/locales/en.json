@@ -379,10 +379,31 @@
       "lbl_distributor": "supplier",
       "lbl_canEditQuantity": "Allow supplier to edit quantity",
       "lbl_materialList": "Material List",
-      "lbl_materialUnit": "type",
+      "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
       "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
+    },
+    "materialRequestDetail": {
+      "title": "Material Request Details",
+      "description": "Description",
+      "descriptionsPlaceholder": "Enter a description to help the distributor provide better consultation...",
+      "allowEditQuantity": "Allow distributor to edit quantity",
+      "allowEditQuantityDes": "Enable this option to allow the distributors to adjust material quantities when submitting an application",
+      "allowAddMaterial": "Allow distributors to add required materials",
+      "allowAddMaterialDes": "Enable this option to allow distributors to add required materials when submitting applications",
+      "materialList": "List of materials to purchase",
+      "itemsCount": "materials",
+      "noMaterial": "No materials in the list",
+      "addMaterial": "Add materials to your list",
+      "image": "Image",
+      "infor": "Information",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "action": "Action",
+      "cancleModalTitle": "Revert changes?",
+      "cancleModalText": "This action cannot be undone"
     }
+
   },
   "contractorServiceRequestManager": {
     "title": "Service Request Manager",
@@ -1029,6 +1050,15 @@
     "PaymentCancelModal": {
       "title": "Payment Failed",
       "text": "An error occurred during payment. Please try again."
+    },
+    "MaterialRequestModal": {
+      "title": "Select Materials",
+      "found": "{{count}} materials found",
+      "noMaterials": "No materials found",
+      "noResults": "No results for \"{{search}}\"",
+      "selectedCount": "{{count}} materials selected",
+      "searchPlaceholder": "Search by name, category, or brand...",
+      "clearSearch": "Clear search"
     }
   },
   "ERROR": {

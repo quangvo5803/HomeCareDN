@@ -54,7 +54,10 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Customer"
+        )]
         [HttpGet("customer/{id:guid}")]
         public async Task<IActionResult> GetByIdForCustomer(Guid id)
         {
