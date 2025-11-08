@@ -182,6 +182,7 @@ namespace HomeCareDNAPI
 
             app.MapControllers();
             app.MapHub<ApplicationHub>("/hubs/application");
+            app.MapHub<ChatHub>("/hubs/chat");
 
             app.Run();
         }
