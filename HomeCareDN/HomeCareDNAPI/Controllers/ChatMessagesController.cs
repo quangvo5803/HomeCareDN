@@ -22,10 +22,18 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetMessagesByConversation(Guid id)
+        public async Task<IActionResult> GetMessagesByConversationID(
+            Guid id,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20
+        )
         {
             var result =
-                await _facadeService.ChatMessageService.GetAllMessagesByConversationIdAsync(id);
+                await _facadeService.ChatMessageService.GetAllMessagesByConversationIDAsync(
+                    id,
+                    pageNumber,
+                    pageSize
+                );
             return Ok(result);
         }
 

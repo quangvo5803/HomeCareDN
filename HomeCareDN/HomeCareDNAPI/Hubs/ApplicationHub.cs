@@ -31,22 +31,21 @@ namespace HomeCareDNAPI.Hubs
 
         public async Task JoinConversation(Guid conversationId)
         {
-            // Validate membership: user phải là Customer hoặc Contractor của conversation
+            // ✅ FIX: Lấy userId từ query string thay vì claims
+            var httpContext = Context.GetHttpContext();
+            var userId = httpContext?.Request.Query["userId"].ToString();
+
+            // Validate membership
             var conv = await _uow.ConversationRepository.GetAsync(c =>
                 c.ConversationID == conversationId
             );
+
             if (conv == null)
                 throw new HubException("CONVERSATION_NOT_FOUND");
 
-            var userId =
-                Context.User?.FindFirst("sub")?.Value
-                ?? Context.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId == null)
-                throw new HubException("UNAUTHORIZED");
-
             bool isMember =
                 conv.CustomerID.ToString() == userId || conv.ContractorID.ToString() == userId;
+
             if (!isMember)
                 throw new HubException("PERMISSION_DENIED");
 

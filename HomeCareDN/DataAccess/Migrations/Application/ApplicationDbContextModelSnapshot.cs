@@ -209,9 +209,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<Guid>("CustomerID")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("IsLocked")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("ServiceRequestID")
                         .HasColumnType("uuid");
 

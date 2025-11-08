@@ -33,11 +33,6 @@ export default function ServiceRequestDetail() {
   const pageSize = 5;
   const [totalCount, setTotalCount] = useState(0);
 
-  // Chat states
-  // const [messages, setMessages] = useState([]);
-  // const [input, setInput] = useState('');
-  // const chatEndRef = useRef(null);
-
   const hasSelectedContractor = Boolean(selectedContractor);
 
   // Use realtime
@@ -166,22 +161,6 @@ export default function ServiceRequestDetail() {
     }
   };
 
-  // ---- CHAT HANDLERS ----
-  // const handleSend = () => {
-  //   if (input.trim() === '') return;
-  //   const newMessage = {
-  //     sender: 'user',
-  //     text: input,
-  //     timestamp: new Date(),
-  //   };
-  //   setMessages((prev) => [...prev, newMessage]);
-  //   setInput('');
-  //   setTimeout(() => {
-  //     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  //   }, 100);
-  // };
-
-  // const handleKeyPress = (e) => {
   //   if (e.key === 'Enter' && !e.shiftKey) {
   //     e.preventDefault();
   //     handleSend();
@@ -203,11 +182,17 @@ export default function ServiceRequestDetail() {
     const fetchServiceRequest = async () => {
       try {
         const result = await getServiceRequestById(serviceRequestId);
+        console.log('ServiceRequest:', serviceRequestId);
+
         if (result) {
           setServiceRequest(result);
           // Initialize selectedContractor from server data if exists
           if (result.selectedContractorApplication) {
             setSelectedContractor(result.selectedContractorApplication);
+            console.log(
+              'SelectedContractor:',
+              result.selectedContractorApplication
+            );
           }
         }
       } catch (error) {
@@ -780,13 +765,13 @@ export default function ServiceRequestDetail() {
           )}
         </div>
         {/* Chat Section */}
-        {
-          <ChatSection
-            conversationId={serviceRequest.conversation.conversationID}
-            isLocked={serviceRequest.conversation.isLocked}
-            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
-          />
-        }
+        <ChatSection
+          conversationID={serviceRequest.conversation?.conversationID}
+          contractorApplicationStatus={
+            serviceRequest.selectedContractorApplication.status
+          }
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+        />
       </div>
     </div>
   );

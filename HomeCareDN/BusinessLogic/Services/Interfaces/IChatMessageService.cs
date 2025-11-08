@@ -6,6 +6,10 @@ namespace BusinessLogic.Services.Interfaces
     public interface IChatMessageService
     {
         Task<ChatMessageDto> SendMessageAsync(SendMessageRequestDto dto);
-        Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIdAsync(Guid id);
+        Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIDAsync(
+            Guid id,
+            int pageNumber,
+            int pageSize
+        );
     }
 }

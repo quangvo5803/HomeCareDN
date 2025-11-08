@@ -21,6 +21,10 @@ namespace BusinessLogic.Services
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationID == id
             );
+            if (conversation == null)
+            {
+                return null;
+            }
             var result = _mapper.Map<ConversationDto>(conversation);
             return result;
         }

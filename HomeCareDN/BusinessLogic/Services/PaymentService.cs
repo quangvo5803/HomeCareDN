@@ -5,6 +5,7 @@ using DataAccess.Entities.Application;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
 using Ultitity.Exceptions;
@@ -126,18 +127,25 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
-                var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                    c.ServiceRequestID == payment.ServiceRequestID
-                );
-
-                if (conversation != null)
-                {
-                    conversation.IsLocked = false;
-                }
-
                 var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
                     s.ServiceRequestID == payment.ServiceRequestID
                 );
+                if (serviceRequest != null && payment.ContractorApplication != null)
+                {
+                    var conversation = new Conversation
+                    {
+                        ConversationID = Guid.NewGuid(),
+                        ServiceRequestID = serviceRequest.ServiceRequestID,
+                        CustomerID = serviceRequest.CustomerID,
+                        ContractorID = payment.ContractorApplication.ContractorID,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    serviceRequest.ConversationID = conversation.ConversationID;
+
+                    await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                }
+                await _unitOfWork.SaveAsync();
+
                 await _notifier.SendToGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
                     "PaymentTransation.Updated",

@@ -43,7 +43,6 @@ namespace DataAccess.Migrations.Application
                     CustomerID = table.Column<Guid>(type: "uuid", nullable: false),
                     ContractorID = table.Column<Guid>(type: "uuid", nullable: false),
                     ServiceRequestID = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsLocked = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>

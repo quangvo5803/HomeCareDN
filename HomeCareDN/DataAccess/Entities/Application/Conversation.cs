@@ -16,8 +16,6 @@ namespace DataAccess.Entities.Application
         [Required]
         public Guid ServiceRequestID { get; set; }
 
-        public bool IsLocked { get; set; } = true;
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ServiceRequest? ServiceRequest { get; set; }

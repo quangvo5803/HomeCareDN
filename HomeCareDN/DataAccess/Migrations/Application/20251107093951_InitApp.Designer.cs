@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251106194250_InitApp")]
+    [Migration("20251107093951_InitApp")]
     partial class InitApp
     {
         /// <inheritdoc />
@@ -211,9 +211,6 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<Guid>("CustomerID")
                         .HasColumnType("uuid");
-
-                    b.Property<bool>("IsLocked")
-                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ServiceRequestID")
                         .HasColumnType("uuid");

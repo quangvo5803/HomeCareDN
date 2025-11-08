@@ -94,8 +94,10 @@ namespace BusinessLogic.Services
             return result;
         }
 
-        public async Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIdAsync(
-            Guid id
+        public async Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIDAsync(
+            Guid id,
+            int pageNumber = 1,
+            int pageSize = 20
         )
         {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
@@ -118,7 +120,7 @@ namespace BusinessLogic.Services
                 .OrderByDescending(m => m.SentAt);
 
             var total = await query.CountAsync();
-            var items = await query.Take(20).ToListAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             // hiển thị tăng dần
             items.Reverse();
@@ -129,8 +131,8 @@ namespace BusinessLogic.Services
             {
                 Items = dtos,
                 TotalCount = total,
-                PageNumber = 1,
-                PageSize = 20,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
             };
         }
     }

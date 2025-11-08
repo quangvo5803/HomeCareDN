@@ -56,11 +56,6 @@ export default function ContractorServiceRequestDetail() {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
 
-  // Chat states
-  // const [messages, setMessages] = useState([]);
-  // const [input, setInput] = useState('');
-  // const chatEndRef = useRef(null);
-
   // Realtime SignalR
   useRealtime({
     //Accept
@@ -174,31 +169,6 @@ export default function ContractorServiceRequestDetail() {
       return () => vb.close();
     }
   }, [serviceRequest, existingApplication]);
-
-  // Chat handlers
-  // const handleSend = () => {
-  //   if (input.trim() === '') return;
-
-  //   const newMessage = {
-  //     sender: 'contractor',
-  //     text: input,
-  //     timestamp: new Date(),
-  //   };
-
-  //   setMessages((prev) => [...prev, newMessage]);
-  //   setInput('');
-
-  //   setTimeout(() => {
-  //     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  //   }, 100);
-  // };
-
-  // const handleKeyPress = (e) => {
-  //   if (e.key === 'Enter' && !e.shiftKey) {
-  //     e.preventDefault();
-  //     handleSend();
-  //   }
-  // };
 
   // Submit contractor application
   const handleSubmit = async (e) => {
@@ -1102,12 +1072,10 @@ export default function ContractorServiceRequestDetail() {
               </div>
             </div>
           )}
-
           {/* Chat Section */}
-
           <ChatSection
-            conversationId={serviceRequest.conversation.conversationID}
-            isLocked={serviceRequest.conversation.isLocked}
+            conversationID={serviceRequest.conversation?.conversationID}
+            contractorApplicationStatus={existingApplication.status}
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
           />
         </div>

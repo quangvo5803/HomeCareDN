@@ -28,8 +28,4 @@
     <ProjectReference Include="..\Ultitity\Ultitity.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\Application\" />
-  </ItemGroup>
-
 </Project>

@@ -6,7 +6,6 @@
         public Guid CustomerID { get; set; }
         public Guid ContractorID { get; set; }
         public Guid ServiceRequestID { get; set; }
-        public bool IsLocked { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }
