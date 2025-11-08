@@ -154,10 +154,10 @@ export default function Home() {
   // 👉 tạo extSlides với id mới để tránh trùng key
   const extSlides = hasMany
     ? [
-        { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
-        ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
-        { ...baseSlides[0], cloneId: 'tail' },
-      ]
+      { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
+      ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
+      { ...baseSlides[0], cloneId: 'tail' },
+    ]
     : baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` }));
 
   const [idx, setIdx] = useState(hasMany ? 1 : 0);
@@ -217,16 +217,14 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center bg-gradient-to-t from-black/70 via-black/40 to-black/10">
                 <div className="container px-6 mx-auto text-left md:px-20">
                   <h5
-                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${
-                      current === i ? 'slideInDown' : ''
-                    }`}
+                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${current === i ? 'slideInDown' : ''
+                      }`}
                   >
                     {t(slide.subtitle)}
                   </h5>
                   <h1
-                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${
-                      current === i ? 'slideInDown' : ''
-                    }`}
+                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${current === i ? 'slideInDown' : ''
+                      }`}
                   >
                     {t(slide.title)}
                   </h1>
@@ -477,7 +475,7 @@ export default function Home() {
               </div>
               <div className="w-full text-left lg:w-auto lg:text-right">
                 <a
-                  href="https://github.com/"
+                  href="/ConstructionViewAll"
                   className="inline-flex items-center justify-center px-6 py-3 font-medium text-white transition bg-orange-400 rounded-lg shadow bg-primary hover:bg-orange-500 "
                 >
                   {t('home.services_more')}
@@ -639,9 +637,8 @@ export default function Home() {
               >
                 <div className="relative overflow-hidden">
                   <div
-                    className={`flex ${
-                      anim ? 'transition-transform duration-700 ease-out' : ''
-                    }`}
+                    className={`flex ${anim ? 'transition-transform duration-700 ease-out' : ''
+                      }`}
                     style={{ transform: `translateX(-${idx * 100}%)` }}
                     onTransitionEnd={handleTransitionEnd}
                   >

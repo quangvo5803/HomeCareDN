@@ -403,7 +403,6 @@
       "cancleModalTitle": "Revert changes?",
       "cancleModalText": "This action cannot be undone"
     }
-
   },
   "contractorServiceRequestManager": {
     "title": "Service Request Manager",
@@ -903,7 +902,7 @@
     "no": "No",
     "fullName": "Full Name",
     "phoneNumber": "Phone Number",
-    "projectCount": "Project Count",
+    "projectCount": "Project received",
     "address": "Address",
     "action": "Action",
     "empty": "No users yet",

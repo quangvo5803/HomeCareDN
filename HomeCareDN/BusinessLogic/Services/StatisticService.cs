@@ -218,8 +218,10 @@ namespace BusinessLogic.Services
             dto.TotalContactor = contractors.Count;
             dto.TotalDistributor = distributors.Count;
 
-            var contractorQuery = _unitOfWork.ContractorApplicationRepository.GetQueryable();
-            var distributorQuery = _unitOfWork.DistributorApplicationRepository.GetQueryable();
+            var contractorQuery = _unitOfWork.ContractorApplicationRepository
+                .GetQueryable().AsSingleQuery().AsNoTracking();
+            var distributorQuery = _unitOfWork.DistributorApplicationRepository
+                .GetQueryable().AsSingleQuery().AsNoTracking();
 
             dto.TotalPending =
                 await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.Pending) +

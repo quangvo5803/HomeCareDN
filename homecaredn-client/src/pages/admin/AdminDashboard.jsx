@@ -199,22 +199,21 @@ export default function AdminDashboard() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 -mt-4">
           {/* Card 1 - Total Users */}
-          <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-blue-100 relative">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
-                  {t('adminDashboard.totalUser')}
-                </p>
-                <h5 className="text-3xl font-bold text-gray-900 mb-2">{stats.totalCustomer}</h5>
+                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">{t('adminDashboard.totalUser')}</p>
+                <h5 className="text-3xl font-bold text-gray-900 mb-1">{stats.totalCustomer}</h5>
               </div>
 
               <div className="flex-shrink-0">
                 <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg hover:scale-105 transition-transform">
-                  <i className="fas fa-users text-white text-2xl"></i>
+                  <i className="fas fa-user-friends text-white text-2xl"></i>
                 </div>
               </div>
             </div>
           </div>
+
 
           {/* Card 2 - Total Partners */}
           <div className="bg-white shadow-lg rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100">
@@ -222,9 +221,6 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-gray-500 uppercase">
                 {t('adminDashboard.totalPartner')}
               </p>
-              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 shadow-md hover:scale-105 transition-transform">
-                <i className="fas fa-handshake text-white text-base"></i>
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -233,7 +229,9 @@ export default function AdminDashboard() {
                   <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500 mb-0.5">
                     <i className="fas fa-hard-hat text-white text-base"></i>
                   </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.contractor')}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
+                    {t('adminDashboard.contractor')}
+                  </p>
                   <h6 className="text-xl font-bold text-gray-900">{stats.totalContactor}</h6>
                 </div>
               </div>
@@ -243,11 +241,14 @@ export default function AdminDashboard() {
                   <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500 mb-0.5">
                     <i className="fas fa-truck text-white text-base"></i>
                   </div>
-                  <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.distributor')}</p>
+                  <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap">
+                    {t('adminDashboard.distributor')}
+                  </p>
                   <h6 className="text-xl font-bold text-gray-900">{stats.totalDistributor}</h6>
                 </div>
               </div>
             </div>
+
           </div>
 
           {/* Card 3 - Service Requests */}
@@ -256,9 +257,6 @@ export default function AdminDashboard() {
               <p className="text-xs font-semibold text-gray-500 uppercase">
                 {t('adminDashboard.serviceRequest')}
               </p>
-              <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-yellow-500 shadow-md hover:scale-105 transition-transform">
-                <i className="fas fa-clipboard-list text-white text-base"></i>
-              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

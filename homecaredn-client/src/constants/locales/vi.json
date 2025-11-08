@@ -382,10 +382,10 @@
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
       "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
     },
-    "materialRequestDetail":{
+    "materialRequestDetail": {
       "title": "Chi tiết yêu cầu vật liệu",
       "description": "Mô Tả",
-      "descriptionsPlaceholder":"Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
+      "descriptionsPlaceholder": "Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
       "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
       "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
       "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
@@ -398,7 +398,7 @@
       "infor": "Thông tin",
       "quantity": "Số lượng",
       "unit": "Đơn Vị",
-      "action":"Hành Động",
+      "action": "Hành Động",
       "cancleModalTitle": "Trở về ban đầu?",
       "cancleModalText": "Bạn không thể hoàn tác thao tác này"
     }
@@ -648,8 +648,8 @@
   "adminDashboard": {
     "totalUser": "Khách hàng",
     "totalPartner": "Đối tác",
-    "contractor": "Thầu",
-    "distributor": "Phân phối",
+    "contractor": "Nhà thầu",
+    "distributor": "Nhà phân phối",
     "serviceRequest": "Dịch vụ đã yêu cầu",
     "pending": "Đang chờ",
     "PendingCommission": "Đang xử lý",
@@ -894,10 +894,10 @@
     "customer": "Khách hàng",
     "contractor": "Nhà thầu",
     "distributor": "Nhà phân phối",
-    "no": "Không",
+    "no": "STT",
     "fullName": "Họ và tên",
     "phoneNumber": "Số điện thoại",
-    "projectCount": "Số lượng dự án",
+    "projectCount": "Dự án đã nhận",
     "address": "Địa chỉ",
     "action": "Hành động",
     "empty": "Chưa có người dùng nào",

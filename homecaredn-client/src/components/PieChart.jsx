@@ -12,7 +12,6 @@ import LoadingComponent from '../components/LoadingComponent';
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 
 export default function PieChart({ title, year, onYearChange, data, type, loading }) {
-  console.log("🔍 Received type:", type);
 
   const options = {
     responsive: true,

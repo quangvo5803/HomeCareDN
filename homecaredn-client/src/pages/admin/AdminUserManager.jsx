@@ -4,10 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from '../../hook/useUser';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useDebounce } from 'use-debounce';
-
+import { useNavigate } from 'react-router-dom';
 
 export default function AdminUserManager() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const pageSize = 10;
 
     const {
@@ -86,7 +87,7 @@ export default function AdminUserManager() {
                         {/* Search, Sort & Filter */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             <select
-                                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
                             >
@@ -114,7 +115,7 @@ export default function AdminUserManager() {
                                     <button
                                         key={key}
                                         onClick={() => setFilter(key)}
-                                        className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${filter === key
+                                        className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
                                             ? 'bg-orange-600 text-white'
                                             : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
                                             }`}
@@ -211,8 +212,15 @@ export default function AdminUserManager() {
                                                             <td className="px-4 py-4 text-center align-middle">
                                                                 <div className="flex items-center justify-center space-x-1">
                                                                     <button
-                                                                        className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            navigate(
+                                                                                `/Admin/User/${item.userID}`
+                                                                            )
+                                                                        }
+                                                                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                                                                     >
+                                                                        <i className="fa-solid fa-eye" />
                                                                         {t('BUTTON.View')}
                                                                     </button>
                                                                 </div>
@@ -222,7 +230,6 @@ export default function AdminUserManager() {
                                                 });
                                             }
 
-                                            // Empty state
                                             return (
                                                 <tr>
                                                     <td colSpan="7" className="px-6 py-16 text-center">
@@ -302,7 +309,16 @@ export default function AdminUserManager() {
                                                     </div>
 
                                                     <div className="flex space-x-2">
-                                                        <button className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100">
+                                                        <button
+                                                            className="flex-1 px-3 py-2 text-xs font-medium  text-white border rounded-md bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/Admin/User/${item.userID}`
+                                                                )
+                                                            }
+                                                        >
+                                                            <i className="fa-solid fa-eye mr-1" />
                                                             {t('BUTTON.View')}
                                                         </button>
                                                     </div>
@@ -311,7 +327,6 @@ export default function AdminUserManager() {
                                         });
                                     }
 
-                                    // Empty state
                                     return (
                                         <div className="py-16 text-center">
                                             <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">

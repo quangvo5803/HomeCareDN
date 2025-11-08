@@ -90,7 +90,8 @@ namespace BusinessLogic.Services.FacadeService
 
             UserService = new UserService(
                 coreDeps.Mapper,
-                identityDeps.UserManager
+                identityDeps.UserManager,
+                coreDeps.UnitOfWork
             );
         }
     }

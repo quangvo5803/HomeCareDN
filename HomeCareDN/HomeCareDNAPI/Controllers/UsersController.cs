@@ -9,7 +9,7 @@ namespace HomeCareDNAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -22,6 +22,13 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetAllUserAsync([FromQuery] QueryParameters parameters)
         {
             var result = await _facadeService.UserService.GetAllUserAsync(parameters);
+            return Ok(result);
+        }
+
+        [HttpGet("{userID}")]
+        public async Task<IActionResult> GetUserByIdAsync(string userID)
+        {
+            var result = await _facadeService.UserService.GetUserByIdAsync(userID);
             return Ok(result);
         }
     }

@@ -36,6 +36,7 @@ import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
+import AdminUserDetail from './pages/admin/AdminUserDetail';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -306,6 +307,10 @@ function Layout() {
             element={<AdminPartnerRequestManager />}
           />
           <Route path="UserManager" element={<AdminUserManager />} />
+          <Route
+            path="User/:userID"
+            element={<AdminUserDetail />}
+          />
         </Route>
         {/* Contractor routes */}
         <Route

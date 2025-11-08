@@ -123,7 +123,7 @@ export default function AdminPartnerRequestManager() {
             {/* Search, Sort & Filter */}
             <div className="flex flex-col sm:flex-row gap-3">
               <select
-                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -151,11 +151,10 @@ export default function AdminPartnerRequestManager() {
                   <button
                     key={key}
                     onClick={() => setFilter(key)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
-                      filter === key
-                        ? 'bg-orange-600 text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     {t(`adminPartnerManager.${key}`)}
                   </button>
@@ -211,9 +210,8 @@ export default function AdminPartnerRequestManager() {
                       partnerRequests.map((partnerRequest, index) => (
                         <tr
                           key={partnerRequest.partnerRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
@@ -237,11 +235,10 @@ export default function AdminPartnerRequestManager() {
                           </td>
                           <td className="px-6 py-4 text-center align-middle">
                             <span
-                              className={`px-3 py-1 text-xs font-medium rounded-full ${
-                                partnerTypeColors[
-                                  partnerRequest.partnerRequestType
-                                ] || 'bg-gray-100 text-gray-800'
-                              }`}
+                              className={`px-3 py-1 text-xs font-medium rounded-full ${partnerTypeColors[
+                                partnerRequest.partnerRequestType
+                              ] || 'bg-gray-100 text-gray-800'
+                                }`}
                             >
                               {t(
                                 `Enums.PartnerType.${partnerRequest.partnerRequestType}`
@@ -257,7 +254,7 @@ export default function AdminPartnerRequestManager() {
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
                               <button
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() => {
                                   setIsModalOpen(true);
                                   setPartnerRequestID(
@@ -269,7 +266,7 @@ export default function AdminPartnerRequestManager() {
                               </button>
                               {partnerRequest?.status === 'Rejected' && (
                                 <button
-                                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                   onClick={() =>
                                     handleDelete(
                                       partnerRequest.partnerRequestID
@@ -345,11 +342,10 @@ export default function AdminPartnerRequestManager() {
                         </div>
                         <div className="flex items-center">
                           <span
-                            className={`px-2 py-1 text-xs font-medium rounded-full ${
-                              partnerTypeColors[
-                                partnerRequest.partnerRequestType
-                              ] || 'bg-gray-100 text-gray-800'
-                            }`}
+                            className={`px-2 py-1 text-xs font-medium rounded-full ${partnerTypeColors[
+                              partnerRequest.partnerRequestType
+                            ] || 'bg-gray-100 text-gray-800'
+                              }`}
                           >
                             {t(
                               `Enums.PartnerType.${partnerRequest.partnerRequestType}`
@@ -360,7 +356,7 @@ export default function AdminPartnerRequestManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                           onClick={() => {
                             setIsModalOpen(true);
                             setPartnerRequestID(
@@ -372,7 +368,7 @@ export default function AdminPartnerRequestManager() {
                         </button>
                         {partnerRequest?.status === 'Rejected' && (
                           <button
-                            className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                            className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                             onClick={() =>
                               handleDelete(partnerRequest.partnerRequestID)
                             }

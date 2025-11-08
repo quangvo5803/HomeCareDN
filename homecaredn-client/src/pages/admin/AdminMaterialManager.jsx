@@ -183,7 +183,7 @@ export default function AdminMaterialManager() {
             {/* Search, Sort & Add Button */}
             <div className="flex flex-col sm:flex-row gap-3">
               <select
-                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -219,7 +219,7 @@ export default function AdminMaterialManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
                 onClick={() => {
                   if (brands.length === 0 || categories.length === 0) {
                     toast.error(t('adminMaterialManager.noBrandAndService'));
@@ -310,9 +310,8 @@ export default function AdminMaterialManager() {
                         return (
                           <tr
                             key={material.materialID}
-                            className={`hover:bg-gray-50 transition-colors duration-150 ${
-                              index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                            className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                              }`}
                           >
                             <td className="px-4 py-4 text-center align-middle">
                               <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
@@ -324,7 +323,7 @@ export default function AdminMaterialManager() {
                               <div className="flex items-center">
                                 <div className="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden rounded-lg border border-gray-200">
                                   {material.imageUrls?.length > 0 &&
-                                  material.imageUrls[0] ? (
+                                    material.imageUrls[0] ? (
                                     <img
                                       src={material.imageUrls[0]}
                                       alt={material.name}
@@ -359,7 +358,7 @@ export default function AdminMaterialManager() {
                                 {i18n.language === 'vi'
                                   ? material.categoryName
                                   : material.categoryNameEN ||
-                                    material.categoryName}
+                                  material.categoryName}
                               </span>
                             </td>
 
@@ -382,13 +381,13 @@ export default function AdminMaterialManager() {
                                 {ownedID === user.id ? (
                                   <>
                                     <button
-                                      className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                      className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                       onClick={() => handleEdit(material)}
                                     >
                                       {t('BUTTON.Edit')}
                                     </button>
                                     <button
-                                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                       onClick={() =>
                                         handleDelete(material.materialID)
                                       }
@@ -399,13 +398,13 @@ export default function AdminMaterialManager() {
                                 ) : (
                                   <>
                                     <button
-                                      className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                      className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                       onClick={() => handleView(material)}
                                     >
                                       {t('BUTTON.View')}
                                     </button>
                                     <button
-                                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                       onClick={() =>
                                         handleDelete(material.materialID)
                                       }
@@ -433,7 +432,7 @@ export default function AdminMaterialManager() {
                               {t('adminMaterialManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700"
+                              className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 cursor-pointer"
                               onClick={() => {
                                 if (
                                   brands.length === 0 ||
@@ -492,7 +491,7 @@ export default function AdminMaterialManager() {
                             </span>
                             <div className="flex items-center justify-center w-10 h-10 overflow-hidden rounded-lg border border-gray-200">
                               {material.imageUrls?.length > 0 &&
-                              material.imageUrls[0] ? (
+                                material.imageUrls[0] ? (
                                 <img
                                   src={material.imageUrls[0]}
                                   alt={material.name}
@@ -532,7 +531,7 @@ export default function AdminMaterialManager() {
                               {i18n.language === 'vi'
                                 ? material.categoryName
                                 : material.categoryNameEN ||
-                                  material.categoryName}
+                                material.categoryName}
                             </span>
                             <p className="mt-1 text-xs text-gray-500">
                               {t('distributorMaterialManager.category')}
@@ -562,13 +561,13 @@ export default function AdminMaterialManager() {
                           {ownedID === user.id ? (
                             <>
                               <button
-                                className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() => handleEdit(material)}
                               >
                                 {t('BUTTON.Edit')}
                               </button>
                               <button
-                                className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                 onClick={() =>
                                   handleDelete(material.materialID)
                                 }
@@ -579,13 +578,13 @@ export default function AdminMaterialManager() {
                           ) : (
                             <>
                               <button
-                                className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() => handleView(material)}
                               >
                                 {t('BUTTON.View')}
                               </button>
                               <button
-                                className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                 onClick={() =>
                                   handleDelete(material.materialID)
                                 }
@@ -610,7 +609,7 @@ export default function AdminMaterialManager() {
                       {t('adminMaterialManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700"
+                      className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 cursor-pointer"
                       onClick={() => {
                         if (brands.length === 0 || categories.length === 0) {
                           toast.error(

@@ -94,10 +94,10 @@ export default function AdminServiceRequestDetail() {
           const newList = prev.map((ca) =>
             ca.contractorApplicationID === payload.contractorApplicationID
               ? {
-                  ...ca,
-                  status: 'PendingCommission',
-                  dueCommisionTime: payload?.dueCommisionTime || null,
-                }
+                ...ca,
+                status: 'PendingCommission',
+                dueCommisionTime: payload?.dueCommisionTime || null,
+              }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -242,7 +242,7 @@ export default function AdminServiceRequestDetail() {
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4">
             <button
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 flex items-center justify-center backdrop-blur-sm"
+              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 flex items-center justify-center backdrop-blur-sm cursor-pointer"
               onClick={() => navigate('/Admin/ServiceRequestManager')}
             >
               <i className="fas fa-arrow-left text-white"></i>
@@ -250,11 +250,10 @@ export default function AdminServiceRequestDetail() {
 
             <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
               <i
-                className={`fas ${
-                  serviceRequestDetail?.serviceType === 'Construction'
-                    ? 'fa-hammer'
-                    : 'fa-screwdriver-wrench'
-                } text-2xl text-white`}
+                className={`fas ${serviceRequestDetail?.serviceType === 'Construction'
+                  ? 'fa-hammer'
+                  : 'fa-screwdriver-wrench'
+                  } text-2xl text-white`}
               />
             </div>
 
@@ -307,8 +306,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.packageOption
                     ? t(
-                        `Enums.PackageOption.${serviceRequestDetail.packageOption}`
-                      )
+                      `Enums.PackageOption.${serviceRequestDetail.packageOption}`
+                    )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -339,8 +338,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.mainStructureType
                     ? t(
-                        `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
-                      )
+                      `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
+                    )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -475,7 +474,7 @@ export default function AdminServiceRequestDetail() {
               {/* Back button - always show when viewing detail */}
               <button
                 onClick={handleBackToList}
-                className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium cursor-pointer"
               >
                 <i className="fas fa-arrow-left"></i>
                 <span>{t('BUTTON.Back')}</span>
@@ -610,9 +609,8 @@ export default function AdminServiceRequestDetail() {
                             href={url}
                             className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
                             data-gall="contractor-gallery"
-                            title={`${
-                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
-                            } ${i + 1}`}
+                            title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                              } ${i + 1}`}
                           >
                             <img
                               src={url}
