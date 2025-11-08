@@ -233,7 +233,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteMaterialAsync(Guid id)
         {
-            var material = await _unitOfWork.MaterialRepository.GetAsync(m => m.MaterialID == id);
+            var material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == id,
+                asNoTracking: false
+            );
 
             if (material == null)
             {

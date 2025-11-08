@@ -105,8 +105,7 @@ namespace BusinessLogic.Mapping
                                 ? src.Images.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
-                )
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                );
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -304,7 +303,45 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 );
-            CreateMap<MaterialRequest, MaterialRequestDto>();
+            CreateMap<MaterialRequest, MaterialRequestDto>()
+                .ForMember(
+                    dest => dest.DistributorApplyCount,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.DistributorApplications != null
+                                ? src.DistributorApplications.Count
+                                : 0
+                        )
+                )
+                .AfterMap(
+                    (src, dest) =>
+                    {
+                        if (dest.MaterialRequestItems != null)
+                        {
+                            foreach (var item in dest.MaterialRequestItems)
+                            {
+                                if (item.Material != null)
+                                {
+                                    var material = item.Material;
+                                    if (material == null)
+                                        continue;
+
+                                    material.Description = null;
+                                    material.DescriptionEN = null;
+                                    material.UserID = string.Empty;
+
+                                    if (material.Images != null && material.Images.Any())
+                                    {
+                                        material.Images = new List<Image>
+                                        {
+                                            material.Images.First(),
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
         }
 
         // ------------------------

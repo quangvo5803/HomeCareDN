@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
+import { useAddress } from '../../hook/useAddress';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatVND } from '../../utils/formatters';
+import { toast } from 'react-toastify';
+import StatusBadge from '../../components/StatusBadge';
 import Loading from '../../components/Loading';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
 import Swal from 'sweetalert2';
@@ -11,10 +14,13 @@ export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
   const { materialRequestId } = useParams();
   const navigate = useNavigate();
+  const { addresses } = useAddress();
+
   const [description, setDescription] = useState('');
   const [canEditQuantity, setCanEditQuantity] = useState(false);
   const [canAddMaterial, setCanAddMaterial] = useState(false);
   const [items, setItems] = useState([]);
+  const [addressID, setAddressID] = useState('');
 
   const { loading, getMaterialRequestById, updateMaterialRequest } =
     useMaterialRequest();
@@ -24,6 +30,10 @@ export default function MaterialRequestDetail() {
   const [originalItems, setOriginalItems] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Check if request is in Draft status
+  const isDraft = materialRequest?.status === 'Draft';
+  const canEdit = isDraft;
+
   useEffect(() => {
     if (materialRequestId) {
       getMaterialRequestById(materialRequestId).then((data) => {
@@ -32,12 +42,33 @@ export default function MaterialRequestDetail() {
           setDescription(data.description || '');
           setCanAddMaterial(data.canAddMaterial || false);
           setCanEditQuantity(data.canEditQuantity || false);
+          setAddressID(data.addressID || '');
           setItems(data.materialRequestItems || []);
           setOriginalItems(data.materialRequestItems || []);
         }
       });
     }
   }, [getMaterialRequestById, materialRequestId]);
+
+  // ===== Kiểm tra thay đổi =====
+  const hasItemChanges =
+    JSON.stringify(items) !== JSON.stringify(originalItems);
+  const hasDescriptionChanges =
+    description !== (materialRequest?.description || '');
+  const hasAddressChanges = addressID !== (materialRequest?.addressID || '');
+  const hasCanEditQuantityChanges =
+    canEditQuantity !== materialRequest?.canEditQuantity;
+  const hasCanAddMaterialChanges =
+    canAddMaterial !== materialRequest?.canAddMaterial;
+  const hasAnyChanges =
+    hasItemChanges ||
+    hasDescriptionChanges ||
+    hasAddressChanges ||
+    hasCanEditQuantityChanges ||
+    hasCanAddMaterialChanges;
+
+  const canShowSaveCancel = hasAnyChanges;
+  const canShowSend = items.length > 0 && addressID;
 
   const handleQuantityChange = (id, value) => {
     setItems((prev) =>
@@ -76,7 +107,13 @@ export default function MaterialRequestDetail() {
     });
   };
 
-  const handleSave = async () => {
+  const handleSave = async (isSubmit = false) => {
+    if (isSubmit) {
+      if (!addressID) {
+        toast.error(t('ERROR.REQUIRED_ADDRESS'));
+        return;
+      }
+    }
     setSubmitting(true);
     const addItems = items.filter(
       (item) =>
@@ -98,11 +135,13 @@ export default function MaterialRequestDetail() {
           )
       )
       .map((o) => o.materialRequestItemID);
+
     const dto = {
       materialRequestID: materialRequestId,
       description: description,
       canEditQuantity: canEditQuantity,
       canAddMaterial: canAddMaterial,
+      isSubmit: isSubmit,
       addItems: addItems.map((a) => ({
         materialID: a.material.materialID,
         quantity: a.quantity,
@@ -113,8 +152,14 @@ export default function MaterialRequestDetail() {
       })),
       deleteItemIDs: deletedItemIDs,
     };
+    if (addressID) {
+      dto.addressID = addressID;
+    }
     await updateMaterialRequest(dto);
     setSubmitting(false);
+    navigate('/Customer', {
+      state: { tab: 'material_requests' },
+    });
   };
 
   const handleCancel = () => {
@@ -131,6 +176,10 @@ export default function MaterialRequestDetail() {
       if (result.isConfirmed) {
         try {
           setItems(originalItems);
+          setDescription(materialRequest?.description || '');
+          setAddressID(materialRequest?.addressID || '');
+          setCanEditQuantity(materialRequest?.canEditQuantity || false);
+          setCanAddMaterial(materialRequest?.canAddMaterial || false);
           Swal.close();
         } catch {
           Swal.close();
@@ -139,9 +188,13 @@ export default function MaterialRequestDetail() {
     });
   };
 
-  if (loading || submitting || !materialRequest) return <Loading />;
+  if (loading || !materialRequest) return <Loading />;
 
   const applications = materialRequest.applications || [];
+  const selectedAddress = addresses?.find((a) => a.addressID === addressID);
+  const addressDisplay = selectedAddress
+    ? `${selectedAddress.detail}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.city}`
+    : '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -192,7 +245,46 @@ export default function MaterialRequestDetail() {
                   <span className="inline-block text-sm font-mono bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">
                     #{materialRequestId.substring(0, 8)}
                   </span>
+                  <div className="flex gap-3 mt-1">
+                    <StatusBadge
+                      status={materialRequest.status}
+                      type="Request"
+                    />
+                  </div>
                 </div>
+              </div>
+
+              {/* Address */}
+              <div className="mb-8 pb-8 border-b border-slate-200">
+                <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+                  <i className="fas fa-map-marker-alt text-orange-600 mr-2"></i>
+                  {t('userPage.materialRequestDetail.address')}
+                </label>
+                {canEdit ? (
+                  <div className="relative">
+                    <select
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors appearance-none bg-white"
+                      value={addressID}
+                      onChange={(e) => setAddressID(e.target.value)}
+                    >
+                      <option value="">
+                        {t('userPage.materialRequestDetail.selectAddress')}
+                      </option>
+                      {addresses?.map((a) => (
+                        <option key={a.addressID} value={a.addressID}>
+                          {a.detail},{a.ward},{a.district},{a.city}
+                        </option>
+                      ))}
+                    </select>
+                    <i className="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                  </div>
+                ) : (
+                  <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4">
+                    <p className="text-slate-700">
+                      {addressDisplay || t('Not specified')}
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Description */}
@@ -201,10 +293,11 @@ export default function MaterialRequestDetail() {
                   {t('userPage.materialRequestDetail.description')}
                 </label>
                 <textarea
-                  className="w-full border-2 border-slate-200 rounded-xl p-4 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none text-slate-700 placeholder-slate-400"
+                  className="w-full border-2 border-slate-200 rounded-xl p-4 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-none text-slate-700 placeholder-slate-400 disabled:bg-slate-50 disabled:cursor-not-allowed"
                   rows={5}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  disabled={!canEdit}
                   placeholder={t(
                     'userPage.materialRequestDetail.descriptionsPlaceholder'
                   )}
@@ -212,83 +305,87 @@ export default function MaterialRequestDetail() {
               </div>
 
               {/* Checkboxes */}
-              <div className="space-y-4">
-                {/* Can Edit Quantity */}
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
-                  <label
-                    className="flex items-start gap-4 cursor-pointer"
-                    aria-label={t(
-                      'userPage.materialRequestDetail.allowEditQuantity'
-                    )}
-                  >
-                    <div className="flex items-center h-6 mt-1">
-                      <input
-                        type="checkbox"
-                        checked={canEditQuantity}
-                        onChange={(e) => setCanEditQuantity(e.target.checked)}
-                        className="w-6 h-6 text-orange-600 border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 cursor-pointer"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <span className="font-bold text-slate-900 block mb-1">
-                        {t('userPage.materialRequestDetail.allowEditQuantity')}
-                      </span>
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {t(
-                          'userPage.materialRequestDetail.allowEditQuantityDes'
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <i
-                        className={`fas fa-${
-                          canEditQuantity
-                            ? 'check-circle text-green-500'
-                            : 'circle text-gray-300'
-                        } text-xl transition-colors`}
-                      ></i>
-                    </div>
-                  </label>
-                </div>
+              {canEdit && (
+                <div className="space-y-4">
+                  {/* Can Edit Quantity */}
+                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
+                    <label
+                      className="flex items-start gap-4 cursor-pointer"
+                      aria-label={t(
+                        'userPage.materialRequestDetail.allowEditQuantity'
+                      )}
+                    >
+                      <div className="flex items-center h-6 mt-1">
+                        <input
+                          type="checkbox"
+                          checked={canEditQuantity}
+                          onChange={(e) => setCanEditQuantity(e.target.checked)}
+                          className="w-6 h-6 text-orange-600 border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-bold text-slate-900 block mb-1">
+                          {t(
+                            'userPage.materialRequestDetail.allowEditQuantity'
+                          )}
+                        </span>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          {t(
+                            'userPage.materialRequestDetail.allowEditQuantityDes'
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <i
+                          className={`fas fa-${
+                            canEditQuantity
+                              ? 'check-circle text-green-500'
+                              : 'circle text-gray-300'
+                          } text-xl transition-colors`}
+                        ></i>
+                      </div>
+                    </label>
+                  </div>
 
-                {/* Can Add Material */}
-                <div className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
-                  <label
-                    className="flex items-start gap-4 cursor-pointer "
-                    aria-label={t(
-                      'userPage.materialRequestDetail.allowAddMaterial'
-                    )}
-                  >
-                    <div className="flex items-center h-6 mt-1">
-                      <input
-                        type="checkbox"
-                        checked={canAddMaterial}
-                        onChange={(e) => setCanAddMaterial(e.target.checked)}
-                        className="w-6 h-6 text-orange-600 border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 cursor-pointer"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <span className="font-bold text-slate-900 block mb-1">
-                        {t('userPage.materialRequestDetail.allowAddMaterial')}
-                      </span>
-                      <p className="text-sm text-slate-600 leading-relaxed">
-                        {t(
-                          'userPage.materialRequestDetail.allowAddMaterialDes'
-                        )}
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0">
-                      <i
-                        className={`fas fa-${
-                          canAddMaterial
-                            ? 'check-circle text-green-500'
-                            : 'circle text-gray-300'
-                        } text-xl transition-colors`}
-                      ></i>
-                    </div>
-                  </label>
+                  {/* Can Add Material */}
+                  <div className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
+                    <label
+                      className="flex items-start gap-4 cursor-pointer"
+                      aria-label={t(
+                        'userPage.materialRequestDetail.allowAddMaterial'
+                      )}
+                    >
+                      <div className="flex items-center h-6 mt-1">
+                        <input
+                          type="checkbox"
+                          checked={canAddMaterial}
+                          onChange={(e) => setCanAddMaterial(e.target.checked)}
+                          className="w-6 h-6 text-orange-600 border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <span className="font-bold text-slate-900 block mb-1">
+                          {t('userPage.materialRequestDetail.allowAddMaterial')}
+                        </span>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          {t(
+                            'userPage.materialRequestDetail.allowAddMaterialDes'
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <i
+                          className={`fas fa-${
+                            canAddMaterial
+                              ? 'check-circle text-green-500'
+                              : 'circle text-gray-300'
+                          } text-xl transition-colors`}
+                        ></i>
+                      </div>
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Materials List Card */}
@@ -317,14 +414,16 @@ export default function MaterialRequestDetail() {
                   <p className="text-sm text-slate-500 mb-6">
                     {t('userPage.materialRequestDetail.addMaterial')}
                   </p>
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition font-bold"
-                    onClick={() => setOpen(true)}
-                  >
-                    <i className="fas fa-plus-circle"></i>
-                    {t('BUTTON.AddNewMaterial')}
-                  </button>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition font-bold"
+                      onClick={() => setOpen(true)}
+                    >
+                      <i className="fas fa-plus-circle"></i>
+                      {t('BUTTON.AddNewMaterial')}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <>
@@ -341,7 +440,6 @@ export default function MaterialRequestDetail() {
                       {t('userPage.materialRequestDetail.quantity')}
                     </div>
                     <div className="col-span-2 text-center">
-                      {' '}
                       {t('userPage.materialRequestDetail.unit')}
                     </div>
                     <div className="col-span-2 text-center">
@@ -381,7 +479,6 @@ export default function MaterialRequestDetail() {
                         >
                           {/* Desktop Layout */}
                           <div className="hidden lg:grid lg:grid-cols-13 gap-4 items-center">
-                            {/* Index */}
                             <div className="col-span-1 text-center">
                               <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center mx-auto">
                                 <span className="text-white font-bold text-sm">
@@ -390,7 +487,6 @@ export default function MaterialRequestDetail() {
                               </div>
                             </div>
 
-                            {/* Image */}
                             <div className="col-span-2">
                               <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
                                 {imageUrl ? (
@@ -415,7 +511,6 @@ export default function MaterialRequestDetail() {
                               </div>
                             </div>
 
-                            {/* Material Info */}
                             <div className="col-span-4">
                               <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
                                 {displayName}
@@ -440,7 +535,6 @@ export default function MaterialRequestDetail() {
                               </div>
                             </div>
 
-                            {/* Quantity Input */}
                             <div className="col-span-2">
                               <div className="flex items-center justify-center gap-2">
                                 <button
@@ -453,8 +547,8 @@ export default function MaterialRequestDetail() {
                                       );
                                     }
                                   }}
-                                  className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50"
-                                  disabled={item.quantity <= 1}
+                                  className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  disabled={item.quantity <= 1 || !canEdit}
                                 >
                                   <i className="fas fa-minus text-xs"></i>
                                 </button>
@@ -468,7 +562,8 @@ export default function MaterialRequestDetail() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-16 px-2 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
+                                  disabled={!canEdit}
+                                  className="w-16 px-2 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
                                 />
                                 <button
                                   type="button"
@@ -478,14 +573,14 @@ export default function MaterialRequestDetail() {
                                       item.quantity + 1
                                     )
                                   }
-                                  className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600"
+                                  className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                  disabled={!canEdit}
                                 >
                                   <i className="fas fa-plus text-xs"></i>
                                 </button>
                               </div>
                             </div>
 
-                            {/* Unit Column */}
                             <div className="col-span-2 text-center">
                               {displayUnit && (
                                 <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
@@ -496,7 +591,6 @@ export default function MaterialRequestDetail() {
                               )}
                             </div>
 
-                            {/* Delete Button */}
                             <div className="col-span-2 flex justify-center">
                               <button
                                 type="button"
@@ -509,8 +603,8 @@ export default function MaterialRequestDetail() {
                                     )
                                   );
                                 }}
-                                className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold"
-                                title={t('Delete')}
+                                disabled={!canEdit}
+                                className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <i className="fas fa-trash-alt"></i>
                               </button>
@@ -541,7 +635,8 @@ export default function MaterialRequestDetail() {
                                     )
                                   );
                                 }}
-                                className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition flex-shrink-0"
+                                disabled={!canEdit}
+                                className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 <i className="fas fa-trash-alt text-sm"></i>
                               </button>
@@ -593,7 +688,7 @@ export default function MaterialRequestDetail() {
                             </div>
 
                             <div className="pt-4 border-t-2 border-slate-200">
-                              <div className="flex items-center justify-between">
+                              <div className="flex items-center justify-between mb-3">
                                 <span className="text-sm font-bold text-slate-700">
                                   {t('Quantity')}:
                                 </span>
@@ -608,8 +703,8 @@ export default function MaterialRequestDetail() {
                                         );
                                       }
                                     }}
-                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600"
-                                    disabled={item.quantity <= 1}
+                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={item.quantity <= 1 || !canEdit}
                                   >
                                     <i className="fas fa-minus text-xs"></i>
                                   </button>
@@ -623,7 +718,8 @@ export default function MaterialRequestDetail() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-16 px-2 py-1 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-sm"
+                                    disabled={!canEdit}
+                                    className="w-16 px-2 py-1 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
                                   />
                                   <button
                                     type="button"
@@ -633,7 +729,8 @@ export default function MaterialRequestDetail() {
                                         item.quantity + 1
                                       )
                                     }
-                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600"
+                                    className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!canEdit}
                                   >
                                     <i className="fas fa-plus text-xs"></i>
                                   </button>
@@ -652,44 +749,84 @@ export default function MaterialRequestDetail() {
                   </div>
 
                   {/* Add Material Button */}
-                  <button
-                    type="button"
-                    className="w-full mt-6 flex items-center justify-center gap-2 py-4 px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all"
-                    onClick={() => setOpen(true)}
-                  >
-                    <i className="fas fa-plus-circle text-lg"></i>
-                    {t('Add Material')}
-                  </button>
+                  {canEdit && (
+                    <button
+                      type="button"
+                      className="w-full mt-6 flex items-center justify-center gap-2 py-4 px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all"
+                      onClick={() => setOpen(true)}
+                    >
+                      <i className="fas fa-plus-circle text-lg"></i>
+                      {t('BUTTON.AddNewMaterial')}
+                    </button>
+                  )}
                 </>
               )}
             </div>
 
             {/* Action Buttons */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-              <div className="flex items-center justify-end gap-4">
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="px-8 py-3 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition font-bold border-2 border-slate-300 hover:border-slate-400"
-                >
-                  <i className="fas fa-times mr-2"></i>
-                  {t('BUTTON.Cancel')}
-                </button>
-                <button
-                  type="button"
-                  className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition font-bold"
-                  onClick={handleSave}
-                >
-                  <i className="fas fa-save mr-2"></i>
-                  {t('BUTTON.Save')}
-                </button>
+            {isDraft && (
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                {/* Cảnh báo thay đổi */}
+                {hasAnyChanges && (
+                  <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg flex items-start gap-3">
+                    <i className="fas fa-exclamation-circle text-amber-600 mt-1 flex-shrink-0 text-lg"></i>
+                    <div>
+                      <p className="font-bold text-amber-900 mb-1">
+                        {t('userPage.materialRequestDetail.unsavedChanges')}
+                      </p>
+                      <p className="text-sm text-amber-800">
+                        {t('userPage.materialRequestDetail.unsavedChangesDesc')}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-end gap-4">
+                  {/* Nút Hủy - hiển thị khi có thay đổi */}
+                  {canShowSaveCancel && (
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      className="px-8 py-3 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition font-bold border-2 border-slate-300 hover:border-slate-400"
+                    >
+                      <i className="fas fa-times mr-2"></i>
+                      {t('BUTTON.Cancel')}
+                    </button>
+                  )}
+
+                  {/* Nút Save - hiển thị khi có thay đổi */}
+                  {canShowSaveCancel && (
+                    <button
+                      type="button"
+                      className="px-8 py-3 bg-orange-500 text-white rounded-lg hover:shadow-lg transition font-bold hover:bg-orange-600"
+                      onClick={() => handleSave(false)}
+                      disabled={submitting}
+                    >
+                      <i className="fas fa-save mr-2"></i>
+                      {t('BUTTON.Save')}
+                    </button>
+                  )}
+
+                  {/* Nút Send - hiển thị khi có items và addressID */}
+                  {canShowSend && (
+                    <button
+                      type="button"
+                      className="px-8 py-3 bg-green-400 text-white rounded-lg hover:shadow-lg transition font-bold hover:bg-green-500"
+                      onClick={() => handleSave(true)}
+                      disabled={submitting}
+                    >
+                      <i className="fas fa-paper-plane mr-2"></i>
+                      {t('BUTTON.SendMaterialRequest')}
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Right Column - Applications (Full Height) */}
+          {/* Right Column - Applications */}
           <div className="xl:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-20 max-h-[calc(100vh-100px)] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-28 max-h-[calc(100vh-100px)] overflow-y-auto">
               {selectedApplication ? (
                 <>
                   {/* Application Detail View */}

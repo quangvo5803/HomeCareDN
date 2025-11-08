@@ -30,7 +30,7 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images";
+            "Images,ContractorApplications.Images,SelectedContractorApplication.Images";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -473,7 +473,8 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
-                includeProperties: INCLUDE_DETAIL
+                includeProperties: "ContractorApplications.Images",
+                false
             );
 
             ValidateServiceRequest(serviceRequest);

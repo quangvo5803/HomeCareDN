@@ -68,15 +68,18 @@ export const MaterialRequestProvider = ({ children }) => {
   const getMaterialRequestById = useCallback(
     async (id) => {
       if (!user) return null;
-
+      const dto = {
+        MaterialRequestID: id,
+        DistributorID: user.role === 'Distributor' ? user.id : undefined,
+      };
       try {
         let result;
         if (user.role === 'Admin') {
-          result = await materialRequestService.getByIdForAdmin(id);
+          result = await materialRequestService.getByIdForAdmin(dto);
         } else if (user.role === 'Distributor') {
-          result = await materialRequestService.getByIdForDistributor(id);
+          result = await materialRequestService.getByIdForDistributor(dto);
         } else if (user.role === 'Customer') {
-          result = await materialRequestService.getByIdForCustomer(id);
+          result = await materialRequestService.getByIdForCustomer(dto);
         } else return null;
 
         return result;
@@ -138,12 +141,11 @@ export const MaterialRequestProvider = ({ children }) => {
           prev.filter((m) => m.materialRequestID !== id)
         );
         setTotalMaterialRequests((prev) => Math.max(0, prev - 1));
-        toast.success(t('SUCCESS.MATERIAL_REQUEST_DELETE'));
       } catch (err) {
         toast.error(handleApiError(err));
       }
     },
-    [t, user]
+    [user]
   );
 
   // ==================== AUTO LOAD ====================

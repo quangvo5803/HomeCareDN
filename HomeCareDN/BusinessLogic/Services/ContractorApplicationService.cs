@@ -387,8 +387,9 @@ namespace BusinessLogic.Services
 
         public async Task DeleteContractorApplicationAsync(Guid id)
         {
-            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
-                ca.ContractorApplicationID == id
+            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == id,
+                asNoTracking: false
             );
 
             if (application == null)

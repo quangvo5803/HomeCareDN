@@ -164,7 +164,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteBrandAsync(Guid id)
         {
-            var brand = await _unitOfWork.BrandRepository.GetAsync(brand => brand.BrandID == id);
+            var brand = await _unitOfWork.BrandRepository.GetAsync(
+                brand => brand.BrandID == id,
+                asNoTracking: false
+            );
             if (brand == null)
             {
                 var errors = new Dictionary<string, string[]>
