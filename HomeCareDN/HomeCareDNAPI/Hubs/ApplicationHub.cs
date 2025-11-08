@@ -5,11 +5,11 @@ namespace HomeCareDNAPI.Hubs
 {
     public class ApplicationHub : Hub
     {
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ApplicationHub(IUnitOfWork uow)
+        public ApplicationHub(IUnitOfWork unitOfWork)
         {
-            _uow = uow;
+            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
@@ -36,7 +36,7 @@ namespace HomeCareDNAPI.Hubs
             var userId = httpContext?.Request.Query["userId"].ToString();
 
             // Validate membership
-            var conv = await _uow.ConversationRepository.GetAsync(c =>
+            var conv = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationID == conversationId
             );
 
