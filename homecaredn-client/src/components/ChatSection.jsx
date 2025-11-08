@@ -124,7 +124,8 @@ export default function ChatSection({
     };
 
     loadConversation();
-  }, [conversationID, t, chatIsLocked, loadMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationID, t, chatIsLocked]);
 
   // Send message
   const handleSend = async () => {
