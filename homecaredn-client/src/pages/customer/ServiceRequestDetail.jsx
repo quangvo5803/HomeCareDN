@@ -164,12 +164,6 @@ export default function ServiceRequestDetail() {
     }
   };
 
-  //   if (e.key === 'Enter' && !e.shiftKey) {
-  //     e.preventDefault();
-  //     handleSend();
-  //   }
-  // };
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!serviceRequest && !loading) {

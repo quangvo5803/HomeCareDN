@@ -347,6 +347,6 @@ export default function ChatSection({
 
 ChatSection.propTypes = {
   conversationID: PropTypes.string,
-  applicationStatus: PropTypes.string,
+  contractorApplicationStatus: PropTypes.string,
   className: PropTypes.string,
 };

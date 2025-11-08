@@ -71,12 +71,12 @@ namespace DataAccess.Repositories
             return false;
         }
 
-        public async Task<bool> DeleteDocumentAsync(List<string> publicIds)
+        public async Task<bool> DeleteDocumentAsync(List<string> publicId)
         {
-            if (publicIds == null || !publicIds.Any())
+            if (publicId == null || !publicId.Any())
                 return false;
 
-            var deleteTasks = publicIds.Select(publicId => DeleteDocumentAsync(publicId));
+            var deleteTasks = publicId.Select(publicId => DeleteDocumentAsync(publicId));
 
             var results = await Task.WhenAll(deleteTasks);
 

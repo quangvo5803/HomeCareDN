@@ -24,8 +24,8 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetMessagesByConversationID(
             Guid id,
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 20
+            [FromQuery] int pageNumber,
+            [FromQuery] int pageSize
         )
         {
             var result =

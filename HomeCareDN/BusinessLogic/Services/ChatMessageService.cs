@@ -96,8 +96,8 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIDAsync(
             Guid id,
-            int pageNumber = 1,
-            int pageSize = 20
+            int pageNumber,
+            int pageSize
         )
         {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>

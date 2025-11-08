@@ -14,11 +14,11 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        //[HttpDelete("delete-document")]
-        //public async Task<IActionResult> DeleteDocument([FromQuery] string documentUrl)
-        //{
-        //    await _facadeService.DocumentService.DeleteDocumentAsync(documentUrl);
-        //    return NoContent();
-        //}
+        [HttpDelete("delete-document")]
+        public async Task<IActionResult> DeleteDocument([FromQuery] string documentUrl)
+        {
+            await _facadeService.DocumentService.DeleteDocumentAsync(documentUrl);
+            return NoContent();
+        }
     }
 }
