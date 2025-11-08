@@ -5,6 +5,7 @@ using DataAccess.Entities.Application;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
 using Ultitity.Exceptions;
@@ -91,7 +92,8 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication"
+                includeProperties: "ContractorApplication",
+                asNoTracking: false
             );
 
             if (payment == null)
@@ -126,9 +128,25 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
-                    s.ServiceRequestID == payment.ServiceRequestID
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    s => s.ServiceRequestID == payment.ServiceRequestID,
+                    asNoTracking: false
                 );
+                if (serviceRequest != null && payment.ContractorApplication != null)
+                {
+                    var conversation = new Conversation
+                    {
+                        ConversationID = Guid.NewGuid(),
+                        ServiceRequestID = serviceRequest.ServiceRequestID,
+                        CustomerID = serviceRequest.CustomerID,
+                        ContractorID = payment.ContractorApplication.ContractorID,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    serviceRequest.ConversationID = conversation.ConversationID;
+                    await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                }
+                await _unitOfWork.SaveAsync();
+
                 await _notifier.SendToGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
                     "PaymentTransation.Updated",

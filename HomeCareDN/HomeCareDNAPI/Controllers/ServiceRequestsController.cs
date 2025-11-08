@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HomeCareDNAPI.Controllers
+namespace HomeCareDNAPI.Hubs
 {
     [Route("api/service-requests")]
     [ApiController]

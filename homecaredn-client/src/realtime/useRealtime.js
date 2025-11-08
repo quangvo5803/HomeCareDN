@@ -1,22 +1,26 @@
 import { useEffect, useContext } from 'react';
 import RealtimeContext from './RealtimeContext';
 
-export default function useRealtime(handlers = {}) {
-  const { connection } = useContext(RealtimeContext);
-
+export default function useRealtime(
+  handlers = {},
+  connectionType = 'application'
+) {
+  const { connection, chatConnection } = useContext(RealtimeContext);
+  const targetConnection =
+    connectionType === 'chat' ? chatConnection : connection;
   useEffect(() => {
-    if (!connection) return;
+    if (!targetConnection) return;
 
     // Đăng ký sự kiện
     Object.entries(handlers).forEach(([event, handler]) => {
-      if (handler) connection.on(event, handler);
+      if (handler) targetConnection.on(event, handler);
     });
 
     // Cleanup khi unmount
     return () => {
       Object.entries(handlers).forEach(([event, handler]) => {
-        if (handler) connection.off(event, handler);
+        if (handler) targetConnection.off(event, handler);
       });
     };
-  }, [connection, handlers]);
+  }, [targetConnection, handlers]);
 }
