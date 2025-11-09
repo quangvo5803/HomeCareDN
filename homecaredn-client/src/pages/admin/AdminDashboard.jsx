@@ -8,16 +8,20 @@ import { StatisticService } from '../../services/statisticService';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
 import LoadingComponent from '../../components/LoadingComponent';
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [lineYear, setLineYear] = useState(new Date().getFullYear());
   const [pieYear, setPieYear] = useState(new Date().getFullYear());
   const [barYear, setBarYear] = useState(new Date().getFullYear());
+
   const [lineChartData, setLineChartData] = useState({ labels: [], datasets: [] });
   const [pieChartData, setPieChartData] = useState({ labels: [], datasets: [] });
   const [barChartData, setBarChartData] = useState({ labels: [], datasets: [] });
+
   const [topStats, setTopStats] = useState({ topContractors: [], topDistributors: [] });
   const [stats, setStats] = useState({
     totalCustomer: 0,
@@ -32,6 +36,8 @@ export default function AdminDashboard() {
   const [loadingPieChart, setLoadingPieChart] = useState(false);
   const [loadingBarChart, setLoadingBarChart] = useState(false);
   const [loadingTop, setLoadingTop] = useState(false);
+
+
 
   const getMonthlyValue = (data, month, key) =>
     data.find((d) => d.month === month)?.[key] ?? 0;
@@ -496,7 +502,7 @@ export default function AdminDashboard() {
 
               <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
                 <button
-                  onClick={() => console.log('View all clicked')}
+                  onClick={() => navigate(`/Admin/UserManager?filter=contractor`)}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-4 py-2 transition-colors"
                 >
                   {t('adminDashboard.viewAll')}
@@ -593,7 +599,7 @@ export default function AdminDashboard() {
 
               <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
                 <button
-                  onClick={() => console.log('View all clicked')}
+                  onClick={() => navigate(`/Admin/UserManager?filter=distributor`)}
                   className="inline-flex items-center gap-2 text-sm font-semibold text-green-600 bg-green-50 rounded-lg hover:bg-green-100 px-4 py-2 transition-colors"
                 >
                   {t('adminDashboard.viewAll')}

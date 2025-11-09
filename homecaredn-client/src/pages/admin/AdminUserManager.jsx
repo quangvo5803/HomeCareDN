@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useUser } from '../../hook/useUser';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useDebounce } from 'use-debounce';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function AdminUserManager() {
     const { t } = useTranslation();
@@ -22,7 +22,18 @@ export default function AdminUserManager() {
     const [search, setSearch] = useState('');
     const [sortBy, setSortBy] = useState('');
     const [debouncedSearch] = useDebounce(search, 1000);
-    const [filter, setFilter] = useState('all');
+
+    const [searchParams] = useSearchParams();
+    const initialFilter = searchParams.get('filter') || 'all';
+    const [filter, setFilter] = useState(initialFilter);
+
+    useEffect(() => {
+        const urlFilter = searchParams.get('filter') || 'all';
+        if (urlFilter !== filter) {
+            setFilter(urlFilter);
+        }
+
+    }, [searchParams, filter]);
 
     useEffect(() => {
         fetchUsers({
@@ -114,7 +125,11 @@ export default function AdminUserManager() {
                                 {['all', 'customer', 'contractor', 'distributor'].map((key) => (
                                     <button
                                         key={key}
-                                        onClick={() => setFilter(key)}
+                                        onClick={() => {
+                                            setFilter(key);
+                                            navigate(`?filter=${key}`);
+                                        }}
+
                                         className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
                                             ? 'bg-orange-600 text-white'
                                             : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'

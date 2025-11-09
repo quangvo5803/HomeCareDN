@@ -13,6 +13,7 @@ namespace BusinessLogic.DTOs.Authorize.User
         public string? PhoneNumber { get; set; }
         public int ProjectCount { get; set; }
         public double AverageRating { get; set; }
+        public string? Role { get; set; }
         public List<ServiceRequestDto>? ServiceRequests { get; set; }
         public List<AddressDto>? Address { get; set; }
     }

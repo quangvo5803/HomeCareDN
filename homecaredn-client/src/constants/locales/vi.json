@@ -909,8 +909,10 @@
     "userDetail": {
       "address": "Chưa có địa chỉ nào",
       "rating": "Đánh giá",
-      "historyTitle": "Lịch sử dịch vụ đã yêu cầu",
-      "historyTitle1": "Lịch sử dịch vụ đã tham gia",
+      "serviceRequest": "dịch vụ đã yêu cầu",
+      "contractorApplication": "dịch vụ đã tham gia",
+      "historySR": "Lịch sử dịch vụ đã yêu cầu",
+      "historyCA": "Lịch sử dịch vụ đã tham gia",
       "history": "Chưa có lịch sử nào"
     }
   },

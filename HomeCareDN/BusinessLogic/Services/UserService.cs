@@ -27,14 +27,30 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<UserDto>> GetAllUserAsync(QueryParameters parameters)
         {
-            var query = _userManager.Users.Include(a => a.Addresses)
-                .AsQueryable().AsSingleQuery().AsNoTracking();
+            var query = _userManager.Users
+                .Include(a => a.Addresses)
+                .AsQueryable()
+                .AsSingleQuery()
+                .AsNoTracking();
 
-            if(!string.IsNullOrEmpty(parameters.FilterRoleName))
+            var allowedRoles = new[] { "Customer", "Contractor", "Distributor" };
+
+            var userIdsInAllowedRoles = new List<string>();
+
+            foreach (var role in allowedRoles)
             {
-                var roleName = (await _userManager.GetUsersInRoleAsync(parameters.FilterRoleName))
-                    .Select(u=> u.Id);
-                query = query.Where(u => roleName.Contains(u.Id));
+                var usersInRole = await _userManager.GetUsersInRoleAsync(role);
+                userIdsInAllowedRoles.AddRange(usersInRole.Select(u => u.Id));
+            }
+
+            query = query.Where(u => userIdsInAllowedRoles.Contains(u.Id));
+
+            if (!string.IsNullOrEmpty(parameters.FilterRoleName))
+            {
+                var roleName = parameters.FilterRoleName;
+                var roleUsers = await _userManager.GetUsersInRoleAsync(roleName);
+                var roleIds = roleUsers.Select(u => u.Id);
+                query = query.Where(u => roleIds.Contains(u.Id));
             }
 
             if (!string.IsNullOrWhiteSpace(parameters.Search))
@@ -46,14 +62,16 @@ namespace BusinessLogic.Services
                     (u.PhoneNumber != null && u.PhoneNumber.ToLower().Contains(keyword))
                 );
             }
+
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
             {
-                "fullname" =>  query.OrderBy(u => u.FullName),
-                "fullnamedesc" =>  query.OrderByDescending(u => u.FullName),
+                "fullname" => query.OrderBy(u => u.FullName),
+                "fullnamedesc" => query.OrderByDescending(u => u.FullName),
                 _ => query.OrderBy(u => u.UserName),
             };
+
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
@@ -91,6 +109,9 @@ namespace BusinessLogic.Services
                 .GetRangeAsync(sr => sr.CustomerID.ToString() == userID);
 
             var dto = _mapper.Map<UserDto>(user);
+
+            var role = await _userManager.GetRolesAsync(user);
+            dto.Role = role.FirstOrDefault();
 
             dto.ServiceRequests = 
                 _mapper.Map<List<ServiceRequestDto>>(serviceRequests);

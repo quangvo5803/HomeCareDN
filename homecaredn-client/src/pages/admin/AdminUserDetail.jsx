@@ -49,19 +49,21 @@ export default function AdminUserDetail() {
             try {
                 if (!userDetail) return;
 
-                if (Array.isArray(userDetail.serviceRequests) && userDetail.serviceRequests.length > 0) {
-                    return;
+                const role = userDetail.role !== 'Customer';
+                const noServiceRequests = !userDetail?.serviceRequests || userDetail.serviceRequests.length === 0;
+
+                if (role && noServiceRequests) {
+                    setLoadingContractors(true);
+                    setContractors([]);
+                    setTotalCount(0);
+                    const res = await contractorApplicationService.getAllByUserIdForAdmin({
+                        PageNumber: currentPage,
+                        PageSize: pageSize,
+                        FilterID: userID,
+                    });
+                    setContractors(res.items || []);
+                    setTotalCount(res.totalCount || 0);
                 }
-                setLoadingContractors(true);
-                setContractors([]);
-                setTotalCount(0);
-                const res = await contractorApplicationService.getAllByUserIdForAdmin({
-                    PageNumber: currentPage,
-                    PageSize: pageSize,
-                    FilterID: userID,
-                });
-                setContractors(res.items || []);
-                setTotalCount(res.totalCount || 0);
             } catch (err) {
                 toast.error(t(handleApiError(err)));
             } finally {
@@ -85,7 +87,7 @@ export default function AdminUserDetail() {
             tint: `text-${color}-600`,
             bg: `bg-${color}-50`,
             ring: `ring-${color}-200`,
-            accent: `bg-gradient-to-br from-${color}-500 to-${color}-600`,
+            accent: `bg-gradient-to-br from-${color}-400 via-${color}-500 to-${color}-600`,
         },
     });
 
@@ -158,7 +160,7 @@ export default function AdminUserDetail() {
                             </div>
 
                             {/* rating & project count */}
-                            {contractors && (
+                            {userDetail?.role === 'Contractor' && (
                                 <div className="flex gap-4 mt-4 md:mt-0">
                                     <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 text-center min-w-[110px]">
                                         <p className="text-yellow-600 text-sm font-medium">{t('adminUserManager.userDetail.rating')}</p>
@@ -180,16 +182,32 @@ export default function AdminUserDetail() {
 
                     {/* Bottom Section */}
                     <div className="bg-white rounded-2xl shadow-md p-6 max-w-5xl mx-auto">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">
-                            {userDetail?.serviceRequests?.length > 0
-                                ? t('adminUserManager.userDetail.historyTitle')
-                                : t('adminUserManager.userDetail.historyTitle1')
-                            }
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+                            <h3 className="text-xl font-bold text-gray-800 mb-4 sm:mb-0">
+                                {userDetail?.role === 'Customer'
+                                    ? t('adminUserManager.userDetail.historySR')
+                                    : t('adminUserManager.userDetail.historyCA')}
+                            </h3>
 
-                        </h3>
+                            {userDetail?.role === 'Customer' ? (
+                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mt-2 sm:mt-0">
+                                    <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                                    <span>
+                                        {userDetail.serviceRequests.length} {t('adminUserManager.userDetail.serviceRequest')}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mt-2 sm:mt-0">
+                                    <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                                    <span>
+                                        {totalCount} {t('adminUserManager.userDetail.contractorApplication')}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
 
                         {/* serviceRequests */}
-                        {userDetail?.serviceRequests?.length > 0 ? (
+                        {userDetail?.serviceRequests?.length > 0 && userDetail?.role === 'Customer' ? (
                             <div className="p-6 space-y-4">
                                 {userDetail.serviceRequests.map((request) => {
                                     const ui =
@@ -227,13 +245,41 @@ export default function AdminUserDetail() {
                                                 <StatusBadge status={request.status} type="Request" />
                                             </div>
 
+                                            {/* Meta chips - Improved */}
                                             <div className="pl-4 mb-5 flex flex-wrap gap-2">
-                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200">
                                                     <i className="fa-solid fa-box-open" />
                                                     {t(`Enums.PackageOption.${request.packageOption}`)}
                                                 </span>
+                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-purple-50 to-purple-100 text-purple-700 border border-purple-200">
+                                                    <i className="fa-solid fa-building" />
+                                                    {t(`Enums.BuildingType.${request.buildingType}`)}
+                                                </span>
+                                                {(request?.floors ?? 0) > 0 && (
+                                                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 border border-gray-200">
+                                                        <i className="fa-solid fa-layer-group" />
+                                                        {request.floors}{' '}
+                                                        {t('contractorServiceRequestDetail.floorsUnit')}
+                                                    </span>
+                                                )}
+                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-teal-50 to-teal-100 text-teal-700 border border-teal-200">
+                                                    <i className="fa-solid fa-ruler-combined" />
+                                                    {(
+                                                        request.length *
+                                                        request.width *
+                                                        request.floors
+                                                    ).toFixed(1) || '—'}{' '}
+                                                    m²
+                                                </span>
+                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-orange-50 to-amber-50 text-orange-700 border border-orange-200">
+                                                    <i className="fa-solid fa-coins" />
+                                                    {request.estimatePrice
+                                                        ? formatVND(request.estimatePrice)
+                                                        : t('contractorServiceRequestManager.negotiable')}
+                                                </span>
                                             </div>
 
+                                            {/* Footer row - Enhanced */}
                                             <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
                                                 <div className="flex items-center gap-2 text-sm text-gray-500">
                                                     <i className="fa-regular fa-calendar text-gray-400"></i>
@@ -258,93 +304,91 @@ export default function AdminUserDetail() {
                         ) : (
                             <>
                                 {/* contractors */}
-                                {!contractors || contractors.length === 0 ? (
+                                {loadingContractors ? (
+                                    <div className="flex justify-center py-10">
+                                        <LoadingComponent />
+                                    </div>
+                                ) : !contractors || contractors.length === 0 ? (
                                     <div className="text-center text-gray-500 py-8">
                                         <i className="fa-solid fa-inbox text-4xl mb-2"></i>
                                         <p>{t('adminUserManager.userDetail.history')}</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-3">
-                                        {loadingContractors ? (
-                                            <LoadingComponent />
-                                        ) : (
-                                            <>
-                                                {contractors.map((request) => {
-                                                    const ui =
-                                                        serviceTypeStyleCA[request?.serviceType] || {
-                                                            icon: "fa-wrench",
-                                                            tint: "text-gray-600",
-                                                            bg: "bg-gray-50",
-                                                            ring: "ring-gray-200",
-                                                            accent: "bg-gradient-to-br from-gray-400 to-gray-500",
-                                                        };
-                                                    return (
-                                                        <div
-                                                            key={request.serviceRequestID}
-                                                            className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200"
-                                                        >
-                                                            <div
-                                                                className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
-                                                            />
-                                                            <div className="flex justify-between items-start mb-3 pl-4">
-                                                                <div className="flex-1">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span
-                                                                            className={`inline-flex items-center justify-center h-10 w-10 rounded-xl ${ui.bg} ring-2 ${ui.ring} transition-transform duration-300 group-hover:scale-110`}
-                                                                        >
-                                                                            <i className={`fa-solid ${ui.icon} ${ui.tint} text-lg`} />
-                                                                        </span>
-                                                                        <h3 className="text-xl font-bold text-gray-900">
-                                                                            {t(`Enums.ServiceType.${request.serviceType}`)}
-                                                                        </h3>
-                                                                    </div>
-                                                                </div>
-                                                                <StatusBadge status={request.status} type="Application" />
-                                                            </div>
-                                                            <div className="pl-4 flex flex-wrap gap-2">
-                                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                                                    <i className="fa-solid fa-coins" />
-                                                                    {request.estimatePrice
-                                                                        ? formatVND(request.estimatePrice)
-                                                                        : t("contractorServiceRequestManager.negotiable")}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
-                                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                                    <i className="fa-regular fa-calendar text-gray-400"></i>
-                                                                    <span className="font-medium">
-                                                                        {formatDate(request.createdAt, i18n.language)}
-                                                                    </span>
-                                                                </div>
-                                                                <button
-                                                                    onClick={() =>
-                                                                        navigate(`/Admin/ServiceRequest/${request.serviceRequestID}`)
-                                                                    }
-                                                                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                                        {contractors.map((request) => {
+                                            const ui = serviceTypeStyleCA[request?.serviceType] || {
+                                                icon: "fa-wrench",
+                                                tint: "text-gray-600",
+                                                bg: "bg-gray-50",
+                                                ring: "ring-gray-200",
+                                                accent: "bg-gradient-to-br from-gray-400 to-gray-500",
+                                            };
+                                            return (
+                                                <div
+                                                    key={request.serviceRequestID}
+                                                    className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200"
+                                                >
+                                                    <div
+                                                        className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
+                                                    />
+                                                    <div className="flex justify-between items-start mb-3 pl-4">
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-3">
+                                                                <span
+                                                                    className={`inline-flex items-center justify-center h-10 w-10 rounded-xl ${ui.bg} ring-2 ${ui.ring} transition-transform duration-300 group-hover:scale-110`}
                                                                 >
-                                                                    <i className="fa-solid fa-eye" />
-                                                                    {t("BUTTON.View")}
-                                                                </button>
+                                                                    <i className={`fa-solid ${ui.icon} ${ui.tint} text-lg`} />
+                                                                </span>
+                                                                <h3 className="text-xl font-bold text-gray-900">
+                                                                    {t(`Enums.ServiceType.${request.serviceType}`)}
+                                                                </h3>
                                                             </div>
                                                         </div>
-                                                    );
-                                                })}
-
-                                                {totalCount > pageSize && (
-                                                    <div className="flex justify-center pt-4">
-                                                        <Pagination
-                                                            current={currentPage}
-                                                            pageSize={pageSize}
-                                                            total={totalCount}
-                                                            onChange={(page) => setCurrentPage(page)}
-                                                            showSizeChanger={false}
-                                                        />
+                                                        <StatusBadge status={request.status} type="Application" />
                                                     </div>
-                                                )}
-                                            </>
+                                                    <div className="pl-4 flex flex-wrap gap-2">
+                                                        <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                                            <i className="fa-solid fa-coins" />
+                                                            {request.estimatePrice
+                                                                ? formatVND(request.estimatePrice)
+                                                                : t("contractorServiceRequestManager.negotiable")}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
+                                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                            <i className="fa-regular fa-calendar text-gray-400"></i>
+                                                            <span className="font-medium">
+                                                                {formatDate(request.createdAt, i18n.language)}
+                                                            </span>
+                                                        </div>
+                                                        <button
+                                                            onClick={() =>
+                                                                navigate(`/Admin/ServiceRequest/${request.serviceRequestID}`)
+                                                            }
+                                                            className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                                                        >
+                                                            <i className="fa-solid fa-eye" />
+                                                            {t("BUTTON.View")}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+
+                                        {totalCount > 0 && (
+                                            <div className="flex justify-center pt-4">
+                                                <Pagination
+                                                    current={currentPage}
+                                                    pageSize={pageSize}
+                                                    total={totalCount}
+                                                    onChange={(page) => setCurrentPage(page)}
+                                                    showSizeChanger={false}
+                                                />
+                                            </div>
                                         )}
                                     </div>
                                 )}
+
                             </>
                         )}
                     </div>

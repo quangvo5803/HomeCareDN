@@ -914,8 +914,10 @@
     "userDetail": {
       "address": "No addresses yet",
       "rating": "Rating",
-      "historyTitle": "Service Requests History",
-      "historyTitle1": "Participated Service History",
+      "serviceRequest": "service requests",
+      "contractorApplication": "participated service",
+      "historySR": "Service requests history",
+      "historyCA": "Participated service history",
       "history": "No history yet"
     }
   },
