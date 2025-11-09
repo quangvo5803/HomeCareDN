@@ -88,7 +88,7 @@ namespace BusinessLogic.Services
 
             // realtime
             await _signalRNotifier.SendToChatGroupAsync(
-                $"conversation_{dto.ConversationID}",
+                dto.ConversationID.ToString(),
                 "Chat.MessageCreated",
                 result
             );

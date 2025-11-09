@@ -34,13 +34,9 @@ namespace HomeCareDNAPI.Realtime
         }
 
         // --- ChatHub ---
-        public async Task SendToChatGroupAsync(
-            string conversationId,
-            string eventName,
-            object? payload
-        )
+        public async Task SendToChatGroupAsync(string id, string eventName, object? payload)
         {
-            var groupName = $"conversation_{conversationId}";
+            var groupName = $"conversation_{id}";
             await _chatHub.Clients.Group(groupName).SendAsync(eventName, payload);
         }
 

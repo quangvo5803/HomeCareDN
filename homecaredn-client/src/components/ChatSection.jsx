@@ -98,7 +98,8 @@ export default function ChatSection({
 
   // Load conversation details
   useEffect(() => {
-    if (chatIsLocked || !conversationID) {
+    if (!conversationID) {
+      setConversation(null);
       setLoading(false);
       return;
     }

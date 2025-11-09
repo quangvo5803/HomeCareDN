@@ -145,7 +145,7 @@ namespace BusinessLogic.Services
                     serviceRequest.ConversationID = conversation.ConversationID;
                     await _unitOfWork.ConversationRepository.AddAsync(conversation);
                     await _notifier.SendToChatGroupAsync(
-                        $"conversation_{conversation.ConversationID}",
+                        conversation.ConversationID.ToString(),
                         "Chat.ConversationUnlocked",
                         new { conversation.ConversationID }
                     );
