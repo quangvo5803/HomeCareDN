@@ -205,7 +205,6 @@ export default function ChatSection({
             ...prev,
             isLocked: false,
           }));
-          toast.success(t('chat.conversationUnlocked'));
         }
       },
     },

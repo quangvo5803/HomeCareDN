@@ -16,4 +16,5 @@ export const RealtimeEvents = Object.freeze({
 
   // Chat
   ChatMessageCreated: 'Chat.MessageCreated',
+  ConversationUnlocked: 'Chat.ConversationUnlocked',
 });
