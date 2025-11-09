@@ -108,15 +108,26 @@ export default function ServiceRequestDetail() {
       });
     },
     [RealtimeEvents.PaymentTransactionUpdated]: async (payload) => {
+      setServiceRequest((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          conversationID: payload.conversationID,
+        };
+      });
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID
       ) {
-        const fullContractor =
-          await contractorApplicationService.getByIdForCustomer(
-            payload.contractorApplicationID
-          );
-        setSelectedContractor(fullContractor);
+        try {
+          const fullContractor =
+            await contractorApplicationService.getByIdForCustomer(
+              payload.contractorApplicationID
+            );
+          setSelectedContractor(fullContractor);
+        } catch (error) {
+          toast.error(t(handleApiError(error)));
+        }
       }
     },
   });
@@ -772,7 +783,7 @@ export default function ServiceRequestDetail() {
         </div>
         {/* Chat Section */}
         <ChatSection
-          conversationID={serviceRequest.conversation?.conversationID}
+          conversationID={serviceRequest.conversationID}
           contractorApplicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />

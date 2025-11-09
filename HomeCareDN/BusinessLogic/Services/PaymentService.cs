@@ -144,13 +144,13 @@ namespace BusinessLogic.Services
                     };
                     serviceRequest.ConversationID = conversation.ConversationID;
                     await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                    await _unitOfWork.SaveAsync();
                     await _notifier.SendToChatGroupAsync(
                         conversation.ConversationID.ToString(),
                         "Chat.ConversationUnlocked",
                         new { conversation.ConversationID }
                     );
                 }
-                await _unitOfWork.SaveAsync();
 
                 await _notifier.SendToApplicationGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
