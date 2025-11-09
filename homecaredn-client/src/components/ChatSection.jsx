@@ -196,6 +196,18 @@ export default function ChatSection({
           }, 100);
         }
       },
+      [RealtimeEvents.ConversationUnlocked]: (payload) => {
+        if (
+          conversation &&
+          payload.conversationID === conversation.conversationID
+        ) {
+          setConversation((prev) => ({
+            ...prev,
+            isLocked: false,
+          }));
+          toast.success(t('chat.conversationUnlocked'));
+        }
+      },
     },
     'chat'
   );
