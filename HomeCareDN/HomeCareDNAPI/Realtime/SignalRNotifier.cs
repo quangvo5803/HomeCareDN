@@ -9,9 +9,12 @@ namespace HomeCareDNAPI.Realtime
         private readonly IHubContext<ApplicationHub> _applicationHub;
         private readonly IHubContext<ChatHub> _chatHub;
 
-        public SignalRNotifier(IHubContext<ApplicationHub> appHub, IHubContext<ChatHub> chatHub)
+        public SignalRNotifier(
+            IHubContext<ApplicationHub> applicationHub,
+            IHubContext<ChatHub> chatHub
+        )
         {
-            _applicationHub = appHub;
+            _applicationHub = applicationHub;
             _chatHub = chatHub;
         }
 
