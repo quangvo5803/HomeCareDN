@@ -28,7 +28,7 @@ namespace HomeCareDNAPI.Realtime
             await _applicationHub.Clients.Group(groupName).SendAsync(eventName, payload);
         }
 
-        public async Task SendToAllApplicationnAsync(string eventName, object? payload)
+        public async Task SendToAllApplicationAsync(string eventName, object? payload)
         {
             await _applicationHub.Clients.All.SendAsync(eventName, payload);
         }
