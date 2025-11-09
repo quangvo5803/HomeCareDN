@@ -155,7 +155,12 @@ namespace BusinessLogic.Services
                 await _notifier.SendToApplicationGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
                     "PaymentTransation.Updated",
-                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                    new
+                    {
+                        payment.ContractorApplicationID,
+                        Status = payment.Status.ToString(),
+                        serviceRequest?.ConversationID,
+                    }
                 );
                 await _notifier.SendToApplicationGroupAsync(
                     $"role_Admin",
