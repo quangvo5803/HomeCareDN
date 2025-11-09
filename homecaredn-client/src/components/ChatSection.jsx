@@ -242,18 +242,11 @@ export default function ChatSection({
     // No conversation
     if (!conversation) {
       return (
-        <div
-          className={`bg-white rounded-2xl shadow-md border border-gray-100 p-6 ${className}`}
-        >
-          <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
-            <i className="fas fa-comments"></i>
-            <span>{t('chat.title')}</span>
-          </h4>
-          <div className="flex items-center justify-center h-96 text-gray-400">
-            <div className="text-center">
-              <i className="fas fa-comment-slash text-4xl mb-2"></i>
-              <p className="text-sm">{t('chat.noConversation')}</p>
-            </div>
+        // SỬA LẠI: Chỉ render placeholder
+        <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="text-center">
+            <i className="fas fa-comment-slash text-4xl mb-2"></i>
+            <p className="text-sm">{t('chat.noConversation')}</p>
           </div>
         </div>
       );
@@ -362,7 +355,7 @@ export default function ChatSection({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyPress}
-          disabled={chatIsLocked}
+          disabled={chatIsLocked || !conversation}
           placeholder={
             chatIsLocked
               ? t('chat.locked_des.placeholder')
@@ -372,7 +365,7 @@ export default function ChatSection({
         />
         <button
           onClick={handleSend}
-          disabled={chatIsLocked || input.trim() === ''}
+          disabled={chatIsLocked || input.trim() === '' || !conversation}
           className="px-5 py-2 rounded-xl bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <i className="fas fa-paper-plane mr-2"></i>
