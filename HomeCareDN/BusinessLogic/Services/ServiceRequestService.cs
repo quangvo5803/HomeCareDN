@@ -414,8 +414,12 @@ namespace BusinessLogic.Services.Interfaces
                 CONTRACTOR
             );
 
-            await _notifier.SendToGroupAsync("role_Admin", "ServiceRequest.Created", adminDto);
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Admin",
+                "ServiceRequest.Created",
+                adminDto
+            );
+            await _notifier.SendToApplicationGroupAsync(
                 "role_Contractor",
                 "ServiceRequest.Created",
                 contractorDto
@@ -490,12 +494,12 @@ namespace BusinessLogic.Services.Interfaces
             }
             await DeleteRelatedEntity(serviceRequest!);
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Contractor",
                 "ServiceRequest.Delete",
                 new { ServiceRequestID = id }
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 "ServiceRequest.Delete",
                 new { ServiceRequestID = id }

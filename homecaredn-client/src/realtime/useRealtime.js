@@ -6,8 +6,13 @@ export default function useRealtime(
   connectionType = 'application'
 ) {
   const { connection, chatConnection } = useContext(RealtimeContext);
-  const targetConnection =
-    connectionType === 'chat' ? chatConnection : connection;
+
+  let targetConnection = connection;
+
+  if (connectionType === 'chat') {
+    targetConnection = chatConnection;
+  }
+
   useEffect(() => {
     if (!targetConnection) return;
 

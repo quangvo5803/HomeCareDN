@@ -6,34 +6,44 @@ namespace HomeCareDNAPI.Realtime
 {
     public class SignalRNotifier : ISignalRNotifier
     {
-        private readonly IHubContext<ApplicationHub> _hubContext;
-        private readonly IHubContext<ChatHub> _chatHubContext;
+        private readonly IHubContext<ApplicationHub> _applicationHub;
+        private readonly IHubContext<ChatHub> _chatHub;
 
-        public SignalRNotifier(
-            IHubContext<ApplicationHub> hubContext,
-            IHubContext<ChatHub> chatHubContext
+        public SignalRNotifier(IHubContext<ApplicationHub> appHub, IHubContext<ChatHub> chatHub)
+        {
+            _applicationHub = appHub;
+            _chatHub = chatHub;
+        }
+
+        // --- ApplicationHub ---
+        public async Task SendToApplicationGroupAsync(
+            string groupName,
+            string eventName,
+            object? payload
         )
         {
-            _hubContext = hubContext;
-            _chatHubContext = chatHubContext;
+            await _applicationHub.Clients.Group(groupName).SendAsync(eventName, payload);
         }
 
-        public async Task SendToGroupAsync(string groupName, string eventName, object? payload)
+        public async Task SendToAllApplicationnAsync(string eventName, object? payload)
         {
-            if (groupName.StartsWith("conversation_"))
-            {
-                await _chatHubContext.Clients.Group(groupName).SendAsync(eventName, payload);
-            }
-            else
-            {
-                await _hubContext.Clients.Group(groupName).SendAsync(eventName, payload);
-            }
+            await _applicationHub.Clients.All.SendAsync(eventName, payload);
         }
 
-        public async Task SendToAllAsync(string eventName, object? payload)
+        // --- ChatHub ---
+        public async Task SendToChatGroupAsync(
+            string conversationId,
+            string eventName,
+            object? payload
+        )
         {
-            await _hubContext.Clients.All.SendAsync(eventName, payload);
-            await _chatHubContext.Clients.All.SendAsync(eventName, payload);
+            var groupName = $"conversation_{conversationId}";
+            await _chatHub.Clients.Group(groupName).SendAsync(eventName, payload);
+        }
+
+        public async Task SendToAllChatAsync(string eventName, object? payload)
+        {
+            await _chatHub.Clients.All.SendAsync(eventName, payload);
         }
     }
 }

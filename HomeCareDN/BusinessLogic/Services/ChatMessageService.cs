@@ -87,7 +87,7 @@ namespace BusinessLogic.Services
             var result = _mapper.Map<ChatMessageDto>(message);
 
             // realtime
-            await _signalRNotifier.SendToGroupAsync(
+            await _signalRNotifier.SendToChatGroupAsync(
                 $"conversation_{dto.ConversationID}",
                 "Chat.MessageCreated",
                 result
