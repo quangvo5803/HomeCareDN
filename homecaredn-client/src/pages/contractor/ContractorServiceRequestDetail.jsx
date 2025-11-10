@@ -6,7 +6,7 @@ import { contractorApplicationService } from '../../services/contractorApplicati
 import { formatVND, formatDate } from '../../utils/formatters';
 import { numberToWordsByLang } from '../../utils/numberToWords';
 import { useAuth } from '../../hook/useAuth';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import VenoBox from 'venobox';
@@ -36,6 +36,10 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
 //For TINY MCE
 
+const MAX_IMAGES = 5;
+const MAX_DOCUMENTS = 5;
+const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
+
 export default function ContractorServiceRequestDetail() {
   const { serviceRequestId } = useParams();
   const [searchParams] = useSearchParams();
@@ -49,13 +53,32 @@ export default function ContractorServiceRequestDetail() {
   const [existingApplication, setExistingApplication] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [images, setImages] = useState([]);
+  const [documents, setDocuments] = useState([]);
   const [description, setDescription] = useState('');
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [totalApplications, setTotalApplications] = useState(0);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
+  const [imageProgress, setImageProgress] = useState({ loaded: 0, total: 0 });
+  const [documentProgress, setDocumentProgress] = useState({
+    loaded: 0,
+    total: 0,
+  });
 
+  // upload docs and imgs progress
+  useEffect(() => {
+    const totalLoaded = imageProgress.loaded + documentProgress.loaded;
+    const totalSize = imageProgress.total + documentProgress.total;
+
+    if (totalSize === 0) {
+      if (uploadProgress !== 1) setUploadProgress(0);
+      return;
+    }
+
+    const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
+    setUploadProgress(percent);
+  }, [imageProgress, documentProgress, uploadProgress]);
   // Realtime SignalR
   useRealtime({
     //Accept
@@ -164,63 +187,124 @@ export default function ContractorServiceRequestDetail() {
 
   // Init VenoBox
   useEffect(() => {
-    if (serviceRequest) {
-      const vb = new VenoBox({ selector: '.venobox' });
-      return () => vb.close();
-    }
-  }, [serviceRequest, existingApplication]);
-
+    const vb = new VenoBox({ selector: '.venobox' });
+    return () => vb.close();
+  }, [
+    serviceRequest?.imageUrls?.length,
+    existingApplication?.imageUrls?.length,
+  ]);
+  // Clean up object URLs khi unmount
+  useEffect(() => {
+    return () => {
+      images.forEach(
+        (i) =>
+          i.isNew && i.url?.startsWith('blob:') && URL.revokeObjectURL(i.url)
+      );
+      documents.forEach(
+        (d) =>
+          d.isNew && d.url?.startsWith('blob:') && URL.revokeObjectURL(d.url)
+      );
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Submit contractor application
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!description.trim()) {
+    if (!description) {
       toast.error(t('ERROR.REQUIRED_CONTRACTOR_APPLY_DESCRIPTION'));
       return;
     }
-
-    if (!estimatePrice.trim()) {
+    if (!estimatePrice) {
       toast.error(t('ERROR.REQUIRED_ESTIMATE_PRICE'));
       return;
     }
-
-    const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
-
-    const payload = {
-      ServiceRequestID: serviceRequestId,
-      ContractorID: user.id,
-      Description: description,
-      EstimatePrice: Number(estimatePrice),
-    };
-
-    if (images.length > 5) {
+    if (images.length > MAX_IMAGES) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
+    if (documents.length > MAX_DOCUMENTS) {
+      toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+      return;
+    }
+
+    const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
+    const newDocumentFiles = documents
+      .filter((i) => i.isNew)
+      .map((i) => i.file);
+
+    const payload = {
+      ServiceRequestID: serviceRequestId,
+      ContractorID: user?.id,
+      Description: description,
+      EstimatePrice: estimatePrice,
+    };
 
     try {
-      if (newFiles.length > 0) {
-        setUploadProgress(1);
-        const uploaded = await uploadImageToCloudinary(
-          newFiles,
-          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => setUploadProgress(percent),
-          'HomeCareDN/ContractorAppication'
-        );
+      setImageProgress({
+        loaded: 0,
+        total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
+      });
+      setDocumentProgress({
+        loaded: 0,
+        total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
+      });
 
-        const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
-        payload.ImageUrls = uploadedArray.map((u) => u.url);
-        payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-        setUploadProgress(0);
+      if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
+        setUploadProgress(1);
+      }
+
+      const imageUploadPromise =
+        newImageFiles.length > 0
+          ? uploadToCloudinary(
+              newImageFiles,
+              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+              (progress) => setImageProgress(progress),
+              'HomeCareDN/ContractorAppication'
+            )
+          : Promise.resolve(null);
+
+      const documentUploadPromise =
+        newDocumentFiles.length > 0
+          ? uploadToCloudinary(
+              newDocumentFiles,
+              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+              (progress) => setDocumentProgress(progress),
+              'HomeCareDN/ContractorAppication/Documents',
+              'raw'
+            )
+          : Promise.resolve(null);
+
+      const [imageResults, documentResults] = await Promise.all([
+        imageUploadPromise,
+        documentUploadPromise,
+      ]);
+
+      if (imageResults) {
+        const arr = Array.isArray(imageResults) ? imageResults : [imageResults];
+        payload.ImageUrls = arr.map((u) => u.url);
+        payload.ImagePublicIds = arr.map((u) => u.publicId);
+      }
+
+      if (documentResults) {
+        const arr = Array.isArray(documentResults)
+          ? documentResults
+          : [documentResults];
+        payload.DocumentUrls = arr.map((u) => u.url);
+        payload.DocumentPublicIds = arr.map((u) => u.publicId);
       }
 
       const appData = await contractorApplicationService.create(payload);
-      toast.success(t('SUCCESS.APPLICATION_CREATE'));
+      toast.success(t('SUCCESS.APPICATION_CREATE'));
+
       setExistingApplication(appData);
       setTotalApplications(totalApplications + 1);
     } catch (error) {
       setUploadProgress(0);
       toast.error(t(handleApiError(error)));
+    } finally {
+      setUploadProgress(0);
+      setImageProgress({ loaded: 0, total: 0 });
+      setDocumentProgress({ loaded: 0, total: 0 });
     }
   };
 
@@ -243,6 +327,7 @@ export default function ContractorServiceRequestDetail() {
           setDescription('');
           setEstimatePrice('');
           setImages([]);
+          setDocuments([]);
           setTotalApplications(totalApplications - 1);
         } catch (err) {
           toast.error(t(handleApiError(err)));
@@ -303,6 +388,25 @@ export default function ContractorServiceRequestDetail() {
     setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
+  const handleRemoveDocument = (doc) => {
+    setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
+  };
+  const handleDocumentChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    if (files.length + images.length > 5) {
+      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+      return;
+    }
+
+    const mapped = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+      isNew: true,
+    }));
+
+    setDocuments((prev) => [...prev, ...mapped]);
+  };
   if (loading || isChecking || !serviceRequest) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
@@ -543,6 +647,80 @@ export default function ContractorServiceRequestDetail() {
               </div>
             </div>
           )}
+          {/* Documents */}
+          {serviceRequest.documentUrls?.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
+              <div className="px-6 py-5">
+                {/* Tiêu đề (giữ nguyên) */}
+                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+                  <i className="fas fa-file-alt text-gray-500" />
+                  {t('contractorServiceRequestDetail.documents')}
+                </h3>
+
+                <div className="space-y-3">
+                  {serviceRequest.documentUrls.map((docUrl) => {
+                    const fileName = decodeURIComponent(
+                      docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                    );
+                    const ext = (
+                      fileName.includes('.') ? fileName.split('.').pop() : ''
+                    ).toLowerCase();
+
+                    const iconClass =
+                      ext === 'pdf'
+                        ? 'fa-file-pdf text-red-600'
+                        : ext === 'doc' || ext === 'docx'
+                        ? 'fa-file-word text-blue-600'
+                        : ext === 'xls' || ext === 'xlsx'
+                        ? 'fa-file-excel text-green-600'
+                        : ext === 'ppt' || ext === 'pptx'
+                        ? 'fa-file-powerpoint text-orange-600'
+                        : ext === 'txt'
+                        ? 'fa-file-lines text-gray-600'
+                        : 'fa-file-alt text-gray-500';
+
+                    return (
+                      <div
+                        key={docUrl}
+                        className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                      >
+                        {/* Icon */}
+                        <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                          <i className={`fas ${iconClass} text-2xl`} />
+                        </div>
+
+                        {/* Name + meta */}
+                        <div className="min-w-0 flex-1">
+                          <p
+                            className="text-sm font-medium text-gray-800 truncate"
+                            title={fileName}
+                          >
+                            {fileName}
+                          </p>
+                          <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                              {(ext || 'file').toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={docUrl}
+                            download
+                            className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                          >
+                            {t('common.Download')}
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Apply Form OR Application Details */}
           {isRequestClosed && !existingApplication ? (
@@ -711,7 +889,69 @@ export default function ContractorServiceRequestDetail() {
                     </div>
                   )}
                 </div>
+                {/* Documents */}
+                <div className="space-y-3 lg:col-span-2">
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center text-sm font-medium text-gray-700">
+                      <i className="fas fa-file-alt text-orange-500 mr-2"></i>
+                      {t('userPage.createServiceRequest.form_documents')}
+                    </label>
+                    <span className="text-xs text-gray-500">
+                      {documents.length}/{MAX_DOCUMENTS}
+                    </span>
+                  </div>
 
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept={ACCEPTED_DOC_TYPES}
+                      multiple
+                      onChange={handleDocumentChange}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      aria-label={t('upload.uploadDocuments')}
+                    />
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                      </div>
+                      <p className="text-gray-600 text-center mb-2">
+                        <span className="font-semibold text-orange-600">
+                          {t('upload.clickToUpload')}
+                        </span>{' '}
+                        {t('upload.orDragAndDrop')}
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        {t('upload.fileTypesHint')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {documents.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                      {documents.map((doc) => (
+                        <div
+                          key={doc.url}
+                          className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200 bg-gray-50 flex flex-col items-center justify-center p-2 text-center"
+                        >
+                          <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
+                          <p className="text-xs text-gray-600 break-all truncate">
+                            {doc.name || ''}
+                          </p>
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveDocument(doc)}
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                              aria-label="Remove document"
+                            >
+                              <i className="fas fa-trash-alt text-sm"></i>
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {/* Submit */}
                 <div>
                   <button
@@ -826,6 +1066,73 @@ export default function ContractorServiceRequestDetail() {
                         />
                       </a>
                     ))}
+                  </div>
+                </div>
+              )}
+              {/* Documents */}
+              {existingApplication.documentUrls?.length > 0 && (
+                <div className="border-t pt-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <i className="fas fa-file-alt text-gray-400"></i>
+                    {t('contractorServiceRequestDetail.documents')} (
+                    {existingApplication.documentUrls.length})
+                  </h4>
+                  <div className="space-y-3">
+                    {existingApplication.documentUrls.map((docUrl) => {
+                      const fileName = decodeURIComponent(
+                        docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+                      const iconClass =
+                        ext === 'pdf'
+                          ? 'fa-file-pdf text-red-600'
+                          : ext === 'doc' || ext === 'docx'
+                          ? 'fa-file-word text-blue-600'
+                          : ext === 'xls' || ext === 'xlsx'
+                          ? 'fa-file-excel text-green-600'
+                          : ext === 'ppt' || ext === 'pptx'
+                          ? 'fa-file-powerpoint text-orange-600'
+                          : ext === 'txt'
+                          ? 'fa-file-lines text-gray-600'
+                          : 'fa-file-alt text-gray-500';
+                      return (
+                        <div
+                          key={docUrl}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={docUrl}
+                              download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -1072,6 +1379,7 @@ export default function ContractorServiceRequestDetail() {
               </div>
             </div>
           )}
+
           {/* Chat Section */}
           <ChatSection
             conversationID={serviceRequest.conversation?.conversationID}
