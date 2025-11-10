@@ -78,7 +78,7 @@ export default function AdminSupportManager() {
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
                 <i className="fa-solid fa-headset text-white text-2xl" />
               </div>
               <div>
@@ -98,7 +98,7 @@ export default function AdminSupportManager() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Stats Card */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="px-5 py-3 bg-orange-600 rounded-xl shadow-lg">
+              <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                     <i className="fa-solid fa-headset text-white text-lg" />
@@ -146,10 +146,11 @@ export default function AdminSupportManager() {
                   <button
                     key={key}
                     onClick={() => setFilter(key)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer ${filter === key
-                      ? 'bg-orange-600 text-white'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                      }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer ${
+                      filter === key
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                    }`}
                   >
                     {t(`adminSupportManager.${key}`)}
                   </button>
@@ -213,11 +214,12 @@ export default function AdminSupportManager() {
                       supports.map((s, index) => (
                         <tr
                           key={s.id}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
-                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
+                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
                               {(currentPage - 1) * pageSize + index + 1}
                             </span>
                           </td>
@@ -245,10 +247,11 @@ export default function AdminSupportManager() {
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
                               <button
-                                className={`inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md cursor-pointer ${s.isProcessed
-                                  ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
-                                  : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
-                                  }`}
+                                className={`inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md cursor-pointer ${
+                                  s.isProcessed
+                                    ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
+                                    : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                                }`}
                                 onClick={() => {
                                   setIsModalOpen(true);
                                   setSupportID(s.id);
@@ -328,10 +331,11 @@ export default function AdminSupportManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className={`flex-1 px-3 py-2 text-xs font-medium border rounded-md cursor-pointer ${s.isProcessed
-                            ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
-                            : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
-                            }`}
+                          className={`flex-1 px-3 py-2 text-xs font-medium border rounded-md cursor-pointer ${
+                            s.isProcessed
+                              ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
+                              : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                          }`}
                           onClick={() => {
                             setIsModalOpen(true);
                             setSupportID(s.id);

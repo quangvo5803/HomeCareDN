@@ -934,7 +934,7 @@
     "replyPlaceholder": "Nhập nội dung phản hồi...",
     "noSupport": "Chưa có yêu cầu hỗ trợ nào",
     "all": "Tất cả",
-    "itemsCount": "{{count}} yêu cầu"
+    "supports": "yêu cầu"
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",

@@ -51,9 +51,9 @@ export default function ServiceRequest() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-              ...sr,
-              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-            }
+                ...sr,
+                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+              }
             : sr
         )
       );
@@ -63,9 +63,9 @@ export default function ServiceRequest() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-              ...sr,
-              status: 'Closed',
-            }
+                ...sr,
+                status: 'Closed',
+              }
             : sr
         )
       );
@@ -75,12 +75,12 @@ export default function ServiceRequest() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-              ...sr,
-              contractorApplyCount: Math.max(
-                0,
-                (sr.contractorApplyCount || 1) - 1
-              ),
-            }
+                ...sr,
+                contractorApplyCount: Math.max(
+                  0,
+                  (sr.contractorApplyCount || 1) - 1
+                ),
+              }
             : sr
         )
       );
@@ -90,9 +90,9 @@ export default function ServiceRequest() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-              ...sr,
-              status: 'Closed',
-            }
+                ...sr,
+                status: 'Closed',
+              }
             : sr
         )
       );
@@ -151,20 +151,22 @@ export default function ServiceRequest() {
             <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${viewMode === 'table'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-50'
-                  }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  viewMode === 'table'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
               >
                 <i className="fa-solid fa-table mr-2" />
                 {t('common.Table')}
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${viewMode === 'grid'
-                  ? 'bg-orange-500 text-white shadow-md'
-                  : 'text-gray-600 hover:bg-gray-50'
-                  }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  viewMode === 'grid'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
               >
                 <i className="fa-solid fa-grip mr-2" />
                 {t('common.Grid')}
@@ -351,11 +353,11 @@ export default function ServiceRequest() {
                             <div className="text-xs text-gray-500 font-medium">
                               {t('adminServiceRequestManager.estimatePrice')}
                             </div>
-                            <div className="text-base font-bold text-orange-600">
+                            <div className="text-base font-bold text-orange-500">
                               {item.estimatePrice == 0
                                 ? t(
-                                  'contractorServiceRequestManager.negotiable'
-                                )
+                                    'contractorServiceRequestManager.negotiable'
+                                  )
                                 : formatVND(Number(item.estimatePrice))}
                             </div>
                           </div>
@@ -369,7 +371,7 @@ export default function ServiceRequest() {
                             `/Admin/ServiceRequest/${item.serviceRequestID}`
                           )
                         }
-                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md cursor-pointer"
+                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md cursor-pointer"
                       >
                         <i className="fa-solid fa-eye" />
                         {t('BUTTON.View')}
@@ -460,8 +462,9 @@ export default function ServiceRequest() {
                       return (
                         <tr
                           key={item.serviceRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <td className="px-4 py-4 text-center">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -519,7 +522,7 @@ export default function ServiceRequest() {
                             )}
                           </td>
 
-                          <td className="px-4 py-4 text-sm font-bold text-orange-600">
+                          <td className="px-4 py-4 text-sm font-bold text-orange-500">
                             {formatVND(Number(item.estimatePrice))}
                           </td>
 
@@ -535,7 +538,7 @@ export default function ServiceRequest() {
                                   `/Admin/ServiceRequest/${item.serviceRequestID}`
                                 )
                               }
-                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                             >
                               <i className="fa-solid fa-eye" />
                               {t('BUTTON.View')}

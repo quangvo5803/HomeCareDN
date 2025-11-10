@@ -172,7 +172,7 @@ export default function AdminServiceManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
                 onClick={() => setIsModalOpen(true)}
               >
                 <i className="fa-solid fa-plus"></i>
@@ -235,8 +235,9 @@ export default function AdminServiceManager() {
                       services.map((svc, index) => (
                         <tr
                           key={svc.serviceID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -295,7 +296,7 @@ export default function AdminServiceManager() {
                               {t('adminServiceManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 cursor-pointer"
+                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-500 cursor-pointer"
                               onClick={() => setIsModalOpen(true)}
                             >
                               <i className="mr-3 fa-solid fa-plus"></i>
@@ -388,7 +389,7 @@ export default function AdminServiceManager() {
                       {t('adminServiceManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600 cursor-pointer"
+                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-500 cursor-pointer"
                       onClick={() => setIsModalOpen(true)}
                     >
                       <i className="mr-3 fa-solid fa-plus"></i>

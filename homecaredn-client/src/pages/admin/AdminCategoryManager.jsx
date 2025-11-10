@@ -96,7 +96,7 @@ export default function AdminCategoryManager() {
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
                 <i className="fa-solid fa-tags text-white text-2xl" />
               </div>
               <div>
@@ -116,7 +116,7 @@ export default function AdminCategoryManager() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Stats Card */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="px-5 py-3 bg-orange-600 rounded-xl shadow-lg">
+              <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                     <i className="fa-solid fa-tags text-white text-lg" />
@@ -178,7 +178,7 @@ export default function AdminCategoryManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
                 onClick={() => setIsModalOpen(true)}
               >
                 <i className="fa-solid fa-plus"></i>
@@ -240,11 +240,12 @@ export default function AdminCategoryManager() {
                       categories.map((cat, index) => (
                         <tr
                           key={cat.categoryID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                            }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${
+                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                          }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
-                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
+                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
                               {(currentPage - 1) * pageSize + index + 1}
                             </span>
                           </td>
@@ -326,7 +327,7 @@ export default function AdminCategoryManager() {
                               {t('adminCategoryManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 cursor-pointer"
+                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
                               onClick={() => setIsModalOpen(true)}
                             >
                               <i className="mr-3 fa-solid fa-plus"></i>
@@ -380,10 +381,11 @@ export default function AdminCategoryManager() {
                         </div>
                         <div className="text-center">
                           <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${cat.isActive
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                              }`}
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              cat.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}
                           >
                             {cat.isActive
                               ? t('BUTTON.Activate')
@@ -428,7 +430,7 @@ export default function AdminCategoryManager() {
                       {t('adminCategoryManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700 cursor-pointer"
+                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
                       onClick={() => setIsModalOpen(true)}
                     >
                       <i className="mr-3 fa-solid fa-plus"></i>
