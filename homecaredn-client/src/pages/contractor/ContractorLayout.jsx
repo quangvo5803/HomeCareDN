@@ -21,7 +21,7 @@ export default function ContractorLayout() {
 
       <div className="flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="flex items-center gap-3 p-4">
             <div className="flex-1 flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-gray-500">
               <i className="fa-solid fa-magnifying-glass"></i>

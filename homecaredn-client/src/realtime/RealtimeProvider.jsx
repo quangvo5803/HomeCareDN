@@ -11,7 +11,11 @@ import RealtimeContext from './RealtimeContext';
 export const RealtimeProvider = ({ children }) => {
   const { user } = useAuth();
   const connectionRef = useRef(null);
+  const chatConnectionRef = useRef(null);
+
   const [connectionState, setConnectionState] = useState('disconnected');
+  const [chatConnectionState, setChatConnectionState] =
+    useState('disconnected');
 
   useEffect(() => {
     let isCancelled = false;
@@ -23,11 +27,17 @@ export const RealtimeProvider = ({ children }) => {
         connectionRef.current = null;
         setConnectionState('disconnected');
       }
+      if (chatConnectionRef.current) {
+        chatConnectionRef.current.stop();
+        chatConnectionRef.current = null;
+        setChatConnectionState('disconnected');
+      }
       return;
     }
 
     // Nếu đã có connection thì không tạo lại
     if (connectionRef.current) return;
+    if (chatConnectionRef.current) return;
 
     const connection = new HubConnectionBuilder()
       .withUrl(
@@ -63,6 +73,35 @@ export const RealtimeProvider = ({ children }) => {
     connection.onreconnected(() => setConnectionState('connected'));
     connection.onclose(() => setConnectionState('disconnected'));
 
+    const chatConnection = new HubConnectionBuilder()
+      .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
+        transport: HttpTransportType.WebSockets,
+        skipNegotiation: true,
+      })
+      .configureLogging(LogLevel.None)
+      .withAutomaticReconnect()
+      .build();
+
+    chatConnectionRef.current = chatConnection;
+
+    // Dùng async function để tránh race condition
+    const startChatConnection = async () => {
+      try {
+        await chatConnection.start();
+        if (!isCancelled) setChatConnectionState('connected');
+      } catch {
+        if (!isCancelled) {
+          setChatConnectionState('error');
+        }
+      }
+    };
+
+    startChatConnection();
+
+    chatConnection.onreconnecting(() => setChatConnectionState('reconnecting'));
+    chatConnection.onreconnected(() => setChatConnectionState('connected'));
+    chatConnection.onclose(() => setChatConnectionState('disconnected'));
+
     // Cleanup
     return () => {
       isCancelled = true;
@@ -71,6 +110,11 @@ export const RealtimeProvider = ({ children }) => {
         connectionRef.current = null;
         setConnectionState('disconnected');
       }
+      if (chatConnectionRef.current) {
+        chatConnectionRef.current.stop();
+        chatConnectionRef.current = null;
+        setChatConnectionState('disconnected');
+      }
     };
   }, [user]);
 
@@ -78,8 +122,10 @@ export const RealtimeProvider = ({ children }) => {
     () => ({
       connection: connectionRef.current,
       connectionState,
+      chatConnection: chatConnectionRef.current,
+      chatConnectionState,
     }),
-    [connectionState]
+    [connectionState, chatConnectionState]
   );
 
   return (
