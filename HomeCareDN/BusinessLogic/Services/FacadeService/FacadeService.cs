@@ -79,7 +79,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 coreDeps.AuthorizeDbContext,
-                coreDeps.UserManager
+                coreDeps.UserManager,
+                infraDeps.Notifier
             );
         }
     }

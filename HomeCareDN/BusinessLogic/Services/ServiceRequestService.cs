@@ -491,6 +491,7 @@ namespace BusinessLogic.Services.Interfaces
             }
             await DeleteRelatedEntity(serviceRequest!);
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
+            await _unitOfWork.SaveAsync();
             await _notifier.SendToGroupAsync(
                 $"role_Contractor",
                 "ServiceRequest.Delete",
@@ -501,7 +502,6 @@ namespace BusinessLogic.Services.Interfaces
                 "ServiceRequest.Delete",
                 new { ServiceRequestID = id }
             );
-            await _unitOfWork.SaveAsync();
         }
 
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)

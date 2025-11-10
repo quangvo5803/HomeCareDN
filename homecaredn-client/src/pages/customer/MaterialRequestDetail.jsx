@@ -199,28 +199,144 @@ export default function MaterialRequestDetail() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-slate-200">
-        <div className="px-6 lg:px-12 py-4">
-          <div className="flex items-center justify-between">
+      <div
+        className={`bg-white shadow-lg ${
+          hasAnyChanges ? 'sticky top-24 z-50' : ''
+        }`}
+      >
+        <div className="px-6 lg:px-12 py-3">
+          <div className="flex items-center justify-between gap-3">
             <button
               onClick={() =>
                 navigate('/Customer', {
                   state: { tab: 'material_requests' },
                 })
               }
-              className="flex items-center gap-2 text-slate-600 hover:text-orange-600 transition-colors font-semibold"
+              className="flex items-center gap-2 text-slate-600 hover:text-orange-600 transition-colors font-semibold flex-shrink-0"
             >
               <i className="fas fa-arrow-left"></i>
-              <span>{t('BUTTON.Back')}</span>
+              <span className="hidden sm:inline text-sm">
+                {t('BUTTON.Back')}
+              </span>
             </button>
 
-            <h1 className="text-2xl font-bold text-slate-900">
-              <i className="fa-solid fa-boxes mr-3 text-orange-600"></i>
-              {t('userPage.materialRequestDetail.title')}
+            <h1 className="text-lg lg:text-xl font-bold text-slate-900 flex-1 text-center">
+              <i className="fa-solid fa-boxes mr-2 text-orange-600"></i>
+              <span className="hidden sm:inline">
+                {t('userPage.materialRequestDetail.title')}
+              </span>
             </h1>
 
-            <div className="w-24"></div>
+            {/* Right side - Alert and Actions */}
+            {isDraft && (
+              <div className="flex items-center gap-2 flex-shrink-0">
+                {/* Alert Badge */}
+                {hasAnyChanges && (
+                  <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 border-l-4 border-amber-500 rounded">
+                    <i className="fas fa-exclamation-circle text-amber-600 text-xs"></i>
+                    <span className="text-xs font-bold text-amber-900 whitespace-nowrap">
+                      {t('userPage.materialRequestDetail.unsavedChanges')}
+                    </span>
+                  </div>
+                )}
+
+                {/* Cancel Button */}
+                {canShowSaveCancel && (
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="hidden lg:inline-flex items-center px-3 py-1.5 bg-white text-slate-700 rounded hover:bg-slate-50 transition font-semibold border-2 border-slate-300 text-xs"
+                  >
+                    <i className="fas fa-times mr-1"></i>
+                    {t('BUTTON.Cancel')}
+                  </button>
+                )}
+
+                {/* Save Button */}
+                {canShowSaveCancel && (
+                  <button
+                    type="button"
+                    className="hidden lg:inline-flex items-center px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 transition font-semibold disabled:opacity-50 text-xs"
+                    onClick={() => handleSave(false)}
+                    disabled={submitting}
+                  >
+                    <i className="fas fa-save mr-1"></i>
+                    {t('BUTTON.Save')}
+                  </button>
+                )}
+
+                {/* Send Button */}
+                {canShowSend && (
+                  <button
+                    type="button"
+                    className="hidden lg:inline-flex items-center px-3 py-1.5 bg-green-400 text-white rounded hover:bg-green-500 transition font-semibold disabled:opacity-50 text-xs"
+                    onClick={() => handleSave(true)}
+                    disabled={submitting}
+                  >
+                    <i className="fas fa-paper-plane mr-1"></i>
+                    {t('BUTTON.SendMaterialRequest')}
+                  </button>
+                )}
+
+                {/* Mobile Action Buttons */}
+                {isDraft && (
+                  <div className="lg:hidden flex items-center gap-1">
+                    {canShowSaveCancel && (
+                      <button
+                        type="button"
+                        onClick={handleCancel}
+                        className="p-2 bg-white text-slate-700 rounded hover:bg-slate-50 transition border-2 border-slate-300 text-xs"
+                        title={t('BUTTON.Cancel')}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
+
+                    {canShowSaveCancel && (
+                      <button
+                        type="button"
+                        className="p-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition disabled:opacity-50 text-xs"
+                        onClick={() => handleSave(false)}
+                        disabled={submitting}
+                        title={t('BUTTON.Save')}
+                      >
+                        <i className="fas fa-save"></i>
+                      </button>
+                    )}
+
+                    {canShowSend && (
+                      <button
+                        type="button"
+                        className="p-2 bg-green-400 text-white rounded hover:bg-green-500 transition disabled:opacity-50 text-xs"
+                        onClick={() => handleSave(true)}
+                        disabled={submitting}
+                        title={t('BUTTON.SendMaterialRequest')}
+                      >
+                        <i className="fas fa-paper-plane"></i>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
+
+          {/* Mobile Alert - Show below header on small screens */}
+          {isDraft && hasAnyChanges && (
+            <div className="lg:hidden mt-2 pt-2 border-t border-slate-200">
+              <div className="p-2 bg-amber-50 border-l-4 border-amber-500 rounded flex items-start gap-2">
+                <i className="fas fa-exclamation-circle text-amber-600 mt-0.5 flex-shrink-0 text-xs"></i>
+                <div>
+                  <p className="font-bold text-amber-900 text-xs leading-tight">
+                    {t('userPage.materialRequestDetail.unsavedChanges')}
+                  </p>
+                  <p className="text-xs text-amber-800 mt-0.5 leading-tight">
+                    {t('userPage.materialRequestDetail.unsavedChangesDesc')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -762,71 +878,11 @@ export default function MaterialRequestDetail() {
                 </>
               )}
             </div>
-
-            {/* Action Buttons */}
-            {isDraft && (
-              <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-                {/* Cảnh báo thay đổi */}
-                {hasAnyChanges && (
-                  <div className="mb-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg flex items-start gap-3">
-                    <i className="fas fa-exclamation-circle text-amber-600 mt-1 flex-shrink-0 text-lg"></i>
-                    <div>
-                      <p className="font-bold text-amber-900 mb-1">
-                        {t('userPage.materialRequestDetail.unsavedChanges')}
-                      </p>
-                      <p className="text-sm text-amber-800">
-                        {t('userPage.materialRequestDetail.unsavedChangesDesc')}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-end gap-4">
-                  {/* Nút Hủy - hiển thị khi có thay đổi */}
-                  {canShowSaveCancel && (
-                    <button
-                      type="button"
-                      onClick={handleCancel}
-                      className="px-8 py-3 bg-white text-slate-700 rounded-lg hover:bg-slate-50 transition font-bold border-2 border-slate-300 hover:border-slate-400"
-                    >
-                      <i className="fas fa-times mr-2"></i>
-                      {t('BUTTON.Cancel')}
-                    </button>
-                  )}
-
-                  {/* Nút Save - hiển thị khi có thay đổi */}
-                  {canShowSaveCancel && (
-                    <button
-                      type="button"
-                      className="px-8 py-3 bg-orange-500 text-white rounded-lg hover:shadow-lg transition font-bold hover:bg-orange-600"
-                      onClick={() => handleSave(false)}
-                      disabled={submitting}
-                    >
-                      <i className="fas fa-save mr-2"></i>
-                      {t('BUTTON.Save')}
-                    </button>
-                  )}
-
-                  {/* Nút Send - hiển thị khi có items và addressID */}
-                  {canShowSend && (
-                    <button
-                      type="button"
-                      className="px-8 py-3 bg-green-400 text-white rounded-lg hover:shadow-lg transition font-bold hover:bg-green-500"
-                      onClick={() => handleSave(true)}
-                      disabled={submitting}
-                    >
-                      <i className="fas fa-paper-plane mr-2"></i>
-                      {t('BUTTON.SendMaterialRequest')}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Column - Applications */}
           <div className="xl:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-28 max-h-[calc(100vh-100px)] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-42 max-h-[calc(100vh-100px)] overflow-y-auto">
               {selectedApplication ? (
                 <>
                   {/* Application Detail View */}

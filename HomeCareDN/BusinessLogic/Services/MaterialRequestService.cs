@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.Contracts;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet.Actions;
@@ -21,6 +23,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly AuthorizeDbContext _authorizeDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISignalRNotifier _notifier;
 
         private const string ADMIN = "Admin";
         private const string DISTRIBUTOR = "Distributor";
@@ -34,13 +37,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            ISignalRNotifier notifier
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authorizeDbContext = authorizeDbContext;
             _userManager = userManager;
+            _notifier = notifier;
         }
 
         public async Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
@@ -410,6 +415,29 @@ namespace BusinessLogic.Services
             {
                 dto.Address = _mapper.Map<AddressDto>(address);
             }
+
+            if (materialRequest?.Status == RequestStatus.Opening)
+            {
+                var adminDto = _mapper.Map<MaterialRequestDto>(materialRequest);
+                var distributorDto = _mapper.Map<MaterialRequestDto>(materialRequest);
+
+                await MapMaterialRequestListAllAsync(
+                    new[] { materialRequest },
+                    new[] { adminDto },
+                    ADMIN
+                );
+                await MapMaterialRequestListAllAsync(
+                    new[] { materialRequest },
+                    new[] { distributorDto },
+                    DISTRIBUTOR
+                );
+                await _notifier.SendToGroupAsync("role_Admin", "MaterialRequest.Created", adminDto);
+                await _notifier.SendToGroupAsync(
+                    "role_Distributor",
+                    "MaterialRequest.Created",
+                    distributorDto
+                );
+            }
             return dto;
         }
 
@@ -479,7 +507,18 @@ namespace BusinessLogic.Services
             }
             await DeleteRelatedEntity(materialRequest);
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
+
             await _unitOfWork.SaveAsync();
+            await _notifier.SendToGroupAsync(
+                $"role_Distributor",
+                "MaterialRequest.Delete",
+                new { MaterialRequestID = materialRequestID }
+            );
+            await _notifier.SendToGroupAsync(
+                $"role_Admin",
+                "MaterialRequest.Delete",
+                new { MaterialRequestID = materialRequestID }
+            );
         }
 
         private async Task DeleteRelatedEntity(MaterialRequest materialRequest)
