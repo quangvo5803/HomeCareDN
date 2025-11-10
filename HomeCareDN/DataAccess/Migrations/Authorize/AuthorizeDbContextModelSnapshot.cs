@@ -68,6 +68,9 @@ namespace DataAccess.Migrations.Authorize
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -117,6 +120,12 @@ namespace DataAccess.Migrations.Authorize
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("ProjectCount")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RatingCount")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");

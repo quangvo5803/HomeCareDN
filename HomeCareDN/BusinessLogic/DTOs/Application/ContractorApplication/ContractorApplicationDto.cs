@@ -1,9 +1,12 @@
-﻿namespace BusinessLogic.DTOs.Application.ContractorApplication
+﻿using DataAccess.Entities.Application;
+
+namespace BusinessLogic.DTOs.Application.ContractorApplication
 {
     public class ContractorApplicationDto
     {
         public Guid ContractorApplicationID { get; set; }
         public Guid ServiceRequestID { get; set; }
+        public string? ServiceType { get; set; }
         public string? Description { get; set; }
         public double EstimatePrice { get; set; }
         public ICollection<string>? ImageUrls { get; set; }

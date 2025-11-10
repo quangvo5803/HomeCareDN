@@ -9,6 +9,11 @@ export const contractorApplicationService = {
     return response.data;
   },
 
+  getAllByUserIdForAdmin: async (params) => {
+    const response = await api.get('/contractor-applications/admin/get-all-by-user-id', { params });
+    return response.data;
+  },
+
   getByIdForAdmin: async (id) => {
     const response = await api.get(`/contractor-applications/admin/${id}`);
     return response.data;

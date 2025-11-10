@@ -88,6 +88,31 @@ namespace BusinessLogic.Services
             };
         }
 
+        public async Task<PagedResultDto<ContractorApplicationDto>> GetAllContractorApplicationByUserIdAsync
+        (
+            QueryParameters parameters
+        )
+        {
+            var query = _unitOfWork
+                .ContractorApplicationRepository.GetQueryable()
+                .Where(ca => ca.ContractorID == parameters.FilterID).AsSingleQuery().AsNoTracking();
+
+            var totalCount = await query.CountAsync();
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<ContractorApplicationDto>>(items);
+
+            return new PagedResultDto<ContractorApplicationDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
         public async Task<ContractorApplicationDto?> GetContractorApplicationByServiceRequestIDAsync(
             ContractorApplicationGetDto contractorApplicationGetDto
         )
@@ -106,7 +131,7 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-
+            dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -137,7 +162,7 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-
+            dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
