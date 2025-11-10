@@ -151,7 +151,7 @@ export default function ServiceRequest() {
             <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
                   viewMode === 'table'
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
@@ -162,7 +162,7 @@ export default function ServiceRequest() {
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
                   viewMode === 'grid'
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'text-gray-600 hover:bg-gray-50'
@@ -205,7 +205,7 @@ export default function ServiceRequest() {
                   setSortOption(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
               >
                 <option value="">{t('common.sortDefault')}</option>
                 <option value="createdat">
@@ -353,7 +353,7 @@ export default function ServiceRequest() {
                             <div className="text-xs text-gray-500 font-medium">
                               {t('adminServiceRequestManager.estimatePrice')}
                             </div>
-                            <div className="text-base font-bold text-orange-600">
+                            <div className="text-base font-bold text-orange-500">
                               {item.estimatePrice == 0
                                 ? t(
                                     'contractorServiceRequestManager.negotiable'
@@ -371,7 +371,7 @@ export default function ServiceRequest() {
                             `/Admin/ServiceRequest/${item.serviceRequestID}`
                           )
                         }
-                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md"
+                        className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md cursor-pointer"
                       >
                         <i className="fa-solid fa-eye" />
                         {t('BUTTON.View')}
@@ -522,7 +522,7 @@ export default function ServiceRequest() {
                             )}
                           </td>
 
-                          <td className="px-4 py-4 text-sm font-bold text-orange-600">
+                          <td className="px-4 py-4 text-sm font-bold text-orange-500">
                             {formatVND(Number(item.estimatePrice))}
                           </td>
 
@@ -538,7 +538,7 @@ export default function ServiceRequest() {
                                   `/Admin/ServiceRequest/${item.serviceRequestID}`
                                 )
                               }
-                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
+                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                             >
                               <i className="fa-solid fa-eye" />
                               {t('BUTTON.View')}

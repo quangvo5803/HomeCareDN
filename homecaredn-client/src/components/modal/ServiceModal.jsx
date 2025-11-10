@@ -211,7 +211,7 @@ export default function ServiceModal({
           </h3>
           <button
             onClick={onClose}
-            className="p-1 text-gray-400 transition-colors duration-200 rounded-lg hover:text-gray-600 hover:bg-gray-100"
+            className="p-1 text-gray-400 transition-colors duration-200 rounded-lg hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
@@ -385,7 +385,7 @@ export default function ServiceModal({
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="flex items-center gap-1 text-sm font-medium text-gray-700"
+                  className="flex items-center gap-1 text-sm font-medium text-gray-700 cursor-pointer"
                 >
                   <i className="fas fa-globe"></i>
                   {t('adminServiceManager.serviceModal.multilanguage_for_data')}
@@ -452,7 +452,7 @@ export default function ServiceModal({
                           <button
                             type="button"
                             onClick={() => handleRemoveImage(img)}
-                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700"
+                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
                           >
                             <i className="fa-solid fa-xmark"></i>
                           </button>
@@ -479,13 +479,13 @@ export default function ServiceModal({
         {/* Footer */}
         <div className="flex items-center justify-end p-6 space-x-3 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <button
-            className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
+            className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
             onClick={onClose}
           >
             {t('BUTTON.Cancel')}
           </button>
           <button
-            className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
             onClick={handleSubmit}
             disabled={
               !name.trim() ||

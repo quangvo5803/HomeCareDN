@@ -13,6 +13,7 @@ using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.Address;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using BusinessLogic.DTOs.Authorize.Profiles;
+using BusinessLogic.DTOs.Authorize.User;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using Ultitity.Extensions;
@@ -165,6 +166,10 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )
                 .ForMember(
+                    dest => dest.ServiceType,
+                    opt => opt.MapFrom(src => src.ServiceRequest!.ServiceType)
+                )
+                .ForMember(
                     dest => dest.DocumentUrls,
                     opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
                 );
@@ -292,6 +297,9 @@ namespace BusinessLogic.Mapping
                 );
             CreateMap<MaterialRequest, MaterialRequestDto>();
 
+            CreateMap<ApplicationUser, UserDto>()
+                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Addresses));
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));

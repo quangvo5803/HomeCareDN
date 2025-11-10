@@ -57,6 +57,11 @@ export default function Sidebar() {
       link: '/Admin/PartnerRequestManager',
     },
     {
+      icon: 'text-blue-600 fa-solid fa-users',
+      title: 'user',
+      link: '/Admin/UserManager',
+    },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',
@@ -73,19 +78,16 @@ export default function Sidebar() {
       >
         <div className="w-6 h-5 flex flex-col justify-between">
           <span
-            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${
-              isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
-            }`}
+            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''
+              }`}
           ></span>
           <span
-            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${
-              isMobileMenuOpen ? 'opacity-0' : ''
-            }`}
+            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''
+              }`}
           ></span>
           <span
-            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${
-              isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
-            }`}
+            className={`block h-0.5 w-full bg-gray-800 transition-all duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''
+              }`}
           ></span>
         </div>
       </button>
@@ -108,10 +110,9 @@ export default function Sidebar() {
       <aside
         className={`fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-300 bg-white border-0 shadow-xl max-w-64 ease-nav-brand z-50 rounded-2xl
           xl:ml-6 xl:left-0 xl:translate-x-0
-          ${
-            isMobileMenuOpen
-              ? 'left-0 translate-x-0'
-              : '-translate-x-full left-0'
+          ${isMobileMenuOpen
+            ? 'left-0 translate-x-0'
+            : '-translate-x-full left-0'
           }
         `}
       >
@@ -141,10 +142,9 @@ export default function Sidebar() {
                     end={menuItem.link === '/Admin'}
                     onClick={closeMobileMenu}
                     className={({ isActive }) =>
-                      `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${
-                        isActive
-                          ? 'bg-blue-500 text-white'
-                          : 'text-slate-700 hover:bg-blue-100'
+                      `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${isActive
+                        ? 'bg-blue-500 text-white'
+                        : 'text-slate-700 hover:bg-blue-100'
                       }`
                     }
                   >
@@ -152,9 +152,8 @@ export default function Sidebar() {
                       <>
                         <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                           <i
-                            className={`${menuItem.icon} ${
-                              isActive ? 'text-white' : ''
-                            } relative top-0 leading-normal`}
+                            className={`${menuItem.icon} ${isActive ? 'text-white' : ''
+                              } relative top-0 leading-normal`}
                           ></i>
                         </div>
                         <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">

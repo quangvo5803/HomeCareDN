@@ -119,7 +119,7 @@ export default function CategoryModal({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-lg"
+            className="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1 hover:bg-gray-100 rounded-lg cursor-pointer"
           >
             <i className="fa-solid fa-xmark"></i>
           </button>
@@ -155,7 +155,7 @@ export default function CategoryModal({
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2"
+                  className="flex items-center gap-1 text-sm font-medium text-gray-700 mb-2 cursor-pointer"
                 >
                   <i className="fas fa-globe"></i>
                   {t(
@@ -239,13 +239,13 @@ export default function CategoryModal({
         {/* Footer */}
         <div className="flex items-center justify-end space-x-3 p-6 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
           <button
-            className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50"
+            className="px-5 py-2.5 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer"
             onClick={onClose}
           >
             {t('BUTTON.Cancel')}
           </button>
           <button
-            className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
             onClick={handleSubmit}
             disabled={
               !categoryName.trim() || (!logoFile && !logoPreview && !category)
