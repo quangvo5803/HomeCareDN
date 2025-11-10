@@ -12,6 +12,7 @@ namespace HomeCareDNAPI.Controllers
     public class StatisticsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
+
         public StatisticsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
@@ -33,11 +34,13 @@ namespace HomeCareDNAPI.Controllers
             return Ok(statistics);
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin/line-chart/{year:int}")]
         public async Task<IActionResult> GetLineStatistics(int year)
         {
-            var statistics = await _facadeService.StatisticService.GetLineChartStatisticsAsync(year);
+            var statistics = await _facadeService.StatisticService.GetLineChartStatisticsAsync(
+                year
+            );
             return Ok(statistics);
         }
 
@@ -55,6 +58,18 @@ namespace HomeCareDNAPI.Controllers
         {
             var stats = await _facadeService.StatisticService.GetStatStatisticAsync();
             return Ok(stats);
+        }
+
+        [Authorize(Roles = "Contractor")]
+        [HttpGet("contractor/bar-chart/{year:int}")]
+        public async Task<IActionResult> GetBarForContractorStatistics(int year, Guid userID)
+        {
+            var statistics =
+                await _facadeService.StatisticService.GetBarChartForContractorStatisticsAsync(
+                    year,
+                    userID
+                );
+            return Ok(statistics);
         }
     }
 }

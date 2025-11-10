@@ -12,6 +12,11 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import PropTypes from 'prop-types';
 import LoadingComponent from '../../components/LoadingComponent';
+import { withMinLoading } from '../../utils/withMinLoading';
+import { handleApiError } from '../../utils/handleApiError';
+import { StatisticService } from '../../services/statisticService';
+import { toast } from 'react-toastify';
+import BarChart from '../../components/BarChart';
 
 const INITIAL_KPI_STATE = {
   totalRequests: 0,
@@ -84,6 +89,13 @@ export default function ContractorDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const [barYear, setBarYear] = useState(new Date().getFullYear());
+
+  const [barChartData, setBarChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+
   const isContractor = !!(user?.id && user.role === 'Contractor');
 
   // KPI State
@@ -91,6 +103,19 @@ export default function ContractorDashboard() {
   const [kpiError, setKpiError] = useState(null);
   const [loadingDashboardStats, setLoadingDashboardStats] = useState(false);
   const [loadingApplications, setLoadingApplications] = useState(false);
+  const [loadingBarChart, setLoadingBarChart] = useState(false);
+
+  const getMonthlyValue = (data, month, key) =>
+    data.find((d) => d.month === month)?.[key] ?? 0;
+
+  const getMonthlyDataset = (data, labels, key) =>
+    labels.map((_, i) => getMonthlyValue(data, i + 1, key));
+
+  const processBarChartData = (data, labels) => ({
+    repair: getMonthlyDataset(data, labels, 'repairCount'),
+    construction: getMonthlyDataset(data, labels, 'constructionCount'),
+    revenue: getMonthlyDataset(data, labels, 'revenueCount'),
+  });
 
   // Table State
   const [currentPage, setCurrentPage] = useState(1);
@@ -104,7 +129,73 @@ export default function ContractorDashboard() {
     setServiceRequests,
     setTotalServiceRequests,
   } = useServiceRequest();
+  //Bar
+  useEffect(() => {
+    const fetchBarChartData = async () => {
+      await withMinLoading(
+        async () => {
+          try {
+            const res = await StatisticService.getBarChartForContractor(
+              barYear,
+              user.id
+            );
+            const data = res.data;
 
+            const labels = [
+              t('adminDashboard.months.jan'),
+              t('adminDashboard.months.feb'),
+              t('adminDashboard.months.mar'),
+              t('adminDashboard.months.apr'),
+              t('adminDashboard.months.may'),
+              t('adminDashboard.months.jun'),
+              t('adminDashboard.months.jul'),
+              t('adminDashboard.months.aug'),
+              t('adminDashboard.months.sep'),
+              t('adminDashboard.months.oct'),
+              t('adminDashboard.months.nov'),
+              t('adminDashboard.months.dec'),
+            ];
+
+            const { repair, construction, revenue } = processBarChartData(
+              data,
+              labels
+            );
+
+            setBarChartData({
+              labels,
+              datasets: [
+                {
+                  label: t('partnerDashboard.repair'),
+                  data: repair,
+                  backgroundColor: 'rgba(59,130,246,0.8)',
+                },
+                {
+                  label: t('partnerDashboard.construction'),
+                  data: construction,
+                  backgroundColor: 'rgba(249,115,22,0.8)',
+                },
+                {
+                  label: t('partnerDashboard.revenue'),
+                  data: revenue,
+                  backgroundColor: 'rgba(139,92,246,0.8)',
+                  borderRadius: {
+                    topLeft: 6,
+                    topRight: 6,
+                  },
+                },
+              ],
+            });
+          } catch (err) {
+            toast.error(t(handleApiError(err)));
+          }
+        },
+        setLoadingBarChart,
+        1000
+      );
+    };
+    fetchBarChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barYear, t]);
   const fetchDashboard = useCallback(async () => {
     if (!isContractor) return;
     setLoadingDashboardStats(true);
@@ -444,7 +535,26 @@ export default function ContractorDashboard() {
             </div>
           </div>
         )}
-
+        {/* Bar Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+          <div className="col-span-12 bg-white rounded-xl p-4 relative">
+            {loadingBarChart && (
+              <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
+                <LoadingComponent />
+              </div>
+            )}
+            <div className="h-full w-full">
+              <BarChart
+                type="Admin"
+                title={t('adminDashboard.barChart.salesOverview')}
+                data={barChartData}
+                year={barYear}
+                onYearChange={setBarYear}
+                loading={loadingBarChart}
+              />
+            </div>
+          </div>
+        </div>
         {/* Table */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
           <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">

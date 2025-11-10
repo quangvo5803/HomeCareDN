@@ -547,7 +547,10 @@
     "access_denied": "Access denied. Contractor role required.",
     "errors": {
       "kpi_load_failed": "Unable to load KPI data"
-    }
+    },
+    "repair": "Repair",
+    "construction": "Construction",
+    "revenue": "Revenue"
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",

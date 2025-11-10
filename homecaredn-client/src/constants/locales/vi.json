@@ -543,7 +543,10 @@
     "access_denied": "Từ chối truy cập. Cần quyền Nhà thầu.",
     "errors": {
       "kpi_load_failed": "Không thể tải dữ liệu KPI"
-    }
+    },
+    "repair":"Sửa Chữa",
+    "construction":"Xây Dựng",
+    "revenue": "Doanh Thu"
   },
   "supportChat": {
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",

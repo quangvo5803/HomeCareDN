@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
+using BusinessLogic.DTOs.Application.Statistic.ContractorStatitic;
 
 namespace BusinessLogic.Services.Interfaces
 {
@@ -9,5 +10,9 @@ namespace BusinessLogic.Services.Interfaces
         Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year);
         Task<AdminTopStatisticsDto> GetTopStatisticsAsync();
         Task<AdminStatStatisticDto> GetStatStatisticAsync();
+        Task<IEnumerable<ContractorBarChartDto>> GetBarChartForContractorStatisticsAsync(
+            int year,
+            Guid userID
+        );
     }
 }
