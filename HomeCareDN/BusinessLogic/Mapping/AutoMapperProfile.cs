@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Category;
-using BusinessLogic.DTOs.Application.Chat.User;
+using BusinessLogic.DTOs.Application.Chat.User.ChatMessage;
+using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
@@ -106,7 +107,8 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 )
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,
@@ -239,47 +241,6 @@ namespace BusinessLogic.Mapping
                 .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
                 .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty));
 
-            //Chat DTOs
-            CreateMap<StartConversationRequestDto, Conversation>()
-                .ForMember(d => d.ConversationId, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                .ForMember(d => d.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(d => d.LastMessageAt, opt => opt.Ignore())
-                .ForMember(d => d.Messages, opt => opt.Ignore());
-
-            CreateMap<StartConversationRequestDto, ChatMessage>()
-                .ForMember(d => d.ChatMessageId, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                // ConversationId sẽ truyền động qua opts.Items["ConversationId"]
-                .ForMember(
-                    d => d.ConversationId,
-                    opt => opt.MapFrom((src, _, __, ctx) => (Guid)ctx.Items["ConversationId"])
-                )
-                .ForMember(d => d.SenderId, opt => opt.MapFrom(src => src.CustomerId))
-                .ForMember(d => d.ReceiverId, opt => opt.MapFrom(src => src.ContractorId))
-                .ForMember(
-                    d => d.Content,
-                    opt => opt.MapFrom(src => src.FirstMessage ?? string.Empty)
-                )
-                .ForMember(d => d.SentAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(d => d.IsRead, opt => opt.MapFrom(_ => false));
-
-            CreateMap<SendMessageRequestDto, ChatMessage>()
-                .ForMember(d => d.ChatMessageId, opt => opt.MapFrom(_ => Guid.NewGuid()))
-                .ForMember(
-                    d => d.SenderId,
-                    opt =>
-                        opt.MapFrom(
-                            (src, _, __, ctx) =>
-                                ctx.Items.TryGetValue("SenderId", out var v)
-                                    ? v?.ToString()!
-                                    : string.Empty
-                        )
-                )
-                .ForMember(d => d.SentAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
-                .ForMember(d => d.IsRead, opt => opt.MapFrom(_ => false));
-
-            CreateMap<Conversation, ConversationDto>();
-            CreateMap<ChatMessage, ChatMessageDto>().ReverseMap();
-
             // ContactSupport
             CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
@@ -305,6 +266,10 @@ namespace BusinessLogic.Mapping
                         )
                 );
             CreateMap<MaterialRequest, MaterialRequestDto>();
+
+            CreateMap<Conversation, ConversationDto>();
+            CreateMap<ChatMessage, ChatMessageDto>()
+                .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
         }
 
         // ------------------------
