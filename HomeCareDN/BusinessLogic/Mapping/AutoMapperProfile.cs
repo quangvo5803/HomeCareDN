@@ -106,7 +106,6 @@ namespace BusinessLogic.Mapping
                                 ? src.Images.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
-
                 )
                 .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
             CreateMap<Service, ServiceDto>()
@@ -265,7 +264,6 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 );
-<<<<<<< HEAD
             CreateMap<MaterialRequest, MaterialRequestDto>()
                 .ForMember(
                     dest => dest.DistributorApplyCount,
@@ -305,13 +303,10 @@ namespace BusinessLogic.Mapping
                         }
                     }
                 );
-=======
-            CreateMap<MaterialRequest, MaterialRequestDto>();
 
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
->>>>>>> develop
         }
 
         // ------------------------

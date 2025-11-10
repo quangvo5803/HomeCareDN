@@ -431,8 +431,12 @@ namespace BusinessLogic.Services
                     new[] { distributorDto },
                     DISTRIBUTOR
                 );
-                await _notifier.SendToGroupAsync("role_Admin", "MaterialRequest.Created", adminDto);
-                await _notifier.SendToGroupAsync(
+                await _notifier.SendToApplicationGroupAsync(
+                    "role_Admin",
+                    "MaterialRequest.Created",
+                    adminDto
+                );
+                await _notifier.SendToApplicationGroupAsync(
                     "role_Distributor",
                     "MaterialRequest.Created",
                     distributorDto
@@ -509,12 +513,12 @@ namespace BusinessLogic.Services
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
 
             await _unitOfWork.SaveAsync();
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Distributor",
                 "MaterialRequest.Delete",
                 new { MaterialRequestID = materialRequestID }
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 "MaterialRequest.Delete",
                 new { MaterialRequestID = materialRequestID }
