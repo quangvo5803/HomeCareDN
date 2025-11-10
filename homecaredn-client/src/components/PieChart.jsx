@@ -38,11 +38,11 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
     ],
   };
 
-  const hasData =
-    data &&
-    Array.isArray(data.datasets) &&
-    data.datasets.length > 0 &&
-    data.datasets.some(ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0));
+  const hasData = !!(
+    data?.datasets?.some(
+      ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0)
+    )
+  );
 
   if (type === "Admin") {
     return (
