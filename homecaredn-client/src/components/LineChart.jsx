@@ -13,6 +13,7 @@ import {
 import PropTypes from "prop-types";
 import LoadingComponent from '../components/LoadingComponent';
 import { formatVND } from "../utils/formatters";
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(
   CategoryScale,
@@ -26,6 +27,9 @@ ChartJS.register(
 );
 
 export default function LineChart({ title, data, year, onYearChange, type, loading }) {
+
+  const { t } = useTranslation();
+
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -37,7 +41,6 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
       title: { display: false },
       tooltip: {
         callbacks: {
-          // Khi hover lên từng điểm hoặc cột
           label: function (context) {
             const value = context.parsed.y || 0;
             return `${context.dataset.label}: ${formatVND(value)}`;
@@ -52,11 +55,11 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
       },
       y: {
         min: 0,
-        suggestedMax: data?.datasets?.[0]?.data?.some(v => v > 0) ? undefined : 1000000,
+        suggestedMax: data?.datasets?.[0]?.data?.some(v => v > 0) ? undefined : 100000,
         ticks: {
           color: "#666",
           callback: (value) => formatVND(value),
-          stepSize: undefined, // hoặc đặt giá trị cố định nếu muốn
+          stepSize: undefined,
         },
         grid: { color: "rgba(0,0,0,0.05)" },
       },
@@ -79,6 +82,12 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
       },
     ],
   };
+
+  const hasData =
+    data &&
+    Array.isArray(data.datasets) &&
+    data.datasets.length > 0 &&
+    data.datasets.some(ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0));
 
   // cho admin
   if (type === "Admin") {
@@ -108,6 +117,13 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
 
         <div className="flex-auto p-4 h-[450px] relative">
           <Line data={data} options={options} height={200} />
+
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+            </div>
+          )}
 
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
@@ -147,6 +163,12 @@ export default function LineChart({ title, data, year, onYearChange, type, loadi
         <div className="flex-auto p-4 h-[450px] relative">
           <Line data={data} options={options} height={200} />
 
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+            </div>
+          )}
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
               <LoadingComponent />

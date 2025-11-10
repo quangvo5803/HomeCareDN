@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import PropTypes from "prop-types";
 import LoadingComponent from '../components/LoadingComponent';
+import { useTranslation } from 'react-i18next';
 
 ChartJS.register(
   CategoryScale,
@@ -21,6 +22,8 @@ ChartJS.register(
 );
 
 export default function BarChart({ title, data, year, onYearChange, type, loading }) {
+
+  const { t } = useTranslation();
 
   const options = {
     responsive: true,
@@ -43,6 +46,12 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
       },
     },
   };
+
+  const hasData =
+    data &&
+    Array.isArray(data.datasets) &&
+    data.datasets.length > 0 &&
+    data.datasets.some(ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0));
 
   if (type === "Admin") {
     return (
@@ -71,6 +80,13 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
 
         <div className="relative w-full h-[400px]">
           <Bar data={data} options={options} />
+
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+            </div>
+          )}
 
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
@@ -109,6 +125,13 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
 
         <div className="relative w-full h-[450px]">
           <Bar data={data} options={options} />
+
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+            </div>
+          )}
 
           {loading && (
             <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">

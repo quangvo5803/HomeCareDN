@@ -651,8 +651,9 @@
     "contractor": "Nhà thầu",
     "distributor": "Nhà phân phối",
     "serviceRequest": "Dịch vụ đã yêu cầu",
-    "pending": "Đang chờ",
-    "PendingCommission": "Đang xử lý",
+    "opening": "Đang mở",
+    "pendingCommission": "Đang xử lý",
+    "approved": "Đã Phê Duyệt",
     "totalCommission": "Tổng tiền hoa hồng",
     "construction": "Xây dựng",
     "repair": "Sửa chữa",
@@ -695,8 +696,8 @@
       "revenue": "Doanh thu",
       "noTop": "Chưa có nhà phân phối hàng đầu"
     },
-    "noTop": "Chưa có top nà",
-    "viewAll": "Xem tất cả"
+    "viewAll": "Xem tất cả",
+    "noData": "Không có dữ liệu để hiển thị"
   },
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
@@ -935,7 +936,7 @@
     "all": "Tất cả",
     "itemsCount": "{{count}} yêu cầu"
   },
-    "chat": {
+  "chat": {
     "unlocked": "Chat đã được mở khóa!",
     "title": "Trò chuyện",
     "noConversation": "Chưa có cuộc trò chuyện",

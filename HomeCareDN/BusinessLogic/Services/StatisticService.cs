@@ -260,14 +260,22 @@ namespace BusinessLogic.Services
                 .GetQueryable().AsSingleQuery().AsNoTracking();
             var distributorQuery = _unitOfWork.DistributorApplicationRepository
                 .GetQueryable().AsSingleQuery().AsNoTracking();
+            var servicereRequestQuery = _unitOfWork.ServiceRequestRepository
+                .GetQueryable().AsSingleQuery().AsNoTracking();
+            var materialRequestQuery = _unitOfWork.MaterialRequestRepository
+                .GetQueryable().AsSingleQuery().AsNoTracking();
 
-            dto.TotalPending =
-                await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.Pending) +
-                await distributorQuery.CountAsync(x => x.Status == ApplicationStatus.Pending);
+            dto.TotalOpening =
+                await servicereRequestQuery.CountAsync(x => x.Status == RequestStatus.Opening) +
+                await materialRequestQuery.CountAsync(x => x.Status == RequestStatus.Opening);
 
             dto.TotalPendingCommission =
                 await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.PendingCommission) +
                 await distributorQuery.CountAsync(x => x.Status == ApplicationStatus.PendingCommission);
+
+            dto.TotalApproved =
+                await contractorQuery.CountAsync(x => x.Status == ApplicationStatus.Approved) +
+                await distributorQuery.CountAsync(x => x.Status == ApplicationStatus.Approved);
 
             var commissionQuery = _unitOfWork.PaymentTransactionsRepository.GetQueryable();
             dto.TotalCommission = await commissionQuery

@@ -656,9 +656,10 @@
     "contractor": "Contractor",
     "distributor": "Distributor",
     "serviceRequest": "Service requested",
-    "pending": "Pending",
-    "PendingCommission": "Commission",
+    "opening": "Opening",
+    "pendingCommission": "Commission",
     "totalCommission": "Total Commission",
+    "approved": "Approved",
     "construction": "Construction",
     "repair": "Repair",
     "material": "Material",
@@ -700,7 +701,8 @@
       "revenue": "Revenue",
       "noTop": "No top distributors yet"
     },
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "noData": "No data to display"
   },
   "adminBrandManager": {
     "title": "Brand Manager",

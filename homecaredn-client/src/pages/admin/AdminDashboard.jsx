@@ -310,14 +310,14 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-300 rounded-xl p-4 hover:border-orange-500 hover:shadow-md transition-all cursor-pointer">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer">
               <div className="flex flex-col items-center text-center">
-                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-orange-500 mb-0.5">
-                  <i className="fas fa-clock text-white text-base"></i>
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500 mb-0.5">
+                  <i className="fas fa-folder-open text-white text-base"></i>
                 </div>
-                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.pending')}</p>
-                <h6 className="text-xl font-bold text-gray-900">{stats.totalPending}</h6>
+                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.opening')}</p>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalOpening}</h6>
               </div>
             </div>
 
@@ -326,8 +326,18 @@ export default function AdminDashboard() {
                 <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-yellow-500 mb-0.5">
                   <i className="fas fa-dollar-sign text-white text-base"></i>
                 </div>
-                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.PendingCommission')}</p>
+                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.pendingCommission')}</p>
                 <h6 className="text-xl font-bold text-gray-900">{stats.totalPendingCommission}</h6>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500 mb-0.5">
+                  <i className="fas fa-check-circle text-white text-base"></i>
+                </div>
+                <p className="text-xs font-medium text-gray-600 mb-0.5">{t('adminDashboard.approved')}</p>
+                <h6 className="text-xl font-bold text-gray-900">{stats.totalApproved}</h6>
               </div>
             </div>
           </div>

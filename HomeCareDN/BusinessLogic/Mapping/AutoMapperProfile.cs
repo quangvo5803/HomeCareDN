@@ -143,6 +143,10 @@ namespace BusinessLogic.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ServiceType,
+                    opt => opt.MapFrom(src => src.ServiceRequest!.ServiceType)
                 );
 
             CreateMap<Material, MaterialDto>()
