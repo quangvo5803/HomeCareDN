@@ -898,6 +898,23 @@
     "all": "Tất cả",
     "itemsCount": "{{count}} yêu cầu"
   },
+    "chat": {
+    "unlocked": "Chat đã được mở khóa!",
+    "title": "Trò chuyện",
+    "noConversation": "Chưa có cuộc trò chuyện",
+    "locked": "Đang khóa",
+    "active": "Đang hoạt động",
+    "noMessages": "Chưa có tin nhắn",
+    "placeholder": "Nhập tin nhắn...",
+    "loadingMore": "Đang tải thêm tin nhắn...",
+    "noMoreMessages": "Không còn tin nhắn nào nữa",
+    "locked_des": {
+      "title": "Chat đang bị khóa",
+      "description": "Chat sẽ được mở sau khi nhà thầu thanh toán phí hợp tác",
+      "noMessages": "Chat đang bị khóa",
+      "placeholder": "Chat đang bị khóa..."
+    }
+  },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
     "address": {

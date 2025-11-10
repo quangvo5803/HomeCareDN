@@ -13,6 +13,8 @@ namespace BusinessLogic.Services.FacadeService
         public IBrandService BrandService { get; }
         public IAiChatService AiChatService { get; }
         public IConversationService ConversationService { get; }
+        public IChatMessageService ChatMessageService { get; }
+
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
         public IPartnerRequestService PartnerService { get; }
@@ -54,6 +56,11 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.Http
             );
             ConversationService = new ConversationService(coreDeps.UnitOfWork, coreDeps.Mapper);
+            ChatMessageService = new ChatMessageService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                infraDeps.Notifier
+            );
             ContactSupportService = new ContactSupportService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,

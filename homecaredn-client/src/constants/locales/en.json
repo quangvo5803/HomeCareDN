@@ -909,7 +909,23 @@
     "all": "All",
     "supports": "request(s)"
   },
-
+  "chat": {
+    "unlocked": "Chat has been unlocked!",
+    "title": "Chat",
+    "noConversation": "No conversation yet",
+    "locked": "Locked",
+    "active": "Active",
+    "noMessages": "No messages yet",
+    "placeholder": "Type a message...",
+    "loadingMore": "Loading more messages...",
+    "noMoreMessages": "No more messages",
+    "locked_des": {
+      "title": "Chat is locked",
+      "description": "Chat will be unlocked after the contractor pays the partnership fee",
+      "noMessages": "Chat is locked",
+      "placeholder": "Chat is locked..."
+    }
+  },
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
