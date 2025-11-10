@@ -15,6 +15,9 @@ namespace DataAccess.Entities.Application
         public DateTime? DueCommisionTime { get; set; }
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<Image>? Images { get; set; }
+
+        [ForeignKey("ServiceRequestID")]
+        public ServiceRequest? ServiceRequest { get; set; }
     }
 
     public enum ApplicationStatus

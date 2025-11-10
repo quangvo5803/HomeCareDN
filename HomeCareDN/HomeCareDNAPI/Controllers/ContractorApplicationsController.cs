@@ -32,6 +32,17 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles ="Admin")]
+        [HttpGet("admin/get-all-by-user-id")]
+        public async Task<IActionResult> GetAllByUserIdForAdmin([FromQuery] QueryParameters parameters)
+        {
+            var result =
+                await _facadeService.ContractorApplicationService.GetAllContractorApplicationByUserIdAsync(
+                    parameters
+                );
+            return Ok(result);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpGet("admin/{id:guid}")]
         public async Task<IActionResult> GetByIdForAdmin(Guid id)

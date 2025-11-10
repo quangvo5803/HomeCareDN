@@ -11,6 +11,11 @@ namespace BusinessLogic.Services.Interfaces
             QueryParameters parameters,
             string role = "Customer"
         );
+
+        Task<PagedResultDto<ContractorApplicationDto>> GetAllContractorApplicationByUserIdAsync(
+            QueryParameters parameters
+        );
+
         Task<ContractorApplicationDto?> GetContractorApplicationByServiceRequestIDAsync(
             ContractorApplicationGetDto contractorApplicationGetDto
         );

@@ -18,6 +18,7 @@ namespace BusinessLogic.DTOs.Application
         public DesignStyle? FilterDesignStyle { get; set; }
         public PartneRequestrStatus? FilterPartnerRequestStatus { get; set; }
 
+        public string? FilterRoleName { get; set; }
         public Guid? FilterCategoryID { get; set; }
         public Guid? FilterBrandID { get; set; }
         public bool? FilterBool { get; set; }

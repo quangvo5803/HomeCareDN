@@ -16,6 +16,7 @@ import { ServiceProvider } from './context/ServiceProvider.jsx';
 import { PartnerRequestProvider } from './context/PartnerRequestProvider.jsx';
 import { ServiceRequestProvider } from './context/ServiceRequestProvider.jsx';
 import { MaterialRequestProvider } from './context/MaterialRequestProvider.jsx';
+import { UserProvider } from './context/UserProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -31,7 +32,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                       <PartnerRequestProvider>
                         <ServiceRequestProvider>
                           <MaterialRequestProvider>
-                            <App />
+                            <UserProvider>
+                              <App />
+                            </UserProvider>
                           </MaterialRequestProvider>
                         </ServiceRequestProvider>
                       </PartnerRequestProvider>
