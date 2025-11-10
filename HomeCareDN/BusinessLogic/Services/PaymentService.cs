@@ -7,6 +7,7 @@ using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
 using Ultitity.Exceptions;
@@ -96,7 +97,8 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication"
+                includeProperties: "ContractorApplication",
+                asNoTracking: false
             );
 
             if (payment == null)
@@ -140,15 +142,41 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
-                    s.ServiceRequestID == payment.ServiceRequestID
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    s => s.ServiceRequestID == payment.ServiceRequestID,
+                    asNoTracking: false
                 );
-                await _notifier.SendToGroupAsync(
+                if (serviceRequest != null && payment.ContractorApplication != null)
+                {
+                    var conversation = new Conversation
+                    {
+                        ConversationID = Guid.NewGuid(),
+                        ServiceRequestID = serviceRequest.ServiceRequestID,
+                        CustomerID = serviceRequest.CustomerID,
+                        ContractorID = payment.ContractorApplication.ContractorID,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    serviceRequest.ConversationID = conversation.ConversationID;
+                    await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                    await _unitOfWork.SaveAsync();
+                    await _notifier.SendToChatGroupAsync(
+                        conversation.ConversationID.ToString(),
+                        "Chat.ConversationUnlocked",
+                        new { conversation.ConversationID }
+                    );
+                }
+
+                await _notifier.SendToApplicationGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
                     "PaymentTransation.Updated",
-                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                    new
+                    {
+                        payment.ContractorApplicationID,
+                        Status = payment.Status.ToString(),
+                        serviceRequest?.ConversationID,
+                    }
                 );
-                await _notifier.SendToGroupAsync(
+                await _notifier.SendToApplicationGroupAsync(
                     $"role_Admin",
                     "PaymentTransation.Updated",
                     new { payment.ContractorApplicationID, Status = payment.Status.ToString() }

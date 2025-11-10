@@ -259,8 +259,12 @@ namespace BusinessLogic.Services
             customerDto.Status = ApplicationStatus.Pending.ToString();
             var notifyTasks = new List<Task>
             {
-                _notifier.SendToGroupAsync($"role_Admin", "ContractorApplication.Created", dto),
-                _notifier.SendToGroupAsync(
+                _notifier.SendToApplicationGroupAsync(
+                    $"role_Admin",
+                    "ContractorApplication.Created",
+                    dto
+                ),
+                _notifier.SendToApplicationGroupAsync(
                     $"user_{serviceRequest.CustomerID}",
                     "ContractorApplication.Created",
                     customerDto
@@ -321,7 +325,7 @@ namespace BusinessLogic.Services
                             contractorApplication.ServiceRequestID,
                             Status = ApplicationStatus.Rejected.ToString(),
                         };
-                        await _notifier.SendToGroupAsync(
+                        await _notifier.SendToApplicationGroupAsync(
                             $"user_{app.ContractorID}",
                             CONTRACTOR_APPLICATION_REJECT,
                             payload
@@ -339,17 +343,17 @@ namespace BusinessLogic.Services
                 Status = ApplicationStatus.PendingCommission.ToString(),
                 contractorApplication.DueCommisionTime,
             };
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"user_{serviceRequest.CustomerID}",
                 "ContractorApplication.Accept",
                 payloadAccept
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"user_{dto.ContractorID}",
                 "ContractorApplication.Accept",
                 payloadAccept
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 "ContractorApplication.Accept",
                 payloadAccept
@@ -387,7 +391,7 @@ namespace BusinessLogic.Services
             contractorApplication.Status = ApplicationStatus.Rejected;
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"user_{dto.ContractorID}",
                 CONTRACTOR_APPLICATION_REJECT,
                 new
@@ -397,7 +401,7 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 CONTRACTOR_APPLICATION_REJECT,
                 new
@@ -442,12 +446,12 @@ namespace BusinessLogic.Services
                 s.ServiceRequestID == application.ServiceRequestID
             );
             _unitOfWork.ContractorApplicationRepository.Remove(application);
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"user_{serviceRequest?.CustomerID}",
                 "ContractorApplication.Delete",
                 new { application.ServiceRequestID, application.ContractorApplicationID }
             );
-            await _notifier.SendToGroupAsync(
+            await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 "ContractorApplication.Delete",
                 new { application.ServiceRequestID, application.ContractorApplicationID }

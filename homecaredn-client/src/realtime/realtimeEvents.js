@@ -13,4 +13,8 @@ export const RealtimeEvents = Object.freeze({
 
   // Payment
   PaymentTransactionUpdated: 'PaymentTransation.Updated',
+
+  // Chat
+  ChatMessageCreated: 'Chat.MessageCreated',
+  ConversationUnlocked: 'Chat.ConversationUnlocked',
 });

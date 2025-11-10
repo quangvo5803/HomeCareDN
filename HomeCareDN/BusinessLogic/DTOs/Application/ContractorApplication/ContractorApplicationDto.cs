@@ -6,7 +6,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
     {
         public Guid ContractorApplicationID { get; set; }
         public Guid ServiceRequestID { get; set; }
-        public ServiceType ServiceType { get; set; }
+        public string? ServiceType { get; set; }
         public string? Description { get; set; }
         public double EstimatePrice { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
