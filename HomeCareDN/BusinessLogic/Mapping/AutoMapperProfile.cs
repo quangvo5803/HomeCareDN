@@ -32,7 +32,8 @@ namespace BusinessLogic.Mapping
             // Create DTO -> Entity (Write)
             // ------------------------
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
 
             CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -48,16 +49,19 @@ namespace BusinessLogic.Mapping
 
             CreateMap<CreateAddressDto, Address>();
             CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
-                .ForMember(d => d.Images, opt => opt.Ignore());
+                .ForMember(d => d.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
             CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
             CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
             CreateMap<MaterialRequestUpdateRequestDto, MaterialRequest>();
             CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
 
             CreateMap<UpdateAddressDto, Address>()
                 // Ignore AddressId and UserId to prevent overwriting them
@@ -107,6 +111,19 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
+                    dest => dest.DocumentPublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Documents != null
+                                ? src.Documents.Select(d => d.PublicId).ToList()
+                                : new List<string>()
+                        )
+                )
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
             CreateMap<Service, ServiceDto>()
@@ -129,6 +146,10 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )
                 .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
                     dest => dest.ImagePublicIds,
                     opt =>
                         opt.MapFrom(src =>
@@ -142,6 +163,10 @@ namespace BusinessLogic.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
                 );
 
             CreateMap<Material, MaterialDto>()
@@ -295,6 +320,11 @@ namespace BusinessLogic.Mapping
         private static List<string> ImagesToUrls(IEnumerable<Image>? images)
         {
             return images?.Select(i => i.ImageUrl).ToList() ?? new List<string>();
+        }
+
+        private static List<string> DocumentsToUrls(IEnumerable<Document>? documents)
+        {
+            return documents?.Select(i => i.DocumentUrl).ToList() ?? new List<string>();
         }
     }
 }

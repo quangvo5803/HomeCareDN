@@ -28,9 +28,11 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
+        private const string ERROR_MAXIMUM_DOCUMENT = "MAXIMUM_DOCUMENT";
+        private const string ERROR_MAXIMUM_DOCUMENT_SIZE = "MAXIMUM_DOCUMENT_SIZE";
         private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images,Conversation";
+            "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents,Conversation";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -280,6 +282,9 @@ namespace BusinessLogic.Services.Interfaces
                     EstimatePrice = selected.EstimatePrice,
                     ImageUrls =
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                    DocumentUrls =
+                        selected.Documents?.Select(i => i.DocumentUrl).ToList()
+                        ?? new List<string>(),
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = 0, // hoặc dữ liệu thực tế nếu có
@@ -363,6 +368,7 @@ namespace BusinessLogic.Services.Interfaces
         )
         {
             ValidateImages(createRequestDto.ImageUrls, 0);
+            ValidateDocuments(createRequestDto.DocumentUrls, 0);
 
             var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
             if (createRequestDto.Floors == 0)
@@ -376,7 +382,11 @@ namespace BusinessLogic.Services.Interfaces
                 createRequestDto.ImageUrls,
                 createRequestDto.ImagePublicIds
             );
-
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                createRequestDto.DocumentUrls,
+                createRequestDto.DocumentPublicIds
+            );
             await _unitOfWork.SaveAsync();
             serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
@@ -442,6 +452,7 @@ namespace BusinessLogic.Services.Interfaces
 
             ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
 
+            ValidateDocuments(updateRequestDto.DocumentUrls, serviceRequest!.Documents?.Count ?? 0);
             _mapper.Map(updateRequestDto, serviceRequest);
             if (updateRequestDto.Floors == 0)
             {
@@ -451,6 +462,11 @@ namespace BusinessLogic.Services.Interfaces
                 serviceRequest.ServiceRequestID,
                 updateRequestDto.ImageUrls,
                 updateRequestDto.ImagePublicIds
+            );
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                updateRequestDto.DocumentUrls,
+                updateRequestDto.DocumentPublicIds
             );
 
             await _unitOfWork.SaveAsync();
@@ -485,11 +501,22 @@ namespace BusinessLogic.Services.Interfaces
             var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
                 i.ServiceRequestID == id
             );
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                d.ServiceRequestID == id
+            );
             if (images != null && images.Any())
             {
                 foreach (var image in images)
                 {
                     await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+
+            if (documents != null && documents.Any())
+            {
+                foreach (var document in documents)
+                {
+                    await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
                 }
             }
             await DeleteRelatedEntity(serviceRequest!);
@@ -558,6 +585,33 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
         }
 
+        private async Task UploadServiceRequestDocumentsAsync(
+            Guid? serviceRequestId,
+            ICollection<string>? documentUrls,
+            ICollection<string>? publicIds
+        )
+        {
+            if (documentUrls == null || !documentUrls.Any())
+                return;
+
+            var ids = publicIds?.ToList() ?? new List<string>();
+
+            var documents = documentUrls
+                .Select(
+                    (url, i) =>
+                        new Document
+                        {
+                            DocumentID = Guid.NewGuid(),
+                            ServiceRequestID = serviceRequestId,
+                            DocumentUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
+
+            await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+        }
+
         private static void ValidateServiceRequest(ServiceRequest? serviceRequest)
         {
             if (serviceRequest == null)
@@ -586,6 +640,30 @@ namespace BusinessLogic.Services.Interfaces
             if (images.Any(i => i.Length > 5 * 1024 * 1024))
             {
                 errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+        }
+
+        private static void ValidateDocuments(ICollection<string>? documents, int existingCount = 0)
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            if (documents == null)
+                return;
+
+            var totalCount = existingCount + documents.Count;
+            if (totalCount > 5)
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT });
+            }
+
+            if (documents.Any(i => i.Length > 5 * 1024 * 1024)) //25MB
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT_SIZE });
             }
 
             if (errors.Any())

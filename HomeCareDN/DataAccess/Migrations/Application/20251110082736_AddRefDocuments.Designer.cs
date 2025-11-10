@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251110082736_AddRefDocuments")]
+    partial class AddRefDocuments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -289,9 +292,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("ServiceID")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid?>("ServiceRequestID")
                         .HasColumnType("uuid");
 
@@ -300,8 +300,6 @@ namespace DataAccess.Migrations.Application
                     b.HasIndex("ContractorApplicationID");
 
                     b.HasIndex("PartnerRequestID");
-
-                    b.HasIndex("ServiceID");
 
                     b.HasIndex("ServiceRequestID");
 
@@ -739,10 +737,6 @@ namespace DataAccess.Migrations.Application
                         .WithMany("Documents")
                         .HasForeignKey("PartnerRequestID");
 
-                    b.HasOne("DataAccess.Entities.Application.Service", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ServiceID");
-
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
                         .WithMany("Documents")
                         .HasForeignKey("ServiceRequestID");
@@ -887,8 +881,6 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Images");
                 });
 
