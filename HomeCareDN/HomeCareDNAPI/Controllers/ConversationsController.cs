@@ -1,4 +1,5 @@
-﻿using BusinessLogic.Services.FacadeService;
+﻿using System.Security.Claims;
+using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,16 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetConversationByID(Guid id)
         {
             var result = await _facadeService.ConversationService.GetConversationByIDAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("admin/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllConversationsByAdminID(Guid id)
+        {
+            var result = await _facadeService.ConversationService.GetAllConversationByAdminIDAsync(
+                id
+            );
             return Ok(result);
         }
     }

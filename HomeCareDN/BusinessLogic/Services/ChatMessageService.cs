@@ -35,19 +35,10 @@ namespace BusinessLogic.Services
 
         public async Task<ChatMessageDto> SendMessageAsync(SendMessageRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Content))
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
-                };
-                throw new CustomValidationException(errors);
-            }
+            ValidateMessageContent(dto.Content);
 
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
-                c => c.ConversationID == dto.ConversationID,
-                includeProperties: null,
-                asNoTracking: false
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                c.ConversationID == dto.ConversationID
             );
 
             if (conversation == null)
@@ -58,11 +49,7 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-
-            bool isInConversation =
-                conversation.CustomerID == dto.SenderID
-                || conversation.ContractorID == dto.SenderID;
-            if (!isInConversation)
+            if (!IsUserInConversation(conversation, dto.SenderID))
             {
                 var errors = new Dictionary<string, string[]>
                 {
@@ -71,27 +58,47 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var message = new ChatMessage
-            {
-                ChatMessageID = Guid.NewGuid(),
-                ConversationID = dto.ConversationID,
-                SenderID = dto.SenderID,
-                ReceiverID = dto.ReceiverID,
-                Content = dto.Content.Trim(),
-                SentAt = DateTime.UtcNow,
-            };
+            var result = await CreateMessageAsync(dto);
 
-            await _unitOfWork.ChatMessageRepository.AddAsync(message);
-            await _unitOfWork.SaveAsync();
+            return result;
+        }
 
-            var result = _mapper.Map<ChatMessageDto>(message);
+        public async Task<ChatMessageDto> SendMessageToAdminAsync(SendMessageRequestDto dto)
+        {
+            ValidateMessageContent(dto.Content);
 
-            // realtime
-            await _signalRNotifier.SendToChatGroupAsync(
-                dto.ConversationID.ToString(),
-                "Chat.MessageCreated",
-                result
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                c.ConversationID == dto.ConversationID
             );
+
+            if (conversation == null)
+            {
+                var newConversation = new Conversation
+                {
+                    ConversationID = Guid.NewGuid(),
+                    UserID = dto.SenderID,
+                    AdminID = dto.ReceiverID,
+                    ConversationType = ConversationType.AdminSupport,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                await _unitOfWork.ConversationRepository.AddAsync(newConversation);
+                await _unitOfWork.SaveAsync();
+                dto.ConversationID = newConversation.ConversationID;
+            }
+            else
+            {
+                if (!IsUserInConversation(conversation, dto.SenderID))
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { CONVERSATION, new[] { ERROR_PERMISSION_DENIED } },
+                    };
+                    throw new CustomValidationException(errors);
+                }
+            }
+
+            var result = await CreateMessageAsync(dto);
 
             return result;
         }
@@ -112,31 +119,89 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            // lấy 20 tin gần nhất
             var query = _unitOfWork
                 .ChatMessageRepository.GetQueryable()
                 .AsNoTracking()
                 .Where(m => m.ConversationID == dto.ConversationID)
                 .OrderByDescending(m => m.SentAt);
 
-            var totalMesage = await query.CountAsync();
-            var itemMessages = await query
-                .Skip((dto.messageNumber - 1) * dto.messageSize)
-                .Take(dto.messageSize)
+            var total = await query.CountAsync();
+
+            var items = await query
+                .Skip((dto.MessageNumber - 1) * dto.MessageSize)
+                .Take(dto.MessageSize)
                 .ToListAsync();
 
-            // hiển thị tăng dần
-            itemMessages.Reverse();
-
-            var messages = _mapper.Map<IEnumerable<ChatMessageDto>>(itemMessages);
+            items.Reverse(); // hiển thị tăng dần
 
             return new PagedResultDto<ChatMessageDto>
             {
-                Items = messages,
-                TotalCount = totalMesage,
-                PageNumber = dto.messageNumber,
-                PageSize = dto.messageSize,
+                Items = _mapper.Map<IEnumerable<ChatMessageDto>>(items),
+                TotalCount = total,
+                PageNumber = dto.MessageNumber,
+                PageSize = dto.MessageSize,
             };
+        }
+
+        // -----------------------------
+        // PRIVATE HELPER
+        // -----------------------------
+        private async Task<ChatMessageDto> CreateMessageAsync(SendMessageRequestDto dto)
+        {
+            var message = new ChatMessage
+            {
+                ChatMessageID = Guid.NewGuid(),
+                ConversationID = dto.ConversationID,
+                SenderID = dto.SenderID,
+                ReceiverID = dto.ReceiverID,
+                Content = dto.Content,
+                SentAt = DateTime.UtcNow,
+            };
+
+            await _unitOfWork.ChatMessageRepository.AddAsync(message);
+            await _unitOfWork.SaveAsync();
+
+            var result = _mapper.Map<ChatMessageDto>(message);
+
+            await _signalRNotifier.SendToChatGroupAsync(
+                dto.ConversationID.ToString(),
+                "Chat.MessageCreated",
+                result
+            );
+
+            return result;
+        }
+
+        private static void ValidateMessageContent(string? content)
+        {
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                var error = new Dictionary<string, string[]>
+                {
+                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
+                };
+                throw new CustomValidationException(error);
+            }
+        }
+
+        private static bool IsUserInConversation(Conversation conversation, Guid senderId)
+        {
+            if (conversation.ConversationType == ConversationType.ServiceRequest)
+            {
+                return conversation.CustomerID == senderId || conversation.ContractorID == senderId;
+            }
+            else if (conversation.ConversationType == ConversationType.AdminSupport)
+            {
+                return conversation.UserID == senderId || conversation.AdminID == senderId;
+            }
+            else
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { CONVERSATION, new[] { ERROR_PERMISSION_DENIED } },
+                };
+                throw new CustomValidationException(errors);
+            }
         }
     }
 }

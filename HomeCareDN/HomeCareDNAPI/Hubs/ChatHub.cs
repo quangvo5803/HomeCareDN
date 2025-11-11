@@ -1,4 +1,5 @@
-﻿using DataAccess.UnitOfWork;
+﻿using DataAccess.Entities.Application;
+using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HomeCareDNAPI.Hubs
@@ -25,9 +26,20 @@ namespace HomeCareDNAPI.Hubs
             if (conversation == null)
                 throw new HubException("CONVERSATION_NOT_FOUND");
 
-            bool isMember =
-                conversation.CustomerID.ToString() == userId
-                || conversation.ContractorID.ToString() == userId;
+            bool isMember = false;
+
+            if (conversation.ConversationType == ConversationType.ServiceRequest)
+            {
+                isMember =
+                    conversation.CustomerID.ToString() == userId
+                    || conversation.ContractorID.ToString() == userId;
+            }
+            else if (conversation.ConversationType == ConversationType.AdminSupport)
+            {
+                isMember =
+                    conversation.UserID.ToString() == userId
+                    || conversation.AdminID.ToString() == userId;
+            }
 
             if (!isMember)
                 throw new HubException("PERMISSION_DENIED");

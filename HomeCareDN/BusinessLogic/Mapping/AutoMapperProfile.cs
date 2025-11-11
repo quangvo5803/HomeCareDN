@@ -287,6 +287,7 @@ namespace BusinessLogic.Mapping
             CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<RequestStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<Gender, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<ConversationType, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

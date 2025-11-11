@@ -140,6 +140,7 @@ namespace BusinessLogic.Services
                         ServiceRequestID = serviceRequest.ServiceRequestID,
                         CustomerID = serviceRequest.CustomerID,
                         ContractorID = payment.ContractorApplication.ContractorID,
+                        ConversationType = ConversationType.ServiceRequest,
                         CreatedAt = DateTime.UtcNow,
                     };
                     serviceRequest.ConversationID = conversation.ConversationID;

@@ -38,5 +38,12 @@ namespace HomeCareDNAPI.Controllers
             var result = await _facadeService.ChatMessageService.SendMessageAsync(dto);
             return Ok(result);
         }
+
+        [HttpPost("send-admin")]
+        public async Task<IActionResult> SendMessageToAdmin([FromBody] SendMessageRequestDto dto)
+        {
+            var result = await _facadeService.ChatMessageService.SendMessageToAdminAsync(dto);
+            return Ok(result);
+        }
     }
 }

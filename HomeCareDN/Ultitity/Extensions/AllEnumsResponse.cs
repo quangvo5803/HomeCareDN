@@ -9,5 +9,6 @@
         public List<EnumDto> DesignStyles { get; set; } = new();
         public List<EnumDto> PartnerType { get; set; } = new();
         public List<EnumDto> PartnerStatus { get; set; } = new();
+        public List<EnumDto> ConversationTypes { get; set; } = new();
     }
 }
