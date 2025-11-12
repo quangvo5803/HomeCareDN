@@ -783,7 +783,7 @@ export default function ServiceRequestDetail() {
         </div>
         {/* Chat Section */}
         <ChatSection
-          conversationID={serviceRequest.conversation?.conversationID}
+          conversationID={serviceRequest.conversationID}
           contractorApplicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />
