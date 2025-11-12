@@ -411,6 +411,9 @@ function ChatWindow({ open, onClose, brand }) {
       };
 
       await chatMessageService.sendMessageToAdmin(dto);
+      if (!conversation) {
+        await loadSupportChat();
+      }
     } catch (err) {
       console.error('Send admin message failed', err);
       setAdminMessages((prev) => [
@@ -471,6 +474,13 @@ function ChatWindow({ open, onClose, brand }) {
     if (open && currentTab === 'ADMIN' && adminChatState === 'idle') {
       loadSupportChat();
     }
+    return () => {
+      if (conversation && chatConnection) {
+        chatConnection
+          .invoke('LeaveConversation', conversation.conversationID)
+          .catch(() => {});
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentTab, adminChatState]);
 

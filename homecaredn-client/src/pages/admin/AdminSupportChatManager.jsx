@@ -56,6 +56,12 @@ export default function AdminSupportChatManager() {
             return [...prev, message];
           });
         }
+        setTimeout(() => {
+          if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop =
+              messagesContainerRef.current.scrollHeight;
+          }
+        }, 100);
       },
       [RealtimeEvents.NewAdminMessage]: (payload) => {
         conversationService
@@ -65,7 +71,15 @@ export default function AdminSupportChatManager() {
           });
 
         if (payload.ConversationID === selectedConversation?.conversationID) {
-          setMessages((prev) => [...prev, payload.Message]);
+          setMessages((prev) => {
+            if (
+              prev.some(
+                (m) => m.chatMessageID === payload.Message.chatMessageID
+              )
+            )
+              return prev;
+            return [...prev, payload.Message];
+          });
         }
       },
     },
@@ -134,8 +148,21 @@ export default function AdminSupportChatManager() {
       setHasMoreMessages(true);
       return;
     }
+    if (chatConnection) {
+      chatConnection.invoke(
+        'JoinConversation',
+        selectedConversation.conversationID
+      );
+    }
     setLoadingMessage(true);
     loadMessages(1, false);
+    return () => {
+      if (chatConnection && selectedConversation) {
+        chatConnection
+          .invoke('LeaveConversation', selectedConversation.conversationID)
+          .catch(() => {});
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation, chatConnection, t]);
 
