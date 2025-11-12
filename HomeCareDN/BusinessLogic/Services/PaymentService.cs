@@ -206,7 +206,16 @@ namespace BusinessLogic.Services
 
             query = query.Where(p => p.Status == PaymentStatus.Paid);
 
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(u => 
+                    u.OrderCode.ToString().Contains(parameters.Search) ||
+                    u.Description.Contains(parameters.Search)
+                );
+            }
+
             var totalCount = await query.CountAsync();
+
             query = parameters.SortBy?.ToLower() switch
             {
                 "paidat" => query.OrderBy(u => u.PaidAt),

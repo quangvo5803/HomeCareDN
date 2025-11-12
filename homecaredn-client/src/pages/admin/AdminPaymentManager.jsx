@@ -13,7 +13,7 @@ import { toast } from 'react-toastify';
 export default function PaymentManager() {
     const { t, i18n } = useTranslation();
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5;
+    const pageSize = 10;
     const [search, setSearch] = useState('');
     const [debouncedSearch] = useDebounce(search, 1000);
     const [sortOption, setSortOption] = useState('');
@@ -55,10 +55,10 @@ export default function PaymentManager() {
                             </div>
                             <div>
                                 <h1 className="text-4xl font-bold text-gray-900 mb-1">
-                                    {t('adminServiceRequestManager.title')}
+                                    {t('adminPaymentManager.title')}
                                 </h1>
                                 <p className="text-gray-600 text-sm font-medium">
-                                    {t('adminServiceRequestManager.subtitle')}
+                                    {t('adminPaymentManager.subtitle')}
                                 </p>
                             </div>
                         </div>
@@ -80,7 +80,7 @@ export default function PaymentManager() {
                                             {loading ? 0 : totalCount || 0}
                                         </div>
                                         <div className="text-xs text-white/90 font-medium">
-                                            {t('adminServiceRequestManager.serviceRequests')}
+                                            {t('adminPaymentManager.transaction')}
                                         </div>
                                     </div>
                                 </div>
@@ -123,99 +123,101 @@ export default function PaymentManager() {
                 {/* Content Area */}
                 <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
+                        <table className="w-full border-collapse text-center">
                             <thead>
-                                <tr className="h-12 bg-gray-50 border-b-1">
-                                    <th className="w-[60px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('adminServiceRequestManager.no')}
+                                <tr className="h-12 bg-gray-50 border-b">
+                                    <th className="w-[60px] px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.no')}
                                     </th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('order code')}
+                                    <th className="px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.orderCode')}
                                     </th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('adminServiceRequestManager.estimatePrice')}
+                                    <th className="px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.amount')}
                                     </th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('adminServiceRequestManager.status')}
+                                    <th className="px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.date')}
                                     </th>
-                                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('date')}
+                                    <th className="px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.description')}
                                     </th>
-                                    <th className="w-[120px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                        {t('adminServiceManager.action')}
+                                    <th className="px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.status')}
+                                    </th>
+                                    <th className="w-[120px] px-4 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                                        {t('adminPaymentManager.action')}
                                     </th>
                                 </tr>
                             </thead>
 
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-gray-100 text-center">
                                 {loading ? (
                                     <tr>
-                                        <td
-                                            colSpan="9"
-                                            className="py-10 text-center align-middle"
-                                        >
+                                        <td colSpan="9" className="py-10 text-center">
                                             <LoadingComponent />
                                         </td>
                                     </tr>
                                 ) : payments && payments.length > 0 ? (
-                                    payments.map((item, idx) => {
-                                        return (
-                                            <tr
-                                                key={item.paymentTransactionID}
-                                                className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                                                    }`}
-                                            >
-                                                <td className="px-4 py-4 text-center">
-                                                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
-                                                        {(currentPage - 1) * pageSize + idx + 1}
-                                                    </span>
-                                                </td>
+                                    payments.map((item, idx) => (
+                                        <tr
+                                            key={item.paymentTransactionID}
+                                            className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                                                }`}
+                                        >
+                                            <td className="px-4 py-4">
+                                                <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                                                    {(currentPage - 1) * pageSize + idx + 1}
+                                                </span>
+                                            </td>
 
-                                                <td className="px-4 py-4 text-sm text-gray-900 font-medium">
-                                                    {item.orderCode}
-                                                </td>
+                                            <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                                                {item.orderCode}
+                                            </td>
 
-                                                <td className="px-4 py-4 text-sm font-bold text-orange-500">
-                                                    {formatVND(Number(item.amount))}
-                                                </td>
+                                            <td className="px-4 py-4 text-sm font-bold text-orange-500">
+                                                {formatVND(Number(item.amount))}
+                                            </td>
 
-                                                <td className="px-4 py-4">
+                                            <td className="px-4 py-4 text-sm text-gray-700">
+                                                {formatDate(item.paidAt, i18n.language)}
+                                            </td>
+
+                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                                {item.description?.replaceAll('-', '')}
+                                            </td>
+
+                                            <td className="px-4 py-4 text-sm text-gray-900">
+                                                <div className="flex justify-center">
                                                     <StatusBadge status={item.status} type="Payment" />
-                                                </td>
+                                                </div>
+                                            </td>
 
-                                                <td className="px-4 py-4 text-sm text-gray-900">
-                                                    {formatDate(item.paidAt, i18n.language)}
-                                                </td>
-
-                                                <td className="px-4 py-4 text-center">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            navigate(
-                                                                `/Admin/ServiceRequest/${item.serviceRequestID}`
-                                                            )
-                                                        }
-                                                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
-                                                    >
-                                                        <i className="fa-solid fa-eye" />
-                                                        {t('BUTTON.View')}
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
+                                            <td className="px-4 py-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        navigate(`/Admin/ServiceRequest/${item.serviceRequestID}`)
+                                                    }
+                                                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
+                                                >
+                                                    <i className="fa-solid fa-eye" />
+                                                    {t('BUTTON.View')}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
                                 ) : (
                                     <tr>
                                         <td colSpan="9" className="px-6 py-16 text-center">
-                                            <div className="flex flex-col items-center text-center mt-5 mb-5">
+                                            <div className="flex flex-col items-center justify-center text-center mt-5 mb-5">
                                                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                                                     <i className="fa-solid fa-clipboard-list text-gray-400 text-3xl" />
                                                 </div>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                                    {t('adminServiceRequestManager.empty')}
+                                                    {t('adminPaymentManager.empty')}
                                                 </h3>
                                                 <p className="text-sm text-gray-500">
-                                                    {t('adminServiceRequestManager.empty_description')}
+                                                    {t('adminPaymentManager.empty_description')}
                                                 </p>
                                             </div>
                                         </td>
@@ -223,6 +225,7 @@ export default function PaymentManager() {
                                 )}
                             </tbody>
                         </table>
+
                     </div>
                 </div>
 
@@ -233,7 +236,7 @@ export default function PaymentManager() {
                             <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                             <span>
                                 {totalCount}{' '}
-                                {t('adminServiceRequestManager.serviceRequests')}
+                                {t('adminPaymentManager.transaction')}
                             </span>
                         </div>
                         <Pagination

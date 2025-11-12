@@ -7,9 +7,11 @@ namespace BusinessLogic.DTOs.Application.Payment
     public class PaymentTransactionDto
     {
         public Guid PaymentTransactionID { get; set; }
-        public decimal Amount { get; set; }
+        public Guid ServiceRequestID { get; set; }
         public long OrderCode { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string Description { get; set; } = string.Empty;
         public DateTime? PaidAt { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

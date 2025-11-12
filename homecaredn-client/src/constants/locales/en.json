@@ -862,7 +862,10 @@
       "project": "project",
       "rating": "Rating",
       "createAt": "Creation date",
-      "images": "Project images"
+      "images": "Project images",
+      "paymentInfo": "Payment information",
+      "orderCode": "Order code",
+      "amount": "Payment amount"
     }
   },
   "adminPartnerManager": {
@@ -942,6 +945,20 @@
     "noSupport": "No support requests yet",
     "all": "All",
     "supports": "request(s)"
+  },
+  "adminPaymentManager": {
+    "title": "Manage commissions",
+    "subtitle": "Manage transaction list",
+    "no": "NO",
+    "transaction": "transaction",
+    "orderCode": "Order code",
+    "amount": "Payment amount",
+    "date": "Creation date",
+    "description": "Descriptions",
+    "status": "Status",
+    "action": "Action",
+    "empty": "No transactions yet",
+    "empty_description": "No transactions have been sent yet."
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",

@@ -485,7 +485,7 @@ export default function AdminDashboard() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
           {/* Top Contractors */}
-          <div className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
+          <div className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden flex flex-col h-full">
             {/* Header */}
             <div className="px-6 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -500,8 +500,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Content */}
-            <div className="p-6">
-              <div className="overflow-x-auto">
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div className="overflow-x-auto flex-1">
                 <table className="w-full">
                   <tbody className="divide-y divide-gray-100">
                     {topStats?.topContractors?.length > 0 ? (
@@ -572,22 +572,24 @@ export default function AdminDashboard() {
                 </table>
               </div>
 
-              <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
-                <button
-                  onClick={() =>
-                    navigate(`/Admin/UserManager?filter=contractor`)
-                  }
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-4 py-2 transition-colors"
-                >
-                  {t('adminDashboard.viewAll')}
-                  <i className="fas fa-arrow-right text-xs"></i>
-                </button>
-              </div>
+              {topStats?.topContractors?.length > 0 && (
+                <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() =>
+                      navigate(`/Admin/UserManager?filter=contractor`)
+                    }
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 px-4 py-2 transition-colors"
+                  >
+                    {t('adminDashboard.viewAll')}
+                    <i className="fas fa-arrow-right text-xs"></i>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Top Distributors */}
-          <div className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden">
+          <div className="bg-white border border-gray-200 shadow-lg rounded-2xl overflow-hidden flex flex-col h-full">
             {/* Header */}
             <div className="px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-500 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -602,8 +604,8 @@ export default function AdminDashboard() {
             </div>
 
             {/* Content */}
-            <div className="p-6">
-              <div className="overflow-x-auto">
+            <div className="p-6 flex-1 flex flex-col justify-between">
+              <div className="overflow-x-auto flex-1">
                 <table className="w-full">
                   <tbody className="divide-y divide-gray-100">
                     {topStats?.topDistributors?.length > 0 ? (
@@ -676,17 +678,19 @@ export default function AdminDashboard() {
                 </table>
               </div>
 
-              <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
-                <button
-                  onClick={() =>
-                    navigate(`/Admin/UserManager?filter=distributor`)
-                  }
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-green-600 bg-green-50 rounded-lg hover:bg-green-100 px-4 py-2 transition-colors"
-                >
-                  {t('adminDashboard.viewAll')}
-                  <i className="fas fa-arrow-right text-xs"></i>
-                </button>
-              </div>
+              {topStats?.topDistributors?.length > 0 && (
+                <div className="flex justify-center mt-6 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={() =>
+                      navigate(`/Admin/UserManager?filter=distributor`)
+                    }
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-green-600 bg-green-50 rounded-lg hover:bg-green-100 px-4 py-2 transition-colors"
+                  >
+                    {t('adminDashboard.viewAll')}
+                    <i className="fas fa-arrow-right text-xs"></i>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
