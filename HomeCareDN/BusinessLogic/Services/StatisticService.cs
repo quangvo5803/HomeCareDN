@@ -129,7 +129,7 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year)
         {
             var payments = await _unitOfWork.PaymentTransactionsRepository
-                .GetRangeAsync(p => p.Status == PaymentStatus.Paid 
+                .GetRangeAsync(p => p.Status == PaymentStatus.Paid
                     && p.PaidAt.HasValue 
                     && p.PaidAt.Value.Year == year
                 );

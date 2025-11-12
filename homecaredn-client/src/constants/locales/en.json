@@ -641,7 +641,8 @@
       "material": "Material",
       "partner": "Partner",
       "user": "User",
-      "support": "Support"
+      "support": "Support",
+      "commission": "Commission"
     },
     "account": {
       "title": "Account pages",
@@ -1281,6 +1282,11 @@
       "Pending": "Pending",
       "Approved": "Approved",
       "Rejected": "Rejected"
+    },
+    "PaymentStatus": {
+      "Pending": "Pending",
+      "Paid": "Paid",
+      "Failed": "Failed"
     }
   },
   "toast": {

@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application.Payment;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using DataAccess.Entities.Payment;
 using Net.payOS.Types;
@@ -9,5 +10,6 @@ namespace BusinessLogic.Services.Interfaces
     {
         Task<CreatePaymentResult> CreatePaymentAsync(PaymentCreateRequestDto requestDto);
         Task HandlePayOSCallbackAsync(PayOSCallbackDto callback);
+        Task<PagedResultDto<PaymentTransactionDto>> GetAllCommissionAsync(QueryParameters parameters);
     }
 }

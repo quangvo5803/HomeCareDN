@@ -636,7 +636,8 @@
       "material": "Vật liệu",
       "partner": "Đối tác",
       "user": "Người dùng",
-      "support": "Hỗ trợ"
+      "support": "Hỗ trợ",
+      "commission": "Tiền hoa hồng"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -1278,6 +1279,11 @@
       "Pending": "Đang chờ",
       "Approved": "Đã phê duyệt",
       "Rejected": "Đã từ chối"
+    },
+    "PaymentStatus": {
+      "Pending": "Đang chờ",
+      "Paid": "Đã thanh toán",
+      "Failed": "Thanh toán thất bại"
     }
   },
   "toast": {
