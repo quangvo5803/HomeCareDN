@@ -560,19 +560,9 @@
     "send": "Send",
     "launcherTitle": "Live support",
     "typing": "Bot is typing…",
-    "demoBadge": "Demo • Version 1.0",
-    "suggestions": [
-      "How to use this website?",
-      "Add rounded avatar",
-      "Suggest modern colors"
-    ],
-    "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
-    "seed": {
-      "user1": "I want a React chat support widget. Please split components.",
-      "bot1": "Sure! I'll design a modern widget with a round launcher button.",
-      "user2": "Prioritize mobile and match the context: 'React support widget'.",
-      "bot2": "Got it! I'll seed sample data and keep components clean."
-    }
+    "tabAI":"Chat with AI",
+    "tabAdmin":"Chat with Admin",
+    "startAdminChat":"Send message to Admin to start convesation"
   },
   "distributorCategoryManager": {
     "title": "Category Manager",
@@ -915,8 +905,10 @@
     "selectConversation": "Select a conversation to start",
     "online": "Online",
     "inputPlaceholder": "Enter message...",
+    "loadingMore": "Loading more messages...",
     "send": "Send",
-    "noMessagesInChat": "No messages in this conversation yet"
+    "noMessagesInChat": "No messages in this conversation yet",
+    "noMoreMessages": "No more messages"
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",

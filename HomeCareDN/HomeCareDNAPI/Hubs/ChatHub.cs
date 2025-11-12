@@ -51,5 +51,15 @@ namespace HomeCareDNAPI.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation_{id}");
         }
+
+        public async Task JoinAdminGroup(Guid id)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"admin_{id}");
+        }
+
+        public async Task LeaveAdminGroup(Guid id)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"admin_{id}");
+        }
     }
 }

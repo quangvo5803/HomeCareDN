@@ -1,4 +1,11 @@
-import { useEffect, useState, useContext, useMemo } from 'react';
+import {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+  useRef,
+  useCallback,
+} from 'react';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import { conversationService } from '../../services/conversationService';
@@ -8,6 +15,8 @@ import RealtimeContext from '../../realtime/RealtimeContext';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+
+const MESSAGE_SIZE = 10;
 
 export default function AdminSupportChatManager() {
   const { t } = useTranslation();
@@ -22,6 +31,47 @@ export default function AdminSupportChatManager() {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [filter, setFilter] = useState('');
 
+  const [page, setPage] = useState(1);
+  const [hasMoreMessages, setHasMoreMessages] = useState(true);
+  const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
+  const messagesContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (!user || !chatConnection) return;
+
+    chatConnection.invoke('JoinAdminGroup', user.id);
+
+    return () => {
+      chatConnection.invoke('LeaveAdminGroup', user.id).catch(() => {});
+    };
+  }, [user, chatConnection]);
+  // Realtime messages
+  useRealtime(
+    {
+      [RealtimeEvents.ChatMessageCreated]: (message) => {
+        if (message.conversationID === selectedConversation?.conversationID) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.chatMessageID === message.chatMessageID))
+              return prev;
+            return [...prev, message];
+          });
+        }
+      },
+      [RealtimeEvents.NewAdminMessage]: (payload) => {
+        conversationService
+          .getAllConversationsByAdminID(user.id)
+          .then((items) => {
+            setConversations(items || []);
+          });
+
+        if (payload.ConversationID === selectedConversation?.conversationID) {
+          setMessages((prev) => [...prev, payload.Message]);
+        }
+      },
+    },
+    'chat'
+  );
+
   // Load conversation list
   useEffect(() => {
     if (!user) return;
@@ -33,44 +83,82 @@ export default function AdminSupportChatManager() {
       .finally(() => setLoadingConversation(false));
   }, [user, t]);
 
+  const loadMessages = useCallback(
+    async (messageToLoad, append = false) => {
+      if (!selectedConversation) return;
+
+      try {
+        if (append) setLoadingMoreMessage(true);
+        else setLoadingMessage(true);
+
+        const conversation =
+          await chatMessageService.getMessagesByConversationID({
+            conversationID: selectedConversation.conversationID,
+            messageNumber: messageToLoad,
+          });
+
+        const items = conversation.items || [];
+
+        setHasMoreMessages(
+          items.length === MESSAGE_SIZE &&
+            messages.length + items.length < (conversation.totalCount || 0)
+        );
+
+        if (append) {
+          setMessages((prev) => [...items, ...prev]);
+        } else {
+          setMessages(items || []);
+          setTimeout(() => {
+            if (messagesContainerRef.current) {
+              messagesContainerRef.current.scrollTop =
+                messagesContainerRef.current.scrollHeight;
+            }
+          }, 100);
+        }
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setLoadingMessage(false);
+        setLoadingMoreMessage(false);
+      }
+    },
+
+    [selectedConversation, t, messages.length]
+  );
+
   // Load messages when select conversation
   useEffect(() => {
     if (!selectedConversation) {
       setMessages([]);
+      setPage(1);
+      setHasMoreMessages(true);
       return;
     }
     setLoadingMessage(true);
-    chatMessageService
-      .getMessagesByConversationID({
-        conversationID: selectedConversation.conversationID,
-      })
-      .then((res) => {
-        setMessages(res.items || []);
-        if (chatConnection)
-          chatConnection.invoke(
-            'JoinConversation',
-            selectedConversation.conversationID
-          );
-      })
-      .catch((error) => toast.error(t(handleApiError(error))))
-      .finally(() => setLoadingMessage(false));
+    loadMessages(1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation, chatConnection, t]);
 
-  // Realtime messages
-  useRealtime(
-    {
-      [RealtimeEvents.ChatMessageCreated]: (msg) => {
-        if (msg.conversationID === selectedConversation?.conversationID) {
-          setMessages((prev) => {
-            if (prev.some((m) => m.chatMessageID === msg.chatMessageID))
-              return prev;
-            return [...prev, msg];
-          });
-        }
-      },
-    },
-    'chat'
-  );
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const container = messagesContainerRef.current;
+    if (!container || loadingMoreMessage || !hasMoreMessages) return;
+
+    // Khi scroll lên đầu, load thêm tin nhắn cũ
+    if (container.scrollTop === 0) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+
+      const scrollHeightBefore = container.scrollHeight;
+
+      loadMessages(nextPage, true).then(() => {
+        requestAnimationFrame(() => {
+          const scrollHeightAfter = container.scrollHeight;
+          container.scrollTop = scrollHeightAfter - scrollHeightBefore;
+        });
+      });
+    }
+  }, [loadingMoreMessage, hasMoreMessages, page, loadMessages]);
 
   // Send message
   const handleSend = async () => {
@@ -91,10 +179,8 @@ export default function AdminSupportChatManager() {
   // Filter conversations
   const filteredConversations = useMemo(() => {
     if (!filter) return conversations;
-    return conversations.filter((conv) =>
-      (conv.userEmail || conv.userID || '')
-        .toLowerCase()
-        .includes(filter.toLowerCase())
+    return conversations.filter((conversation) =>
+      conversation.userID.toLowerCase().includes(filter.toLowerCase())
     );
   }, [conversations, filter]);
 
@@ -136,12 +222,12 @@ export default function AdminSupportChatManager() {
               </div>
             ) : filteredConversations.length > 0 ? (
               <ul className="divide-y">
-                {filteredConversations.map((convesation) => (
+                {filteredConversations.map((conversation) => (
                   <li
-                    key={convesation.conversationID}
-                    onClick={() => setSelectedConversation(convesation)}
+                    key={conversation.conversationID}
+                    onClick={() => setSelectedConversation(conversation)}
                     className={`p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
-                      convesation.conversationID ===
+                      conversation.conversationID ===
                       selectedConversation?.conversationID
                         ? 'bg-indigo-100 border-l-4 border-indigo-500'
                         : ''
@@ -149,11 +235,11 @@ export default function AdminSupportChatManager() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-                        {convesation.userID.charAt(0).toUpperCase()}
+                        {conversation.userID.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate text-gray-800">
-                          {convesation.userID.slice(0, 8)}
+                          {conversation.userID.slice(0, 8)}
                         </p>
                       </div>
                     </div>
@@ -188,57 +274,84 @@ export default function AdminSupportChatManager() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-5 bg-gradient-to-b from-gray-50 to-gray-100 scrollbar-thin scrollbar-thumb-indigo-200">
+              <div
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto p-4 bg-gray-50"
+              >
                 {loadingMessage ? (
                   <div className="flex items-center justify-center h-full">
                     <i className="fa-solid fa-spinner fa-spin text-3xl text-gray-400"></i>
                   </div>
-                ) : messages.length > 0 ? (
-                  <div className="flex flex-col gap-3">
-                    {messages.map((message) => {
-                      const isAdmin = message.senderID === user.id;
-                      return (
-                        <div
-                          key={message.chatMessageID}
-                          className={`flex ${
-                            isAdmin ? 'justify-end' : 'justify-start'
-                          }`}
-                        >
-                          <div className="flex flex-col max-w-[75%]">
-                            <div
-                              className={`px-4 py-2 rounded-2xl shadow-sm ${
-                                isAdmin
-                                  ? 'bg-indigo-600 text-white rounded-br-sm'
-                                  : 'bg-white border text-gray-800 rounded-bl-sm'
-                              }`}
-                            >
-                              <p className="text-sm leading-relaxed">
-                                {message.content}
-                              </p>
-                            </div>
-                            <p
-                              className={`text-[10px] text-gray-400 mt-1 ${
-                                isAdmin ? 'text-right' : 'text-left'
-                              }`}
-                            >
-                              {new Date(message.sentAt).toLocaleTimeString(
-                                'vi-VN',
-                                {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                }
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                    <i className="fa-regular fa-comments text-4xl mb-2"></i>
-                    <p>{t('adminSupportChatManager.noMessagesYet')}</p>
-                  </div>
+                  <>
+                    {/* Loading more messages */}
+                    {loadingMoreMessage && (
+                      <div className="flex justify-center py-2 mb-3">
+                        <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs text-gray-600">
+                          <i className="fas fa-spinner fa-spin text-indigo-500"></i>
+                          {t('adminSupportChatManager.loadingMore')}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* No more messages */}
+                    {!hasMoreMessages && messages.length > 0 && (
+                      <div className="text-center py-2 mb-3">
+                        <span className="inline-block text-xs text-gray-400 px-3 py-1 rounded-full border border-gray-200 bg-white">
+                          {t('adminSupportChatManager.noMoreMessages')}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Messages List */}
+                    {messages.length > 0 ? (
+                      <div className="flex flex-col gap-3">
+                        {messages.map((msg) => {
+                          const isAdmin = msg.senderID === user.id;
+                          return (
+                            <div
+                              key={msg.chatMessageID}
+                              className={`flex ${
+                                isAdmin ? 'justify-end' : 'justify-start'
+                              }`}
+                            >
+                              <div className="flex flex-col max-w-[70%]">
+                                <div
+                                  className={`px-4 py-2 rounded-2xl ${
+                                    isAdmin
+                                      ? 'bg-indigo-600 text-white rounded-br-sm'
+                                      : 'bg-white border text-gray-800 rounded-bl-sm'
+                                  }`}
+                                >
+                                  <p className="text-sm leading-relaxed">
+                                    {msg.content}
+                                  </p>
+                                </div>
+                                <p
+                                  className={`text-[10px] text-gray-400 mt-1 ${
+                                    isAdmin ? 'text-right' : 'text-left'
+                                  }`}
+                                >
+                                  {new Date(msg.sentAt).toLocaleTimeString(
+                                    'vi-VN',
+                                    {
+                                      hour: '2-digit',
+                                      minute: '2-digit',
+                                    }
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400">
+                        <i className="fa-regular fa-comments text-4xl"></i>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 

@@ -1,27 +1,22 @@
-// src/components/SupportChatWidget.jsx
-import React, { useEffect, useMemo, useRef, useState, useContext } from 'react';
+import { useEffect, useMemo, useRef, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
 import { getSupportPrompt } from '../prompts/supportPrompt';
-
-// ===== Import cho Chat Admin =====
 import { useAuth } from '../hook/useAuth';
 import RealtimeContext from '../realtime/RealtimeContext';
 import useRealtime from '../realtime/useRealtime';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
 import { chatMessageService } from '../services/chatMessageService';
-// SỬ DỤNG conversationService MỚI
 import { conversationService } from '../services/conversationService';
 
-/* ===== Helpers ===== */
 const ROLES = { USER: 'user', BOT: 'assistant' };
 const cn = (...xs) => xs.filter(Boolean).join(' ');
 
-// Lấy Admin ID cố định
-const ADMIN_ID = 'a2e44ef4-eb65-4d0b-8105-6539a9ee3091';
+//AdminID
+const ADMIN_ID = import.meta.env.VITE_ADMIN_ID;
 
-// UID Generator (Giữ nguyên)
+// UID Generator
 const uid = (() => {
   let seq = 0;
   return () => {
@@ -45,7 +40,7 @@ const uid = (() => {
   };
 })();
 
-// Helper cho tin nhắn AI
+// Helper for AI
 const toAiUiMessage = (m) => ({
   id: uid(),
   role: m.role === 'assistant' ? ROLES.BOT : ROLES.USER,
@@ -73,7 +68,7 @@ function useAutoScroll(dep) {
   return ref;
 }
 
-/* ===== Sub components (Giữ nguyên) ===== */
+/*Sub components*/
 function BotAvatar() {
   return (
     <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
@@ -234,7 +229,7 @@ ChatHeader.propTypes = {
   brand: PropTypes.string,
 };
 
-// Component Tab mới
+// Component Tab
 function TabButton({ label, icon, isActive, onClick, disabled }) {
   return (
     <button
@@ -300,25 +295,25 @@ function ChatWindow({ open, onClose, brand }) {
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
 
-  // State chung
-  const [currentTab, setCurrentTab] = useState('AI'); // 'AI' hoặc 'ADMIN'
+  // State
+  const [currentTab, setCurrentTab] = useState('AI');
   const [filter, setFilter] = useState('');
   const [minimized, setMinimized] = useState(false);
 
-  // State cho AI
+  // State for AI
   const [aiMessages, setAiMessages] = useState([]);
   const [aiTyping, setAiTyping] = useState(false);
 
-  // State cho Chat Admin
+  // State for Chat Admin
   const [adminMessages, setAdminMessages] = useState([]);
   const [conversation, setConversation] = useState(null);
-  const [adminChatState, setAdminChatState] = useState('idle'); // idle, loading, loaded, error
+  const [adminChatState, setAdminChatState] = useState('idle');
   const [adminSending, setAdminSending] = useState(false);
 
   const parseErr = (err) =>
     err?.response?.data ?? err?.message ?? 'Bad request';
 
-  // ----- Logic cho AI Chat (Giữ nguyên) -----
+  // ----- Logic cho AI Chat -----
   const loadAiHistory = async () => {
     try {
       const raw = await aiChatService.history();
@@ -373,8 +368,6 @@ function ChatWindow({ open, onClose, brand }) {
         toAdminUiMessage(m, user.id)
       );
       setAdminMessages(list);
-
-      // Tham gia phòng chat
       if (chatConnection) {
         await chatConnection.invoke('JoinConversation', id);
       }
@@ -523,7 +516,7 @@ function ChatWindow({ open, onClose, brand }) {
               icon="fa-solid fa-user-tie"
               isActive={currentTab === 'ADMIN'}
               onClick={() => setCurrentTab('ADMIN')}
-              disabled={!user} // Vô hiệu hóa nếu chưa login
+              disabled={!user}
             />
           </div>
         )}

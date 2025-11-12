@@ -169,6 +169,21 @@ namespace BusinessLogic.Services
                 "Chat.MessageCreated",
                 result
             );
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                c.ConversationID == dto.ConversationID
+            );
+
+            if (
+                conversation?.ConversationType == ConversationType.AdminSupport
+                && conversation.AdminID.HasValue
+            )
+            {
+                await _signalRNotifier.SendToAdminAsync(
+                    conversation.AdminID.Value.ToString(),
+                    "Chat.NewAdminMessage",
+                    new { dto.ConversationID, Message = result }
+                );
+            }
 
             return result;
         }
