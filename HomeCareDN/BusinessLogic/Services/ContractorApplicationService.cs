@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -162,6 +163,9 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
+            var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                p.ServiceRequestID == contractorApplication.ServiceRequestID
+            );
             dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
@@ -174,6 +178,10 @@ namespace BusinessLogic.Services
                     dto.ContractorEmail = string.Empty;
                     dto.ContractorPhone = string.Empty;
                 }
+            }
+            if (payment != null)
+            {
+                dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
             }
             return dto;
         }

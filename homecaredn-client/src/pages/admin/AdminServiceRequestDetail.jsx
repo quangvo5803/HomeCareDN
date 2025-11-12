@@ -578,67 +578,70 @@ export default function AdminServiceRequestDetail() {
                   </div>
 
                   {/*Payment Information */}
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100">
-                    <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
-                      <i className="fa-solid fa-credit-card"></i>
-                      {t(
-                        'adminServiceRequestManager.contractorDetail.paymentInfo'
-                      )}
-                    </p>
+                  {selectedContractor.status === 'Approved' && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100">
+                      <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                        <i className="fa-solid fa-credit-card"></i>
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.paymentInfo'
+                        )}
+                      </p>
 
-                    <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                      <table className="w-full">
-                        <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
-                          <tr>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                              {t('adminServiceRequestManager.contractorDetail.orderCode')}
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                              {t('adminServiceRequestManager.contractorDetail.amount')}
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                              {t('adminServiceRequestManager.description')}
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                              {t('adminServiceRequestManager.contractorDetail.createAt')}
-                            </th>
-                            <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                              {t('adminServiceRequestManager.status')}
-                            </th>
-                          </tr>
-                        </thead>
+                      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full">
+                          <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
+                            <tr>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.contractorDetail.orderCode')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.contractorDetail.amount')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.description')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.contractorDetail.createAt')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.status')}
+                              </th>
+                            </tr>
+                          </thead>
 
-                        <tbody className="divide-y divide-gray-100">
-                          <tr className="hover:bg-indigo-50 transition-colors">
-                            <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                              {selectedContractor.payment.orderCode || 'N/A'}
-                            </td>
+                          <tbody className="divide-y divide-gray-100">
+                            <tr className="hover:bg-indigo-50 transition-colors">
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                                {selectedContractor.payment?.orderCode || 'N/A'}
+                              </td>
 
-                            <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
-                              {formatVND(selectedContractor.payment.amount || 0)}
-                            </td>
+                              <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
+                                {formatVND(selectedContractor.payment?.amount || 0)}
+                              </td>
 
-                            <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                              {selectedContractor.payment.description.replaceAll('-', '') || 'No description'}
-                            </td>
+                              <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                                {selectedContractor.payment?.description.replaceAll('-', '') || 'No description'}
+                              </td>
 
-                            <td className="px-4 py-4 text-sm text-gray-700 text-center">
-                              {formatDate(selectedContractor.payment.paidAt, i18n.language)}
-                            </td>
+                              <td className="px-4 py-4 text-sm text-gray-700 text-center">
+                                {formatDate(selectedContractor.payment?.paidAt, i18n.language)}
+                              </td>
 
-                            <td className="px-4 py-4 text-sm text-gray-900 text-center">
-                              <div className="flex justify-center">
-                                <StatusBadge
-                                  status={selectedContractor.payment.status}
-                                  type="Payment"
-                                />
-                              </div>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                              <td className="px-4 py-4 text-sm text-gray-900 text-center">
+                                <div className="flex justify-center">
+                                  <StatusBadge
+                                    status={selectedContractor.payment?.status}
+                                    type="Payment"
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
 
                   {/* Commission Countdown - Show when PendingCommission */}
                   {selectedContractor.status === 'PendingCommission' &&
