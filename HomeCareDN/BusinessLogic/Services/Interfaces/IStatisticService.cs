@@ -14,5 +14,9 @@ namespace BusinessLogic.Services.Interfaces
             int year,
             Guid userID
         );
+        Task<IEnumerable<ContractorLineChartDto>> GetLineChartForContractorStatisticsAsync(
+            int year,
+            Guid userID
+        );
     }
 }

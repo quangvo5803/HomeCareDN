@@ -776,12 +776,12 @@ export default function ServiceRequestCreateUpdate() {
                       onChange={handleDocumentChange} // Use new handler
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
                       <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-file-upload text-orange-500 text-xl"></i>
+                        <i className="fas fa-file-upload  text-blue-500 text-xl"></i>
                       </div>
                       <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-orange-600">
+                        <span className="font-semibold text-blue-600">
                           {t('upload.clickToUpload')}
                         </span>{' '}
                         {t('upload.orDragAndDrop')}

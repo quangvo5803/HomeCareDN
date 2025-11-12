@@ -71,5 +71,17 @@ namespace HomeCareDNAPI.Controllers
                 );
             return Ok(statistics);
         }
+
+        [Authorize(Roles = "Contractor")]
+        [HttpGet("contractor/line-chart/{year:int}")]
+        public async Task<IActionResult> GetLineForContractorStatistics(int year, Guid userID)
+        {
+            var statistics =
+                await _facadeService.StatisticService.GetLineChartForContractorStatisticsAsync(
+                    year,
+                    userID
+                );
+            return Ok(statistics);
+        }
     }
 }

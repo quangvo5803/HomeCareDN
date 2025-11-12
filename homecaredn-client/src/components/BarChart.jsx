@@ -1,4 +1,4 @@
-import { Bar } from "react-chartjs-2";
+import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,8 +7,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from "chart.js";
-import PropTypes from "prop-types";
+} from 'chart.js';
+import PropTypes from 'prop-types';
 import LoadingComponent from '../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 
@@ -21,8 +21,14 @@ ChartJS.register(
   Legend
 );
 
-export default function BarChart({ title, data, year, onYearChange, type, loading }) {
-
+export default function BarChart({
+  title,
+  data,
+  year,
+  onYearChange,
+  type,
+  loading,
+}) {
   const { t } = useTranslation();
 
   const options = {
@@ -30,39 +36,36 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: "top",
-        labels: { color: "#333" },
+        position: 'top',
+        labels: { color: '#333' },
       },
     },
     scales: {
       x: {
         stacked: true,
-        ticks: { color: "#666" },
+        ticks: { color: '#666' },
         grid: { display: false },
       },
       y: {
         stacked: true,
-        ticks: { color: "#666" },
+        ticks: { color: '#666' },
       },
     },
   };
 
-  const hasData = !!(
-    data?.datasets?.some(
-      ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0)
-    )
+  const hasData = !!data?.datasets?.some(
+    (ds) => Array.isArray(ds.data) && ds.data.some((v) => v !== 0)
   );
 
-  if (type === "Admin") {
+  if (type === 'Admin') {
     return (
       <div className="bg-white rounded-2xl shadow-xl p-4 dark:bg-slate-850">
         <div className="flex items-center justify-between mb-3">
-          <h6 className="text-xl capitalize dark:text-white">
-            {title}
-          </h6>
+          <h6 className="text-xl capitalize dark:text-white">{title}</h6>
 
           {onYearChange && (
-            <select className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+            <select
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
             >
@@ -84,7 +87,9 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
           {!hasData && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
               <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
-              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
             </div>
           )}
 
@@ -98,16 +103,15 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
     );
   }
 
-  if (type === "Contractor") {
+  if (type === 'Contractor') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-4 dark:bg-slate-850">
-        <div className="flex items-center justify-between mb-3">
-          <h6 className="text-xl capitalize dark:text-white">
-            {title}
-          </h6>
+      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+        <div className="flex items-center justify-between mb-4">
+          <h6 className="text-xl font-semibold dark:text-white">{title}</h6>
 
           {onYearChange && (
-            <select className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+            <select
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
             >
@@ -129,7 +133,9 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
           {!hasData && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
               <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
-              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
             </div>
           )}
 
@@ -142,7 +148,6 @@ export default function BarChart({ title, data, year, onYearChange, type, loadin
       </div>
     );
   }
-
 }
 BarChart.propTypes = {
   title: PropTypes.string.isRequired,

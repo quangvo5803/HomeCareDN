@@ -113,7 +113,6 @@ namespace BusinessLogic.Services
                     g.Key.Month,
                     g.Key.ServiceType,
                     Count = g.Count(),
-                    EstimatePrice = g.Sum(x => x.EstimatePrice),
                 })
                 .ToList();
 
@@ -131,13 +130,49 @@ namespace BusinessLogic.Services
                         .Where(x => x.Month == m && x.ServiceType == ServiceType.Construction)
                         .Select(x => x.Count)
                         .FirstOrDefault(),
-                    RevenueCount = groupedContractor
+                })
+                .ToList();
+
+            return result;
+        }
+
+        public async Task<
+            IEnumerable<ContractorLineChartDto>
+        > GetLineChartForContractorStatisticsAsync(int year, Guid userID)
+        {
+            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                sta =>
+                    sta.Status == ApplicationStatus.Approved
+                    && sta.CreatedAt.Year == year
+                    && sta.ContractorID == userID,
+                includeProperties: "ServiceRequest"
+            );
+
+            if (contractor == null)
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { "Line Chart Null", new[] { "Line Chart Not Found" } },
+                    }
+                );
+            }
+            var groupedPayments = contractor
+                .GroupBy(g => new { g.CreatedAt.Month, g.ServiceRequest!.ServiceType })
+                .Select(g => new { g.Key.Month, EstimatePrice = g.Sum(x => x.EstimatePrice) })
+                .ToList();
+            var result = Enumerable
+                .Range(1, 12)
+                .Select(m => new ContractorLineChartDto
+                {
+                    Month = m,
+                    Year = year,
+                    RevenueCount = groupedPayments
                         .Where(x => x.Month == m)
                         .Select(x => x.EstimatePrice)
                         .FirstOrDefault(),
                 })
                 .ToList();
-
             return result;
         }
 

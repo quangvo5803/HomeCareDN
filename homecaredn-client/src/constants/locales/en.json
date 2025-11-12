@@ -249,6 +249,7 @@
       "form_phoneNumber": "Phone Number",
       "form_description": "Company Description",
       "form_images": "Company Images",
+      "form_documents": "Documents",
       "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
     }
   },
@@ -327,6 +328,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
+      "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
@@ -444,6 +446,7 @@
     "address": "Address",
     "description": "Description",
     "images": "Images",
+    "documents": "Documents",
     "statusOpen": "Open",
     "statusClosed": "Closed",
     "applicationStatus": "Application Status",
@@ -539,9 +542,7 @@
     "my_projects": "My Projects",
     "applications": "Applications",
     "profile": "Profile",
-    "kpi_meta": {
-      "open_requests": "▲ +2 this week"
-    },
+    
     "retry": "Retry",
     "no_requests": "No requests",
     "access_denied": "Access denied. Contractor role required.",
@@ -1310,7 +1311,8 @@
     "sortCreateDateOld": "Oldest",
     "Grid": "Grid",
     "Table": "Table",
-    "All": "All"
+    "All": "All",
+    "Download": "Download"
   },
   "commission": {
     "partner": {

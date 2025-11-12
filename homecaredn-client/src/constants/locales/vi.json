@@ -248,6 +248,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
+      "form_documents": "Tài liệu",
       "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
@@ -327,6 +328,8 @@
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
+      "uploading": "Đang tải lên",
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",

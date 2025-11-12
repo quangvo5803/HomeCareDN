@@ -31,4 +31,13 @@ export const StatisticService = {
     });
     return response;
   },
+  getLineChartForContractor: async (year, userID) => {
+    const response = await api.get(
+      `/Statistics/contractor/line-chart/${year}`,
+      {
+        params: { userID },
+      }
+    );
+    return response;
+  },
 };
