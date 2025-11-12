@@ -43,6 +43,79 @@ export default function PaymentManager() {
         fetchPayments();
     }, [t, currentPage, sortOption, debouncedSearch])
 
+    let tableContent;
+
+    if (loading) {
+        tableContent = (
+            <tr>
+                <td colSpan="9" className="py-10 text-center">
+                    <LoadingComponent />
+                </td>
+            </tr>
+        );
+    } else if (payments && payments.length > 0) {
+        tableContent = payments.map((item, idx) => (
+            <tr
+                key={item.paymentTransactionID}
+                className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
+            >
+                <td className="px-4 py-4">
+                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                        {(currentPage - 1) * pageSize + idx + 1}
+                    </span>
+                </td>
+                <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                    {item.orderCode}
+                </td>
+                <td className="px-4 py-4 text-sm font-bold text-orange-500">
+                    {formatVND(Number(item.amount))}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-700">
+                    {formatDate(item.paidAt, i18n.language)}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-900">
+                    {item.description?.replaceAll('-', '')}
+                </td>
+                <td className="px-4 py-4 text-sm text-gray-900">
+                    <div className="flex justify-center">
+                        <StatusBadge status={item.status} type="Payment" />
+                    </div>
+                </td>
+                <td className="px-4 py-4">
+                    <button
+                        type="button"
+                        onClick={() =>
+                            navigate(`/Admin/ServiceRequest/${item.serviceRequestID}`)
+                        }
+                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
+                    >
+                        <i className="fa-solid fa-eye" />
+                        {t('BUTTON.View')}
+                    </button>
+                </td>
+            </tr>
+        ));
+    } else {
+        tableContent = (
+            <tr>
+                <td colSpan="9" className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center text-center mt-5 mb-5">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <i className="fa-solid fa-clipboard-list text-gray-400 text-3xl" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {t('adminPaymentManager.empty')}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            {t('adminPaymentManager.empty_description')}
+                        </p>
+                    </div>
+                </td>
+            </tr>
+        );
+    }
+
     return (
         <div className="min-h-screen p-6 bg-white">
             <div className="max-w-7xl mx-auto">
@@ -151,78 +224,7 @@ export default function PaymentManager() {
                             </thead>
 
                             <tbody className="divide-y divide-gray-100 text-center">
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan="9" className="py-10 text-center">
-                                            <LoadingComponent />
-                                        </td>
-                                    </tr>
-                                ) : payments && payments.length > 0 ? (
-                                    payments.map((item, idx) => (
-                                        <tr
-                                            key={item.paymentTransactionID}
-                                            className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                                                }`}
-                                        >
-                                            <td className="px-4 py-4">
-                                                <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
-                                                    {(currentPage - 1) * pageSize + idx + 1}
-                                                </span>
-                                            </td>
-
-                                            <td className="px-4 py-4 text-sm font-medium text-gray-900">
-                                                {item.orderCode}
-                                            </td>
-
-                                            <td className="px-4 py-4 text-sm font-bold text-orange-500">
-                                                {formatVND(Number(item.amount))}
-                                            </td>
-
-                                            <td className="px-4 py-4 text-sm text-gray-700">
-                                                {formatDate(item.paidAt, i18n.language)}
-                                            </td>
-
-                                            <td className="px-4 py-4 text-sm text-gray-900">
-                                                {item.description?.replaceAll('-', '')}
-                                            </td>
-
-                                            <td className="px-4 py-4 text-sm text-gray-900">
-                                                <div className="flex justify-center">
-                                                    <StatusBadge status={item.status} type="Payment" />
-                                                </div>
-                                            </td>
-
-                                            <td className="px-4 py-4">
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        navigate(`/Admin/ServiceRequest/${item.serviceRequestID}`)
-                                                    }
-                                                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
-                                                >
-                                                    <i className="fa-solid fa-eye" />
-                                                    {t('BUTTON.View')}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="9" className="px-6 py-16 text-center">
-                                            <div className="flex flex-col items-center justify-center text-center mt-5 mb-5">
-                                                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                                    <i className="fa-solid fa-clipboard-list text-gray-400 text-3xl" />
-                                                </div>
-                                                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                                    {t('adminPaymentManager.empty')}
-                                                </h3>
-                                                <p className="text-sm text-gray-500">
-                                                    {t('adminPaymentManager.empty_description')}
-                                                </p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
+                                {tableContent}
                             </tbody>
                         </table>
 
