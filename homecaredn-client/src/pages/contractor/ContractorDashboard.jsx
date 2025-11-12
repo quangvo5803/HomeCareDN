@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
-import { Pagination } from 'antd';
 import { formatVND, formatDate } from '../../utils/formatters';
 import StatusBadge from '../../components/StatusBadge';
-import { useServiceRequest } from '../../hook/useServiceRequest';
+import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hook/useAuth';
-import Loading from '../../components/Loading';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
-import PropTypes from 'prop-types';
 import LoadingComponent from '../../components/LoadingComponent';
 import { withMinLoading } from '../../utils/withMinLoading';
 import { handleApiError } from '../../utils/handleApiError';
@@ -23,65 +20,6 @@ const INITIAL_KPI_STATE = {
   pendingApplications: 0,
   pendingCommissions: 0,
   approvedApplications: 0,
-};
-
-const ServiceRequestRow = React.memo(function ServiceRequestRow({
-  req,
-  t,
-  i18n,
-  onView,
-}) {
-  return (
-    <tr className="hover:bg-gray-50 transition-colors">
-      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
-        {req.serviceRequestID}
-      </td>
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-2">
-          <i className="fas fa-hammer text-orange-500"></i>
-          <span className="text-sm font-medium text-gray-900">
-            {t(`Enums.ServiceType.${req.serviceType}`)}
-          </span>
-        </div>
-      </td>
-      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-        {req.estimatePrice
-          ? formatVND(req.estimatePrice)
-          : t('contractorServiceRequestManager.negotiable')}
-      </td>
-      <td className="px-6 py-4 text-sm text-gray-600">
-        {formatDate(req.createdAt, i18n.language)}
-      </td>
-      <td className="px-6 py-4">
-        <StatusBadge status={req.status} type="Request" />
-      </td>
-      <td className="px-6 py-4">
-        <button
-          onClick={() => onView(req.serviceRequestID)}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
-        >
-          <i className="fas fa-eye"></i>
-          {t('partnerDashboard.view')}
-        </button>
-      </td>
-    </tr>
-  );
-});
-
-ServiceRequestRow.propTypes = {
-  serviceRequestID: PropTypes.string.isRequired,
-  serviceType: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-    .isRequired,
-  estimatePrice: PropTypes.oneOfType([
-    PropTypes.number,
-    PropTypes.oneOf([null]),
-  ]),
-  createdAt: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
-    .isRequired,
-  status: PropTypes.string.isRequired,
-  t: PropTypes.func.isRequired,
-  i18n: PropTypes.shape({ language: PropTypes.string.isRequired }).isRequired,
-  onView: PropTypes.func.isRequired,
 };
 
 export default function ContractorDashboard() {
@@ -105,6 +43,7 @@ export default function ContractorDashboard() {
   // KPI State
   const [kpiData, setKpiData] = useState(INITIAL_KPI_STATE);
   const [kpiError, setKpiError] = useState(null);
+  const [latestApplications, setLatestApplications] = useState([]);
   const [loadingDashboardStats, setLoadingDashboardStats] = useState(false);
   const [loadingApplications, setLoadingApplications] = useState(false);
   const [loadingBarChart, setLoadingBarChart] = useState(false);
@@ -124,18 +63,27 @@ export default function ContractorDashboard() {
   const processLineChartData = (data, labels) => ({
     revenue: getMonthlyDataset(data, labels, 'totalValue'),
   });
-  // Table State
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
 
-  const {
-    fetchServiceRequests,
-    serviceRequests,
-    totalServiceRequests,
-    loading: isLoadingTable,
-    setServiceRequests,
-    setTotalServiceRequests,
-  } = useServiceRequest();
+  const fetchLatestApplications = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const result = await contractorApplicationService.getLatestApplications({
+        PageNumber: 1,
+        PageSize: 5,
+        SortBy: 'CreatedAt',
+        SortDirection: 'DESC',
+      });
+      setLatestApplications(result.items || []);
+    } catch (err) {
+      toast.error(t('partnerDashboard.errors.load_apps_failed'));
+      console.error('Failed to fetch latest applications:', err);
+    }
+  }, [user?.id, t]);
+
+  const handleView = useCallback(
+    (id) => navigate(`/Contractor/service-request/${id}`),
+    [navigate]
+  );
   //Bar
   useEffect(() => {
     const fetchBarChartData = async () => {
@@ -276,68 +224,33 @@ export default function ContractorDashboard() {
 
     const loadData = async () => {
       setLoadingApplications(true);
-      await Promise.all([
-        fetchDashboard(),
-        fetchServiceRequests({ PageNumber: currentPage, PageSize: pageSize }),
-      ]);
+      await Promise.all([fetchDashboard(), fetchLatestApplications()]);
       setLoadingApplications(false);
     };
 
     loadData();
-  }, [isContractor, currentPage, fetchDashboard, fetchServiceRequests]);
-
-  // Realtime
-  const handleView = useCallback(
-    (id) => navigate(`/Contractor/service-request/${id}`),
-    [navigate]
-  );
+  }, [isContractor, fetchDashboard, fetchLatestApplications]);
 
   useRealtime({
-    [RealtimeEvents.ServiceRequestCreated]: (payload) => {
+    [RealtimeEvents.ServiceRequestCreated]: () => {
       setKpiData((prev) => ({
         ...prev,
         totalRequests: prev.totalRequests + 1,
       }));
-      setServiceRequests((prev) => {
-        if (prev.some((r) => r.serviceRequestID === payload.serviceRequestID))
-          return prev;
-        const newList = [payload, ...prev];
-        return newList.slice(0, pageSize);
-      });
-      setTotalServiceRequests((prev) => prev + 1);
     },
 
-    [RealtimeEvents.ServiceRequestDelete]: (payload) => {
-      setKpiData((prev) => {
-        const wasOpen = serviceRequests.some(
-          (r) =>
-            r.serviceRequestID === payload.serviceRequestID &&
-            r.status !== 'Closed' &&
-            (r.selectedContractorApplicationID === null ||
-              r.selectedContractorApplicationID === undefined)
-        );
-        return wasOpen
-          ? { ...prev, totalRequests: Math.max(0, prev.totalRequests - 1) }
-          : prev;
-      });
-      setServiceRequests((prev) =>
-        prev.filter((r) => r.serviceRequestID !== payload.serviceRequestID)
-      );
-      setTotalServiceRequests((prev) => Math.max(0, prev - 1));
-    },
-
-    [RealtimeEvents.ServiceRequestClosed]: (payload) => {
+    [RealtimeEvents.ServiceRequestDelete]: () => {
       setKpiData((prev) => ({
         ...prev,
         totalRequests: Math.max(0, prev.totalRequests - 1),
       }));
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? { ...sr, status: 'Closed' }
-            : sr
-        )
-      );
+    },
+
+    [RealtimeEvents.ServiceRequestClosed]: () => {
+      setKpiData((prev) => ({
+        ...prev,
+        totalRequests: Math.max(0, prev.totalRequests - 1),
+      }));
     },
 
     onNewContractorApplication: (payload) => {
@@ -346,17 +259,9 @@ export default function ContractorDashboard() {
           ...prev,
           pendingApplications: prev.pendingApplications + 1,
         }));
+        fetchLatestApplications();
       }
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-              ...sr,
-              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-            }
-            : sr
-        )
-      );
+
     },
 
     onAcceptedContractorApplication: (payload) => {
@@ -368,13 +273,7 @@ export default function ContractorDashboard() {
           totalRequests: Math.max(0, prev.totalRequests - 1),
         }));
       }
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? { ...sr, status: 'Closed' }
-            : sr
-        )
-      );
+      fetchLatestApplications();
     },
 
     [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
@@ -383,6 +282,7 @@ export default function ContractorDashboard() {
           ...prev,
           pendingApplications: Math.max(0, prev.pendingApplications - 1),
         }));
+        fetchLatestApplications();
       }
     },
 
@@ -393,19 +293,7 @@ export default function ContractorDashboard() {
           pendingApplications: Math.max(0, prev.pendingApplications - 1),
         }));
       }
-      setServiceRequests((prev) =>
-        prev.map((sr) =>
-          sr.serviceRequestID === payload.serviceRequestID
-            ? {
-              ...sr,
-              contractorApplyCount: Math.max(
-                0,
-                (sr.contractorApplyCount || 1) - 1
-              ),
-            }
-            : sr
-        )
-      );
+      fetchLatestApplications();
     },
 
     onPaymentUpdate: (payload) => {
@@ -415,44 +303,10 @@ export default function ContractorDashboard() {
           pendingCommissions: Math.max(0, prev.pendingCommissions - 1),
           approvedApplications: prev.approvedApplications + 1,
         }));
+        fetchLatestApplications();
       }
     },
   });
-
-  const tableBody = useMemo(() => {
-    if (isLoadingTable) {
-      return (
-        <tr>
-          <td colSpan="6" className="px-6 py-12 text-center">
-            <Loading />
-          </td>
-        </tr>
-      );
-    }
-    if (!serviceRequests || serviceRequests.length === 0) {
-      return (
-        <tr>
-          <td colSpan="6" className="px-6 py-12 text-center">
-            <div className="flex flex-col items-center">
-              <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
-              <p className="text-gray-500 font-medium">
-                {t('partnerDashboard.no_requests')}
-              </p>
-            </div>
-          </td>
-        </tr>
-      );
-    }
-    return serviceRequests.map((req) => (
-      <ServiceRequestRow
-        key={req.serviceRequestID}
-        req={req}
-        t={t}
-        i18n={i18n}
-        onView={handleView}
-      />
-    ));
-  }, [isLoadingTable, serviceRequests, t, i18n, handleView]);
 
   // Guard role
   if (!isContractor) {
@@ -633,7 +487,7 @@ export default function ContractorDashboard() {
           </div>
         </div>
         {loadingApplications ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-12">
             <LoadingComponent />
           </div>
         ) : (
@@ -642,7 +496,10 @@ export default function ContractorDashboard() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.id')}
+                    {t('partnerDashboard.no')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.service_type')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('partnerDashboard.description')}
@@ -651,7 +508,10 @@ export default function ContractorDashboard() {
                     {t('partnerDashboard.estimate')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.last_update')}
+                    {t('partnerDashboard.commission_due')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.apply_at')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('partnerDashboard.status')}
@@ -662,20 +522,85 @@ export default function ContractorDashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {tableBody}
+                {!latestApplications || latestApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center">
+                        <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                        <p className="text-gray-500 font-medium">
+                          {t('partnerDashboard.no_applications')}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  latestApplications.map((app, index) => (
+                    <tr
+                      key={app.contractorApplicationID}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {/* NO. */}
+                      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                        {index + 1}
+                      </td>
+                      {/* Service Type */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          {app.serviceType === 'Construction' ? (
+                            <i
+                              className="fas fa-hard-hat text-blue-500"
+                              title="Construction"
+                            ></i>
+                          ) : (
+                            <i
+                              className="fas fa-wrench text-orange-500"
+                              title="Repair"
+                            ></i>
+                          )}
+                          <span className="text-sm font-medium text-gray-900">
+                            {t(`Enums.ServiceType.${app.serviceType}`)}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Description */}
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                          {app.description || '-'}
+                        </span>
+                      </td>
+                      {/* Estimate Price */}
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                        {app.estimatePrice ? formatVND(app.estimatePrice) : '-'}
+                      </td>
+                      {/* DueCommissionTime */}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {app.dueCommisionTime
+                          ? formatDate(app.dueCommisionTime, i18n.language)
+                          : '-'}
+                      </td>
+                      {/* Apply At (CreatedAt) */}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {formatDate(app.createdAt, i18n.language)}
+                      </td>
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <StatusBadge status={app.status} type="Application" />
+                      </td>
+                      {/* Action */}
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleView(app.serviceRequestID)}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                        >
+                          <i className="fas fa-eye"></i>
+                          {t('partnerDashboard.view')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
-          </div>
-        )}
-        {totalServiceRequests > 0 && (
-          <div className="flex justify-center py-6 border-t border-gray-100 bg-gray-50/50">
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={totalServiceRequests}
-              onChange={(page) => setCurrentPage(page)}
-              showSizeChanger={false}
-            />
           </div>
         )}
       </div>

@@ -507,6 +507,8 @@
     "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion."
   },
   "partnerDashboard": {
+    "no": "No",
+    "service_type": "Service Type",
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
@@ -517,6 +519,8 @@
     },
     "description": "Description",
     "estimate": "Estimate",
+    "commission_due": "Commission Due",
+    "apply_at": "Applied At",
     "last_update": "Last Update",
     "notifications": "Notifications",
     "status": "Status",

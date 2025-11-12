@@ -33,9 +33,11 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin/get-all-by-user-id")]
-        public async Task<IActionResult> GetAllByUserIdForAdmin([FromQuery] QueryParameters parameters)
+        public async Task<IActionResult> GetAllByUserIdForAdmin(
+            [FromQuery] QueryParameters parameters
+        )
         {
             var result =
                 await _facadeService.ContractorApplicationService.GetAllContractorApplicationByUserIdAsync(
@@ -114,6 +116,23 @@ namespace HomeCareDNAPI.Controllers
                 await _facadeService.ContractorApplicationService.GetAllContractorApplicationByServiceRequestIdAsync(
                     parameters,
                     "Contractor"
+                );
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Contractor")]
+        [HttpGet("contractor/applications")]
+        public async Task<IActionResult> GetApplications([FromQuery] QueryParameters parameters)
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(sub, out var contractorId))
+                return Unauthorized("Invalid contractor ID.");
+
+            parameters.FilterID = contractorId;
+
+            var result =
+                await _facadeService.ContractorApplicationService.GetAllContractorApplicationByUserIdAsync(
+                    parameters
                 );
             return Ok(result);
         }
