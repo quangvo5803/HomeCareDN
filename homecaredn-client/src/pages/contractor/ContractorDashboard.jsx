@@ -90,8 +90,9 @@ export default function ContractorDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getBarChartForContractor(
+            const res = await StatisticService.getBarChart(
               barYear,
+              user.role,
               user.id
             );
             const data = res.data;
@@ -145,8 +146,9 @@ export default function ContractorDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getLineChartForContractor(
+            const res = await StatisticService.getLineChart(
               lineYear,
+              user.role,
               user.id
             );
             const data = res.data;

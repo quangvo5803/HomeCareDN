@@ -10,11 +10,11 @@ import { handleApiError } from '../../utils/handleApiError';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
 import { withMinLoading } from '../../utils/withMinLoading';
-
+import { useAuth } from '../../hook/useAuth';
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const [lineYear, setLineYear] = useState(new Date().getFullYear());
   const [pieYear, setPieYear] = useState(new Date().getFullYear());
   const [barYear, setBarYear] = useState(new Date().getFullYear());
@@ -72,7 +72,10 @@ export default function AdminDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getBarChart(barYear);
+            const res = await StatisticService.getBarChart(
+              barYear,
+              user.role,
+            );
             const data = res.data;
 
             const labels = [
@@ -137,7 +140,10 @@ export default function AdminDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getLineChart(lineYear);
+            const res = await StatisticService.getLineChart(
+              lineYear,
+              user.role
+            );
             const data = res.data;
 
             const labels = [

@@ -19,31 +19,41 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        //================= Admin =================
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin/bar-chart/{year:int}")]
-        public async Task<IActionResult> GetBarStatistics(int year)
+        [Authorize(Roles = "Admin, Contractor")]
+        [HttpGet("bar-chart")]
+        public async Task<IActionResult> GetBarChart(
+            [FromQuery] int year, [FromQuery] string role, [FromQuery] Guid? contractorId = null
+        )
         {
-            var statistics = await _facadeService.StatisticService.GetAdminBarChartAsync(year);
+            var statistics = await _facadeService.StatisticService.GetBarChartAsync(
+                year, 
+                role, 
+                contractorId
+            );
             return Ok(statistics);
         }
+
+        [Authorize(Roles = "Admin, Contractor")]
+        [HttpGet("line-chart")]
+        public async Task<IActionResult> GetLineStatistics(
+            [FromQuery] int year, [FromQuery] string role, [FromQuery] Guid? contractorId = null
+        )
+        {
+            var statistics = await _facadeService.StatisticService.GetLineChartAsync(
+                year,
+                role,
+                contractorId
+            );
+            return Ok(statistics);
+        }
+
+        //================= Admin =================
 
         [Authorize(Roles = "Admin")]
         [HttpGet("admin/pie-chart/{year:int}")]
         public async Task<IActionResult> GetPieStatistics(int year)
         {
             var statistics = await _facadeService.StatisticService.GetPieChartStatisticsAsync(year);
-            return Ok(statistics);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin/line-chart/{year:int}")]
-        public async Task<IActionResult> GetLineStatistics(int year)
-        {
-            var statistics = await _facadeService.StatisticService.GetAdminLineChartAsync(
-                year
-            );
             return Ok(statistics);
         }
 
@@ -78,30 +88,6 @@ namespace HomeCareDNAPI.Controllers
                     contractorId
                 );
             return Ok(result);
-        }
-
-        [Authorize(Roles = "Contractor")]
-        [HttpGet("contractor/bar-chart/{year:int}")]
-        public async Task<IActionResult> GetBarForContractorStatistics(int year, Guid contractorID)
-        {
-            var statistics =
-                await _facadeService.StatisticService.GetContractorBarChartAsync(
-                    year,
-                    contractorID
-                );
-            return Ok(statistics);
-        }
-
-        [Authorize(Roles = "Contractor")]
-        [HttpGet("contractor/line-chart/{year:int}")]
-        public async Task<IActionResult> GetLineForContractorStatistics(int year, Guid contractorID)
-        {
-            var statistics =
-                await _facadeService.StatisticService.GetContractorLineChartAsync(
-                    year,
-                    contractorID
-                );
-            return Ok(statistics);
         }
     }
 }

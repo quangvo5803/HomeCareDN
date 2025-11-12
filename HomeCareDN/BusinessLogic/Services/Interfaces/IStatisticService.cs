@@ -6,16 +6,17 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IStatisticService
     {
+        Task<IEnumerable<BarChartDto>> GetBarChartAsync(int year, string role, Guid? contractorId = null);
+        Task<IEnumerable<LineChartDto>> GetLineChartAsync(
+            int year, string role, Guid? contractorId = null
+        );
+
         //================= Admin =================
         Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year);
-        Task<IEnumerable<BarChartDto>> GetAdminBarChartAsync(int year);
-        Task<IEnumerable<LineChartDto>> GetAdminLineChartAsync(int year);
         Task<AdminTopDto> GetAdminTopAsync();
         Task<AdminStatDto> GetAdminStatAsync();
 
         //================= Contractor =================
-        Task<IEnumerable<BarChartDto>> GetContractorBarChartAsync(int year, Guid contractorID);
-        Task<IEnumerable<LineChartDto>> GetContractorLineChartAsync(int year, Guid contractorID);
         Task<ContractorStatDto> GetContractorStatAsync(Guid contractorID);
     }
 }

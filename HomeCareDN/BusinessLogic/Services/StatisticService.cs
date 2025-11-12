@@ -23,23 +23,40 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<BarChartDto>> GetAdminBarChartAsync(int year)
+        public async Task<IEnumerable<BarChartDto>> GetBarChartAsync(
+            int year, string role, Guid? contractorId = null
+        )
         {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
-                includeProperties: "ServiceRequest"
-            );
+            IEnumerable<ContractorApplication> contractor = Enumerable.Empty<ContractorApplication>();
+            IEnumerable<DistributorApplication> distributor = Enumerable.Empty<DistributorApplication>();
 
-            var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
-                x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
-                includeProperties: "Items"
-            );
+            if (role == "Admin")
+            {
+                contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                    x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
+                    includeProperties: "ServiceRequest"
+                );
+
+                distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
+                    x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
+                    includeProperties: "Items"
+                );
+            }
+            else if (role == "Contractor" && contractorId.HasValue)
+            {
+                contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                    x => x.Status == ApplicationStatus.Approved &&
+                         x.CreatedAt.Year == year &&
+                         x.ContractorID == contractorId.Value,
+                    includeProperties: "ServiceRequest"
+                );
+            }
 
             var result = BuildBarChart(
-                contractor, 
-                distributor, 
-                year, 
-                x => x.CreatedAt, 
+                contractor,
+                role == "Admin" ? distributor : null,
+                year,
+                x => x.CreatedAt,
                 x => x.ServiceRequest?.ServiceType,
                 x => x.CreatedAt
             );
@@ -47,20 +64,47 @@ namespace BusinessLogic.Services
             return result;
         }
 
-        public async Task<IEnumerable<LineChartDto>> GetAdminLineChartAsync(int year)
+        public async Task<IEnumerable<LineChartDto>> GetLineChartAsync(
+            int year, string role, Guid? contractorId = null
+        )
         {
-            var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(
-                p => p.Status == PaymentStatus.Paid 
-                && p.PaidAt.HasValue && p.PaidAt.Value.Year == year
-            );
+            if (role == "Admin")
+            {
+                var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(
+                    p => p.Status == PaymentStatus.Paid &&
+                         p.PaidAt.HasValue &&
+                         p.PaidAt.Value.Year == year
+                );
 
-            var result = BuildLineChart(
-                payments, 
-                year, 
-                p => p.PaidAt!.Value, 
-                p => p.Amount
-            );
-            return result;
+                var result = BuildLineChart(
+                    payments,
+                    year,
+                    p => p.PaidAt!.Value,
+                    p => p.Amount
+                );
+
+                return result;
+            }
+            else if (role == "Contractor" && contractorId.HasValue)
+            {
+                var contractorApps = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                    x => x.Status == ApplicationStatus.Approved &&
+                         x.CreatedAt.Year == year &&
+                         x.ContractorID == contractorId.Value,
+                    includeProperties: "ServiceRequest"
+                );
+
+                var result = BuildLineChart(
+                    contractorApps,
+                    year,
+                    x => x.CreatedAt,
+                    x => (decimal)x.EstimatePrice
+                );
+
+                return result;
+            }
+
+            return Enumerable.Empty<LineChartDto>();
         }
 
         public async Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year)
@@ -243,40 +287,7 @@ namespace BusinessLogic.Services
 
 
         //================= Contractor =================
-        public async Task<IEnumerable<BarChartDto>> GetContractorBarChartAsync(int year, Guid contractorID)
-        {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                x => x.Status == ApplicationStatus.Approved &&
-                     x.CreatedAt.Year == year &&
-                     x.ContractorID == contractorID,
-                includeProperties: "ServiceRequest"
-            );
-
-            var result = BuildBarChart<ContractorApplication, object>(
-                contractor,
-                null,
-                year,
-                x => x.CreatedAt,
-                x => x.ServiceRequest?.ServiceType
-            );
-            return result;
-
-        }
-        public async Task<IEnumerable<LineChartDto>> GetContractorLineChartAsync(int year, Guid contractorID)
-        {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                x => x.Status == ApplicationStatus.Approved && 
-                x.CreatedAt.Year == year && x.ContractorID == contractorID,
-                includeProperties: "ServiceRequest"
-            );
-
-            var result = BuildLineChart(contractor, 
-                year, 
-                x => x.CreatedAt, 
-                x => (decimal)x.EstimatePrice
-            );
-            return result;
-        }
+        
         public async Task<ContractorStatDto> GetContractorStatAsync(Guid contractorID)
         {
             var openRequests = await _unitOfWork
