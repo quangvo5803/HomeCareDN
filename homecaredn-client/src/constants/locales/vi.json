@@ -635,7 +635,8 @@
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
       "partner": "Đối tác",
-      "support": "Quản lý hỗ trợ"
+      "support": "Quản lý hỗ trợ",
+      "supportChat": "Quản lý hỗ trợ chat"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -893,7 +894,20 @@
     "all": "Tất cả",
     "itemsCount": "{{count}} yêu cầu"
   },
-    "chat": {
+  "adminSupportChat": {
+    "title": "Chat hỗ trợ khách hàng",
+    "subtitle": "Quản lý và trả lời các yêu cầu hỗ trợ",
+    "conversationList": "Danh sách hội thoại",
+    "searchUser": "Tìm kiếm người dùng...",
+    "noConversations": "Chưa có yêu cầu hỗ trợ nào",
+    "noMessage": "Chưa có tin nhắn",
+    "selectConversation": "Chọn một hội thoại để bắt đầu",
+    "online": "Đang hoạt động",
+    "inputPlaceholder": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "noMessagesInChat": "Chưa có tin nhắn nào trong cuộc trò chuyện này"
+  },
+  "chat": {
     "unlocked": "Chat đã được mở khóa!",
     "title": "Trò chuyện",
     "noConversation": "Chưa có cuộc trò chuyện",

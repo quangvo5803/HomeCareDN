@@ -35,6 +35,7 @@ import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
+import AdminSupportChatManager from './pages/admin/AdminSupportChatManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -304,6 +305,10 @@ function Layout() {
           <Route
             path="PartnerRequestManager"
             element={<AdminPartnerRequestManager />}
+          />
+          <Route
+            path="SupportChatManager"
+            element={<AdminSupportChatManager />}
           />
         </Route>
         {/* Contractor routes */}

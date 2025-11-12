@@ -57,12 +57,11 @@ const toAiUiMessage = (m) => ({
       : new Date().toTimeString().slice(0, 5)),
 });
 
-// Helper cho tin nhắn Admin (Sửa: dùng camelCase)
 const toAdminUiMessage = (m, currentUserId) => ({
-  id: m.id ?? m.chatMessageId ?? uid(), // SỬA: chatMessageId
-  role: m.senderId === currentUserId ? ROLES.USER : ROLES.BOT, // SỬA: senderId
+  id: m.id ?? m.chatMessageID ?? uid(),
+  role: m.senderID === currentUserId ? ROLES.USER : ROLES.BOT,
   text: m.content ?? '',
-  time: new Date(m.timestamp ?? m.sentAt).toTimeString().slice(0, 5), // SỬA: sentAt
+  time: new Date(m.sentAt).toTimeString().slice(0, 5),
 });
 
 function useAutoScroll(dep) {
@@ -362,16 +361,10 @@ function ChatWindow({ open, onClose, brand }) {
     }
   };
 
-  // ----- Logic cho Admin Chat (LOGIC "CHECK-FIRST") -----
-
-  // Hàm tải lịch sử tin nhắn
-  const loadAdminChatHistory = async (convId) => {
+  const loadAdminChatHistory = async (id) => {
     try {
-      // SỬA: Dùng camelCase
       const params = {
-        conversationId: convId,
-        messageSize: 100,
-        messageNumber: 1,
+        conversationID: id,
       };
       const history = await chatMessageService.getMessagesByConversationID(
         params
@@ -383,7 +376,7 @@ function ChatWindow({ open, onClose, brand }) {
 
       // Tham gia phòng chat
       if (chatConnection) {
-        await chatConnection.invoke('JoinConversation', convId);
+        await chatConnection.invoke('JoinConversation', id);
       }
       setAdminChatState('loaded');
     } catch (err) {
@@ -392,24 +385,20 @@ function ChatWindow({ open, onClose, brand }) {
     }
   };
 
-  // Hàm "Kiểm tra" khi bấm tab
   const loadSupportChat = async () => {
     if (!user) return;
     setAdminChatState('loading');
     try {
-      // 1. GỌI API MỚI: "Kiểm tra"
-      const conv = await conversationService.getConversationByUserID(user.id);
-
-      // 2. TRƯỜNG HỢP CÓ HỘI THOẠI
-      if (conv) {
-        setConversation(conv); // Lưu lại
-        await loadAdminChatHistory(conv.conversationID); // SỬA: Dùng camelCase
-      }
-      // 3. TRƯỜNG HỢP CHƯA CÓ HỘI THOẠI (BE trả về null)
-      else {
-        setConversation(null); // Đảm bảo là null
+      const conversation = await conversationService.getConversationByUserID(
+        user.id
+      );
+      if (conversation) {
+        setConversation(conversation);
+        await loadAdminChatHistory(conversation.conversationID);
+      } else {
+        setConversation(null);
         setAdminMessages([]);
-        setAdminChatState('loaded'); // Vẫn là 'loaded', nhưng trống
+        setAdminChatState('loaded');
       }
     } catch (err) {
       console.error('Load support chat failed', err);
@@ -417,22 +406,18 @@ function ChatWindow({ open, onClose, brand }) {
     }
   };
 
-  // Gửi tin nhắn (SỬA: Gửi camelCase)
   const sendAdminMessage = async (text) => {
     if (!user || adminSending) return;
-
     setAdminSending(true);
     try {
-      // SỬA: Dùng camelCase cho DTO
       const dto = {
         content: text,
-        senderId: user.id,
-        receiverId: ADMIN_ID,
-        conversationId: conversation ? conversation.conversationID : null, // SỬA: Dùng camelCase
+        senderID: user.id,
+        receiverID: ADMIN_ID,
+        conversationID: conversation ? conversation.conversationID : null,
       };
 
       await chatMessageService.sendMessageToAdmin(dto);
-      // Chờ SignalR broadcast lại
     } catch (err) {
       console.error('Send admin message failed', err);
       setAdminMessages((prev) => [
@@ -449,30 +434,25 @@ function ChatWindow({ open, onClose, brand }) {
     }
   };
 
-  // Lắng nghe tin nhắn mới (SỬA: Dùng camelCase)
-  const handleNewAdminMessage = (messageDto) => {
-    // Nếu chưa có conversation, đây là tin nhắn ĐẦU TIÊN
+  const handleNewAdminMessage = (dto) => {
     if (!conversation) {
-      const convId = messageDto.conversationId; // SỬA: Dùng camelCase
-      if (convId) {
-        // Lưu lại conversation MỚI
+      const conversationID = dto.conversationID;
+      if (conversationID) {
         setConversation({
-          conversationID: convId, // BE DTO dùng PascalCase, nên phải đọc PascalCase
-          userID: messageDto.senderId, // SỬA: Dùng camelCase
+          conversationID: conversationID,
+          userID: dto.senderID,
           adminID: ADMIN_ID,
         });
-        // Tải lịch sử (sẽ bao gồm tin nhắn này)
-        loadAdminChatHistory(convId);
+        loadAdminChatHistory(conversationID);
         return;
       }
     }
 
-    // Nếu ĐÃ CÓ conversation, chỉ thêm tin nhắn
-    if (messageDto?.conversationId === conversation?.conversationID) {
-      // SỬA: So sánh camelCase với PascalCase
+    if (dto?.conversationID === conversation?.conversationID) {
       setAdminMessages((prev) => {
-        if (prev.some((m) => m.id === messageDto.id)) return prev;
-        return [...prev, toAdminUiMessage(messageDto, user.id)];
+        if (prev.some((message) => message.chatMessageID === dto.chatMessageID))
+          return prev;
+        return [...prev, toAdminUiMessage(dto, user.id)];
       });
     }
   };
@@ -482,28 +462,25 @@ function ChatWindow({ open, onClose, brand }) {
     'chat'
   );
 
-  // ----- Effect Hooks -----
   useEffect(() => {
     if (open) {
-      loadAiHistory(); // Luôn load AI khi mở
+      loadAiHistory();
     } else {
-      // Reset mọi thứ khi đóng
       setConversation(null);
       setAiMessages([]);
       setAdminMessages([]);
       setCurrentTab('AI');
-      setAdminChatState('idle'); // Quan trọng: reset về 'idle'
+      setAdminChatState('idle');
     }
   }, [open]);
 
-  // EFFECT MỚI: Tải chat khi bấm tab Admin
   useEffect(() => {
     if (open && currentTab === 'ADMIN' && adminChatState === 'idle') {
       loadSupportChat();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, currentTab, adminChatState]);
 
-  // ----- Hàm Send Chung -----
   const send = async (text) => {
     if (currentTab === 'AI') {
       await sendAiMessage(text);
@@ -514,7 +491,6 @@ function ChatWindow({ open, onClose, brand }) {
 
   if (!open) return null;
 
-  // Xác định danh sách tin nhắn và trạng thái disabled
   const currentMessages = currentTab === 'AI' ? aiMessages : adminMessages;
   const isInputDisabled =
     aiTyping ||
@@ -592,7 +568,7 @@ function ChatWindow({ open, onClose, brand }) {
                   <MessageList messages={currentMessages} filter={filter} />
                 )}
 
-                {/* (LOGIC BẠN YÊU CẦU) Đã tải, nhưng không có hội thoại */}
+                {/* Đã tải, nhưng không có hội thoại */}
                 {user && adminChatState === 'loaded' && !conversation && (
                   <div className="h-[48vh] md:h-[50vh] flex flex-col items-center justify-center text-center text-sm text-gray-500 px-4">
                     <i className="fa-solid fa-paper-plane text-2xl mb-3 text-indigo-400"></i>

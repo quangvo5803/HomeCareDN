@@ -8,10 +8,7 @@ namespace HomeCareDNAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(
-        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
-        Roles = "Customer,Contractor"
-    )]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ConversationsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -22,6 +19,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("{id:guid}")]
+        [Authorize(Roles = "Customer,Contractor")]
         public async Task<IActionResult> GetConversationByID(Guid id)
         {
             var result = await _facadeService.ConversationService.GetConversationByIDAsync(id);
@@ -29,6 +27,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("user/{id:guid}")]
+        [Authorize(Roles = "Customer,Contractor")]
         public async Task<IActionResult> GetConversationByUserID(Guid id)
         {
             var result = await _facadeService.ConversationService.GetConversationByUserIDAsync(id);

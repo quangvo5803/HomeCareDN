@@ -641,7 +641,8 @@
       "serviceRequest": "Service Request",
       "material": "Material",
       "partner": "Partner",
-      "support": "Support Manager"
+      "support": "Support Manager",
+      "supportChat": "Support Chat Manager"
     },
     "account": {
       "title": "Account pages",
@@ -903,6 +904,19 @@
     "noSupport": "No support requests yet",
     "all": "All",
     "supports": "request(s)"
+  },
+  "adminSupportChatManager": {
+    "title": "Customer Support Chat",
+    "subtitle": "Manage and respond to support requests",
+    "conversationList": "Conversation List",
+    "searchUser": "Search user...",
+    "noConversations": "No support requests yet",
+    "noMessage": "No messages yet",
+    "selectConversation": "Select a conversation to start",
+    "online": "Online",
+    "inputPlaceholder": "Enter message...",
+    "send": "Send",
+    "noMessagesInChat": "No messages in this conversation yet"
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",

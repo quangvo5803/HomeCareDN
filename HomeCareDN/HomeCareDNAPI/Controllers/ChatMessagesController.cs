@@ -9,10 +9,7 @@ namespace HomeCareDNAPI.Controllers
 {
     [ApiController]
     [Route("api/chat-messages")]
-    [Authorize(
-        AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
-        Roles = "Customer,Contractor"
-    )]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatMessagesController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -33,6 +30,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Customer,Contractor,Admin")]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageRequestDto dto)
         {
             var result = await _facadeService.ChatMessageService.SendMessageAsync(dto);
@@ -40,6 +38,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("send-admin")]
+        [Authorize(Roles = "Customer,Contractor")]
         public async Task<IActionResult> SendMessageToAdmin([FromBody] SendMessageRequestDto dto)
         {
             var result = await _facadeService.ChatMessageService.SendMessageToAdminAsync(dto);

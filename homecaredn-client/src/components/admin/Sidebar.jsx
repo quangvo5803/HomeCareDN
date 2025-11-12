@@ -61,6 +61,11 @@ export default function Sidebar() {
       title: 'support',
       link: '/Admin/SupportManager',
     },
+    {
+      icon: 'text-emerald-600 fa-solid fa-headset',
+      title: 'supportChat',
+      link: '/Admin/SupportChatManager',
+    },
   ];
 
   return (
