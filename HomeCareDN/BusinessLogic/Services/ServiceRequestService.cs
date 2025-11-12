@@ -263,15 +263,7 @@ namespace BusinessLogic.Services.Interfaces
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = contractor!.ProjectCount,
                     AverageRating = 0,
-                    Payment = new PaymentTransactionDto
-                    {
-                        ServiceRequestID = payment!.ServiceRequestID,
-                        OrderCode = payment.OrderCode,
-                        Amount = payment.Amount,
-                        Description = payment.Description,
-                        PaidAt = payment.PaidAt,
-                        Status = payment.Status.ToString(),
-                    }
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
         }
