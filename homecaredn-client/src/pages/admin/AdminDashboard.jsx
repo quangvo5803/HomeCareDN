@@ -63,7 +63,7 @@ export default function AdminDashboard() {
   });
 
   const processLineChartData = (data, labels) => ({
-    commission: getMonthlyDataset(data, labels, 'totalCommission'),
+    commission: getMonthlyDataset(data, labels, 'totalValue'),
   });
 
   //Bar

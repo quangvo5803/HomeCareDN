@@ -1,6 +1,6 @@
-﻿namespace BusinessLogic.DTOs.Application.ContractorApplication
+﻿namespace BusinessLogic.DTOs.Application.Statistic.ContractorStatistic
 {
-    public class ContractorDashBoardDto
+    public class ContractorStatDto
     {
         public int OpenRequests { get; set; }
         public int Applied { get; set; }

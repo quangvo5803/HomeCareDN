@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';
 import { formatVND, formatDate } from '../../utils/formatters';
 import StatusBadge from '../../components/StatusBadge';
-import { contractorApplicationService } from '../../services/contractorApplicationService';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { useAuth } from '../../hook/useAuth';
 import Loading from '../../components/Loading';
@@ -123,7 +122,7 @@ export default function ContractorDashboard() {
   });
 
   const processLineChartData = (data, labels) => ({
-    revenue: getMonthlyDataset(data, labels, 'revenueCount'),
+    revenue: getMonthlyDataset(data, labels, 'totalValue'),
   });
   // Table State
   const [currentPage, setCurrentPage] = useState(1);
@@ -251,7 +250,7 @@ export default function ContractorDashboard() {
     setLoadingDashboardStats(true);
     setKpiError(null);
     try {
-      const data = await contractorApplicationService.getDashboardData();
+      const data = await StatisticService.getStatStatisticForContractor();
       setKpiData({
         totalRequests: data?.openRequests ?? data?.OpenRequests ?? 0,
         pendingApplications: data?.applied ?? data?.Applied ?? 0,
@@ -261,10 +260,10 @@ export default function ContractorDashboard() {
     } catch (error) {
       setKpiError(
         error?.response?.data?.title ||
-          error?.response?.data?.message ||
-          error?.response?.data ||
-          error?.message ||
-          t('partnerDashboard.errors.kpi_load_failed')
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error?.message ||
+        t('partnerDashboard.errors.kpi_load_failed')
       );
     } finally {
       setLoadingDashboardStats(false);
@@ -352,9 +351,9 @@ export default function ContractorDashboard() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-              }
+              ...sr,
+              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -398,12 +397,12 @@ export default function ContractorDashboard() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                contractorApplyCount: Math.max(
-                  0,
-                  (sr.contractorApplyCount || 1) - 1
-                ),
-              }
+              ...sr,
+              contractorApplyCount: Math.max(
+                0,
+                (sr.contractorApplyCount || 1) - 1
+              ),
+            }
             : sr
         )
       );

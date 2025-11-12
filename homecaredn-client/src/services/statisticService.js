@@ -1,6 +1,8 @@
 import api from './public/api';
 
 export const StatisticService = {
+
+  // ====================== Admin ======================
   getBarChart: async (year) => {
     const response = await api.get(`/Statistics/admin/bar-chart/${year}`);
     return response;
@@ -25,17 +27,25 @@ export const StatisticService = {
     const response = await api.get('/Statistics/admin/stat-statistics');
     return response;
   },
-  getBarChartForContractor: async (year, userID) => {
+
+  // ====================== Contractor ======================
+  getStatStatisticForContractor: async () => {
+    const { data } = await api.get(
+      '/Statistics/contractor/stat-statistics'
+    );
+    return data;
+  },
+  getBarChartForContractor: async (year, contractorID) => {
     const response = await api.get(`/Statistics/contractor/bar-chart/${year}`, {
-      params: { userID },
+      params: { contractorID },
     });
     return response;
   },
-  getLineChartForContractor: async (year, userID) => {
+  getLineChartForContractor: async (year, contractorID) => {
     const response = await api.get(
       `/Statistics/contractor/line-chart/${year}`,
       {
-        params: { userID },
+        params: { contractorID },
       }
     );
     return response;

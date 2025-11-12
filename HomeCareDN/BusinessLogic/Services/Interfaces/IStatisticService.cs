@@ -1,22 +1,21 @@
-﻿using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
-using BusinessLogic.DTOs.Application.Statistic.ContractorStatitic;
+﻿using BusinessLogic.DTOs.Application.Statistic;
+using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
+using BusinessLogic.DTOs.Application.Statistic.ContractorStatistic;
 
 namespace BusinessLogic.Services.Interfaces
 {
     public interface IStatisticService
     {
-        Task<IEnumerable<AdminBarChartDto>> GetBarChartStatisticsAsync(int year);
+        //================= Admin =================
         Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year);
-        Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year);
-        Task<AdminTopStatisticsDto> GetTopStatisticsAsync();
-        Task<AdminStatStatisticDto> GetStatStatisticAsync();
-        Task<IEnumerable<ContractorBarChartDto>> GetBarChartForContractorStatisticsAsync(
-            int year,
-            Guid userID
-        );
-        Task<IEnumerable<ContractorLineChartDto>> GetLineChartForContractorStatisticsAsync(
-            int year,
-            Guid userID
-        );
+        Task<IEnumerable<BarChartDto>> GetAdminBarChartAsync(int year);
+        Task<IEnumerable<LineChartDto>> GetAdminLineChartAsync(int year);
+        Task<AdminTopDto> GetAdminTopAsync();
+        Task<AdminStatDto> GetAdminStatAsync();
+
+        //================= Contractor =================
+        Task<IEnumerable<BarChartDto>> GetContractorBarChartAsync(int year, Guid contractorID);
+        Task<IEnumerable<LineChartDto>> GetContractorLineChartAsync(int year, Guid contractorID);
+        Task<ContractorStatDto> GetContractorStatAsync(Guid contractorID);
     }
 }

@@ -119,21 +119,6 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [Authorize(Roles = "Contractor")]
-        [HttpGet("contractor/dashboard")]
-        public async Task<IActionResult> GetKpiDataForContractor()
-        {
-            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(sub, out var contractorId))
-                return Unauthorized("Invalid contractor ID.");
-
-            var result =
-                await _facadeService.ContractorApplicationService.GetContractorDashboardDataAsync(
-                    contractorId
-                );
-            return Ok(result);
-        }
-
-        [Authorize(Roles = "Contractor")]
         [HttpGet("contractor/{id:guid}")]
         public async Task<IActionResult> GetByIdForDistributor(Guid id)
         {

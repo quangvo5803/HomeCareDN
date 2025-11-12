@@ -24,7 +24,6 @@ namespace BusinessLogic.Services.Interfaces
             Guid id,
             string role = "Customer"
         );
-        Task<ContractorDashBoardDto> GetContractorDashboardDataAsync(Guid contractorId);
         Task<ContractorApplicationDto> CreateContractorApplicationAsync(
             ContractorCreateApplicationDto createRequest
         );

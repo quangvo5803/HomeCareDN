@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Statistic;
 using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
-using BusinessLogic.DTOs.Application.Statistic.ContractorStatitic;
+using BusinessLogic.DTOs.Application.Statistic.ContractorStatistic;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -23,156 +23,43 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<IEnumerable<AdminBarChartDto>> GetBarChartStatisticsAsync(int year)
+        public async Task<IEnumerable<BarChartDto>> GetAdminBarChartAsync(int year)
         {
             var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                sta => sta.Status == ApplicationStatus.Approved && sta.CreatedAt.Year == year,
+                x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
                 includeProperties: "ServiceRequest"
             );
 
             var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
-                sta => sta.Status == ApplicationStatus.Approved && sta.CreatedAt.Year == year,
+                x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
                 includeProperties: "Items"
             );
 
-            if (contractor == null || distributor == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Bar Chart Null", new[] { "Bar Chart Not Found" } },
-                    }
-                );
-            }
-
-            var groupedContractor = contractor
-                .GroupBy(ca => new { ca.CreatedAt.Month, ca.ServiceRequest!.ServiceType })
-                .Select(g => new
-                {
-                    g.Key.Month,
-                    g.Key.ServiceType,
-                    Count = g.Count(),
-                })
-                .ToList();
-
-            var groupedDistributor = distributor
-                .GroupBy(d => d.CreatedAt.Month)
-                .Select(g => new { Month = g.Key, Count = g.Count() })
-                .ToList();
-
-            var result = Enumerable
-                .Range(1, 12)
-                .Select(m => new AdminBarChartDto
-                {
-                    Month = m,
-                    Year = year,
-                    RepairCount = groupedContractor
-                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Repair)
-                        .Select(x => x.Count)
-                        .FirstOrDefault(),
-                    ConstructionCount = groupedContractor
-                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Construction)
-                        .Select(x => x.Count)
-                        .FirstOrDefault(),
-                    MaterialCount = groupedDistributor
-                        .Where(x => x.Month == m)
-                        .Select(x => x.Count)
-                        .FirstOrDefault(),
-                })
-                .ToList();
+            var result = BuildBarChart(
+                contractor, 
+                distributor, 
+                year, 
+                x => x.CreatedAt, 
+                x => x.ServiceRequest?.ServiceType,
+                x => x.CreatedAt
+            );
 
             return result;
         }
 
-        public async Task<
-            IEnumerable<ContractorBarChartDto>
-        > GetBarChartForContractorStatisticsAsync(int year, Guid userID)
+        public async Task<IEnumerable<LineChartDto>> GetAdminLineChartAsync(int year)
         {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                sta =>
-                    sta.Status == ApplicationStatus.Approved
-                    && sta.CreatedAt.Year == year
-                    && sta.ContractorID == userID,
-                includeProperties: "ServiceRequest"
+            var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(
+                p => p.Status == PaymentStatus.Paid 
+                && p.PaidAt.HasValue && p.PaidAt.Value.Year == year
             );
 
-            if (contractor == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Bar Chart Null", new[] { "Bar Chart Not Found" } },
-                    }
-                );
-            }
-
-            var groupedContractor = contractor
-                .GroupBy(ca => new { ca.CreatedAt.Month, ca.ServiceRequest!.ServiceType })
-                .Select(g => new
-                {
-                    g.Key.Month,
-                    g.Key.ServiceType,
-                    Count = g.Count(),
-                })
-                .ToList();
-
-            var result = Enumerable
-                .Range(1, 12)
-                .Select(m => new ContractorBarChartDto
-                {
-                    Month = m,
-                    Year = year,
-                    RepairCount = groupedContractor
-                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Repair)
-                        .Select(x => x.Count)
-                        .FirstOrDefault(),
-                    ConstructionCount = groupedContractor
-                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Construction)
-                        .Select(x => x.Count)
-                        .FirstOrDefault(),
-                })
-                .ToList();
-
-            return result;
-        }
-
-        public async Task<
-            IEnumerable<ContractorLineChartDto>
-        > GetLineChartForContractorStatisticsAsync(int year, Guid userID)
-        {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                sta =>
-                    sta.Status == ApplicationStatus.Approved
-                    && sta.CreatedAt.Year == year
-                    && sta.ContractorID == userID,
-                includeProperties: "ServiceRequest"
+            var result = BuildLineChart(
+                payments, 
+                year, 
+                p => p.PaidAt!.Value, 
+                p => p.Amount
             );
-
-            if (contractor == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Line Chart Null", new[] { "Line Chart Not Found" } },
-                    }
-                );
-            }
-            var groupedPayments = contractor
-                .GroupBy(g => new { g.CreatedAt.Month, g.ServiceRequest!.ServiceType })
-                .Select(g => new { g.Key.Month, EstimatePrice = g.Sum(x => x.EstimatePrice) })
-                .ToList();
-            var result = Enumerable
-                .Range(1, 12)
-                .Select(m => new ContractorLineChartDto
-                {
-                    Month = m,
-                    Year = year,
-                    RevenueCount = groupedPayments
-                        .Where(x => x.Month == m)
-                        .Select(x => x.EstimatePrice)
-                        .FirstOrDefault(),
-                })
-                .ToList();
             return result;
         }
 
@@ -211,43 +98,9 @@ namespace BusinessLogic.Services
             return resultGrouped;
         }
 
-        public async Task<IEnumerable<AdminLineChartDto>> GetLineChartStatisticsAsync(int year)
+        public async Task<AdminTopDto> GetAdminTopAsync()
         {
-            var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(p =>
-                p.Status == PaymentStatus.Paid && p.PaidAt.HasValue && p.PaidAt.Value.Year == year
-            );
-
-            if (payments == null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Line Chart Null", new[] { "Line Chart Not Found" } },
-                    }
-                );
-            }
-            var groupedPayments = payments
-                .GroupBy(p => p.PaidAt!.Value.Month)
-                .Select(g => new { Month = g.Key, TotalAmount = g.Sum(x => x.Amount) })
-                .ToList();
-            var result = Enumerable
-                .Range(1, 12)
-                .Select(m => new AdminLineChartDto
-                {
-                    Month = m,
-                    Year = year,
-                    TotalCommission = groupedPayments
-                        .Where(x => x.Month == m)
-                        .Select(x => x.TotalAmount)
-                        .FirstOrDefault(),
-                })
-                .ToList();
-            return result;
-        }
-
-        public async Task<AdminTopStatisticsDto> GetTopStatisticsAsync()
-        {
-            var result = new AdminTopStatisticsDto();
+            var result = new AdminTopDto();
 
             // === Contractors ===
             var topContractors = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
@@ -335,9 +188,9 @@ namespace BusinessLogic.Services
             return result;
         }
 
-        public async Task<AdminStatStatisticDto> GetStatStatisticAsync()
+        public async Task<AdminStatDto> GetAdminStatAsync()
         {
-            var dto = new AdminStatStatisticDto();
+            var dto = new AdminStatDto();
 
             var customers = await _userManager.GetUsersInRoleAsync("Customer");
             var contractors = await _userManager.GetUsersInRoleAsync("Contractor");
@@ -386,6 +239,161 @@ namespace BusinessLogic.Services
                 .SumAsync(x => x.Amount);
 
             return dto;
+        }
+
+
+        //================= Contractor =================
+        public async Task<IEnumerable<BarChartDto>> GetContractorBarChartAsync(int year, Guid contractorID)
+        {
+            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                x => x.Status == ApplicationStatus.Approved &&
+                     x.CreatedAt.Year == year &&
+                     x.ContractorID == contractorID,
+                includeProperties: "ServiceRequest"
+            );
+
+            var result = BuildBarChart<ContractorApplication, object>(
+                contractor,
+                null,
+                year,
+                x => x.CreatedAt,
+                x => x.ServiceRequest?.ServiceType
+            );
+            return result;
+
+        }
+        public async Task<IEnumerable<LineChartDto>> GetContractorLineChartAsync(int year, Guid contractorID)
+        {
+            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                x => x.Status == ApplicationStatus.Approved && 
+                x.CreatedAt.Year == year && x.ContractorID == contractorID,
+                includeProperties: "ServiceRequest"
+            );
+
+            var result = BuildLineChart(contractor, 
+                year, 
+                x => x.CreatedAt, 
+                x => (decimal)x.EstimatePrice
+            );
+            return result;
+        }
+        public async Task<ContractorStatDto> GetContractorStatAsync(Guid contractorID)
+        {
+            var openRequests = await _unitOfWork
+                .ServiceRequestRepository.GetQueryable()
+                .AsNoTracking()
+                .CountAsync(sr =>
+                    sr.Status != RequestStatus.Closed && sr.SelectedContractorApplicationID == null
+                );
+
+            var statusCounts = await _unitOfWork
+                .ContractorApplicationRepository.GetQueryable()
+                .AsNoTracking()
+                .Where(ca => ca.ContractorID == contractorID)
+                .GroupBy(ca => ca.Status)
+                .Select(g => new { g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var dict = statusCounts.ToDictionary(x => x.Key, x => x.Count);
+
+            return new ContractorStatDto
+            {
+                OpenRequests = dict.TryGetValue((ApplicationStatus)(-1), out _)
+                    ? openRequests
+                    : openRequests,
+                Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)
+                    ? pending
+                    : 0,
+                PendingPayments = dict.TryGetValue(
+                    ApplicationStatus.PendingCommission,
+                    out var pendingCom
+                )
+                    ? pendingCom
+                    : 0,
+                Won = dict.TryGetValue(ApplicationStatus.Approved, out var approved) ? approved : 0,
+            };
+        }
+
+
+        //================= Build Chart =================
+        private static IEnumerable<BarChartDto> BuildBarChart<TContractor, TDistributor>(
+            IEnumerable<TContractor> contractor,
+            IEnumerable<TDistributor>? distributor,
+            int year,
+            Func<TContractor, DateTime> contractorCreatedAtSelector,
+            Func<TContractor, ServiceType?> contractorServiceTypeSelector,
+            Func<TDistributor, DateTime>? distributorCreatedAtSelector = null)
+        {
+            var groupedContractor = contractor
+                .GroupBy(c => new
+                {
+                    Month = contractorCreatedAtSelector(c).Month,
+                    ServiceType = contractorServiceTypeSelector(c)
+                })
+                .Select(g => new { g.Key.Month, g.Key.ServiceType, Count = g.Count() })
+                .ToList();
+
+            var groupedDistributor = distributor != null
+                ? distributor
+                    .GroupBy(d => distributorCreatedAtSelector!(d).Month)
+                    .Select(g => new { 
+                        Month = g.Key, 
+                        Count = g.Count() 
+                    })
+                    .ToList()
+                : new List<(int Month, int Count)>()
+                    .Select(x => new { 
+                        x.Month, 
+                        x.Count 
+                    })
+                    .ToList();
+
+            return Enumerable.Range(1, 12)
+                .Select(m => new BarChartDto
+                {
+                    Month = m,
+                    Year = year,
+                    RepairCount = groupedContractor
+                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Repair)
+                        .Select(x => x.Count)
+                        .FirstOrDefault(),
+                    ConstructionCount = groupedContractor
+                        .Where(x => x.Month == m && x.ServiceType == ServiceType.Construction)
+                        .Select(x => x.Count)
+                        .FirstOrDefault(),
+                    MaterialCount = groupedDistributor
+                        .Where(x => x.Month == m)
+                        .Select(x => x.Count)
+                        .FirstOrDefault(),
+                })
+                .ToList();
+        }
+
+        private static IEnumerable<LineChartDto> BuildLineChart<T>(
+            IEnumerable<T> data,
+            int year,
+            Func<T, DateTime> dateSelector,
+            Func<T, decimal> valueSelector)
+        {
+            var grouped = data
+                .GroupBy(x => dateSelector(x).Month)
+                .Select(g => new { 
+                    Month = g.Key, 
+                    Total = g.Sum(valueSelector) 
+                })
+                .ToList();
+
+            return Enumerable.Range(1, 12)
+                .Select(m => new LineChartDto
+                {
+                    Month = m,
+                    Year = year,
+                    TotalValue = grouped
+                        .Where(x => x.Month == m)
+                        .Select(x => x.Total)
+                        .FirstOrDefault()
+                })
+                .ToList();
         }
     }
 }
