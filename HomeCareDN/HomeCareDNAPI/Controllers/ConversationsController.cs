@@ -28,6 +28,13 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("user/{id:guid}")]
+        public async Task<IActionResult> GetConversationByUserID(Guid id)
+        {
+            var result = await _facadeService.ConversationService.GetConversationByUserIDAsync(id);
+            return Ok(result);
+        }
+
         [HttpGet("admin/{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllConversationsByAdminID(Guid id)

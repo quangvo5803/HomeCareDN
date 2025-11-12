@@ -95,16 +95,15 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ConversationID")
+                    b.Property<Guid?>("ConversationID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ReceiverID")
+                    b.Property<Guid?>("ReceiverID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SenderID")
+                    b.Property<Guid?>("SenderID")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SentAt")
@@ -198,16 +197,26 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ContractorID")
+                    b.Property<Guid?>("AdminID")
                         .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ContractorID")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ConversationType")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerID")
+                    b.Property<Guid?>("CustomerID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ServiceRequestID")
+                    b.Property<Guid?>("ServiceRequestID")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserID")
                         .HasColumnType("uuid");
 
                     b.HasKey("ConversationID");
@@ -693,8 +702,7 @@ namespace DataAccess.Migrations.Application
                     b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Conversation");
                 });

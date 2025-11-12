@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251111074233_AddSupportConversationType")]
+    [Migration("20251112133627_AddSupportConversationType")]
     partial class AddSupportConversationType
     {
         /// <inheritdoc />
@@ -98,16 +98,15 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("uuid");
 
                     b.Property<string>("Content")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ConversationID")
+                    b.Property<Guid?>("ConversationID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ReceiverID")
+                    b.Property<Guid?>("ReceiverID")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("SenderID")
+                    b.Property<Guid?>("SenderID")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("SentAt")
@@ -706,8 +705,7 @@ namespace DataAccess.Migrations.Application
                     b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
                         .WithMany("Messages")
                         .HasForeignKey("ConversationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Conversation");
                 });

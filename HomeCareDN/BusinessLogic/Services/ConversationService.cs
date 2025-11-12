@@ -23,8 +23,22 @@ namespace BusinessLogic.Services
 
         public async Task<ConversationDto?> GetConversationByIDAsync(Guid id)
         {
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                c => c.ConversationID == id,
+                asNoTracking: false
+            );
+            if (conversation == null)
+            {
+                return null;
+            }
+            var result = _mapper.Map<ConversationDto>(conversation);
+            return result;
+        }
+
+        public async Task<ConversationDto?> GetConversationByUserIDAsync(Guid id)
+        {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ConversationID == id
+                c.UserID == id
             );
             if (conversation == null)
             {

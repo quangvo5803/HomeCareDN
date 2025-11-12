@@ -83,8 +83,8 @@ namespace BusinessLogic.Services
                 };
 
                 await _unitOfWork.ConversationRepository.AddAsync(newConversation);
-                await _unitOfWork.SaveAsync();
                 dto.ConversationID = newConversation.ConversationID;
+                await _unitOfWork.SaveAsync();
             }
             else
             {
@@ -107,8 +107,9 @@ namespace BusinessLogic.Services
             ChatMessageGetByIdDto dto
         )
         {
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ConversationID == dto.ConversationID
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                c => c.ConversationID == dto.ConversationID,
+                asNoTracking: false
             );
             if (conversation == null)
             {
@@ -164,7 +165,7 @@ namespace BusinessLogic.Services
             var result = _mapper.Map<ChatMessageDto>(message);
 
             await _signalRNotifier.SendToChatGroupAsync(
-                dto.ConversationID.ToString(),
+                dto.ConversationID!.Value.ToString(),
                 "Chat.MessageCreated",
                 result
             );

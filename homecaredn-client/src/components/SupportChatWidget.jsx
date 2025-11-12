@@ -1,49 +1,68 @@
 // src/components/SupportChatWidget.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { useTranslation } from "react-i18next";
-import { aiChatService } from "../services/aiChatService";
-import { getSupportPrompt } from "../prompts/supportPrompt";
+import React, { useEffect, useMemo, useRef, useState, useContext } from 'react';
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
+import { aiChatService } from '../services/aiChatService';
+import { getSupportPrompt } from '../prompts/supportPrompt';
+
+// ===== Import cho Chat Admin =====
+import { useAuth } from '../hook/useAuth';
+import RealtimeContext from '../realtime/RealtimeContext';
+import useRealtime from '../realtime/useRealtime';
+import { RealtimeEvents } from '../realtime/realtimeEvents';
+import { chatMessageService } from '../services/chatMessageService';
+// SỬ DỤNG conversationService MỚI
+import { conversationService } from '../services/conversationService';
 
 /* ===== Helpers ===== */
-const ROLES = { USER: "user", BOT: "assistant" };
-const cn = (...xs) => xs.filter(Boolean).join(" ");
+const ROLES = { USER: 'user', BOT: 'assistant' };
+const cn = (...xs) => xs.filter(Boolean).join(' ');
 
+// Lấy Admin ID cố định
+const ADMIN_ID = 'a2e44ef4-eb65-4d0b-8105-6539a9ee3091';
+
+// UID Generator (Giữ nguyên)
 const uid = (() => {
-  let seq = 0; // fallback đếm tăng dần để không đụng Math.random
+  let seq = 0;
   return () => {
-    const c = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
-
-    // 1) Tốt nhất: UUID v4 native (Node >= 16.15 / Browser hiện đại)
+    const c = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
     if (c?.randomUUID) return c.randomUUID();
-
-    // 2) Tự tạo UUID v4 bằng getRandomValues (crypto-strong)
     if (c?.getRandomValues) {
       const bytes = new Uint8Array(16);
       c.getRandomValues(bytes);
-      // set version & variant cho UUID v4
       bytes[6] = (bytes[6] & 0x0f) | 0x40;
       bytes[8] = (bytes[8] & 0x3f) | 0x80;
-      const hex = Array.from(bytes, b => b.toString(16).padStart(2, "0")).join("");
-      return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+      const hex = Array.from(bytes, (b) =>
+        b.toString(16).padStart(2, '0')
+      ).join('');
+      return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(
+        12,
+        16
+      )}-${hex.slice(16, 20)}-${hex.slice(20)}`;
     }
-
-    // 3) Fallback cuối (môi trường rất cũ/không có crypto): không ngẫu nhiên,
-    // chỉ cần duy nhất/ổn định để key React hoạt động, tránh dùng PRNG.
     seq += 1;
     return `uid-${Date.now()}-${seq}`;
   };
 })();
 
-const toUiMessage = (m) => ({
+// Helper cho tin nhắn AI
+const toAiUiMessage = (m) => ({
   id: uid(),
-  role: m.role === "assistant" ? ROLES.BOT : ROLES.USER,
-  text: m.content ?? m.text ?? "",
+  role: m.role === 'assistant' ? ROLES.BOT : ROLES.USER,
+  text: m.content ?? m.text ?? '',
   time:
     m.time ??
     (m.timestamp
       ? new Date(m.timestamp).toTimeString().slice(0, 5)
       : new Date().toTimeString().slice(0, 5)),
+});
+
+// Helper cho tin nhắn Admin (Sửa: dùng camelCase)
+const toAdminUiMessage = (m, currentUserId) => ({
+  id: m.id ?? m.chatMessageId ?? uid(), // SỬA: chatMessageId
+  role: m.senderId === currentUserId ? ROLES.USER : ROLES.BOT, // SỬA: senderId
+  text: m.content ?? '',
+  time: new Date(m.timestamp ?? m.sentAt).toTimeString().slice(0, 5), // SỬA: sentAt
 });
 
 function useAutoScroll(dep) {
@@ -55,11 +74,13 @@ function useAutoScroll(dep) {
   return ref;
 }
 
-/* ===== Sub components ===== */
+/* ===== Sub components (Giữ nguyên) ===== */
 function BotAvatar() {
   return (
     <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
-      <span className="text-xs"><i className="fa-solid fa-robot" /></span>
+      <span className="text-xs">
+        <i className="fa-solid fa-headset" />
+      </span>
     </div>
   );
 }
@@ -71,7 +92,6 @@ function UserAvatar() {
   );
 }
 
-/* ===== Shapes (cho PropTypes) ===== */
 const MessageShape = PropTypes.exact({
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   role: PropTypes.oneOf([ROLES.USER, ROLES.BOT]).isRequired,
@@ -86,23 +106,33 @@ const MessageShape = PropTypes.exact({
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
   return (
-    <div className={cn("flex w-full gap-2", isUser ? "justify-end" : "justify-start")}>
+    <div
+      className={cn(
+        'flex w-full gap-2',
+        isUser ? 'justify-end' : 'justify-start'
+      )}
+    >
       {!isUser && <BotAvatar />}
-      <div className={cn("max-w-[75%] md:max-w-[65%]", isUser ? "items-end" : "items-start")}>
+      <div
+        className={cn(
+          'max-w-[75%] md:max-w-[65%]',
+          isUser ? 'items-end' : 'items-start'
+        )}
+      >
         <div
           className={cn(
-            "rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border",
+            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border',
             isUser
-              ? "bg-indigo-600 text-white border-indigo-500/30"
-              : "bg-white text-gray-900 border-gray-200"
+              ? 'bg-indigo-600 text-white border-indigo-500/30'
+              : 'bg-white text-gray-900 border-gray-200'
           )}
         >
           {message.text}
         </div>
         <div
           className={cn(
-            "mt-1 text-[10px] opacity-60",
-            isUser ? "text-right text-white/80" : "text-left text-gray-500"
+            'mt-1 text-[10px] opacity-60',
+            isUser ? 'text-right text-white/80' : 'text-left text-gray-500'
           )}
         >
           {message.time}
@@ -120,7 +150,7 @@ function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
     return messages.filter((m) =>
-      (m.text || "").toLowerCase().includes(filter.toLowerCase())
+      (m.text || '').toLowerCase().includes(filter.toLowerCase())
     );
   }, [messages, filter]);
   const ref = useAutoScroll(filtered.length);
@@ -140,23 +170,28 @@ MessageList.propTypes = {
   filter: PropTypes.string,
 };
 
-function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) {
+function ChatHeader({
+  onClose,
+  onMinimize,
+  isMinimized,
+  brand = 'HomeCareDN',
+}) {
   const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="relative">
           <div className="h-9 w-9 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
-            <i className="fa-solid fa-robot" />
+            <i className="fa-solid fa-headset" />
           </div>
           <span className="absolute -right-0 -bottom-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
         </div>
         <div>
           <div className="text-sm font-semibold">
-            {t("supportChat.headerTitle", { brand })}
+            {t('supportChat.headerTitle', { brand })}
           </div>
           <div className="text-xs text-green-500">
-            {t("supportChat.headerStatusReady")}
+            {t('supportChat.headerStatusReady')}
           </div>
         </div>
       </div>
@@ -165,10 +200,14 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
           onClick={onMinimize}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
           title={
-            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+            isMinimized
+              ? t('supportChat.action.expand')
+              : t('supportChat.action.minimize')
           }
           aria-label={
-            isMinimized ? t("supportChat.action.expand") : t("supportChat.action.minimize")
+            isMinimized
+              ? t('supportChat.action.expand')
+              : t('supportChat.action.minimize')
           }
         >
           {isMinimized ? (
@@ -180,8 +219,8 @@ function ChatHeader({ onClose, onMinimize, isMinimized, brand = "HomeCareDN" }) 
         <button
           onClick={onClose}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
-          title={t("supportChat.action.close")}
-          aria-label={t("supportChat.action.close")}
+          title={t('supportChat.action.close')}
+          aria-label={t('supportChat.action.close')}
         >
           <i className="fa-solid fa-xmark" />
         </button>
@@ -196,22 +235,49 @@ ChatHeader.propTypes = {
   brand: PropTypes.string,
 };
 
+// Component Tab mới
+function TabButton({ label, icon, isActive, onClick, disabled }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(
+        'flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium border-b-2',
+        isActive
+          ? 'text-indigo-600 border-indigo-600'
+          : 'text-gray-500 border-transparent hover:text-gray-700',
+        disabled && 'opacity-50 cursor-not-allowed'
+      )}
+    >
+      <i className={icon} />
+      <span>{label}</span>
+    </button>
+  );
+}
+TabButton.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  isActive: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+  disabled: PropTypes.bool,
+};
+
 function ChatInput({ onSend, disabled }) {
   const { t } = useTranslation();
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState('');
   const submit = (e) => {
     e.preventDefault();
     const v = value.trim();
     if (!v) return;
     onSend(v);
-    setValue("");
+    setValue('');
   };
   return (
     <form onSubmit={submit} className="flex w-full items-center gap-2">
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={t("supportChat.inputPlaceholder")}
+        placeholder={t('supportChat.inputPlaceholder')}
         className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         disabled={disabled}
       />
@@ -220,7 +286,7 @@ function ChatInput({ onSend, disabled }) {
         disabled={disabled || !value.trim()}
         className="rounded-md bg-indigo-600 px-3 py-2 text-white disabled:opacity-50"
       >
-        {t("supportChat.send")}
+        {t('supportChat.send')}
       </button>
     </form>
   );
@@ -232,38 +298,57 @@ ChatInput.propTypes = {
 
 function ChatWindow({ open, onClose, brand }) {
   const { t, i18n } = useTranslation();
-  const [messages, setMessages] = useState([]);
-  const [filter, setFilter] = useState("");
-  const [typing, setTyping] = useState(false);
+  const { user } = useAuth();
+  const { chatConnection } = useContext(RealtimeContext);
+
+  // State chung
+  const [currentTab, setCurrentTab] = useState('AI'); // 'AI' hoặc 'ADMIN'
+  const [filter, setFilter] = useState('');
   const [minimized, setMinimized] = useState(false);
 
-  const loadHistory = async () => {
+  // State cho AI
+  const [aiMessages, setAiMessages] = useState([]);
+  const [aiTyping, setAiTyping] = useState(false);
+
+  // State cho Chat Admin
+  const [adminMessages, setAdminMessages] = useState([]);
+  const [conversation, setConversation] = useState(null);
+  const [adminChatState, setAdminChatState] = useState('idle'); // idle, loading, loaded, error
+  const [adminSending, setAdminSending] = useState(false);
+
+  const parseErr = (err) =>
+    err?.response?.data ?? err?.message ?? 'Bad request';
+
+  // ----- Logic cho AI Chat (Giữ nguyên) -----
+  const loadAiHistory = async () => {
     try {
       const raw = await aiChatService.history();
-      const list = Array.isArray(raw) ? raw.map(toUiMessage) : [];
-      setMessages(list);
+      const list = Array.isArray(raw) ? raw.map(toAiUiMessage) : [];
+      setAiMessages(list);
     } catch (e) {
-      console.warn("Load history failed", e);
+      console.warn('Load AI history failed', e);
     }
   };
 
-  useEffect(() => {
-    if (!open) return;
-    loadHistory();
-  }, [open]);
-
-  const parseErr = (err) => err?.response?.data ?? err?.message ?? "Bad request";
-
-  const send = async (text) => {
+  const sendAiMessage = async (text) => {
     try {
-      setTyping(true);
+      setAiTyping(true);
+      setAiMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          role: ROLES.USER,
+          text,
+          time: new Date().toTimeString().slice(0, 5),
+        },
+      ]);
       await aiChatService.send({
         prompt: text,
         system: getSupportPrompt(i18n.language),
       });
-      await loadHistory();
+      await loadAiHistory();
     } catch (err) {
-      setMessages((prev) => [
+      setAiMessages((prev) => [
         ...prev,
         {
           id: uid(),
@@ -273,11 +358,168 @@ function ChatWindow({ open, onClose, brand }) {
         },
       ]);
     } finally {
-      setTyping(false);
+      setAiTyping(false);
+    }
+  };
+
+  // ----- Logic cho Admin Chat (LOGIC "CHECK-FIRST") -----
+
+  // Hàm tải lịch sử tin nhắn
+  const loadAdminChatHistory = async (convId) => {
+    try {
+      // SỬA: Dùng camelCase
+      const params = {
+        conversationId: convId,
+        messageSize: 100,
+        messageNumber: 1,
+      };
+      const history = await chatMessageService.getMessagesByConversationID(
+        params
+      );
+      const list = (history.items || []).map((m) =>
+        toAdminUiMessage(m, user.id)
+      );
+      setAdminMessages(list);
+
+      // Tham gia phòng chat
+      if (chatConnection) {
+        await chatConnection.invoke('JoinConversation', convId);
+      }
+      setAdminChatState('loaded');
+    } catch (err) {
+      console.error('Load admin chat history failed', err);
+      setAdminChatState('error');
+    }
+  };
+
+  // Hàm "Kiểm tra" khi bấm tab
+  const loadSupportChat = async () => {
+    if (!user) return;
+    setAdminChatState('loading');
+    try {
+      // 1. GỌI API MỚI: "Kiểm tra"
+      const conv = await conversationService.getConversationByUserID(user.id);
+
+      // 2. TRƯỜNG HỢP CÓ HỘI THOẠI
+      if (conv) {
+        setConversation(conv); // Lưu lại
+        await loadAdminChatHistory(conv.conversationID); // SỬA: Dùng camelCase
+      }
+      // 3. TRƯỜNG HỢP CHƯA CÓ HỘI THOẠI (BE trả về null)
+      else {
+        setConversation(null); // Đảm bảo là null
+        setAdminMessages([]);
+        setAdminChatState('loaded'); // Vẫn là 'loaded', nhưng trống
+      }
+    } catch (err) {
+      console.error('Load support chat failed', err);
+      setAdminChatState('error');
+    }
+  };
+
+  // Gửi tin nhắn (SỬA: Gửi camelCase)
+  const sendAdminMessage = async (text) => {
+    if (!user || adminSending) return;
+
+    setAdminSending(true);
+    try {
+      // SỬA: Dùng camelCase cho DTO
+      const dto = {
+        content: text,
+        senderId: user.id,
+        receiverId: ADMIN_ID,
+        conversationId: conversation ? conversation.conversationID : null, // SỬA: Dùng camelCase
+      };
+
+      await chatMessageService.sendMessageToAdmin(dto);
+      // Chờ SignalR broadcast lại
+    } catch (err) {
+      console.error('Send admin message failed', err);
+      setAdminMessages((prev) => [
+        ...prev,
+        {
+          id: uid(),
+          role: ROLES.BOT,
+          text: `⚠️ ${t('supportChat.sendAdminChatError')}`,
+          time: new Date().toTimeString().slice(0, 5),
+        },
+      ]);
+    } finally {
+      setAdminSending(false);
+    }
+  };
+
+  // Lắng nghe tin nhắn mới (SỬA: Dùng camelCase)
+  const handleNewAdminMessage = (messageDto) => {
+    // Nếu chưa có conversation, đây là tin nhắn ĐẦU TIÊN
+    if (!conversation) {
+      const convId = messageDto.conversationId; // SỬA: Dùng camelCase
+      if (convId) {
+        // Lưu lại conversation MỚI
+        setConversation({
+          conversationID: convId, // BE DTO dùng PascalCase, nên phải đọc PascalCase
+          userID: messageDto.senderId, // SỬA: Dùng camelCase
+          adminID: ADMIN_ID,
+        });
+        // Tải lịch sử (sẽ bao gồm tin nhắn này)
+        loadAdminChatHistory(convId);
+        return;
+      }
+    }
+
+    // Nếu ĐÃ CÓ conversation, chỉ thêm tin nhắn
+    if (messageDto?.conversationId === conversation?.conversationID) {
+      // SỬA: So sánh camelCase với PascalCase
+      setAdminMessages((prev) => {
+        if (prev.some((m) => m.id === messageDto.id)) return prev;
+        return [...prev, toAdminUiMessage(messageDto, user.id)];
+      });
+    }
+  };
+
+  useRealtime(
+    { [RealtimeEvents.ChatMessageCreated]: handleNewAdminMessage },
+    'chat'
+  );
+
+  // ----- Effect Hooks -----
+  useEffect(() => {
+    if (open) {
+      loadAiHistory(); // Luôn load AI khi mở
+    } else {
+      // Reset mọi thứ khi đóng
+      setConversation(null);
+      setAiMessages([]);
+      setAdminMessages([]);
+      setCurrentTab('AI');
+      setAdminChatState('idle'); // Quan trọng: reset về 'idle'
+    }
+  }, [open]);
+
+  // EFFECT MỚI: Tải chat khi bấm tab Admin
+  useEffect(() => {
+    if (open && currentTab === 'ADMIN' && adminChatState === 'idle') {
+      loadSupportChat();
+    }
+  }, [open, currentTab, adminChatState]);
+
+  // ----- Hàm Send Chung -----
+  const send = async (text) => {
+    if (currentTab === 'AI') {
+      await sendAiMessage(text);
+    } else {
+      await sendAdminMessage(text);
     }
   };
 
   if (!open) return null;
+
+  // Xác định danh sách tin nhắn và trạng thái disabled
+  const currentMessages = currentTab === 'AI' ? aiMessages : adminMessages;
+  const isInputDisabled =
+    aiTyping ||
+    adminSending ||
+    (currentTab === 'ADMIN' && (adminChatState === 'loading' || !user));
 
   return (
     <div className="fixed bottom-24 right-4 z-50 w-[92vw] max-w-md">
@@ -291,6 +533,25 @@ function ChatWindow({ open, onClose, brand }) {
           />
         </div>
 
+        {/* ==== UI TABS ==== */}
+        {!minimized && (
+          <div className="flex px-4 pt-3 border-b border-gray-200">
+            <TabButton
+              label={t('supportChat.tabAI')}
+              icon="fa-solid fa-robot"
+              isActive={currentTab === 'AI'}
+              onClick={() => setCurrentTab('AI')}
+            />
+            <TabButton
+              label={t('supportChat.tabAdmin')}
+              icon="fa-solid fa-user-tie"
+              isActive={currentTab === 'ADMIN'}
+              onClick={() => setCurrentTab('ADMIN')}
+              disabled={!user} // Vô hiệu hóa nếu chưa login
+            />
+          </div>
+        )}
+
         {!minimized && (
           <div className="p-4 space-y-3">
             <div className="flex items-center gap-2 rounded-xl border bg-gray-50 px-3 py-2">
@@ -298,29 +559,65 @@ function ChatWindow({ open, onClose, brand }) {
               <input
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                placeholder={t("supportChat.searchPlaceholder")}
+                placeholder={t('supportChat.searchPlaceholder')}
                 className="bg-transparent text-sm outline-none w-full"
               />
             </div>
 
-            <MessageList messages={messages} filter={filter} />
+            {/* ==== HIỂN THỊ DANH SÁCH TIN NHẮN THEO TAB ==== */}
+            {currentTab === 'AI' && (
+              <MessageList messages={currentMessages} filter={filter} />
+            )}
+
+            {currentTab === 'ADMIN' && (
+              <>
+                {!user && (
+                  <div className="h-[48vh] md:h-[50vh] flex flex-col items-center justify-center text-center text-sm text-gray-500 px-4">
+                    <i className="fa-solid fa-right-to-bracket text-2xl mb-3"></i>
+                    <p>{t('supportChat.mustLogin')}</p>
+                  </div>
+                )}
+                {/* Đang tải (Khi check lần đầu) */}
+                {user &&
+                  (adminChatState === 'loading' ||
+                    adminChatState === 'loadingHistory') && (
+                    <div className="h-[48vh] md:h-[50vh] flex flex-col items-center justify-center text-sm text-gray-500">
+                      <i className="fa-solid fa-spinner animate-spin text-2xl mb-3" />
+                      <p>{t('supportChat.loadingAdminChat')}</p>
+                    </div>
+                  )}
+
+                {/* Đã tải, có hội thoại */}
+                {user && adminChatState === 'loaded' && conversation && (
+                  <MessageList messages={currentMessages} filter={filter} />
+                )}
+
+                {/* (LOGIC BẠN YÊU CẦU) Đã tải, nhưng không có hội thoại */}
+                {user && adminChatState === 'loaded' && !conversation && (
+                  <div className="h-[48vh] md:h-[50vh] flex flex-col items-center justify-center text-center text-sm text-gray-500 px-4">
+                    <i className="fa-solid fa-paper-plane text-2xl mb-3 text-indigo-400"></i>
+                    <p>{t('supportChat.startAdminChat')}</p>
+                  </div>
+                )}
+              </>
+            )}
 
             <div className="flex items-center justify-between">
-              {typing ? (
+              {aiTyping && currentTab === 'AI' ? (
                 <div className="flex items-center gap-2 text-xs text-gray-500">
                   <span className="inline-block h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
-                  {t("supportChat.typing")}
+                  {t('supportChat.typing')}
                 </div>
               ) : (
                 <span />
               )}
 
               <span className="text-[10px] rounded-full border px-2 py-0.5 text-gray-500">
-                Cookie-backed
+                {currentTab === 'AI' ? 'Cookie-backed' : 'Live Support'}
               </span>
             </div>
 
-            <ChatInput onSend={send} disabled={typing} />
+            <ChatInput onSend={send} disabled={isInputDisabled} />
           </div>
         )}
       </div>
@@ -339,13 +636,17 @@ function ChatLauncherButton({ open, setOpen }) {
     <button
       onClick={() => setOpen((v) => !v)}
       className={cn(
-        "fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl border",
-        "bg-indigo-600 text-white grid place-items-center hover:scale-105 transition"
+        'fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl border',
+        'bg-indigo-600 text-white grid place-items-center hover:scale-110 transition'
       )}
-      title={t("supportChat.launcherTitle")}
-      aria-label={t("supportChat.launcherTitle")}
+      title={t('supportChat.launcherTitle')}
+      aria-label={t('supportChat.launcherTitle')}
     >
-      {open ? <i className="fa-solid fa-xmark" /> : <i className="fa-solid fa-comment" />}
+      {open ? (
+        <i className="fa-solid fa-xmark" />
+      ) : (
+        <i className="fa-solid fa-comment" />
+      )}
     </button>
   );
 }
@@ -355,7 +656,7 @@ ChatLauncherButton.propTypes = {
 };
 
 /* ===== Default export ===== */
-export default function SupportChatWidget({ brand = "HomeCareDN" }) {
+export default function SupportChatWidget({ brand = 'HomeCareDN' }) {
   const [open, setOpen] = useState(false);
   return (
     <>

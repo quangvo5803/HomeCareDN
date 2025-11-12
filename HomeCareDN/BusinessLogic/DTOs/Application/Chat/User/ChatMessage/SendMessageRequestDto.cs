@@ -4,8 +4,7 @@ namespace BusinessLogic.DTOs.Application.Chat.User.ChatMessage
 {
     public class SendMessageRequestDto
     {
-        [Required]
-        public Guid ConversationID { get; set; }
+        public Guid? ConversationID { get; set; }
 
         [Required]
         public Guid SenderID { get; set; }
