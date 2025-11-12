@@ -503,6 +503,8 @@
     "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
   },
   "partnerDashboard": {
+    "no": "STT",
+    "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
@@ -513,6 +515,8 @@
     },
     "description": "Mô tả",
     "estimate": "Ước tính",
+    "commission_due": "Khoản hoa hồng phải trả",
+    "apply_at": "Ngày ứng tuyển",
     "last_update": "Cập nhật lần cuối",
     "notifications": "Thông báo",
     "status": "Trạng thái",

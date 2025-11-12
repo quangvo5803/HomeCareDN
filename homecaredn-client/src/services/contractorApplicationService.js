@@ -10,7 +10,10 @@ export const contractorApplicationService = {
   },
 
   getAllByUserIdForAdmin: async (params) => {
-    const response = await api.get('/contractor-applications/admin/get-all-by-user-id', { params });
+    const response = await api.get(
+      '/contractor-applications/admin/get-all-by-user-id',
+      { params }
+    );
     return response.data;
   },
 
@@ -56,6 +59,15 @@ export const contractorApplicationService = {
   getDashboardData: async () => {
     const { data } = await api.get(
       '/contractor-applications/contractor/dashboard'
+    );
+    return data;
+  },
+  getLatestApplications: async (params) => {
+    const { data } = await api.get(
+      '/contractor-applications/contractor/applications',
+      {
+        params: params,
+      }
     );
     return data;
   },

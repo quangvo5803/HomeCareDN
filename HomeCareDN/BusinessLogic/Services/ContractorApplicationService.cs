@@ -91,14 +91,15 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<PagedResultDto<ContractorApplicationDto>> GetAllContractorApplicationByUserIdAsync
-        (
-            QueryParameters parameters
-        )
+        public async Task<
+            PagedResultDto<ContractorApplicationDto>
+        > GetAllContractorApplicationByUserIdAsync(QueryParameters parameters)
         {
             var query = _unitOfWork
-                .ContractorApplicationRepository.GetQueryable()
-                .Where(ca => ca.ContractorID == parameters.FilterID).AsSingleQuery().AsNoTracking();
+                .ContractorApplicationRepository.GetQueryable(includeProperties: "ServiceRequest")
+                .Where(ca => ca.ContractorID == parameters.FilterID)
+                .AsSingleQuery()
+                .AsNoTracking();
 
             var totalCount = await query.CountAsync();
             query = query
@@ -116,6 +117,7 @@ namespace BusinessLogic.Services
                 PageSize = parameters.PageSize,
             };
         }
+
         public async Task<ContractorApplicationDto?> GetContractorApplicationByServiceRequestIDAsync(
             ContractorApplicationGetDto contractorApplicationGetDto
         )
