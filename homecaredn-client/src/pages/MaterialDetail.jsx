@@ -22,11 +22,6 @@ export default function MaterialDetail() {
     fetchMaterial();
   }, [materialID, getMaterialById, location.key]);
 
-  // luôn nhảy lên đầu
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location.key]);
-
   useEffect(() => {
     if (!material.categoryID) return;
     const loadMaterials = async () => {

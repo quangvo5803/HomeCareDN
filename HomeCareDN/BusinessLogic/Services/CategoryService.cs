@@ -171,7 +171,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteCategoryAsync(Guid id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetAsync(c => c.CategoryID == id);
+            var category = await _unitOfWork.CategoryRepository.GetAsync(
+                c => c.CategoryID == id,
+                asNoTracking: false
+            );
             if (category == null)
             {
                 var errors = new Dictionary<string, string[]>

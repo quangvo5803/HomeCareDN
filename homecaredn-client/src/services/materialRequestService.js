@@ -7,8 +7,10 @@ export const materialRequestService = {
     return response.data;
   },
 
-  getByIdForAdmin: async (id) => {
-    const response = await api.get(`/material-requests/admin/${id}`);
+  getByIdForAdmin: async (dto) => {
+    const response = await api.get('/material-requests/admin/detail', {
+      params: dto,
+    });
     return response.data;
   },
 
@@ -20,8 +22,10 @@ export const materialRequestService = {
     return response.data;
   },
 
-  getByIdForCustomer: async (id) => {
-    const response = await api.get(`/material-requests/customer/${id}`);
+  getByIdForCustomer: async (dto) => {
+    const response = await api.get('/material-requests/customer/detail', {
+      params: dto,
+    });
     return response.data;
   },
 
@@ -57,8 +61,10 @@ export const materialRequestService = {
     return response.data;
   },
 
-  getByIdForDistributor: async (id) => {
-    const response = await api.get(`/material-requests/distributor/${id}`);
+  getByIdForDistributor: async (dto) => {
+    const response = await api.get('/material-requests/distributor/detail', {
+      params: dto,
+    });
     return response.data;
   },
 };

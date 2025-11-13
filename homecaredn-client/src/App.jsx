@@ -14,6 +14,7 @@ import { setNavigate } from './utils/navigateHelper';
 
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
+import ScrollToTop from './components/ScrollToTop';
 
 // Public pages
 import Home from './pages/Home';
@@ -132,6 +133,7 @@ function Layout() {
 
   return (
     <>
+      <ScrollToTop />
       {showHeaderFooter && <Header />}
       <Routes>
         {/* Public routes */}

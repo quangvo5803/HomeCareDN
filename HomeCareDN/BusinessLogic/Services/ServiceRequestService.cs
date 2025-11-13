@@ -477,7 +477,8 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
-                includeProperties: INCLUDE_DETAIL
+                includeProperties: "ContractorApplications.Images",
+                false
             );
 
             ValidateServiceRequest(serviceRequest);
@@ -494,6 +495,7 @@ namespace BusinessLogic.Services.Interfaces
             }
             await DeleteRelatedEntity(serviceRequest!);
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
+            await _unitOfWork.SaveAsync();
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Contractor",
                 "ServiceRequest.Delete",
@@ -504,7 +506,6 @@ namespace BusinessLogic.Services.Interfaces
                 "ServiceRequest.Delete",
                 new { ServiceRequestID = id }
             );
-            await _unitOfWork.SaveAsync();
         }
 
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)

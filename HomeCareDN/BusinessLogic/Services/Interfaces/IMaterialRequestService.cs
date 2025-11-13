@@ -13,7 +13,7 @@ namespace BusinessLogic.Services.Interfaces
             QueryParameters parameters
         );
         Task<MaterialRequestDto> GetMaterialRequestByIdAsync(
-            Guid materialRequestID,
+            MaterialRequestGetByIdDto getByIdDto,
             string role = "Admin"
         );
         Task<MaterialRequestDto> CreateNewMaterialRequestAsync(

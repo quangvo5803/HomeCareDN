@@ -5,6 +5,10 @@ export const RealtimeEvents = Object.freeze({
   ServiceRequestDelete: 'ServiceRequest.Delete',
   ServiceRequestClosed: 'ServiceRequest.Closed',
 
+  //MaterialRequest
+  MaterialRequestCreated: 'MaterialRequest.Created',
+  MaterialRequestDelete: 'MaterialRequest.Delete',
+
   // ContractorApplication
   ContractorApplicationCreated: 'ContractorApplication.Created',
   ContractorApplicationAccept: 'ContractorApplication.Accept',
