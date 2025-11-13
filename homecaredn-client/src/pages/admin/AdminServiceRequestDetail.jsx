@@ -94,10 +94,10 @@ export default function AdminServiceRequestDetail() {
           const newList = prev.map((ca) =>
             ca.contractorApplicationID === payload.contractorApplicationID
               ? {
-                ...ca,
-                status: 'PendingCommission',
-                dueCommisionTime: payload?.dueCommisionTime || null,
-              }
+                  ...ca,
+                  status: 'PendingCommission',
+                  dueCommisionTime: payload?.dueCommisionTime || null,
+                }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -250,10 +250,11 @@ export default function AdminServiceRequestDetail() {
 
             <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
               <i
-                className={`fas ${serviceRequestDetail?.serviceType === 'Construction'
-                  ? 'fa-hammer'
-                  : 'fa-screwdriver-wrench'
-                  } text-2xl text-white`}
+                className={`fas ${
+                  serviceRequestDetail?.serviceType === 'Construction'
+                    ? 'fa-hammer'
+                    : 'fa-screwdriver-wrench'
+                } text-2xl text-white`}
               />
             </div>
 
@@ -306,8 +307,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.packageOption
                     ? t(
-                      `Enums.PackageOption.${serviceRequestDetail.packageOption}`
-                    )
+                        `Enums.PackageOption.${serviceRequestDetail.packageOption}`
+                      )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -338,8 +339,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.mainStructureType
                     ? t(
-                      `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
-                    )
+                        `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
+                      )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -592,16 +593,22 @@ export default function AdminServiceRequestDetail() {
                           <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
                             <tr>
                               <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.orderCode')}
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.orderCode'
+                                )}
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.amount')}
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.amount'
+                                )}
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
                                 {t('adminServiceRequestManager.description')}
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.createAt')}
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.createAt'
+                                )}
                               </th>
                               <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
                                 {t('adminServiceRequestManager.status')}
@@ -616,15 +623,23 @@ export default function AdminServiceRequestDetail() {
                               </td>
 
                               <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
-                                {formatVND(selectedContractor.payment?.amount || 0)}
+                                {formatVND(
+                                  selectedContractor.payment?.amount || 0
+                                )}
                               </td>
 
                               <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                                {selectedContractor.payment?.description.replaceAll('-', '') || 'No description'}
+                                {selectedContractor.payment?.description.replaceAll(
+                                  '-',
+                                  ''
+                                ) || 'No description'}
                               </td>
 
                               <td className="px-4 py-4 text-sm text-gray-700 text-center">
-                                {formatDate(selectedContractor.payment?.paidAt, i18n.language)}
+                                {formatDate(
+                                  selectedContractor.payment?.paidAt,
+                                  i18n.language
+                                )}
                               </td>
 
                               <td className="px-4 py-4 text-sm text-gray-900 text-center">
@@ -641,7 +656,6 @@ export default function AdminServiceRequestDetail() {
                       </div>
                     </div>
                   )}
-
 
                   {/* Commission Countdown - Show when PendingCommission */}
                   {selectedContractor.status === 'PendingCommission' &&
@@ -675,8 +689,9 @@ export default function AdminServiceRequestDetail() {
                             href={url}
                             className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
                             data-gall="contractor-gallery"
-                            title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'
-                              } ${i + 1}`}
+                            title={`${
+                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                            } ${i + 1}`}
                           >
                             <img
                               src={url}

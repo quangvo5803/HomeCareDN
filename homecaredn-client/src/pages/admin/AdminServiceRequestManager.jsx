@@ -14,7 +14,7 @@ import { useAuth } from '../../hook/useAuth';
 export default function ServiceRequest() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const pageSize = 10;
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const [sortOption, setSortOption] = useState('');
