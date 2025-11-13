@@ -8,6 +8,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.Address;
@@ -315,6 +316,8 @@ namespace BusinessLogic.Mapping
             CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
+
+            CreateMap<PaymentTransaction, PaymentTransactionDto>();
         }
 
         // ------------------------

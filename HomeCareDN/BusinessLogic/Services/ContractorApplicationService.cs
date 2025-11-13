@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -175,6 +176,17 @@ namespace BusinessLogic.Services
                     dto.ContractorPhone = string.Empty;
                 }
             }
+            if(role == "Admin" && dto.Status == ApplicationStatus.Approved.ToString())
+            {
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.ServiceRequestID == contractorApplication.ServiceRequestID
+                );
+                if (payment != null)
+                {
+                    dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
+                }
+            }
+        
             return dto;
         }
 
