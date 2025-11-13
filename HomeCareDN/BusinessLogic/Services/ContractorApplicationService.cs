@@ -163,9 +163,6 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-            var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
-                p.ServiceRequestID == contractorApplication.ServiceRequestID
-            );
             dto.CompletedProjectCount = contractor!.ProjectCount;
             if (contractor != null)
             {
@@ -179,10 +176,17 @@ namespace BusinessLogic.Services
                     dto.ContractorPhone = string.Empty;
                 }
             }
-            if (payment != null)
+            if(role == "Admin" && dto.Status == ApplicationStatus.Approved.ToString())
             {
-                dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.ServiceRequestID == contractorApplication.ServiceRequestID
+                );
+                if (payment != null)
+                {
+                    dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
+                }
             }
+        
             return dto;
         }
 

@@ -945,7 +945,7 @@
     "subtitle": "Quản lý danh sách giao dịch",
     "no": "STT",
     "transaction": "giao dịch",
-    "orderCode": "Mã đơn hàng",
+    "orderCode": "Mã giao dịch",
     "amount": "Tiền thanh toán",
     "date": "Ngày tạo",
     "description": "Mô Tả",

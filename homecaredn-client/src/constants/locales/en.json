@@ -951,7 +951,7 @@
     "subtitle": "Manage transaction list",
     "no": "NO",
     "transaction": "transaction",
-    "orderCode": "Order code",
+    "orderCode": "Transaction code",
     "amount": "Payment amount",
     "date": "Creation date",
     "description": "Descriptions",
