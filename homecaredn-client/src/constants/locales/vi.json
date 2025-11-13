@@ -1038,6 +1038,15 @@
     "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
+    "ReviewModal": {
+      "view": "Đánh giá của bạn",
+      "create": "Hãy cho chúng tôi biết trải nghiệm của bạn với nhà thầu này.",
+      "rating":"Đánh giá",
+      "comment":"Nhận xét",
+      "commentPlaceholder":"Viết nhận xét của bạn ở đây...",
+      "images":"Hình ảnh",
+      "uploadImages":"Tải lên hình ảnh"
+    },
     "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
@@ -1350,5 +1359,16 @@
     "minutes": "Phút",
     "seconds": "Giây",
     "due": "Hạn"
+  },
+  "ReviewCountdown":{
+    "reviewed": "Bạn đã đánh giá nhà thầu này.",
+    "viewReview": "Xem đánh giá",
+    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu!",
+    "createReview": "Tạo đánh giá",
+    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu trước khi có thể đánh giá họ:",
+    "days": "Ngày",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "seconds": "Giây"
   }
 }

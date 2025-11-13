@@ -1043,6 +1043,15 @@
     "Approve": "Approve"
   },
   "ModalPopup": {
+    "ReviewModal": {
+    "view": "Your Review",
+    "create": "Tell us about your experience with this contractor.",
+    "rating": "Rating",
+    "comment": "Comment",
+    "commentPlaceholder": "Write your comment here...",
+    "images": "Images",
+    "uploadImages": "Upload Images"
+  },
     "DeleteBrandModal": {
       "title": "Are you sure?",
       "text": "This brand will be deleted and cannot be restored!"
@@ -1353,5 +1362,16 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "due": "Due date"
+  },
+  "ReviewCountdown": {
+    "reviewed": "You have reviewed this contractor.",
+    "viewReview": "View Review",
+    "reviewTimeExpired": "You can review the contractor now!",
+    "createReview": "Create Review",
+    "reviewAvailableIn": "You need to work with the contractor before you can review them:",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
   }
 }

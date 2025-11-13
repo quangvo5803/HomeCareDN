@@ -8,6 +8,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.Address;
@@ -32,6 +33,8 @@ namespace BusinessLogic.Mapping
             // ------------------------
             // Create DTO -> Entity (Write)
             // ------------------------
+            CreateMap<ReviewCreateRequestDto, Review>()
+                .ForMember(dest => dest.Images, opt => opt.Ignore());
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
 
@@ -85,6 +88,12 @@ namespace BusinessLogic.Mapping
             // ------------------------
             // Entity -> DTO (Read / Response)
             // ------------------------
+            CreateMap<Review, ReviewDto>()
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                );
+
             CreateMap<ServiceRequest, ServiceRequestDto>()
                 .ForMember(
                     dest => dest.ContractorApplyCount,
@@ -108,7 +117,9 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 )
+                .ForMember(dest => dest.Review, opt => opt.MapFrom(src => src.Review))
                 .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
+
             CreateMap<Service, ServiceDto>()
                 .ForMember(
                     dest => dest.ImageUrls,

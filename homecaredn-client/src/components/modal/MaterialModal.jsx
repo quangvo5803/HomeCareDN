@@ -217,7 +217,7 @@ export default function MaterialModal({
 
       await onSave(data);
     } catch (err) {
-      toast.error(t(handleApiError(err)));
+      toast.error(handleApiError(err));
     }
   };
 
@@ -468,8 +468,8 @@ export default function MaterialModal({
                   <span className="ml-3 text-sm text-gray-500">
                     {images.filter((i) => i.isNew).length > 0
                       ? `${images.filter((i) => i.isNew).length} ${t(
-                        'distributorMaterialManager.materialModal.filesSelected'
-                      )}`
+                          'distributorMaterialManager.materialModal.filesSelected'
+                        )}`
                       : t('distributorMaterialManager.materialModal.noFile')}
                   </span>
                 </div>

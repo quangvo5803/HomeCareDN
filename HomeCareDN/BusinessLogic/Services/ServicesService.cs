@@ -1,7 +1,5 @@
-﻿using System.Security.Cryptography;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;

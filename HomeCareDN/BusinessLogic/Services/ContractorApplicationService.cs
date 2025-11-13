@@ -65,11 +65,17 @@ namespace BusinessLogic.Services
             var dtos = _mapper.Map<IEnumerable<ContractorApplicationDto>>(items);
             foreach (var dto in dtos)
             {
+                var contractor = await _userManager.FindByIdAsync(dto.ContractorID.ToString());
+
                 //Hidden to low loading => show when getById
                 dto.Description = string.Empty;
+
+                dto.ReviewCount = contractor!.RatingCount;
+                dto.AverageRating = contractor!.AverageRating;
+                dto.CompletedProjectCount = contractor!.ProjectCount;
+
                 if (role == "Admin")
                 {
-                    var contractor = await _userManager.FindByIdAsync(dto.ContractorID.ToString());
                     if (contractor != null)
                     {
                         dto.ContractorEmail = contractor.Email ?? string.Empty;
@@ -88,14 +94,15 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<PagedResultDto<ContractorApplicationDto>> GetAllContractorApplicationByUserIdAsync
-        (
-            QueryParameters parameters
-        )
+        public async Task<
+            PagedResultDto<ContractorApplicationDto>
+        > GetAllContractorApplicationByUserIdAsync(QueryParameters parameters)
         {
             var query = _unitOfWork
                 .ContractorApplicationRepository.GetQueryable()
-                .Where(ca => ca.ContractorID == parameters.FilterID).AsSingleQuery().AsNoTracking();
+                .Where(ca => ca.ContractorID == parameters.FilterID)
+                .AsSingleQuery()
+                .AsNoTracking();
 
             var totalCount = await query.CountAsync();
             query = query
@@ -113,6 +120,7 @@ namespace BusinessLogic.Services
                 PageSize = parameters.PageSize,
             };
         }
+
         public async Task<ContractorApplicationDto?> GetContractorApplicationByServiceRequestIDAsync(
             ContractorApplicationGetDto contractorApplicationGetDto
         )
@@ -163,6 +171,8 @@ namespace BusinessLogic.Services
                 contractorApplication.ContractorID.ToString()
             );
             dto.CompletedProjectCount = contractor!.ProjectCount;
+            dto.AverageRating = contractor.AverageRating;
+            dto.ReviewCount = contractor.RatingCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";

@@ -28,7 +28,8 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
-        private const string INCLUDE_LISTALL = "ContractorApplications";
+        private const string INCLUDE_LISTALL =
+            "ContractorApplications,SelectedContractorApplication,Review,Review.Images";
         private const string INCLUDE_DETAIL =
             "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images,Conversation";
 
@@ -168,6 +169,26 @@ namespace BusinessLogic.Services.Interfaces
                         dto.Address.Ward = string.Empty;
                     }
                 }
+                if (role == "Customer")
+                {
+                    if (dto.SelectedContractorApplication != null)
+                    {
+                        if (
+                            dto.SelectedContractorApplication.Status
+                            == ApplicationStatus.Approved.ToString()
+                        )
+                        {
+                            var contractorPayment =
+                                await _unitOfWork.PaymentTransactionsRepository.GetAsync(cp =>
+                                    cp.ServiceRequestID == dto.ServiceRequestID
+                                );
+                            if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
+                            {
+                                dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -257,7 +278,8 @@ namespace BusinessLogic.Services.Interfaces
                     DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = contractor!.ProjectCount,
-                    AverageRating = 0,
+                    AverageRating = contractor!.AverageRating,
+                    ReviewCount = contractor!.RatingCount,
                 };
             }
         }
@@ -282,8 +304,9 @@ namespace BusinessLogic.Services.Interfaces
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount, // hoặc dữ liệu thực tế nếu có
-                    AverageRating = 0,
+                    CompletedProjectCount = contractor!.ProjectCount,
+                    AverageRating = contractor.AverageRating,
+                    ReviewCount = contractor.RatingCount,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved

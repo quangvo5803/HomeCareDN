@@ -154,7 +154,6 @@ export default function ServiceRequestCreateUpdate() {
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         payload.ImageUrls = uploadedArray.map((u) => u.url);
         payload.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-        setUploadProgress(0);
       }
       if (serviceRequestId) {
         payload.ServiceRequestID = serviceRequestId;
@@ -168,6 +167,7 @@ export default function ServiceRequestCreateUpdate() {
     } catch {
       /// Handle in context
     } finally {
+      setUploadProgress(0);
       setIsSubmitting(false);
     }
   };

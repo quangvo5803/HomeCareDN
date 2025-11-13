@@ -17,6 +17,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         // Thông tin đánh giá nhà thầu
         public int CompletedProjectCount { get; set; }
         public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
 
         // Thông tin liên lạc nhà thầu (mới hiển thị khi đóng phí)
         public required string ContractorID { get; set; }

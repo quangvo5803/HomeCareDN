@@ -20,6 +20,7 @@ namespace BusinessLogic.Services.FacadeService
         public IPartnerRequestService PartnerService { get; }
         public IPaymentService PaymentService { get; }
         public IMaterialRequestService MaterialRequestService { get; }
+        public IReviewService ReviewService { get; }
         public IStatisticService StatisticService { get; }
         public IUserService UserService { get; }
 
@@ -93,10 +94,13 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.Notifier
             );
 
-            StatisticService = new StatisticService(
+            ReviewService = new ReviewService(
                 coreDeps.UnitOfWork,
-                identityDeps.UserManager
+                coreDeps.Mapper,
+                coreDeps.UserManager
             );
+
+            StatisticService = new StatisticService(coreDeps.UnitOfWork, identityDeps.UserManager);
 
             UserService = new UserService(
                 coreDeps.Mapper,

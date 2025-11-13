@@ -41,6 +41,7 @@ namespace DataAccess.UnitOfWork
         }
 
         public IPaymentTransactionsRepository PaymentTransactionsRepository { get; private set; }
+        public IReviewRepository ReviewRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudinaryOptions)
         {
@@ -61,6 +62,7 @@ namespace DataAccess.UnitOfWork
             DistributorApplicationRepository = new DistributorApplicationRepository(_db);
             DistributorApplicationItemRepository = new DistributorApplicationItemRepository(_db);
             PaymentTransactionsRepository = new PaymentTransactionsRepository(_db);
+            ReviewRepository = new ReviewRepository(_db);
         }
 
         public async Task SaveAsync()

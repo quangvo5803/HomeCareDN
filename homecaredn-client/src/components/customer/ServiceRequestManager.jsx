@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { reviewService } from '../../services/reviewService';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
@@ -10,12 +11,22 @@ import Loading from '../Loading';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useAddress } from '../../hook/useAddress';
+import { useState } from 'react';
+import ReviewModal from '../modal/ReviewModal';
+import ReviewCountdown from '../ReviewCountdown';
+
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { addresses } = useAddress();
   const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
     useServiceRequest();
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedServiceRequest, setSelectedServiceRequest] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [reviewReadOnly, setReviewReadOnly] = useState(false);
+
   useRealtime({
     [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       setServiceRequests((prev) =>
@@ -63,12 +74,14 @@ export default function ServiceRequestManager() {
             ? {
                 ...sr,
                 status: 'Closed',
+                startReviewDate: payload.startReviewDate,
               }
             : sr
         )
       );
     },
   });
+
   const handleServiceRequestViewDetail = (serviceRequestId) => {
     navigate(`/Customer/ServiceRequestDetail/${serviceRequestId}`);
   };
@@ -104,6 +117,38 @@ export default function ServiceRequestManager() {
         }
       },
     });
+  };
+
+  const handleCreateReview = (serviceRequest) => {
+    setSelectedServiceRequest(serviceRequest);
+    setReviewReadOnly(false);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleViewReview = (serviceRequest) => {
+    setSelectedServiceRequest(serviceRequest);
+    setReviewReadOnly(true);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSaveReview = async (reviewData) => {
+    try {
+      const response = await reviewService.create(reviewData);
+      toast.success(t('SUCCESS.CREATE_REVIEW'));
+
+      // Update service request with new review
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === reviewData.serviceRequestID
+            ? { ...sr, review: response }
+            : sr
+        )
+      );
+      setIsReviewModalOpen(false);
+      setSelectedServiceRequest(null);
+    } catch (err) {
+      handleApiError(err, t);
+    }
   };
 
   const getServiceIcon = (type) => {
@@ -156,7 +201,8 @@ export default function ServiceRequestManager() {
     </span>
   );
 
-  if (loading) return <Loading />;
+  if (loading || uploadProgress > 0)
+    return <Loading progress={uploadProgress} />;
 
   return (
     <div>
@@ -179,6 +225,24 @@ export default function ServiceRequestManager() {
           {t('BUTTON.CreateServiceRequest')}
         </button>
       </div>
+
+      {/* Review Modal */}
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setSelectedServiceRequest(null);
+          setReviewReadOnly(false);
+        }}
+        onSave={handleSaveReview}
+        review={reviewReadOnly ? selectedServiceRequest?.review : null}
+        serviceRequestID={selectedServiceRequest?.serviceRequestID}
+        partnerID={
+          selectedServiceRequest?.selectedContractorApplication.contractorID
+        }
+        setUploadProgress={setUploadProgress}
+        readOnly={reviewReadOnly}
+      />
 
       {!serviceRequests || serviceRequests.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
@@ -352,6 +416,13 @@ export default function ServiceRequestManager() {
                         )}
                     </div>
                   </div>
+
+                  {/* Review Countdown Section */}
+                  <ReviewCountdown
+                    serviceRequest={req}
+                    onCreateReview={handleCreateReview}
+                    onViewReview={handleViewReview}
+                  />
                 </div>
               </div>
             </div>

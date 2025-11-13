@@ -116,12 +116,11 @@ namespace BusinessLogic.Services
 
                     var contractorID = payment.ContractorApplication.ContractorID;
                     var contractor = await _userManager.FindByIdAsync(contractorID.ToString());
-                    if(contractor != null)
+                    if (contractor != null)
                     {
                         contractor.ProjectCount += 1;
                         await _userManager.UpdateAsync(contractor);
                     }
-
                 }
                 if (
                     DateTime.TryParseExact(
@@ -173,6 +172,7 @@ namespace BusinessLogic.Services
                     {
                         payment.ContractorApplicationID,
                         Status = payment.Status.ToString(),
+                        StartReviewDate = payment.PaidAt.Value.AddMinutes(5),
                         serviceRequest?.ConversationID,
                     }
                 );
