@@ -173,37 +173,27 @@ namespace BusinessLogic.Services
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationID == dto.ConversationID
             );
+            if (conversation == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { CONVERSATION, new[] { ERROR_CONVERSATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var notifiedNewConversation = await NotifyNewConversationForAdmin(conversation, result);
 
             if (
-                conversation?.ConversationType == ConversationType.AdminSupport
+                !notifiedNewConversation
+                && conversation.ConversationType == ConversationType.AdminSupport
                 && conversation.AdminID.HasValue
             )
             {
-                var messageCount = await _unitOfWork
-                    .ChatMessageRepository.GetQueryable()
-                    .CountAsync(m => m.ConversationID == conversation.ConversationID);
-
-                if (messageCount == 1)
-                {
-                    await _signalRNotifier.SendToAdminAsync(
-                        conversation.AdminID.Value.ToString(),
-                        "Chat.NewConversationForAdmin",
-                        new
-                        {
-                            dto.ConversationID,
-                            Conversation = _mapper.Map<ConversationDto>(conversation),
-                            FirstMessage = result,
-                        }
-                    );
-                }
-                else
-                {
-                    await _signalRNotifier.SendToAdminAsync(
-                        conversation.AdminID.Value.ToString(),
-                        "Chat.NewAdminMessage",
-                        new { dto.ConversationID, Message = result }
-                    );
-                }
+                await _signalRNotifier.SendToAdminAsync(
+                    conversation.AdminID.Value.ToString(),
+                    "Chat.NewAdminMessage",
+                    new { dto.ConversationID, Message = result }
+                );
             }
 
             return result;
@@ -239,6 +229,39 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+        }
+
+        private async Task<bool> NotifyNewConversationForAdmin(
+            Conversation conversation,
+            ChatMessageDto dto
+        )
+        {
+            if (
+                conversation.ConversationType != ConversationType.AdminSupport
+                || !conversation.AdminID.HasValue
+            )
+                return false;
+
+            var messageCount = await _unitOfWork
+                .ChatMessageRepository.GetQueryable()
+                .CountAsync(m => m.ConversationID == conversation.ConversationID);
+
+            if (messageCount == 1)
+            {
+                await _signalRNotifier.SendToAdminAsync(
+                    conversation.AdminID.Value.ToString(),
+                    "Chat.NewConversationForAdmin",
+                    new
+                    {
+                        conversation.ConversationID,
+                        Conversation = _mapper.Map<ConversationDto>(conversation),
+                        FirstMessage = dto,
+                    }
+                );
+                return true;
+            }
+
+            return false;
         }
     }
 }

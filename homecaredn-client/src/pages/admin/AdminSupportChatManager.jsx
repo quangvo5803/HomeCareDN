@@ -31,18 +31,67 @@ export default function AdminSupportChatManager() {
   const [loadingMessage, setLoadingMessage] = useState(false);
   const [filter, setFilter] = useState('');
 
-  const [page, setPage] = useState(1);
+  const [moreMessage, setMoreMessage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
   const messagesContainerRef = useRef(null);
+  const adminGroupJoinedRef = useRef(false);
 
   useEffect(() => {
-    if (!user || !chatConnection) return;
-    chatConnection.invoke('JoinAdminGroup', user.id);
-    return () => {
-      chatConnection.invoke('LeaveAdminGroup', user.id).catch(() => {});
+    if (!user?.id || !chatConnection || adminGroupJoinedRef.current) return;
+
+    let retryTimer = null;
+    let isComponentMounted = true; // Track component
+
+    const JoinConversation = async () => {
+      if (!isComponentMounted || adminGroupJoinedRef.current) return;
+
+      if (chatConnection.state === 'Connected') {
+        try {
+          await chatConnection.invoke('JoinAdminGroup', user.id);
+          adminGroupJoinedRef.current = true;
+        } catch (error) {
+          toast.error(t(handleApiError(error)));
+          if (isComponentMounted) {
+            retryTimer = setTimeout(JoinConversation, 500);
+          }
+        }
+        return;
+      }
+      retryTimer = setTimeout(JoinConversation, 300);
     };
-  }, [user, chatConnection]);
+
+    retryTimer = setTimeout(JoinConversation, 100);
+
+    const handleReconnected = () => {
+      adminGroupJoinedRef.current = false;
+      if (isComponentMounted) {
+        retryTimer = setTimeout(JoinConversation, 100);
+      }
+    };
+
+    if (chatConnection.onreconnected) {
+      chatConnection.onreconnected(handleReconnected);
+    }
+
+    return () => {
+      isComponentMounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
+
+      if (
+        adminGroupJoinedRef.current &&
+        chatConnection?.state === 'Connected'
+      ) {
+        chatConnection
+          .invoke('LeaveAdminGroup', user.id)
+          .then(() => {
+            adminGroupJoinedRef.current = false;
+          })
+          .catch(() => {});
+      }
+    };
+  }, [user?.id, chatConnection, t]);
+
   // Realtime messages
   useRealtime(
     {
@@ -85,6 +134,8 @@ export default function AdminSupportChatManager() {
       },
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
+        if (!user?.id) return;
+
         conversationService
           .getAllConversationsByAdminID(user.id)
           .then((items) => {
@@ -109,15 +160,16 @@ export default function AdminSupportChatManager() {
 
   // Load conversation list
   useEffect(() => {
-    if (!user) return;
+    if (!user?.id || !chatConnection) return;
     setLoadingConversation(true);
     conversationService
       .getAllConversationsByAdminID(user.id)
       .then((items) => setConversations(items || []))
       .catch((error) => toast.error(t(handleApiError(error))))
       .finally(() => setLoadingConversation(false));
-  }, [user, t]);
+  }, [user?.id, chatConnection, t]);
 
+  // Load message
   const loadMessages = useCallback(
     async (messageToLoad, append = false) => {
       if (!selectedConversation) return;
@@ -130,6 +182,7 @@ export default function AdminSupportChatManager() {
           await chatMessageService.getMessagesByConversationID({
             conversationID: selectedConversation.conversationID,
             messageNumber: messageToLoad,
+            messageSize: MESSAGE_SIZE,
           });
 
         const items = conversation.items || [];
@@ -157,7 +210,6 @@ export default function AdminSupportChatManager() {
         setLoadingMoreMessage(false);
       }
     },
-
     [selectedConversation, t, messages.length]
   );
 
@@ -165,7 +217,7 @@ export default function AdminSupportChatManager() {
   useEffect(() => {
     if (!selectedConversation) {
       setMessages([]);
-      setPage(1);
+      setMoreMessage(1);
       setHasMoreMessages(true);
       return;
     }
@@ -185,7 +237,7 @@ export default function AdminSupportChatManager() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedConversation, chatConnection, t]);
+  }, [selectedConversation, chatConnection]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
@@ -193,23 +245,23 @@ export default function AdminSupportChatManager() {
     if (!container || loadingMoreMessage || !hasMoreMessages) return;
 
     if (container.scrollTop === 0) {
-      const nextPage = page + 1;
-      setPage(nextPage);
+      const nextMessage = moreMessage + 1;
+      setMoreMessage(nextMessage);
 
       const scrollHeightBefore = container.scrollHeight;
 
-      loadMessages(nextPage, true).then(() => {
+      loadMessages(nextMessage, true).then(() => {
         requestAnimationFrame(() => {
           const scrollHeightAfter = container.scrollHeight;
           container.scrollTop = scrollHeightAfter - scrollHeightBefore;
         });
       });
     }
-  }, [loadingMoreMessage, hasMoreMessages, page, loadMessages]);
+  }, [loadingMoreMessage, hasMoreMessages, moreMessage, loadMessages]);
 
   // Send message
   const handleSend = async () => {
-    if (!messageInput.trim() || !selectedConversation) return;
+    if (!messageInput.trim() || !selectedConversation || !user?.id) return;
     try {
       await chatMessageService.sendMessage({
         content: messageInput,
