@@ -44,6 +44,14 @@ export default function StatusBadge({ status, type }) {
       cls: 'bg-red-100 text-red-700 border border-red-300',
       icon: 'fa-circle-xmark',
     },
+    Paid: {
+      cls: 'bg-green-100 text-green-700 border border-green-300',
+      icon: 'fa-circle-check',
+    },
+    Failed: {
+      cls: 'bg-red-100 text-red-700 border border-red-300',
+      icon: 'fa-circle-xmark',
+    },
   };
 
   const styleCfg = styleMap[normalizedStatus] || {
@@ -55,6 +63,7 @@ export default function StatusBadge({ status, type }) {
     Application: `Enums.ApplicationStatus.${normalizedStatus}`,
     Request: `Enums.RequestStatus.${normalizedStatus}`,
     PartnerRequest: `Enums.PartneRequestrStatus.${normalizedStatus}`,
+    Payment: `Enums.PaymentStatus.${normalizedStatus}`,
   }[type];
 
   const translatedText = t(translationPath, { defaultValue: normalizedStatus });

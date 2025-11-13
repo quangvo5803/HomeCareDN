@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application.Payment;
+﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.FacadeService;
 using DataAccess.Entities;
 using DataAccess.Entities.Payment;
@@ -45,6 +46,13 @@ namespace HomeCareDNAPI.Controllers
         {
             await _facadeService.PaymentService.HandlePayOSCallbackAsync(callback);
             return Ok(new { message = "Cập nhật thanh toán thành công" });
+        }
+
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAllCommissions([FromQuery] QueryParameters parameters)
+        {
+            var result = await _facadeService.PaymentService.GetAllCommissionAsync(parameters);
+            return Ok(result);
         }
     }
 }

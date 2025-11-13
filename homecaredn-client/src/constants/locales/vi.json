@@ -641,7 +641,8 @@
       "material": "Vật liệu",
       "partner": "Đối tác",
       "user": "Người dùng",
-      "support": "Hỗ trợ"
+      "support": "Hỗ trợ",
+      "commission": "Tiền hoa hồng"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -818,7 +819,10 @@
       "project": "dự án",
       "rating": "Đánh giá",
       "createAt": "Ngày tạo",
-      "images": "Hình ảnh dự án"
+      "images": "Hình ảnh dự án",
+      "paymentInfo": "Thông tin thanh toán",
+      "orderCode": "Mã đơn hàng",
+      "amount": "Tiền thanh toán"
     }
   },
   "adminMaterialManager": {
@@ -940,6 +944,20 @@
     "noSupport": "Chưa có yêu cầu hỗ trợ nào",
     "all": "Tất cả",
     "supports": "yêu cầu"
+  },
+  "adminPaymentManager": {
+    "title": "Quản lý hoa hồng",
+    "subtitle": "Quản lý danh sách giao dịch",
+    "no": "STT",
+    "transaction": "giao dịch",
+    "orderCode": "Mã giao dịch",
+    "amount": "Tiền thanh toán",
+    "date": "Ngày tạo",
+    "description": "Mô Tả",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "empty": "Chưa có giao dịch nào",
+    "empty_description": "Chưa có giao dịch nào được gửi."
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
@@ -1297,6 +1315,11 @@
       "Pending": "Đang chờ",
       "Approved": "Đã phê duyệt",
       "Rejected": "Đã từ chối"
+    },
+    "PaymentStatus": {
+      "Pending": "Đang chờ",
+      "Paid": "Đã thanh toán",
+      "Failed": "Thanh toán thất bại"
     }
   },
   "toast": {
