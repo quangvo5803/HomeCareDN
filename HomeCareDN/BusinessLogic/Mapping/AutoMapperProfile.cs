@@ -295,7 +295,45 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 );
-            CreateMap<MaterialRequest, MaterialRequestDto>();
+            CreateMap<MaterialRequest, MaterialRequestDto>()
+                .ForMember(
+                    dest => dest.DistributorApplyCount,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.DistributorApplications != null
+                                ? src.DistributorApplications.Count
+                                : 0
+                        )
+                )
+                .AfterMap(
+                    (src, dest) =>
+                    {
+                        if (dest.MaterialRequestItems != null)
+                        {
+                            foreach (var item in dest.MaterialRequestItems)
+                            {
+                                if (item.Material != null)
+                                {
+                                    var material = item.Material;
+                                    if (material == null)
+                                        continue;
+
+                                    material.Description = null;
+                                    material.DescriptionEN = null;
+                                    material.UserID = string.Empty;
+
+                                    if (material.Images != null && material.Images.Any())
+                                    {
+                                        material.Images = new List<Image>
+                                        {
+                                            material.Images.First(),
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
 
             CreateMap<ApplicationUser, UserDto>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))

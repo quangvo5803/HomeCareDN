@@ -92,7 +92,8 @@ namespace BusinessLogic.Services
         {
             var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
                 m => m.PartnerRequestID == partnerRequestID,
-                includeProperties: PARTNER_REQUEST_INCLUDES
+                includeProperties: PARTNER_REQUEST_INCLUDES,
+                false
             );
 
             if (partnerRequest == null)

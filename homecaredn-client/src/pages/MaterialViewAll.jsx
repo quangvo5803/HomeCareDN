@@ -18,8 +18,8 @@ export default function MaterialViewAll() {
   const pageSize = 9;
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const [selectedBrandId, setSelectedBrandId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
+  const [selectedBrandId, setSelectedBrandId] = useState('');
 
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -47,8 +47,13 @@ export default function MaterialViewAll() {
       FilterCategoryID: selectedCategoryId || null,
       FilterBrandID: selectedBrandId || null,
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage, sortOption, fetchMaterials, selectedCategoryId, selectedBrandId]);
+  }, [
+    currentPage,
+    sortOption,
+    fetchMaterials,
+    selectedCategoryId,
+    selectedBrandId,
+  ]);
 
   const start = totalMaterials > 0 ? (currentPage - 1) * pageSize + 1 : 0;
   const end = Math.min(currentPage * pageSize, totalMaterials);
@@ -85,7 +90,9 @@ export default function MaterialViewAll() {
               </option>
               <option
                 value={
-                  i18n.language === 'vi' ? 'materialname_desc' : 'materialnameen_desc'
+                  i18n.language === 'vi'
+                    ? 'materialname_desc'
+                    : 'materialnameen_desc'
                 }
               >
                 Z-A
@@ -101,7 +108,7 @@ export default function MaterialViewAll() {
             {/* Category */}
             <FilterItem
               itemType={{ type: 'material' }}
-              label={t("materialViewAll.filterCategory")}
+              label={t('materialViewAll.filterCategory')}
               options={categories}
               selectedValue={selectedCategoryId}
               onChange={setSelectedCategoryId}
@@ -113,7 +120,7 @@ export default function MaterialViewAll() {
             {/* Brand */}
             <FilterItem
               itemType={{ type: 'material' }}
-              label={t("materialViewAll.filterBrand")}
+              label={t('materialViewAll.filterBrand')}
               options={brands}
               selectedValue={selectedBrandId}
               onChange={setSelectedBrandId}
@@ -145,12 +152,14 @@ export default function MaterialViewAll() {
             ) : (
               <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">
                 <i className="fas fa-box-open text-4xl mb-3 text-gray-400"></i>
-                <p className="text-lg font-medium">{t('materialViewAll.noMaterial')}</p>
+                <p className="text-lg font-medium">
+                  {t('materialViewAll.noMaterial')}
+                </p>
               </div>
             )}
           </section>
         </div>
-      </div >
-    </body >
+      </div>
+    </body>
   );
 }

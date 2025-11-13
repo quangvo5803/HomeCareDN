@@ -357,7 +357,11 @@ namespace BusinessLogic.Services
                     }
                 }
             }
-
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Contractor",
+                "ServiceRequest.Closed",
+                new { serviceRequest.ServiceRequestID }
+            );
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             var payloadAccept = new
@@ -440,8 +444,9 @@ namespace BusinessLogic.Services
 
         public async Task DeleteContractorApplicationAsync(Guid id)
         {
-            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(ca =>
-                ca.ContractorApplicationID == id
+            var application = await _unitOfWork.ContractorApplicationRepository.GetAsync(
+                ca => ca.ContractorApplicationID == id,
+                asNoTracking: false
             );
 
             if (application == null)

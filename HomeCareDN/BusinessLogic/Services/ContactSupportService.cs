@@ -169,7 +169,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteAsync(Guid id)
         {
-            var entity = await _unitOfWork.ContactSupportRepository.GetAsync(x => x.Id == id);
+            var entity = await _unitOfWork.ContactSupportRepository.GetAsync(
+                x => x.Id == id,
+                asNoTracking: false
+            );
 
             if (entity == null)
             {
