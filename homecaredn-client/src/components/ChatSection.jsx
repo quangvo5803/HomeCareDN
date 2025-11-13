@@ -51,7 +51,7 @@ export default function ChatSection({
       return () => {
         chatConnection
           .invoke('LeaveConversation', conversationID)
-          .catch(() => {});
+          .catch(() => { });
       };
     }
   }, [chatConnection, conversationID]);
@@ -73,7 +73,7 @@ export default function ChatSection({
 
         setHasMoreMessages(
           data.items.length === MESSAGE_SIZE &&
-            messages.length + data.items.length < data.totalCount
+          messages.length + data.items.length < data.totalCount
         );
 
         if (append) {
@@ -284,9 +284,8 @@ export default function ChatSection({
               </p>
             </div>
             <p
-              className={`text-[11px] text-gray-400 mt-1 ${
-                isMyMessage ? 'text-right' : 'text-left'
-              }`}
+              className={`text-[11px] text-gray-400 mt-1 ${isMyMessage ? 'text-right' : 'text-left'
+                }`}
             >
               {new Date(m.sentAt).toLocaleTimeString('vi-VN', {
                 hour: '2-digit',
@@ -308,7 +307,7 @@ export default function ChatSection({
       </h4>
 
       {/* Lock overlay */}
-      {chatIsLocked && (
+      {(!conversation || chatIsLocked) && (
         <div className="absolute inset-0 bg-black/60 rounded-2xl flex items-center justify-center z-10 backdrop-blur-sm">
           <div className="text-center text-white px-6">
             <i className="fas fa-lock text-4xl mb-4"></i>

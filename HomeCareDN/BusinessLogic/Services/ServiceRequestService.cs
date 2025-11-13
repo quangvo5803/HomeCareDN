@@ -244,8 +244,7 @@ namespace BusinessLogic.Services.Interfaces
                 var selected = item.SelectedContractorApplication;
                 var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
                 var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
-                    p => p.ServiceRequestID == selected.ServiceRequestID,
-                    asNoTracking: true
+                    p => p.ServiceRequestID == selected.ServiceRequestID
                 );
                 dto.SelectedContractorApplication = new ContractorApplicationDto
                 {

@@ -45,9 +45,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-              }
+              ...sr,
+              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -91,9 +91,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -276,11 +276,10 @@ export default function ServiceRequestDetail() {
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i
-                  className={`text-orange-600 text-xl fas ${
-                    serviceRequest.serviceType === 'Construction'
-                      ? 'fa-hammer'
-                      : 'fa-screwdriver-wrench'
-                  }`}
+                  className={`text-orange-600 text-xl fas ${serviceRequest.serviceType === 'Construction'
+                    ? 'fa-hammer'
+                    : 'fa-screwdriver-wrench'
+                    }`}
                 />{' '}
               </div>
               <div className="flex-1">
@@ -783,7 +782,7 @@ export default function ServiceRequestDetail() {
         </div>
         {/* Chat Section */}
         <ChatSection
-          conversationID={serviceRequest.conversationID}
+          conversationID={serviceRequest.conversationID || serviceRequest.conversation?.conversationID}
           contractorApplicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />
