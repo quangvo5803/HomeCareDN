@@ -884,7 +884,7 @@
     "all": "Tất cả",
     "itemsCount": "{{count}} yêu cầu"
   },
-  "adminSupportChat": {
+  "adminSupportChatManager": {
     "title": "Chat hỗ trợ khách hàng",
     "subtitle": "Quản lý và trả lời các yêu cầu hỗ trợ",
     "conversationList": "Danh sách hội thoại",
@@ -897,7 +897,8 @@
     "loadingMore": "Đang tải thêm tin nhắn...",
     "send": "Gửi",
     "noMessagesInChat": "Chưa có tin nhắn nào trong cuộc trò chuyện này",
-    "noMoreMessages": "Không còn tin nhắn nào nữa"
+    "noMoreMessages": "Không còn tin nhắn nào nữa",
+    "newConversation":"Có cuộc trò chuyện mới được tạo"
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",

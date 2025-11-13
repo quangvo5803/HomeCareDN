@@ -38,9 +38,7 @@ export default function AdminSupportChatManager() {
 
   useEffect(() => {
     if (!user || !chatConnection) return;
-
     chatConnection.invoke('JoinAdminGroup', user.id);
-
     return () => {
       chatConnection.invoke('LeaveAdminGroup', user.id).catch(() => {});
     };
@@ -63,11 +61,34 @@ export default function AdminSupportChatManager() {
           }
         }, 100);
       },
+      [RealtimeEvents.NewConversationForAdmin]: (payload) => {
+        if (!payload.conversation?.conversationID) {
+          return;
+        }
+
+        const newConversation = payload.conversation;
+
+        setConversations((prev) => {
+          if (
+            prev.some(
+              (c) => c.conversationID === newConversation.conversationID
+            )
+          ) {
+            return prev;
+          }
+          return [newConversation, ...prev];
+        });
+
+        toast.success(t('adminSupportChatManager.newConversation'), {
+          onClick: () => setSelectedConversation(newConversation),
+        });
+      },
+
       [RealtimeEvents.NewAdminMessage]: (payload) => {
         conversationService
           .getAllConversationsByAdminID(user.id)
           .then((items) => {
-            setConversations(items || []);
+            setConversations([...items]);
           });
 
         if (payload.ConversationID === selectedConversation?.conversationID) {
@@ -171,7 +192,6 @@ export default function AdminSupportChatManager() {
     const container = messagesContainerRef.current;
     if (!container || loadingMoreMessage || !hasMoreMessages) return;
 
-    // Khi scroll lên đầu, load thêm tin nhắn cũ
     if (container.scrollTop === 0) {
       const nextPage = page + 1;
       setPage(nextPage);

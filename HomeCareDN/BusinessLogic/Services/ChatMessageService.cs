@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.User.ChatMessage;
+using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
@@ -178,11 +179,31 @@ namespace BusinessLogic.Services
                 && conversation.AdminID.HasValue
             )
             {
-                await _signalRNotifier.SendToAdminAsync(
-                    conversation.AdminID.Value.ToString(),
-                    "Chat.NewAdminMessage",
-                    new { dto.ConversationID, Message = result }
-                );
+                var messageCount = await _unitOfWork
+                    .ChatMessageRepository.GetQueryable()
+                    .CountAsync(m => m.ConversationID == conversation.ConversationID);
+
+                if (messageCount == 1)
+                {
+                    await _signalRNotifier.SendToAdminAsync(
+                        conversation.AdminID.Value.ToString(),
+                        "Chat.NewConversationForAdmin",
+                        new
+                        {
+                            dto.ConversationID,
+                            Conversation = _mapper.Map<ConversationDto>(conversation),
+                            FirstMessage = result,
+                        }
+                    );
+                }
+                else
+                {
+                    await _signalRNotifier.SendToAdminAsync(
+                        conversation.AdminID.Value.ToString(),
+                        "Chat.NewAdminMessage",
+                        new { dto.ConversationID, Message = result }
+                    );
+                }
             }
 
             return result;

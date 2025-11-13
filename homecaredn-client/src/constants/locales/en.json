@@ -908,7 +908,8 @@
     "loadingMore": "Loading more messages...",
     "send": "Send",
     "noMessagesInChat": "No messages in this conversation yet",
-    "noMoreMessages": "No more messages"
+    "noMoreMessages": "No more messages",
+    "newConversation":"New convesation just created"
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",
