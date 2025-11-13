@@ -546,11 +546,19 @@ namespace BusinessLogic.Services.Interfaces
                     var caImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
                         i.ContractorApplicationID == contractorApplication.ContractorApplicationID
                     );
+                    var caDocuments = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                        d.ContractorApplicationID == contractorApplication.ContractorApplicationID
+                    );
                     if (caImages != null && caImages.Any())
                     {
                         var publicIds = caImages.Select(img => img.PublicId).ToList();
 
                         await _unitOfWork.ImageRepository.DeleteImagesAsync(publicIds);
+                    }
+                    if (caDocuments != null && caDocuments.Any())
+                    {
+                        var docPublicIds = caDocuments.Select(d => d.PublicId).ToList();
+                        await _unitOfWork.DocumentRepository.DeleteDocumentsAsync(docPublicIds);
                     }
                     _unitOfWork.ContractorApplicationRepository.Remove(contractorApplication);
                 }

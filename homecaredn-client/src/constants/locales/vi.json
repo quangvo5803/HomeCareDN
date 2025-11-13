@@ -1297,7 +1297,8 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "upload": {
-    "clickToUpload": "Chọn để tải ảnh",
+    "clickToUploadImage": "Chọn để tải ảnh",
+    "clickToUploadDocument": "Chọn để tải tài liệu",
     "orDragAndDrop": "hoặc kéo và thả",
     "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
   },

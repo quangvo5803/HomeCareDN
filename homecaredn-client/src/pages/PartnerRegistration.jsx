@@ -87,12 +87,27 @@ export default function PartnerRegistration() {
       file,
       url: URL.createObjectURL(file),
       isNew: true,
+      name: file.name,
     }));
     setDocuments((prev) => [...prev, ...mapped]);
   };
 
   const handleRemoveDocument = (doc) => {
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
+  };
+
+  const getDocumentIcon = (fileName) => {
+    if (!fileName) return 'fas fa-file text-gray-400';
+    if (fileName.endsWith('.pdf')) {
+      return 'fas fa-file-pdf text-red-500';
+    }
+    if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      return 'fas fa-file-word text-blue-500';
+    }
+    if (fileName.endsWith('.txt')) {
+      return 'fas fa-file-alt text-gray-500';
+    }
+    return 'fas fa-file text-gray-400';
   };
 
   const handleSubmit = async (e) => {
@@ -365,7 +380,7 @@ export default function PartnerRegistration() {
                   </div>
                   <p className="text-gray-600 text-center mb-2">
                     <span className="font-semibold text-orange-600">
-                      {t('upload.clickToUpload')}
+                      {t('upload.clickToUploadImage')}
                     </span>{' '}
                     {t('upload.orDragAndDrop')}
                   </p>
@@ -430,7 +445,7 @@ export default function PartnerRegistration() {
                   </div>
                   <p className="text-gray-600 text-center mb-2">
                     <span className="font-semibold text-blue-600">
-                      {t('upload.clickToUpload')}
+                      {t('upload.clickToUploadDocument')}
                     </span>{' '}
                     {t('upload.orDragAndDrop')}
                   </p>
@@ -444,9 +459,11 @@ export default function PartnerRegistration() {
                       className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 transition-colors bg-gray-50 flex flex-col items-center justify-center p-2 text-center"
                     >
                       {/* Đổi màu hover */}
-                      <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
-                      <p className="text-xs text-gray-600 break-all truncate">
-                        {doc.name || ''}
+                      <i
+                        className={`${getDocumentIcon(doc.name)} text-4xl mb-2`}
+                      ></i>
+                      <p className="text-xs text-gray-600 break-all truncate px-2">
+                        {doc.name}
                       </p>
                       <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button

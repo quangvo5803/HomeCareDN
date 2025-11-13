@@ -355,6 +355,7 @@
       "label_address": "Construction Address:",
       "label_description": "Detailed Description:",
       "label_images": "Illustration / Current Images:",
+      "label_documents": "Attachments / Documents:",
       "section_contractor": "Applied Contractors",
       "noContractor": "No contractors have applied yet",
       "noContractorDesc": "Currently, no contractors have applied for your project. Please wait for a while.",
@@ -1088,6 +1089,10 @@
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
     },
+    "DeleteDocumentModal": {
+      "title": "Are you sure?",
+      "text": "This document will be deleted and cannot be restored!"
+    },
     "DeleteApplicationModal": {
       "title": "Are you sure?",
       "text": "This application will be gone forever"
@@ -1298,7 +1303,8 @@
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
   "upload": {
-    "clickToUpload": "Click to upload",
+    "clickToUploadImage": "Click to upload",
+    "clickToUploadDocument": "Click to upload",
     "orDragAndDrop": "or drag and drop",
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },

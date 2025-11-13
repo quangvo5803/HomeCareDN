@@ -403,10 +403,25 @@ export default function ContractorServiceRequestDetail() {
       file,
       url: URL.createObjectURL(file),
       isNew: true,
+      name: file.name,
     }));
 
     setDocuments((prev) => [...prev, ...mapped]);
   };
+  const getDocumentIcon = (fileName) => {
+    if (!fileName) return 'fas fa-file text-gray-400';
+    if (fileName.endsWith('.pdf')) {
+      return 'fas fa-file-pdf text-red-500';
+    }
+    if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      return 'fas fa-file-word text-blue-500';
+    }
+    if (fileName.endsWith('.txt')) {
+      return 'fas fa-file-alt text-gray-500';
+    }
+    return 'fas fa-file text-gray-400';
+  };
+
   if (loading || isChecking || !serviceRequest) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
@@ -854,7 +869,7 @@ export default function ContractorServiceRequestDetail() {
                       </div>
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-orange-600">
-                          {t('upload.clickToUpload')}
+                          {t('upload.clickToUploadImage')}
                         </span>{' '}
                         {t('upload.orDragAndDrop')}
                       </p>
@@ -910,13 +925,13 @@ export default function ContractorServiceRequestDetail() {
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       aria-label={t('upload.uploadDocuments')}
                     />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
                       <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                        <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
                       </div>
                       <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-orange-600">
-                          {t('upload.clickToUpload')}
+                        <span className="font-semibold text-blue-600">
+                          {t('upload.clickToUploadDocument')}
                         </span>{' '}
                         {t('upload.orDragAndDrop')}
                       </p>
@@ -933,9 +948,13 @@ export default function ContractorServiceRequestDetail() {
                           key={doc.url}
                           className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors ring-1 ring-gray-200 bg-gray-50 flex flex-col items-center justify-center p-2 text-center"
                         >
-                          <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
-                          <p className="text-xs text-gray-600 break-all truncate">
-                            {doc.name || ''}
+                          <i
+                            className={`${getDocumentIcon(
+                              doc.name
+                            )} text-4xl mb-2`}
+                          ></i>
+                          <p className="text-xs text-gray-600 break-all truncate px-2">
+                            {doc.name}
                           </p>
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button

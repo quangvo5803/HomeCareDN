@@ -62,11 +62,6 @@ export default function ServiceRequestCreateUpdate() {
     const totalLoaded = imageProgress.loaded + documentProgress.loaded;
     const totalSize = imageProgress.total + documentProgress.total;
 
-    if (totalSize === 0) {
-      if (uploadProgress !== 1) setUploadProgress(0);
-      return;
-    }
-
     const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
     setUploadProgress(percent);
   }, [imageProgress, documentProgress, uploadProgress]);
@@ -91,7 +86,11 @@ export default function ServiceRequestCreateUpdate() {
             (res.imageUrls || []).map((url) => ({ url, isNew: false }))
           );
           setDocuments(
-            (res.documentUrls || []).map((url) => ({ url, isNew: false }))
+            (res.documentUrls || []).map((url) => ({
+              url,
+              isNew: false,
+              name: getFileNameFromUrl(url),
+            }))
           );
         })
         .catch((err) => handleApiError(err, t));
@@ -128,16 +127,39 @@ export default function ServiceRequestCreateUpdate() {
       file,
       url: URL.createObjectURL(file),
       isNew: true,
+      name: file.name,
     }));
     setDocuments((prev) => [...prev, ...mapped]);
+  };
+
+  const getFileNameFromUrl = (url) => {
+    if (!url) return 'unknown_file';
+
+    const urlWithoutQuery = url.split('?')[0];
+    const segments = urlWithoutQuery.split('/');
+    const fileName = segments.pop();
+
+    return decodeURIComponent(fileName);
+  };
+  const getDocumentIcon = (fileName) => {
+    if (!fileName) return 'fas fa-file text-gray-400';
+    if (fileName.endsWith('.pdf')) {
+      return 'fas fa-file-pdf text-red-500';
+    }
+    if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      return 'fas fa-file-word text-blue-500';
+    }
+    if (fileName.endsWith('.txt')) {
+      return 'fas fa-file-alt text-gray-500';
+    }
+    return 'fas fa-file text-gray-400';
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
-    if (images.some((i) => i.isNew)) {
+    setIsSubmitting(true);
+    if (images.some((i) => i.isNew) || documents.some((d) => d.isNew)) {
       setUploadProgress(1);
-    } else {
-      setIsSubmitting(true);
     }
     try {
       if (!addressID) {
@@ -251,10 +273,8 @@ export default function ServiceRequestCreateUpdate() {
         if (serviceRequestId) {
           payload.ServiceRequestID = serviceRequestId;
           await updateServiceRequest(payload);
-          toast.success(t('SUCCESS.SERVICE_REQUEST_UPDATE'));
         } else {
           await createServiceRequest(payload);
-          toast.success(t('SUCCESS.SERVICE_REQUEST_ADD'));
         }
 
         navigate('/Customer', {
@@ -303,9 +323,11 @@ export default function ServiceRequestCreateUpdate() {
       });
     }
   };
+
   const removeDocumentFromState = (doc) => {
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
   };
+
   const handleRemoveDocument = (doc) => {
     if (doc.isNew) {
       removeDocumentFromState(doc);
@@ -327,9 +349,8 @@ export default function ServiceRequestCreateUpdate() {
       });
     }
   };
-
-  if (addressLoading || isSubmitting) return <Loading />;
-  if (uploadProgress) return <Loading progress={uploadProgress} />;
+  if (uploadProgress || isSubmitting || addressLoading)
+    return <Loading progress={uploadProgress} />;
 
   return (
     <>
@@ -715,7 +736,7 @@ export default function ServiceRequestCreateUpdate() {
                       </div>
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-orange-600">
-                          {t('upload.clickToUpload')}
+                          {t('upload.clickToUploadImage')}
                         </span>{' '}
                         {t('upload.orDragAndDrop')}
                       </p>
@@ -773,7 +794,7 @@ export default function ServiceRequestCreateUpdate() {
                       type="file"
                       accept={ACCEPTED_DOC_TYPES} // Specify accepted types
                       multiple
-                      onChange={handleDocumentChange} // Use new handler
+                      onChange={handleDocumentChange}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                     <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
@@ -782,7 +803,7 @@ export default function ServiceRequestCreateUpdate() {
                       </div>
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-blue-600">
-                          {t('upload.clickToUpload')}
+                          {t('upload.clickToUploadDocument')}
                         </span>{' '}
                         {t('upload.orDragAndDrop')}
                       </p>
@@ -800,8 +821,12 @@ export default function ServiceRequestCreateUpdate() {
                           key={doc.url}
                           className="relative group aspect-square border-2 border-gray-200 rounded-lg overflow-hidden hover:border-orange-300 transition-colors bg-gray-50 flex flex-col items-center justify-center p-2"
                         >
-                          <i className="fas fa-file-alt text-4xl text-gray-400 mb-2"></i>
-                          <p className="text-xs text-gray-600 text-center break-all truncate">
+                          <i
+                            className={`${getDocumentIcon(
+                              doc.name
+                            )} text-4xl mb-2`}
+                          ></i>
+                          <p className="text-xs text-gray-600 text-center break-all truncate px-2">
                             {doc.name}
                           </p>
                           <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
