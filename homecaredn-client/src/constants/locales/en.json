@@ -376,6 +376,7 @@
       "subtitle": "View and manage your material requests.",
       "noRequest": "No material requests yet",
       "letStart": "Get started by creating your first material request",
+      "lbl_address": "Address",
       "lbl_distributor": "supplier",
       "lbl_canEditQuantity": "Allow supplier to edit quantity",
       "lbl_materialList": "Material List",
@@ -387,6 +388,8 @@
       "title": "Material Request Details",
       "description": "Description",
       "descriptionsPlaceholder": "Enter a description to help the distributor provide better consultation...",
+      "address":"Address",
+      "selectAddress": "Select address",
       "allowEditQuantity": "Allow distributor to edit quantity",
       "allowEditQuantityDes": "Enable this option to allow the distributors to adjust material quantities when submitting an application",
       "allowAddMaterial": "Allow distributors to add required materials",
@@ -400,6 +403,8 @@
       "quantity": "Quantity",
       "unit": "Unit",
       "action": "Action",
+      "unsavedChanges": "You have unsaved changes",
+      "unsavedChangesDesc": "Your changes will be lost if you leave this page.",
       "cancleModalTitle": "Revert changes?",
       "cancleModalText": "This action cannot be undone"
     }
@@ -1025,7 +1030,6 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
-    "CreateMaterialRequest": "Create Material Request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -1046,6 +1050,9 @@
     "AddAddress": "Add Address",
     "CreateServiceRequest": "Create Service Request",
     "UpdateServiceRequest": "Update Service Request",
+    "CreateMaterialRequest": "Create Material Request",
+    "UpdateMaterialRequest": "Update Material Request",
+    "SendMaterialRequest": "Send Material Request",
     "Back": "Back",
     "ViewDetail": "View detail",
     "RegisterPartner": "Register as Partner",
@@ -1085,6 +1092,10 @@
     },
     "DeleteServiceRequestModal": {
       "title": "Delete this service request?",
+      "text": "This action cannot be undone."
+    },
+    "DeleteMaterialRequestModal": {
+      "title": "Delete this material request?",
       "text": "This action cannot be undone."
     },
     "DeletingLoadingModal": {
@@ -1166,8 +1177,8 @@
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
-    "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
-    "IN_USE_ADDRESS": "This address is in use and cannot be deleted!",
+    "REQUIRED_ADDRESS": "Please provide address information before creating a request!",
+    "IN_USE_ADDRESS":"This address is in use and cannot be deleted!",
 
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 

@@ -375,6 +375,7 @@
       "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
       "noRequest": "Chưa có yêu cầu vật liệu nào",
       "letStart": "Bắt đầu bằng cách tạo yêu cầu vật liệu đầu tiên của bạn",
+      "lbl_address": "Địa chỉ: ",
       "lbl_distributor": "nhà cung cấp",
       "lbl_canEditQuantity": "Cho phép nhà cung cấp chỉnh sửa số lượng",
       "lbl_materialList": "Danh sách vật liệu",
@@ -385,7 +386,9 @@
     "materialRequestDetail": {
       "title": "Chi tiết yêu cầu vật liệu",
       "description": "Mô Tả",
-      "descriptionsPlaceholder": "Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
+      "descriptionsPlaceholder":"Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
+      "address":"Địa chỉ",
+      "selectAddress": "Chọn địa chỉ",
       "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
       "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
       "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
@@ -398,7 +401,9 @@
       "infor": "Thông tin",
       "quantity": "Số lượng",
       "unit": "Đơn Vị",
-      "action": "Hành Động",
+      "action":"Hành Động",
+      "unsavedChanges": "Bạn có thay đổi chưa lưu",
+      "unsavedChangesDesc": "Những thay đổi của bạn sẽ bị mất nếu bạn rời khỏi trang.",
       "cancleModalTitle": "Trở về ban đầu?",
       "cancleModalText": "Bạn không thể hoàn tác thao tác này"
     }
@@ -1041,6 +1046,7 @@
     "UpdateServiceRequest": "Cập nhật yêu cầu dịch vụ",
     "CreateMaterialRequest": "Tạo yêu cầu vật liệu",
     "UpdateMaterialRequest": "Cập nhật yêu cầu vật liệu",
+    "SendMaterialRequest": "Gửi yêu cầu vật liệu",
     "Back": "Trở về",
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
@@ -1080,7 +1086,11 @@
       "text": "Hành động này không thể hoàn tác."
     },
     "DeleteServiceRequestModal": {
-      "title": "Xóa yêu cầu này?",
+      "title": "Xóa yêu cầu dịch vụ này?",
+      "text": "Hành động này không thể hoàn tác."
+    },
+    "DeleteMaterialRequestModal": {
+      "title": "Xóa yêu cầu vật liệu này?",
       "text": "Hành động này không thể hoàn tác."
     },
     "DeletingLoadingModal": {
@@ -1162,8 +1172,8 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
-    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
-    "IN_USE_ADDRESS": "Địa chỉ này đang được sử dụng không thể xóa được!",
+    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu",
+    "IN_USE_ADDRESS":"Địa chỉ này đang được sử dụng không thể xóa được!",
 
     "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
 

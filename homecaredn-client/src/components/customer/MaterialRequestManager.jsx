@@ -1,14 +1,18 @@
-import PropTypes from 'prop-types';
-import StatusBadge from '../../components/StatusBadge';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Loading from '../Loading';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-
+import { handleApiError } from '../../utils/handleApiError';
+import { showDeleteModal } from '../modal/DeleteModal';
+import Loading from '../Loading';
+import Swal from 'sweetalert2';
+import PropTypes from 'prop-types';
+import StatusBadge from '../../components/StatusBadge';
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const [isCreating, setIsCreating] = useState(false);
   const {
     loading,
     materialRequests,
@@ -23,17 +27,32 @@ export default function MaterialRequestManager({ user }) {
   const handleCreate = async () => {
     if (
       materialRequests.filter(
-        (m) => m.status == 'Draft' || m.status == 'Pending'
+        (m) => m.status == 'Draft' || m.status == 'Opening'
       ).length >= 3
     ) {
       toast.error(t('ERROR.MAXIMUM_MATERIAL_REQUEST'));
       return;
     }
+    setIsCreating(true);
     await createMaterialRequest({ CustomerID: user.id });
+    setIsCreating(false);
   };
 
   const handleDelete = async (materialRequestID) => {
-    await deleteMaterialRequest(materialRequestID);
+    showDeleteModal({
+      t,
+      titleKey: t('ModalPopup.DeleteMaterialRequestModal.title'),
+      textKey: t('ModalPopup.DeleteMaterialRequestModal.text'),
+      onConfirm: async () => {
+        try {
+          await deleteMaterialRequest(materialRequestID);
+          Swal.close();
+          toast.success(t('SUCCESS.DELETE'));
+        } catch (err) {
+          handleApiError(err, t);
+        }
+      },
+    });
   };
 
   if (loading) return <Loading />;
@@ -75,7 +94,8 @@ export default function MaterialRequestManager({ user }) {
           </p>
           <button
             onClick={() => handleCreate()}
-            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors duration-200 inline-flex items-center gap-2"
+            disabled={isCreating}
+            className="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-orange-700 transition-colors duration-200 inline-flex items-center gap-2 disabled:opacity-50"
           >
             <i className="fas fa-plus"></i>
             {t('BUTTON.CreateServiceRequest')}
@@ -119,7 +139,21 @@ export default function MaterialRequestManager({ user }) {
                         ? req.description.slice(0, 100) + '...'
                         : req.description}
                     </p>
-
+                    {/* Address */}
+                    {req.address && (
+                      <div className="mb-3 flex items-center gap-2 text-sm">
+                        <i className="fa-solid fa-location-dot text-orange-500"></i>
+                        <span className="text-gray-600">
+                          {t('userPage.materialRequest.lbl_address')}
+                        </span>
+                        <span className="font-semibold text-gray-800">
+                          {req.address.detail && `${req.address.detail}, `}
+                          {req.address.ward && `${req.address.ward}, `}
+                          {req.address.district && `${req.address.district}, `}
+                          {req.address.city}
+                        </span>
+                      </div>
+                    )}
                     {/* Material Items */}
                     {req.materialRequestItems?.length > 0 ? (
                       <div className="bg-gray-50 rounded-lg p-3 mb-3">
@@ -173,7 +207,7 @@ export default function MaterialRequestManager({ user }) {
                       <StatusBadge status={req.status} type="Request" />
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                         <i className="fas fa-boxes mr-1"></i>
-                        {req.distributorApplications.length}{' '}
+                        {req.distributorApplyCount}{' '}
                         {t('userPage.materialRequest.lbl_distributor')}
                       </span>
                     </div>

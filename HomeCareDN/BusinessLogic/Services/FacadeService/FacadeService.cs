@@ -88,7 +88,10 @@ namespace BusinessLogic.Services.FacadeService
 
             MaterialRequestService = new MaterialRequestService(
                 coreDeps.UnitOfWork,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                coreDeps.AuthorizeDbContext,
+                coreDeps.UserManager,
+                infraDeps.Notifier
             );
 
             StatisticService = new StatisticService(
