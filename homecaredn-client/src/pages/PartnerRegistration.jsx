@@ -110,39 +110,114 @@ export default function PartnerRegistration() {
     return 'fas fa-file text-gray-400';
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const validateForm = () => {
     if (!partnerRequestType) {
       toast.error(t('ERROR.NULL_PARTNERTYPE'));
-      return;
+      return false;
     }
-    if (!email || !isSafeEmail(email)) {
-      toast.error(!email ? t('ERROR.NULL_EMAIL') : t('ERROR.INVALID_EMAIL'));
-      return;
+
+    if (!email) {
+      toast.error(t('ERROR.NULL_EMAIL'));
+      return false;
     }
+    if (!isSafeEmail(email)) {
+      toast.error(t('ERROR.INVALID_EMAIL'));
+      return false;
+    }
+
     if (!companyName) {
       toast.error(t('ERROR.NULL_COMPANYNAME'));
-      return;
+      return false;
     }
-    if (!phoneNumber || !isSafePhone(phoneNumber)) {
-      toast.error(
-        !phoneNumber ? t('ERROR.NULL_PHONE') : t('ERROR.INVALID_PHONE')
-      );
-      return;
+
+    if (!phoneNumber) {
+      toast.error(t('ERROR.NULL_PHONE'));
+      return false;
     }
+    if (!isSafePhone(phoneNumber)) {
+      toast.error(t('ERROR.INVALID_PHONE'));
+      return false;
+    }
+
     if (images.length > MAX_IMAGES) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
+      return false;
     }
     if (documents.length > MAX_DOCUMENTS) {
       toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
-      return;
+      return false;
+    }
+    return true;
+  };
+  const handleFileUploads = async () => {
+    const newImageFiles = images
+      .filter((img) => img.file)
+      .map((img) => img.file);
+    const newDocumentFiles = documents
+      .filter((doc) => doc.file)
+      .map((doc) => doc.file);
+
+    if (newImageFiles.length === 0 && newDocumentFiles.length === 0) {
+      return { imageResults: null, documentResults: null };
     }
 
-    // File filtering
-    const newImageFiles = images.filter((i) => i.file).map((i) => i.file); // Kiểm tra i.file tồn tại
-    const newDocumentFiles = documents.filter((d) => d.file).map((d) => d.file);
+    setImageProgress({
+      loaded: 0,
+      total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
+    });
+    setDocumentProgress({
+      loaded: 0,
+      total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
+    });
+    setUploadProgress(1);
+
+    // Tạo promises
+    const imageUploadPromise =
+      newImageFiles.length > 0
+        ? uploadToCloudinary(
+            newImageFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setImageProgress(progress),
+            'HomeCareDN/PartnerRequest'
+          )
+        : Promise.resolve(null);
+
+    const documentUploadPromise =
+      newDocumentFiles.length > 0
+        ? uploadToCloudinary(
+            newDocumentFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setDocumentProgress(progress),
+            'HomeCareDN/PartnerRequest/Documents',
+            'raw'
+          )
+        : Promise.resolve(null);
+
+    // Chờ cả hai hoàn thành
+    const [imageResults, documentResults] = await Promise.all([
+      imageUploadPromise,
+      documentUploadPromise,
+    ]);
+
+    return { imageResults, documentResults };
+  };
+  const formatUploadResults = (results) => {
+    if (!results) {
+      return { urls: [], publicIds: [] };
+    }
+    const arr = Array.isArray(results) ? results : [results];
+    return {
+      urls: arr.map((u) => u.url),
+      publicIds: arr.map((u) => u.publicId),
+    };
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     const payload = {
       PartnerRequestType: partnerRequestType,
@@ -153,57 +228,20 @@ export default function PartnerRegistration() {
     };
 
     try {
-      setImageProgress({
-        loaded: 0,
-        total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
-      });
-      setDocumentProgress({
-        loaded: 0,
-        total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
-      });
-      if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
-        setUploadProgress(1);
+      const { imageResults, documentResults } = await handleFileUploads();
+
+      const { urls: ImageUrls, publicIds: ImagePublicIds } =
+        formatUploadResults(imageResults);
+      const { urls: DocumentUrls, publicIds: DocumentPublicIds } =
+        formatUploadResults(documentResults);
+
+      if (ImageUrls.length > 0) {
+        payload.ImageUrls = ImageUrls;
+        payload.ImagePublicIds = ImagePublicIds;
       }
-
-      // Tạo promises
-      const imageUploadPromise =
-        newImageFiles.length > 0
-          ? uploadToCloudinary(
-              newImageFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setImageProgress(progress),
-              'HomeCareDN/PartnerRequest'
-            )
-          : Promise.resolve(null);
-
-      const documentUploadPromise =
-        newDocumentFiles.length > 0
-          ? uploadToCloudinary(
-              newDocumentFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setDocumentProgress(progress),
-              'HomeCareDN/PartnerRequest/Documents',
-              'raw'
-            )
-          : Promise.resolve(null);
-
-      const [imageResults, documentResults] = await Promise.all([
-        imageUploadPromise,
-        documentUploadPromise,
-      ]);
-
-      // Gắn kết quả vào payload
-      if (imageResults) {
-        const arr = Array.isArray(imageResults) ? imageResults : [imageResults];
-        payload.ImageUrls = arr.map((u) => u.url);
-        payload.ImagePublicIds = arr.map((u) => u.publicId);
-      }
-      if (documentResults) {
-        const arr = Array.isArray(documentResults)
-          ? documentResults
-          : [documentResults];
-        payload.DocumentUrls = arr.map((u) => u.url);
-        payload.DocumentPublicIds = arr.map((u) => u.publicId);
+      if (DocumentUrls.length > 0) {
+        payload.DocumentUrls = DocumentUrls;
+        payload.DocumentPublicIds = DocumentPublicIds;
       }
 
       await createPartnerRequest(payload);
@@ -364,36 +402,33 @@ export default function PartnerRegistration() {
                   {images.length}/{MAX_IMAGES}
                 </span>
               </div>
-              {images.length === MAX_IMAGES && (
-                <>
-                  {/* Upload Button */}
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      aria-label={t('upload.uploadImages')}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
-                      </div>
-                      <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-orange-600">
-                          {t('upload.clickToUploadImage')}
-                        </span>{' '}
-                        {t('upload.orDragAndDrop')}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {i18n.language === 'vi'
-                          ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
-                          : 'PNG, JPG, GIF up to 5MB each'}
-                      </p>
+              {images.length < MAX_IMAGES && (
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    aria-label={t('upload.uploadImages')}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  />
+                  <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                      <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
                     </div>
+                    <p className="text-gray-600 text-center mb-2">
+                      <span className="font-semibold text-orange-600">
+                        {t('upload.clickToUploadImage')}
+                      </span>{' '}
+                      {t('upload.orDragAndDrop')}
+                    </p>
+                    <p className="text-sm text-gray-400">
+                      {i18n.language === 'vi'
+                        ? 'PNG, JPG, GIF tối đa 5MB mỗi file'
+                        : 'PNG, JPG, GIF up to 5MB each'}
+                    </p>
                   </div>
-                </>
+                </div>
               )}
               {/* Image Preview Grid */}
               {images.length > 0 && (
@@ -434,30 +469,28 @@ export default function PartnerRegistration() {
                   {documents.length}/{MAX_DOCUMENTS}
                 </span>
               </div>
-              {documents.length === MAX_DOCUMENTS && (
-                <>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept={ACCEPTED_DOC_TYPES}
-                      multiple
-                      onChange={handleDocumentChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label="Upload documents"
-                    />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
-                      </div>
-                      <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-blue-600">
-                          {t('upload.clickToUploadDocument')}
-                        </span>{' '}
-                        {t('upload.orDragAndDrop')}
-                      </p>
+              {documents.length < MAX_DOCUMENTS && (
+                <div className="relative">
+                  <input
+                    type="file"
+                    accept={ACCEPTED_DOC_TYPES}
+                    multiple
+                    onChange={handleDocumentChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    aria-label="Upload documents"
+                  />
+                  <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
+                      <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
                     </div>
+                    <p className="text-gray-600 text-center mb-2">
+                      <span className="font-semibold text-blue-600">
+                        {t('upload.clickToUploadDocument')}
+                      </span>{' '}
+                      {t('upload.orDragAndDrop')}
+                    </p>
                   </div>
-                </>
+                </div>
               )}
 
               {documents.length > 0 && (

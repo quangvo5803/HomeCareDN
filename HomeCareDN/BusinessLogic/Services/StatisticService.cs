@@ -16,6 +16,7 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+        private const string SERVICE_REQUEST_INCLUDE = "ServiceRequest";
 
         public StatisticService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
@@ -24,17 +25,21 @@ namespace BusinessLogic.Services
         }
 
         public async Task<IEnumerable<BarChartDto>> GetBarChartAsync(
-            int year, string role, Guid? contractorId = null
+            int year,
+            string role,
+            Guid? contractorId = null
         )
         {
-            IEnumerable<ContractorApplication> contractor = Enumerable.Empty<ContractorApplication>();
-            IEnumerable<DistributorApplication> distributor = Enumerable.Empty<DistributorApplication>();
+            IEnumerable<ContractorApplication> contractor =
+                Enumerable.Empty<ContractorApplication>();
+            IEnumerable<DistributorApplication> distributor =
+                Enumerable.Empty<DistributorApplication>();
 
             if (role == "Admin")
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                     x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
-                    includeProperties: "ServiceRequest"
+                    includeProperties: SERVICE_REQUEST_INCLUDE
                 );
 
                 distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
@@ -45,10 +50,11 @@ namespace BusinessLogic.Services
             else if (role == "Contractor" && contractorId.HasValue)
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                    x => x.Status == ApplicationStatus.Approved &&
-                         x.CreatedAt.Year == year &&
-                         x.ContractorID == contractorId.Value,
-                    includeProperties: "ServiceRequest"
+                    x =>
+                        x.Status == ApplicationStatus.Approved
+                        && x.CreatedAt.Year == year
+                        && x.ContractorID == contractorId.Value,
+                    includeProperties: SERVICE_REQUEST_INCLUDE
                 );
             }
 
@@ -65,34 +71,33 @@ namespace BusinessLogic.Services
         }
 
         public async Task<IEnumerable<LineChartDto>> GetLineChartAsync(
-            int year, string role, Guid? contractorId = null
+            int year,
+            string role,
+            Guid? contractorId = null
         )
         {
             if (role == "Admin")
             {
-                var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(
-                    p => p.Status == PaymentStatus.Paid &&
-                         p.PaidAt.HasValue &&
-                         p.PaidAt.Value.Year == year
+                var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(p =>
+                    p.Status == PaymentStatus.Paid
+                    && p.PaidAt.HasValue
+                    && p.PaidAt.Value.Year == year
                 );
 
-                var result = BuildLineChart(
-                    payments,
-                    year,
-                    p => p.PaidAt!.Value,
-                    p => p.Amount
-                );
+                var result = BuildLineChart(payments, year, p => p.PaidAt!.Value, p => p.Amount);
 
                 return result;
             }
             else if (role == "Contractor" && contractorId.HasValue)
             {
-                var contractorApps = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                    x => x.Status == ApplicationStatus.Approved &&
-                         x.CreatedAt.Year == year &&
-                         x.ContractorID == contractorId.Value,
-                    includeProperties: "ServiceRequest"
-                );
+                var contractorApps =
+                    await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
+                        x =>
+                            x.Status == ApplicationStatus.Approved
+                            && x.CreatedAt.Year == year
+                            && x.ContractorID == contractorId.Value,
+                        includeProperties: SERVICE_REQUEST_INCLUDE
+                    );
 
                 var result = BuildLineChart(
                     contractorApps,
@@ -111,7 +116,7 @@ namespace BusinessLogic.Services
         {
             var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                 ca => ca.Status == ApplicationStatus.Approved && ca.CreatedAt.Year == year,
-                includeProperties: "ServiceRequest"
+                includeProperties: SERVICE_REQUEST_INCLUDE
             );
 
             var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
@@ -285,9 +290,8 @@ namespace BusinessLogic.Services
             return dto;
         }
 
-
         //================= Contractor =================
-        
+
         public async Task<ContractorStatDto> GetContractorStatAsync(Guid contractorID)
         {
             var openRequests = await _unitOfWork
@@ -309,9 +313,7 @@ namespace BusinessLogic.Services
 
             return new ContractorStatDto
             {
-                OpenRequests = dict.TryGetValue((ApplicationStatus)(-1), out _)
-                    ? openRequests
-                    : openRequests,
+                OpenRequests = openRequests,
                 Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)
                     ? pending
                     : 0,
@@ -325,7 +327,6 @@ namespace BusinessLogic.Services
             };
         }
 
-
         //================= Build Chart =================
         private static IEnumerable<BarChartDto> BuildBarChart<TContractor, TDistributor>(
             IEnumerable<TContractor> contractor,
@@ -333,33 +334,35 @@ namespace BusinessLogic.Services
             int year,
             Func<TContractor, DateTime> contractorCreatedAtSelector,
             Func<TContractor, ServiceType?> contractorServiceTypeSelector,
-            Func<TDistributor, DateTime>? distributorCreatedAtSelector = null)
+            Func<TDistributor, DateTime>? distributorCreatedAtSelector = null
+        )
         {
             var groupedContractor = contractor
                 .GroupBy(c => new
                 {
                     Month = contractorCreatedAtSelector(c).Month,
-                    ServiceType = contractorServiceTypeSelector(c)
+                    ServiceType = contractorServiceTypeSelector(c),
                 })
-                .Select(g => new { g.Key.Month, g.Key.ServiceType, Count = g.Count() })
+                .Select(g => new
+                {
+                    g.Key.Month,
+                    g.Key.ServiceType,
+                    Count = g.Count(),
+                })
                 .ToList();
 
-            var groupedDistributor = distributor != null
-                ? distributor
-                    .GroupBy(d => distributorCreatedAtSelector!(d).Month)
-                    .Select(g => new { 
-                        Month = g.Key, 
-                        Count = g.Count() 
-                    })
-                    .ToList()
-                : new List<(int Month, int Count)>()
-                    .Select(x => new { 
-                        x.Month, 
-                        x.Count 
-                    })
-                    .ToList();
+            var groupedDistributor =
+                distributor != null
+                    ? distributor
+                        .GroupBy(d => distributorCreatedAtSelector!(d).Month)
+                        .Select(g => new { Month = g.Key, Count = g.Count() })
+                        .ToList()
+                    : new List<(int Month, int Count)>()
+                        .Select(x => new { x.Month, x.Count })
+                        .ToList();
 
-            return Enumerable.Range(1, 12)
+            return Enumerable
+                .Range(1, 12)
                 .Select(m => new BarChartDto
                 {
                     Month = m,
@@ -384,17 +387,15 @@ namespace BusinessLogic.Services
             IEnumerable<T> data,
             int year,
             Func<T, DateTime> dateSelector,
-            Func<T, decimal> valueSelector)
+            Func<T, decimal> valueSelector
+        )
         {
-            var grouped = data
-                .GroupBy(x => dateSelector(x).Month)
-                .Select(g => new { 
-                    Month = g.Key, 
-                    Total = g.Sum(valueSelector) 
-                })
+            var grouped = data.GroupBy(x => dateSelector(x).Month)
+                .Select(g => new { Month = g.Key, Total = g.Sum(valueSelector) })
                 .ToList();
 
-            return Enumerable.Range(1, 12)
+            return Enumerable
+                .Range(1, 12)
                 .Select(m => new LineChartDto
                 {
                     Month = m,
@@ -402,7 +403,7 @@ namespace BusinessLogic.Services
                     TotalValue = grouped
                         .Where(x => x.Month == m)
                         .Select(x => x.Total)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
                 })
                 .ToList();
         }
