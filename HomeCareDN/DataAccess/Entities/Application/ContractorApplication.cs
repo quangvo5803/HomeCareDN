@@ -16,6 +16,8 @@ namespace DataAccess.Entities.Application
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<Image>? Images { get; set; }
 
+        public ICollection<Document>? Documents { get; set; }
+
         [ForeignKey("ServiceRequestID")]
         public ServiceRequest? ServiceRequest { get; set; }
     }

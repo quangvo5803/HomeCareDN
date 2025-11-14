@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { useCategory } from '../../hook/useCategory';
 import LoadingComponent from '../LoadingComponent';
 
@@ -14,6 +14,7 @@ export default function CategoryModal({
   onSave,
   categoryID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
@@ -51,7 +52,7 @@ export default function CategoryModal({
       setUploadProgress(0);
     };
     fetchCategory();
-  }, [isOpen, categoryID, category, getCategoryById, setUploadProgress]);
+  }, [isOpen, categoryID, getCategoryById, setUploadProgress]);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setLogoFile(file);
@@ -65,6 +66,7 @@ export default function CategoryModal({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!categoryName.trim()) {
       return toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
     }
@@ -85,23 +87,24 @@ export default function CategoryModal({
     try {
       if (logoFile) {
         setUploadProgress(1);
-        const result = await uploadImageToCloudinary(
+        const result = await uploadToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => {
+          (progress, percent) => {
             setUploadProgress(percent);
           },
           'HomeCareDN/CategoryLogo'
         );
         data.CategoryLogoUrl = result.url;
         data.CategoryLogoPublicId = result.publicId;
-        onClose();
-        setUploadProgress(0);
       }
 
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setUploadProgress(0);
+      setSubmitting(false);
     }
   };
 
@@ -265,6 +268,7 @@ CategoryModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   categoryID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
+  setSubmitting: PropTypes.func.isRequired,
 };
 
 // Default props

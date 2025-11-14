@@ -73,7 +73,7 @@ export const MaterialProvider = ({ children }) => {
   const executeFetchById = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
       try {
-        const data = await materialService.getAllMaterialByUserId({
+        const data = await materialService.getAll({
           PageNumber,
           PageSize,
           FilterID,

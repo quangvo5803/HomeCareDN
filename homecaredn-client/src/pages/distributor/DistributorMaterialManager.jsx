@@ -19,6 +19,7 @@ export default function DistributorMaterialManager() {
   const { fetchAllBrands } = useBrand();
   const { fetchAllCategories } = useCategory();
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
   const {
     materials,
     totalMaterials,
@@ -83,19 +84,27 @@ export default function DistributorMaterialManager() {
 
   // Save Material (Create / Update)
   const handleSave = async (materialData) => {
-    if (materialData.MaterialID) {
-      await updateMaterial(materialData);
-    } else {
-      await createMaterial(materialData);
-      const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
-      setCurrentPage(lastPage);
+    setSubmitting(true);
+    try {
+      if (materialData.MaterialID) {
+        await updateMaterial(materialData);
+      } else {
+        await createMaterial(materialData);
+        const lastPage = Math.ceil((totalMaterials + 1) / pageSize);
+        setCurrentPage(lastPage);
+      }
+      setIsModalOpen(false);
+      setEditingMaterialID(null);
+    } catch (err) {
+      console.error(err);
+      return;
+    } finally {
+      setSubmitting(false);
     }
-    setIsModalOpen(false);
-    setEditingMaterialID(null);
   };
 
-  if (loading && !isModalOpen) return <Loading />;
-  if (uploadProgress) return <Loading progress={uploadProgress} />;
+  if (submitting || uploadProgress || loading)
+    return <Loading progress={uploadProgress} />;
   return (
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
       {/* Header */}

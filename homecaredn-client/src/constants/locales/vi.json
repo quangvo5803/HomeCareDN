@@ -248,6 +248,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
+      "form_documents": "Tài liệu",
       "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
@@ -327,6 +328,8 @@
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
+      "uploading": "Đang tải lên",
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
@@ -505,6 +508,8 @@
     "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
   },
   "partnerDashboard": {
+    "no": "STT",
+    "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
@@ -515,6 +520,8 @@
     },
     "description": "Mô tả",
     "estimate": "Ước tính",
+    "commission_due": "Khoản hoa hồng phải trả",
+    "apply_at": "Ngày ứng tuyển",
     "last_update": "Cập nhật lần cuối",
     "notifications": "Thông báo",
     "status": "Trạng thái",
@@ -541,11 +548,17 @@
     "applications": "Đơn Xin",
     "profile": "Hồ Sơ",
     "kpi_meta": {
-      "open_requests": "▲ +2 tuần này",
-      "applied": "↺ 3 đang chờ",
-      "won": "▲ Tỉ lệ 36%",
-      "pending_payments": "▼ 1 quá hạn"
-    }
+      "open_requests": "▲ +2 tuần này"
+    },
+    "retry": "Thử lại",
+    "no_requests": "Không có yêu cầu nào",
+    "access_denied": "Từ chối truy cập. Cần quyền Nhà thầu.",
+    "errors": {
+      "kpi_load_failed": "Không thể tải dữ liệu KPI"
+    },
+    "repair":"Sửa Chữa",
+    "construction":"Xây Dựng",
+    "revenue": "Doanh Thu"
   },
   "supportChat": {
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
@@ -1330,7 +1343,8 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "upload": {
-    "clickToUpload": "Chọn để tải ảnh",
+    "clickToUploadImage": "Chọn để tải ảnh",
+    "clickToUploadDocument": "Chọn để tải tài liệu",
     "orDragAndDrop": "hoặc kéo và thả",
     "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
   },
