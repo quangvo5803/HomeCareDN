@@ -96,8 +96,8 @@ export default function AdminUserDetail() {
     if (userDetail.address?.length > 0) {
       return (
         <div className="space-y-1">
-          {userDetail.address.slice(0, 3).map((addr) => (
-            <div key={addr.id} className="flex items-start">
+          {userDetail.address.slice(0, 4).map((addr) => (
+            <div key={addr.addressID} className="flex items-start">
               <i className="fa-solid fa-location-dot text-orange-500 mr-2 mt-1"></i>
               <span>
                 {addr.detail}, {addr.district}, {addr.city}
@@ -109,8 +109,8 @@ export default function AdminUserDetail() {
     }
     return (
       <div className="flex items-center">
-        <i className="fa-solid fa-location-dot text-gray-400 mr-2"></i>
-        <span>{t('adminUserManager.userDetail.address')}</span>
+        <i className="fa-solid fa-location-dot text-gray-500 mr-2"></i>
+        <span>{t('adminUserManager.userDetail.noAddress')}</span>
       </div>
     );
   };
@@ -122,7 +122,7 @@ export default function AdminUserDetail() {
   );
 
   const renderHeader = () => (
-    <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-6 rounded-3xl mb-3">
+    <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-6 rounded-t-3xl mb-5">
       <div className="mx-auto flex items-center gap-4">
         <button
           className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 cursor-pointer"
@@ -130,7 +130,11 @@ export default function AdminUserDetail() {
         >
           <i className="fas fa-arrow-left"></i>
         </button>
-        <h1 className="text-2xl font-bold">{userDetail.fullName}</h1>
+        <h1 className="text-2xl font-bold">
+          {t(`roles.${userDetail.role}`)}
+          {': '}
+          {userDetail.fullName}
+        </h1>
       </div>
     </div>
   );
@@ -149,7 +153,7 @@ export default function AdminUserDetail() {
       <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center">
         <div className="space-y-2">
           <h2 className="text-xl font-bold text-gray-800">
-            {userDetail.fullName}
+            {userDetail.fullName || t('adminUserManager.userDetail.noName')}
           </h2>
           <p className="text-gray-600">
             <i className="fa-solid fa-envelope text-orange-500 mr-2"></i>
@@ -157,7 +161,7 @@ export default function AdminUserDetail() {
           </p>
           <p className="text-gray-600">
             <i className="fa-solid fa-phone text-orange-500 mr-2"></i>
-            {userDetail.phoneNumber}
+            {userDetail.phoneNumber || t('adminUserManager.userDetail.noPhone')}
           </p>
           <div className="text-gray-600">{renderAddress()}</div>
         </div>
@@ -170,7 +174,7 @@ export default function AdminUserDetail() {
               </p>
               <p className="text-lg font-bold text-yellow-700 flex items-center justify-center gap-1">
                 <i className="fa-solid fa-star"></i>
-                {userDetail.averageRating}
+                {userDetail.averageRating.toFixed(1)}
               </p>
             </div>
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center min-w-[110px]">
@@ -275,7 +279,7 @@ export default function AdminUserDetail() {
                 <button
                   onClick={() =>
                     navigate(
-                      `/Admin/ServiceRequest/${request.serviceRequestID}`
+                      `/Admin/ServiceRequestManager/${request.serviceRequestID}`
                     )
                   }
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
@@ -356,7 +360,7 @@ export default function AdminUserDetail() {
                 <button
                   onClick={() =>
                     navigate(
-                      `/Admin/ServiceRequest/${request.serviceRequestID}`
+                      `/Admin/ServiceRequestManager/${request.serviceRequestID}`
                     )
                   }
                   className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-600 hover:to-blue-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"

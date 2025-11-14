@@ -368,7 +368,7 @@ export default function ServiceRequest() {
                         type="button"
                         onClick={() =>
                           navigate(
-                            `/Admin/ServiceRequest/${item.serviceRequestID}`
+                            `/Admin/ServiceRequestManager/${item.serviceRequestID}`
                           )
                         }
                         className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-md cursor-pointer"
@@ -535,7 +535,7 @@ export default function ServiceRequest() {
                               type="button"
                               onClick={() =>
                                 navigate(
-                                  `/Admin/ServiceRequest/${item.serviceRequestID}`
+                                  `/Admin/ServiceRequestManager/${item.serviceRequestID}`
                                 )
                               }
                               className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"

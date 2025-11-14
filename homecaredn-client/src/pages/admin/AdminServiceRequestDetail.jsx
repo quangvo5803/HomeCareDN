@@ -548,7 +548,7 @@ export default function AdminServiceRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedContractor.averageRating}
+                        {selectedContractor.averageRating.toFixed(1)}
                       </p>
                     </div>
 
@@ -578,9 +578,55 @@ export default function AdminServiceRequestDetail() {
                     />
                   </div>
 
+                  {/* Commission Countdown - Show when PendingCommission */}
+                  {selectedContractor.status === 'PendingCommission' &&
+                    selectedContractor.dueCommisionTime && (
+                      <div className="mb-6">
+                        <CommissionCountdown
+                          dueCommisionTime={selectedContractor.dueCommisionTime}
+                          onExpired={() => {
+                            toast.warning(
+                              t(
+                                'contractorServiceRequestDetail.paymentDeadlineExpired'
+                              )
+                            );
+                          }}
+                          role="admin"
+                        />
+                      </div>
+                    )}
+
+                  {selectedContractor.imageUrls?.length > 0 && (
+                    <div>
+                      <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.images'
+                        )}
+                      </p>
+                      <div className="grid grid-cols-5 gap-3">
+                        {selectedContractor.imageUrls.map((url, i) => (
+                          <a
+                            key={`${url}-${i}`}
+                            href={url}
+                            className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                            data-gall="contractor-gallery"
+                            title={`${
+                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                            } ${i + 1}`}
+                          >
+                            <img
+                              src={url}
+                              alt={`contractor-${i}`}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {/*Payment Information */}
                   {selectedContractor.status === 'Approved' && (
-                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100">
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100 mt-5">
                       <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
                         <i className="fa-solid fa-credit-card"></i>
                         {t(
@@ -653,53 +699,6 @@ export default function AdminServiceRequestDetail() {
                             </tr>
                           </tbody>
                         </table>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Commission Countdown - Show when PendingCommission */}
-                  {selectedContractor.status === 'PendingCommission' &&
-                    selectedContractor.dueCommisionTime && (
-                      <div className="mb-6">
-                        <CommissionCountdown
-                          dueCommisionTime={selectedContractor.dueCommisionTime}
-                          onExpired={() => {
-                            toast.warning(
-                              t(
-                                'contractorServiceRequestDetail.paymentDeadlineExpired'
-                              )
-                            );
-                          }}
-                          role="admin"
-                        />
-                      </div>
-                    )}
-
-                  {selectedContractor.imageUrls?.length > 0 && (
-                    <div>
-                      <p className="text-gray-500 text-sm font-semibold mb-3 uppercase tracking-wide">
-                        {t(
-                          'adminServiceRequestManager.contractorDetail.images'
-                        )}
-                      </p>
-                      <div className="grid grid-cols-5 gap-3">
-                        {selectedContractor.imageUrls.map((url, i) => (
-                          <a
-                            key={`${url}-${i}`}
-                            href={url}
-                            className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
-                            data-gall="contractor-gallery"
-                            title={`${
-                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
-                            } ${i + 1}`}
-                          >
-                            <img
-                              src={url}
-                              alt={`contractor-${i}`}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            />
-                          </a>
-                        ))}
                       </div>
                     </div>
                   )}
