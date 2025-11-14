@@ -51,7 +51,7 @@ export default function ChatSection({
       return () => {
         chatConnection
           .invoke('LeaveConversation', conversationID)
-          .catch(() => {});
+          .catch(() => { });
       };
     }
   }, [chatConnection, conversationID]);
@@ -73,7 +73,7 @@ export default function ChatSection({
 
         setHasMoreMessages(
           data.items.length === MESSAGE_SIZE &&
-            messages.length + data.items.length < data.totalCount
+          messages.length + data.items.length < data.totalCount
         );
 
         if (append) {
@@ -285,9 +285,8 @@ export default function ChatSection({
               </p>
             </div>
             <p
-              className={`text-[11px] text-gray-400 mt-1 ${
-                isMyMessage ? 'text-right' : 'text-left'
-              }`}
+              className={`text-[11px] text-gray-400 mt-1 ${isMyMessage ? 'text-right' : 'text-left'
+                }`}
             >
               {new Date(m.sentAt).toLocaleTimeString('vi-VN', {
                 hour: '2-digit',

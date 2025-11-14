@@ -25,5 +25,7 @@ namespace BusinessLogic.DTOs.Application.Partner
         public DateTime CreatedAt { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
+        public ICollection<string>? DocumentUrls { get; set; }
+        public ICollection<string>? DocumentPublicIds { get; set; }
     }
 }

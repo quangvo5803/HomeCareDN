@@ -6,6 +6,7 @@ namespace DataAccess.Entities.Application
     {
         public Guid MaterialRequestID { get; set; }
         public Guid CustomerID { get; set; }
+        public Guid? AddressId { get; set; }
         public Guid? SelectedDistributorApplicationID { get; set; }
         public string? Description { get; set; }
         public bool CanEditQuantity { get; set; } = false;

@@ -136,7 +136,7 @@ export default function AdminServiceManager() {
             {/* Search, Sort & Add Button */}
             <div className="flex flex-col sm:flex-row gap-3">
               <select
-                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -172,7 +172,7 @@ export default function AdminServiceManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-600 transition-all duration-200 shadow-md sm:w-auto w-full"
+                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
                 onClick={() => setIsModalOpen(true)}
               >
                 <i className="fa-solid fa-plus"></i>
@@ -264,7 +264,7 @@ export default function AdminServiceManager() {
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
                               <button
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() => {
                                   setEditingServiceID(svc.serviceID);
                                   setIsModalOpen(true);
@@ -273,7 +273,7 @@ export default function AdminServiceManager() {
                                 {t('BUTTON.Edit')}
                               </button>
                               <button
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                 onClick={() => handleDelete(svc.serviceID)}
                               >
                                 {t('BUTTON.Delete')}
@@ -296,7 +296,7 @@ export default function AdminServiceManager() {
                               {t('adminServiceManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
+                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-500 cursor-pointer"
                               onClick={() => setIsModalOpen(true)}
                             >
                               <i className="mr-3 fa-solid fa-plus"></i>
@@ -360,7 +360,7 @@ export default function AdminServiceManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                          className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                           onClick={() => {
                             setEditingServiceID(svc.serviceID);
                             setIsModalOpen(true);
@@ -369,7 +369,7 @@ export default function AdminServiceManager() {
                           {t('BUTTON.Edit')}
                         </button>
                         <button
-                          className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                          className="flex-1 px-3 py-2 text-xs font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                           onClick={() => handleDelete(svc.serviceID)}
                         >
                           {t('BUTTON.Delete')}
@@ -389,7 +389,7 @@ export default function AdminServiceManager() {
                       {t('adminServiceManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-600"
+                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-500 cursor-pointer"
                       onClick={() => setIsModalOpen(true)}
                     >
                       <i className="mr-3 fa-solid fa-plus"></i>

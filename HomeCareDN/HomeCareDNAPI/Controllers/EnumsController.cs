@@ -22,6 +22,7 @@ namespace HomeCareDNAPI.Controllers
                 PartnerType = EnumExtensions.GetEnumList<PartnerRequestType>(),
                 PartnerStatus = EnumExtensions.GetEnumList<PartneRequestrStatus>(),
                 ConversationTypes = EnumExtensions.GetEnumList<ConversationType>(),
+                PaymentStatus = EnumExtensions.GetEnumList<PaymentStatus>(),
             };
             return Ok(result);
         }

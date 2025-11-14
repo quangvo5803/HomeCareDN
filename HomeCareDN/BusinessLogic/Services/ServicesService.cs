@@ -172,7 +172,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteServiceAsync(Guid id)
         {
-            var service = await _unitOfWork.ServiceRepository.GetAsync(s => s.ServiceID == id);
+            var service = await _unitOfWork.ServiceRepository.GetAsync(
+                s => s.ServiceID == id,
+                asNoTracking: false
+            );
             if (service == null)
             {
                 throw new CustomValidationException(
