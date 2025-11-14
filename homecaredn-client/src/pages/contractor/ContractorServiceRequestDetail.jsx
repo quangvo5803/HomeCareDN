@@ -72,7 +72,7 @@ export default function ContractorServiceRequestDetail() {
     const totalSize = imageProgress.total + documentProgress.total;
 
     if (totalSize === 0) {
-      if (uploadProgress !== 1) setUploadProgress(0);
+      setUploadProgress(0);
       return;
     }
 
@@ -855,29 +855,34 @@ export default function ContractorServiceRequestDetail() {
                       {images.length}/5
                     </span>
                   </label>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                  {images.length < MAX_IMAGES && (
+                    <>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleImageChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                            <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                          </div>
+                          <p className="text-gray-600 text-center mb-2">
+                            <span className="font-semibold text-orange-600">
+                              {t('upload.clickToUploadImage')}
+                            </span>{' '}
+                            {t('upload.orDragAndDrop')}
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            {t('upload.fileTypesHint')}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-orange-600">
-                          {t('upload.clickToUploadImage')}
-                        </span>{' '}
-                        {t('upload.orDragAndDrop')}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {t('upload.fileTypesHint')}
-                      </p>
-                    </div>
-                  </div>
+                    </>
+                  )}
+
                   {images.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-3">
                       {images.map((img, idx) => (
@@ -916,30 +921,34 @@ export default function ContractorServiceRequestDetail() {
                     </span>
                   </div>
 
-                  <div className="relative">
-                    <input
-                      type="file"
-                      accept={ACCEPTED_DOC_TYPES}
-                      multiple
-                      onChange={handleDocumentChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label={t('upload.uploadDocuments')}
-                    />
-                    <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                      <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                        <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                  {documents.length < MAX_DOCUMENTS && (
+                    <>
+                      <div className="relative">
+                        <input
+                          type="file"
+                          accept={ACCEPTED_DOC_TYPES}
+                          multiple
+                          onChange={handleDocumentChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                          aria-label={t('upload.uploadDocuments')}
+                        />
+                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                            <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                          </div>
+                          <p className="text-gray-600 text-center mb-2">
+                            <span className="font-semibold text-blue-600">
+                              {t('upload.clickToUploadDocument')}
+                            </span>{' '}
+                            {t('upload.orDragAndDrop')}
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            {t('upload.fileTypesHint')}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-gray-600 text-center mb-2">
-                        <span className="font-semibold text-blue-600">
-                          {t('upload.clickToUploadDocument')}
-                        </span>{' '}
-                        {t('upload.orDragAndDrop')}
-                      </p>
-                      <p className="text-sm text-gray-400">
-                        {t('upload.fileTypesHint')}
-                      </p>
-                    </div>
-                  </div>
+                    </>
+                  )}
 
                   {documents.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">

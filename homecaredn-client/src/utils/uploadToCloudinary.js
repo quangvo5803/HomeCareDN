@@ -64,7 +64,7 @@ export const uploadToCloudinary = async (
             100,
             Math.round((uploadedBytes * 100) / totalSize)
           );
-          onProgress(percent);
+          onProgress({ loaded: uploadedBytes, total: totalSize }, percent);
         }
       },
     });
