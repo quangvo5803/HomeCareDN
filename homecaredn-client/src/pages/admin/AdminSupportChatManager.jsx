@@ -291,8 +291,15 @@ export default function AdminSupportChatManager() {
   // Filter conversations
   const filteredConversations = useMemo(() => {
     if (!filter) return conversations;
-    return conversations.filter((conversation) =>
-      conversation.userID.toLowerCase().includes(filter.toLowerCase())
+
+    const searchTerm = filter.toLowerCase();
+
+    return conversations.filter(
+      (conversation) =>
+        (conversation.userEmail &&
+          conversation.userEmail.toLowerCase().includes(searchTerm)) ||
+        (conversation.userName &&
+          conversation.userName.toLowerCase().includes(searchTerm))
     );
   }, [conversations, filter]);
 
@@ -347,12 +354,19 @@ export default function AdminSupportChatManager() {
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-                        {conversation.userID.charAt(0).toUpperCase()}
+                        {conversation.userEmail?.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
+                        {/* email */}
                         <p className="font-medium text-sm truncate text-gray-800">
-                          {conversation.userID.slice(0, 8)}
+                          {conversation?.userEmail}
                         </p>
+                        {/* name */}
+                        {conversation?.userName && (
+                          <p className="text-xs text-gray-500 truncate">
+                            {conversation?.userName}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </li>
@@ -376,12 +390,17 @@ export default function AdminSupportChatManager() {
               {/* Header */}
               <div className="p-4 border-b flex items-center gap-3 bg-gray-50">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
-                  {selectedConversation.userID.charAt(0).toUpperCase()}
+                  {selectedConversation?.userEmail?.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-700">
-                    {selectedConversation.userID.slice(0, 8)}
+                    {selectedConversation?.userEmail}
                   </h3>
+                  {selectedConversation?.userName && (
+                    <p className="text-xs text-gray-500">
+                      {selectedConversation?.userName}
+                    </p>
+                  )}
                 </div>
               </div>
 

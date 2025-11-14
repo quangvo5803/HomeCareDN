@@ -273,6 +273,14 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => src.ConversationID)
                 )
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.UserID))
+                .ForMember(
+                    dest => dest.UserEmail,
+                    opt => opt.MapFrom(src => src.User != null ? src.User.Email : null)
+                )
+                .ForMember(
+                    dest => dest.UserName,
+                    opt => opt.MapFrom(src => src.User != null ? src.User.FullName : null)
+                )
                 .ForMember(dest => dest.AdminID, opt => opt.MapFrom(src => src.AdminID))
                 .ForMember(
                     dest => dest.ConversationType,

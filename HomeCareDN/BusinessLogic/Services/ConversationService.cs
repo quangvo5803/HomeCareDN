@@ -13,6 +13,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
 
         private const string CONVERSATION = "Conversation";
+        private const string USER = "User";
         private const string ERROR_CONVERSATIONS_NOT_FOUND = "CONVERSATIONS_NOT_FOUND";
 
         public ConversationService(IUnitOfWork unitOfWork, IMapper mapper)
@@ -51,7 +52,7 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<ConversationDto>> GetAllConversationByAdminIDAsync(Guid id)
         {
             var conversations = await _unitOfWork
-                .ConversationRepository.GetQueryable()
+                .ConversationRepository.GetQueryable(includeProperties: USER)
                 .Where(c => c.AdminID == id)
                 .OrderByDescending(c => c.CreatedAt)
                 .ToListAsync();

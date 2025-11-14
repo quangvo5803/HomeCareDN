@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using DataAccess.Entities.Authorize;
 
 namespace DataAccess.Entities.Application
 {
@@ -22,6 +23,7 @@ namespace DataAccess.Entities.Application
         public ConversationType ConversationType { get; set; }
 
         public ServiceRequest? ServiceRequest { get; set; }
+        public virtual ApplicationUser? User { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }
 

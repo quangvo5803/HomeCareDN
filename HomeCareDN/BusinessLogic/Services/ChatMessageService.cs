@@ -18,6 +18,7 @@ namespace BusinessLogic.Services
 
         private const string CONVERSATION = "Conversation";
         private const string MESSAGE = "Message";
+        private const string USER = "User";
 
         private const string ERROR_CONVERSATION_NOT_FOUND = "CONVERSATION_NOT_FOUND";
         private const string ERROR_PERMISSION_DENIED = "PERMISSION_DENIED";
@@ -170,8 +171,9 @@ namespace BusinessLogic.Services
                 "Chat.MessageCreated",
                 result
             );
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ConversationID == dto.ConversationID
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                c => c.ConversationID == dto.ConversationID,
+                includeProperties: USER
             );
             if (conversation == null)
             {
