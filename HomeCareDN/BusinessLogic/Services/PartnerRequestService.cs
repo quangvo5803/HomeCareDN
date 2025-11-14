@@ -114,21 +114,103 @@ namespace BusinessLogic.Services
         {
             try
             {
-                await ValidatePartnerRequestAsync(request);
+                var user = await _userManager.FindByEmailAsync(request.Email);
+                if (user != null)
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { PARTNER_REQUEST, new[] { "REGISTER_ALREADY_EXISTS" } },
+                        }
+                    );
+                }
+                var existing = (
+                    await _unitOfWork.PartnerRequestRepository.GetAllAsync()
+                ).FirstOrDefault(p => p.Email == request.Email);
+
+                if (existing != null)
+                {
+                    switch (existing.Status)
+                    {
+                        case PartneRequestrStatus.Pending:
+                            throw new CustomValidationException(
+                                new Dictionary<string, string[]>
+                                {
+                                    { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_PENDING } },
+                                }
+                            );
+
+                        case PartneRequestrStatus.Rejected:
+                            if (existing.CreatedAt.AddDays(3) > DateTime.UtcNow)
+                            {
+                                throw new CustomValidationException(
+                                    new Dictionary<string, string[]>
+                                    {
+                                        {
+                                            PARTNER_REQUEST,
+                                            new[] { ERROR_PARTNER_REQUEST_REJECTED }
+                                        },
+                                    }
+                                );
+                            }
+                            break;
+                    }
+                }
 
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);
                 await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
 
-                await ProcessPartnerImagesAsync(request, partnerRequest.PartnerRequestID);
-                await ProcessPartnerDocumentsAsync(request, partnerRequest.PartnerRequestID);
+                if (request.ImageUrls != null)
+                {
+                    var ids = request.ImagePublicIds?.ToList() ?? new List<string>();
+                    var images = request
+                        .ImageUrls.Select(
+                            (url, i) =>
+                                new Image
+                                {
+                                    ImageID = Guid.NewGuid(),
+                                    PartnerRequestID = partnerRequest.PartnerRequestID,
+                                    ImageUrl = url,
+                                    PublicId = i < ids.Count ? ids[i] : string.Empty,
+                                }
+                        )
+                        .ToList();
+
+                    await _unitOfWork.ImageRepository.AddRangeAsync(images);
+                }
+                if (request.DocumentUrls != null)
+                {
+                    var ids = request.DocumentPublicIds?.ToList() ?? new List<string>();
+                    var documents = request
+                        .DocumentUrls.Select(
+                            (url, i) =>
+                                new Document
+                                {
+                                    DocumentID = Guid.NewGuid(),
+                                    PartnerRequestID = partnerRequest.PartnerRequestID,
+                                    DocumentUrl = url,
+                                    PublicId = i < ids.Count ? ids[i] : string.Empty,
+                                }
+                        )
+                        .ToList();
+
+                    await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+                }
 
                 await _unitOfWork.SaveAsync();
                 QueueEmailReceived(partnerRequest);
 
                 return _mapper.Map<PartnerRequestDto>(partnerRequest);
             }
+            catch (CustomValidationException)
+            {
+                // rollback ảnh nếu validation fail
+                await HandleImageError(request.ImagePublicIds);
+                throw;
+            }
             catch (Exception)
             {
+                // rollback ảnh nếu có lỗi bất ngờ
                 await HandleImageError(request.ImagePublicIds);
                 throw;
             }
@@ -237,103 +319,6 @@ namespace BusinessLogic.Services
 
             _unitOfWork.PartnerRequestRepository.Remove(partnerRequest);
             await _unitOfWork.SaveAsync();
-        }
-
-        private async Task ValidatePartnerRequestAsync(PartnerRequestCreateRequestDto request)
-        {
-            var user = await _userManager.FindByEmailAsync(request.Email);
-            if (user != null)
-            {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { PARTNER_REQUEST, new[] { "REGISTER_ALREADY_EXISTS" } },
-                    }
-                );
-            }
-
-            var existing = (
-                await _unitOfWork.PartnerRequestRepository.GetAllAsync()
-            ).FirstOrDefault(p => p.Email == request.Email);
-
-            if (existing != null)
-            {
-                switch (existing.Status)
-                {
-                    case PartneRequestrStatus.Pending:
-                        throw new CustomValidationException(
-                            new Dictionary<string, string[]>
-                            {
-                                { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_PENDING } },
-                            }
-                        );
-                    case PartneRequestrStatus.Rejected:
-                        if (existing.CreatedAt.AddDays(3) > DateTime.UtcNow)
-                        {
-                            throw new CustomValidationException(
-                                new Dictionary<string, string[]>
-                                {
-                                    { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_REJECTED } },
-                                }
-                            );
-                        }
-                        break;
-                }
-            }
-        }
-
-        private async Task ProcessPartnerImagesAsync(
-            PartnerRequestCreateRequestDto request,
-            Guid partnerRequestId
-        )
-        {
-            if (request.ImageUrls == null || !request.ImageUrls.Any())
-            {
-                return;
-            }
-
-            var ids = request.ImagePublicIds?.ToList() ?? new List<string>();
-            var images = request
-                .ImageUrls.Select(
-                    (url, i) =>
-                        new Image
-                        {
-                            ImageID = Guid.NewGuid(),
-                            PartnerRequestID = partnerRequestId,
-                            ImageUrl = url,
-                            PublicId = i < ids.Count ? ids[i] : string.Empty,
-                        }
-                )
-                .ToList();
-
-            await _unitOfWork.ImageRepository.AddRangeAsync(images);
-        }
-
-        private async Task ProcessPartnerDocumentsAsync(
-            PartnerRequestCreateRequestDto request,
-            Guid partnerRequestId
-        )
-        {
-            if (request.DocumentUrls == null || !request.DocumentUrls.Any())
-            {
-                return;
-            }
-
-            var ids = request.DocumentPublicIds?.ToList() ?? new List<string>();
-            var documents = request
-                .DocumentUrls.Select(
-                    (url, i) =>
-                        new Document
-                        {
-                            DocumentID = Guid.NewGuid(),
-                            PartnerRequestID = partnerRequestId,
-                            DocumentUrl = url,
-                            PublicId = i < ids.Count ? ids[i] : string.Empty,
-                        }
-                )
-                .ToList();
-
-            await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
         }
 
         #region EmailTemplate
