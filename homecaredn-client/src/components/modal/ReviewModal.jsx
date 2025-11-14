@@ -140,6 +140,8 @@ export default function ReviewModal({
                     'ModalPopup.ReviewModal.ratingStar'
                   )}`}
                   disabled={readOnly}
+                  onMouseEnter={() => !readOnly && setHoveredRating(star)}
+                  onMouseLeave={() => !readOnly && setHoveredRating(0)}
                   onKeyDown={(e) => {
                     if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
                       e.preventDefault();
@@ -149,14 +151,12 @@ export default function ReviewModal({
                   onClick={() => !readOnly && setRating(star)}
                 >
                   <i
-                    className={`${
+                    className={
                       star <= (hoveredRating || rating)
                         ? 'fas fa-star text-yellow-400'
                         : 'far fa-star text-gray-300'
-                    }`}
-                    onMouseEnter={() => !readOnly && setHoveredRating(star)}
-                    onMouseLeave={() => !readOnly && setHoveredRating(0)}
-                  ></i>
+                    }
+                  />
                 </button>
               ))}
             </div>
