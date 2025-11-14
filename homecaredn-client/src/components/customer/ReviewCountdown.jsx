@@ -53,8 +53,8 @@ export default function ReviewCountdown({
               {t('ReviewCountdown.reviewed')}
             </span>
             <div className="flex items-center gap-1 ml-2">
-              {[...new Array(5)].map((_, i) => {
-                const key = `star-${serviceRequest?.id || 'sr'}-${i}`; // tránh dùng index trần
+              {Array.from({ length: 5 }, (_, i) => {
+                const key = `star-${serviceRequest?.id || 'sr'}-${i}`;
                 return (
                   <i
                     key={key}

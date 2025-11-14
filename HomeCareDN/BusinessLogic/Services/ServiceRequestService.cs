@@ -467,16 +467,14 @@ namespace BusinessLogic.Services.Interfaces
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.FullName ?? string.Empty
-                            : string.Empty,
+                            ? contractor.FullName ?? ""
+                            : "",
                     ContractorEmail =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Email ?? string.Empty
-                            : string.Empty,
+                        selected.Status == ApplicationStatus.Approved ? contractor.Email ?? "" : "",
                     ContractorPhone =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.PhoneNumber ?? string.Empty
-                            : string.Empty,
+                            ? contractor.PhoneNumber ?? ""
+                            : "",
                 };
             }
         }
