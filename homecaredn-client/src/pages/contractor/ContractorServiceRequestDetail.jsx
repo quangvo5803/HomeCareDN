@@ -298,7 +298,7 @@ export default function ContractorServiceRequestDetail() {
       }
 
       const appData = await contractorApplicationService.create(payload);
-      toast.success(t('SUCCESS.APPICATION_CREATE'));
+      toast.success(t('SUCCESS.APPLICATION_CREATE'));
 
       setExistingApplication(appData);
       setTotalApplications(totalApplications + 1);
@@ -398,8 +398,8 @@ export default function ContractorServiceRequestDetail() {
   const handleDocumentChange = (e) => {
     const files = Array.from(e.target.files);
 
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+    if (files.length + documents.length > 5) {
+      toast.error(t('ERROR.MAXIMUM_DOCUMENTS'));
       return;
     }
 
@@ -951,7 +951,7 @@ export default function ContractorServiceRequestDetail() {
                   )}
 
                   {documents.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                       {documents.map((doc) => (
                         <div
                           key={doc.url}
