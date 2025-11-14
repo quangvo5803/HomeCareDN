@@ -29,7 +29,7 @@ const ADMIN_ID = import.meta.env.VITE_ADMIN_ID;
 const uid = (() => {
   let seq = 0;
   return () => {
-    const c = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
+    const c = typeof globalThis === 'undefined' ? undefined : globalThis.crypto;
     if (c?.randomUUID) return c.randomUUID();
     if (c?.getRandomValues) {
       const bytes = new Uint8Array(16);

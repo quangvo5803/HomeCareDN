@@ -65,7 +65,7 @@ namespace BusinessLogic.Services
                 .OrderByDescending(c => c.AdminUnreadCount)
                 .ThenByDescending(c => c.CreatedAt)
                 .ToListAsync();
-            if (conversations == null)
+            if (conversations.Count == 0)
             {
                 var errors = new Dictionary<string, string[]>
                 {
@@ -74,12 +74,28 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             var result = _mapper.Map<IEnumerable<ConversationDto>>(conversations);
+            //LINQ
+            var userIds = result
+                .Where(dto => !string.IsNullOrEmpty(dto.UserID))
+                .Select(dto => dto.UserID)
+                .Distinct()
+                .ToList();
+
+            if (userIds.Count == 0)
+            {
+                return result;
+            }
+
+            //Apply LINQ to Query
+            var userMap = await _userManager
+                .Users.Where(u => userIds.Contains(u.Id))
+                .ToDictionaryAsync(u => u.Id, u => u);
+
             foreach (var dto in result)
             {
                 if (!string.IsNullOrEmpty(dto.UserID))
                 {
-                    var user = await _userManager.FindByIdAsync(dto.UserID);
-                    if (user != null)
+                    if (userMap.TryGetValue(dto.UserID, out var user))
                     {
                         dto.UserEmail = user.Email;
                         dto.UserName = user.FullName;
