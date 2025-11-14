@@ -350,43 +350,60 @@ export default function AdminSupportChatManager() {
       return (
         <ul className="divide-y">
           {filteredConversations.map((conversation) => (
-            <li
-              key={conversation.conversationID}
-              onClick={() => handleSelectConversation(conversation)}
-              className={`p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
-                conversation.conversationID ===
-                selectedConversation?.conversationID
-                  ? 'bg-indigo-100 border-l-4 border-indigo-500'
-                  : ''
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="relative flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-                    {conversation.userEmail?.charAt(0).toUpperCase()}
+            <li key={conversation.conversationID}>
+              <button
+                type="button"
+                onClick={() => handleSelectConversation(conversation)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelectConversation(conversation);
+                  }
+                }}
+                className={`w-full text-left p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
+                  conversation.conversationID ===
+                  selectedConversation?.conversationID
+                    ? 'bg-indigo-100 border-l-4 border-indigo-500'
+                    : ''
+                }`}
+                aria-label={`${t(
+                  'adminSupportChatManager.selectConversation'
+                )}: ${conversation.userEmail}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
+                      {conversation.userEmail?.charAt(0).toUpperCase()}
+                    </div>
+                    {conversation.adminUnreadCount > 0 && (
+                      <span
+                        className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white"
+                        aria-label={`${conversation.adminUnreadCount} ${t(
+                          'adminSupportChatManager.unreadMessages'
+                        )}`}
+                      />
+                    )}
                   </div>
-                  {conversation.adminUnreadCount > 0 && (
-                    <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  {/* email */}
-                  <p className="font-medium text-sm truncate text-gray-800">
-                    {conversation?.userEmail}
-                  </p>
-                  {/* name */}
-                  {conversation?.userName && (
-                    <p className="text-xs text-gray-500 truncate">
-                      {conversation?.userName}
+                  <div className="flex-1 min-w-0">
+                    {/* email */}
+                    <p className="font-medium text-sm truncate text-gray-800">
+                      {conversation?.userEmail}
                     </p>
-                  )}
+                    {/* name */}
+                    {conversation?.userName && (
+                      <p className="text-xs text-gray-500 truncate">
+                        {conversation?.userName}
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </button>
             </li>
           ))}
         </ul>
       );
     }
+
     return (
       <div className="flex flex-col items-center justify-center h-full text-gray-400">
         <i className="fa-regular fa-inbox text-4xl mb-2"></i>
@@ -396,6 +413,7 @@ export default function AdminSupportChatManager() {
       </div>
     );
   };
+
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-fadeIn">
       {/* Header */}

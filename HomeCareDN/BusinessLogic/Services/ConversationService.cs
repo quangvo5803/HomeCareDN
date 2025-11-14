@@ -65,6 +65,7 @@ namespace BusinessLogic.Services
                 .OrderByDescending(c => c.AdminUnreadCount)
                 .ThenByDescending(c => c.CreatedAt)
                 .ToListAsync();
+
             if (conversations.Count == 0)
             {
                 var errors = new Dictionary<string, string[]>
@@ -73,8 +74,9 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
             var result = _mapper.Map<IEnumerable<ConversationDto>>(conversations);
-            //LINQ
+
             var userIds = result
                 .Where(dto => !string.IsNullOrEmpty(dto.UserID))
                 .Select(dto => dto.UserID)
@@ -86,23 +88,24 @@ namespace BusinessLogic.Services
                 return result;
             }
 
-            //Apply LINQ to Query
+            // Get user map
             var userMap = await _userManager
                 .Users.Where(u => userIds.Contains(u.Id))
                 .ToDictionaryAsync(u => u.Id, u => u);
 
-            foreach (var dto in result)
+            // Replace foreach loop with LINQ Select
+            return result.Select(dto =>
             {
-                if (!string.IsNullOrEmpty(dto.UserID))
+                if (
+                    !string.IsNullOrEmpty(dto.UserID)
+                    && userMap.TryGetValue(dto.UserID, out var user)
+                )
                 {
-                    if (userMap.TryGetValue(dto.UserID, out var user))
-                    {
-                        dto.UserEmail = user.Email;
-                        dto.UserName = user.FullName;
-                    }
+                    dto.UserEmail = user.Email;
+                    dto.UserName = user.FullName;
                 }
-            }
-            return result;
+                return dto;
+            });
         }
 
         public async Task MarkConversationAsReadAsync(Guid id)
