@@ -15,7 +15,8 @@ import RealtimeContext from '../../realtime/RealtimeContext';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import notificationSoundFile from '../../assets/sounds/notification.mp3';
+import notificationSoundNewConvesation from '../../assets/sounds/notification.mp3';
+import notificationSoundNewMessage from '../../assets/sounds/message.mp3';
 
 const MESSAGE_SIZE = 10;
 
@@ -37,7 +38,10 @@ export default function AdminSupportChatManager() {
   const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
   const messagesContainerRef = useRef(null);
   const adminGroupJoinedRef = useRef(false);
-  const notificationSound = useRef(new Audio(notificationSoundFile));
+  const notificationNewConvesation = useRef(
+    new Audio(notificationSoundNewConvesation)
+  );
+  const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
@@ -137,12 +141,14 @@ export default function AdminSupportChatManager() {
         toast.success(t('adminSupportChatManager.newConversation'), {
           onClick: () => setSelectedConversation(newConversation),
         });
-        notificationSound.current.play().catch(() => {});
+        notificationNewConvesation.current.play().catch(() => {});
       },
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
         if (!user?.id) return;
-
+        if (payload.conversationID !== selectedConversation?.conversationID) {
+          notificationNewMessage.current.play().catch(() => {});
+        }
         conversationService
           .getAllConversationsByAdminID(user.id)
           .then((items) => {

@@ -909,7 +909,7 @@
     "send": "Send",
     "noMessagesInChat": "No messages in this conversation yet",
     "noMoreMessages": "No more messages",
-    "newConversation":"New convesation just created"
+    "newConversation":"You have received new Convesation!"
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",
