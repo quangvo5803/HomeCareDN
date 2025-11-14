@@ -72,10 +72,6 @@ namespace BusinessLogic.Services
 
             var totalCount = await query.CountAsync();
 
-            var items = await query.ToListAsync();
-            query = query
-                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize);
             query = parameters.SortBy switch
             {
                 "createat" => query.OrderBy(s => s.CreatedAt),
@@ -85,6 +81,11 @@ namespace BusinessLogic.Services
                 "random" => query.OrderBy(s => s.ReviewID),
                 _ => query.OrderBy(b => b.CreatedAt),
             };
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+            var items = await query.ToListAsync();
+
             var serviceDtos = _mapper.Map<IEnumerable<ReviewDto>>(items);
             return new PagedResultDto<ReviewDto>
             {

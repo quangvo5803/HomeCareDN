@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hook/useAuth';
 import { uploadImageToCloudinary } from '../../utils/uploadImage';
-import LoadingComponent from '../LoadingComponent';
 import { handleApiError } from '../../utils/handleApiError';
 
 export default function ReviewModal({
@@ -31,12 +30,7 @@ export default function ReviewModal({
       if (review) {
         setRating(review.rating || 0);
         setComment(review.comment || '');
-        setImages(
-          (review.imageUrls || []).map((url) => ({
-            url,
-            isNew: false,
-          }))
-        );
+        setImages(review.imageUrls || []);
       } else {
         // Reset for new review
         setRating(0);
@@ -60,7 +54,6 @@ export default function ReviewModal({
     const mappedFiles = files.map((f) => ({
       url: URL.createObjectURL(f),
       file: f,
-      isNew: true,
     }));
 
     setImages((prev) => [...prev, ...mappedFiles]);
@@ -84,7 +77,7 @@ export default function ReviewModal({
     }
 
     try {
-      const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
+      const newFiles = images.map((i) => i.file);
 
       const data = {
         UserID: user?.id || null,
@@ -201,9 +194,9 @@ export default function ReviewModal({
               {t('ModalPopup.ReviewModal.images')}
             </label>
             <div className="flex flex-wrap gap-3">
-              {images.map((img, idx) => (
+              {images.map((img) => (
                 <div
-                  key={idx}
+                  key={img.url}
                   className="relative overflow-hidden border w-28 h-28 rounded-xl group"
                 >
                   <img

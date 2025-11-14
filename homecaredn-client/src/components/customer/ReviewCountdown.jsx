@@ -53,16 +53,19 @@ export default function ReviewCountdown({
               {t('ReviewCountdown.reviewed')}
             </span>
             <div className="flex items-center gap-1 ml-2">
-              {[...Array(5)].map((_, i) => (
-                <i
-                  key={i}
-                  className={`fas fa-star text-sm ${
-                    i < serviceRequest.review.rating
-                      ? 'text-yellow-400'
-                      : 'text-gray-300'
-                  }`}
-                ></i>
-              ))}
+              {[...new Array(5)].map((_, i) => {
+                const key = `star-${serviceRequest?.id || 'sr'}-${i}`; // tránh dùng index trần
+                return (
+                  <i
+                    key={key}
+                    className={`fas fa-star text-sm ${
+                      i < serviceRequest.review.rating
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'
+                    }`}
+                  ></i>
+                );
+              })}
             </div>
           </div>
           <button

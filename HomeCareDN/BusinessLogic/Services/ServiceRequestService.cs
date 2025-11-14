@@ -4,6 +4,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
+using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -143,6 +144,157 @@ namespace BusinessLogic.Services.Interfaces
             };
         }
 
+        public async Task<ServiceRequestDto> CreateServiceRequestAsync(
+            ServiceRequestCreateRequestDto createRequestDto
+        )
+        {
+            ValidateImages(createRequestDto.ImageUrls, 0);
+
+            var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
+            if (createRequestDto.Floors == 0)
+            {
+                serviceRequest.Floors = 1;
+            }
+            await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
+
+            await UploadServiceRequestImagesAsync(
+                serviceRequest.ServiceRequestID,
+                createRequestDto.ImageUrls,
+                createRequestDto.ImagePublicIds
+            );
+
+            await _unitOfWork.SaveAsync();
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL
+            );
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            var adminDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+            var contractorDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            await MapServiceRequestListAllAsync(
+                new[] { serviceRequest },
+                new[] { adminDto },
+                ADMIN
+            );
+            await MapServiceRequestListAllAsync(
+                new[] { serviceRequest },
+                new[] { contractorDto },
+                CONTRACTOR
+            );
+
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Admin",
+                "ServiceRequest.Created",
+                adminDto
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Contractor",
+                "ServiceRequest.Created",
+                contractorDto
+            );
+
+            return dto;
+        }
+
+        public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
+            ServiceRequestUpdateRequestDto updateRequestDto
+        )
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL,
+                false
+            );
+
+            ValidateServiceRequest(serviceRequest);
+
+            ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
+
+            _mapper.Map(updateRequestDto, serviceRequest);
+            if (updateRequestDto.Floors == 0)
+            {
+                serviceRequest.Floors = 1;
+            }
+            await UploadServiceRequestImagesAsync(
+                serviceRequest.ServiceRequestID,
+                updateRequestDto.ImageUrls,
+                updateRequestDto.ImagePublicIds
+            );
+
+            await _unitOfWork.SaveAsync();
+
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL
+            );
+
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            return dto;
+        }
+
+        public async Task DeleteServiceRequestAsync(Guid id)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == id,
+                includeProperties: "ContractorApplications.Images",
+                false
+            );
+
+            ValidateServiceRequest(serviceRequest);
+
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == id
+            );
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+            await DeleteRelatedEntity(serviceRequest!);
+            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
+            await _unitOfWork.SaveAsync();
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Contractor",
+                "ServiceRequest.Delete",
+                new { ServiceRequestID = id }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                "ServiceRequest.Delete",
+                new { ServiceRequestID = id }
+            );
+        }
+
+        // ========================== Helper for List All Service Request =============================
         private async Task MapServiceRequestListAllAsync(
             IEnumerable<ServiceRequest> items,
             IEnumerable<ServiceRequestDto> dtos,
@@ -172,26 +324,26 @@ namespace BusinessLogic.Services.Interfaces
                 }
                 if (role == "Customer")
                 {
-                    if (dto.SelectedContractorApplication != null)
-                    {
-                        if (
-                            dto.SelectedContractorApplication.Status
-                            == ApplicationStatus.Approved.ToString()
-                        )
-                        {
-                            var contractorPayment =
-                                await _unitOfWork.PaymentTransactionsRepository.GetAsync(cp =>
-                                    cp.ServiceRequestID == dto.ServiceRequestID
-                                );
-                            if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
-                            {
-                                dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
-                            }
-                        }
-                    }
+                    await MapStartReviewDateForCustomerListAll(dto);
                 }
             }
         }
+
+        private async Task MapStartReviewDateForCustomerListAll(ServiceRequestDto dto)
+        {
+            if (dto.SelectedContractorApplication?.Status == ApplicationStatus.Approved.ToString())
+            {
+                var contractorPayment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                    cp => cp.ServiceRequestID == dto.ServiceRequestID
+                );
+                if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
+                {
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                }
+            }
+        }
+
+        // ========================== Helper  Service Request Detail =============================
 
         private async Task MapServiceRequestDetailAsync(
             ServiceRequest item,
@@ -386,156 +538,7 @@ namespace BusinessLogic.Services.Interfaces
             }
         }
 
-        public async Task<ServiceRequestDto> CreateServiceRequestAsync(
-            ServiceRequestCreateRequestDto createRequestDto
-        )
-        {
-            ValidateImages(createRequestDto.ImageUrls, 0);
-
-            var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
-            if (createRequestDto.Floors == 0)
-            {
-                serviceRequest.Floors = 1;
-            }
-            await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
-
-            await UploadServiceRequestImagesAsync(
-                serviceRequest.ServiceRequestID,
-                createRequestDto.ImageUrls,
-                createRequestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL
-            );
-            if (serviceRequest == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                a.AddressID == dto.AddressID
-            );
-
-            if (address != null)
-            {
-                dto.Address = _mapper.Map<AddressDto>(address);
-            }
-            var adminDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-            var contractorDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            await MapServiceRequestListAllAsync(
-                new[] { serviceRequest },
-                new[] { adminDto },
-                ADMIN
-            );
-            await MapServiceRequestListAllAsync(
-                new[] { serviceRequest },
-                new[] { contractorDto },
-                CONTRACTOR
-            );
-
-            await _notifier.SendToApplicationGroupAsync(
-                "role_Admin",
-                "ServiceRequest.Created",
-                adminDto
-            );
-            await _notifier.SendToApplicationGroupAsync(
-                "role_Contractor",
-                "ServiceRequest.Created",
-                contractorDto
-            );
-
-            return dto;
-        }
-
-        public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
-            ServiceRequestUpdateRequestDto updateRequestDto
-        )
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL,
-                false
-            );
-
-            ValidateServiceRequest(serviceRequest);
-
-            ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
-
-            _mapper.Map(updateRequestDto, serviceRequest);
-            if (updateRequestDto.Floors == 0)
-            {
-                serviceRequest.Floors = 1;
-            }
-            await UploadServiceRequestImagesAsync(
-                serviceRequest.ServiceRequestID,
-                updateRequestDto.ImageUrls,
-                updateRequestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-
-            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL
-            );
-
-            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                a.AddressID == dto.AddressID
-            );
-
-            if (address != null)
-            {
-                dto.Address = _mapper.Map<AddressDto>(address);
-            }
-            return dto;
-        }
-
-        public async Task DeleteServiceRequestAsync(Guid id)
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == id,
-                includeProperties: "ContractorApplications.Images",
-                false
-            );
-
-            ValidateServiceRequest(serviceRequest);
-
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.ServiceRequestID == id
-            );
-            if (images != null && images.Any())
-            {
-                foreach (var image in images)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-                }
-            }
-            await DeleteRelatedEntity(serviceRequest!);
-            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
-            await _unitOfWork.SaveAsync();
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Contractor",
-                "ServiceRequest.Delete",
-                new { ServiceRequestID = id }
-            );
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                "ServiceRequest.Delete",
-                new { ServiceRequestID = id }
-            );
-        }
-
+        // ========================== Helper Delete Service Request =============================
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)
         {
             if (
@@ -560,6 +563,7 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
         }
 
+        // ========================== Helper Create Service Request =============================
         private async Task UploadServiceRequestImagesAsync(
             Guid? serviceRequestId,
             ICollection<string>? imageUrls,

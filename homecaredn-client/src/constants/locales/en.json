@@ -1387,11 +1387,11 @@
     "due": "Due date"
   },
   "ReviewCountdown": {
-    "reviewed": "You have reviewed this contractor.",
+    "reviewed": "You have reviewed this contractor/distributor:",
     "viewReview": "View Review",
-    "reviewTimeExpired": "You can review the contractor now!",
+    "reviewTimeExpired": "You can review the contractor/distributor now!",
     "createReview": "Create Review",
-    "reviewAvailableIn": "You need to work with the contractor before you can review them:",
+    "reviewAvailableIn": "You need to work with the contractor/distributor before you can review them:",
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",

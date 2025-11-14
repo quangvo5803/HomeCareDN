@@ -1384,11 +1384,11 @@
     "due": "Hạn"
   },
   "ReviewCountdown":{
-    "reviewed": "Bạn đã đánh giá nhà thầu này.",
+    "reviewed": "Bạn đã đánh giá nhà thầu/nhà phân phối này: ",
     "viewReview": "Xem đánh giá",
-    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu!",
+    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu/nhà phân phối!",
     "createReview": "Tạo đánh giá",
-    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu trước khi có thể đánh giá họ:",
+    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu/nhà phân phối trước khi có thể đánh giá họ:",
     "days": "Ngày",
     "hours": "Giờ",
     "minutes": "Phút",

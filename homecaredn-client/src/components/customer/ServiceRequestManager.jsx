@@ -13,7 +13,7 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useAddress } from '../../hook/useAddress';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
-import ReviewCountdown from '../ReviewCountdown';
+import ReviewCountdown from '../customer/ReviewCountdown';
 
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
@@ -139,7 +139,7 @@ export default function ServiceRequestManager() {
       // Update service request with new review
       setServiceRequests((prev) =>
         prev.map((sr) =>
-          sr.serviceRequestID === reviewData.serviceRequestID
+          sr.serviceRequestID === response.serviceRequestID
             ? { ...sr, review: response }
             : sr
         )
