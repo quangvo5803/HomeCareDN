@@ -121,11 +121,10 @@ export default function AdminUserManager() {
                       setFilter(key);
                       navigate(`?filter=${key}`);
                     }}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${
-                      filter === key
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     {t(`adminUserManager.${key}`)}
                   </button>
@@ -150,7 +149,7 @@ export default function AdminUserManager() {
                       <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
                         {t('adminUserManager.fullName')}
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                         Email
                       </th>
                       <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -187,16 +186,15 @@ export default function AdminUserManager() {
                           const firstAddress = item?.address?.[0];
                           const addressText = firstAddress
                             ? [firstAddress.district, firstAddress.city]
-                                .filter(Boolean)
-                                .join(', ')
+                              .filter(Boolean)
+                              .join(', ')
                             : '—';
 
                           return (
                             <tr
                               key={item.userID}
-                              className={`hover:bg-gray-50 transition-colors duration-150 ${
-                                index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                              }`}
+                              className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                                }`}
                             >
                               <td className="px-4 py-4 text-center align-middle">
                                 <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -208,7 +206,7 @@ export default function AdminUserManager() {
                                   {item.fullName}
                                 </div>
                               </td>
-                              <td className="px-6 py-4 align-middle">
+                              <td className="px-6 py-4 text-center align-middle">
                                 <div className="text-sm text-gray-900">
                                   {item.email}
                                 </div>
@@ -289,8 +287,8 @@ export default function AdminUserManager() {
                       const firstAddress = item?.address?.[0];
                       const addressText = firstAddress
                         ? [firstAddress.district, firstAddress.city]
-                            .filter(Boolean)
-                            .join(', ')
+                          .filter(Boolean)
+                          .join(', ')
                         : '—';
 
                       return (

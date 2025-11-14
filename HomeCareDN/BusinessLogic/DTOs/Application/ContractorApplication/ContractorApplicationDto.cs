@@ -1,4 +1,5 @@
-﻿using DataAccess.Entities.Application;
+﻿using BusinessLogic.DTOs.Application.Payment;
+using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.ContractorApplication
 {
@@ -24,5 +25,8 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         public string ContractorName { get; set; } = string.Empty;
         public string ContractorEmail { get; set; } = string.Empty;
         public string ContractorPhone { get; set; } = string.Empty;
+
+        // Thông tin giao dịch thanh toán
+        public PaymentTransactionDto? Payment { get; set; }
     }
 }

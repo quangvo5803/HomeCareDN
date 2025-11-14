@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using DataAccess.Data;
@@ -244,6 +245,9 @@ namespace BusinessLogic.Services.Interfaces
             {
                 var selected = item.SelectedContractorApplication;
                 var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                    p => p.ServiceRequestID == selected.ServiceRequestID
+                );
                 dto.SelectedContractorApplication = new ContractorApplicationDto
                 {
                     ContractorID = contractor?.Id ?? string.Empty,
@@ -260,6 +264,7 @@ namespace BusinessLogic.Services.Interfaces
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = contractor!.ProjectCount,
                     AverageRating = 0,
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
         }

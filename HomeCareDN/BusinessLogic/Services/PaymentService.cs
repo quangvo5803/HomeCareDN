@@ -1,15 +1,19 @@
-﻿using System.Globalization;
+﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Payment;
+using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
+using System.Globalization;
 using Ultitity.Exceptions;
 using Ultitity.Options;
 
@@ -22,13 +26,15 @@ namespace BusinessLogic.Services
         private readonly PayOsOptions _payOsOptions;
         private readonly ISignalRNotifier _notifier;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
             IOptions<PayOsOptions> payOsOptions,
             ISignalRNotifier notifier,
-            UserManager<ApplicationUser> userManager
+            UserManager<ApplicationUser> userManager,
+            IMapper mapper
         )
         {
             _payOS = payOS;
@@ -36,6 +42,7 @@ namespace BusinessLogic.Services
             _payOsOptions = payOsOptions.Value;
             _notifier = notifier;
             _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task<CreatePaymentResult> CreatePaymentAsync(
@@ -188,6 +195,48 @@ namespace BusinessLogic.Services
             }
 
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<PagedResultDto<PaymentTransactionDto>> GetAllCommissionAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork.PaymentTransactionsRepository.GetQueryable(
+                includeProperties:"ContractorApplication",
+                asNoTracking: true
+            );
+
+            query = query.Where(p => p.Status == PaymentStatus.Paid);
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(u => 
+                    u.OrderCode.ToString().Contains(parameters.Search) ||
+                    u.Description.Contains(parameters.Search)
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "paidat" => query.OrderBy(u => u.PaidAt),
+                "paidatdesc" => query.OrderByDescending(u => u.PaidAt),
+                _ => query.OrderBy(u => u.PaymentTransactionID),
+            };
+
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+                
+            var payments = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<PaymentTransactionDto>>(payments);
+
+            return new PagedResultDto<PaymentTransactionDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
     }
 }

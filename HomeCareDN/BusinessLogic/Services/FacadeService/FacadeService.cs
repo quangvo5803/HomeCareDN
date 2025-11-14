@@ -83,7 +83,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.UnitOfWork,
                 infraDeps.PayOsOptions,
                 infraDeps.Notifier,
-                coreDeps.UserManager
+                coreDeps.UserManager,
+                coreDeps.Mapper
             );
 
             MaterialRequestService = new MaterialRequestService(
