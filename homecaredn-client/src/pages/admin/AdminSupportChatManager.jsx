@@ -146,7 +146,15 @@ export default function AdminSupportChatManager() {
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
         if (!user?.id) return;
-        if (payload.conversationID !== selectedConversation?.conversationID) {
+
+        const isViewing =
+          payload.conversationID === selectedConversation?.conversationID;
+
+        if (isViewing) {
+          conversationService
+            .markAsRead(payload.conversationID)
+            .catch(() => {});
+        } else {
           notificationNewMessage.current.play().catch(() => {});
         }
         setConversations((prev) => {
@@ -156,7 +164,19 @@ export default function AdminSupportChatManager() {
 
           if (index === -1) return prev;
 
-          const updatedConversation = prev[index];
+          const currentConversation = prev[index];
+
+          let newUnreadCount;
+          if (isViewing) {
+            newUnreadCount = currentConversation.adminUnreadCount;
+          } else {
+            newUnreadCount = payload.adminUnreadCount;
+          }
+
+          const updatedConversation = {
+            ...currentConversation,
+            adminUnreadCount: newUnreadCount,
+          };
 
           const filtered = prev.filter(
             (c) => c.conversationID !== payload.conversationID
@@ -269,6 +289,26 @@ export default function AdminSupportChatManager() {
     }
   }, [loadingMoreMessage, hasMoreMessages, moreMessage, loadMessages]);
 
+  // Selected Conversation
+  const handleSelectConversation = (conversation) => {
+    setSelectedConversation(conversation);
+    if (!conversation.adminUnreadCount || conversation.adminUnreadCount === 0) {
+      return;
+    }
+    conversationService
+      .markAsRead(conversation.conversationID)
+      .catch((error) => {
+        toast.error(t(handleApiError(error)));
+      });
+
+    setConversations((prev) =>
+      prev.map((c) =>
+        c.conversationID === conversation.conversationID
+          ? { ...c, adminUnreadCount: 0 } // Reset count
+          : c
+      )
+    );
+  };
   // Send message
   const handleSend = async () => {
     if (!messageInput.trim() || !selectedConversation || !user?.id) return;
@@ -341,7 +381,7 @@ export default function AdminSupportChatManager() {
                 {filteredConversations.map((conversation) => (
                   <li
                     key={conversation.conversationID}
-                    onClick={() => setSelectedConversation(conversation)}
+                    onClick={() => handleSelectConversation(conversation)}
                     className={`p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
                       conversation.conversationID ===
                       selectedConversation?.conversationID
@@ -350,8 +390,13 @@ export default function AdminSupportChatManager() {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-                        {conversation.userEmail?.charAt(0).toUpperCase()}
+                      <div className="relative flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
+                          {conversation.userEmail?.charAt(0).toUpperCase()}
+                        </div>
+                        {conversation.adminUnreadCount > 0 && (
+                          <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         {/* email */}

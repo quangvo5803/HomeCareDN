@@ -1,4 +1,11 @@
-import { useEffect, useMemo, useRef, useState, useContext } from 'react';
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useContext,
+  useCallback,
+} from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
@@ -416,67 +423,95 @@ function ChatWindow({ open, onClose, brand }) {
   const sendAdminMessage = async (text) => {
     if (!user || adminSending || countdown > 0) return;
     setAdminSending(true);
-    try {
-      const dto = {
-        content: text,
-        senderID: user.id,
-        receiverID: ADMIN_ID,
-        conversationID: conversation ? conversation.conversationID : null,
-      };
 
-      await chatMessageService.sendMessageToAdmin(dto);
+    const tempId = uid();
+    const tempMessage = toAdminUiMessage(
+      {
+        id: tempId,
+        senderID: user.id,
+        content: text,
+        sentAt: new Date().toISOString(),
+      },
+      user.id
+    );
+    setAdminMessages((prev) => [...prev, tempMessage]);
+
+    const dto = {
+      content: text,
+      senderID: user.id,
+      receiverID: ADMIN_ID,
+      conversationID: conversation ? conversation.conversationID : null,
+    };
+
+    try {
+      const createdMessageDto = await chatMessageService.sendMessageToAdmin(
+        dto
+      );
+
+      setAdminMessages((prev) =>
+        prev.map((m) =>
+          m.id === tempId ? toAdminUiMessage(createdMessageDto, user.id) : m
+        )
+      );
+
       if (!conversation) {
-        await loadSupportChat();
+        const newConversation = {
+          conversationID: createdMessageDto.conversationID,
+          userID: createdMessageDto.senderID,
+          adminID: ADMIN_ID,
+        };
+        setConversation(newConversation);
+
+        if (chatConnection) {
+          chatConnection.invoke(
+            'JoinConversation',
+            newConversation.conversationID
+          );
+        }
       }
     } catch (error) {
       toast.error(t(handleApiError(error)));
-      setAdminMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          role: ROLES.BOT,
-          text: `⚠️ ${t('supportChat.sendAdminChatError')}`,
-          time: new Date().toTimeString().slice(0, 5),
-        },
-      ]);
-    } finally {
+      setAdminMessages((prev) => prev.filter((m) => m.id !== tempId));
       setAdminSending(false);
-      setCountdown(3); //Prevent Spawm Message
-      countdownRef.current = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            // If count = 0, delete interval
-            clearInterval(countdownRef.current);
-            return 0;
-          }
-          return prev - 1; //second
-        });
-      }, 1000);
+      return;
     }
+
+    setAdminSending(false);
+    setCountdown(3); //Prevent Spawm Message
+
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+    }
+
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
-  const handleNewAdminMessage = (dto) => {
-    if (!conversation) {
-      const conversationID = dto.conversationID;
-      if (conversationID) {
-        setConversation({
-          conversationID: conversationID,
-          userID: dto.senderID,
-          adminID: ADMIN_ID,
-        });
-        loadAdminChatHistory(conversationID);
+  const handleNewAdminMessage = useCallback(
+    (dto) => {
+      if (dto.senderID === user.id) {
         return;
       }
-    }
 
-    if (dto?.conversationID === conversation?.conversationID) {
-      setAdminMessages((prev) => {
-        if (prev.some((message) => message.chatMessageID === dto.chatMessageID))
-          return prev;
-        return [...prev, toAdminUiMessage(dto, user.id)];
-      });
-    }
-  };
+      if (dto?.conversationID === conversation?.conversationID) {
+        setAdminMessages((prev) => {
+          if (
+            prev.some((message) => message.chatMessageID === dto.chatMessageID)
+          )
+            return prev;
+          return [...prev, toAdminUiMessage(dto, user.id)];
+        });
+      }
+    },
+    [conversation, user]
+  );
 
   useRealtime(
     { [RealtimeEvents.ChatMessageCreated]: handleNewAdminMessage },
@@ -492,6 +527,9 @@ function ChatWindow({ open, onClose, brand }) {
       setAdminMessages([]);
       setCurrentTab('AI');
       setAdminChatState('idle');
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -501,9 +539,6 @@ function ChatWindow({ open, onClose, brand }) {
       loadSupportChat();
     }
     return () => {
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
       if (conversation && chatConnection) {
         chatConnection
           .invoke('LeaveConversation', conversation.conversationID)

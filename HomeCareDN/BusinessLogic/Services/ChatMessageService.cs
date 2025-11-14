@@ -8,6 +8,7 @@ using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -65,7 +66,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            var result = await CreateMessageAsync(dto);
+            var result = await CreateMessageAsync(dto, conversation);
 
             return result;
         }
@@ -74,39 +75,18 @@ namespace BusinessLogic.Services
         {
             ValidateMessageContent(dto.Content);
 
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ConversationID == dto.ConversationID
-            );
+            var conversation = await CreateOrUpdateAdminConversationAsync(dto);
 
-            if (conversation == null)
+            if (!IsUserInConversation(conversation, dto.SenderID))
             {
-                var newConversation = new Conversation
+                var errors = new Dictionary<string, string[]>
                 {
-                    ConversationID = Guid.NewGuid(),
-                    UserID = dto.SenderID,
-                    AdminID = dto.ReceiverID,
-                    ConversationType = ConversationType.AdminSupport,
-                    CreatedAt = DateTime.UtcNow,
+                    { USER, new[] { ERROR_PERMISSION_DENIED } },
                 };
-
-                await _unitOfWork.ConversationRepository.AddAsync(newConversation);
-                dto.ConversationID = newConversation.ConversationID;
-                await _unitOfWork.SaveAsync();
-            }
-            else
-            {
-                if (!IsUserInConversation(conversation, dto.SenderID))
-                {
-                    var errors = new Dictionary<string, string[]>
-                    {
-                        { CONVERSATION, new[] { ERROR_PERMISSION_DENIED } },
-                    };
-                    throw new CustomValidationException(errors);
-                }
+                throw new CustomValidationException(errors);
             }
 
-            var result = await CreateMessageAsync(dto);
-
+            var result = await CreateMessageAsync(dto, conversation);
             return result;
         }
 
@@ -153,7 +133,10 @@ namespace BusinessLogic.Services
         // -----------------------------
         // PRIVATE HELPER
         // -----------------------------
-        private async Task<ChatMessageDto> CreateMessageAsync(SendMessageRequestDto dto)
+        private async Task<ChatMessageDto> CreateMessageAsync(
+            SendMessageRequestDto dto,
+            Conversation conversation
+        )
         {
             var message = new ChatMessage
             {
@@ -175,33 +158,71 @@ namespace BusinessLogic.Services
                 "Chat.MessageCreated",
                 result
             );
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.ConversationID == dto.ConversationID
-            );
-            if (conversation == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { CONVERSATION, new[] { ERROR_CONVERSATION_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
+
             var notifiedNewConversation = await NotifyNewConversationForAdmin(conversation, result);
 
             if (
                 !notifiedNewConversation
                 && conversation.ConversationType == ConversationType.AdminSupport
-                && (conversation.AdminID != null)
+                && conversation.AdminID != null
             )
             {
                 await _signalRNotifier.SendToAdminAsync(
                     conversation.AdminID,
                     "Chat.NewAdminMessage",
-                    new { dto.ConversationID, Message = result }
+                    new
+                    {
+                        dto.ConversationID,
+                        Message = result,
+                        conversation.AdminUnreadCount,
+                    }
                 );
             }
 
             return result;
+        }
+
+        private async Task<Conversation> CreateOrUpdateAdminConversationAsync(
+            SendMessageRequestDto dto
+        )
+        {
+            //Create
+            if (dto.ConversationID == null)
+            {
+                var conversation = new Conversation
+                {
+                    ConversationID = Guid.NewGuid(),
+                    UserID = dto.SenderID,
+                    AdminID = dto.ReceiverID,
+                    ConversationType = ConversationType.AdminSupport,
+                    CreatedAt = DateTime.UtcNow,
+                    AdminUnreadCount = 1,
+                };
+
+                await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                dto.ConversationID = conversation.ConversationID;
+                return conversation;
+            }
+            else
+            {
+                //Update
+                var conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                    c => c.ConversationID == dto.ConversationID,
+                    asNoTracking: false
+                );
+
+                if (conversation == null)
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { CONVERSATION, new[] { ERROR_CONVERSATION_NOT_FOUND } },
+                    };
+                    throw new CustomValidationException(errors);
+                }
+
+                conversation.AdminUnreadCount++;
+                return conversation;
+            }
         }
 
         private static void ValidateMessageContent(string? content)

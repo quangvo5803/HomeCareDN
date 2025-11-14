@@ -43,5 +43,13 @@ namespace HomeCareDNAPI.Controllers
             );
             return Ok(result);
         }
+
+        [HttpPost("mark-as-read/{id:guid}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> MarkAsRead(Guid id)
+        {
+            await _facadeService.ConversationService.MarkConversationAsReadAsync(id);
+            return Ok();
+        }
     }
 }

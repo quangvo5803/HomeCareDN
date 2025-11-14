@@ -7,5 +7,6 @@ namespace BusinessLogic.Services.Interfaces
         Task<ConversationDto?> GetConversationByIDAsync(Guid id);
         Task<ConversationDto?> GetConversationByUserIDAsync(string id);
         Task<IEnumerable<ConversationDto>> GetAllConversationByAdminIDAsync(string id);
+        Task MarkConversationAsReadAsync(Guid id);
     }
 }

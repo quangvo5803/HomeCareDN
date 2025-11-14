@@ -10,6 +10,7 @@
         public string? UserEmail { get; set; }
         public string? UserName { get; set; }
         public Guid? ServiceRequestID { get; set; }
+        public int AdminUnreadCount { get; set; }
         public required string ConversationType { get; set; }
         public DateTime CreatedAt { get; set; }
     }

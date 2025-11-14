@@ -19,7 +19,7 @@ namespace DataAccess.Entities.Application
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ConversationType ConversationType { get; set; }
-
+        public int AdminUnreadCount { get; set; } = 0;
         public ServiceRequest? ServiceRequest { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }

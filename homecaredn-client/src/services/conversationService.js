@@ -13,4 +13,7 @@ export const conversationService = {
     const res = await api.get(`/conversations/admin/${id}`);
     return res.data;
   },
+  markAsRead: async (id) => {
+    api.post(`/conversations/mark-as-read/${id}`);
+  },
 };

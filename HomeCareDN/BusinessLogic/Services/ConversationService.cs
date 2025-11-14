@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.Services.Interfaces;
+using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
@@ -85,6 +86,27 @@ namespace BusinessLogic.Services
                 }
             }
             return result;
+        }
+
+        public async Task MarkConversationAsReadAsync(Guid id)
+        {
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                c => c.ConversationID == id,
+                asNoTracking: false
+            );
+            if (conversation == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { CONVERSATION, new[] { ERROR_CONVERSATIONS_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            else
+            {
+                conversation.AdminUnreadCount = 0;
+                await _unitOfWork.SaveAsync();
+            }
         }
     }
 }
