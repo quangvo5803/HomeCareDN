@@ -142,13 +142,13 @@ export default function ReviewModal({
                   disabled={readOnly}
                   onMouseEnter={() => !readOnly && setHoveredRating(star)}
                   onMouseLeave={() => !readOnly && setHoveredRating(0)}
+                  onClick={() => !readOnly && setRating(star)}
                   onKeyDown={(e) => {
                     if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
                       e.preventDefault();
                       setRating(star);
                     }
                   }}
-                  onClick={() => !readOnly && setRating(star)}
                 >
                   <i
                     className={
@@ -156,7 +156,7 @@ export default function ReviewModal({
                         ? 'fas fa-star text-yellow-400'
                         : 'far fa-star text-gray-300'
                     }
-                  />
+                  ></i>
                 </button>
               ))}
             </div>
