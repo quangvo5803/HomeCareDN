@@ -1,28 +1,43 @@
 import api from './public/api';
 
 export const StatisticService = {
-    getBarChart: async (year) => {
-        const response = await api.get(`/Statistics/admin/bar-chart/${year}`);
-        return response;
-    },
+  getBarChart: async (year, role, contractorId = null) => {
+    const params = { year, role };
+    if (contractorId) params.contractorId = contractorId;
 
-    getPieChart: async (year) => {
-        const response = await api.get(`/Statistics/admin/pie-chart/${year}`);
-        return response;
-    },
+    const response = await api.get(`/Statistics/bar-chart`, { params });
+    return response;
+  },
 
-    getLineChart: async (year) => {
-        const response = await api.get(`/Statistics/admin/line-chart/${year}`);
-        return response;
-    },
+  getLineChart: async (year, role, contractorId = null) => {
+    const params = { year, role };
+    if (contractorId) params.contractorId = contractorId;
 
-    getTopStatistic: async () => {
-        const response = await api.get('/Statistics/admin/top-statistics');
-        return response;
-    },
+    const response = await api.get(`/Statistics/line-chart`, { params });
+    return response;
+  },
 
-    getStatStatistic: async () => {
-        const response = await api.get('/Statistics/admin/stat-statistics');
-        return response;
-    }
-}
+  // ====================== Admin ======================
+  getPieChart: async (year) => {
+    const response = await api.get(`/Statistics/admin/pie-chart/${year}`);
+    return response;
+  },
+
+  getTopStatistic: async () => {
+    const response = await api.get('/Statistics/admin/top-statistics');
+    return response;
+  },
+
+  getStatStatistic: async () => {
+    const response = await api.get('/Statistics/admin/stat-statistics');
+    return response;
+  },
+
+  // ====================== Contractor ======================
+  getStatStatisticForContractor: async () => {
+    const { data } = await api.get(
+      '/Statistics/contractor/stat-statistics'
+    );
+    return data;
+  },
+};

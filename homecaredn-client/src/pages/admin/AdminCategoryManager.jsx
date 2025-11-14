@@ -72,18 +72,25 @@ export default function AdminCategoryManager() {
   };
 
   const handleSave = async (categoryData) => {
-    setSubmitting(true);
-    if (categoryData.CategoryID) {
-      await updateCategory(categoryData);
-    } else {
-      await createCategory(categoryData);
-      const lastPage = Math.ceil((totalCategories + 1) / pageSize);
-      setCurrentPage(lastPage);
-    }
+    try {
+      setSubmitting(true);
+      if (categoryData.CategoryID) {
+        await updateCategory(categoryData);
+      } else {
+        await createCategory(categoryData);
+        const lastPage = Math.ceil((totalCategories + 1) / pageSize);
+        setCurrentPage(lastPage);
+      }
 
-    setIsModalOpen(false);
-    setEditingCategoryID(null);
-    setSubmitting(false);
+      setIsModalOpen(false);
+      setEditingCategoryID(null);
+      setSubmitting(false);
+    } catch (err) {
+      console.error(err);
+      return;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitting || uploadProgress)
@@ -198,6 +205,7 @@ export default function AdminCategoryManager() {
           onSave={handleSave}
           categoryID={editingCategoryID}
           setUploadProgress={setUploadProgress}
+          setSubmitting={setSubmitting}
         />
 
         {/* Table Container */}

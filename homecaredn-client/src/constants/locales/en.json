@@ -249,6 +249,7 @@
       "form_phoneNumber": "Phone Number",
       "form_description": "Company Description",
       "form_images": "Company Images",
+      "form_documents": "Documents",
       "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
     }
   },
@@ -327,6 +328,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
+      "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
@@ -353,6 +355,7 @@
       "label_address": "Construction Address:",
       "label_description": "Detailed Description:",
       "label_images": "Illustration / Current Images:",
+      "label_documents": "Attachments / Documents:",
       "section_contractor": "Applied Contractors",
       "noContractor": "No contractors have applied yet",
       "noContractorDesc": "Currently, no contractors have applied for your project. Please wait for a while.",
@@ -449,6 +452,7 @@
     "address": "Address",
     "description": "Description",
     "images": "Images",
+    "documents": "Documents",
     "statusOpen": "Open",
     "statusClosed": "Closed",
     "applicationStatus": "Application Status",
@@ -509,6 +513,8 @@
     "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion."
   },
   "partnerDashboard": {
+    "no": "No",
+    "service_type": "Service Type",
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
@@ -519,6 +525,8 @@
     },
     "description": "Description",
     "estimate": "Estimate",
+    "commission_due": "Commission Due",
+    "apply_at": "Applied At",
     "last_update": "Last Update",
     "notifications": "Notifications",
     "status": "Status",
@@ -544,12 +552,16 @@
     "my_projects": "My Projects",
     "applications": "Applications",
     "profile": "Profile",
-    "kpi_meta": {
-      "open_requests": "▲ +2 this week",
-      "applied": "↺ 3 pending",
-      "won": "▲ 36% rate",
-      "pending_payments": "▼ 1 overdue"
-    }
+    
+    "retry": "Retry",
+    "no_requests": "No requests",
+    "access_denied": "Access denied. Contractor role required.",
+    "errors": {
+      "kpi_load_failed": "Unable to load KPI data"
+    },
+    "repair": "Repair",
+    "construction": "Construction",
+    "revenue": "Revenue"
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",
@@ -1106,6 +1118,10 @@
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
     },
+    "DeleteDocumentModal": {
+      "title": "Are you sure?",
+      "text": "This document will be deleted and cannot be restored!"
+    },
     "DeleteApplicationModal": {
       "title": "Are you sure?",
       "text": "This application will be gone forever"
@@ -1161,8 +1177,11 @@
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
+    "BRAND_NAME_ALREADY_EXISTS": "Brand name already exists.",
     "CATEGORY_NOT_FOUND": "Category not found.",
+    "CATEGORY_NAME_ALREADY_EXISTS": "Category name already exists.",
     "MATERIAL_NOT_FOUND": "Material not found.",
+    "MATERIAL_NAME_ALREADY_EXISTS": "Material name already exists.",
     "IMAGE_NOT_FOUND": "Image not found.",
     "NOT_FOUND_EMAIL": "Email for verification not found.",
 
@@ -1321,7 +1340,8 @@
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
   "upload": {
-    "clickToUpload": "Click to upload",
+    "clickToUploadImage": "Click to upload",
+    "clickToUploadDocument": "Click to upload",
     "orDragAndDrop": "or drag and drop",
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },
@@ -1338,7 +1358,8 @@
     "sortCreateDateOld": "Oldest",
     "Grid": "Grid",
     "Table": "Table",
-    "All": "All"
+    "All": "All",
+    "Download": "Download"
   },
   "commission": {
     "partner": {

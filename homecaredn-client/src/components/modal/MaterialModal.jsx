@@ -7,7 +7,7 @@ import { useAuth } from '../../hook/useAuth';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import LoadingComponent from '../LoadingComponent';
 
 //For TINY MCE
@@ -201,23 +201,22 @@ export default function MaterialModal({
 
       if (newFiles.length > 0) {
         setUploadProgress(1);
-        const uploaded = await uploadImageToCloudinary(
+        const uploaded = await uploadToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => setUploadProgress(percent),
+          (progress, percent) => setUploadProgress(percent),
           'HomeCareDN/Material'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
         data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-
-        onClose();
-        setUploadProgress(0);
       }
 
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setUploadProgress(0);
     }
   };
 
@@ -468,8 +467,8 @@ export default function MaterialModal({
                   <span className="ml-3 text-sm text-gray-500">
                     {images.filter((i) => i.isNew).length > 0
                       ? `${images.filter((i) => i.isNew).length} ${t(
-                        'distributorMaterialManager.materialModal.filesSelected'
-                      )}`
+                          'distributorMaterialManager.materialModal.filesSelected'
+                        )}`
                       : t('distributorMaterialManager.materialModal.noFile')}
                   </span>
                 </div>

@@ -26,6 +26,7 @@ namespace BusinessLogic.Services
         private const string CONTRACTOR = "Contractor";
         private const string APPLICATION = "Application";
         private const string IMAGES = "Images";
+        private const string DOCUMENTS = "Documents";
         private const string CONTRACTOR_APPLICATION_REJECT = "ContractorApplication.Rejected";
 
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
@@ -54,7 +55,9 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork
-                .ContractorApplicationRepository.GetQueryable(includeProperties: IMAGES)
+                .ContractorApplicationRepository.GetQueryable(
+                    includeProperties: $"{IMAGES},{DOCUMENTS}"
+                )
                 .Where(ca => ca.ServiceRequestID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
@@ -89,14 +92,15 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<PagedResultDto<ContractorApplicationDto>> GetAllContractorApplicationByUserIdAsync
-        (
-            QueryParameters parameters
-        )
+        public async Task<
+            PagedResultDto<ContractorApplicationDto>
+        > GetAllContractorApplicationByUserIdAsync(QueryParameters parameters)
         {
             var query = _unitOfWork
-                .ContractorApplicationRepository.GetQueryable()
-                .Where(ca => ca.ContractorID == parameters.FilterID).AsSingleQuery().AsNoTracking();
+                .ContractorApplicationRepository.GetQueryable(includeProperties: "ServiceRequest")
+                .Where(ca => ca.ContractorID == parameters.FilterID)
+                .AsSingleQuery()
+                .AsNoTracking();
 
             var totalCount = await query.CountAsync();
             query = query
@@ -114,6 +118,7 @@ namespace BusinessLogic.Services
                 PageSize = parameters.PageSize,
             };
         }
+
         public async Task<ContractorApplicationDto?> GetContractorApplicationByServiceRequestIDAsync(
             ContractorApplicationGetDto contractorApplicationGetDto
         )
@@ -122,7 +127,7 @@ namespace BusinessLogic.Services
                 ca =>
                     ca.ServiceRequestID == contractorApplicationGetDto.ServiceRequestID
                     && ca.ContractorID == contractorApplicationGetDto.ContractorID,
-                includeProperties: IMAGES
+                includeProperties: $"{IMAGES},{DOCUMENTS}"
             );
             if (contractorApplication == null)
             {
@@ -149,7 +154,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == id,
-                includeProperties: IMAGES
+                includeProperties: $"{IMAGES},{DOCUMENTS}"
             );
             if (contractorApplication == null)
             {
@@ -255,6 +260,25 @@ namespace BusinessLogic.Services
 
                 await _unitOfWork.ImageRepository.AddRangeAsync(images);
             }
+            if (createRequest.DocumentUrls != null)
+            {
+                var docIds = createRequest.DocumentPublicIds?.ToList() ?? new List<string>();
+                var documents = createRequest
+                    .DocumentUrls.Select(
+                        (url, i) =>
+                            new Document
+                            {
+                                DocumentID = Guid.NewGuid(),
+                                DocumentUrl = url,
+                                PublicId = i < docIds.Count ? docIds[i] : string.Empty,
+                                ContractorApplicationID =
+                                    contractorApplication.ContractorApplicationID,
+                            }
+                    )
+                    .ToList();
+
+                await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
+            }
             await _unitOfWork.ContractorApplicationRepository.AddAsync(contractorApplication);
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
@@ -292,7 +316,7 @@ namespace BusinessLogic.Services
         {
             var contractorApplication = await _unitOfWork.ContractorApplicationRepository.GetAsync(
                 ca => ca.ContractorApplicationID == contractorApplicationID,
-                includeProperties: IMAGES,
+                includeProperties: $"{IMAGES},{DOCUMENTS}",
                 false
             );
             if (contractorApplication == null)
@@ -458,6 +482,19 @@ namespace BusinessLogic.Services
                         await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
                     }
                 }
+            }
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                d.ContractorApplicationID == id
+            );
+            if (documents != null && documents.Any())
+            {
+                var publicIds = documents
+                    .Where(d => !string.IsNullOrEmpty(d.PublicId))
+                    .Select(d => d.PublicId)
+                    .ToList();
+
+                if (publicIds.Any())
+                    await _unitOfWork.DocumentRepository.DeleteDocumentsAsync(publicIds);
             }
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
                 s.ServiceRequestID == application.ServiceRequestID

@@ -1,6 +1,6 @@
 ﻿namespace BusinessLogic.DTOs.Application.Statistic.AdminStatistic
 {
-    public class AdminStatStatisticDto
+    public class AdminStatDto
     {
         public int TotalCustomer { get; set; }
         public int TotalContactor { get; set; }
