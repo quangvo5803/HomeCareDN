@@ -4,7 +4,9 @@ using BusinessLogic.DTOs.Application.Chat.User.ChatMessage;
 using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
 
@@ -15,6 +17,7 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ISignalRNotifier _signalRNotifier;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private const string CONVERSATION = "Conversation";
         private const string MESSAGE = "Message";
@@ -27,12 +30,14 @@ namespace BusinessLogic.Services
         public ChatMessageService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
-            ISignalRNotifier signalRNotifier
+            ISignalRNotifier signalRNotifier,
+            UserManager<ApplicationUser> userManager
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _signalRNotifier = signalRNotifier;
+            _userManager = userManager;
         }
 
         public async Task<ChatMessageDto> SendMessageAsync(SendMessageRequestDto dto)
@@ -55,7 +60,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { CONVERSATION, new[] { ERROR_PERMISSION_DENIED } },
+                    { USER, new[] { ERROR_PERMISSION_DENIED } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -124,7 +129,6 @@ namespace BusinessLogic.Services
 
             var query = _unitOfWork
                 .ChatMessageRepository.GetQueryable()
-                .AsNoTracking()
                 .Where(m => m.ConversationID == dto.ConversationID)
                 .OrderByDescending(m => m.SentAt);
 
@@ -171,9 +175,8 @@ namespace BusinessLogic.Services
                 "Chat.MessageCreated",
                 result
             );
-            var conversation = await _unitOfWork.ConversationRepository.GetAsync(
-                c => c.ConversationID == dto.ConversationID,
-                includeProperties: USER
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                c.ConversationID == dto.ConversationID
             );
             if (conversation == null)
             {
@@ -188,11 +191,11 @@ namespace BusinessLogic.Services
             if (
                 !notifiedNewConversation
                 && conversation.ConversationType == ConversationType.AdminSupport
-                && conversation.AdminID.HasValue
+                && (conversation.AdminID != null)
             )
             {
                 await _signalRNotifier.SendToAdminAsync(
-                    conversation.AdminID.Value.ToString(),
+                    conversation.AdminID,
                     "Chat.NewAdminMessage",
                     new { dto.ConversationID, Message = result }
                 );
@@ -213,7 +216,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        private static bool IsUserInConversation(Conversation conversation, Guid senderId)
+        private static bool IsUserInConversation(Conversation conversation, string senderId)
         {
             if (conversation.ConversationType == ConversationType.ServiceRequest)
             {
@@ -227,7 +230,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { CONVERSATION, new[] { ERROR_PERMISSION_DENIED } },
+                    { USER, new[] { ERROR_PERMISSION_DENIED } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -240,7 +243,7 @@ namespace BusinessLogic.Services
         {
             if (
                 conversation.ConversationType != ConversationType.AdminSupport
-                || !conversation.AdminID.HasValue
+                || conversation.AdminID == null
             )
                 return false;
 
@@ -248,15 +251,25 @@ namespace BusinessLogic.Services
                 .ChatMessageRepository.GetQueryable()
                 .CountAsync(m => m.ConversationID == conversation.ConversationID);
 
-            if (messageCount == 1)
+            if (messageCount == 1 && conversation.AdminID != null)
             {
+                var conversationDto = _mapper.Map<ConversationDto>(conversation);
+                if (!string.IsNullOrEmpty(conversationDto.UserID))
+                {
+                    var user = await _userManager.FindByIdAsync(conversationDto.UserID);
+                    if (user != null)
+                    {
+                        conversationDto.UserEmail = user.Email;
+                        conversationDto.UserName = user.FullName;
+                    }
+                }
                 await _signalRNotifier.SendToAdminAsync(
-                    conversation.AdminID.Value.ToString(),
+                    conversation.AdminID,
                     "Chat.NewConversationForAdmin",
                     new
                     {
                         conversation.ConversationID,
-                        Conversation = _mapper.Map<ConversationDto>(conversation),
+                        Conversation = conversationDto,
                         FirstMessage = dto,
                     }
                 );

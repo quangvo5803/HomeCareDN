@@ -5,7 +5,7 @@ namespace BusinessLogic.Services.Interfaces
     public interface IConversationService
     {
         Task<ConversationDto?> GetConversationByIDAsync(Guid id);
-        Task<ConversationDto?> GetConversationByUserIDAsync(Guid id);
-        Task<IEnumerable<ConversationDto>> GetAllConversationByAdminIDAsync(Guid id);
+        Task<ConversationDto?> GetConversationByUserIDAsync(string id);
+        Task<IEnumerable<ConversationDto>> GetAllConversationByAdminIDAsync(string id);
     }
 }

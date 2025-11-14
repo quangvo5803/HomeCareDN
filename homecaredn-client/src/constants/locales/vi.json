@@ -557,7 +557,9 @@
     "typing": "Bot đang soạn…",
     "tabAI":"Nhắn với AI",
     "tabAdmin":"Nhắn với Quản Trị Viên",
-    "startAdminChat":"Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện"
+    "startAdminChat":"Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện",
+    "sendAdminChatError":"Gửi tin nhắn cho Quản Trị Viên BỊ LỖI"
+
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",

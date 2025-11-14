@@ -562,7 +562,8 @@
     "typing": "Bot is typing…",
     "tabAI":"Chat with AI",
     "tabAdmin":"Chat with Admin",
-    "startAdminChat":"Send message to Admin to start convesation"
+    "startAdminChat":"Send message to Admin to start convesation",
+    "sendAdminChatError":"Send message to Admin ERROR"
   },
   "distributorCategoryManager": {
     "title": "Category Manager",

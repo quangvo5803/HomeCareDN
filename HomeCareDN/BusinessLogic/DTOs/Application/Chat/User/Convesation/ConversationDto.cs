@@ -3,10 +3,10 @@
     public class ConversationDto
     {
         public Guid ConversationID { get; set; }
-        public Guid? CustomerID { get; set; }
-        public Guid? ContractorID { get; set; }
-        public Guid? AdminID { get; set; }
-        public Guid? UserID { get; set; }
+        public string? CustomerID { get; set; }
+        public string? ContractorID { get; set; }
+        public string? AdminID { get; set; }
+        public string? UserID { get; set; }
         public string? UserEmail { get; set; }
         public string? UserName { get; set; }
         public Guid? ServiceRequestID { get; set; }

@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
 import { getSupportPrompt } from '../prompts/supportPrompt';
 import { useAuth } from '../hook/useAuth';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
 import RealtimeContext from '../realtime/RealtimeContext';
 import useRealtime from '../realtime/useRealtime';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
@@ -256,7 +258,7 @@ TabButton.propTypes = {
   disabled: PropTypes.bool,
 };
 
-function ChatInput({ onSend, disabled }) {
+function ChatInput({ onSend, disabled, isLoading, countdown }) {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
   const submit = (e) => {
@@ -266,6 +268,15 @@ function ChatInput({ onSend, disabled }) {
     onSend(v);
     setValue('');
   };
+  const buttonText = useMemo(() => {
+    if (isLoading) {
+      return <i className="fa-solid fa-spinner animate-spin w-4" />;
+    }
+    if (countdown > 0) {
+      return <span className="w-4 font-bold">{countdown}s</span>;
+    }
+    return t('supportChat.send');
+  }, [isLoading, countdown, t]);
   return (
     <form onSubmit={submit} className="flex w-full items-center gap-2">
       <input
@@ -278,9 +289,9 @@ function ChatInput({ onSend, disabled }) {
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="rounded-md bg-indigo-600 px-3 py-2 text-white disabled:opacity-50"
+        className="rounded-md bg-indigo-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150"
       >
-        {t('supportChat.send')}
+        {buttonText}
       </button>
     </form>
   );
@@ -288,6 +299,8 @@ function ChatInput({ onSend, disabled }) {
 ChatInput.propTypes = {
   onSend: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  countdown: PropTypes.number,
 };
 
 function ChatWindow({ open, onClose, brand }) {
@@ -309,7 +322,8 @@ function ChatWindow({ open, onClose, brand }) {
   const [conversation, setConversation] = useState(null);
   const [adminChatState, setAdminChatState] = useState('idle');
   const [adminSending, setAdminSending] = useState(false);
-
+  const [countdown, setCountdown] = useState(0);
+  const countdownRef = useRef(null);
   const parseErr = (err) =>
     err?.response?.data ?? err?.message ?? 'Bad request';
 
@@ -319,8 +333,8 @@ function ChatWindow({ open, onClose, brand }) {
       const raw = await aiChatService.history();
       const list = Array.isArray(raw) ? raw.map(toAiUiMessage) : [];
       setAiMessages(list);
-    } catch (e) {
-      console.warn('Load AI history failed', e);
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
     }
   };
 
@@ -372,8 +386,8 @@ function ChatWindow({ open, onClose, brand }) {
         await chatConnection.invoke('JoinConversation', id);
       }
       setAdminChatState('loaded');
-    } catch (err) {
-      console.error('Load admin chat history failed', err);
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
       setAdminChatState('error');
     }
   };
@@ -393,14 +407,14 @@ function ChatWindow({ open, onClose, brand }) {
         setAdminMessages([]);
         setAdminChatState('loaded');
       }
-    } catch (err) {
-      console.error('Load support chat failed', err);
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
       setAdminChatState('error');
     }
   };
 
   const sendAdminMessage = async (text) => {
-    if (!user || adminSending) return;
+    if (!user || adminSending || countdown > 0) return;
     setAdminSending(true);
     try {
       const dto = {
@@ -414,8 +428,8 @@ function ChatWindow({ open, onClose, brand }) {
       if (!conversation) {
         await loadSupportChat();
       }
-    } catch (err) {
-      console.error('Send admin message failed', err);
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
       setAdminMessages((prev) => [
         ...prev,
         {
@@ -427,6 +441,17 @@ function ChatWindow({ open, onClose, brand }) {
       ]);
     } finally {
       setAdminSending(false);
+      setCountdown(3); //Prevent Spawm Message
+      countdownRef.current = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            // If count = 0, delete interval
+            clearInterval(countdownRef.current);
+            return 0;
+          }
+          return prev - 1; //second
+        });
+      }, 1000);
     }
   };
 
@@ -468,6 +493,7 @@ function ChatWindow({ open, onClose, brand }) {
       setCurrentTab('AI');
       setAdminChatState('idle');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   useEffect(() => {
@@ -475,6 +501,9 @@ function ChatWindow({ open, onClose, brand }) {
       loadSupportChat();
     }
     return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+      }
       if (conversation && chatConnection) {
         chatConnection
           .invoke('LeaveConversation', conversation.conversationID)
@@ -498,6 +527,7 @@ function ChatWindow({ open, onClose, brand }) {
   const isInputDisabled =
     aiTyping ||
     adminSending ||
+    countdown > 0 ||
     (currentTab === 'ADMIN' && (adminChatState === 'loading' || !user));
 
   return (
@@ -596,7 +626,12 @@ function ChatWindow({ open, onClose, brand }) {
               </span>
             </div>
 
-            <ChatInput onSend={send} disabled={isInputDisabled} />
+            <ChatInput
+              onSend={send}
+              disabled={isInputDisabled}
+              isLoading={aiTyping || adminSending}
+              countdown={currentTab === 'ADMIN' ? countdown : 0}
+            />
           </div>
         )}
       </div>

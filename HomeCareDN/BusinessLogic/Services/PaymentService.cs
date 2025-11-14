@@ -138,8 +138,8 @@ namespace BusinessLogic.Services
                     {
                         ConversationID = Guid.NewGuid(),
                         ServiceRequestID = serviceRequest.ServiceRequestID,
-                        CustomerID = serviceRequest.CustomerID,
-                        ContractorID = payment.ContractorApplication.ContractorID,
+                        CustomerID = serviceRequest.CustomerID.ToString(),
+                        ContractorID = payment.ContractorApplication.ContractorID.ToString(),
                         ConversationType = ConversationType.ServiceRequest,
                         CreatedAt = DateTime.UtcNow,
                     };

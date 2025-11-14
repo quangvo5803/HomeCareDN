@@ -30,15 +30,11 @@ namespace HomeCareDNAPI.Hubs
 
             if (conversation.ConversationType == ConversationType.ServiceRequest)
             {
-                isMember =
-                    conversation.CustomerID.ToString() == userId
-                    || conversation.ContractorID.ToString() == userId;
+                isMember = conversation.CustomerID == userId || conversation.ContractorID == userId;
             }
             else if (conversation.ConversationType == ConversationType.AdminSupport)
             {
-                isMember =
-                    conversation.UserID.ToString() == userId
-                    || conversation.AdminID.ToString() == userId;
+                isMember = conversation.UserID == userId || conversation.AdminID == userId;
             }
 
             if (!isMember)

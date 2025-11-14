@@ -149,23 +149,20 @@ export default function AdminSupportChatManager() {
         if (payload.conversationID !== selectedConversation?.conversationID) {
           notificationNewMessage.current.play().catch(() => {});
         }
-        conversationService
-          .getAllConversationsByAdminID(user.id)
-          .then((items) => {
-            setConversations([...items]);
-          });
+        setConversations((prev) => {
+          const index = prev.findIndex(
+            (c) => c.conversationID === payload.conversationID
+          );
 
-        if (payload.ConversationID === selectedConversation?.conversationID) {
-          setMessages((prev) => {
-            if (
-              prev.some(
-                (m) => m.chatMessageID === payload.Message.chatMessageID
-              )
-            )
-              return prev;
-            return [...prev, payload.Message];
-          });
-        }
+          if (index === -1) return prev;
+
+          const updatedConversation = prev[index];
+
+          const filtered = prev.filter(
+            (c) => c.conversationID !== payload.conversationID
+          );
+          return [updatedConversation, ...filtered];
+        });
       },
     },
     'chat'
@@ -252,8 +249,8 @@ export default function AdminSupportChatManager() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation, chatConnection]);
 
-  // Infinite scroll handler
-  const handleScroll = useCallback(() => {
+  // Infinite scroll message handler
+  const handleScrollMessage = useCallback(() => {
     const container = messagesContainerRef.current;
     if (!container || loadingMoreMessage || !hasMoreMessages) return;
 
@@ -407,7 +404,7 @@ export default function AdminSupportChatManager() {
               {/* Messages */}
               <div
                 ref={messagesContainerRef}
-                onScroll={handleScroll}
+                onScroll={handleScrollMessage}
                 className="flex-1 overflow-y-auto p-4 bg-gray-50"
               >
                 {loadingMessage ? (
