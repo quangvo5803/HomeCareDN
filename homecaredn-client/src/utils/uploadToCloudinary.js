@@ -52,6 +52,15 @@ export const uploadToCloudinary = async (
     formData.append('upload_preset', uploadPreset);
     if (folder) formData.append('folder', folder);
 
+    const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+    // Tạo chuỗi ngẫu nhiên 5 ký tự (ví dụ: 'a1b2c')
+    const randomId = Math.random().toString(36).substring(2, 7);
+    const uniqueName = `${nameWithoutExt}_${randomId}`;
+    formData.append(
+      'public_id',
+      folder ? `${folder}/${uniqueName}` : uniqueName
+    );
+
     return axios.post(uploadUrl, formData, {
       onUploadProgress: (progressEvent) => {
         if (onProgress && progressEvent.total) {
@@ -76,6 +85,7 @@ export const uploadToCloudinary = async (
     const results = responses.map((res) => ({
       url: res.data.secure_url,
       publicId: res.data.public_id,
+      name: res.data.original_filename,
     }));
     return Array.isArray(files) ? results : results[0];
   } catch (error) {
