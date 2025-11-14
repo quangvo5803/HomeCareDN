@@ -62,7 +62,8 @@ namespace BusinessLogic.Services
             var conversations = await _unitOfWork
                 .ConversationRepository.GetQueryable()
                 .Where(c => c.AdminID == id)
-                .OrderByDescending(c => c.CreatedAt)
+                .OrderByDescending(c => c.AdminUnreadCount)
+                .ThenByDescending(c => c.CreatedAt)
                 .ToListAsync();
             if (conversations == null)
             {
