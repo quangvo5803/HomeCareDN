@@ -135,22 +135,32 @@ export default function ReviewModal({
                 <label
                   key={star}
                   className="cursor-pointer text-4xl transition-all duration-200"
+                  aria-label={`${star} ${t(
+                    'ModalPopup.ReviewModal.ratingStar'
+                  )}`}
+                  tabIndex={readOnly ? -1 : 0}
+                  onKeyDown={(e) => {
+                    if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      setRating(star);
+                    }
+                  }}
                 >
                   <input
                     type="radio"
                     name="rating"
                     value={star}
                     className="hidden"
-                    disabled={readOnly}
                     checked={rating === star}
                     onChange={() => !readOnly && setRating(star)}
+                    disabled={readOnly}
                   />
                   <i
                     className={`${
                       star <= (hoveredRating || rating)
                         ? 'fas fa-star text-yellow-400'
                         : 'far fa-star text-gray-300'
-                    } ${readOnly ? 'cursor-default' : 'hover:scale-110'}`}
+                    }`}
                     onMouseEnter={() => !readOnly && setHoveredRating(star)}
                     onMouseLeave={() => !readOnly && setHoveredRating(0)}
                   ></i>
