@@ -3,7 +3,6 @@ import { useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Reveal from '../components/Reveal';
 
-
 // ---- Video modal (validated props) ----
 function AutoPlayVideoModal({ src, className }) {
   const [open, setOpen] = useState(false);
@@ -70,10 +69,7 @@ function AutoPlayVideoModal({ src, className }) {
       {/* Modal phóng to */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 animate-fadeIn">
-          <div
-            ref={modalContainerRef}
-            className="relative w-full max-w-7xl"
-          >
+          <div ref={modalContainerRef} className="relative w-full max-w-7xl">
             {/* Nút đóng */}
             <button
               type="button"
@@ -127,11 +123,6 @@ AutoPlayVideoModal.defaultProps = {
 export default function About() {
   const { t } = useTranslation();
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, []);
-
-
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Page Header */}
@@ -141,11 +132,11 @@ export default function About() {
           <div className="relative container mx-auto text-center py-20 px-6">
             <nav className="flex justify-center text-sm text-gray-300 space-x-2 mt-6">
               <a href="/" className="hover:text-orange-400">
-                {t('common.home')}
+                {t('header.home')}
               </a>
               <span>/</span>
               <span className="text-orange-500 font-semibold">
-                {t('common.about')}
+                {t('header.about')}
               </span>
             </nav>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">

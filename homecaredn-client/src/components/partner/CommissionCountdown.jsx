@@ -18,7 +18,6 @@ export default function CommissionCountdown({
       const total = new Date(dueCommisionTime) - new Date().getTime();
       if (total <= 0) {
         setTimeLeft(null);
-        onExpired?.();
         return;
       }
       const hours = Math.floor((total / (1000 * 60 * 60)) % 24);

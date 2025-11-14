@@ -89,6 +89,17 @@ namespace BusinessLogic.Services
 
         public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
         {
+            var isDuplicate = await _unitOfWork
+                .BrandRepository.GetQueryable()
+                .AnyAsync(b => b.BrandName.ToLower() == requestDto.BrandName.ToLower());
+            if (isDuplicate)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" } },
+                };
+                throw new CustomValidationException(errors);
+            }
             var brand = _mapper.Map<Brand>(requestDto);
             brand.BrandID = Guid.NewGuid();
 
@@ -105,10 +116,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.BrandRepository.AddAsync(brand);
 
             await _unitOfWork.SaveAsync();
-            brand = await _unitOfWork.BrandRepository.GetAsync(
-                b => b.BrandID == brand.BrandID,
-                includeProperties: INCLUDE
-            );
+
             var brandDto = _mapper.Map<BrandDto>(brand);
             return brandDto;
         }
@@ -116,6 +124,18 @@ namespace BusinessLogic.Services
         public async Task<BrandDto> UpdateBrandAsync(BrandUpdateRequestDto requestDto)
         {
             var errors = new Dictionary<string, string[]>();
+            var isDuplicate = await _unitOfWork
+                .BrandRepository.GetQueryable()
+                .AnyAsync(b =>
+                    b.BrandName.ToLower() == requestDto.BrandName.ToLower()
+                    && b.BrandID != requestDto.BrandID
+                );
+
+            if (isDuplicate)
+            {
+                errors.Add("BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" });
+                throw new CustomValidationException(errors);
+            }
             var brand = await _unitOfWork.BrandRepository.GetAsync(
                 b => b.BrandID == requestDto.BrandID,
                 includeProperties: "LogoImage,Materials",
@@ -164,7 +184,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteBrandAsync(Guid id)
         {
-            var brand = await _unitOfWork.BrandRepository.GetAsync(brand => brand.BrandID == id);
+            var brand = await _unitOfWork.BrandRepository.GetAsync(
+                brand => brand.BrandID == id,
+                asNoTracking: false
+            );
             if (brand == null)
             {
                 var errors = new Dictionary<string, string[]>

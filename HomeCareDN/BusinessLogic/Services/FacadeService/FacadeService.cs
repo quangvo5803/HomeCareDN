@@ -14,12 +14,14 @@ namespace BusinessLogic.Services.FacadeService
         public IAiChatService AiChatService { get; }
         public IConversationService ConversationService { get; }
         public IChatMessageService ChatMessageService { get; }
-
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
+        public IDocumentService DocumentService { get; }
         public IPartnerRequestService PartnerService { get; }
         public IPaymentService PaymentService { get; }
         public IMaterialRequestService MaterialRequestService { get; }
+        public IStatisticService StatisticService { get; }
+        public IUserService UserService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -72,6 +74,7 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.EmailQueue
             );
             ImageService = new ImageService(coreDeps.UnitOfWork);
+            DocumentService = new DocumentService(coreDeps.UnitOfWork);
 
             PartnerService = new PartnerRequestService(
                 coreDeps.UnitOfWork,
@@ -84,12 +87,28 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.PayOS,
                 coreDeps.UnitOfWork,
                 infraDeps.PayOsOptions,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.UserManager,
+                coreDeps.Mapper
             );
 
             MaterialRequestService = new MaterialRequestService(
                 coreDeps.UnitOfWork,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                coreDeps.AuthorizeDbContext,
+                coreDeps.UserManager,
+                infraDeps.Notifier
+            );
+
+            StatisticService = new StatisticService(
+                coreDeps.UnitOfWork,
+                identityDeps.UserManager
+            );
+
+            UserService = new UserService(
+                coreDeps.Mapper,
+                identityDeps.UserManager,
+                coreDeps.UnitOfWork
             );
         }
     }

@@ -28,10 +28,6 @@ export default function ServiceDetail() {
   }, [serviceID, getServiceById, location.key]);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [location.key]);
-
-  useEffect(() => {
     if (!service.serviceType) return;
 
     const loadServices = async () => {

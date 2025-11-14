@@ -3,6 +3,7 @@ using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Ultitity.Options;
@@ -25,6 +26,25 @@ namespace DataAccess.Repositories
                 options.Value.ApiSecret
             );
             _cloudinary = new Cloudinary(account);
+        }
+
+        public async Task UploadDocumentAsync(IFormFile file, string folder, Document document)
+        {
+            await using var stream = file.OpenReadStream();
+
+            var uploadParams = new RawUploadParams
+            {
+                File = new FileDescription(file.FileName, stream),
+                Folder = folder,
+                UseFilename = true,
+                UniqueFilename = true,
+                Overwrite = false,
+            };
+
+            var result = await _cloudinary.UploadAsync(uploadParams);
+            document.PublicId = result.PublicId;
+            document.DocumentUrl = result.SecureUrl.ToString();
+            _db.Documents.Add(document);
         }
 
         public async Task<bool> DeleteDocumentAsync(string publicId)
@@ -50,6 +70,18 @@ namespace DataAccess.Repositories
             }
 
             return false;
+        }
+
+        public async Task<bool> DeleteDocumentsAsync(List<string> publicIds)
+        {
+            if (publicIds == null || !publicIds.Any())
+                return false;
+
+            var deleteTasks = publicIds.Select(publicId => DeleteDocumentAsync(publicId));
+
+            var results = await Task.WhenAll(deleteTasks);
+
+            return results.All(r => r);
         }
     }
 }

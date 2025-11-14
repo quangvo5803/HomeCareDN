@@ -7,7 +7,9 @@ namespace BusinessLogic.DTOs.Application.Category
     {
         [Required]
         public Guid CategoryID { get; set; }
-        public string? CategoryName { get; set; }
+
+        [Required(ErrorMessage = "REQUIRED_CATEGORYNAME")]
+        public required string CategoryName { get; set; }
         public string? CategoryNameEN { get; set; }
         public bool IsActive { get; set; }
         public string? CategoryLogoUrl { get; set; }

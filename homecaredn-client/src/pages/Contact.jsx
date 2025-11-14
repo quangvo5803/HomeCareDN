@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { contactSupportService } from '../services/contactSupportService';
 import { toast } from 'react-toastify';
@@ -14,11 +14,6 @@ export default function Contact() {
     message: '',
   });
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // 'instant' không nằm trong spec; dùng 'auto' để an toàn
-    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +52,7 @@ export default function Contact() {
           <div className="relative container mx-auto text-center py-20 px-6">
             <nav className="flex justify-center text-sm text-gray-300 space-x-2">
               <a href="/" className="hover:text-orange-400">
-                {t('common.home')}
+                {t('header.home')}
               </a>
               <span>/</span>
               <span className="text-orange-500 font-semibold">

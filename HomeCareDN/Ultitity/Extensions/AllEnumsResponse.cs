@@ -10,5 +10,6 @@
         public List<EnumDto> PartnerType { get; set; } = new();
         public List<EnumDto> PartnerStatus { get; set; } = new();
         public List<EnumDto> ConversationTypes { get; set; } = new();
+        public List<EnumDto> PaymentStatus { get; set; } = new();
     }
 }

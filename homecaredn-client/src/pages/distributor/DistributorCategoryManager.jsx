@@ -13,6 +13,7 @@ export default function DistributorCategoryManager() {
   const [currentPage, setCurrentPage] = useState(1);
   const { user } = useAuth();
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
 
   const pageSize = 10;
 
@@ -63,20 +64,28 @@ export default function DistributorCategoryManager() {
   };
   // Save Category (Create / Update)
   const handleSave = async (categoryData) => {
-    if (categoryData.CategoryID) {
-      await updateCategory(categoryData);
-    } else {
-      await createCategory(categoryData);
-      const lastPage = Math.ceil((totalCategories + 1) / pageSize);
-      setCurrentPage(lastPage);
-    }
+    setSubmitting(true);
+    try {
+      if (categoryData.CategoryID) {
+        await updateCategory(categoryData);
+      } else {
+        await createCategory(categoryData);
+        const lastPage = Math.ceil((totalCategories + 1) / pageSize);
+        setCurrentPage(lastPage);
+      }
 
-    setIsModalOpen(false);
-    setEditingCategoryID(null);
+      setIsModalOpen(false);
+      setEditingCategoryID(null);
+    } catch (err) {
+      console.error(err);
+      return;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (loading) return <Loading />;
-  if (uploadProgress) return <Loading progress={uploadProgress} />;
+  if (submitting || uploadProgress || loading)
+    return <Loading progress={uploadProgress} />;
 
   return (
     <div className="overflow-hidden bg-white border border-gray-100 shadow-md rounded-2xl">
@@ -117,6 +126,7 @@ export default function DistributorCategoryManager() {
         onSave={handleSave}
         categoryID={editingCategoryID}
         setUploadProgress={setUploadProgress}
+        setSubmitting={setSubmitting}
       />
 
       {/* Table */}

@@ -45,9 +45,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-              }
+              ...sr,
+              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -91,9 +91,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -242,6 +242,18 @@ export default function ServiceRequestDetail() {
     return () => vb.close();
   });
 
+  const ICON_MAP = {
+    pdf: 'fa-file-pdf text-red-600',
+    doc: 'fa-file-word text-blue-600',
+    docx: 'fa-file-word text-blue-600',
+    xls: 'fa-file-excel text-green-600',
+    xlsx: 'fa-file-excel text-green-600',
+    ppt: 'fa-file-powerpoint text-orange-600',
+    pptx: 'fa-file-powerpoint text-orange-600',
+    txt: 'fa-file-lines text-gray-600',
+  };
+  const DEFAULT_ICON = 'fa-file-alt text-gray-500';
+
   if (loading || !serviceRequest) return <Loading />;
 
   // ---- UI ----
@@ -276,11 +288,10 @@ export default function ServiceRequestDetail() {
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i
-                  className={`text-orange-600 text-xl fas ${
-                    serviceRequest.serviceType === 'Construction'
-                      ? 'fa-hammer'
-                      : 'fa-screwdriver-wrench'
-                  }`}
+                  className={`text-orange-600 text-xl fas ${serviceRequest.serviceType === 'Construction'
+                    ? 'fa-hammer'
+                    : 'fa-screwdriver-wrench'
+                    }`}
                 />{' '}
               </div>
               <div className="flex-1">
@@ -349,6 +360,66 @@ export default function ServiceRequestDetail() {
               </div>
             )}
           </div>
+          {/* Documents */}
+          {serviceRequest.documentUrls.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                <i className="fas fa-file-alt text-orange-500 mt-1"></i>{' '}
+                {t('userPage.serviceRequestDetail.label_documents')}
+              </h3>
+
+              <div className="space-y-3">
+                {serviceRequest.documentUrls.map((docUrl) => {
+                  const fileName = decodeURIComponent(
+                    docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                  );
+                  const ext = (
+                    fileName.includes('.') ? fileName.split('.').pop() : ''
+                  ).toLowerCase();
+
+                  const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
+
+                  return (
+                    <div
+                      key={docUrl}
+                      className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition bg-white"
+                    >
+                      {/* Icon */}
+                      <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                        <i className={`fas ${iconClass} text-2xl`} />
+                      </div>
+
+                      {/* Name + meta */}
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-sm font-medium text-gray-800 truncate"
+                          title={fileName}
+                        >
+                          {fileName}
+                        </p>
+                        <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                            {(ext || 'file').toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={docUrl}
+                          download
+                          className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                        >
+                          {t('common.Download')}
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Specifications Card */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -545,7 +616,65 @@ export default function ServiceRequestDetail() {
                   type="Application"
                 />
               </div>
+              {/* Documents  */}
+              {selectedContractor?.documentUrls?.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    {t('contractorServiceRequestDetail.documents')}
+                  </h4>
 
+                  <div className="space-y-3">
+                    {selectedContractor.documentUrls.map((doc) => {
+                      const fileName = decodeURIComponent(
+                        doc.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+
+                      const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
+
+                      return (
+                        <div
+                          key={doc}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={doc}
+                              download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               {/* Contractor Contact Information - Show when Approved */}
               {selectedContractor.status === 'Approved' && (
                 <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
@@ -783,10 +912,7 @@ export default function ServiceRequestDetail() {
         </div>
         {/* Chat Section */}
         <ChatSection
-          conversationID={
-            serviceRequest.conversationID ||
-            serviceRequest.conversation?.conversationID
-          }
+          conversationID={serviceRequest.conversationID || serviceRequest.conversation?.conversationID}
           contractorApplicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />

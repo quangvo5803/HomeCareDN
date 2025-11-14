@@ -71,18 +71,24 @@ export default function AdminBrandManager() {
   };
 
   const handleSave = async (brandData) => {
-    setSubmitting(true);
-    if (brandData.BrandID) {
-      await updateBrand(brandData);
-    } else {
-      await createBrand(brandData);
-      const lastPage = Math.ceil((totalBrands + 1) / pageSize);
-      setCurrentPage(lastPage);
-    }
+    try {
+      setSubmitting(true);
+      if (brandData.BrandID) {
+        await updateBrand(brandData);
+      } else {
+        await createBrand(brandData);
+        const lastPage = Math.ceil((totalBrands + 1) / pageSize);
+        setCurrentPage(lastPage);
+      }
 
-    setIsModalOpen(false);
-    setEditingBrandID(null);
-    setSubmitting(false);
+      setIsModalOpen(false);
+      setEditingBrandID(null);
+      setSubmitting(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitting || uploadProgress)
@@ -95,7 +101,7 @@ export default function AdminBrandManager() {
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-orange-600 rounded-2xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
                 <i className="fa-solid fa-star text-white text-2xl" />
               </div>
               <div>
@@ -115,7 +121,7 @@ export default function AdminBrandManager() {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Stats Card */}
             <div className="flex items-center gap-3 flex-wrap">
-              <div className="px-5 py-3 bg-orange-600 rounded-xl shadow-lg">
+              <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                     <i className="fa-solid fa-star text-white text-lg" />
@@ -135,7 +141,7 @@ export default function AdminBrandManager() {
             {/* Search, Sort & Add Button */}
             <div className="flex flex-col sm:flex-row gap-3">
               <select
-                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm"
+                className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
               >
@@ -175,7 +181,7 @@ export default function AdminBrandManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full"
+                className="cursor-pointer flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full"
                 onClick={() => setIsModalOpen(true)}
               >
                 <i className="fa-solid fa-plus"></i>
@@ -240,7 +246,7 @@ export default function AdminBrandManager() {
                           }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
-                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-600 rounded-full shadow-sm">
+                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
                               {(currentPage - 1) * pageSize + index + 1}
                             </span>
                           </td>
@@ -277,7 +283,7 @@ export default function AdminBrandManager() {
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
                               <button
-                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                                className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() => {
                                   setEditingBrandID(brand.brandID);
                                   setIsModalOpen(true);
@@ -287,7 +293,7 @@ export default function AdminBrandManager() {
                               </button>
                               {brand.materials?.length === 0 && (
                                 <button
-                                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100"
+                                  className="inline-flex items-center px-3 py-2 text-sm font-medium text-red-700 border border-red-300 rounded-md bg-red-50 hover:bg-red-100 cursor-pointer"
                                   onClick={() => handleDelete(brand.brandID)}
                                 >
                                   {t('BUTTON.Delete')}
@@ -311,7 +317,7 @@ export default function AdminBrandManager() {
                               {t('adminBrandManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700"
+                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
                               onClick={() => setIsModalOpen(true)}
                             >
                               <i className="mr-3 fa-solid fa-plus"></i>
@@ -398,7 +404,7 @@ export default function AdminBrandManager() {
                       {t('adminBrandManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-600 rounded-lg hover:bg-orange-700"
+                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700"
                       onClick={() => setIsModalOpen(true)}
                     >
                       <i className="mr-3 fa-solid fa-plus"></i>

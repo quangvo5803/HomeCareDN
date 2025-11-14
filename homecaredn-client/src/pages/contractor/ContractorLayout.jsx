@@ -11,7 +11,6 @@ export default function ContractorLayout() {
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-gray-50">
       <MenuList
-        serviceRequestsCount={10}
         brand={{
           logoUrl:
             'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png',

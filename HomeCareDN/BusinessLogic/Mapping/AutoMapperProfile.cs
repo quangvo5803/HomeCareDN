@@ -8,11 +8,13 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.Address;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 using BusinessLogic.DTOs.Authorize.Profiles;
+using BusinessLogic.DTOs.Authorize.User;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using Ultitity.Extensions;
@@ -32,7 +34,8 @@ namespace BusinessLogic.Mapping
             // Create DTO -> Entity (Write)
             // ------------------------
             CreateMap<ServiceRequestCreateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
 
             CreateMap<ServiceCreateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
@@ -48,16 +51,19 @@ namespace BusinessLogic.Mapping
 
             CreateMap<CreateAddressDto, Address>();
             CreateMap<PartnerRequestCreateRequestDto, PartnerRequest>()
-                .ForMember(d => d.Images, opt => opt.Ignore());
+                .ForMember(d => d.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
             CreateMap<ContractorCreateApplicationDto, ContractorApplication>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
             CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
             CreateMap<MaterialRequestUpdateRequestDto, MaterialRequest>();
             CreateMap<ServiceRequestUpdateRequestDto, ServiceRequest>()
-                .ForMember(dest => dest.Images, opt => opt.Ignore());
+                .ForMember(dest => dest.Images, opt => opt.Ignore())
+                .ForMember(dest => dest.Documents, opt => opt.Ignore());
 
             CreateMap<UpdateAddressDto, Address>()
                 // Ignore AddressId and UserId to prevent overwriting them
@@ -107,6 +113,19 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
+                    dest => dest.DocumentPublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Documents != null
+                                ? src.Documents.Select(d => d.PublicId).ToList()
+                                : new List<string>()
+                        )
+                )
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.Conversation, opt => opt.MapFrom(src => src.Conversation));
             CreateMap<Service, ServiceDto>()
@@ -129,6 +148,10 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )
                 .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
                     dest => dest.ImagePublicIds,
                     opt =>
                         opt.MapFrom(src =>
@@ -142,6 +165,14 @@ namespace BusinessLogic.Mapping
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
+                )
+                .ForMember(
+                    dest => dest.ServiceType,
+                    opt => opt.MapFrom(src => src.ServiceRequest!.ServiceType)
+                )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
                 );
 
             CreateMap<Material, MaterialDto>()
@@ -265,8 +296,50 @@ namespace BusinessLogic.Mapping
                                 : new List<string>()
                         )
                 );
-            CreateMap<MaterialRequest, MaterialRequestDto>();
+            CreateMap<MaterialRequest, MaterialRequestDto>()
+                .ForMember(
+                    dest => dest.DistributorApplyCount,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.DistributorApplications != null
+                                ? src.DistributorApplications.Count
+                                : 0
+                        )
+                )
+                .AfterMap(
+                    (src, dest) =>
+                    {
+                        if (dest.MaterialRequestItems != null)
+                        {
+                            foreach (var item in dest.MaterialRequestItems)
+                            {
+                                if (item.Material != null)
+                                {
+                                    var material = item.Material;
+                                    if (material == null)
+                                        continue;
 
+                                    material.Description = null;
+                                    material.DescriptionEN = null;
+                                    material.UserID = string.Empty;
+
+                                    if (material.Images != null && material.Images.Any())
+                                    {
+                                        material.Images = new List<Image>
+                                        {
+                                            material.Images.First(),
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                );
+
+            CreateMap<ApplicationUser, UserDto>()
+                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Addresses));
+                
             CreateMap<Conversation, ConversationDto>()
                 .ForMember(
                     dest => dest.ConversationID,
@@ -283,8 +356,11 @@ namespace BusinessLogic.Mapping
                     dest => dest.AdminUnreadCount,
                     opt => opt.MapFrom(src => src.AdminUnreadCount)
                 );
+
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
+
+            CreateMap<PaymentTransaction, PaymentTransactionDto>();
         }
 
         // ------------------------
@@ -311,6 +387,11 @@ namespace BusinessLogic.Mapping
         private static List<string> ImagesToUrls(IEnumerable<Image>? images)
         {
             return images?.Select(i => i.ImageUrl).ToList() ?? new List<string>();
+        }
+
+        private static List<string> DocumentsToUrls(IEnumerable<Document>? documents)
+        {
+            return documents?.Select(i => i.DocumentUrl).ToList() ?? new List<string>();
         }
     }
 }

@@ -9,7 +9,9 @@ namespace BusinessLogic.DTOs.Application.Material
         [Required]
         public Guid MaterialID { get; set; }
         public Guid? CategoryID { get; set; }
-        public string? Name { get; set; }
+
+        [Required(ErrorMessage = "REQUIRED_MATERIALNAME")]
+        public required string Name { get; set; }
         public string? NameEN { get; set; }
         public Guid? BrandID { get; set; }
 
@@ -17,7 +19,7 @@ namespace BusinessLogic.DTOs.Application.Material
         public string? UnitEN { get; set; }
 
         public string? Description { get; set; }
-        public string? DescriptionEN {  get; set; }
+        public string? DescriptionEN { get; set; }
         public List<string>? ImageUrls { get; set; }
         public List<string>? ImagePublicIds { get; set; }
     }
