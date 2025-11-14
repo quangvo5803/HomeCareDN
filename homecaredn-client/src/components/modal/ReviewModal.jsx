@@ -132,29 +132,22 @@ export default function ReviewModal({
               className="flex items-center gap-2"
             >
               {[1, 2, 3, 4, 5].map((star) => (
-                <label
+                <button
                   key={star}
-                  className="cursor-pointer text-4xl transition-all duration-200"
+                  type="button"
+                  className="cursor-pointer text-4xl transition-all duration-200 bg-transparent border-none p-0"
                   aria-label={`${star} ${t(
                     'ModalPopup.ReviewModal.ratingStar'
                   )}`}
-                  tabIndex={readOnly ? -1 : 0}
+                  disabled={readOnly}
                   onKeyDown={(e) => {
                     if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
                       e.preventDefault();
                       setRating(star);
                     }
                   }}
+                  onClick={() => !readOnly && setRating(star)}
                 >
-                  <input
-                    type="radio"
-                    name="rating"
-                    value={star}
-                    className="hidden"
-                    checked={rating === star}
-                    onChange={() => !readOnly && setRating(star)}
-                    disabled={readOnly}
-                  />
                   <i
                     className={`${
                       star <= (hoveredRating || rating)
@@ -164,7 +157,7 @@ export default function ReviewModal({
                     onMouseEnter={() => !readOnly && setHoveredRating(star)}
                     onMouseLeave={() => !readOnly && setHoveredRating(0)}
                   ></i>
-                </label>
+                </button>
               ))}
             </div>
           </div>
