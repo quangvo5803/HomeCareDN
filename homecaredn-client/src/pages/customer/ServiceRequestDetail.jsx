@@ -242,6 +242,18 @@ export default function ServiceRequestDetail() {
     return () => vb.close();
   });
 
+  const ICON_MAP = {
+    pdf: 'fa-file-pdf text-red-600',
+    doc: 'fa-file-word text-blue-600',
+    docx: 'fa-file-word text-blue-600',
+    xls: 'fa-file-excel text-green-600',
+    xlsx: 'fa-file-excel text-green-600',
+    ppt: 'fa-file-powerpoint text-orange-600',
+    pptx: 'fa-file-powerpoint text-orange-600',
+    txt: 'fa-file-lines text-gray-600',
+  };
+  const DEFAULT_ICON = 'fa-file-alt text-gray-500';
+
   if (loading || !serviceRequest) return <Loading />;
 
   // ---- UI ----
@@ -366,18 +378,7 @@ export default function ServiceRequestDetail() {
                     fileName.includes('.') ? fileName.split('.').pop() : ''
                   ).toLowerCase();
 
-                  const iconClass =
-                    ext === 'pdf'
-                      ? 'fa-file-pdf text-red-600'
-                      : ext === 'doc' || ext === 'docx'
-                      ? 'fa-file-word text-blue-600'
-                      : ext === 'xls' || ext === 'xlsx'
-                      ? 'fa-file-excel text-green-600'
-                      : ext === 'ppt' || ext === 'pptx'
-                      ? 'fa-file-powerpoint text-orange-600'
-                      : ext === 'txt'
-                      ? 'fa-file-lines text-gray-600'
-                      : 'fa-file-alt text-gray-500';
+                  const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
 
                   return (
                     <div
@@ -632,18 +633,7 @@ export default function ServiceRequestDetail() {
                         fileName.includes('.') ? fileName.split('.').pop() : ''
                       ).toLowerCase();
 
-                      const iconClass =
-                        ext === 'pdf'
-                          ? 'fa-file-pdf text-red-600'
-                          : ext === 'doc' || ext === 'docx'
-                          ? 'fa-file-word text-blue-600'
-                          : ext === 'xls' || ext === 'xlsx'
-                          ? 'fa-file-excel text-green-600'
-                          : ext === 'ppt' || ext === 'pptx'
-                          ? 'fa-file-powerpoint text-orange-600'
-                          : ext === 'txt'
-                          ? 'fa-file-lines text-gray-600'
-                          : 'fa-file-alt text-gray-500';
+                      const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
 
                       return (
                         <div

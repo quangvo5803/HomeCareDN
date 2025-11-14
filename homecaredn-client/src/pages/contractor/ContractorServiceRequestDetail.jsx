@@ -196,14 +196,18 @@ export default function ContractorServiceRequestDetail() {
   // Clean up object URLs khi unmount
   useEffect(() => {
     return () => {
-      images.forEach(
-        (i) =>
-          i.isNew && i.url?.startsWith('blob:') && URL.revokeObjectURL(i.url)
-      );
-      documents.forEach(
-        (d) =>
-          d.isNew && d.url?.startsWith('blob:') && URL.revokeObjectURL(d.url)
-      );
+      // Đổi thành for of
+      for (const i of images) {
+        if (i.isNew && i.url?.startsWith('blob:')) {
+          URL.revokeObjectURL(i.url);
+        }
+      }
+
+      for (const d of documents) {
+        if (d.isNew && d.url?.startsWith('blob:')) {
+          URL.revokeObjectURL(d.url);
+        }
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -421,6 +425,17 @@ export default function ContractorServiceRequestDetail() {
     }
     return 'fas fa-file text-gray-400';
   };
+  const ICON_MAP = {
+    pdf: 'fa-file-pdf text-red-600',
+    doc: 'fa-file-word text-blue-600',
+    docx: 'fa-file-word text-blue-600',
+    xls: 'fa-file-excel text-green-600',
+    xlsx: 'fa-file-excel text-green-600',
+    ppt: 'fa-file-powerpoint text-orange-600',
+    pptx: 'fa-file-powerpoint text-orange-600',
+    txt: 'fa-file-lines text-gray-600',
+  };
+  const DEFAULT_ICON = 'fa-file-alt text-gray-500';
 
   if (loading || isChecking || !serviceRequest) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
@@ -681,18 +696,7 @@ export default function ContractorServiceRequestDetail() {
                       fileName.includes('.') ? fileName.split('.').pop() : ''
                     ).toLowerCase();
 
-                    const iconClass =
-                      ext === 'pdf'
-                        ? 'fa-file-pdf text-red-600'
-                        : ext === 'doc' || ext === 'docx'
-                        ? 'fa-file-word text-blue-600'
-                        : ext === 'xls' || ext === 'xlsx'
-                        ? 'fa-file-excel text-green-600'
-                        : ext === 'ppt' || ext === 'pptx'
-                        ? 'fa-file-powerpoint text-orange-600'
-                        : ext === 'txt'
-                        ? 'fa-file-lines text-gray-600'
-                        : 'fa-file-alt text-gray-500';
+                    const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
 
                     return (
                       <div
@@ -856,31 +860,29 @@ export default function ContractorServiceRequestDetail() {
                     </span>
                   </label>
                   {images.length < MAX_IMAGES && (
-                    <>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleImageChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                            <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
-                          </div>
-                          <p className="text-gray-600 text-center mb-2">
-                            <span className="font-semibold text-orange-600">
-                              {t('upload.clickToUploadImage')}
-                            </span>{' '}
-                            {t('upload.orDragAndDrop')}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {t('upload.fileTypesHint')}
-                          </p>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                          <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
                         </div>
+                        <p className="text-gray-600 text-center mb-2">
+                          <span className="font-semibold text-orange-600">
+                            {t('upload.clickToUploadImage')}
+                          </span>{' '}
+                          {t('upload.orDragAndDrop')}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {t('upload.fileTypesHint')}
+                        </p>
                       </div>
-                    </>
+                    </div>
                   )}
 
                   {images.length > 0 && (
@@ -922,32 +924,30 @@ export default function ContractorServiceRequestDetail() {
                   </div>
 
                   {documents.length < MAX_DOCUMENTS && (
-                    <>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept={ACCEPTED_DOC_TYPES}
-                          multiple
-                          onChange={handleDocumentChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                          aria-label={t('upload.uploadDocuments')}
-                        />
-                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                            <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
-                          </div>
-                          <p className="text-gray-600 text-center mb-2">
-                            <span className="font-semibold text-blue-600">
-                              {t('upload.clickToUploadDocument')}
-                            </span>{' '}
-                            {t('upload.orDragAndDrop')}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {t('upload.fileTypesHint')}
-                          </p>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept={ACCEPTED_DOC_TYPES}
+                        multiple
+                        onChange={handleDocumentChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        aria-label={t('upload.uploadDocuments')}
+                      />
+                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                          <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
                         </div>
+                        <p className="text-gray-600 text-center mb-2">
+                          <span className="font-semibold text-blue-600">
+                            {t('upload.clickToUploadDocument')}
+                          </span>{' '}
+                          {t('upload.orDragAndDrop')}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {t('upload.fileTypesHint')}
+                        </p>
                       </div>
-                    </>
+                    </div>
                   )}
 
                   {documents.length > 0 && (
@@ -1113,18 +1113,7 @@ export default function ContractorServiceRequestDetail() {
                       const ext = (
                         fileName.includes('.') ? fileName.split('.').pop() : ''
                       ).toLowerCase();
-                      const iconClass =
-                        ext === 'pdf'
-                          ? 'fa-file-pdf text-red-600'
-                          : ext === 'doc' || ext === 'docx'
-                          ? 'fa-file-word text-blue-600'
-                          : ext === 'xls' || ext === 'xlsx'
-                          ? 'fa-file-excel text-green-600'
-                          : ext === 'ppt' || ext === 'pptx'
-                          ? 'fa-file-powerpoint text-orange-600'
-                          : ext === 'txt'
-                          ? 'fa-file-lines text-gray-600'
-                          : 'fa-file-alt text-gray-500';
+                      const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
                       return (
                         <div
                           key={docUrl}
