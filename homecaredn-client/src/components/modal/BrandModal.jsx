@@ -91,20 +91,21 @@ export default function BrandModal({
         const result = await uploadToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => {
+          (progress, percent) => {
             setUploadProgress(percent);
           },
           'HomeCareDN/BrandLogo'
         );
         data.BrandLogoUrl = result.url;
         data.BrandLogoPublicId = result.publicId;
-        onClose();
-        setUploadProgress(0);
       }
 
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setUploadProgress(0);
+      setSubmitting(false);
     }
   };
 

@@ -71,18 +71,24 @@ export default function AdminBrandManager() {
   };
 
   const handleSave = async (brandData) => {
-    setSubmitting(true);
-    if (brandData.BrandID) {
-      await updateBrand(brandData);
-    } else {
-      await createBrand(brandData);
-      const lastPage = Math.ceil((totalBrands + 1) / pageSize);
-      setCurrentPage(lastPage);
-    }
+    try {
+      setSubmitting(true);
+      if (brandData.BrandID) {
+        await updateBrand(brandData);
+      } else {
+        await createBrand(brandData);
+        const lastPage = Math.ceil((totalBrands + 1) / pageSize);
+        setCurrentPage(lastPage);
+      }
 
-    setIsModalOpen(false);
-    setEditingBrandID(null);
-    setSubmitting(false);
+      setIsModalOpen(false);
+      setEditingBrandID(null);
+      setSubmitting(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitting || uploadProgress)
