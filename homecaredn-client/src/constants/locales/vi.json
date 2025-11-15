@@ -248,6 +248,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
+      "form_documents": "Tài liệu",
       "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
@@ -262,6 +263,7 @@
         "name": "Họ và tên",
         "email": "Email",
         "phone": "Số điện thoại",
+        "phone_placeholder": "Nhập số điện thoại của bạn",
         "gender": "Giới tính",
         "gender_choice": "Chọn giới tính",
         "gender_male": "Nam",
@@ -327,6 +329,8 @@
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
+      "uploading": "Đang tải lên",
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
@@ -357,7 +361,7 @@
       "noContractorDesc": "Hiện tại chưa có nhà thầu nào ứng tuyển cho dự án của bạn. Vui lòng chờ thêm thời gian.",
       "label_avarageRating": "Đánh giá trung bình:",
       "contractorApplyCount": " nhà thầu",
-      "label_contractorInfo":"Thông tin liên hệ",
+      "label_contractorInfo": "Thông tin liên hệ",
       "label_contractorName": "Tên nhà thầu",
       "label_phone": "Số điện thoại",
       "label_selectedContractor": "Nhà thầu bạn chọn",
@@ -367,7 +371,7 @@
       "lowerThanEstimate": "Thấp hơn dự toán {{value}} triệu",
       "higherThanEstimate": "Cao hơn dự toán {{value}} triệu",
       "section_chat": "Trò chuyện với nhà thầu",
-      "noMessages" :"Chưa có tin nhắn nào",
+      "noMessages": "Chưa có tin nhắn nào",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
     },
     "materialRequest": {
@@ -375,12 +379,37 @@
       "subtitle": "Xem và quản lý các yêu cầu vật liệu của bạn.",
       "noRequest": "Chưa có yêu cầu vật liệu nào",
       "letStart": "Bắt đầu bằng cách tạo yêu cầu vật liệu đầu tiên của bạn",
+      "lbl_address": "Địa chỉ: ",
       "lbl_distributor": "nhà cung cấp",
       "lbl_canEditQuantity": "Cho phép nhà cung cấp chỉnh sửa số lượng",
       "lbl_materialList": "Danh sách vật liệu",
-      "lbl_materialUnit": "loại",
+      "lbl_materialUnit": "vật liệu",
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
       "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
+    },
+    "materialRequestDetail": {
+      "title": "Chi tiết yêu cầu vật liệu",
+      "description": "Mô Tả",
+      "descriptionsPlaceholder":"Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
+      "address":"Địa chỉ",
+      "selectAddress": "Chọn địa chỉ",
+      "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
+      "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
+      "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
+      "allowAddMaterialDes": "Bật tùy chọn này để cho phép nhà phân phối thêm vật liệu cần thiết khi nộp đơn ứng tuyển",
+      "materialList": "Danh sách vật liệu muốn mua",
+      "itemsCount": "vật liệu",
+      "noMaterial": "Danh sách trống",
+      "addMaterial": "Thêm vật liệu vào danh sách của bạn",
+      "image": "Hình ảnh",
+      "infor": "Thông tin",
+      "quantity": "Số lượng",
+      "unit": "Đơn Vị",
+      "action":"Hành Động",
+      "unsavedChanges": "Bạn có thay đổi chưa lưu",
+      "unsavedChangesDesc": "Những thay đổi của bạn sẽ bị mất nếu bạn rời khỏi trang.",
+      "cancleModalTitle": "Trở về ban đầu?",
+      "cancleModalText": "Bạn không thể hoàn tác thao tác này"
     }
   },
   "contractorServiceRequestManager": {
@@ -466,7 +495,7 @@
     "requestClosedNote": "Yêu cầu này đã đóng. Đơn ứng tuyển của bạn sẽ không được xử lý thêm.",
     "chatSection": "Chat với khách hàng",
     "no_messages": "Chưa có tin nhắn nào",
-    "input_placeholder":"Aa", 
+    "input_placeholder": "Aa",
     "publicCommissionTiers": "Bảng mức hoa hồng công khai",
     "priceRange": "Khoảng giá trị gói thầu",
     "rate": "Tỷ lệ hoa hồng",
@@ -480,6 +509,8 @@
     "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
   },
   "partnerDashboard": {
+    "no": "STT",
+    "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
@@ -490,6 +521,8 @@
     },
     "description": "Mô tả",
     "estimate": "Ước tính",
+    "commission_due": "Khoản hoa hồng phải trả",
+    "apply_at": "Ngày ứng tuyển",
     "last_update": "Cập nhật lần cuối",
     "notifications": "Thông báo",
     "status": "Trạng thái",
@@ -516,11 +549,17 @@
     "applications": "Đơn Xin",
     "profile": "Hồ Sơ",
     "kpi_meta": {
-      "open_requests": "▲ +2 tuần này",
-      "applied": "↺ 3 đang chờ",
-      "won": "▲ Tỉ lệ 36%",
-      "pending_payments": "▼ 1 quá hạn"
-    }
+      "open_requests": "▲ +2 tuần này"
+    },
+    "retry": "Thử lại",
+    "no_requests": "Không có yêu cầu nào",
+    "access_denied": "Từ chối truy cập. Cần quyền Nhà thầu.",
+    "errors": {
+      "kpi_load_failed": "Không thể tải dữ liệu KPI"
+    },
+    "repair":"Sửa Chữa",
+    "construction":"Xây Dựng",
+    "revenue": "Doanh Thu"
   },
   "supportChat": {
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
@@ -615,7 +654,9 @@
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
       "partner": "Đối tác",
-      "support": "Quản lý hỗ trợ"
+      "user": "Người dùng",
+      "support": "Hỗ trợ",
+      "commission": "Tiền hoa hồng"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -625,46 +666,58 @@
     }
   },
   "adminDashboard": {
-    "statisticMoney": {
-      "todayMoney": "Thu nhập hôm nay",
-      "sinceLastMonth": " so với tháng trước"
+    "totalUser": "Khách hàng",
+    "totalPartner": "Đối tác",
+    "contractor": "Nhà thầu",
+    "distributor": "Nhà phân phối",
+    "serviceRequest": "Dịch vụ đã yêu cầu",
+    "opening": "Đang mở",
+    "pendingCommission": "Đang xử lý",
+    "approved": "Đã Phê Duyệt",
+    "totalCommission": "Tổng tiền hoa hồng",
+    "construction": "Xây dựng",
+    "repair": "Sửa chữa",
+    "material": "Vật liệu",
+    "months": {
+      "jan": "Th 1",
+      "feb": "Th 2",
+      "mar": "Th 3",
+      "apr": "Th 4",
+      "may": "Th 5",
+      "jun": "Th 6",
+      "jul": "Th 7",
+      "aug": "Th 8",
+      "sep": "Th 9",
+      "oct": "Th 10",
+      "nov": "Th 11",
+      "dec": "Th 12"
     },
-    "statisticUser": {
-      "todayUsers": "Tổng số người dùng tháng này",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "statisticServiceRequest": {
-      "newServiceRequest": "Yêu cầu dịch vụ mới",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "statisticSales": {
-      "sales": "Doanh thu",
-      "sinceLastMonth": " so với tháng trước"
-    },
-    "salesChart": {
-      "salesOverview": "Tổng quan doanh số"
+    "lineChart": {
+      "commissionRevenue": "Doanh thu hoa hồng trong năm",
+      "commission": "Tiền hoa hồng"
     },
     "pieChart": {
-      "serviceRequests": "Yêu cầu dịch vụ",
-      "construction": "Xây dựng",
-      "repair": "Sửa chữa",
-      "material": "Vật liệu"
+      "serviceRequests": "Tổng dịch vụ đã yêu cầu"
+    },
+    "barChart": {
+      "salesOverview": "Doanh số trong năm"
     },
     "contractors": {
       "title": "Nhà thầu hàng đầu",
       "email": "Email",
-      "serviceRequest": "Số yêu cầu dịch vụ",
-      "values": "Giá trị",
-      "bounce": "Tăng trưởng"
+      "serviceRequest": "Dịch vụ đã yêu cầu",
+      "revenue": "Doanh thu",
+      "noTop": "Chưa có nhà thầu hàng đầu"
     },
     "distributors": {
       "title": "Nhà phân phối hàng đầu",
       "email": "Email",
-      "sales": "Doanh số",
-      "values": "Giá trị",
-      "bounce": "Tăng trưởng"
+      "materialRequest": "Vật liệu đã yêu cầu",
+      "revenue": "Doanh thu",
+      "noTop": "Chưa có nhà phân phối hàng đầu"
     },
-    "viewAll": "Xem tất cả"
+    "viewAll": "Xem tất cả",
+    "noData": "Không có dữ liệu để hiển thị"
   },
   "adminBrandManager": {
     "title": "Quản lý thương hiệu",
@@ -766,11 +819,11 @@
     "floors": "tầng",
     "estimatePrice": "Giá ước tính",
     "address": "Địa chỉ",
-    "status":"Trạng Thái",
+    "status": "Trạng Thái",
     "listCandidate": "Danh sách nhà thầu",
     "totalCandidate": "nhà thầu",
     "viewProfile": "Xem hồ sơ",
-    "empty": "Không có yêu cầu dịch vụ nào",
+    "empty": "Chưa có yêu cầu dịch vụ nào",
     "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi.",
     "noContractor": "Chưa có nhà thầu nào",
     "noContractorYet": "Chưa có nhà thầu nào đăng ký.",
@@ -780,7 +833,10 @@
       "project": "dự án",
       "rating": "Đánh giá",
       "createAt": "Ngày tạo",
-      "images": "Hình ảnh dự án"
+      "images": "Hình ảnh dự án",
+      "paymentInfo": "Thông tin thanh toán",
+      "orderCode": "Mã đơn hàng",
+      "amount": "Tiền thanh toán"
     }
   },
   "adminMaterialManager": {
@@ -829,6 +885,10 @@
     "title": "Quản lý đối tác",
     "subtitle": "Xem, duyệt hay từ chối các đăng ký đối tác.",
     "partners": "đối tác",
+    "all": "Tất cả",
+    "pending": "Đang Chờ",
+    "approved": "Đã Phê Duyệt",
+    "rejected": "Đã Từ Chối",
     "no": "STT",
     "companyName": "Tên công ty",
     "phoneNumber": "Số điện thoại",
@@ -854,6 +914,35 @@
       "rejectReasonPlaceHolder": "Nhập lí do từ chối"
     }
   },
+  "adminUserManager": {
+    "title": "Quản lý người dùng",
+    "subtitle": "Xem danh sách tất cả người dùng trong hệ thống.",
+    "users": "người dùng",
+    "all": "Tất cả",
+    "customer": "Khách hàng",
+    "contractor": "Nhà thầu",
+    "distributor": "Nhà phân phối",
+    "no": "STT",
+    "fullName": "Họ và tên",
+    "phoneNumber": "Số điện thoại",
+    "role": "Vai trò",
+    "projectCount": "Dự án đã nhận",
+    "address": "Địa chỉ",
+    "action": "Hành động",
+    "empty": "Chưa có người dùng nào",
+    "empty_description": "Chưa có người dùng nào đăng ký.",
+    "userDetail": {
+      "noName": "Người dùng chưa cung cấp tên.",
+      "noPhone": "Người dùng chưa cung cấp số điện thoại.",
+      "noAddress": "Người dùng chưa cung cấp địa chỉ nào.",
+      "rating": "Đánh giá",
+      "serviceRequest": "dịch vụ đã yêu cầu",
+      "contractorApplication": "dịch vụ đã tham gia",
+      "historySR": "Lịch sử dịch vụ đã yêu cầu",
+      "historyCA": "Lịch sử dịch vụ đã tham gia",
+      "history": "Chưa có lịch sử nào"
+    }
+  },
   "adminSupportManager": {
     "title": "Quản lý hỗ trợ",
     "subtitle": "Yêu cầu từ khách hàng",
@@ -871,7 +960,38 @@
     "replyPlaceholder": "Nhập nội dung phản hồi...",
     "noSupport": "Chưa có yêu cầu hỗ trợ nào",
     "all": "Tất cả",
-    "itemsCount": "{{count}} yêu cầu"
+    "supports": "yêu cầu"
+  },
+  "adminPaymentManager": {
+    "title": "Quản lý hoa hồng",
+    "subtitle": "Quản lý danh sách giao dịch",
+    "no": "STT",
+    "transaction": "giao dịch",
+    "orderCode": "Mã giao dịch",
+    "amount": "Tiền thanh toán",
+    "date": "Ngày tạo",
+    "description": "Mô Tả",
+    "status": "Trạng thái",
+    "action": "Thao tác",
+    "empty": "Chưa có giao dịch nào",
+    "empty_description": "Chưa có giao dịch nào được gửi."
+  },
+  "chat": {
+    "unlocked": "Chat đã được mở khóa!",
+    "title": "Trò chuyện",
+    "noConversation": "Chưa có cuộc trò chuyện",
+    "locked": "Đang khóa",
+    "active": "Đang hoạt động",
+    "noMessages": "Chưa có tin nhắn",
+    "placeholder": "Nhập tin nhắn...",
+    "loadingMore": "Đang tải thêm tin nhắn...",
+    "noMoreMessages": "Không còn tin nhắn nào nữa",
+    "locked_des": {
+      "title": "Chat đang bị khóa",
+      "description": "Chat sẽ được mở sau khi nhà thầu thanh toán phí hợp tác",
+      "noMessages": "Chat đang bị khóa",
+      "placeholder": "Chat đang bị khóa..."
+    }
   },
   "footer": {
     "description": "Chúng tôi mang đến giải pháp hiện đại cho doanh nghiệp và cá nhân.",
@@ -943,6 +1063,7 @@
     "UpdateServiceRequest": "Cập nhật yêu cầu dịch vụ",
     "CreateMaterialRequest": "Tạo yêu cầu vật liệu",
     "UpdateMaterialRequest": "Cập nhật yêu cầu vật liệu",
+    "SendMaterialRequest": "Gửi yêu cầu vật liệu",
     "Back": "Trở về",
     "ViewDetail": "Xem chi tiết",
     "RegisterPartner": "Đăng kí trở thành đối tác",
@@ -952,6 +1073,17 @@
     "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
+    "ReviewModal": {
+      "view": "Đánh giá của bạn",
+      "create": "Hãy cho chúng tôi biết trải nghiệm của bạn với nhà thầu này.",
+      "rating":"Đánh giá",
+      "ratingStar": "Sao",
+      "comment":"Nhận xét",
+      "commentPlaceholder":"Viết nhận xét của bạn ở đây...",
+      "images":"Hình ảnh",
+      "uploadImages":"Tải lên hình ảnh",
+      "warning": "Bạn không thể chỉnh sửa sau khi gửi. Đánh giá có thể ảnh hưởng đến chất lượng dịch vụ và đối tác."
+    },
     "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
@@ -982,7 +1114,11 @@
       "text": "Hành động này không thể hoàn tác."
     },
     "DeleteServiceRequestModal": {
-      "title": "Xóa yêu cầu này?",
+      "title": "Xóa yêu cầu dịch vụ này?",
+      "text": "Hành động này không thể hoàn tác."
+    },
+    "DeleteMaterialRequestModal": {
+      "title": "Xóa yêu cầu vật liệu này?",
       "text": "Hành động này không thể hoàn tác."
     },
     "DeletingLoadingModal": {
@@ -1004,6 +1140,15 @@
     "PaymentCancelModal": {
       "title": "Thanh toán thất bại!",
       "text": "Đã có lỗi xảy ra trong quá trình thanh toán. Vui lòng thử lại."
+    },
+    "MaterialRequestModal": {
+      "title": "Chọn vật liệu",
+      "found": "Tìm thấy {{count}} vật liệu",
+      "noMaterials": "Không tìm thấy vật liệu",
+      "noResults": "Không có kết quả cho \"{{search}}\"",
+      "selectedCount": "{{count}} vật liệu được chọn",
+      "searchPlaceholder": "Tìm kiếm theo tên, danh mục, thương hiệu...",
+      "clearSearch": "Xóa tìm kiếm"
     }
   },
   "ERROR": {
@@ -1055,7 +1200,7 @@
     "REQUIRED_SERVICENAME": "Vui lòng nhập tên dịch vụ.",
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
-    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu dịch vụ!",
+    "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu",
     "IN_USE_ADDRESS":"Địa chỉ này đang được sử dụng không thể xóa được!",
 
     "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
@@ -1067,10 +1212,10 @@
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ!",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhấ!",
     "REQUIRED_SERVICE_TYPE": "Vui lòng chọn loại dịch vụ!",
-    "REQUIRED_PACKAGE_OPTION":"Vui lòng chọn gọi dịch vụ!",
+    "REQUIRED_PACKAGE_OPTION": "Vui lòng chọn gọi dịch vụ!",
     "REQUIRED_BUILDING_TYPE": "Vui lòng chọn loại công trình!",
     "REQUIRED_STRUCTURE_TYPE": "Vui lòng chọn kết cấu chính!",
-    
+
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
@@ -1111,12 +1256,12 @@
     "MATERIAL_REQUEST_ADD": "Thêm yêu cầu vật liệu thành công",
     "MATERIAL_REQUEST_UPDATE": "Cập nhật yêu cầu vật liệu thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "CREATE_REVIEW": "Đã gửi đánh giá thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
     "RECONNECTED": "Đã kết nối lại với server!"
-
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1190,13 +1335,19 @@
       "Pending": "Đang chờ",
       "Approved": "Đã phê duyệt",
       "Rejected": "Đã từ chối"
+    },
+    "PaymentStatus": {
+      "Pending": "Đang chờ",
+      "Paid": "Đã thanh toán",
+      "Failed": "Thanh toán thất bại"
     }
   },
   "toast": {
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "upload": {
-    "clickToUpload": "Chọn để tải ảnh",
+    "clickToUploadImage": "Chọn để tải ảnh",
+    "clickToUploadDocument": "Chọn để tải tài liệu",
     "orDragAndDrop": "hoặc kéo và thả",
     "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
   },
@@ -1215,7 +1366,7 @@
     "Grid": "Lưới",
     "Table": "Bảng",
     "All": "Tất cả"
-  },  
+  },
   "commission": {
     "partner": {
       "expiredTitle": "Bạn đã không đóng phí hoa hồng đúng thời hạn",
@@ -1252,5 +1403,16 @@
     "minutes": "Phút",
     "seconds": "Giây",
     "due": "Hạn"
+  },
+  "ReviewCountdown":{
+    "reviewed": "Bạn đã đánh giá nhà thầu/nhà phân phối này: ",
+    "viewReview": "Xem đánh giá",
+    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu/nhà phân phối!",
+    "createReview": "Tạo đánh giá",
+    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu/nhà phân phối trước khi có thể đánh giá họ:",
+    "days": "Ngày",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "seconds": "Giây"
   }
 }

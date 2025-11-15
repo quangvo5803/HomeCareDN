@@ -5,6 +5,10 @@ export const RealtimeEvents = Object.freeze({
   ServiceRequestDelete: 'ServiceRequest.Delete',
   ServiceRequestClosed: 'ServiceRequest.Closed',
 
+  //MaterialRequest
+  MaterialRequestCreated: 'MaterialRequest.Created',
+  MaterialRequestDelete: 'MaterialRequest.Delete',
+
   // ContractorApplication
   ContractorApplicationCreated: 'ContractorApplication.Created',
   ContractorApplicationAccept: 'ContractorApplication.Accept',
@@ -13,4 +17,8 @@ export const RealtimeEvents = Object.freeze({
 
   // Payment
   PaymentTransactionUpdated: 'PaymentTransation.Updated',
+
+  // Chat
+  ChatMessageCreated: 'Chat.MessageCreated',
+  ConversationUnlocked: 'Chat.ConversationUnlocked',
 });

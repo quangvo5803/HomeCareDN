@@ -14,6 +14,7 @@ import { setNavigate } from './utils/navigateHelper';
 
 import Unauthorized from './pages/Unauthorized';
 import NotFound from './pages/NotFound';
+import ScrollToTop from './components/ScrollToTop';
 
 // Public pages
 import Home from './pages/Home';
@@ -35,6 +36,9 @@ import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
+import AdminUserManager from './pages/admin/AdminUserManager';
+import AdminUserDetail from './pages/admin/AdminUserDetail';
+import AdminPaymentManager from './pages/admin/AdminPaymentManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -131,6 +135,7 @@ function Layout() {
 
   return (
     <>
+      <ScrollToTop />
       {showHeaderFooter && <Header />}
       <Routes>
         {/* Public routes */}
@@ -296,7 +301,7 @@ function Layout() {
             element={<AdminServiceRequestManager />}
           />
           <Route
-            path="ServiceRequest/:serviceRequestId"
+            path="ServiceRequestManager/:serviceRequestId"
             element={<AdminServiceRequestDetail />}
           />
           <Route path="SupportManager" element={<AdminSupportManager />} />
@@ -305,6 +310,9 @@ function Layout() {
             path="PartnerRequestManager"
             element={<AdminPartnerRequestManager />}
           />
+          <Route path="UserManager" element={<AdminUserManager />} />
+          <Route path="UserManager/:userID" element={<AdminUserDetail />} />
+          <Route path="PaymentManager" element={<AdminPaymentManager />} />
         </Route>
         {/* Contractor routes */}
         <Route

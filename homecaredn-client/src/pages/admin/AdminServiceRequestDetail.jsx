@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
-import { formatVND } from '../../utils/formatters';
+import { formatVND, formatDate } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
 import StatusBadge from '../../components/StatusBadge';
@@ -238,11 +238,11 @@ export default function AdminServiceRequestDetail() {
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-3xl">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 rounded-3xl">
+      <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-6 rounded-3xl">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4">
             <button
-              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 flex items-center justify-center backdrop-blur-sm"
+              className="w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 transition-all duration-200 flex items-center justify-center backdrop-blur-sm cursor-pointer"
               onClick={() => navigate('/Admin/ServiceRequestManager')}
             >
               <i className="fas fa-arrow-left text-white"></i>
@@ -298,7 +298,7 @@ export default function AdminServiceRequestDetail() {
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="flex items-center gap-3 p-3 bg-orange-50 rounded-xl">
               <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <i className="fa-solid fa-star text-orange-600"></i>
+                <i className="fa-solid fa-star text-orange-500"></i>
               </div>
               <div>
                 <p className="text-xs text-gray-500">
@@ -463,7 +463,7 @@ export default function AdminServiceRequestDetail() {
                 : t('adminServiceRequestManager.listCandidate')}
             </h3>
             {!viewingContractorDetail && (
-              <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-orange-100 text-orange-500 px-3 py-1 rounded-full text-sm font-medium">
                 {totalCount || 0}{' '}
                 {t('adminServiceRequestManager.totalCandidate')}
               </span>
@@ -475,7 +475,7 @@ export default function AdminServiceRequestDetail() {
               {/* Back button - always show when viewing detail */}
               <button
                 onClick={handleBackToList}
-                className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 mb-6 font-medium cursor-pointer"
               >
                 <i className="fas fa-arrow-left"></i>
                 <span>{t('BUTTON.Back')}</span>
@@ -548,7 +548,7 @@ export default function AdminServiceRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedContractor.averageRating}
+                        {selectedContractor.averageRating.toFixed(1)}
                       </p>
                     </div>
 
@@ -564,6 +564,18 @@ export default function AdminServiceRequestDetail() {
                         ).toLocaleDateString('vi-VN')}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+                      {t('adminServiceRequestManager.description')}
+                    </p>
+                    <div
+                      className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+                      dangerouslySetInnerHTML={{
+                        __html: he.decode(selectedContractor.description || ''),
+                      }}
+                    />
                   </div>
 
                   {/* Commission Countdown - Show when PendingCommission */}
@@ -583,18 +595,6 @@ export default function AdminServiceRequestDetail() {
                         />
                       </div>
                     )}
-
-                  <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-                      {t('adminServiceRequestManager.description')}
-                    </p>
-                    <div
-                      className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-                      dangerouslySetInnerHTML={{
-                        __html: he.decode(selectedContractor.description || ''),
-                      }}
-                    />
-                  </div>
 
                   {selectedContractor.imageUrls?.length > 0 && (
                     <div>
@@ -621,6 +621,84 @@ export default function AdminServiceRequestDetail() {
                             />
                           </a>
                         ))}
+                      </div>
+                    </div>
+                  )}
+                  {/*Payment Information */}
+                  {selectedContractor.status === 'Approved' && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100 mt-5">
+                      <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                        <i className="fa-solid fa-credit-card"></i>
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.paymentInfo'
+                        )}
+                      </p>
+
+                      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full">
+                          <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
+                            <tr>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.orderCode'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.amount'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.description')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.createAt'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.status')}
+                              </th>
+                            </tr>
+                          </thead>
+
+                          <tbody className="divide-y divide-gray-100">
+                            <tr className="hover:bg-indigo-50 transition-colors">
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                                {selectedContractor.payment?.orderCode || 'N/A'}
+                              </td>
+
+                              <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
+                                {formatVND(
+                                  selectedContractor.payment?.amount || 0
+                                )}
+                              </td>
+
+                              <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                                {selectedContractor.payment?.description.replaceAll(
+                                  '-',
+                                  ''
+                                ) || 'No description'}
+                              </td>
+
+                              <td className="px-4 py-4 text-sm text-gray-700 text-center">
+                                {formatDate(
+                                  selectedContractor.payment?.paidAt,
+                                  i18n.language
+                                )}
+                              </td>
+
+                              <td className="px-4 py-4 text-sm text-gray-900 text-center">
+                                <div className="flex justify-center">
+                                  <StatusBadge
+                                    status={selectedContractor.payment?.status}
+                                    type="Payment"
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   )}
@@ -660,7 +738,7 @@ export default function AdminServiceRequestDetail() {
                         />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-800 group-hover:text-orange-600">
+                        <p className="font-semibold text-gray-800 group-hover:text-orange-500">
                           {item.contractorName}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -669,7 +747,7 @@ export default function AdminServiceRequestDetail() {
                       </div>
                     </div>
 
-                    <span className="text-orange-600 font-medium">
+                    <span className="text-orange-500 font-medium">
                       {t('adminServiceRequestManager.viewProfile')}{' '}
                       <i className="fa-solid fa-arrow-right ms-1"></i>
                     </span>

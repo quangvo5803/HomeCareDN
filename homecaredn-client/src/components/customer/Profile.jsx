@@ -349,6 +349,7 @@ export default function Profile({ user }) {
               name="phoneNumber"
               value={form.phoneNumber}
               onChange={onChange}
+              placeholder={t('userPage.profile.form.phone_placeholder')}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
             />
           </div>

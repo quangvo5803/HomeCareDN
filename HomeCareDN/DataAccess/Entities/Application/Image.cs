@@ -16,6 +16,7 @@ namespace DataAccess.Entities.Application
         public Guid? BrandID { get; set; }
         public Guid? CategoryID { get; set; }
         public Guid? PartnerRequestID { get; set; }
+        public Guid? ReviewID { get; set; }
         public string PublicId { get; set; } = string.Empty;
     }
 }

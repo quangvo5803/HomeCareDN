@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import VenoBox from 'venobox';
 import 'venobox/dist/venobox.min.css';
 import Loading from '../../components/Loading';
+import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
@@ -15,6 +16,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import he from 'he';
 import CommissionCountdown from '../../components/partner/CommissionCountdown';
+import ChatSection from '../../components/ChatSection';
 
 export default function ServiceRequestDetail() {
   const navigate = useNavigate();
@@ -29,13 +31,10 @@ export default function ServiceRequestDetail() {
   // Contractor list pagination
   const [contractorApplications, setContractorApplications] = useState([]);
   const [currentApplicationPage, setCurrentApplicationPage] = useState(1);
+  const [loadingContractorApplications, setLoadingContractorApplications] =
+    useState(false);
   const pageSize = 5;
   const [totalCount, setTotalCount] = useState(0);
-
-  // Chat states
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const chatEndRef = useRef(null);
 
   const hasSelectedContractor = Boolean(selectedContractor);
 
@@ -46,9 +45,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
-              }
+              ...sr,
+              contractorApplyCount: (sr.contractorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -92,9 +91,9 @@ export default function ServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -109,15 +108,27 @@ export default function ServiceRequestDetail() {
       });
     },
     [RealtimeEvents.PaymentTransactionUpdated]: async (payload) => {
+      setServiceRequest((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          startReviewDate: payload.startReviewDate,
+          conversationID: payload.conversationID,
+        };
+      });
       if (
         payload.contractorApplicationID ===
         selectedContractor?.contractorApplicationID
       ) {
-        const fullContractor =
-          await contractorApplicationService.getByIdForCustomer(
-            payload.contractorApplicationID
-          );
-        setSelectedContractor(fullContractor);
+        try {
+          const fullContractor =
+            await contractorApplicationService.getByIdForCustomer(
+              payload.contractorApplicationID
+            );
+          setSelectedContractor(fullContractor);
+        } catch (error) {
+          toast.error(t(handleApiError(error)));
+        }
       }
     },
   });
@@ -165,28 +176,6 @@ export default function ServiceRequestDetail() {
     }
   };
 
-  // ---- CHAT HANDLERS ----
-  const handleSend = () => {
-    if (input.trim() === '') return;
-    const newMessage = {
-      sender: 'user',
-      text: input,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput('');
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!serviceRequest && !loading) {
@@ -218,6 +207,7 @@ export default function ServiceRequestDetail() {
 
   const fetchContractors = useCallback(async () => {
     try {
+      setLoadingContractorApplications(true);
       const res = await contractorApplicationService.getAllForCustomer({
         PageNumber: currentApplicationPage,
         PageSize: pageSize,
@@ -227,6 +217,8 @@ export default function ServiceRequestDetail() {
       setTotalCount(res.totalCount);
     } catch (error) {
       toast.error(t(handleApiError(error)));
+    } finally {
+      setLoadingContractorApplications(false);
     }
   }, [serviceRequestId, t, pageSize, currentApplicationPage]);
 
@@ -250,6 +242,18 @@ export default function ServiceRequestDetail() {
     const vb = new VenoBox({ selector: '.venobox' });
     return () => vb.close();
   });
+
+  const ICON_MAP = {
+    pdf: 'fa-file-pdf text-red-600',
+    doc: 'fa-file-word text-blue-600',
+    docx: 'fa-file-word text-blue-600',
+    xls: 'fa-file-excel text-green-600',
+    xlsx: 'fa-file-excel text-green-600',
+    ppt: 'fa-file-powerpoint text-orange-600',
+    pptx: 'fa-file-powerpoint text-orange-600',
+    txt: 'fa-file-lines text-gray-600',
+  };
+  const DEFAULT_ICON = 'fa-file-alt text-gray-500';
 
   if (loading || !serviceRequest) return <Loading />;
 
@@ -285,11 +289,10 @@ export default function ServiceRequestDetail() {
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i
-                  className={`text-orange-600 text-xl fas ${
-                    serviceRequest.serviceType === 'Construction'
-                      ? 'fa-hammer'
-                      : 'fa-screwdriver-wrench'
-                  }`}
+                  className={`text-orange-600 text-xl fas ${serviceRequest.serviceType === 'Construction'
+                    ? 'fa-hammer'
+                    : 'fa-screwdriver-wrench'
+                    }`}
                 />{' '}
               </div>
               <div className="flex-1">
@@ -358,6 +361,66 @@ export default function ServiceRequestDetail() {
               </div>
             )}
           </div>
+          {/* Documents */}
+          {serviceRequest.documentUrls.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                <i className="fas fa-file-alt text-orange-500 mt-1"></i>{' '}
+                {t('userPage.serviceRequestDetail.label_documents')}
+              </h3>
+
+              <div className="space-y-3">
+                {serviceRequest.documentUrls.map((docUrl) => {
+                  const fileName = decodeURIComponent(
+                    docUrl.split('/').pop()?.split('?')[0] ?? 'document'
+                  );
+                  const ext = (
+                    fileName.includes('.') ? fileName.split('.').pop() : ''
+                  ).toLowerCase();
+
+                  const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
+
+                  return (
+                    <div
+                      key={docUrl}
+                      className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition bg-white"
+                    >
+                      {/* Icon */}
+                      <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                        <i className={`fas ${iconClass} text-2xl`} />
+                      </div>
+
+                      {/* Name + meta */}
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-sm font-medium text-gray-800 truncate"
+                          title={fileName}
+                        >
+                          {fileName}
+                        </p>
+                        <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                            {(ext || 'file').toUpperCase()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={docUrl}
+                          download
+                          className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                        >
+                          {t('common.Download')}
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Specifications Card */}
           <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -539,7 +602,7 @@ export default function ServiceRequestDetail() {
                   <span className="flex items-center gap-1 text-yellow-600">
                     <i className="fas fa-star"></i>
                     <span className="font-semibold">
-                      {selectedContractor.averageRating}
+                      {selectedContractor.averageRating.toFixed(1)}
                     </span>
                   </span>
                   <span className="text-gray-300">•</span>
@@ -554,7 +617,65 @@ export default function ServiceRequestDetail() {
                   type="Application"
                 />
               </div>
+              {/* Documents  */}
+              {selectedContractor?.documentUrls?.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
+                    {t('contractorServiceRequestDetail.documents')}
+                  </h4>
 
+                  <div className="space-y-3">
+                    {selectedContractor.documentUrls.map((doc) => {
+                      const fileName = decodeURIComponent(
+                        doc.split('/').pop()?.split('?')[0] ?? 'document'
+                      );
+                      const ext = (
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
+                      ).toLowerCase();
+
+                      const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
+
+                      return (
+                        <div
+                          key={doc}
+                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                        >
+                          {/* Icon */}
+                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
+                            <i className={`fas ${iconClass} text-2xl`} />
+                          </div>
+
+                          {/* Name + meta */}
+                          <div className="min-w-0 flex-1">
+                            <p
+                              className="text-sm font-medium text-gray-800 truncate"
+                              title={fileName}
+                            >
+                              {fileName}
+                            </p>
+                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                                {(ext || 'file').toUpperCase()}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center gap-2">
+                            <a
+                              href={doc}
+                              download
+                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            >
+                              {t('common.Download')}
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
               {/* Contractor Contact Information - Show when Approved */}
               {selectedContractor.status === 'Approved' && (
                 <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
@@ -722,134 +843,80 @@ export default function ServiceRequestDetail() {
             </div>
           ) : (
             <div className="space-y-3">
-              {contractorApplications.map((c) => (
-                <button
-                  key={c.contractorApplicationID}
-                  onClick={() => handleSelectContractor(c)}
-                  className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
-                >
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                      {c.contractorApplicationID.charAt(0)}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 truncate mb-1">
-                        {c.contractorApplicationID.substring(0, 12)}
-                      </h4>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <i className="fas fa-star text-yellow-500"></i>
-                          <span>{c.averageRating}</span>
-                        </span>
-                        <span>•</span>
-                        <span>
-                          <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                          {c.completedProjectCount}{' '}
-                          {t('userPage.serviceRequestDetail.label_project')}
+              {loadingContractorApplications ? (
+                <div className="flex justify-center py-10">
+                  <LoadingComponent />
+                </div>
+              ) : contractorApplications.length > 0 ? (
+                <>
+                  {contractorApplications.map((c) => (
+                    <button
+                      key={c.contractorApplicationID}
+                      onClick={() => handleSelectContractor(c)}
+                      className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
+                    >
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                          {c.contractorApplicationID.charAt(0)}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-gray-900 truncate mb-1">
+                            {c.contractorApplicationID.substring(0, 12)}
+                          </h4>
+                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <i className="fas fa-star text-yellow-500"></i>
+                              <span>{c.averageRating.toFixed(1)}</span>
+                            </span>
+                            <span>•</span>
+                            <span>
+                              <i className="fas fa-check-circle text-green-500 mr-1"></i>
+                              {c.completedProjectCount}{' '}
+                              {t('userPage.serviceRequestDetail.label_project')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between pt-3 border-t">
+                        <StatusBadge status={c.status} type="Application" />
+                        <span className="text-lg font-bold text-orange-600">
+                          {(c.estimatePrice / 1000000).toFixed(0)}{' '}
+                          <span className="text-sm">
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                          </span>
                         </span>
                       </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between pt-3 border-t">
-                    <StatusBadge status={c.status} type="Application" />
-                    <span className="text-lg font-bold text-orange-600">
-                      {(c.estimatePrice / 1000000).toFixed(0)}{' '}
-                      <span className="text-sm">
-                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
-                      </span>
-                    </span>
-                  </div>
-                </button>
-              ))}
+                    </button>
+                  ))}
 
-              {/* Pagination */}
-              {totalCount > 0 && (
-                <div className="flex justify-center py-4">
-                  <Pagination
-                    current={currentApplicationPage}
-                    pageSize={pageSize}
-                    total={totalCount}
-                    onChange={(page) => setCurrentApplicationPage(page)}
-                    showSizeChanger={false}
-                    size="small"
-                  />
+                  {/* Pagination */}
+                  {totalCount > 0 && (
+                    <div className="flex justify-center py-4">
+                      <Pagination
+                        current={currentApplicationPage}
+                        pageSize={pageSize}
+                        total={totalCount}
+                        onChange={(page) => setCurrentApplicationPage(page)}
+                        showSizeChanger={false}
+                        size="small"
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-6 text-gray-500">
+                  {t('common.noData')}
                 </div>
               )}
             </div>
           )}
         </div>
-
-        {/* CHAT SECTION */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 relative">
-          <h4 className="font-semibold text-orange-600 mb-4 flex items-center gap-2">
-            <i className="fas fa-comments"></i>
-            <span>{t('userPage.serviceRequestDetail.section_chat')}</span>
-          </h4>
-
-          {selectedContractor?.status !== 'Approved' && (
-            <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center z-10 backdrop-blur-sm">
-              <div className="text-center text-white px-6">
-                <i className="fas fa-lock text-4xl mb-4"></i>
-                <p className="text-lg font-semibold mb-2">
-                  {t('userPage.serviceRequestDetail.noChatFunction')}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Messages */}
-          <div className="h-96 overflow-y-auto bg-gray-50 p-4 rounded-lg mb-4 space-y-3">
-            {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-400">
-                <div className="text-center">
-                  <i className="fas fa-comment-dots text-4xl mb-2"></i>
-                  <p className="text-sm">
-                    {t('userPage.serviceRequestDetail.noMessages')}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              messages.map((m) => (
-                <div
-                  key={m.messageID}
-                  className={`flex ${
-                    m.sender === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  <div
-                    className={`px-4 py-2 rounded-lg max-w-[70%] ${
-                      m.sender === 'user'
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-gray-200 text-gray-800'
-                    }`}
-                  >
-                    <p className="text-sm">{m.text}</p>
-                  </div>
-                </div>
-              ))
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Input */}
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="flex-1 border rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-400 outline-none"
-            />
-            <button
-              onClick={handleSend}
-              disabled={input.trim() === ''}
-              className="px-6 py-2 rounded-lg bg-orange-600 text-white hover:bg-orange-700 font-semibold shadow-sm disabled:opacity-50"
-            >
-              <i className="fas fa-paper-plane mr-2"></i>
-              {t('BUTTON.Send')}
-            </button>
-          </div>
-        </div>
+        {/* Chat Section */}
+        <ChatSection
+          conversationID={serviceRequest.conversationID || serviceRequest.conversation?.conversationID}
+          contractorApplicationStatus={selectedContractor?.status}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+        />
       </div>
     </div>
   );

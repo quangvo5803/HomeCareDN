@@ -13,11 +13,16 @@ namespace BusinessLogic.Services.FacadeService
         public IBrandService BrandService { get; }
         public IAiChatService AiChatService { get; }
         public IConversationService ConversationService { get; }
+        public IChatMessageService ChatMessageService { get; }
         public IContactSupportService ContactSupportService { get; }
         public IImageService ImageService { get; }
+        public IDocumentService DocumentService { get; }
         public IPartnerRequestService PartnerService { get; }
         public IPaymentService PaymentService { get; }
         public IMaterialRequestService MaterialRequestService { get; }
+        public IReviewService ReviewService { get; }
+        public IStatisticService StatisticService { get; }
+        public IUserService UserService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -54,12 +59,18 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.Http
             );
             ConversationService = new ConversationService(coreDeps.UnitOfWork, coreDeps.Mapper);
+            ChatMessageService = new ChatMessageService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                infraDeps.Notifier
+            );
             ContactSupportService = new ContactSupportService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 infraDeps.EmailQueue
             );
             ImageService = new ImageService(coreDeps.UnitOfWork);
+            DocumentService = new DocumentService(coreDeps.UnitOfWork);
 
             PartnerService = new PartnerRequestService(
                 coreDeps.UnitOfWork,
@@ -72,12 +83,31 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.PayOS,
                 coreDeps.UnitOfWork,
                 infraDeps.PayOsOptions,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.UserManager,
+                coreDeps.Mapper
             );
 
             MaterialRequestService = new MaterialRequestService(
                 coreDeps.UnitOfWork,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                coreDeps.AuthorizeDbContext,
+                coreDeps.UserManager,
+                infraDeps.Notifier
+            );
+
+            ReviewService = new ReviewService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                coreDeps.UserManager
+            );
+
+            StatisticService = new StatisticService(coreDeps.UnitOfWork, identityDeps.UserManager);
+
+            UserService = new UserService(
+                coreDeps.Mapper,
+                identityDeps.UserManager,
+                coreDeps.UnitOfWork
             );
         }
     }

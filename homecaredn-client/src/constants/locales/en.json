@@ -249,6 +249,7 @@
       "form_phoneNumber": "Phone Number",
       "form_description": "Company Description",
       "form_images": "Company Images",
+      "form_documents": "Documents",
       "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner."
     }
   },
@@ -262,6 +263,7 @@
         "name": "Full Name",
         "email": "Email",
         "phone": "Phone Number",
+        "phone_placeholder": "Enter your phone number",
         "gender": "Gender",
         "gender_choice": "Select Gender",
         "gender_male": "Male",
@@ -327,6 +329,7 @@
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
       "form_images": "Reference / Current State (Maximum 5 images)",
+      "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
@@ -353,6 +356,7 @@
       "label_address": "Construction Address:",
       "label_description": "Detailed Description:",
       "label_images": "Illustration / Current Images:",
+      "label_documents": "Attachments / Documents:",
       "section_contractor": "Applied Contractors",
       "noContractor": "No contractors have applied yet",
       "noContractorDesc": "Currently, no contractors have applied for your project. Please wait for a while.",
@@ -370,18 +374,43 @@
       "section_chat": "Chat with Contractor",
       "noMessages": "No messages yet",
       "noChatFunction": "This feature is only available after you’ve selected a contractor"
-      },
+    },
     "materialRequest": {
       "title": "Material Requests",
       "subtitle": "View and manage your material requests.",
       "noRequest": "No material requests yet",
       "letStart": "Get started by creating your first material request",
+      "lbl_address": "Address",
       "lbl_distributor": "supplier",
       "lbl_canEditQuantity": "Allow supplier to edit quantity",
       "lbl_materialList": "Material List",
-      "lbl_materialUnit": "type",
+      "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
       "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
+    },
+    "materialRequestDetail": {
+      "title": "Material Request Details",
+      "description": "Description",
+      "descriptionsPlaceholder": "Enter a description to help the distributor provide better consultation...",
+      "address":"Address",
+      "selectAddress": "Select address",
+      "allowEditQuantity": "Allow distributor to edit quantity",
+      "allowEditQuantityDes": "Enable this option to allow the distributors to adjust material quantities when submitting an application",
+      "allowAddMaterial": "Allow distributors to add required materials",
+      "allowAddMaterialDes": "Enable this option to allow distributors to add required materials when submitting applications",
+      "materialList": "List of materials to purchase",
+      "itemsCount": "materials",
+      "noMaterial": "No materials in the list",
+      "addMaterial": "Add materials to your list",
+      "image": "Image",
+      "infor": "Information",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "action": "Action",
+      "unsavedChanges": "You have unsaved changes",
+      "unsavedChangesDesc": "Your changes will be lost if you leave this page.",
+      "cancleModalTitle": "Revert changes?",
+      "cancleModalText": "This action cannot be undone"
     }
   },
   "contractorServiceRequestManager": {
@@ -424,6 +453,7 @@
     "address": "Address",
     "description": "Description",
     "images": "Images",
+    "documents": "Documents",
     "statusOpen": "Open",
     "statusClosed": "Closed",
     "applicationStatus": "Application Status",
@@ -484,6 +514,8 @@
     "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion."
   },
   "partnerDashboard": {
+    "no": "No",
+    "service_type": "Service Type",
     "title": "Contractor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
@@ -494,6 +526,8 @@
     },
     "description": "Description",
     "estimate": "Estimate",
+    "commission_due": "Commission Due",
+    "apply_at": "Applied At",
     "last_update": "Last Update",
     "notifications": "Notifications",
     "status": "Status",
@@ -502,7 +536,7 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "dashboard": "Dashboard",
-    "category": "Material Category",
+    "category": "Category",
     "UI sample for": "UI Sample For",
     "latest_applications": "Latest Applications",
     "view_all": "View All",
@@ -519,12 +553,16 @@
     "my_projects": "My Projects",
     "applications": "Applications",
     "profile": "Profile",
-    "kpi_meta": {
-      "open_requests": "▲ +2 this week",
-      "applied": "↺ 3 pending",
-      "won": "▲ 36% rate",
-      "pending_payments": "▼ 1 overdue"
-    }
+    
+    "retry": "Retry",
+    "no_requests": "No requests",
+    "access_denied": "Access denied. Contractor role required.",
+    "errors": {
+      "kpi_load_failed": "Unable to load KPI data"
+    },
+    "repair": "Repair",
+    "construction": "Construction",
+    "revenue": "Revenue"
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",
@@ -554,7 +592,7 @@
     }
   },
   "distributorCategoryManager": {
-    "title": "Material Category Manager",
+    "title": "Category Manager",
     "subtitle": "Manage material category list",
     "categories": "category(es)",
     "no": "NO",
@@ -615,12 +653,14 @@
     "menu": {
       "dashboard": "Dashboard",
       "brand": "Brands",
-      "category": "Material Category",
+      "category": "Category",
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material",
       "partner": "Partner",
-      "support": "Support Manager"
+      "user": "User",
+      "support": "Support",
+      "commission": "Commission"
     },
     "account": {
       "title": "Account pages",
@@ -630,46 +670,58 @@
     }
   },
   "adminDashboard": {
-    "statisticMoney": {
-      "todayMoney": "Today's Money",
-      "sinceLastMonth": " since last month"
+    "totalUser": "Customers",
+    "totalPartner": "Partners",
+    "contractor": "Contractor",
+    "distributor": "Distributor",
+    "serviceRequest": "Service requested",
+    "opening": "Opening",
+    "pendingCommission": "Commission",
+    "totalCommission": "Total Commission",
+    "approved": "Approved",
+    "construction": "Construction",
+    "repair": "Repair",
+    "material": "Material",
+    "months": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec"
     },
-    "statisticUser": {
-      "todayUsers": "This month's Users",
-      "sinceLastMonth": " since last month"
-    },
-    "statisticServiceRequest": {
-      "newServiceRequest": "New Service Requests",
-      "sinceLastMonth": " since last month"
-    },
-    "statisticSales": {
-      "sales": "Sales",
-      "sinceLastMonth": " since last month"
-    },
-    "salesChart": {
-      "salesOverview": "Sales overview"
+    "lineChart": {
+      "commissionRevenue": "Commission revenue for the year",
+      "commission": "Commission"
     },
     "pieChart": {
-      "serviceRequests": "Service Requests",
-      "construction": "Construction",
-      "repair": "Repair",
-      "material": "Material"
+      "serviceRequests": "Service Requested"
+    },
+    "barChart": {
+      "salesOverview": "Sales for the year"
     },
     "contractors": {
       "title": "Top Contractors",
       "email": "Email",
-      "serviceRequest": "Service Request",
-      "values": "Values",
-      "bounce": "Bounce"
+      "serviceRequest": "Service requested",
+      "revenue": "Revenue",
+      "noTop": "No top contractors yet"
     },
     "distributors": {
       "title": "Top Distributors",
       "email": "Email",
-      "sales": "Sales",
-      "values": "Values",
-      "bounce": "Bounce"
+      "materialRequest": "Material requested",
+      "revenue": "Revenue",
+      "noTop": "No top distributors yet"
     },
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "noData": "No data to display"
   },
   "adminBrandManager": {
     "title": "Brand Manager",
@@ -699,7 +751,7 @@
     }
   },
   "adminCategoryManager": {
-    "title": "Material Category Manager",
+    "title": "Category Manager",
     "subtitle": "Manage material category list",
     "categories": "category(es)",
     "no": "NO",
@@ -814,7 +866,7 @@
     "floors": "floor(s)",
     "estimatePrice": "Estimated price",
     "address": "Address",
-    "status":"Status",
+    "status": "Status",
     "empty": "No service request",
     "empty_description": "No service request have been submitted.",
     "listCandidate": "List of contractors",
@@ -828,13 +880,16 @@
       "project": "project",
       "rating": "Rating",
       "createAt": "Creation date",
-      "images": "Project images"
+      "images": "Project images",
+      "paymentInfo": "Payment information",
+      "orderCode": "Order code",
+      "amount": "Payment amount"
     }
   },
   "adminPartnerManager": {
     "empty": "No partners",
     "empty_description": "No partnership requests have been submitted.",
-    "title": "Partner Management",
+    "title": "Partner Manager",
     "subtitle": "Review, approve, or reject partner requests.",
     "partners": "partners",
     "no": "No",
@@ -864,6 +919,35 @@
       "rejectReasonPlaceHolder": "Enter rejection reason"
     }
   },
+  "adminUserManager": {
+    "title": "User Manager",
+    "subtitle": "View a list of all users in the system.",
+    "users": "users",
+    "all": "All",
+    "customer": "Customer",
+    "contractor": "Contractor",
+    "distributor": "Distributor",
+    "no": "No",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "role": "Role",
+    "projectCount": "Project received",
+    "address": "Address",
+    "action": "Action",
+    "empty": "No users yet",
+    "empty_description": "No users registered yet.",
+    "userDetail": {
+      "noName": "The user has not provided a name.",
+      "noPhone": "The user has not provided a phone number.",
+      "noAddress": "The user has not provided any address.",
+      "rating": "Rating",
+      "serviceRequest": "service requests",
+      "contractorApplication": "participated service",
+      "historySR": "Service requests history",
+      "historyCA": "Participated service history",
+      "history": "No history yet"
+    }
+  },
   "adminSupportManager": {
     "title": "Support Manager",
     "subtitle": "Customer requests",
@@ -883,7 +967,37 @@
     "all": "All",
     "supports": "request(s)"
   },
-
+  "adminPaymentManager": {
+    "title": "Manage commissions",
+    "subtitle": "Manage transaction list",
+    "no": "NO",
+    "transaction": "transaction",
+    "orderCode": "Transaction code",
+    "amount": "Payment amount",
+    "date": "Creation date",
+    "description": "Descriptions",
+    "status": "Status",
+    "action": "Action",
+    "empty": "No transactions yet",
+    "empty_description": "No transactions have been sent yet."
+  },
+  "chat": {
+    "unlocked": "Chat has been unlocked!",
+    "title": "Chat",
+    "noConversation": "No conversation yet",
+    "locked": "Locked",
+    "active": "Active",
+    "noMessages": "No messages yet",
+    "placeholder": "Type a message...",
+    "loadingMore": "Loading more messages...",
+    "noMoreMessages": "No more messages",
+    "locked_des": {
+      "title": "Chat is locked",
+      "description": "Chat will be unlocked after the contractor pays the partnership fee",
+      "noMessages": "Chat is locked",
+      "placeholder": "Chat is locked..."
+    }
+  },
   "footer": {
     "description": "We provide modern solutions for businesses and individuals.",
     "address": {
@@ -932,7 +1046,6 @@
     "UpdateService": "Update Service",
     "AddNewRequest": "Create and add a new request",
     "AddToExisting": "Add to an existing request",
-    "CreateMaterialRequest": "Create Material Request",
     "View": "View",
     "Edit": "Edit",
     "Delete": "Delete",
@@ -953,6 +1066,9 @@
     "AddAddress": "Add Address",
     "CreateServiceRequest": "Create Service Request",
     "UpdateServiceRequest": "Update Service Request",
+    "CreateMaterialRequest": "Create Material Request",
+    "UpdateMaterialRequest": "Update Material Request",
+    "SendMaterialRequest": "Send Material Request",
     "Back": "Back",
     "ViewDetail": "View detail",
     "RegisterPartner": "Register as Partner",
@@ -961,6 +1077,17 @@
     "Approve": "Approve"
   },
   "ModalPopup": {
+    "ReviewModal": {
+    "view": "Your Review",
+    "create": "Tell us about your experience with this contractor.",
+    "rating": "Rating",
+    "ratingStar": "Star",
+    "comment": "Comment",
+    "commentPlaceholder": "Write your comment here...",
+    "images": "Images",
+    "uploadImages": "Upload Images",
+    "warning": "You cannot edit after submitting. Your review may affect service quality and partners."
+  },
     "DeleteBrandModal": {
       "title": "Are you sure?",
       "text": "This brand will be deleted and cannot be restored!"
@@ -994,6 +1121,10 @@
       "title": "Delete this service request?",
       "text": "This action cannot be undone."
     },
+    "DeleteMaterialRequestModal": {
+      "title": "Delete this material request?",
+      "text": "This action cannot be undone."
+    },
     "DeletingLoadingModal": {
       "title": "Deleting...",
       "text": "Please wait a moment."
@@ -1001,6 +1132,10 @@
     "DeleteImageModal": {
       "title": "Are you sure?",
       "text": "This image will be deleted and cannot be restored!"
+    },
+    "DeleteDocumentModal": {
+      "title": "Are you sure?",
+      "text": "This document will be deleted and cannot be restored!"
     },
     "DeleteApplicationModal": {
       "title": "Are you sure?",
@@ -1013,6 +1148,15 @@
     "PaymentCancelModal": {
       "title": "Payment Failed",
       "text": "An error occurred during payment. Please try again."
+    },
+    "MaterialRequestModal": {
+      "title": "Select Materials",
+      "found": "{{count}} materials found",
+      "noMaterials": "No materials found",
+      "noResults": "No results for \"{{search}}\"",
+      "selectedCount": "{{count}} materials selected",
+      "searchPlaceholder": "Search by name, category, or brand...",
+      "clearSearch": "Clear search"
     }
   },
   "ERROR": {
@@ -1048,8 +1192,11 @@
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
     "BRAND_NOT_FOUND": "Brand not found.",
+    "BRAND_NAME_ALREADY_EXISTS": "Brand name already exists.",
     "CATEGORY_NOT_FOUND": "Category not found.",
+    "CATEGORY_NAME_ALREADY_EXISTS": "Category name already exists.",
     "MATERIAL_NOT_FOUND": "Material not found.",
+    "MATERIAL_NAME_ALREADY_EXISTS": "Material name already exists.",
     "IMAGE_NOT_FOUND": "Image not found.",
     "NOT_FOUND_EMAIL": "Email for verification not found.",
 
@@ -1064,7 +1211,7 @@
     "REQUIRED_SERVICENAME": "Please enter the service name.",
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
-    "REQUIRED_ADDRESS": "Please provide address information before creating a service request!",
+    "REQUIRED_ADDRESS": "Please provide address information before creating a request!",
     "IN_USE_ADDRESS":"This address is in use and cannot be deleted!",
 
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
@@ -1080,13 +1227,12 @@
     "REQUIRED_BUILDING_TYPE": "Please select a building type!",
     "REQUIRED_STRUCTURE_TYPE": "Please select the main structure type!",
 
-
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
     "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
     "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
-    
+
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description",
 
@@ -1121,6 +1267,7 @@
     "MATERIAL_REQUEST_ADD": "Add material request successfully.",
     "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",
@@ -1198,13 +1345,19 @@
       "Pending": "Pending",
       "Approved": "Approved",
       "Rejected": "Rejected"
+    },
+    "PaymentStatus": {
+      "Pending": "Pending",
+      "Paid": "Paid",
+      "Failed": "Failed"
     }
   },
   "toast": {
     "uploadLogo": "Uploading images: {{percent}}%. Please don't leave page."
   },
   "upload": {
-    "clickToUpload": "Click to upload",
+    "clickToUploadImage": "Click to upload",
+    "clickToUploadDocument": "Click to upload",
     "orDragAndDrop": "or drag and drop",
     "fileTypesHint": "PNG, JPG, GIF up to 5MB each"
   },
@@ -1221,7 +1374,8 @@
     "sortCreateDateOld": "Oldest",
     "Grid": "Grid",
     "Table": "Table",
-    "All": "All"
+    "All": "All",
+    "Download": "Download"
   },
   "commission": {
     "partner": {
@@ -1259,5 +1413,16 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "due": "Due date"
+  },
+  "ReviewCountdown": {
+    "reviewed": "You have reviewed this contractor/distributor:",
+    "viewReview": "View Review",
+    "reviewTimeExpired": "You can review the contractor/distributor now!",
+    "createReview": "Create Review",
+    "reviewAvailableIn": "You need to work with the contractor/distributor before you can review them:",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { serviceRequestService } from '../services/serviceRequestService';
 import { imageService } from '../services/public/imageService';
+import { documentService } from '../services/public/documentService';
 import { useAuth } from '../hook/useAuth';
 import ServiceRequestContext from './ServiceRequestContext';
 import { toast } from 'react-toastify';
@@ -45,13 +46,9 @@ export const ServiceRequestProvider = ({ children }) => {
           return { items: [], totalCount: 0 };
         }
 
-        const itemsWithType = (data.items || []).map((r) => ({
-          ...r,
-          type: 'serviceRequest',
-        }));
-        setServiceRequests(itemsWithType);
+        setServiceRequests(data.items || []);
         setTotalServiceRequests(data.totalCount || 0);
-        return itemsWithType;
+        return data.items || [];
       } catch (err) {
         toast.error(handleApiError(err));
         setServiceRequests([]);
@@ -174,6 +171,25 @@ export const ServiceRequestProvider = ({ children }) => {
     []
   );
 
+  // ==================== DELETE DOCUMENT ====================
+  const deleteServiceRequestDocument = useCallback(
+    async (serviceRequestId, documentUrl) => {
+      try {
+        await documentService.delete(documentUrl);
+        setServiceRequests((prev) =>
+          updateServiceRequestAfterDeleteDocuments(
+            prev,
+            serviceRequestId,
+            documentUrl
+          )
+        );
+      } catch (err) {
+        toast.error(handleApiError(err));
+      }
+    },
+    []
+  );
+
   // ==================== AUTO LOAD ====================
   useEffect(() => {
     if (!user) {
@@ -201,6 +217,7 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     }),
     [
       serviceRequests,
@@ -214,6 +231,7 @@ export const ServiceRequestProvider = ({ children }) => {
       updateServiceRequest,
       deleteServiceRequest,
       deleteServiceRequestImage,
+      deleteServiceRequestDocument,
     ]
   );
 
@@ -236,6 +254,21 @@ function updateServiceRequestAfterDeleteImages(
     };
   });
 }
+
+function updateServiceRequestAfterDeleteDocuments(
+  prevRequests,
+  serviceRequestId,
+  documentUrl
+) {
+  return prevRequests.map((req) => {
+    if (req.serviceRequestID !== serviceRequestId) return req;
+    return {
+      ...req,
+      documentUrls: req.documentUrls.filter((doc) => doc !== documentUrl),
+    };
+  });
+}
+
 ServiceRequestProvider.propTypes = {
   children: PropTypes.node.isRequired,
 };

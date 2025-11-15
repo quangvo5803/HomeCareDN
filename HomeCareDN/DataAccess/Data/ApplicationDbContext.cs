@@ -61,7 +61,7 @@ namespace DataAccess.Data
                 .Entity<Conversation>()
                 .HasMany(c => c.Messages)
                 .WithOne(m => m.Conversation!)
-                .HasForeignKey(m => m.ConversationId)
+                .HasForeignKey(m => m.ConversationID)
                 .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<PartnerRequest>(entity =>
             {
@@ -76,6 +76,21 @@ namespace DataAccess.Data
             {
                 entity.Property(mr => mr.Status).HasConversion<string>();
             });
+            // 1 ServiceRequest có nhiều ContractorApplications
+            modelBuilder
+                .Entity<ContractorApplication>()
+                .HasOne(ca => ca.ServiceRequest)
+                .WithMany(sr => sr.ContractorApplications)
+                .HasForeignKey(ca => ca.ServiceRequestID);
+
+            // 1 ServiceRequest có 1 SelectedContractorApplication (1-1)
+            modelBuilder
+                .Entity<ServiceRequest>()
+                .HasOne(sr => sr.SelectedContractorApplication)
+                .WithOne()
+                .HasForeignKey<ServiceRequest>(sr => sr.SelectedContractorApplicationID);
+
+            modelBuilder.Entity<Conversation>().HasIndex(c => c.ServiceRequestID).IsUnique();
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -1,4 +1,6 @@
-﻿using BusinessLogic.DTOs.Application.ContractorApplication;
+﻿using BusinessLogic.DTOs.Application.Chat.User.Convesation;
+using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
 
 namespace BusinessLogic.DTOs.Application.ServiceRequest
@@ -31,8 +33,13 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public int ContractorApplyCount { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
+        public ICollection<string>? DocumentUrls { get; set; }
+        public ICollection<string>? DocumentPublicIds { get; set; }
 
         // Thông tin nhà thầu đã được chọn (chỉ có 1 khi chọn)
         public ContractorApplicationDto? SelectedContractorApplication { get; set; }
+        public ConversationDto? Conversation { get; set; }
+        public ReviewDto? Review { get; set; }
+        public DateTime? StartReviewDate { get; set; }
     }
 }

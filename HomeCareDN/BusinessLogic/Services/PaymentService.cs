@@ -1,12 +1,19 @@
-﻿using System.Globalization;
+﻿using AutoMapper;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Payment;
+using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
+using DataAccess.Entities.Authorize;
 using DataAccess.Entities.Payment;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
+using System.Globalization;
 using Ultitity.Exceptions;
 using Ultitity.Options;
 
@@ -18,18 +25,24 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly PayOsOptions _payOsOptions;
         private readonly ISignalRNotifier _notifier;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IMapper _mapper;
 
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
             IOptions<PayOsOptions> payOsOptions,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            UserManager<ApplicationUser> userManager,
+            IMapper mapper
         )
         {
             _payOS = payOS;
             _unitOfWork = unitOfWork;
             _payOsOptions = payOsOptions.Value;
             _notifier = notifier;
+            _userManager = userManager;
+            _mapper = mapper;
         }
 
         public async Task<CreatePaymentResult> CreatePaymentAsync(
@@ -91,7 +104,8 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication"
+                includeProperties: "ContractorApplication",
+                asNoTracking: false
             );
 
             if (payment == null)
@@ -106,6 +120,14 @@ namespace BusinessLogic.Services
                 {
                     payment.ContractorApplication.Status = ApplicationStatus.Approved;
                     payment.ContractorApplication.DueCommisionTime = null;
+
+                    var contractorID = payment.ContractorApplication.ContractorID;
+                    var contractor = await _userManager.FindByIdAsync(contractorID.ToString());
+                    if (contractor != null)
+                    {
+                        contractor.ProjectCount += 1;
+                        await _userManager.UpdateAsync(contractor);
+                    }
                 }
                 if (
                     DateTime.TryParseExact(
@@ -126,15 +148,42 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(s =>
-                    s.ServiceRequestID == payment.ServiceRequestID
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    s => s.ServiceRequestID == payment.ServiceRequestID,
+                    asNoTracking: false
                 );
-                await _notifier.SendToGroupAsync(
+                if (serviceRequest != null && payment.ContractorApplication != null)
+                {
+                    var conversation = new Conversation
+                    {
+                        ConversationID = Guid.NewGuid(),
+                        ServiceRequestID = serviceRequest.ServiceRequestID,
+                        CustomerID = serviceRequest.CustomerID,
+                        ContractorID = payment.ContractorApplication.ContractorID,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+                    serviceRequest.ConversationID = conversation.ConversationID;
+                    await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                    await _unitOfWork.SaveAsync();
+                    await _notifier.SendToChatGroupAsync(
+                        conversation.ConversationID.ToString(),
+                        "Chat.ConversationUnlocked",
+                        new { conversation.ConversationID }
+                    );
+                }
+
+                await _notifier.SendToApplicationGroupAsync(
                     $"user_{serviceRequest?.CustomerID}",
                     "PaymentTransation.Updated",
-                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                    new
+                    {
+                        payment.ContractorApplicationID,
+                        Status = payment.Status.ToString(),
+                        StartReviewDate = payment.PaidAt.Value.AddMinutes(5),
+                        serviceRequest?.ConversationID,
+                    }
                 );
-                await _notifier.SendToGroupAsync(
+                await _notifier.SendToApplicationGroupAsync(
                     $"role_Admin",
                     "PaymentTransation.Updated",
                     new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
@@ -146,6 +195,48 @@ namespace BusinessLogic.Services
             }
 
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<PagedResultDto<PaymentTransactionDto>> GetAllCommissionAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork.PaymentTransactionsRepository.GetQueryable(
+                includeProperties:"ContractorApplication",
+                asNoTracking: true
+            );
+
+            query = query.Where(p => p.Status == PaymentStatus.Paid);
+
+            if (!string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(u => 
+                    u.OrderCode.ToString().Contains(parameters.Search) ||
+                    u.Description.Contains(parameters.Search)
+                );
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = parameters.SortBy?.ToLower() switch
+            {
+                "paidat" => query.OrderBy(u => u.PaidAt),
+                "paidatdesc" => query.OrderByDescending(u => u.PaidAt),
+                _ => query.OrderBy(u => u.PaymentTransactionID),
+            };
+
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+                
+            var payments = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<PaymentTransactionDto>>(payments);
+
+            return new PagedResultDto<PaymentTransactionDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
         }
     }
 }

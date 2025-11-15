@@ -126,29 +126,6 @@ namespace BusinessLogic.Services
             };
         }
 
-        public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
-        {
-            var material = _mapper.Map<Material>(requestDto);
-            await _unitOfWork.MaterialRepository.AddAsync(material);
-            //check image
-            ValidateImages(requestDto.ImageUrls, 0);
-
-            //upload image
-            await UploadMaterialImagesAsync(
-                material.MaterialID,
-                requestDto.ImageUrls,
-                requestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-
-            material = await _unitOfWork.MaterialRepository.GetAsync(
-                m => m.MaterialID == material.MaterialID,
-                includeProperties: MATERIAL_INCLUDE
-            );
-            return _mapper.Map<MaterialDto>(material);
-        }
-
         public async Task<MaterialDetailDto> GetMaterialByIdAsync(Guid id)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
@@ -203,12 +180,60 @@ namespace BusinessLogic.Services
             return _mapper.Map<MaterialDto>(material);
         }
 
+        public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
+        {
+            var isDuplicate = await _unitOfWork
+                .MaterialRepository.GetQueryable()
+                .AnyAsync(b => b.Name.ToLower() == requestDto.Name.ToLower());
+            if (isDuplicate)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var material = _mapper.Map<Material>(requestDto);
+            await _unitOfWork.MaterialRepository.AddAsync(material);
+            //check image
+            ValidateImages(requestDto.ImageUrls, 0);
+
+            //upload image
+            await UploadMaterialImagesAsync(
+                material.MaterialID,
+                requestDto.ImageUrls,
+                requestDto.ImagePublicIds
+            );
+
+            await _unitOfWork.SaveAsync();
+
+            material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == material.MaterialID,
+                includeProperties: MATERIAL_INCLUDE
+            );
+            return _mapper.Map<MaterialDto>(material);
+        }
+
         public async Task<MaterialDto> UpdateMaterialAsync(MaterialUpdateRequestDto requestDto)
         {
             var material = await _unitOfWork.MaterialRepository.GetAsync(
                 m => m.MaterialID == requestDto.MaterialID,
-                includeProperties: MATERIAL_INCLUDE
+                includeProperties: MATERIAL_INCLUDE,
+                false
             );
+            var errors = new Dictionary<string, string[]>();
+            var isDuplicate = await _unitOfWork
+                .MaterialRepository.GetQueryable()
+                .AnyAsync(b =>
+                    b.Name.ToLower() == requestDto.Name.ToLower()
+                    && b.MaterialID != requestDto.MaterialID
+                );
+
+            if (isDuplicate)
+            {
+                errors.Add("MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" });
+                throw new CustomValidationException(errors);
+            }
 
             //check image
             ValidateImages(requestDto.ImageUrls, material!.Images?.Count ?? 0);
@@ -232,7 +257,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteMaterialAsync(Guid id)
         {
-            var material = await _unitOfWork.MaterialRepository.GetAsync(m => m.MaterialID == id);
+            var material = await _unitOfWork.MaterialRepository.GetAsync(
+                m => m.MaterialID == id,
+                asNoTracking: false
+            );
 
             if (material == null)
             {

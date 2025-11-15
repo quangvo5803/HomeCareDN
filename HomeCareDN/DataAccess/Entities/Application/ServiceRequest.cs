@@ -25,10 +25,17 @@ namespace DataAccess.Entities.Application
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public RequestStatus Status { get; set; } = RequestStatus.Opening;
         public Guid? SelectedContractorApplicationID { get; set; } //Nhà thầu khách hàng chọn
+        public Guid? ConversationID { get; set; }
 
         [ForeignKey("SelectedContractorApplicationID")]
         public ContractorApplication? SelectedContractorApplication { get; set; }
+
+        [ForeignKey("ConversationID")]
+        public Conversation? Conversation { get; set; }
+        public Review? Review { get; set; }
+
         public ICollection<Image>? Images { get; set; }
+        public ICollection<Document>? Documents { get; set; }
         public ICollection<ContractorApplication>? ContractorApplications { get; set; }
     }
 }

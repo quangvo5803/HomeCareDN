@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -31,11 +32,13 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpGet("admin/{id:guid}")]
-        public async Task<IActionResult> GetByIdForAdmin(Guid id)
+        [HttpGet("admin/detail")]
+        public async Task<IActionResult> GetByIdForAdmin(
+            [FromQuery] MaterialRequestGetByIdDto getByIdDto
+        )
         {
             var result = await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(
-                id
+                getByIdDto
             );
             return Ok(result);
         }
@@ -55,12 +58,17 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpGet("customer/{id:guid}")]
-        public async Task<IActionResult> GetByIdForCustomer(Guid id)
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Customer"
+        )]
+        [HttpGet("customer/detail")]
+        public async Task<IActionResult> GetByIdForCustomer(
+            [FromQuery] MaterialRequestGetByIdDto getByIdDto
+        )
         {
             var result = await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(
-                id,
+                getByIdDto,
                 "Customer"
             );
             return Ok(result);
@@ -124,11 +132,13 @@ namespace HomeCareDNAPI.Controllers
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             Roles = "Distributor"
         )]
-        [HttpGet("distributor/{id:guid}")]
-        public async Task<IActionResult> GetByIdForDistributor(Guid id)
+        [HttpGet("distributor/detail")]
+        public async Task<IActionResult> GetByIdForDistributor(
+            [FromQuery] MaterialRequestGetByIdDto getByIdDto
+        )
         {
             var result = await _facadeService.MaterialRequestService.GetMaterialRequestByIdAsync(
-                id,
+                getByIdDto,
                 "Distributor"
             );
             return Ok(result);

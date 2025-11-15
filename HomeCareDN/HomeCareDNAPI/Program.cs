@@ -45,11 +45,19 @@ namespace HomeCareDNAPI
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                        sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                )
             );
 
             builder.Services.AddDbContext<AuthorizeDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions =>
+                        sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
+                )
             );
 
             var key = builder.Configuration["Jwt:Key"];
@@ -174,6 +182,7 @@ namespace HomeCareDNAPI
 
             app.MapControllers();
             app.MapHub<ApplicationHub>("/hubs/application");
+            app.MapHub<ChatHub>("/hubs/chat");
 
             app.Run();
         }

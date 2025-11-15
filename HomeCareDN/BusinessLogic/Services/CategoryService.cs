@@ -99,6 +99,17 @@ namespace BusinessLogic.Services
 
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
+            var isDuplicate = await _unitOfWork
+                .CategoryRepository.GetQueryable()
+                .AnyAsync(b => b.CategoryName.ToLower() == requestDto.CategoryName.ToLower());
+            if (isDuplicate)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" } },
+                };
+                throw new CustomValidationException(errors);
+            }
             var category = _mapper.Map<Category>(requestDto);
             category.CategoryID = Guid.NewGuid();
 
@@ -115,10 +126,6 @@ namespace BusinessLogic.Services
             await _unitOfWork.CategoryRepository.AddAsync(category);
 
             await _unitOfWork.SaveAsync();
-            category = await _unitOfWork.CategoryRepository.GetAsync(
-                c => c.CategoryID == category.CategoryID,
-                includeProperties: INCLUDE
-            );
             var categoryDto = _mapper.Map<CategoryDto>(category);
             return categoryDto;
         }
@@ -127,9 +134,22 @@ namespace BusinessLogic.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetAsync(
                 c => c.CategoryID == requestDto.CategoryID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE,
+                false
             );
             var errors = new Dictionary<string, string[]>();
+            var isDuplicate = await _unitOfWork
+                .CategoryRepository.GetQueryable()
+                .AnyAsync(b =>
+                    b.CategoryName.ToLower() == requestDto.CategoryName.ToLower()
+                    && b.CategoryID != requestDto.CategoryID
+                );
+
+            if (isDuplicate)
+            {
+                errors.Add("CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" });
+                throw new CustomValidationException(errors);
+            }
 
             if (category == null)
             {
@@ -170,7 +190,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteCategoryAsync(Guid id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetAsync(c => c.CategoryID == id);
+            var category = await _unitOfWork.CategoryRepository.GetAsync(
+                c => c.CategoryID == id,
+                asNoTracking: false
+            );
             if (category == null)
             {
                 var errors = new Dictionary<string, string[]>

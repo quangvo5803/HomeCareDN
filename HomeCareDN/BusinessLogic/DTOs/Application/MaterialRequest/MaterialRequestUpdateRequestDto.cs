@@ -3,8 +3,11 @@
     public class MaterialRequestUpdateRequestDto
     {
         public Guid MaterialRequestID { get; set; }
+        public Guid? AddressID { get; set; }
         public string? Description { get; set; }
         public bool CanEditQuantity { get; set; }
+        public bool CanAddMaterial { get; set; }
+        public bool IsSubmit { get; set; }
         public List<MaterialRequestItemCreateDto>? AddItems { get; set; }
         public List<MaterialRequestItemUpdateDto>? UpdateItems { get; set; }
         public List<Guid>? DeleteItemIDs { get; set; }
