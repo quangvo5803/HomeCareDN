@@ -263,6 +263,7 @@
         "name": "Họ và tên",
         "email": "Email",
         "phone": "Số điện thoại",
+        "phone_placeholder": "Nhập số điện thoại của bạn",
         "gender": "Giới tính",
         "gender_choice": "Chọn giới tính",
         "gender_male": "Nam",
@@ -924,13 +925,16 @@
     "no": "STT",
     "fullName": "Họ và tên",
     "phoneNumber": "Số điện thoại",
+    "role": "Vai trò",
     "projectCount": "Dự án đã nhận",
     "address": "Địa chỉ",
     "action": "Hành động",
     "empty": "Chưa có người dùng nào",
     "empty_description": "Chưa có người dùng nào đăng ký.",
     "userDetail": {
-      "address": "Chưa có địa chỉ nào",
+      "noName": "Người dùng chưa cung cấp tên.",
+      "noPhone": "Người dùng chưa cung cấp số điện thoại.",
+      "noAddress": "Người dùng chưa cung cấp địa chỉ nào.",
       "rating": "Đánh giá",
       "serviceRequest": "dịch vụ đã yêu cầu",
       "contractorApplication": "dịch vụ đã tham gia",
@@ -1069,6 +1073,17 @@
     "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
+    "ReviewModal": {
+      "view": "Đánh giá của bạn",
+      "create": "Hãy cho chúng tôi biết trải nghiệm của bạn với nhà thầu này.",
+      "rating":"Đánh giá",
+      "ratingStar": "Sao",
+      "comment":"Nhận xét",
+      "commentPlaceholder":"Viết nhận xét của bạn ở đây...",
+      "images":"Hình ảnh",
+      "uploadImages":"Tải lên hình ảnh",
+      "warning": "Bạn không thể chỉnh sửa sau khi gửi. Đánh giá có thể ảnh hưởng đến chất lượng dịch vụ và đối tác."
+    },
     "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
@@ -1241,6 +1256,7 @@
     "MATERIAL_REQUEST_ADD": "Thêm yêu cầu vật liệu thành công",
     "MATERIAL_REQUEST_UPDATE": "Cập nhật yêu cầu vật liệu thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "CREATE_REVIEW": "Đã gửi đánh giá thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
@@ -1387,5 +1403,16 @@
     "minutes": "Phút",
     "seconds": "Giây",
     "due": "Hạn"
+  },
+  "ReviewCountdown":{
+    "reviewed": "Bạn đã đánh giá nhà thầu/nhà phân phối này: ",
+    "viewReview": "Xem đánh giá",
+    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu/nhà phân phối!",
+    "createReview": "Tạo đánh giá",
+    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu/nhà phân phối trước khi có thể đánh giá họ:",
+    "days": "Ngày",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "seconds": "Giây"
   }
 }

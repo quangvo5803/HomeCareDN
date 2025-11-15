@@ -4,6 +4,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.AddressDtos;
+using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -29,9 +30,10 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
+        private const string INCLUDE_LISTALL =
+            "ContractorApplications,SelectedContractorApplication,Review,Review.Images";
         private const string ERROR_MAXIMUM_DOCUMENT = "MAXIMUM_DOCUMENT";
         private const string ERROR_MAXIMUM_DOCUMENT_SIZE = "MAXIMUM_DOCUMENT_SIZE";
-        private const string INCLUDE_LISTALL = "ContractorApplications";
         private const string INCLUDE_DETAIL =
             "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents,Conversation";
 
@@ -142,230 +144,6 @@ namespace BusinessLogic.Services.Interfaces
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
             };
-        }
-
-        private async Task MapServiceRequestListAllAsync(
-            IEnumerable<ServiceRequest> items,
-            IEnumerable<ServiceRequestDto> dtos,
-            string? role = ADMIN
-        )
-        {
-            var itemDict = items.ToDictionary(i => i.ServiceRequestID);
-
-            var addressIds = items.Select(i => i.AddressId).Distinct().ToList();
-
-            var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID))
-                .ToListAsync();
-
-            var addressDict = addresses.ToDictionary(a => a.AddressID);
-
-            foreach (var dto in dtos)
-            {
-                if (addressDict.TryGetValue(dto.AddressID, out var address))
-                {
-                    dto.Address = _mapper.Map<AddressDto>(address);
-                    if (role == CONTRACTOR)
-                    {
-                        dto.Address.Detail = string.Empty;
-                        dto.Address.Ward = string.Empty;
-                    }
-                }
-            }
-        }
-
-        private async Task MapServiceRequestDetailAsync(
-            ServiceRequest item,
-            ServiceRequestDto dto,
-            string role = ADMIN,
-            Guid? currentContractorId = null
-        )
-        {
-            // Map address chung
-            await MapAddressAsync(item, dto, role, currentContractorId);
-
-            dto.ContractorApplyCount = item.ContractorApplications?.Count ?? 0;
-
-            switch (role)
-            {
-                case ADMIN:
-                    await MapForAdminAsync(item, dto);
-                    break;
-                case "Customer":
-                    await MapForCustomerAsync(item, dto);
-                    break;
-                case CONTRACTOR:
-                    await MapForContractorAsync(item, dto, currentContractorId);
-                    break;
-            }
-        }
-
-        // ==================== Map Address ====================
-        private async Task MapAddressAsync(
-            ServiceRequest item,
-            ServiceRequestDto dto,
-            string role,
-            Guid? currentContractorId
-        )
-        {
-            if (role == CONTRACTOR)
-            {
-                var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                    a.AddressID == item.AddressId
-                );
-                if (address != null)
-                    dto.Address = _mapper.Map<AddressDto>(address);
-                bool showAddress =
-                    item.Status == RequestStatus.Closed
-                    && item.SelectedContractorApplication?.ContractorID == currentContractorId
-                    && item.SelectedContractorApplication?.Status == ApplicationStatus.Approved;
-
-                if (!showAddress)
-                {
-                    dto.Address.Detail = string.Empty;
-                    dto.Address.Ward = string.Empty;
-                }
-            }
-            else
-            {
-                var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                    a.AddressID == item.AddressId
-                );
-                if (address != null)
-                {
-                    dto.Address = _mapper.Map<AddressDto>(address);
-                }
-            }
-        }
-
-        // ==================== Admin ====================
-        private async Task MapForAdminAsync(ServiceRequest item, ServiceRequestDto dto)
-        {
-            if (item.SelectedContractorApplication != null)
-            {
-                var selected = item.SelectedContractorApplication;
-                var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
-                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
-                    p => p.ServiceRequestID == selected.ServiceRequestID
-                );
-                dto.SelectedContractorApplication = new ContractorApplicationDto
-                {
-                    ContractorID = contractor?.Id ?? string.Empty,
-                    ContractorApplicationID = selected.ContractorApplicationID,
-                    ContractorName = contractor?.FullName ?? string.Empty,
-                    ContractorEmail = contractor?.Email ?? string.Empty,
-                    ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
-                    EstimatePrice = selected.EstimatePrice,
-                    Status = selected.Status.ToString(),
-                    ImageUrls =
-                        selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
-                    Description = selected.Description,
-                    DueCommisionTime = selected.DueCommisionTime,
-                    CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount,
-                    AverageRating = 0,
-                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
-                };
-            }
-        }
-
-        // ==================== Customer ====================
-        private async Task MapForCustomerAsync(ServiceRequest item, ServiceRequestDto dto)
-        {
-            if (item.SelectedContractorApplication != null)
-            {
-                var selected = item.SelectedContractorApplication;
-                var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
-                dto.SelectedContractorApplication = new ContractorApplicationDto
-                {
-                    ContractorID =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Id ?? string.Empty
-                            : string.Empty,
-                    ContractorApplicationID = selected.ContractorApplicationID,
-                    Description = selected.Description,
-                    EstimatePrice = selected.EstimatePrice,
-                    ImageUrls =
-                        selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
-                    DocumentUrls =
-                        selected.Documents?.Select(i => i.DocumentUrl).ToList()
-                        ?? new List<string>(),
-                    Status = selected.Status.ToString(),
-                    CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount, // hoặc dữ liệu thực tế nếu có
-                    AverageRating = 0,
-                    DueCommisionTime = selected.DueCommisionTime,
-                    ContractorName =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.FullName ?? string.Empty
-                            : string.Empty,
-                    ContractorEmail =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Email ?? string.Empty
-                            : string.Empty,
-                    ContractorPhone =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.PhoneNumber ?? string.Empty
-                            : string.Empty,
-                };
-            }
-        }
-
-        // ==================== Contractor ====================
-        private async Task MapForContractorAsync(
-            ServiceRequest item,
-            ServiceRequestDto dto,
-            Guid? currentContractorId
-        )
-        {
-            if (item.SelectedContractorApplication != null)
-            {
-                if (item.SelectedContractorApplication.ContractorID != currentContractorId)
-                {
-                    dto.SelectedContractorApplication = new ContractorApplicationDto
-                    {
-                        ContractorID = "ANOTHER_CONTRACTOR",
-                        ContractorName = "ANOTHER_CONTRACTOR",
-                        ContractorEmail = string.Empty,
-                        ContractorPhone = string.Empty,
-                        Status = item.SelectedContractorApplication.Status.ToString(),
-                        EstimatePrice = 0,
-                        ImageUrls = new List<string>(),
-                    };
-                }
-                else
-                {
-                    var selected = item.SelectedContractorApplication;
-                    var contractor = await _userManager.FindByIdAsync(
-                        selected.ContractorID.ToString()
-                    );
-                    dto.SelectedContractorApplication = new ContractorApplicationDto
-                    {
-                        ContractorID = contractor?.Id ?? string.Empty,
-                        ContractorApplicationID = selected.ContractorApplicationID,
-                        ContractorName = contractor?.FullName ?? string.Empty,
-                        ContractorEmail = contractor?.Email ?? string.Empty,
-                        ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
-                        EstimatePrice = selected.EstimatePrice,
-                        Status = selected.Status.ToString(),
-                        DueCommisionTime = selected.DueCommisionTime,
-                        ImageUrls =
-                            selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
-                        Description = selected.Description,
-                        CreatedAt = selected.CreatedAt,
-                    };
-                    if (selected.Status == ApplicationStatus.Approved)
-                    {
-                        var customer = await _userManager.FindByIdAsync(dto.CustomerID.ToString());
-                        if (customer != null)
-                        {
-                            dto.CustomerName = customer.FullName ?? customer.UserName;
-                            dto.CustomerEmail = customer.Email ?? "";
-                            dto.CustomerPhone = customer.PhoneNumber ?? "";
-                        }
-                    }
-                }
-            }
         }
 
         public async Task<ServiceRequestDto> CreateServiceRequestAsync(
@@ -540,6 +318,249 @@ namespace BusinessLogic.Services.Interfaces
             );
         }
 
+        // ========================== Helper for List All Service Request =============================
+        private async Task MapServiceRequestListAllAsync(
+            IEnumerable<ServiceRequest> items,
+            IEnumerable<ServiceRequestDto> dtos,
+            string? role = ADMIN
+        )
+        {
+            var itemDict = items.ToDictionary(i => i.ServiceRequestID);
+
+            var addressIds = items.Select(i => i.AddressId).Distinct().ToList();
+
+            var addresses = await _authorizeDbContext
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
+                .ToListAsync();
+
+            var addressDict = addresses.ToDictionary(a => a.AddressID);
+
+            foreach (var dto in dtos)
+            {
+                if (addressDict.TryGetValue(dto.AddressID, out var address))
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                    if (role == CONTRACTOR)
+                    {
+                        dto.Address.Detail = string.Empty;
+                        dto.Address.Ward = string.Empty;
+                    }
+                }
+                if (role == "Customer")
+                {
+                    await MapStartReviewDateForCustomerListAll(dto);
+                }
+            }
+        }
+
+        private async Task MapStartReviewDateForCustomerListAll(ServiceRequestDto dto)
+        {
+            if (dto.SelectedContractorApplication?.Status == ApplicationStatus.Approved.ToString())
+            {
+                var contractorPayment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                    cp => cp.ServiceRequestID == dto.ServiceRequestID
+                );
+                if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
+                {
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                }
+            }
+        }
+
+        // ========================== Helper  Service Request Detail =============================
+
+        private async Task MapServiceRequestDetailAsync(
+            ServiceRequest item,
+            ServiceRequestDto dto,
+            string role = ADMIN,
+            Guid? currentContractorId = null
+        )
+        {
+            // Map address chung
+            await MapAddressAsync(item, dto, role, currentContractorId);
+
+            dto.ContractorApplyCount = item.ContractorApplications?.Count ?? 0;
+
+            switch (role)
+            {
+                case ADMIN:
+                    await MapForAdminAsync(item, dto);
+                    break;
+                case "Customer":
+                    await MapForCustomerAsync(item, dto);
+                    break;
+                case CONTRACTOR:
+                    await MapForContractorAsync(item, dto, currentContractorId);
+                    break;
+            }
+        }
+
+        // ==================== Map Address ====================
+        private async Task MapAddressAsync(
+            ServiceRequest item,
+            ServiceRequestDto dto,
+            string role,
+            Guid? currentContractorId
+        )
+        {
+            if (role == CONTRACTOR)
+            {
+                var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                    a.AddressID == item.AddressId
+                );
+                if (address != null)
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                bool showAddress =
+                    item.Status == RequestStatus.Closed
+                    && item.SelectedContractorApplication?.ContractorID == currentContractorId
+                    && item.SelectedContractorApplication?.Status == ApplicationStatus.Approved;
+
+                if (!showAddress)
+                {
+                    dto.Address.Detail = string.Empty;
+                    dto.Address.Ward = string.Empty;
+                }
+            }
+            else
+            {
+                var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                    a.AddressID == item.AddressId
+                );
+                if (address != null)
+                {
+                    dto.Address = _mapper.Map<AddressDto>(address);
+                }
+            }
+        }
+
+        // ==================== Admin ====================
+        private async Task MapForAdminAsync(ServiceRequest item, ServiceRequestDto dto)
+        {
+            if (item.SelectedContractorApplication != null)
+            {
+                var selected = item.SelectedContractorApplication;
+                var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.ServiceRequestID == selected.ServiceRequestID
+                );
+                dto.SelectedContractorApplication = new ContractorApplicationDto
+                {
+                    ContractorID = contractor?.Id ?? string.Empty,
+                    ContractorApplicationID = selected.ContractorApplicationID,
+                    ContractorName = contractor?.FullName ?? string.Empty,
+                    ContractorEmail = contractor?.Email ?? string.Empty,
+                    ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
+                    EstimatePrice = selected.EstimatePrice,
+                    Status = selected.Status.ToString(),
+                    ImageUrls =
+                        selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                    Description = selected.Description,
+                    DueCommisionTime = selected.DueCommisionTime,
+                    CreatedAt = selected.CreatedAt,
+                    CompletedProjectCount = contractor!.ProjectCount,
+                    AverageRating = contractor!.AverageRating,
+                    ReviewCount = contractor!.RatingCount,
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
+                };
+            }
+        }
+
+        // ==================== Customer ====================
+        private async Task MapForCustomerAsync(ServiceRequest item, ServiceRequestDto dto)
+        {
+            if (item.SelectedContractorApplication != null)
+            {
+                var selected = item.SelectedContractorApplication;
+                var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
+                dto.SelectedContractorApplication = new ContractorApplicationDto
+                {
+                    ContractorID =
+                        selected.Status == ApplicationStatus.Approved
+                            ? contractor?.Id ?? string.Empty
+                            : string.Empty,
+                    ContractorApplicationID = selected.ContractorApplicationID,
+                    Description = selected.Description,
+                    EstimatePrice = selected.EstimatePrice,
+                    ImageUrls =
+                        selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                    Status = selected.Status.ToString(),
+                    CreatedAt = selected.CreatedAt,
+                    CompletedProjectCount = contractor!.ProjectCount,
+                    AverageRating = contractor.AverageRating,
+                    ReviewCount = contractor.RatingCount,
+                    DueCommisionTime = selected.DueCommisionTime,
+                    ContractorName =
+                        selected.Status == ApplicationStatus.Approved
+                            ? contractor.FullName ?? ""
+                            : "",
+                    ContractorEmail =
+                        selected.Status == ApplicationStatus.Approved ? contractor.Email ?? "" : "",
+                    ContractorPhone =
+                        selected.Status == ApplicationStatus.Approved
+                            ? contractor.PhoneNumber ?? ""
+                            : "",
+                };
+            }
+        }
+
+        // ==================== Contractor ====================
+        private async Task MapForContractorAsync(
+            ServiceRequest item,
+            ServiceRequestDto dto,
+            Guid? currentContractorId
+        )
+        {
+            if (item.SelectedContractorApplication != null)
+            {
+                if (item.SelectedContractorApplication.ContractorID != currentContractorId)
+                {
+                    dto.SelectedContractorApplication = new ContractorApplicationDto
+                    {
+                        ContractorID = "ANOTHER_CONTRACTOR",
+                        ContractorName = "ANOTHER_CONTRACTOR",
+                        ContractorEmail = string.Empty,
+                        ContractorPhone = string.Empty,
+                        Status = item.SelectedContractorApplication.Status.ToString(),
+                        EstimatePrice = 0,
+                        ImageUrls = new List<string>(),
+                    };
+                }
+                else
+                {
+                    var selected = item.SelectedContractorApplication;
+                    var contractor = await _userManager.FindByIdAsync(
+                        selected.ContractorID.ToString()
+                    );
+                    dto.SelectedContractorApplication = new ContractorApplicationDto
+                    {
+                        ContractorID = contractor?.Id ?? string.Empty,
+                        ContractorApplicationID = selected.ContractorApplicationID,
+                        ContractorName = contractor?.FullName ?? string.Empty,
+                        ContractorEmail = contractor?.Email ?? string.Empty,
+                        ContractorPhone = contractor?.PhoneNumber ?? string.Empty,
+                        EstimatePrice = selected.EstimatePrice,
+                        Status = selected.Status.ToString(),
+                        DueCommisionTime = selected.DueCommisionTime,
+                        ImageUrls =
+                            selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
+                        Description = selected.Description,
+                        CreatedAt = selected.CreatedAt,
+                    };
+                    if (selected.Status == ApplicationStatus.Approved)
+                    {
+                        var customer = await _userManager.FindByIdAsync(dto.CustomerID.ToString());
+                        if (customer != null)
+                        {
+                            dto.CustomerName = customer.FullName ?? customer.UserName;
+                            dto.CustomerEmail = customer.Email ?? "";
+                            dto.CustomerPhone = customer.PhoneNumber ?? "";
+                        }
+                    }
+                }
+            }
+        }
+
+        // ========================== Helper Delete Service Request =============================
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)
         {
             if (
@@ -572,6 +593,7 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
         }
 
+        // ========================== Helper Create Service Request =============================
         private async Task UploadServiceRequestImagesAsync(
             Guid? serviceRequestId,
             ICollection<string>? imageUrls,

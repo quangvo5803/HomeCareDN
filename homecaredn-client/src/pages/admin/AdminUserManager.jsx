@@ -121,10 +121,11 @@ export default function AdminUserManager() {
                       setFilter(key);
                       navigate(`?filter=${key}`);
                     }}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                      }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${
+                      filter === key
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                    }`}
                   >
                     {t(`adminUserManager.${key}`)}
                   </button>
@@ -156,6 +157,9 @@ export default function AdminUserManager() {
                         {t('adminUserManager.phoneNumber')}
                       </th>
                       <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminUserManager.role')}
+                      </th>
+                      <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
                         {t('adminUserManager.projectCount')}
                       </th>
                       <th className="px-6 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -182,19 +186,20 @@ export default function AdminUserManager() {
                       }
 
                       if (users && users.length > 0) {
-                        return users.map((item, index) => {
-                          const firstAddress = item?.address?.[0];
+                        return users.map((user, index) => {
+                          const firstAddress = user?.address?.[0];
                           const addressText = firstAddress
                             ? [firstAddress.district, firstAddress.city]
-                              .filter(Boolean)
-                              .join(', ')
+                                .filter(Boolean)
+                                .join(', ')
                             : '—';
 
                           return (
                             <tr
-                              key={item.userID}
-                              className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                                }`}
+                              key={user.userID}
+                              className={`hover:bg-gray-50 transition-colors duration-150 ${
+                                index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                              }`}
                             >
                               <td className="px-4 py-4 text-center align-middle">
                                 <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -203,23 +208,28 @@ export default function AdminUserManager() {
                               </td>
                               <td className="px-6 py-4 align-middle">
                                 <div className="text-sm font-medium text-gray-900">
-                                  {item.fullName}
+                                  {user.fullName}
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center align-middle">
                                 <div className="text-sm text-gray-900">
-                                  {item.email}
+                                  {user.email}
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center align-middle">
                                 <div className="text-sm text-gray-900">
-                                  {item.phoneNumber ?? '—'}
+                                  {user.phoneNumber ?? '—'}
                                 </div>
                               </td>
                               <td className="px-6 py-4 text-center align-middle">
                                 <div className="text-sm text-gray-900">
-                                  {item.projectCount > 0
-                                    ? item.projectCount
+                                  {t(`roles.${user.role}`)}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-center align-middle">
+                                <div className="text-sm text-gray-900">
+                                  {user.projectCount > 0
+                                    ? user.projectCount
                                     : '—'}
                                 </div>
                               </td>
@@ -233,7 +243,9 @@ export default function AdminUserManager() {
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      navigate(`/Admin/User/${item.userID}`)
+                                      navigate(
+                                        `/Admin/UserManager/${user.userID}`
+                                      )
                                     }
                                     className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                                   >
@@ -283,17 +295,17 @@ export default function AdminUserManager() {
                   }
 
                   if (users && users.length > 0) {
-                    return users.map((item, index) => {
-                      const firstAddress = item?.address?.[0];
+                    return users.map((user, index) => {
+                      const firstAddress = user?.address?.[0];
                       const addressText = firstAddress
                         ? [firstAddress.district, firstAddress.city]
-                          .filter(Boolean)
-                          .join(', ')
+                            .filter(Boolean)
+                            .join(', ')
                         : '—';
 
                       return (
                         <div
-                          key={item.userID}
+                          key={user.userID}
                           className="p-4 bg-white border border-gray-200 rounded-lg shadow-sm"
                         >
                           <div className="flex items-start justify-between mb-3">
@@ -303,10 +315,10 @@ export default function AdminUserManager() {
                               </span>
                               <div>
                                 <h3 className="text-sm font-medium text-gray-900">
-                                  {item.fullName}
+                                  {user.fullName}
                                 </h3>
                                 <p className="text-xs text-gray-500">
-                                  {item.email}
+                                  {user.email}
                                 </p>
                               </div>
                             </div>
@@ -315,11 +327,11 @@ export default function AdminUserManager() {
                           <div className="mb-3 space-y-2">
                             <div className="flex items-center text-xs text-gray-600">
                               <i className="fa-solid fa-phone w-4 mr-2" />
-                              {item.phoneNumber ?? '—'}
+                              {user.phoneNumber ?? '—'}
                             </div>
                             <div className="flex items-center text-xs text-gray-600">
                               <i className="fa-solid fa-diagram-project w-4 mr-2" />
-                              {item.projectCount > 0 ? item.projectCount : '—'}
+                              {user.projectCount > 0 ? user.projectCount : '—'}
                             </div>
                           </div>
 
@@ -335,7 +347,7 @@ export default function AdminUserManager() {
                               className="flex-1 px-3 py-2 text-xs font-medium  text-white border rounded-md bg-orange-500 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                               type="button"
                               onClick={() =>
-                                navigate(`/Admin/User/${item.userID}`)
+                                navigate(`/Admin/UserManager/${user.userID}`)
                               }
                             >
                               <i className="fa-solid fa-eye mr-1" />
@@ -365,7 +377,7 @@ export default function AdminUserManager() {
             </div>
 
             {/* Pagination */}
-            {totalUsers > 0 && (
+            {!loading && totalUsers > 0 && (
               <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>

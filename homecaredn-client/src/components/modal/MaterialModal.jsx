@@ -214,7 +214,7 @@ export default function MaterialModal({
 
       await onSave(data);
     } catch (err) {
-      toast.error(t(handleApiError(err)));
+      toast.error(handleApiError(err));
     } finally {
       setUploadProgress(0);
     }

@@ -263,6 +263,7 @@
         "name": "Full Name",
         "email": "Email",
         "phone": "Phone Number",
+        "phone_placeholder": "Enter your phone number",
         "gender": "Gender",
         "gender_choice": "Select Gender",
         "gender_male": "Male",
@@ -929,13 +930,16 @@
     "no": "No",
     "fullName": "Full Name",
     "phoneNumber": "Phone Number",
+    "role": "Role",
     "projectCount": "Project received",
     "address": "Address",
     "action": "Action",
     "empty": "No users yet",
     "empty_description": "No users registered yet.",
     "userDetail": {
-      "address": "No addresses yet",
+      "noName": "The user has not provided a name.",
+      "noPhone": "The user has not provided a phone number.",
+      "noAddress": "The user has not provided any address.",
       "rating": "Rating",
       "serviceRequest": "service requests",
       "contractorApplication": "participated service",
@@ -1073,6 +1077,17 @@
     "Approve": "Approve"
   },
   "ModalPopup": {
+    "ReviewModal": {
+    "view": "Your Review",
+    "create": "Tell us about your experience with this contractor.",
+    "rating": "Rating",
+    "ratingStar": "Star",
+    "comment": "Comment",
+    "commentPlaceholder": "Write your comment here...",
+    "images": "Images",
+    "uploadImages": "Upload Images",
+    "warning": "You cannot edit after submitting. Your review may affect service quality and partners."
+  },
     "DeleteBrandModal": {
       "title": "Are you sure?",
       "text": "This brand will be deleted and cannot be restored!"
@@ -1252,6 +1267,7 @@
     "MATERIAL_REQUEST_ADD": "Add material request successfully.",
     "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",
@@ -1397,5 +1413,16 @@
     "minutes": "Minutes",
     "seconds": "Seconds",
     "due": "Due date"
+  },
+  "ReviewCountdown": {
+    "reviewed": "You have reviewed this contractor/distributor:",
+    "viewReview": "View Review",
+    "reviewTimeExpired": "You can review the contractor/distributor now!",
+    "createReview": "Create Review",
+    "reviewAvailableIn": "You need to work with the contractor/distributor before you can review them:",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds"
   }
 }

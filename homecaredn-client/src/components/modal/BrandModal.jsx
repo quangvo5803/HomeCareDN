@@ -13,7 +13,6 @@ export default function BrandModal({
   onSave,
   brandID,
   setUploadProgress,
-  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [brandName, setBrandName] = useState('');
@@ -72,7 +71,6 @@ export default function BrandModal({
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
 
@@ -105,7 +103,6 @@ export default function BrandModal({
       toast.error(t(handleApiError(err)));
     } finally {
       setUploadProgress(0);
-      setSubmitting(false);
     }
   };
 

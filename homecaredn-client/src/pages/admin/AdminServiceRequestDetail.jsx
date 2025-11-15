@@ -94,10 +94,10 @@ export default function AdminServiceRequestDetail() {
           const newList = prev.map((ca) =>
             ca.contractorApplicationID === payload.contractorApplicationID
               ? {
-                ...ca,
-                status: 'PendingCommission',
-                dueCommisionTime: payload?.dueCommisionTime || null,
-              }
+                  ...ca,
+                  status: 'PendingCommission',
+                  dueCommisionTime: payload?.dueCommisionTime || null,
+                }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -250,10 +250,11 @@ export default function AdminServiceRequestDetail() {
 
             <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
               <i
-                className={`fas ${serviceRequestDetail?.serviceType === 'Construction'
-                  ? 'fa-hammer'
-                  : 'fa-screwdriver-wrench'
-                  } text-2xl text-white`}
+                className={`fas ${
+                  serviceRequestDetail?.serviceType === 'Construction'
+                    ? 'fa-hammer'
+                    : 'fa-screwdriver-wrench'
+                } text-2xl text-white`}
               />
             </div>
 
@@ -306,8 +307,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.packageOption
                     ? t(
-                      `Enums.PackageOption.${serviceRequestDetail.packageOption}`
-                    )
+                        `Enums.PackageOption.${serviceRequestDetail.packageOption}`
+                      )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -338,8 +339,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.mainStructureType
                     ? t(
-                      `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
-                    )
+                        `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
+                      )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -547,7 +548,7 @@ export default function AdminServiceRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedContractor.averageRating}
+                        {selectedContractor.averageRating.toFixed(1)}
                       </p>
                     </div>
 
@@ -576,72 +577,6 @@ export default function AdminServiceRequestDetail() {
                       }}
                     />
                   </div>
-
-                  {/*Payment Information */}
-                  {selectedContractor.status === 'Approved' && (
-                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100">
-                      <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
-                        <i className="fa-solid fa-credit-card"></i>
-                        {t(
-                          'adminServiceRequestManager.contractorDetail.paymentInfo'
-                        )}
-                      </p>
-
-                      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
-                        <table className="w-full">
-                          <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
-                            <tr>
-                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.orderCode')}
-                              </th>
-                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.amount')}
-                              </th>
-                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.description')}
-                              </th>
-                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.contractorDetail.createAt')}
-                              </th>
-                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
-                                {t('adminServiceRequestManager.status')}
-                              </th>
-                            </tr>
-                          </thead>
-
-                          <tbody className="divide-y divide-gray-100">
-                            <tr className="hover:bg-indigo-50 transition-colors">
-                              <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
-                                {selectedContractor.payment?.orderCode || 'N/A'}
-                              </td>
-
-                              <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
-                                {formatVND(selectedContractor.payment?.amount || 0)}
-                              </td>
-
-                              <td className="px-4 py-3 text-sm text-gray-700 text-center">
-                                {selectedContractor.payment?.description.replaceAll('-', '') || 'No description'}
-                              </td>
-
-                              <td className="px-4 py-4 text-sm text-gray-700 text-center">
-                                {formatDate(selectedContractor.payment?.paidAt, i18n.language)}
-                              </td>
-
-                              <td className="px-4 py-4 text-sm text-gray-900 text-center">
-                                <div className="flex justify-center">
-                                  <StatusBadge
-                                    status={selectedContractor.payment?.status}
-                                    type="Payment"
-                                  />
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  )}
-
 
                   {/* Commission Countdown - Show when PendingCommission */}
                   {selectedContractor.status === 'PendingCommission' &&
@@ -675,8 +610,9 @@ export default function AdminServiceRequestDetail() {
                             href={url}
                             className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
                             data-gall="contractor-gallery"
-                            title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'
-                              } ${i + 1}`}
+                            title={`${
+                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                            } ${i + 1}`}
                           >
                             <img
                               src={url}
@@ -685,6 +621,84 @@ export default function AdminServiceRequestDetail() {
                             />
                           </a>
                         ))}
+                      </div>
+                    </div>
+                  )}
+                  {/*Payment Information */}
+                  {selectedContractor.status === 'Approved' && (
+                    <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100 mt-5">
+                      <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                        <i className="fa-solid fa-credit-card"></i>
+                        {t(
+                          'adminServiceRequestManager.contractorDetail.paymentInfo'
+                        )}
+                      </p>
+
+                      <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                        <table className="w-full">
+                          <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
+                            <tr>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.orderCode'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.amount'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.description')}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t(
+                                  'adminServiceRequestManager.contractorDetail.createAt'
+                                )}
+                              </th>
+                              <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                {t('adminServiceRequestManager.status')}
+                              </th>
+                            </tr>
+                          </thead>
+
+                          <tbody className="divide-y divide-gray-100">
+                            <tr className="hover:bg-indigo-50 transition-colors">
+                              <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                                {selectedContractor.payment?.orderCode || 'N/A'}
+                              </td>
+
+                              <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
+                                {formatVND(
+                                  selectedContractor.payment?.amount || 0
+                                )}
+                              </td>
+
+                              <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                                {selectedContractor.payment?.description.replaceAll(
+                                  '-',
+                                  ''
+                                ) || 'No description'}
+                              </td>
+
+                              <td className="px-4 py-4 text-sm text-gray-700 text-center">
+                                {formatDate(
+                                  selectedContractor.payment?.paidAt,
+                                  i18n.language
+                                )}
+                              </td>
+
+                              <td className="px-4 py-4 text-sm text-gray-900 text-center">
+                                <div className="flex justify-center">
+                                  <StatusBadge
+                                    status={selectedContractor.payment?.status}
+                                    type="Payment"
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   )}

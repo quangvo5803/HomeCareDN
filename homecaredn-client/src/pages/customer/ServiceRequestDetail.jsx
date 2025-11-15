@@ -112,6 +112,7 @@ export default function ServiceRequestDetail() {
         if (!prev) return null;
         return {
           ...prev,
+          startReviewDate: payload.startReviewDate,
           conversationID: payload.conversationID,
         };
       });
@@ -601,7 +602,7 @@ export default function ServiceRequestDetail() {
                   <span className="flex items-center gap-1 text-yellow-600">
                     <i className="fas fa-star"></i>
                     <span className="font-semibold">
-                      {selectedContractor.averageRating}
+                      {selectedContractor.averageRating.toFixed(1)}
                     </span>
                   </span>
                   <span className="text-gray-300">•</span>
@@ -865,7 +866,7 @@ export default function ServiceRequestDetail() {
                           <div className="flex items-center gap-3 text-xs text-gray-500">
                             <span className="flex items-center gap-1">
                               <i className="fas fa-star text-yellow-500"></i>
-                              <span>{c.averageRating}</span>
+                              <span>{c.averageRating.toFixed(1)}</span>
                             </span>
                             <span>•</span>
                             <span>

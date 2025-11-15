@@ -18,7 +18,12 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUnitOfWork _unitOfWork;
-        public UserService(IMapper mapper, UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork)
+
+        public UserService(
+            IMapper mapper,
+            UserManager<ApplicationUser> userManager,
+            IUnitOfWork unitOfWork
+        )
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -27,8 +32,8 @@ namespace BusinessLogic.Services
 
         public async Task<PagedResultDto<UserDto>> GetAllUserAsync(QueryParameters parameters)
         {
-            var query = _userManager.Users
-                .Include(a => a.Addresses)
+            var query = _userManager
+                .Users.Include(a => a.Addresses)
                 .AsQueryable()
                 .AsSingleQuery()
                 .AsNoTracking();
@@ -47,8 +52,7 @@ namespace BusinessLogic.Services
 
             if (!string.IsNullOrEmpty(parameters.FilterRoleName))
             {
-                var roleName = parameters.FilterRoleName;
-                var roleUsers = await _userManager.GetUsersInRoleAsync(roleName);
+                var roleUsers = await _userManager.GetUsersInRoleAsync(parameters.FilterRoleName);
                 var roleIds = roleUsers.Select(u => u.Id);
                 query = query.Where(u => roleIds.Contains(u.Id));
             }
@@ -57,9 +61,9 @@ namespace BusinessLogic.Services
             {
                 string keyword = parameters.Search.ToLower();
                 query = query.Where(u =>
-                    u.FullName.ToLower().Contains(keyword) ||
-                    u.Email!.ToLower().Contains(keyword) ||
-                    (u.PhoneNumber != null && u.PhoneNumber.ToLower().Contains(keyword))
+                    u.FullName.ToLower().Contains(keyword)
+                    || u.Email!.ToLower().Contains(keyword)
+                    || (u.PhoneNumber != null && u.PhoneNumber.ToLower().Contains(keyword))
                 );
             }
 
@@ -78,7 +82,12 @@ namespace BusinessLogic.Services
 
             var users = await query.ToListAsync();
             var dtos = _mapper.Map<IEnumerable<UserDto>>(users);
-
+            foreach (var dto in dtos)
+            {
+                var user = users.First(u => u.Id == dto.UserID);
+                var role = await _userManager.GetRolesAsync(user);
+                dto.Role = role.FirstOrDefault();
+            }
             return new PagedResultDto<UserDto>
             {
                 Items = dtos,
@@ -90,8 +99,8 @@ namespace BusinessLogic.Services
 
         public async Task<UserDto> GetUserByIdAsync(string userID)
         {
-            var user = await _userManager.Users
-                .Include(u => u.Addresses)
+            var user = await _userManager
+                .Users.Include(u => u.Addresses)
                 .AsSingleQuery()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userID);
@@ -105,16 +114,16 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            var serviceRequests = await _unitOfWork.ServiceRequestRepository
-                .GetRangeAsync(sr => sr.CustomerID.ToString() == userID);
+            var serviceRequests = await _unitOfWork.ServiceRequestRepository.GetRangeAsync(sr =>
+                sr.CustomerID.ToString() == userID
+            );
 
             var dto = _mapper.Map<UserDto>(user);
 
             var role = await _userManager.GetRolesAsync(user);
             dto.Role = role.FirstOrDefault();
 
-            dto.ServiceRequests = 
-                _mapper.Map<List<ServiceRequestDto>>(serviceRequests);
+            dto.ServiceRequests = _mapper.Map<List<ServiceRequestDto>>(serviceRequests);
             dto.Address = _mapper.Map<List<AddressDto>>(user.Addresses);
             return dto;
         }

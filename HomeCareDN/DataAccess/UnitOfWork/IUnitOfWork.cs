@@ -21,6 +21,7 @@ namespace DataAccess.UnitOfWork
         IDistributorApplicationRepository DistributorApplicationRepository { get; }
         IDistributorApplicationItemRepository DistributorApplicationItemRepository { get; }
         IPaymentTransactionsRepository PaymentTransactionsRepository { get; }
+        IReviewRepository ReviewRepository { get; }
         Task SaveAsync();
     }
 }
