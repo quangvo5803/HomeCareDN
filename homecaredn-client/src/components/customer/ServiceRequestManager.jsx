@@ -201,8 +201,7 @@ export default function ServiceRequestManager() {
     </span>
   );
 
-  if (loading || uploadProgress > 0)
-    return <Loading progress={uploadProgress} />;
+  if (loading || uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div>

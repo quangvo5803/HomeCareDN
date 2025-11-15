@@ -263,6 +263,7 @@
         "name": "Full Name",
         "email": "Email",
         "phone": "Phone Number",
+        "phone_placeholder": "Enter your phone number",
         "gender": "Gender",
         "gender_choice": "Select Gender",
         "gender_male": "Male",
@@ -1084,7 +1085,8 @@
     "comment": "Comment",
     "commentPlaceholder": "Write your comment here...",
     "images": "Images",
-    "uploadImages": "Upload Images"
+    "uploadImages": "Upload Images",
+    "warning": "You cannot edit after submitting. Your review may affect service quality and partners."
   },
     "DeleteBrandModal": {
       "title": "Are you sure?",
@@ -1265,6 +1267,7 @@
     "MATERIAL_REQUEST_ADD": "Add material request successfully.",
     "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
     "DELETE_APPLICATION": "Delete Application Successful",

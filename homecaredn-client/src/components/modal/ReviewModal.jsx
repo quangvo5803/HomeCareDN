@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hook/useAuth';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
 
@@ -77,7 +77,7 @@ export default function ReviewModal({
       };
       if (newFiles.length > 0) {
         setUploadProgress(1);
-        const uploaded = await uploadImageToCloudinary(
+        const uploaded = await uploadToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
@@ -281,7 +281,12 @@ export default function ReviewModal({
             </div>
           )}
         </div>
-
+        {!readOnly && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl flex gap-2 text-sm text-red-700">
+            <i className="fa-solid fa-triangle-exclamation text-red-500 text-lg"></i>
+            <p>{t('ModalPopup.ReviewModal.warning')}</p>
+          </div>
+        )}
         {/* Footer */}
         <div className="flex items-center justify-end gap-4 pt-4 mt-6 border-t">
           <button
