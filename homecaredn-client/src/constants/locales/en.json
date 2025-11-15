@@ -577,19 +577,10 @@
     "send": "Send",
     "launcherTitle": "Live support",
     "typing": "Bot is typing…",
-    "demoBadge": "Demo • Version 1.0",
-    "suggestions": [
-      "How to use this website?",
-      "Add rounded avatar",
-      "Suggest modern colors"
-    ],
-    "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
-    "seed": {
-      "user1": "I want a React chat support widget. Please split components.",
-      "bot1": "Sure! I'll design a modern widget with a round launcher button.",
-      "user2": "Prioritize mobile and match the context: 'React support widget'.",
-      "bot2": "Got it! I'll seed sample data and keep components clean."
-    }
+    "tabAI":"Chat with AI",
+    "tabAdmin":"Chat with Admin",
+    "startAdminChat":"Send message to Admin to start convesation",
+    "sendAdminChatError":"Send message to Admin ERROR"
   },
   "distributorCategoryManager": {
     "title": "Category Manager",
@@ -658,8 +649,9 @@
       "serviceRequest": "Service Request",
       "material": "Material",
       "partner": "Partner",
+      "support": "Support Manager",
+      "supportChat": "Support Chat Manager",
       "user": "User",
-      "support": "Support",
       "commission": "Commission"
     },
     "account": {
@@ -966,6 +958,28 @@
     "noSupport": "No support requests yet",
     "all": "All",
     "supports": "request(s)"
+  },
+  "adminSupportChatManager": {
+    "title": "Customer Support Chat",
+    "subtitle": "Manage and respond to support requests",
+    "conversationList": "Conversation List",
+    "searchUser": "Search user...",
+    "noConversations": "No support requests yet",
+    "noMessage": "No messages yet",
+    "selectConversation": "Select a conversation to start",
+    "online": "Online",
+    "inputPlaceholder": "Enter message...",
+    "loadingMore": "Loading more messages...",
+    "send": "Send",
+    "noMessagesInChat": "No messages in this conversation yet",
+    "noMoreMessages": "No more messages",
+    "newConversation":"You have received new Convesation!",
+    "newMessage":"You have received new Message!",
+    "roles":{
+      "Customer":"Customer",
+      "Contractor":"Contractor",
+      "Distributor":"Distributor"
+    }
   },
   "adminPaymentManager": {
     "title": "Manage commissions",

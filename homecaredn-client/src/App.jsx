@@ -36,6 +36,7 @@ import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
+import AdminSupportChatManager from './pages/admin/AdminSupportChatManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminPaymentManager from './pages/admin/AdminPaymentManager';
@@ -309,6 +310,10 @@ function Layout() {
           <Route
             path="PartnerRequestManager"
             element={<AdminPartnerRequestManager />}
+          />
+          <Route
+            path="SupportChatManager"
+            element={<AdminSupportChatManager />}
           />
           <Route path="UserManager" element={<AdminUserManager />} />
           <Route path="UserManager/:userID" element={<AdminUserDetail />} />

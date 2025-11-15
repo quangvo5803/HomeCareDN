@@ -1,6 +1,3 @@
-// src/components/LoadingInline.jsx
-import React from 'react';
-
 export default function LoadingComponent() {
   return (
     <div className="flex flex-col items-center justify-center w-full h-64">

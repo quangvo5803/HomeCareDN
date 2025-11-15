@@ -1,9 +1,116 @@
 import Sidebar from '../../components/admin/Sidebar';
 import Navbar from '../../components/admin/Navbar';
 import Footer from '../../components/admin/Footer';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useContext, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import RealtimeContext from '../../realtime/RealtimeContext';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import { useAuth } from '../../hook/useAuth';
+import { handleApiError } from '../../utils/handleApiError';
+import notificationSoundNewConvesation from '../../assets/sounds/notification.mp3';
+import notificationSoundNewMessage from '../../assets/sounds/message.mp3';
 
 export default function AdminLayout() {
+  const { user } = useAuth();
+  const { t } = useTranslation();
+  const { chatConnection, chatConnectionState } = useContext(RealtimeContext);
+  const location = useLocation();
+
+  const adminGroupJoinedRef = useRef(false);
+  const notificationNewConvesation = useRef(
+    new Audio(notificationSoundNewConvesation)
+  );
+  const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
+
+  useEffect(() => {
+    if (!user?.id || !chatConnection || adminGroupJoinedRef.current) return;
+
+    let retryTimer = null;
+    let isComponentMounted = true; // Track component
+
+    const JoinConversation = async () => {
+      if (!isComponentMounted || adminGroupJoinedRef.current) return;
+
+      if (chatConnection.state === 'Connected') {
+        try {
+          await chatConnection.invoke('JoinAdminGroup', user.id);
+          adminGroupJoinedRef.current = true;
+        } catch (error) {
+          toast.error(t(handleApiError(error)));
+          if (isComponentMounted) {
+            retryTimer = setTimeout(JoinConversation, 500);
+          }
+        }
+        return;
+      }
+      retryTimer = setTimeout(JoinConversation, 300);
+    };
+
+    retryTimer = setTimeout(JoinConversation, 100);
+
+    const handleReconnected = () => {
+      adminGroupJoinedRef.current = false;
+      if (isComponentMounted) {
+        retryTimer = setTimeout(JoinConversation, 100);
+      }
+    };
+
+    if (chatConnection.onreconnected) {
+      chatConnection.onreconnected(handleReconnected);
+    }
+
+    return () => {
+      isComponentMounted = false;
+      if (retryTimer) clearTimeout(retryTimer);
+
+      if (
+        adminGroupJoinedRef.current &&
+        chatConnection?.state === 'Connected'
+      ) {
+        chatConnection
+          .invoke('LeaveAdminGroup', user.id)
+          .then(() => {
+            adminGroupJoinedRef.current = false;
+          })
+          .catch(() => {});
+      }
+      if (chatConnectionState !== 'Connected' && adminGroupJoinedRef.current) {
+        adminGroupJoinedRef.current = false;
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, chatConnection, chatConnectionState]);
+
+  useRealtime(
+    {
+      [RealtimeEvents.NewConversationForAdmin]: (payload) => {
+        if (location.pathname.includes('/Admin/SupportChatManager')) {
+          return;
+        }
+        if (!user?.id || payload.senderID === user.id) {
+          return;
+        }
+        toast.success(t('adminSupportChatManager.newConversation'));
+        notificationNewConvesation.current.play().catch(() => {});
+      },
+
+      [RealtimeEvents.NewAdminMessage]: (payload) => {
+        if (location.pathname.includes('/Admin/SupportChatManager')) {
+          return;
+        }
+        const msg = payload.message;
+        if (!user?.id || msg?.senderID === user.id) {
+          return;
+        }
+        toast.info(t('adminSupportChatManager.newMessage'));
+        notificationNewMessage.current.play().catch(() => {});
+      },
+    },
+    'chat'
+  );
   return (
     <div className="flex flex-col min-h-screen font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500">
       <div className="absolute w-full bg-blue-500 min-h-75"></div>
