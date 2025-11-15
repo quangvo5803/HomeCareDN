@@ -468,8 +468,9 @@ namespace BusinessLogic.Services
             {
                 foreach (var updateDto in materialRequestUpdateRequestDto.UpdateItems)
                 {
-                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(i =>
-                        i.MaterialRequestItemID == updateDto.MaterialRequestItemID
+                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(
+                        i => i.MaterialRequestItemID == updateDto.MaterialRequestItemID,
+                        asNoTracking: false
                     );
                     if (updateItem != null)
                     {

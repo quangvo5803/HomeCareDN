@@ -69,11 +69,17 @@ namespace BusinessLogic.Services
             var dtos = _mapper.Map<IEnumerable<ContractorApplicationDto>>(items);
             foreach (var dto in dtos)
             {
+                var contractor = await _userManager.FindByIdAsync(dto.ContractorID.ToString());
+
                 //Hidden to low loading => show when getById
                 dto.Description = string.Empty;
+
+                dto.ReviewCount = contractor!.RatingCount;
+                dto.AverageRating = contractor!.AverageRating;
+                dto.CompletedProjectCount = contractor!.ProjectCount;
+
                 if (role == "Admin")
                 {
-                    var contractor = await _userManager.FindByIdAsync(dto.ContractorID.ToString());
                     if (contractor != null)
                     {
                         dto.ContractorEmail = contractor.Email ?? string.Empty;
@@ -169,6 +175,8 @@ namespace BusinessLogic.Services
                 contractorApplication.ContractorID.ToString()
             );
             dto.CompletedProjectCount = contractor!.ProjectCount;
+            dto.AverageRating = contractor.AverageRating;
+            dto.ReviewCount = contractor.RatingCount;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -181,7 +189,7 @@ namespace BusinessLogic.Services
                     dto.ContractorPhone = string.Empty;
                 }
             }
-            if(role == "Admin" && dto.Status == ApplicationStatus.Approved.ToString())
+            if (role == "Admin" && dto.Status == ApplicationStatus.Approved.ToString())
             {
                 var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
                     p.ServiceRequestID == contractorApplication.ServiceRequestID
@@ -191,7 +199,7 @@ namespace BusinessLogic.Services
                     dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
                 }
             }
-        
+
             return dto;
         }
 

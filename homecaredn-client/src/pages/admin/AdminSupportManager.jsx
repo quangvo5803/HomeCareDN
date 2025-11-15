@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useDebounce } from 'use-debounce';
 import SupportModal from '../../components/modal/SupportModal';
-import Loading from '../../components/Loading';
 import LoadingComponent from '../../components/LoadingComponent';
 import { contactSupportService } from '../../services/contactSupportService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
