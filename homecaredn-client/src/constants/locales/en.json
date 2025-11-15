@@ -970,6 +970,7 @@
     "noMessagesInChat": "No messages in this conversation yet",
     "noMoreMessages": "No more messages",
     "newConversation":"You have received new Convesation!",
+    "newMessage":"You have received new Message!",
     "roles":{
       "Customer":"Customer",
       "Contractor":"Contractor",

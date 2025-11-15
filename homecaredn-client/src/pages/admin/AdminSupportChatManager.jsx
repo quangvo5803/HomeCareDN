@@ -37,73 +37,10 @@ export default function AdminSupportChatManager() {
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
   const messagesContainerRef = useRef(null);
-  const adminGroupJoinedRef = useRef(false);
   const notificationNewConvesation = useRef(
     new Audio(notificationSoundNewConvesation)
   );
   const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
-
-  useEffect(() => {
-    if ('Notification' in globalThis && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!user?.id || !chatConnection || adminGroupJoinedRef.current) return;
-
-    let retryTimer = null;
-    let isComponentMounted = true; // Track component
-
-    const JoinConversation = async () => {
-      if (!isComponentMounted || adminGroupJoinedRef.current) return;
-
-      if (chatConnection.state === 'Connected') {
-        try {
-          await chatConnection.invoke('JoinAdminGroup', user.id);
-          adminGroupJoinedRef.current = true;
-        } catch (error) {
-          toast.error(t(handleApiError(error)));
-          if (isComponentMounted) {
-            retryTimer = setTimeout(JoinConversation, 500);
-          }
-        }
-        return;
-      }
-      retryTimer = setTimeout(JoinConversation, 300);
-    };
-
-    retryTimer = setTimeout(JoinConversation, 100);
-
-    const handleReconnected = () => {
-      adminGroupJoinedRef.current = false;
-      if (isComponentMounted) {
-        retryTimer = setTimeout(JoinConversation, 100);
-      }
-    };
-
-    if (chatConnection.onreconnected) {
-      chatConnection.onreconnected(handleReconnected);
-    }
-
-    return () => {
-      isComponentMounted = false;
-      if (retryTimer) clearTimeout(retryTimer);
-
-      if (
-        adminGroupJoinedRef.current &&
-        chatConnection?.state === 'Connected'
-      ) {
-        chatConnection
-          .invoke('LeaveAdminGroup', user.id)
-          .then(() => {
-            adminGroupJoinedRef.current = false;
-          })
-          .catch(() => {});
-      }
-    };
-  }, [user?.id, chatConnection, t]);
-
   // Realtime messages
   useRealtime(
     {
@@ -126,7 +63,9 @@ export default function AdminSupportChatManager() {
         if (!payload.conversation?.conversationID) {
           return;
         }
-
+        if (!user?.id || payload.senderID === user.id) {
+          return;
+        }
         const newConversation = payload.conversation;
 
         setConversations((prev) => {
@@ -139,10 +78,7 @@ export default function AdminSupportChatManager() {
           }
           return [newConversation, ...prev];
         });
-
-        toast.success(t('adminSupportChatManager.newConversation'), {
-          onClick: () => setSelectedConversation(newConversation),
-        });
+        toast.success(t('adminSupportChatManager.newConversation'));
         notificationNewConvesation.current.play().catch(() => {});
       },
 
@@ -157,6 +93,11 @@ export default function AdminSupportChatManager() {
             .markAsRead(payload.conversationID)
             .catch(() => {});
         } else {
+          const msg = payload.message;
+          if (msg?.senderID === user.id) {
+            return;
+          }
+          toast.info(t('adminSupportChatManager.newMessage'));
           notificationNewMessage.current.play().catch(() => {});
         }
         setConversations((prev) => {

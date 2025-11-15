@@ -979,7 +979,8 @@
     "send": "Gửi",
     "noMessagesInChat": "Chưa có tin nhắn nào trong cuộc trò chuyện này",
     "noMoreMessages": "Không còn tin nhắn nào nữa",
-    "newConversation":"Bạn vừa có cuộc trò chuyện mới!",
+    "newConversation":"Bạn có cuộc trò chuyện mới!",
+    "newMessage":"Bạn có tin nhắn mới!",
     "roles":{
       "Customer":"Khách hàng",
       "Contractor":"Nhà thầu",
