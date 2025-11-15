@@ -62,6 +62,11 @@ export default function Sidebar() {
       link: '/Admin/UserManager',
     },
     {
+      icon: 'text-green-500 fa-solid fa-dollar',
+      title: 'commission',
+      link: '/Admin/PaymentManager',
+    },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',

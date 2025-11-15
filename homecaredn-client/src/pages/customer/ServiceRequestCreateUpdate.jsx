@@ -290,6 +290,7 @@ export default function ServiceRequestCreateUpdate() {
     } catch {
       /// Handle in context
     } finally {
+      setUploadProgress(0);
       setIsSubmitting(false);
     }
   };

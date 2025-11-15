@@ -14,7 +14,6 @@ export default function CategoryModal({
   onSave,
   categoryID,
   setUploadProgress,
-  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
@@ -66,7 +65,6 @@ export default function CategoryModal({
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
     if (!categoryName.trim()) {
       return toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
     }
@@ -104,7 +102,6 @@ export default function CategoryModal({
       toast.error(t(handleApiError(err)));
     } finally {
       setUploadProgress(0);
-      setSubmitting(false);
     }
   };
 
