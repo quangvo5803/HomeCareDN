@@ -19,8 +19,27 @@ import { toast } from 'react-toastify';
 import notificationSoundNewConvesation from '../../assets/sounds/notification.mp3';
 import notificationSoundNewMessage from '../../assets/sounds/message.mp3';
 
-const MESSAGE_SIZE = 10;
+function RoleBadgeColors({ role }) {
+  const { t } = useTranslation();
+  const roleColors = {
+    Customer: 'bg-blue-100 text-blue-700',
+    Contractor: 'bg-emerald-100 text-emerald-700',
+    Distributor: 'bg-purple-100 text-purple-700',
+  };
+  const translatedRole = t(`adminSupportChatManager.roles.${role}`);
+  return (
+    <span
+      className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${roleColors[role]}`}
+    >
+      {translatedRole}
+    </span>
+  );
+}
+RoleBadgeColors.propTypes = {
+  role: PropTypes.string,
+};
 
+const MESSAGE_SIZE = 10;
 export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -267,24 +286,6 @@ export default function AdminSupportChatManager() {
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
-  };
-  function RoleBadgeColors({ role }) {
-    const roleColors = {
-      Customer: 'bg-blue-100 text-blue-700',
-      Contractor: 'bg-emerald-100 text-emerald-700',
-      Distributor: 'bg-purple-100 text-purple-700',
-    };
-    const translatedRole = t(`adminSupportChatManager.roles.${role}`);
-    return (
-      <span
-        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${roleColors[role]}`}
-      >
-        {translatedRole}
-      </span>
-    );
-  }
-  RoleBadgeColors.propTypes = {
-    role: PropTypes.string,
   };
   // Filter conversations
   const filteredConversations = useMemo(() => {
