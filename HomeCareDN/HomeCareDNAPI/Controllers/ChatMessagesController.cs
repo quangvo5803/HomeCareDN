@@ -30,7 +30,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Customer,Contractor,Admin")]
+        [Authorize(Roles = "Customer,Contractor,Distributor,Admin")]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageRequestDto dto)
         {
             var result = await _facadeService.ChatMessageService.SendMessageAsync(dto);
@@ -38,7 +38,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpPost("send-admin")]
-        [Authorize(Roles = "Customer,Contractor")]
+        [Authorize(Roles = "Customer,Contractor,Distributor")]
         public async Task<IActionResult> SendMessageToAdmin([FromBody] SendMessageRequestDto dto)
         {
             var result = await _facadeService.ChatMessageService.SendMessageToAdminAsync(dto);

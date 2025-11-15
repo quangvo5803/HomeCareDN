@@ -80,7 +80,7 @@ function useAutoScroll(dep) {
 /*Sub components*/
 function BotAvatar() {
   return (
-    <div className="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
+    <div className="h-8 w-8 rounded-full bg-indigo-100 text-orange-600 grid place-items-center border">
       <span className="text-xs">
         <i className="fa-solid fa-headset" />
       </span>
@@ -126,7 +126,7 @@ function MessageBubble({ message }) {
           className={cn(
             'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border',
             isUser
-              ? 'bg-indigo-600 text-white border-indigo-500/30'
+              ? 'bg-orange-600 text-white border-indigo-500/30'
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
@@ -184,7 +184,7 @@ function ChatHeader({
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
         <div className="relative">
-          <div className="h-9 w-9 rounded-full bg-indigo-100 text-indigo-600 grid place-items-center border">
+          <div className="h-9 w-9 rounded-full bg-indigo-100 text-orange-600 grid place-items-center border">
             <i className="fa-solid fa-headset" />
           </div>
           <span className="absolute -right-0 -bottom-0 h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-white" />
@@ -247,7 +247,7 @@ function TabButton({ label, icon, isActive, onClick, disabled }) {
       className={cn(
         'flex-1 flex items-center justify-center gap-2 px-3 py-2.5 text-sm font-medium border-b-2',
         isActive
-          ? 'text-indigo-600 border-indigo-600'
+          ? 'text-orange-600 orange-indigo-600'
           : 'text-gray-500 border-transparent hover:text-gray-700',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
@@ -290,13 +290,13 @@ function ChatInput({ onSend, disabled, isLoading, countdown }) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={t('supportChat.inputPlaceholder')}
-        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
         disabled={disabled}
       />
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="rounded-md bg-indigo-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150"
+        className="rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150"
       >
         {buttonText}
       </button>
@@ -686,7 +686,7 @@ function ChatLauncherButton({ open, setOpen }) {
       onClick={() => setOpen((v) => !v)}
       className={cn(
         'fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-2xl border',
-        'bg-indigo-600 text-white grid place-items-center hover:scale-110 transition'
+        'bg-orange-600 text-white grid place-items-center hover:scale-110 transition'
       )}
       title={t('supportChat.launcherTitle')}
       aria-label={t('supportChat.launcherTitle')}

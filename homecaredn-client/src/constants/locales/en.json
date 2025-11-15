@@ -651,7 +651,6 @@
       "support": "Support Manager",
       "supportChat": "Support Chat Manager",
       "user": "User",
-      "support": "Support",
       "commission": "Commission"
     },
     "account": {
@@ -970,7 +969,12 @@
     "send": "Send",
     "noMessagesInChat": "No messages in this conversation yet",
     "noMoreMessages": "No more messages",
-    "newConversation":"You have received new Convesation!"
+    "newConversation":"You have received new Convesation!",
+    "roles":{
+      "Customer":"Customer",
+      "Contractor":"Contractor",
+      "Distributor":"Distributor"
+    }
   },
   "adminPaymentManager": {
     "title": "Manage commissions",

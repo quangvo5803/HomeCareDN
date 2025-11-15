@@ -42,11 +42,13 @@ export default function AdminSupportChatManager() {
     new Audio(notificationSoundNewConvesation)
   );
   const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
+
   useEffect(() => {
     if ('Notification' in globalThis && Notification.permission === 'default') {
       Notification.requestPermission();
     }
   }, []);
+
   useEffect(() => {
     if (!user?.id || !chatConnection || adminGroupJoinedRef.current) return;
 
@@ -324,7 +326,21 @@ export default function AdminSupportChatManager() {
       toast.error(t(handleApiError(error)));
     }
   };
-
+  function RoleBadgeColors({ role }) {
+    const roleColors = {
+      Customer: 'bg-blue-100 text-blue-700',
+      Contractor: 'bg-emerald-100 text-emerald-700',
+      Distributor: 'bg-purple-100 text-purple-700',
+    };
+    const translatedRole = t(`adminSupportChatManager.roles.${role}`);
+    return (
+      <span
+        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${roleColors[role]}`}
+      >
+        {translatedRole}
+      </span>
+    );
+  }
   // Filter conversations
   const filteredConversations = useMemo(() => {
     if (!filter) return conversations;
@@ -337,6 +353,7 @@ export default function AdminSupportChatManager() {
         conversation.UserName?.toLowerCase()?.includes(searchTerm)
     );
   }, [conversations, filter]);
+  //Left
   const renderConversationList = () => {
     if (loadingConversation) {
       return (
@@ -363,39 +380,47 @@ export default function AdminSupportChatManager() {
                 className={`w-full text-left p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
                   conversation.conversationID ===
                   selectedConversation?.conversationID
-                    ? 'bg-indigo-100 border-l-4 border-indigo-500'
+                    ? 'bg-indigo-100 border-l-4 border-orange-500'
                     : ''
                 }`}
                 aria-label={`${t(
                   'adminSupportChatManager.selectConversation'
                 )}: ${conversation.userEmail}`}
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold">
-                      {conversation.userEmail?.charAt(0).toUpperCase()}
+                <div className="flex items-center justify-between gap-3">
+                  {/* Avatar and Name */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                        {conversation.userEmail?.charAt(0).toUpperCase()}
+                      </div>
+                      {conversation.adminUnreadCount > 0 && (
+                        <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+                      )}
                     </div>
-                    {conversation.adminUnreadCount > 0 && (
-                      <span
-                        className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white"
-                        aria-label={`${conversation.adminUnreadCount} ${t(
-                          'adminSupportChatManager.unreadMessages'
-                        )}`}
-                      />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    {/* email */}
-                    <p className="font-medium text-sm truncate text-gray-800">
-                      {conversation?.userEmail}
-                    </p>
-                    {/* name */}
-                    {conversation?.userName && (
-                      <p className="text-xs text-gray-500 truncate">
-                        {conversation?.userName}
+
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate text-gray-800">
+                        {conversation?.userEmail}
                       </p>
-                    )}
+                      {conversation?.userName && (
+                        <p className="text-xs text-gray-500 truncate">
+                          {conversation.userName}
+                        </p>
+                      )}
+                      {conversation?.userRole && (
+                        <RoleBadgeColors role={conversation.userRole} />
+                      )}
+                    </div>
                   </div>
+
+                  {conversation.adminUnreadCount > 0 && (
+                    <span className="flex-shrink-0 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                      {conversation.adminUnreadCount > 9
+                        ? '9+'
+                        : conversation.adminUnreadCount}
+                    </span>
+                  )}
                 </div>
               </button>
             </li>
@@ -417,7 +442,7 @@ export default function AdminSupportChatManager() {
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-fadeIn">
       {/* Header */}
-      <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-md p-5 mb-5 text-white">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-5 mb-5 text-white">
         <h2 className="text-2xl font-semibold flex items-center gap-2">
           <i className="fa-solid fa-headset"></i>
           {t('adminSupportChatManager.title')}
@@ -430,10 +455,10 @@ export default function AdminSupportChatManager() {
       {/* Content */}
       <div className="flex flex-1 gap-5 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-80 bg-white rounded-2xl shadow-md border flex flex-col overflow-hidden">
-          <div className="p-4 border-b bg-gray-50">
+        <div className="w-80 bg-white rounded-xl shadow-md border flex flex-col overflow-hidden">
+          <div className="p-3 border-b bg-gray-50">
             <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <i className="fa-solid fa-list text-indigo-500"></i>
+              <i className="fa-solid fa-list text-orange-500"></i>
               {t('adminSupportChatManager.conversationList')}
             </h4>
             <input
@@ -441,22 +466,23 @@ export default function AdminSupportChatManager() {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               placeholder={t('adminSupportChatManager.searchUser')}
-              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
-
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-gray-100">
+          {/* Left */}
+          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
             {renderConversationList()}
           </div>
         </div>
 
+        {/* Right */}
         {/* Chat Area */}
-        <div className="flex-1 bg-white rounded-2xl shadow-md border flex flex-col overflow-hidden">
+        <div className="flex-1 bg-white rounded-xl shadow-md border flex flex-col overflow-hidden">
           {selectedConversation ? (
             <>
               {/* Header */}
-              <div className="p-4 border-b flex items-center gap-3 bg-gray-50">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+              <div className="p-4 border-b flex items-center gap-3 bg-gray-50 ">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold text-lg">
                   {selectedConversation?.userEmail?.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -467,6 +493,9 @@ export default function AdminSupportChatManager() {
                     <p className="text-xs text-gray-500">
                       {selectedConversation?.userName}
                     </p>
+                  )}
+                  {selectedConversation?.userRole && (
+                    <RoleBadgeColors role={selectedConversation.userRole} />
                   )}
                 </div>
               </div>
@@ -487,7 +516,7 @@ export default function AdminSupportChatManager() {
                     {loadingMoreMessage && (
                       <div className="flex justify-center py-2 mb-3">
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs text-gray-600">
-                          <i className="fas fa-spinner fa-spin text-indigo-500"></i>
+                          <i className="fas fa-spinner fa-spin text-orange-500"></i>
                           {t('adminSupportChatManager.loadingMore')}
                         </span>
                       </div>
@@ -518,7 +547,7 @@ export default function AdminSupportChatManager() {
                                 <div
                                   className={`px-4 py-2 rounded-2xl ${
                                     isAdmin
-                                      ? 'bg-indigo-600 text-white rounded-br-sm'
+                                      ? 'bg-orange-600 text-white rounded-br-sm'
                                       : 'bg-white border text-gray-800 rounded-bl-sm'
                                   }`}
                                 >
@@ -566,12 +595,12 @@ export default function AdminSupportChatManager() {
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder={t('adminSupportChatManager.inputPlaceholder')}
-                  className="flex-1 border rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                  className="flex-1 border rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
                 />
                 <button
                   type="submit"
                   disabled={!messageInput.trim()}
-                  className="px-5 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 transition flex items-center gap-2"
+                  className="px-5 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 disabled:opacity-50 transition flex items-center gap-2"
                 >
                   <i className="fa-solid fa-paper-plane"></i>
                   {t('adminSupportChatManager.send')}

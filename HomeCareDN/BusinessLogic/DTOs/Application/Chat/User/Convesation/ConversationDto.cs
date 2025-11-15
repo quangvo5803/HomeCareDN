@@ -9,6 +9,7 @@
         public string? UserID { get; set; }
         public string? UserEmail { get; set; }
         public string? UserName { get; set; }
+        public string? UserRole { get; set; }
         public Guid? ServiceRequestID { get; set; }
         public int AdminUnreadCount { get; set; }
         public required string ConversationType { get; set; }

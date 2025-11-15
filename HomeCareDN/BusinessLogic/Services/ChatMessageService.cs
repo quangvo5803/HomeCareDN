@@ -278,10 +278,13 @@ namespace BusinessLogic.Services
                 if (!string.IsNullOrEmpty(conversationDto.UserID))
                 {
                     var user = await _userManager.FindByIdAsync(conversationDto.UserID);
+
                     if (user != null)
                     {
                         conversationDto.UserEmail = user.Email;
                         conversationDto.UserName = user.FullName;
+                        var roles = await _userManager.GetRolesAsync(user);
+                        conversationDto.UserRole = roles.FirstOrDefault();
                     }
                 }
                 await _signalRNotifier.SendToAdminAsync(

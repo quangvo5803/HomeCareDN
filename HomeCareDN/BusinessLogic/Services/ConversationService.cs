@@ -47,7 +47,7 @@ namespace BusinessLogic.Services
         public async Task<ConversationDto?> GetConversationByUserIDAsync(string id)
         {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
-                c.UserID == id
+                c.UserID == id && c.ConversationType == ConversationType.AdminSupport
             );
             if (conversation == null)
             {
@@ -76,36 +76,21 @@ namespace BusinessLogic.Services
             }
 
             var result = _mapper.Map<IEnumerable<ConversationDto>>(conversations);
-
-            var userIds = result
-                .Where(dto => !string.IsNullOrEmpty(dto.UserID))
-                .Select(dto => dto.UserID)
-                .Distinct()
-                .ToList();
-
-            if (userIds.Count == 0)
+            foreach (var dto in result)
             {
-                return result;
-            }
-
-            // Get user map
-            var userMap = await _userManager
-                .Users.Where(u => userIds.Contains(u.Id))
-                .ToDictionaryAsync(u => u.Id, u => u);
-
-            // Replace foreach loop with LINQ Select
-            return result.Select(dto =>
-            {
-                if (
-                    !string.IsNullOrEmpty(dto.UserID)
-                    && userMap.TryGetValue(dto.UserID, out var user)
-                )
+                if (!string.IsNullOrEmpty(dto.UserID))
                 {
-                    dto.UserEmail = user.Email;
-                    dto.UserName = user.FullName;
+                    var user = await _userManager.FindByIdAsync(dto.UserID);
+                    if (user != null)
+                    {
+                        dto.UserEmail = user.Email;
+                        dto.UserName = user.FullName;
+                        var roles = await _userManager.GetRolesAsync(user);
+                        dto.UserRole = roles.FirstOrDefault();
+                    }
                 }
-                return dto;
-            });
+            }
+            return result;
         }
 
         public async Task MarkConversationAsReadAsync(Guid id)

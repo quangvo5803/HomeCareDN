@@ -648,7 +648,6 @@
       "support": "Quản lý hỗ trợ",
       "supportChat": "Quản lý hỗ trợ chat",
       "user": "Người dùng",
-      "support": "Hỗ trợ",
       "commission": "Tiền hoa hồng"
     },
     "account": {
@@ -980,7 +979,12 @@
     "send": "Gửi",
     "noMessagesInChat": "Chưa có tin nhắn nào trong cuộc trò chuyện này",
     "noMoreMessages": "Không còn tin nhắn nào nữa",
-    "newConversation":"Bạn vừa có cuộc trò chuyện mới!"
+    "newConversation":"Bạn vừa có cuộc trò chuyện mới!",
+    "roles":{
+      "Customer":"Khách hàng",
+      "Contractor":"Nhà thầu",
+      "Distributor":"Nhà phân phối"
+    }
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",

@@ -19,7 +19,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("{id:guid}")]
-        [Authorize(Roles = "Customer,Contractor")]
+        [Authorize(Roles = "Customer,Contractor,Distributor")]
         public async Task<IActionResult> GetConversationByID(Guid id)
         {
             var result = await _facadeService.ConversationService.GetConversationByIDAsync(id);
@@ -27,7 +27,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("user/{id}")]
-        [Authorize(Roles = "Customer,Contractor")]
+        [Authorize(Roles = "Customer,Contractor,Distributor")]
         public async Task<IActionResult> GetConversationByUserID(string id)
         {
             var result = await _facadeService.ConversationService.GetConversationByUserIDAsync(id);
