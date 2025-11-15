@@ -76,20 +76,25 @@ namespace BusinessLogic.Services
             }
 
             var result = _mapper.Map<IEnumerable<ConversationDto>>(conversations);
-            foreach (var dto in result)
-            {
-                if (!string.IsNullOrEmpty(dto.UserID))
+            //LINQ
+            var tasks = result.Select(
+                async (dto) =>
                 {
-                    var user = await _userManager.FindByIdAsync(dto.UserID);
-                    if (user != null)
+                    if (!string.IsNullOrEmpty(dto.UserID))
                     {
-                        dto.UserEmail = user.Email;
-                        dto.UserName = user.FullName;
-                        var roles = await _userManager.GetRolesAsync(user);
-                        dto.UserRole = roles.FirstOrDefault();
+                        var user = await _userManager.FindByIdAsync(dto.UserID);
+                        if (user != null)
+                        {
+                            dto.UserEmail = user.Email;
+                            dto.UserName = user.FullName;
+                            var roles = await _userManager.GetRolesAsync(user);
+                            dto.UserRole = roles.FirstOrDefault();
+                        }
                     }
                 }
-            }
+            );
+            await Task.WhenAll(tasks);
+
             return result;
         }
 

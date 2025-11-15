@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
+import PropTypes from 'prop-types';
 import { conversationService } from '../../services/conversationService';
 import { chatMessageService } from '../../services/chatMessageService';
 import useRealtime from '../../realtime/useRealtime';
@@ -282,6 +283,9 @@ export default function AdminSupportChatManager() {
       </span>
     );
   }
+  RoleBadgeColors.propTypes = {
+    role: PropTypes.string,
+  };
   // Filter conversations
   const filteredConversations = useMemo(() => {
     if (!filter) return conversations;
