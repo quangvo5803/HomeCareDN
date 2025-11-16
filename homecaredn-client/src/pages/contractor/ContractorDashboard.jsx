@@ -1,204 +1,610 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { formatVND, formatDate } from '../../utils/formatters';
 import StatusBadge from '../../components/StatusBadge';
+import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hook/useAuth';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import LoadingComponent from '../../components/LoadingComponent';
+import { withMinLoading } from '../../utils/withMinLoading';
+import { handleApiError } from '../../utils/handleApiError';
+import { StatisticService } from '../../services/statisticService';
+import { toast } from 'react-toastify';
+import BarChart from '../../components/BarChart';
+import LineChart from '../../components/LineChart';
 
-/* ========= Seed data (5 items) ========= */
-const SEED_APPS = [
-  {
-    id: 'APP-2025-0001',
-    description: 'Electrical repair — replace breaker',
-    estimatePrice: 1800000,
-    createdAt: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
-    status: 'Pending',
-    notifications: 2,
-  },
-  {
-    id: 'APP-2025-0002',
-    description: 'Paint 60m² apartment (materials included)',
-    estimatePrice: 9200000,
-    createdAt: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-    status: 'Approved',
-    notifications: 0,
-  },
-  {
-    id: 'APP-2025-0003',
-    description: 'Plumbing leak fix — kitchen sink',
-    estimatePrice: 1500000,
-    createdAt: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
-    status: 'Pending',
-    notifications: 1,
-  },
-  {
-    id: 'APP-2025-0004',
-    description: 'AC installation (1.5HP) — Binh Thanh',
-    estimatePrice: 6500000,
-    createdAt: new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString(),
-    status: 'Approved',
-    notifications: 3,
-  },
-  {
-    id: 'APP-2025-0005',
-    description: 'Socket replacement — 4 rooms',
-    estimatePrice: 1200000,
-    createdAt: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString(),
-    status: 'Rejected',
-    notifications: 0,
-  },
-];
+const INITIAL_KPI_STATE = {
+  totalRequests: 0,
+  pendingApplications: 0,
+  pendingCommissions: 0,
+  approvedApplications: 0,
+};
 
-export default function DistributorDashboard() {
+export default function ContractorDashboard() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const [barYear, setBarYear] = useState(new Date().getFullYear());
+  const [lineYear, setLineYear] = useState(new Date().getFullYear());
+
+  const [barChartData, setBarChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+  const [lineChartData, setLineChartData] = useState({
+    labels: [],
+    datasets: [],
+  });
+  const isContractor = !!(user?.id && user.role === 'Contractor');
+
+  // KPI State
+  const [kpiData, setKpiData] = useState(INITIAL_KPI_STATE);
+  const [kpiError, setKpiError] = useState(null);
+  const [latestApplications, setLatestApplications] = useState([]);
+  const [loadingDashboardStats, setLoadingDashboardStats] = useState(false);
+  const [loadingApplications, setLoadingApplications] = useState(false);
+  const [loadingBarChart, setLoadingBarChart] = useState(false);
+  const [loadingLineChart, setLoadingLineChart] = useState(false);
+
+  const getMonthlyValue = (data, month, key) =>
+    data.find((d) => d.month === month)?.[key] ?? 0;
+
+  const getMonthlyDataset = (data, labels, key) =>
+    labels.map((_, i) => getMonthlyValue(data, i + 1, key));
+
+  const processBarChartData = (data, labels) => ({
+    repair: getMonthlyDataset(data, labels, 'repairCount'),
+    construction: getMonthlyDataset(data, labels, 'constructionCount'),
+  });
+
+  const processLineChartData = (data, labels) => ({
+    revenue: getMonthlyDataset(data, labels, 'totalValue'),
+  });
+
+  const fetchLatestApplications = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const result = await contractorApplicationService.getLatestApplications({
+        PageNumber: 1,
+        PageSize: 5,
+        SortBy: 'CreatedAt',
+        SortDirection: 'DESC',
+      });
+      setLatestApplications(result.items || []);
+    } catch (err) {
+      toast.error(t('partnerDashboard.errors.load_apps_failed'));
+      console.error('Failed to fetch latest applications:', err);
+    }
+  }, [user?.id, t]);
+
+  const handleView = useCallback(
+    (id) => navigate(`/Contractor/ServiceRequestManager/${id}`),
+    [navigate]
+  );
+  //Bar
+  useEffect(() => {
+    const fetchBarChartData = async () => {
+      await withMinLoading(
+        async () => {
+          try {
+            const res = await StatisticService.getBarChart(
+              barYear,
+              user.role,
+              user.id
+            );
+            const data = res.data;
+
+            const labels = [
+              t('adminDashboard.months.jan'),
+              t('adminDashboard.months.feb'),
+              t('adminDashboard.months.mar'),
+              t('adminDashboard.months.apr'),
+              t('adminDashboard.months.may'),
+              t('adminDashboard.months.jun'),
+              t('adminDashboard.months.jul'),
+              t('adminDashboard.months.aug'),
+              t('adminDashboard.months.sep'),
+              t('adminDashboard.months.oct'),
+              t('adminDashboard.months.nov'),
+              t('adminDashboard.months.dec'),
+            ];
+
+            const { repair, construction } = processBarChartData(data, labels);
+
+            setBarChartData({
+              labels,
+              datasets: [
+                {
+                  label: t('partnerDashboard.repair'),
+                  data: repair,
+                  backgroundColor: 'rgba(59,130,246,0.8)',
+                },
+                {
+                  label: t('partnerDashboard.construction'),
+                  data: construction,
+                  backgroundColor: 'rgba(249,115,22,0.8)',
+                },
+              ],
+            });
+          } catch (err) {
+            toast.error(t(handleApiError(err)));
+          }
+        },
+        setLoadingBarChart,
+        1000
+      );
+    };
+    fetchBarChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barYear, t]);
+  //Line
+  useEffect(() => {
+    const fetchLineChartData = async () => {
+      await withMinLoading(
+        async () => {
+          try {
+            const res = await StatisticService.getLineChart(
+              lineYear,
+              user.role,
+              user.id
+            );
+            const data = res.data;
+
+            const labels = [
+              t('adminDashboard.months.jan'),
+              t('adminDashboard.months.feb'),
+              t('adminDashboard.months.mar'),
+              t('adminDashboard.months.apr'),
+              t('adminDashboard.months.may'),
+              t('adminDashboard.months.jun'),
+              t('adminDashboard.months.jul'),
+              t('adminDashboard.months.aug'),
+              t('adminDashboard.months.sep'),
+              t('adminDashboard.months.oct'),
+              t('adminDashboard.months.nov'),
+              t('adminDashboard.months.dec'),
+            ];
+
+            const { revenue } = processLineChartData(data, labels);
+
+            setLineChartData({
+              labels,
+              datasets: [
+                {
+                  label: t('adminDashboard.lineChart.commissionRevenue'),
+                  data: revenue,
+                  borderColor: '#10b981',
+                  backgroundColor: 'rgba(16,185,129,0.2)',
+                  fill: true,
+                },
+              ],
+            });
+          } catch (err) {
+            toast.error(t(handleApiError(err)));
+          }
+        },
+        setLoadingLineChart,
+        1000
+      );
+    };
+
+    fetchLineChartData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lineYear, t]);
+
+  const fetchDashboard = useCallback(async () => {
+    if (!isContractor) return;
+    setLoadingDashboardStats(true);
+    setKpiError(null);
+    try {
+      const data = await StatisticService.getStatStatisticForContractor();
+      setKpiData({
+        totalRequests: data?.openRequests ?? data?.OpenRequests ?? 0,
+        pendingApplications: data?.applied ?? data?.Applied ?? 0,
+        pendingCommissions: data?.pendingPayments ?? data?.PendingPayments ?? 0,
+        approvedApplications: data?.won ?? data?.Won ?? 0,
+      });
+    } catch (error) {
+      setKpiError(
+        error?.response?.data?.title ||
+          error?.response?.data?.message ||
+          error?.response?.data ||
+          error?.message ||
+          t('partnerDashboard.errors.kpi_load_failed')
+      );
+    } finally {
+      setLoadingDashboardStats(false);
+    }
+  }, [isContractor, t]);
+
+  // Initial load
+  useEffect(() => {
+    if (!isContractor) return;
+
+    const loadData = async () => {
+      setLoadingApplications(true);
+      await Promise.all([fetchDashboard(), fetchLatestApplications()]);
+      setLoadingApplications(false);
+    };
+
+    loadData();
+  }, [isContractor, fetchDashboard, fetchLatestApplications]);
+
+  useRealtime({
+    [RealtimeEvents.ServiceRequestCreated]: () => {
+      setKpiData((prev) => ({
+        ...prev,
+        totalRequests: prev.totalRequests + 1,
+      }));
+    },
+
+    [RealtimeEvents.ServiceRequestDelete]: () => {
+      setKpiData((prev) => ({
+        ...prev,
+        totalRequests: Math.max(0, prev.totalRequests - 1),
+      }));
+    },
+
+    [RealtimeEvents.ServiceRequestClosed]: () => {
+      setKpiData((prev) => ({
+        ...prev,
+        totalRequests: Math.max(0, prev.totalRequests - 1),
+      }));
+    },
+
+    onNewContractorApplication: (payload) => {
+      if (payload.contractorID === user?.id) {
+        setKpiData((prev) => ({
+          ...prev,
+          pendingApplications: prev.pendingApplications + 1,
+        }));
+        fetchLatestApplications();
+      }
+    },
+
+    onAcceptedContractorApplication: (payload) => {
+      if (payload.contractorID === user?.id) {
+        setKpiData((prev) => ({
+          ...prev,
+          pendingApplications: Math.max(0, prev.pendingApplications - 1),
+          pendingCommissions: prev.pendingCommissions + 1,
+          totalRequests: Math.max(0, prev.totalRequests - 1),
+        }));
+      }
+      fetchLatestApplications();
+    },
+
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      if (payload.contractorID === user?.id) {
+        setKpiData((prev) => ({
+          ...prev,
+          pendingApplications: Math.max(0, prev.pendingApplications - 1),
+        }));
+        fetchLatestApplications();
+      }
+    },
+
+    onDeleteContractorApplication: (payload) => {
+      if (payload.contractorID === user?.id) {
+        setKpiData((prev) => ({
+          ...prev,
+          pendingApplications: Math.max(0, prev.pendingApplications - 1),
+        }));
+      }
+      fetchLatestApplications();
+    },
+
+    onPaymentUpdate: (payload) => {
+      if (payload.contractorID === user?.id && payload.status === 'Approved') {
+        setKpiData((prev) => ({
+          ...prev,
+          pendingCommissions: Math.max(0, prev.pendingCommissions - 1),
+          approvedApplications: prev.approvedApplications + 1,
+        }));
+        fetchLatestApplications();
+      }
+    },
+  });
+
+  // Guard role
+  if (!isContractor) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <i className="fas fa-lock text-4xl text-gray-400 mb-4"></i>
+          <p className="text-gray-600">{t('partnerDashboard.access_denied')}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <>
+    <div className="w-full px-6 py-6 mx-auto bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 min-h-screen">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
           {t('partnerDashboard.title')}
         </h1>
-        <p className="text-gray-600">
-          {t('partnerDashboard.subtitle')}
-        </p>
+        <p className="text-gray-600">{t('partnerDashboard.subtitle')}</p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6">
+      {/* KPI Error */}
+      {kpiError && (
+        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{t('partnerDashboard.kpi.open_requests')}</p>
-              <p className="text-2xl font-bold text-gray-900">8</p>
-              <p className="text-xs text-green-600">{t('partnerDashboard.kpi_meta.open_requests')}</p>
+            <div className="flex items-center gap-3">
+              <i className="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+              <div>
+                <p className="font-semibold text-red-800">
+                  {t('partnerDashboard.errors.kpi_load_failed')}
+                </p>
+                <p className="text-sm text-red-700">{kpiError}</p>
+              </div>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <i className="fa-solid fa-clipboard-list text-blue-600 text-xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{t('partnerDashboard.kpi.applied')}</p>
-              <p className="text-2xl font-bold text-gray-900">14</p>
-              <p className="text-xs text-blue-600">{t('partnerDashboard.kpi_meta.applied')}</p>
-            </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <i className="fa-solid fa-hand-paper text-green-600 text-xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{t('partnerDashboard.kpi.won')}</p>
-              <p className="text-2xl font-bold text-gray-900">5</p>
-              <p className="text-xs text-green-600">{t('partnerDashboard.kpi_meta.won')}</p>
-            </div>
-            <div className="p-3 bg-yellow-100 rounded-full">
-              <i className="fa-solid fa-trophy text-yellow-600 text-xl"></i>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">{t('partnerDashboard.kpi.pending_payments')}</p>
-              <p className="text-2xl font-bold text-gray-900">3</p>
-              <p className="text-xs text-red-600">{t('partnerDashboard.kpi_meta.pending_payments')}</p>
-            </div>
-            <div className="p-3 bg-red-100 rounded-full">
-              <i className="fa-solid fa-credit-card text-red-600 text-xl"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Latest Applications */}
-      <div className="bg-white rounded-lg shadow-md">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              {t('partnerDashboard.latest_applications')}
-            </h2>
-            <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-              {t('partnerDashboard.view_all')}
+            <button
+              onClick={fetchDashboard}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              disabled={loadingDashboardStats}
+            >
+              {loadingDashboardStats ? (
+                <i className="fas fa-spinner fa-spin" />
+              ) : (
+                t('partnerDashboard.retry')
+              )}
             </button>
           </div>
         </div>
+      )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-xs text-gray-500">
-              <tr className="border-b">
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.id')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.description')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.estimate')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.last_update')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.notifications')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.status')}
-                </th>
-                <th className="py-2 px-3 text-left">
-                  {t('partnerDashboard.action')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {SEED_APPS.map((app) => (
-                <tr key={app.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-3">{app.id}</td>
-                  <td className="py-3 px-3">{app.description}</td>
-                  <td className="py-3 px-3">
-                    {formatVND(app.estimatePrice)}
-                  </td>
-                  <td className="py-3 px-3">
-                    {formatDate(app.createdAt, i18n.language)}
-                  </td>
-                  <td className="py-3 px-3">
-                    {app.notifications > 0 ? (
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-red-200 text-red-700">
-                        {app.notifications}
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded-full text-xs bg-gray-200 text-gray-1000">
-                        0
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-3 px-3">
-                    <StatusBadge status={app.status} type="PartnerRequest" />
-                  </td>
-                  <td className="py-3 px-3">
-                    <button
-                      onClick={() => navigate(`/applications/${app.id}`)}
-                      className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
-                    >
-                      {t('partnerDashboard.view')}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* KPI Cards */}
+      {loadingDashboardStats ? (
+        <div className="flex justify-center py-8">
+          <LoadingComponent />
         </div>
-        <footer className="p-6 text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} HomeCareDN
-        </footer>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Open Requests */}
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  {t('partnerDashboard.kpi.open_requests')}
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {kpiData.totalRequests}
+                </p>
+              </div>
+              <div className="p-4 bg-blue-100 rounded-full">
+                <i className="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+              </div>
+            </div>
+          </div>
+
+          {/* Applied */}
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  {t('partnerDashboard.kpi.applied')}
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {kpiData.pendingApplications}
+                </p>
+              </div>
+              <div className="p-4 bg-yellow-100 rounded-full">
+                <i className="fas fa-clock text-yellow-600 text-2xl"></i>
+              </div>
+            </div>
+          </div>
+
+          {/* Pending Payments */}
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  {t('partnerDashboard.kpi.pending_payments')}
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {kpiData.pendingCommissions}
+                </p>
+              </div>
+              <div className="p-4 bg-orange-100 rounded-full">
+                <i className="fas fa-credit-card text-orange-600 text-2xl"></i>
+              </div>
+            </div>
+          </div>
+
+          {/* Won */}
+          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">
+                  {t('partnerDashboard.kpi.won')}
+                </p>
+                <p className="text-3xl font-bold text-gray-900">
+                  {kpiData.approvedApplications}
+                </p>
+              </div>
+              <div className="p-4 bg-green-100 rounded-full">
+                <i className="fas fa-trophy text-green-600 text-2xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chart Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+        {/* Bar Chart - 50% */}
+        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[400px]">
+          {loadingBarChart && (
+            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
+              <LoadingComponent />
+            </div>
+          )}
+          <div className="h-full w-full">
+            <BarChart
+              type="Contractor"
+              title={t('adminDashboard.barChart.salesOverview')}
+              data={barChartData}
+              year={barYear}
+              onYearChange={setBarYear}
+              loading={loadingBarChart}
+            />
+          </div>
+        </div>
+        {/* Line Chart - 50% */}
+        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[400px]">
+          {loadingLineChart && (
+            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
+              <LoadingComponent />
+            </div>
+          )}
+          <div className="h-full w-full">
+            <LineChart
+              type="Contractor"
+              title={t('adminDashboard.lineChart.commissionRevenue')}
+              data={lineChartData}
+              year={lineYear}
+              onYearChange={setLineYear}
+              loading={loadingLineChart}
+            />
+          </div>
+        </div>
       </div>
-    </>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mt-10">
+        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">
+                {t('partnerDashboard.latest_applications')}
+              </h2>
+            </div>
+          </div>
+        </div>
+        {loadingApplications ? (
+          <div className="flex justify-center py-12">
+            <LoadingComponent />
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.no')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.service_type')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.description')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.estimate')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.commission_due')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.apply_at')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.status')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    {t('partnerDashboard.action')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {!latestApplications || latestApplications.length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center">
+                      <div className="flex flex-col items-center">
+                        <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                        <p className="text-gray-500 font-medium">
+                          {t('partnerDashboard.no_applications')}
+                        </p>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  latestApplications.map((app, index) => (
+                    <tr
+                      key={app.contractorApplicationID}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      {/* NO. */}
+                      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                        {index + 1}
+                      </td>
+                      {/* Service Type */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          {app.serviceType === 'Construction' ? (
+                            <i
+                              className="fas fa-hard-hat text-blue-500"
+                              title="Construction"
+                            ></i>
+                          ) : (
+                            <i
+                              className="fas fa-wrench text-orange-500"
+                              title="Repair"
+                            ></i>
+                          )}
+                          <span className="text-sm font-medium text-gray-900">
+                            {t(`Enums.ServiceType.${app.serviceType}`)}
+                          </span>
+                        </div>
+                      </td>
+                      {/* Description */}
+                      <td className="px-6 py-4">
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                          {app.description || '-'}
+                        </span>
+                      </td>
+                      {/* Estimate Price */}
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                        {app.estimatePrice ? formatVND(app.estimatePrice) : '-'}
+                      </td>
+                      {/* DueCommissionTime */}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {app.dueCommisionTime
+                          ? formatDate(app.dueCommisionTime, i18n.language)
+                          : '-'}
+                      </td>
+                      {/* Apply At (CreatedAt) */}
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {formatDate(app.createdAt, i18n.language)}
+                      </td>
+                      {/* Status */}
+                      <td className="px-6 py-4">
+                        <StatusBadge status={app.status} type="Application" />
+                      </td>
+                      {/* Action */}
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleView(app.serviceRequestID)}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                        >
+                          <i className="fas fa-eye"></i>
+                          {t('partnerDashboard.view')}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

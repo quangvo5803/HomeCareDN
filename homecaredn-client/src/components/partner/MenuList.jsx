@@ -74,7 +74,7 @@ export default function Sidebar({
           key: 'service_requests',
           label: t('partnerDashboard.service_requests'),
           icon: <i className="fa-solid fa-list-alt"></i>,
-          to: '/Contractor/service-requests',
+          to: '/Contractor/ServiceRequestManager',
           badge: serviceRequestsCount,
         },
         {
@@ -93,7 +93,7 @@ export default function Sidebar({
           key: 'profile',
           label: t('partnerDashboard.profile'),
           icon: <i className="fa-solid fa-id-card"></i>,
-          to: '/Contractor/profile',
+          to: '/Contractor/Profile',
         },
         {
           key: 'logout',

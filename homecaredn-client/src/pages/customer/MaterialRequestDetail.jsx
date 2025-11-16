@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
-import { useAddress } from '../../hook/useAddress';
+import { useUser } from '../../hook/useUser';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatVND } from '../../utils/formatters';
 import { toast } from 'react-toastify';
@@ -22,7 +22,7 @@ export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
   const { materialRequestId } = useParams();
   const navigate = useNavigate();
-  const { addresses } = useAddress();
+  const { addresses } = useUser();
 
   const [description, setDescription] = useState('');
   const [canEditQuantity, setCanEditQuantity] = useState(false);

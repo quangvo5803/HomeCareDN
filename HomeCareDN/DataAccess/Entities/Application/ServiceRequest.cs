@@ -32,6 +32,8 @@ namespace DataAccess.Entities.Application
 
         [ForeignKey("ConversationID")]
         public Conversation? Conversation { get; set; }
+        public Review? Review { get; set; }
+
         public ICollection<Image>? Images { get; set; }
         public ICollection<Document>? Documents { get; set; }
         public ICollection<ContractorApplication>? ContractorApplications { get; set; }

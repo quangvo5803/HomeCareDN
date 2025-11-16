@@ -4,7 +4,7 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet.Actions;
 using DataAccess.Data;
@@ -510,8 +510,9 @@ namespace BusinessLogic.Services
             {
                 foreach (var updateDto in materialRequestUpdateRequestDto.UpdateItems)
                 {
-                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(i =>
-                        i.MaterialRequestItemID == updateDto.MaterialRequestItemID
+                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(
+                        i => i.MaterialRequestItemID == updateDto.MaterialRequestItemID,
+                        asNoTracking: false
                     );
                     if (updateItem != null)
                     {

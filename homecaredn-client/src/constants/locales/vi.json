@@ -248,6 +248,7 @@
       "form_phoneNumber": "Số điện thoại",
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
+      "form_documents": "Tài liệu",
       "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
     }
   },
@@ -262,6 +263,7 @@
         "name": "Họ và tên",
         "email": "Email",
         "phone": "Số điện thoại",
+        "phone_placeholder": "Nhập số điện thoại của bạn",
         "gender": "Giới tính",
         "gender_choice": "Chọn giới tính",
         "gender_male": "Nam",
@@ -327,6 +329,8 @@
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
+      "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
+      "uploading": "Đang tải lên",
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
@@ -509,7 +513,12 @@
     "commissionCalculation": "Tính toán hoa hồng",
     "commissionRate": "Tỷ lệ hoa hồng áp dụng",
     "commissionToPay": "Hoa hồng phải trả",
-    "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
+    "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ",
+    "customerReview": "Đánh giá từ khách hàng",
+    "reviewComment": "Nội dung đánh giá",
+    "reviewImages": "Hình ảnh đánh giá",
+    "reviewedAt": "Ngày đánh giá",
+    "reviewImageTitle": "Ảnh đánh giá"
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
@@ -575,6 +584,8 @@
     "deleteApplication": "Xóa đơn ứng tuyển"
   },
   "partnerDashboard": {
+    "no": "STT",
+    "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
@@ -585,6 +596,8 @@
     },
     "description": "Mô tả",
     "estimate": "Ước tính",
+    "commission_due": "Khoản hoa hồng phải trả",
+    "apply_at": "Ngày ứng tuyển",
     "last_update": "Cập nhật lần cuối",
     "notifications": "Thông báo",
     "status": "Trạng thái",
@@ -612,11 +625,17 @@
     "applications": "Đơn Xin",
     "profile": "Hồ Sơ",
     "kpi_meta": {
-      "open_requests": "▲ +2 tuần này",
-      "applied": "↺ 3 đang chờ",
-      "won": "▲ Tỉ lệ 36%",
-      "pending_payments": "▼ 1 quá hạn"
-    }
+      "open_requests": "▲ +2 tuần này"
+    },
+    "retry": "Thử lại",
+    "no_requests": "Không có yêu cầu nào",
+    "access_denied": "Từ chối truy cập. Cần quyền Nhà thầu.",
+    "errors": {
+      "kpi_load_failed": "Không thể tải dữ liệu KPI"
+    },
+    "repair": "Sửa Chữa",
+    "construction": "Xây Dựng",
+    "revenue": "Doanh Thu"
   },
   "supportChat": {
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
@@ -693,7 +712,20 @@
     "noCategory": "Chưa có danh mục nào",
     "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
   },
-
+  "partnerProfile": {
+    "title": "Hồ sơ của tôi",
+    "noName": "Không có tên",
+    "noPhone": "Không có số điện thoại",
+    "noAddress": "Chưa có địa chỉ",
+    "rating": "Đánh giá",
+    "projects": "Dự án",
+    "infoTitle": "Thông tin hồ sơ",
+    "infoNote": "Thông tin hồ sơ không thể chỉnh sửa. Vui lòng liên hệ hỗ trợ nếu bạn cần cập nhật.",
+    "customerReviews": "Đánh giá từ khách hàng",
+    "totalReviews": "lượt đánh giá",
+    "noReviews": "Chưa có đánh giá",
+    "noReviewsDesc": "Hãy hoàn thành các dự án để nhận đánh giá từ khách hàng"
+  },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -712,6 +744,7 @@
       "material": "Vật liệu",
       "partner": "Đối tác",
       "user": "Người dùng",
+      "review": "Đánh giá",
       "support": "Hỗ trợ",
       "commission": "Tiền hoa hồng"
     },
@@ -893,7 +926,11 @@
       "images": "Hình ảnh dự án",
       "paymentInfo": "Thông tin thanh toán",
       "orderCode": "Mã đơn hàng",
-      "amount": "Tiền thanh toán"
+      "amount": "Tiền thanh toán",
+      "reviewInfo": "Thông tin đánh giá",
+      "reviewComment": "Bình luận",
+      "reviewImages": "Hình ảnh đánh giá",
+      "reviewedAt": "Đánh giá lúc"
     }
   },
   "adminMaterialManager": {
@@ -982,13 +1019,16 @@
     "no": "STT",
     "fullName": "Họ và tên",
     "phoneNumber": "Số điện thoại",
+    "role": "Vai trò",
     "projectCount": "Dự án đã nhận",
     "address": "Địa chỉ",
     "action": "Hành động",
     "empty": "Chưa có người dùng nào",
     "empty_description": "Chưa có người dùng nào đăng ký.",
     "userDetail": {
-      "address": "Chưa có địa chỉ nào",
+      "noName": "Người dùng chưa cung cấp tên.",
+      "noPhone": "Người dùng chưa cung cấp số điện thoại.",
+      "noAddress": "Người dùng chưa cung cấp địa chỉ nào.",
       "rating": "Đánh giá",
       "serviceRequest": "dịch vụ đã yêu cầu",
       "contractorApplication": "dịch vụ đã tham gia",
@@ -1029,6 +1069,21 @@
     "action": "Thao tác",
     "empty": "Chưa có giao dịch nào",
     "empty_description": "Chưa có giao dịch nào được gửi."
+  },
+  "adminReviewManager": {
+    "title": "Quản lý đánh giá",
+    "subtitle": "Danh sách đánh giá từ người dùng và đối tác",
+    "reviews": "Đánh giá",
+    "no": "STT",
+    "user": "Người dùng",
+    "partner": "Đối tác",
+    "rating": "Xếp hạng",
+    "comment": "Bình luận",
+    "type": "Loại",
+    "createdAt": "Ngày tạo",
+    "all": "Tất cả",
+    "empty": "Không có đánh giá nào",
+    "empty_description": "Hiện chưa có đánh giá nào được ghi nhận."
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
@@ -1127,6 +1182,17 @@
     "BackToList": "Quay lại danh sách"
   },
   "ModalPopup": {
+    "ReviewModal": {
+      "view": "Đánh giá của bạn",
+      "create": "Hãy cho chúng tôi biết trải nghiệm của bạn với nhà thầu này.",
+      "rating": "Đánh giá",
+      "ratingStar": "Sao",
+      "comment": "Nhận xét",
+      "commentPlaceholder": "Viết nhận xét của bạn ở đây...",
+      "images": "Hình ảnh",
+      "uploadImages": "Tải lên hình ảnh",
+      "warning": "Bạn không thể chỉnh sửa sau khi gửi. Đánh giá có thể ảnh hưởng đến chất lượng dịch vụ và đối tác."
+    },
     "DeleteBrandModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Thương hiệu này sẽ bị xóa và không thể khôi phục!"
@@ -1244,6 +1310,7 @@
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
     "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu",
+    "REQUIRED_PHONE_NUMBER": "Vui lòng cung cấp số điện thoại liên lạc trước khi tạo yêu cầu",
     "IN_USE_ADDRESS": "Địa chỉ này đang được sử dụng không thể xóa được!",
 
     "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
@@ -1299,6 +1366,7 @@
     "MATERIAL_REQUEST_ADD": "Thêm yêu cầu vật liệu thành công",
     "MATERIAL_REQUEST_UPDATE": "Cập nhật yêu cầu vật liệu thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "CREATE_REVIEW": "Đã gửi đánh giá thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
@@ -1388,7 +1456,8 @@
     "uploadLogo": "Đang tải ảnh lên: {{percent}}%. Vui lòng không rời khỏi trang."
   },
   "upload": {
-    "clickToUpload": "Chọn để tải ảnh",
+    "clickToUploadImage": "Chọn để tải ảnh",
+    "clickToUploadDocument": "Chọn để tải tài liệu",
     "orDragAndDrop": "hoặc kéo và thả",
     "fileTypesHint": "PNG, JPG, GIF mỗi file 5MB"
   },
@@ -1444,5 +1513,16 @@
     "minutes": "Phút",
     "seconds": "Giây",
     "due": "Hạn"
+  },
+  "ReviewCountdown": {
+    "reviewed": "Bạn đã đánh giá nhà thầu/nhà phân phối này: ",
+    "viewReview": "Xem đánh giá",
+    "reviewTimeExpired": "Bạn có thể đánh giá nhà thầu/nhà phân phối!",
+    "createReview": "Tạo đánh giá",
+    "reviewAvailableIn": "Bạn cần phải làm việc với nhà thầu/nhà phân phối trước khi có thể đánh giá họ:",
+    "days": "Ngày",
+    "hours": "Giờ",
+    "minutes": "Phút",
+    "seconds": "Giây"
   }
 }

@@ -38,7 +38,8 @@ import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
-import AdminPaymentManager from './pages/admin/AdminPaymentManager'
+import AdminReviewManager from './pages/admin/AdminReviewManager';
+import AdminPaymentManager from './pages/admin/AdminPaymentManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -49,6 +50,8 @@ import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialRequestManager from './pages/distributor/DistributorMaterialRequestManager';
 import DistributorMaterialRequestDetail from './pages/distributor/DistributorMaterialRequestDetail';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Partner pages
+import PartnerProfile from './pages/partner/PartnerProfile';
 //Home Page
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
@@ -94,10 +97,11 @@ function App() {
           aria-label="Back to top"
           className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${showBackTop
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-3 pointer-events-none'
-            }`}
+                    ${
+                      showBackTop
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-3 pointer-events-none'
+                    }`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -302,7 +306,7 @@ function Layout() {
             element={<AdminServiceRequestManager />}
           />
           <Route
-            path="ServiceRequest/:serviceRequestId"
+            path="ServiceRequestManager/:serviceRequestId"
             element={<AdminServiceRequestDetail />}
           />
           <Route path="SupportManager" element={<AdminSupportManager />} />
@@ -312,10 +316,8 @@ function Layout() {
             element={<AdminPartnerRequestManager />}
           />
           <Route path="UserManager" element={<AdminUserManager />} />
-          <Route
-            path="User/:userID"
-            element={<AdminUserDetail />}
-          />
+          <Route path="UserManager/:userID" element={<AdminUserDetail />} />
+          <Route path="ReviewManager" element={<AdminReviewManager />} />
           <Route path="PaymentManager" element={<AdminPaymentManager />} />
         </Route>
         {/* Contractor routes */}
@@ -329,22 +331,14 @@ function Layout() {
         >
           <Route index element={<ContractorDashboard />} />
           <Route
-            path="service-requests"
+            path="ServiceRequestManager"
             element={<ContractorServiceRequestManager />}
           />
           <Route
-            path="service-request/:serviceRequestId"
+            path="ServiceRequestManager/:serviceRequestId"
             element={<ContractorServiceRequestDetail />}
           />
-          <Route
-            path="my-projects"
-            element={<div>My Projects - Coming Soon</div>}
-          />
-          <Route
-            path="applications"
-            element={<div>Applications - Coming Soon</div>}
-          />
-          <Route path="profile" element={<div>Profile - Coming Soon</div>} />
+          <Route path="Profile" element={<PartnerProfile />} />
         </Route>
         {/* Distributor routes */}
         <Route
@@ -372,6 +366,7 @@ function Layout() {
             path="CategoryManager"
             element={<DistributorCategoryManager />}
           />
+          <Route path="Profile" element={<PartnerProfile />} />
         </Route>
 
         {/* Redirect root → /home */}

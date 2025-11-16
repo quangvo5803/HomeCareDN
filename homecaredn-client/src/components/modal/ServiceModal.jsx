@@ -7,7 +7,7 @@ import { useService } from '../../hook/useService';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import LoadingComponent from '../LoadingComponent';
 
 //For TINY MCE
@@ -175,7 +175,7 @@ export default function ServiceModal({
 
       if (newFiles.length > 0) {
         setUploadProgress(1);
-        const uploaded = await uploadImageToCloudinary(
+        const uploaded = await uploadToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
           (percent) => setUploadProgress(percent),
@@ -432,46 +432,48 @@ export default function ServiceModal({
               </div>
 
               {/* Upload Images */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  {t('adminServiceManager.serviceModal.images')}
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  {images.map((img) => (
-                    <div
-                      key={img.url}
-                      className="relative overflow-hidden border w-28 h-28 rounded-xl group"
-                    >
-                      <img
-                        src={img.url}
-                        alt="preview"
-                        className="object-cover w-full h-full"
-                      />
-                      <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                        {(images.length !== 1 || img.isNew) && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(img)}
-                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
-                          >
-                            <i className="fa-solid fa-xmark"></i>
-                          </button>
-                        )}
+              {images.length < 5 && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('adminServiceManager.serviceModal.images')}
+                  </label>
+                  <div className="flex flex-wrap gap-3">
+                    {images.map((img) => (
+                      <div
+                        key={img.url}
+                        className="relative overflow-hidden border w-28 h-28 rounded-xl group"
+                      >
+                        <img
+                          src={img.url}
+                          alt="preview"
+                          className="object-cover w-full h-full"
+                        />
+                        <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                          {(images.length !== 1 || img.isNew) && (
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImage(img)}
+                              className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
+                            >
+                              <i className="fa-solid fa-xmark"></i>
+                            </button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
+                    {t('adminServiceManager.serviceModal.chooseFiles')}
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                  </label>
                 </div>
-                <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
-                  {t('adminServiceManager.serviceModal.chooseFiles')}
-                  <input
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                  />
-                </label>
-              </div>
+              )}
             </>
           )}
         </div>

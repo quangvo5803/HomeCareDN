@@ -3,7 +3,8 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.User;
+using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -29,9 +30,12 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_SERVICE_REQUEST_NOT_FOUND = "SERVICE_REQUEST_NOT_FOUND";
         private const string ERROR_MAXIMUM_IMAGE = "MAXIMUM_IMAGE";
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
-        private const string INCLUDE_LISTALL = "ContractorApplications";
+        private const string INCLUDE_LISTALL =
+            "ContractorApplications,SelectedContractorApplication,Review,Review.Images";
         private const string INCLUDE_DETAIL =
-            "Images,ContractorApplications,ContractorApplications.Images,SelectedContractorApplication,SelectedContractorApplication.Images,Conversation";
+            "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents,Conversation,Review,Review.Images";
+        private const string ERROR_MAXIMUM_DOCUMENT = "MAXIMUM_DOCUMENT";
+        private const string ERROR_MAXIMUM_DOCUMENT_SIZE = "MAXIMUM_DOCUMENT_SIZE";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -64,8 +68,14 @@ namespace BusinessLogic.Services.Interfaces
                     && s.ContractorApplications.Any(ca => ca.ContractorID == parameters.FilterID)
                 );
             }
+
             var totalCount = await query.CountAsync();
             
+            if (role == ADMIN && parameters.FilterID != null)
+            {
+                query = query.Where(s => s.CustomerID == parameters.FilterID);
+            }
+
             query = parameters.SortBy?.ToLower() switch
             {
                 "createdat" => query.OrderBy(sr => sr.CreatedAt),
@@ -143,6 +153,179 @@ namespace BusinessLogic.Services.Interfaces
             };
         }
 
+        public async Task<ServiceRequestDto> CreateServiceRequestAsync(
+            ServiceRequestCreateRequestDto createRequestDto
+        )
+        {
+            ValidateImages(createRequestDto.ImageUrls, 0);
+            ValidateDocuments(createRequestDto.DocumentUrls, 0);
+
+            var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
+            if (createRequestDto.Floors == 0)
+            {
+                serviceRequest.Floors = 1;
+            }
+            await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
+
+            await UploadServiceRequestImagesAsync(
+                serviceRequest.ServiceRequestID,
+                createRequestDto.ImageUrls,
+                createRequestDto.ImagePublicIds
+            );
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                createRequestDto.DocumentUrls,
+                createRequestDto.DocumentPublicIds
+            );
+            await _unitOfWork.SaveAsync();
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL
+            );
+            if (serviceRequest == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            var adminDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+            var contractorDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            await MapServiceRequestListAllAsync(
+                new[] { serviceRequest },
+                new[] { adminDto },
+                ADMIN
+            );
+            await MapServiceRequestListAllAsync(
+                new[] { serviceRequest },
+                new[] { contractorDto },
+                CONTRACTOR
+            );
+
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Admin",
+                "ServiceRequest.Created",
+                adminDto
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Contractor",
+                "ServiceRequest.Created",
+                contractorDto
+            );
+
+            return dto;
+        }
+
+        public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
+            ServiceRequestUpdateRequestDto updateRequestDto
+        )
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL,
+                false
+            );
+
+            ValidateServiceRequest(serviceRequest);
+
+            ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
+
+            ValidateDocuments(updateRequestDto.DocumentUrls, serviceRequest!.Documents?.Count ?? 0);
+            _mapper.Map(updateRequestDto, serviceRequest);
+            if (updateRequestDto.Floors == 0)
+            {
+                serviceRequest.Floors = 1;
+            }
+            await UploadServiceRequestImagesAsync(
+                serviceRequest.ServiceRequestID,
+                updateRequestDto.ImageUrls,
+                updateRequestDto.ImagePublicIds
+            );
+            await UploadServiceRequestDocumentsAsync(
+                serviceRequest.ServiceRequestID,
+                updateRequestDto.DocumentUrls,
+                updateRequestDto.DocumentPublicIds
+            );
+
+            await _unitOfWork.SaveAsync();
+
+            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
+                includeProperties: INCLUDE_DETAIL
+            );
+
+            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
+
+            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
+                a.AddressID == dto.AddressID
+            );
+
+            if (address != null)
+            {
+                dto.Address = _mapper.Map<AddressDto>(address);
+            }
+            return dto;
+        }
+
+        public async Task DeleteServiceRequestAsync(Guid id)
+        {
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                sr => sr.ServiceRequestID == id,
+                includeProperties: "ContractorApplications.Images",
+                false
+            );
+
+            ValidateServiceRequest(serviceRequest);
+
+            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
+                i.ServiceRequestID == id
+            );
+            var documents = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                d.ServiceRequestID == id
+            );
+            if (images != null && images.Any())
+            {
+                foreach (var image in images)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
+                }
+            }
+
+            if (documents != null && documents.Any())
+            {
+                foreach (var document in documents)
+                {
+                    await _unitOfWork.DocumentRepository.DeleteDocumentAsync(document.PublicId);
+                }
+            }
+            await DeleteRelatedEntity(serviceRequest!);
+            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
+            await _unitOfWork.SaveAsync();
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Contractor",
+                "ServiceRequest.Delete",
+                new { ServiceRequestID = id }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                "ServiceRequest.Delete",
+                new { ServiceRequestID = id }
+            );
+        }
+
+        // ========================== Helper for List All Service Request =============================
         private async Task MapServiceRequestListAllAsync(
             IEnumerable<ServiceRequest> items,
             IEnumerable<ServiceRequestDto> dtos,
@@ -170,8 +353,28 @@ namespace BusinessLogic.Services.Interfaces
                         dto.Address.Ward = string.Empty;
                     }
                 }
+                if (role == "Customer")
+                {
+                    await MapStartReviewDateForCustomerListAll(dto);
+                }
             }
         }
+
+        private async Task MapStartReviewDateForCustomerListAll(ServiceRequestDto dto)
+        {
+            if (dto.SelectedContractorApplication?.Status == ApplicationStatus.Approved.ToString())
+            {
+                var contractorPayment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                    cp => cp.ServiceRequestID == dto.ServiceRequestID
+                );
+                if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
+                {
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                }
+            }
+        }
+
+        // ========================== Helper  Service Request Detail =============================
 
         private async Task MapServiceRequestDetailAsync(
             ServiceRequest item,
@@ -244,8 +447,8 @@ namespace BusinessLogic.Services.Interfaces
             {
                 var selected = item.SelectedContractorApplication;
                 var contractor = await _userManager.FindByIdAsync(selected.ContractorID.ToString());
-                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
-                    p => p.ServiceRequestID == selected.ServiceRequestID
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.ServiceRequestID == selected.ServiceRequestID
                 );
                 dto.SelectedContractorApplication = new ContractorApplicationDto
                 {
@@ -262,7 +465,8 @@ namespace BusinessLogic.Services.Interfaces
                     DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
                     CompletedProjectCount = contractor!.ProjectCount,
-                    AverageRating = 0,
+                    AverageRating = contractor!.AverageRating,
+                    ReviewCount = contractor!.RatingCount,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -288,21 +492,20 @@ namespace BusinessLogic.Services.Interfaces
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount, // hoặc dữ liệu thực tế nếu có
-                    AverageRating = 0,
+                    CompletedProjectCount = contractor!.ProjectCount,
+                    AverageRating = contractor.AverageRating,
+                    ReviewCount = contractor.RatingCount,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.FullName ?? string.Empty
-                            : string.Empty,
+                            ? contractor.FullName ?? ""
+                            : "",
                     ContractorEmail =
-                        selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Email ?? string.Empty
-                            : string.Empty,
+                        selected.Status == ApplicationStatus.Approved ? contractor.Email ?? "" : "",
                     ContractorPhone =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.PhoneNumber ?? string.Empty
-                            : string.Empty,
+                            ? contractor.PhoneNumber ?? ""
+                            : "",
                 };
             }
         }
@@ -364,156 +567,7 @@ namespace BusinessLogic.Services.Interfaces
             }
         }
 
-        public async Task<ServiceRequestDto> CreateServiceRequestAsync(
-            ServiceRequestCreateRequestDto createRequestDto
-        )
-        {
-            ValidateImages(createRequestDto.ImageUrls, 0);
-
-            var serviceRequest = _mapper.Map<ServiceRequest>(createRequestDto);
-            if (createRequestDto.Floors == 0)
-            {
-                serviceRequest.Floors = 1;
-            }
-            await _unitOfWork.ServiceRequestRepository.AddAsync(serviceRequest);
-
-            await UploadServiceRequestImagesAsync(
-                serviceRequest.ServiceRequestID,
-                createRequestDto.ImageUrls,
-                createRequestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL
-            );
-            if (serviceRequest == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { ERROR_SERVICE_REQUEST, new[] { ERROR_SERVICE_REQUEST_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                a.AddressID == dto.AddressID
-            );
-
-            if (address != null)
-            {
-                dto.Address = _mapper.Map<AddressDto>(address);
-            }
-            var adminDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-            var contractorDto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            await MapServiceRequestListAllAsync(
-                new[] { serviceRequest },
-                new[] { adminDto },
-                ADMIN
-            );
-            await MapServiceRequestListAllAsync(
-                new[] { serviceRequest },
-                new[] { contractorDto },
-                CONTRACTOR
-            );
-
-            await _notifier.SendToApplicationGroupAsync(
-                "role_Admin",
-                "ServiceRequest.Created",
-                adminDto
-            );
-            await _notifier.SendToApplicationGroupAsync(
-                "role_Contractor",
-                "ServiceRequest.Created",
-                contractorDto
-            );
-
-            return dto;
-        }
-
-        public async Task<ServiceRequestDto> UpdateServiceRequestAsync(
-            ServiceRequestUpdateRequestDto updateRequestDto
-        )
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == updateRequestDto.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL,
-                false
-            );
-
-            ValidateServiceRequest(serviceRequest);
-
-            ValidateImages(updateRequestDto.ImageUrls, serviceRequest!.Images?.Count ?? 0);
-
-            _mapper.Map(updateRequestDto, serviceRequest);
-            if (updateRequestDto.Floors == 0)
-            {
-                serviceRequest.Floors = 1;
-            }
-            await UploadServiceRequestImagesAsync(
-                serviceRequest.ServiceRequestID,
-                updateRequestDto.ImageUrls,
-                updateRequestDto.ImagePublicIds
-            );
-
-            await _unitOfWork.SaveAsync();
-
-            serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == serviceRequest.ServiceRequestID,
-                includeProperties: INCLUDE_DETAIL
-            );
-
-            var dto = _mapper.Map<ServiceRequestDto>(serviceRequest);
-
-            var address = await _authorizeDbContext.Addresses.FirstOrDefaultAsync(a =>
-                a.AddressID == dto.AddressID
-            );
-
-            if (address != null)
-            {
-                dto.Address = _mapper.Map<AddressDto>(address);
-            }
-            return dto;
-        }
-
-        public async Task DeleteServiceRequestAsync(Guid id)
-        {
-            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                sr => sr.ServiceRequestID == id,
-                includeProperties: "ContractorApplications.Images",
-                false
-            );
-
-            ValidateServiceRequest(serviceRequest);
-
-            var images = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
-                i.ServiceRequestID == id
-            );
-            if (images != null && images.Any())
-            {
-                foreach (var image in images)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(image.PublicId);
-                }
-            }
-            await DeleteRelatedEntity(serviceRequest!);
-            _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
-            await _unitOfWork.SaveAsync();
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Contractor",
-                "ServiceRequest.Delete",
-                new { ServiceRequestID = id }
-            );
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                "ServiceRequest.Delete",
-                new { ServiceRequestID = id }
-            );
-        }
-
+        // ========================== Helper Delete Service Request =============================
         private async Task DeleteRelatedEntity(ServiceRequest serviceRequest)
         {
             if (
@@ -526,11 +580,19 @@ namespace BusinessLogic.Services.Interfaces
                     var caImages = await _unitOfWork.ImageRepository.GetRangeAsync(i =>
                         i.ContractorApplicationID == contractorApplication.ContractorApplicationID
                     );
+                    var caDocuments = await _unitOfWork.DocumentRepository.GetRangeAsync(d =>
+                        d.ContractorApplicationID == contractorApplication.ContractorApplicationID
+                    );
                     if (caImages != null && caImages.Any())
                     {
                         var publicIds = caImages.Select(img => img.PublicId).ToList();
 
                         await _unitOfWork.ImageRepository.DeleteImagesAsync(publicIds);
+                    }
+                    if (caDocuments != null && caDocuments.Any())
+                    {
+                        var docPublicIds = caDocuments.Select(d => d.PublicId).ToList();
+                        await _unitOfWork.DocumentRepository.DeleteDocumentsAsync(docPublicIds);
                     }
                     _unitOfWork.ContractorApplicationRepository.Remove(contractorApplication);
                 }
@@ -538,6 +600,7 @@ namespace BusinessLogic.Services.Interfaces
             await _unitOfWork.SaveAsync();
         }
 
+        // ========================== Helper Create Service Request =============================
         private async Task UploadServiceRequestImagesAsync(
             Guid? serviceRequestId,
             ICollection<string>? imageUrls,
@@ -563,6 +626,33 @@ namespace BusinessLogic.Services.Interfaces
                 .ToList();
 
             await _unitOfWork.ImageRepository.AddRangeAsync(images);
+        }
+
+        private async Task UploadServiceRequestDocumentsAsync(
+            Guid? serviceRequestId,
+            ICollection<string>? documentUrls,
+            ICollection<string>? publicIds
+        )
+        {
+            if (documentUrls == null || !documentUrls.Any())
+                return;
+
+            var ids = publicIds?.ToList() ?? new List<string>();
+
+            var documents = documentUrls
+                .Select(
+                    (url, i) =>
+                        new Document
+                        {
+                            DocumentID = Guid.NewGuid(),
+                            ServiceRequestID = serviceRequestId,
+                            DocumentUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
+
+            await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
         }
 
         private static void ValidateServiceRequest(ServiceRequest? serviceRequest)
@@ -593,6 +683,30 @@ namespace BusinessLogic.Services.Interfaces
             if (images.Any(i => i.Length > 5 * 1024 * 1024))
             {
                 errors.Add(nameof(images), new[] { ERROR_MAXIMUM_IMAGE_SIZE });
+            }
+
+            if (errors.Any())
+            {
+                throw new CustomValidationException(errors);
+            }
+        }
+
+        private static void ValidateDocuments(ICollection<string>? documents, int existingCount = 0)
+        {
+            var errors = new Dictionary<string, string[]>();
+
+            if (documents == null)
+                return;
+
+            var totalCount = existingCount + documents.Count;
+            if (totalCount > 5)
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT });
+            }
+
+            if (documents.Any(i => i.Length > 5 * 1024 * 1024)) //25MB
+            {
+                errors.Add(nameof(documents), new[] { ERROR_MAXIMUM_DOCUMENT_SIZE });
             }
 
             if (errors.Any())

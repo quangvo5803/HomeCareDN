@@ -10,11 +10,11 @@ import { handleApiError } from '../../utils/handleApiError';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useNavigate } from 'react-router-dom';
 import { withMinLoading } from '../../utils/withMinLoading';
-
+import { useAuth } from '../../hook/useAuth';
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
+  const { user } = useAuth();
   const [lineYear, setLineYear] = useState(new Date().getFullYear());
   const [pieYear, setPieYear] = useState(new Date().getFullYear());
   const [barYear, setBarYear] = useState(new Date().getFullYear());
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
   });
 
   const processLineChartData = (data, labels) => ({
-    commission: getMonthlyDataset(data, labels, 'totalCommission'),
+    commission: getMonthlyDataset(data, labels, 'totalValue'),
   });
 
   //Bar
@@ -72,7 +72,10 @@ export default function AdminDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getBarChart(barYear);
+            const res = await StatisticService.getBarChart(
+              barYear,
+              user.role,
+            );
             const data = res.data;
 
             const labels = [
@@ -137,7 +140,10 @@ export default function AdminDashboard() {
       await withMinLoading(
         async () => {
           try {
-            const res = await StatisticService.getLineChart(lineYear);
+            const res = await StatisticService.getLineChart(
+              lineYear,
+              user.role
+            );
             const data = res.data;
 
             const labels = [
@@ -343,13 +349,14 @@ export default function AdminDashboard() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer">
+          <div className="grid grid-cols-3 gap-3 items-stretch">
+            {/* Opening */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-4 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center">
               <div className="flex flex-col items-center text-center">
                 <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-500 mb-0.5">
                   <i className="fas fa-folder-open text-white text-base"></i>
                 </div>
-                <p className="text-xs font-medium text-gray-600 mb-0.5">
+                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap truncate">
                   {t('adminDashboard.opening')}
                 </p>
                 <h6 className="text-xl font-bold text-gray-900">
@@ -358,12 +365,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 hover:border-yellow-500 hover:shadow-md transition-all cursor-pointer">
+            {/* Pending Commission */}
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-4 hover:border-yellow-500 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center">
               <div className="flex flex-col items-center text-center">
                 <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-yellow-500 mb-0.5">
                   <i className="fas fa-dollar-sign text-white text-base"></i>
                 </div>
-                <p className="text-xs font-medium text-gray-600 mb-0.5">
+                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap truncate">
                   {t('adminDashboard.pendingCommission')}
                 </p>
                 <h6 className="text-xl font-bold text-gray-900">
@@ -372,12 +380,13 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer">
+            {/* Approved */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-4 hover:border-green-500 hover:shadow-md transition-all cursor-pointer h-full flex flex-col justify-center">
               <div className="flex flex-col items-center text-center">
                 <div className="w-7 h-7 flex items-center justify-center rounded-lg bg-green-500 mb-0.5">
                   <i className="fas fa-check-circle text-white text-base"></i>
                 </div>
-                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap truncate max-w-[100px]">
+                <p className="text-xs font-medium text-gray-600 mb-0.5 whitespace-nowrap truncate">
                   {t('adminDashboard.approved')}
                 </p>
                 <h6 className="text-xl font-bold text-gray-900">

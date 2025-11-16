@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import PropTypes from 'prop-types';
 import { handleApiError } from '../../utils/handleApiError';
-import { uploadImageToCloudinary } from '../../utils/uploadImage';
+import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { useBrand } from '../../hook/useBrand';
 import LoadingComponent from '../LoadingComponent';
 
@@ -13,7 +13,6 @@ export default function BrandModal({
   onSave,
   brandID,
   setUploadProgress,
-  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [brandName, setBrandName] = useState('');
@@ -72,7 +71,6 @@ export default function BrandModal({
   };
 
   const handleSubmit = async () => {
-    setSubmitting(true);
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
 
@@ -88,23 +86,23 @@ export default function BrandModal({
 
       if (logoFile) {
         setUploadProgress(1);
-        const result = await uploadImageToCloudinary(
+        const result = await uploadToCloudinary(
           logoFile,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => {
+          (progress, percent) => {
             setUploadProgress(percent);
           },
           'HomeCareDN/BrandLogo'
         );
         data.BrandLogoUrl = result.url;
         data.BrandLogoPublicId = result.publicId;
-        onClose();
-        setUploadProgress(0);
       }
 
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setUploadProgress(0);
     }
   };
 

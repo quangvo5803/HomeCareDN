@@ -1,5 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application.DistributorApplication;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.User;
 using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.MaterialRequest

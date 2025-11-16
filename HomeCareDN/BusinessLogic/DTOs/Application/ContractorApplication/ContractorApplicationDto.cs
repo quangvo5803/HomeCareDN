@@ -11,6 +11,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         public string? Description { get; set; }
         public double EstimatePrice { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
+        public ICollection<string>? DocumentUrls { get; set; }
         public DateTime CreatedAt { get; set; }
         public required string Status { get; set; }
         public DateTime? DueCommisionTime { get; set; }
@@ -18,6 +19,7 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
         // Thông tin đánh giá nhà thầu
         public int CompletedProjectCount { get; set; }
         public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
 
         // Thông tin liên lạc nhà thầu (mới hiển thị khi đóng phí)
         public required string ContractorID { get; set; }
