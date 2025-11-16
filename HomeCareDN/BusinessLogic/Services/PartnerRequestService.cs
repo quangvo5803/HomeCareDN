@@ -26,7 +26,7 @@ namespace BusinessLogic.Services
         private const string ERROR_PARTNER_REQUEST_NOT_FOUND = "PARTNER_REQUEST_NOT_FOUND";
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
         private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
-        private const string PARTNER_REQUEST_INCLUDES = "Images, Documents";
+        private const string PARTNER_REQUEST_INCLUDES = "Images,Documents";
 
         public PartnerRequestService(
             IUnitOfWork unitOfWork,

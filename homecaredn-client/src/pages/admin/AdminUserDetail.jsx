@@ -1,15 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Pagination } from 'antd';
 import Avatar from 'react-avatar';
 import { formatVND, formatDate } from '../../utils/formatters';
 import { useUser } from '../../hook/useUser';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
+import { useServiceRequest } from '../../hook/useServiceRequest';
 import { useParams, useNavigate } from 'react-router-dom';
 import StatusBadge from '../../components/StatusBadge';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../../utils/handleApiError';
 import { useTranslation } from 'react-i18next';
 import LoadingComponent from '../../components/LoadingComponent';
+import { withMinLoading } from '../../utils/withMinLoading';
 
 export default function AdminUserDetail() {
   const { t, i18n } = useTranslation();
@@ -18,7 +20,13 @@ export default function AdminUserDetail() {
   const navigate = useNavigate();
 
   const [userDetail, setUserDetail] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const {
+    fetchServiceRequests,
+    totalServiceRequests,
+    loading,
+    serviceRequests,
+  } = useServiceRequest();
+  const [userLoading, setUserLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [contractors, setContractors] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
@@ -49,47 +57,80 @@ export default function AdminUserDetail() {
   useEffect(() => {
     const fetchUserById = async () => {
       try {
+        setUserLoading(true);
         if (!userID) return;
         const data = await getUserById(userID);
         setUserDetail(data);
-      } catch (err) {
-        toast.error(t(handleApiError(err)));
+      } catch {
+        // Handle error on provider
       } finally {
-        setLoading(false);
+        setUserLoading(false);
       }
     };
     fetchUserById();
   }, [t, getUserById, userID]);
 
   // --- Fetch contractors ---
-  useEffect(() => {
-    const fetchContractors = async () => {
-      if (!userDetail) return;
-      const role = userDetail.role !== 'Customer';
-      const noServiceRequests =
-        !userDetail?.serviceRequests || userDetail.serviceRequests.length === 0;
-
-      if (!role || !noServiceRequests) return;
-
+  const executeFetchContractors = useCallback(
+    async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {
       try {
-        setLoadingContractors(true);
-        setContractors([]);
-        setTotalCount(0);
-        const res = await contractorApplicationService.getAllByUserIdForAdmin({
-          PageNumber: currentPage,
-          PageSize: pageSize,
-          FilterID: userID,
+        if (userDetail?.role !== 'Contractor') {
+          return { items: [], totalCount: 0 };
+        }
+
+        const data = await contractorApplicationService.getAllByUserIdForAdmin({
+          PageNumber,
+          PageSize,
+          FilterID,
         });
-        setContractors(res.items || []);
-        setTotalCount(res.totalCount || 0);
+
+        setContractors(data.items || []);
+        setTotalCount(data.totalCount || 0);
+
+        return data.items || [];
       } catch (err) {
         toast.error(t(handleApiError(err)));
-      } finally {
-        setLoadingContractors(false);
+        setContractors([]);
+        setTotalCount(0);
+        return [];
       }
+    },
+    [userDetail, t]
+  );
+
+  // Wrapper có loading tối thiểu
+  const fetchContractors = useCallback(
+    async (params = {}) =>
+      withMinLoading(
+        () => executeFetchContractors(params),
+        setLoadingContractors
+      ),
+    [executeFetchContractors]
+  );
+  useEffect(() => {
+    if (!userDetail) return;
+
+    const params = {
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      FilterID: userID,
     };
-    fetchContractors();
-  }, [t, userID, currentPage, userDetail]);
+
+    if (userDetail.role === 'Contractor') {
+      fetchContractors(params);
+    }
+
+    if (userDetail.role === 'Customer') {
+      fetchServiceRequests(params);
+    }
+  }, [
+    userDetail,
+    userID,
+    currentPage,
+    pageSize,
+    fetchContractors,
+    fetchServiceRequests,
+  ]);
 
   // --- Helpers ---
   const renderAddress = () => {
@@ -199,98 +240,114 @@ export default function AdminUserDetail() {
   );
   // --- Service Requests ---
   const renderServiceRequests = () => {
-    const requests = userDetail?.serviceRequests;
-    const noRequests = !requests || requests.length === 0;
-
-    if (noRequests) return renderEmptyState();
+    if (totalServiceRequests == 0) return renderEmptyState();
     return (
       <div className="p-6 space-y-4">
-        {userDetail.serviceRequests.map((request) => {
-          const ui = serviceTypeStyleSR[request?.serviceType] || {
-            icon: 'fa-wrench',
-            tint: 'text-gray-600',
-            bg: 'bg-gray-50',
-            ring: 'ring-gray-200',
-            accent: 'bg-gradient-to-br from-gray-400 to-gray-500',
-          };
+        {loading ? (
+          <div className="flex justify-center py-10">
+            <LoadingComponent />
+          </div>
+        ) : (
+          serviceRequests.map((request) => {
+            const ui = serviceTypeStyleSR[request?.serviceType] || {
+              icon: 'fa-wrench',
+              tint: 'text-gray-600',
+              bg: 'bg-gray-50',
+              ring: 'ring-gray-200',
+              accent: 'bg-gradient-to-br from-gray-400 to-gray-500',
+            };
 
-          return (
-            <div
-              key={request.serviceRequestID}
-              className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-orange-200"
-            >
+            return (
               <div
-                className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
-              />
-              <div className="flex justify-between items-start mb-5 pl-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span
-                      className={`inline-flex items-center justify-center h-10 w-10 rounded-xl ${ui.bg} ring-2 ${ui.ring} transition-transform duration-300 group-hover:scale-110`}
-                    >
-                      <i className={`fa-solid ${ui.icon} ${ui.tint} text-lg`} />
-                    </span>
-                    <h3 className="text-xl font-bold text-gray-900">
-                      {t(`Enums.ServiceType.${request.serviceType}`)}
-                    </h3>
+                key={request.serviceRequestID}
+                className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-orange-200"
+              >
+                <div
+                  className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
+                />
+                <div className="flex justify-between items-start mb-5 pl-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span
+                        className={`inline-flex items-center justify-center h-10 w-10 rounded-xl ${ui.bg} ring-2 ${ui.ring} transition-transform duration-300 group-hover:scale-110`}
+                      >
+                        <i
+                          className={`fa-solid ${ui.icon} ${ui.tint} text-lg`}
+                        />
+                      </span>
+                      <h3 className="text-xl font-bold text-gray-900">
+                        {t(`Enums.ServiceType.${request.serviceType}`)}
+                      </h3>
+                    </div>
                   </div>
+                  <StatusBadge status={request.status} type="Request" />
                 </div>
-                <StatusBadge status={request.status} type="Request" />
-              </div>
 
-              <div className="pl-4 mb-5 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-                  <i className="fa-solid fa-box-open" />
-                  {t(`Enums.PackageOption.${request.packageOption}`)}
-                </span>
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
-                  <i className="fa-solid fa-building" />
-                  {t(`Enums.BuildingType.${request.buildingType}`)}
-                </span>
-                {(request?.floors ?? 0) > 0 && (
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
-                    <i className="fa-solid fa-layer-group" />
-                    {request.floors}{' '}
-                    {t('contractorServiceRequestDetail.floorsUnit')}
+                <div className="pl-4 mb-5 flex flex-wrap gap-2">
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                    <i className="fa-solid fa-box-open" />
+                    {t(`Enums.PackageOption.${request.packageOption}`)}
                   </span>
-                )}
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200">
-                  <i className="fa-solid fa-ruler-combined" />
-                  {(request.length * request.width * request.floors).toFixed(
-                    1
-                  ) || '—'}{' '}
-                  m²
-                </span>
-                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
-                  <i className="fa-solid fa-coins" />
-                  {request.estimatePrice
-                    ? formatVND(request.estimatePrice)
-                    : t('contractorServiceRequestManager.negotiable')}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <i className="fa-regular fa-calendar text-gray-400"></i>
-                  <span className="font-medium">
-                    {formatDate(request.createdAt, i18n.language)}
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                    <i className="fa-solid fa-building" />
+                    {t(`Enums.BuildingType.${request.buildingType}`)}
+                  </span>
+                  {(request?.floors ?? 0) > 0 && (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
+                      <i className="fa-solid fa-layer-group" />
+                      {request.floors}{' '}
+                      {t('contractorServiceRequestDetail.floorsUnit')}
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200">
+                    <i className="fa-solid fa-ruler-combined" />
+                    {(request.length * request.width * request.floors).toFixed(
+                      1
+                    ) || '—'}{' '}
+                    m²
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
+                    <i className="fa-solid fa-coins" />
+                    {request.estimatePrice
+                      ? formatVND(request.estimatePrice)
+                      : t('contractorServiceRequestManager.negotiable')}
                   </span>
                 </div>
-                <button
-                  onClick={() =>
-                    navigate(
-                      `/Admin/ServiceRequestManager/${request.serviceRequestID}`
-                    )
-                  }
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
-                >
-                  <i className="fa-solid fa-eye" />
-                  {t('BUTTON.View')}
-                </button>
+
+                <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <i className="fa-regular fa-calendar text-gray-400"></i>
+                    <span className="font-medium">
+                      {formatDate(request.createdAt, i18n.language)}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/Admin/ServiceRequestManager/${request.serviceRequestID}`
+                      )
+                    }
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-700 shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    <i className="fa-solid fa-eye" />
+                    {t('BUTTON.View')}
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
+        {!loading && totalServiceRequests > 0 && (
+          <div className="flex justify-center pt-4">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalServiceRequests}
+              onChange={(page) => setCurrentPage(page)}
+              showSizeChanger={false}
+            />
+          </div>
+        )}
       </div>
     );
   };
@@ -373,7 +430,7 @@ export default function AdminUserDetail() {
           );
         })}
 
-        {totalCount > 0 && (
+        {!loadingContractors && totalCount > 0 && (
           <div className="flex justify-center pt-4">
             <Pagination
               current={currentPage}
@@ -391,7 +448,7 @@ export default function AdminUserDetail() {
   // --- Render main ---
   return (
     <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-3xl">
-      {loading ? (
+      {userLoading ? (
         renderLoading()
       ) : (
         <>
@@ -411,7 +468,7 @@ export default function AdminUserDetail() {
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 mt-2 sm:mt-0">
                   <span className="w-3 h-3 bg-green-500 rounded-full"></span>
                   <span>
-                    {userDetail.serviceRequests.length}{' '}
+                    {totalServiceRequests}{' '}
                     {t('adminUserManager.userDetail.serviceRequest')}
                   </span>
                 </div>

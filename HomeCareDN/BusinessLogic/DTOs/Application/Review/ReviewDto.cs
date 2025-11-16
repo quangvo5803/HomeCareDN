@@ -4,10 +4,12 @@
     {
         public Guid ReviewID { get; set; }
         public required string UserID { get; set; }
+        public string? CustomerName { get; set; }
 
         public Guid? ServiceRequestID { get; set; }
         public Guid? MaterialRequestID { get; set; }
-        public string? PartnerID { get; set; }
+        public required string PartnerID { get; set; }
+        public string? PartnerName { get; set; }
 
         public int Rating { get; set; }
         public string? Comment { get; set; }
