@@ -40,6 +40,8 @@ RoleBadgeColors.propTypes = {
 };
 
 const MESSAGE_SIZE = 10;
+const CONVERSATION_SIZE = 7;
+
 export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -56,11 +58,19 @@ export default function AdminSupportChatManager() {
   const [moreMessage, setMoreMessage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
   const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
+
+  const [conversationPage, setConversationPage] = useState(1);
+  const [hasMoreConversations, setHasMoreConversations] = useState(true);
+  const [loadingMoreConversations, setLoadingMoreConversations] =
+    useState(false);
   const messagesContainerRef = useRef(null);
+  const conversationListRef = useRef(null);
+
   const notificationNewConvesation = useRef(
     new Audio(notificationSoundNewConvesation)
   );
   const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
+
   // Realtime messages
   useRealtime(
     {
@@ -151,16 +161,67 @@ export default function AdminSupportChatManager() {
     'chat'
   );
 
-  // Load conversation list
+  //Load conversations
+  const loadConversations = useCallback(
+    async (conversationToLoad, append = false) => {
+      if (!user?.id) return;
+
+      try {
+        if (append) setLoadingMoreConversations(true);
+        else setLoadingConversation(true);
+
+        const conversationData =
+          await conversationService.getAllConversationsByAdminID({
+            adminID: user.id,
+            conversationNumber: conversationToLoad,
+            conversationSize: CONVERSATION_SIZE,
+          });
+
+        const isLastPage = conversationData.items.length < CONVERSATION_SIZE;
+        const totalFetched = conversationToLoad * CONVERSATION_SIZE;
+        const hasMore =
+          !isLastPage && totalFetched < conversationData.totalCount;
+
+        setHasMoreConversations(hasMore);
+
+        if (append) {
+          setConversations((prev) => [...prev, ...conversationData.items]);
+        } else {
+          setConversations(conversationData.items || []);
+        }
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setLoadingConversation(false);
+        setLoadingMoreConversations(false);
+      }
+    },
+    [user?.id, t]
+  );
+
+  //Load conversation list
   useEffect(() => {
     if (!user?.id || !chatConnection) return;
-    setLoadingConversation(true);
-    conversationService
-      .getAllConversationsByAdminID(user.id)
-      .then((items) => setConversations(items || []))
-      .catch((error) => toast.error(t(handleApiError(error))))
-      .finally(() => setLoadingConversation(false));
-  }, [user?.id, chatConnection, t]);
+    loadConversations(1, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, chatConnection]);
+
+  //Infinite scroll for conversations
+  const handleScrollConversations = useCallback(() => {
+    const container = conversationListRef.current;
+    if (!container || loadingMoreConversations || !hasMoreConversations) return;
+
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+
+    if (scrollTop + clientHeight >= scrollHeight - 1) {
+      const nextPage = conversationPage + 1;
+      setConversationPage(nextPage);
+      loadConversations(nextPage, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingMoreConversations, hasMoreConversations, conversationPage]);
 
   // Load message
   const loadMessages = useCallback(
@@ -203,7 +264,8 @@ export default function AdminSupportChatManager() {
         setLoadingMoreMessage(false);
       }
     },
-    [selectedConversation, t, messages.length]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedConversation, t]
   );
 
   // Load messages when select conversation
@@ -272,6 +334,7 @@ export default function AdminSupportChatManager() {
       )
     );
   };
+
   // Send message
   const handleSend = async () => {
     if (!messageInput.trim() || !selectedConversation || !user?.id) return;
@@ -287,6 +350,7 @@ export default function AdminSupportChatManager() {
       toast.error(t(handleApiError(error)));
     }
   };
+
   // Filter conversations
   const filteredConversations = useMemo(() => {
     if (!filter) return conversations;
@@ -296,10 +360,10 @@ export default function AdminSupportChatManager() {
     return conversations.filter(
       (conversation) =>
         conversation.userEmail?.toLowerCase()?.includes(searchTerm) ||
-        conversation.UserName?.toLowerCase()?.includes(searchTerm)
+        conversation.userName?.toLowerCase()?.includes(searchTerm)
     );
   }, [conversations, filter]);
-  //Left
+
   const renderConversationList = () => {
     if (loadingConversation) {
       return (
@@ -311,67 +375,82 @@ export default function AdminSupportChatManager() {
 
     if (filteredConversations.length > 0) {
       return (
-        <ul className="divide-y">
-          {filteredConversations.map((conversation) => (
-            <li key={conversation.conversationID}>
-              <button
-                type="button"
-                onClick={() => handleSelectConversation(conversation)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleSelectConversation(conversation);
-                  }
-                }}
-                className={`w-full text-left p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
-                  conversation.conversationID ===
-                  selectedConversation?.conversationID
-                    ? 'bg-indigo-100 border-l-4 border-orange-500'
-                    : ''
-                }`}
-                aria-label={`${t(
-                  'adminSupportChatManager.selectConversation'
-                )}: ${conversation.userEmail}`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  {/* Avatar and Name */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="relative flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold">
-                        {conversation.userEmail?.charAt(0).toUpperCase()}
+        <>
+          <ul className="divide-y">
+            {filteredConversations.map((conversation) => (
+              <li key={conversation.conversationID}>
+                <button
+                  type="button"
+                  onClick={() => handleSelectConversation(conversation)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSelectConversation(conversation);
+                    }
+                  }}
+                  className={`w-full text-left p-4 cursor-pointer transition-all hover:bg-indigo-50 ${
+                    conversation.conversationID ===
+                    selectedConversation?.conversationID
+                      ? 'bg-indigo-100 border-l-4 border-orange-500'
+                      : ''
+                  }`}
+                  aria-label={`${t(
+                    'adminSupportChatManager.selectConversation'
+                  )}: ${conversation.userEmail}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    {/* Avatar and Name */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                          {conversation.userEmail?.charAt(0).toUpperCase()}
+                        </div>
+                        {conversation.adminUnreadCount > 0 && (
+                          <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
+                        )}
                       </div>
-                      {conversation.adminUnreadCount > 0 && (
-                        <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
-                      )}
-                    </div>
 
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate text-gray-800">
-                        {conversation?.userEmail}
-                      </p>
-                      {conversation?.userName && (
-                        <p className="text-xs text-gray-500 truncate">
-                          {conversation.userName}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate text-gray-800">
+                          {conversation?.userEmail}
                         </p>
-                      )}
-                      {conversation?.userRole && (
-                        <RoleBadgeColors role={conversation.userRole} />
-                      )}
+                        {conversation?.userName && (
+                          <p className="text-xs text-gray-500 truncate">
+                            {conversation.userName}
+                          </p>
+                        )}
+                        {conversation?.userRole && (
+                          <RoleBadgeColors role={conversation.userRole} />
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  {conversation.adminUnreadCount > 0 && (
-                    <span className="flex-shrink-0 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                      {conversation.adminUnreadCount > 9
-                        ? '9+'
-                        : conversation.adminUnreadCount}
-                    </span>
-                  )}
-                </div>
-              </button>
-            </li>
-          ))}
-        </ul>
+                    {conversation.adminUnreadCount > 0 && (
+                      <span className="flex-shrink-0 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                        {conversation.adminUnreadCount > 9
+                          ? '9+'
+                          : conversation.adminUnreadCount}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          {loadingMoreConversations && (
+            <div className="flex justify-center py-3">
+              <i className="fa-solid fa-spinner fa-spin text-orange-500"></i>
+              {t('adminSupportChatManager.loadingMoreConversation')}
+            </div>
+          )}
+
+          {!hasMoreConversations && conversations.length > 0 && (
+            <div className="text-center py-3 text-xs text-gray-400">
+              {t('adminSupportChatManager.noMoreConversations')}
+            </div>
+          )}
+        </>
       );
     }
 
@@ -415,8 +494,11 @@ export default function AdminSupportChatManager() {
               className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
             />
           </div>
-          {/* Left */}
-          <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100">
+          <div
+            ref={conversationListRef}
+            onScroll={handleScrollConversations}
+            className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-orange-300 scrollbar-track-gray-100"
+          >
             {renderConversationList()}
           </div>
         </div>
@@ -463,7 +545,7 @@ export default function AdminSupportChatManager() {
                       <div className="flex justify-center py-2 mb-3">
                         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white text-xs text-gray-600">
                           <i className="fas fa-spinner fa-spin text-orange-500"></i>
-                          {t('adminSupportChatManager.loadingMore')}
+                          {t('adminSupportChatManager.loadingMoreMessage')}
                         </span>
                       </div>
                     )}

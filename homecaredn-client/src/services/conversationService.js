@@ -9,8 +9,8 @@ export const conversationService = {
     const res = await api.get(`/conversations/user/${id}`);
     return res.data;
   },
-  getAllConversationsByAdminID: async (id) => {
-    const res = await api.get(`/conversations/admin/${id}`);
+  getAllConversationsByAdminID: async (params) => {
+    const res = await api.get(`/conversations/admin`, { params });
     return res.data;
   },
   markAsRead: async (id) => {

@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -34,12 +35,14 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
-        [HttpGet("admin/{id}")]
+        [HttpGet("admin")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllConversationsByAdminID(string id)
+        public async Task<IActionResult> GetAllConversationsByAdminID(
+            [FromQuery] ConversationGetByIdDto dto
+        )
         {
             var result = await _facadeService.ConversationService.GetAllConversationByAdminIDAsync(
-                id
+                dto
             );
             return Ok(result);
         }
