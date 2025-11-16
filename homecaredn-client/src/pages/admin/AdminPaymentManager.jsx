@@ -1,6 +1,6 @@
 import StatusBadge from '../../components/StatusBadge';
 import { paymentService } from '../../services/paymentService';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'use-debounce';
@@ -9,6 +9,7 @@ import { formatVND, formatDate } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
+import { withMinLoading } from '../../utils/withMinLoading';
 
 export default function PaymentManager() {
   const { t, i18n } = useTranslation();
@@ -22,26 +23,45 @@ export default function PaymentManager() {
   const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchPayments = async () => {
+  // Fetch PAYMENTS
+  const executeFetchPayments = useCallback(
+    async ({ PageNumber = 1, PageSize = 10, SortBy, Search = '' } = {}) => {
       try {
-        const res = await paymentService.getAll({
-          PageNumber: currentPage,
-          PageSize: pageSize,
-          SortBy: sortOption,
-          Search: debouncedSearch || '',
+        const data = await paymentService.getAll({
+          PageNumber,
+          PageSize,
+          SortBy,
+          Search,
         });
-        setPayments(res.items || []);
-        setTotalCount(res.totalCount || 0);
-        setLoading(true);
+
+        setPayments(data.items || []);
+        setTotalCount(data.totalCount || 0);
+
+        return data.items || [];
       } catch (err) {
         toast.error(t(handleApiError(err)));
-      } finally {
-        setLoading(false);
+        setPayments([]);
+        setTotalCount(0);
+        return [];
       }
-    };
-    fetchPayments();
-  }, [t, currentPage, sortOption, debouncedSearch]);
+    },
+    [t]
+  );
+
+  // Wrapper có loading tối thiểu
+  const fetchPayments = useCallback(
+    async (params = {}) =>
+      withMinLoading(() => executeFetchPayments(params), setLoading),
+    [executeFetchPayments]
+  );
+  useEffect(() => {
+    fetchPayments({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: sortOption,
+      Search: debouncedSearch || '',
+    });
+  }, [t, currentPage, sortOption, debouncedSearch, fetchPayments]);
 
   let tableContent;
 

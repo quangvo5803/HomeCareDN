@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataAccess.Entities.Authorize;
 
-namespace BusinessLogic.DTOs.Authorize.Profiles
+namespace BusinessLogic.DTOs.Authorize.User
 {
-    public class UpdateProfileDto
+    public class UpdateUserDto
     {
         public string UserId { get; set; } = default!;
 

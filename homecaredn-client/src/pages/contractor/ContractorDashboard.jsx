@@ -81,7 +81,7 @@ export default function ContractorDashboard() {
   }, [user?.id, t]);
 
   const handleView = useCallback(
-    (id) => navigate(`/Contractor/service-request/${id}`),
+    (id) => navigate(`/Contractor/ServiceRequestManager/${id}`),
     [navigate]
   );
   //Bar
@@ -210,10 +210,10 @@ export default function ContractorDashboard() {
     } catch (error) {
       setKpiError(
         error?.response?.data?.title ||
-        error?.response?.data?.message ||
-        error?.response?.data ||
-        error?.message ||
-        t('partnerDashboard.errors.kpi_load_failed')
+          error?.response?.data?.message ||
+          error?.response?.data ||
+          error?.message ||
+          t('partnerDashboard.errors.kpi_load_failed')
       );
     } finally {
       setLoadingDashboardStats(false);
@@ -263,7 +263,6 @@ export default function ContractorDashboard() {
         }));
         fetchLatestApplications();
       }
-
     },
 
     onAcceptedContractorApplication: (payload) => {

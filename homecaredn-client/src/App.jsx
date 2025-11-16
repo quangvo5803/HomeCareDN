@@ -38,6 +38,7 @@ import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
+import AdminReviewManager from './pages/admin/AdminReviewManager';
 import AdminPaymentManager from './pages/admin/AdminPaymentManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
@@ -47,6 +48,8 @@ import ContractorServiceRequestDetail from './pages/contractor/ContractorService
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
+//Partner pages
+import PartnerProfile from './pages/partner/PartnerProfile';
 //Home Page
 import MaterialViewAll from './pages/MaterialViewAll';
 import MaterialDetail from './pages/MaterialDetail';
@@ -312,6 +315,7 @@ function Layout() {
           />
           <Route path="UserManager" element={<AdminUserManager />} />
           <Route path="UserManager/:userID" element={<AdminUserDetail />} />
+          <Route path="ReviewManager" element={<AdminReviewManager />} />
           <Route path="PaymentManager" element={<AdminPaymentManager />} />
         </Route>
         {/* Contractor routes */}
@@ -325,22 +329,14 @@ function Layout() {
         >
           <Route index element={<ContractorDashboard />} />
           <Route
-            path="service-requests"
+            path="ServiceRequestManager"
             element={<ContractorServiceRequestManager />}
           />
           <Route
-            path="service-request/:serviceRequestId"
+            path="ServiceRequestManager/:serviceRequestId"
             element={<ContractorServiceRequestDetail />}
           />
-          <Route
-            path="my-projects"
-            element={<div>My Projects - Coming Soon</div>}
-          />
-          <Route
-            path="applications"
-            element={<div>Applications - Coming Soon</div>}
-          />
-          <Route path="profile" element={<div>Profile - Coming Soon</div>} />
+          <Route path="Profile" element={<PartnerProfile />} />
         </Route>
         {/* Distributor routes */}
         <Route
@@ -360,6 +356,7 @@ function Layout() {
             path="CategoryManager"
             element={<DistributorCategoryManager />}
           />
+          <Route path="Profile" element={<PartnerProfile />} />
         </Route>
 
         {/* Redirect root → /home */}

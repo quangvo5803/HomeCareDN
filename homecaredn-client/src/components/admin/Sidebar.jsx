@@ -67,6 +67,11 @@ export default function Sidebar() {
       link: '/Admin/PaymentManager',
     },
     {
+      icon: 'text-yellow-500 fa-solid fa-star',
+      title: 'review',
+      link: '/Admin/ReviewManager',
+    },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',

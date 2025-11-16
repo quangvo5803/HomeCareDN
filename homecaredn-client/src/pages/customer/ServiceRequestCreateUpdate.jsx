@@ -4,7 +4,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useEnums } from '../../hook/useEnums';
 import { useAuth } from '../../hook/useAuth';
-import { useAddress } from '../../hook/useAddress';
+import { useUser } from '../../hook/useUser';
 import { useServiceRequest } from '../../hook/useServiceRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
@@ -21,7 +21,7 @@ const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
 export default function ServiceRequestCreateUpdate() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { addressLoading, addresses } = useAddress();
+  const { addressLoading, addresses } = useUser();
   const { serviceRequestId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -615,6 +615,49 @@ export default function ServiceRequestCreateUpdate() {
                   <p></p>
                 )}
 
+                {/* Address */}
+                <div className="space-y-2 lg:col-span-2">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <i className="fas fa-map-marker-alt text-orange-500 mr-2"></i>
+                    {t('userPage.createServiceRequest.form_address')}
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors appearance-none bg-white"
+                      value={addressID}
+                      onChange={(e) => setAddressID(e.target.value)}
+                    >
+                      <option value="">
+                        {t('userPage.createServiceRequest.form_selectAddress')}
+                      </option>
+                      {addresses?.map((a) => (
+                        <option key={a.addressID} value={a.addressID}>
+                          {a.detail},{a.ward},{a.district},{a.city}
+                        </option>
+                      ))}
+                    </select>
+                    <i className="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-2 lg:col-span-2">
+                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                    <i className="fas fa-comment-alt text-orange-500 mr-2"></i>
+                    {t('userPage.createServiceRequest.form_description')}
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={4}
+                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
+                    placeholder={t(
+                      'userPage.createServiceRequest.form_descriptionPlaceholder'
+                    )}
+                  />
+                </div>
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -670,51 +713,6 @@ export default function ServiceRequestCreateUpdate() {
                     </>
                   )}
                 </div>
-
-                {/* Address */}
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-map-marker-alt text-orange-500 mr-2"></i>
-                    {t('userPage.createServiceRequest.form_address')}
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors appearance-none bg-white"
-                      value={addressID}
-                      onChange={(e) => setAddressID(e.target.value)}
-                    >
-                      <option value="">
-                        {t('userPage.createServiceRequest.form_selectAddress')}
-                      </option>
-                      {addresses?.map((a) => (
-                        <option key={a.addressID} value={a.addressID}>
-                          {a.detail},{a.ward},{a.district},{a.city}
-                        </option>
-                      ))}
-                    </select>
-                    <i className="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                    <i className="fas fa-comment-alt text-orange-500 mr-2"></i>
-                    {t('userPage.createServiceRequest.form_description')}
-                    <span className="text-red-500 ml-1">*</span>
-                  </label>
-                  <textarea
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    rows={4}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors resize-none"
-                    placeholder={t(
-                      'userPage.createServiceRequest.form_descriptionPlaceholder'
-                    )}
-                  />
-                </div>
-
                 {/* Images Upload Section */}
                 <div className="space-y-4 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">

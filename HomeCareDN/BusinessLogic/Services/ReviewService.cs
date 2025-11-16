@@ -29,6 +29,62 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
+        public async Task<PagedResultDto<ReviewDto>> GetAllReviewsAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork.ReviewRepository.GetQueryable();
+
+            //Get all Partenr Reviews
+            if (parameters.FilterID.HasValue)
+            {
+                query = query.Where(r => r.PartnerID == parameters.FilterID.ToString());
+            }
+            if (parameters.Rating.HasValue)
+            {
+                query = query.Where(r => r.Rating == parameters.Rating);
+            }
+
+            var totalCount = await query.CountAsync();
+
+            query = parameters.SortBy switch
+            {
+                "createat" => query.OrderBy(s => s.CreatedAt),
+                "createat_desc" => query.OrderByDescending(s => s.CreatedAt),
+                "rating" => query.OrderBy(s => s.Rating),
+                "rating_desc" => query.OrderByDescending(s => s.Rating),
+                "random" => query.OrderBy(s => s.ReviewID),
+                _ => query.OrderBy(b => b.CreatedAt),
+            };
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+            var items = await query.ToListAsync();
+
+            var serviceDtos = _mapper.Map<IEnumerable<ReviewDto>>(items);
+
+            var userIds = serviceDtos.Select(r => r.UserID).ToList();
+            var partnerIds = serviceDtos.Select(r => r.PartnerID).ToList();
+
+            var allUserIds = userIds.Concat(partnerIds).Distinct().ToList();
+            var users = await _userManager
+                .Users.Where(u => allUserIds.Contains(u.Id))
+                .ToListAsync();
+            var userDict = users.ToDictionary(u => u.Id, u => u.FullName);
+
+            foreach (var dto in serviceDtos)
+            {
+                dto.CustomerName = userDict.GetValueOrDefault(dto.UserID);
+                dto.PartnerName = userDict.GetValueOrDefault(dto.PartnerID);
+            }
+
+            return new PagedResultDto<ReviewDto>
+            {
+                Items = serviceDtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
+
         public async Task<ReviewDto> CreateReviewAsync(ReviewCreateRequestDto request)
         {
             var review = _mapper.Map<Review>(request);
@@ -64,36 +120,6 @@ namespace BusinessLogic.Services
                 await _userManager.UpdateAsync(partner);
             }
             return _mapper.Map<ReviewDto>(review);
-        }
-
-        public async Task<PagedResultDto<ReviewDto>> GetAllReviewsAsync(QueryParameters parameters)
-        {
-            var query = _unitOfWork.ReviewRepository.GetQueryable(asNoTracking: false);
-
-            var totalCount = await query.CountAsync();
-
-            query = parameters.SortBy switch
-            {
-                "createat" => query.OrderBy(s => s.CreatedAt),
-                "createat_desc" => query.OrderByDescending(s => s.CreatedAt),
-                "rating" => query.OrderBy(s => s.Rating),
-                "rating_desc" => query.OrderByDescending(s => s.Rating),
-                "random" => query.OrderBy(s => s.ReviewID),
-                _ => query.OrderBy(b => b.CreatedAt),
-            };
-            query = query
-                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize);
-            var items = await query.ToListAsync();
-
-            var serviceDtos = _mapper.Map<IEnumerable<ReviewDto>>(items);
-            return new PagedResultDto<ReviewDto>
-            {
-                Items = serviceDtos,
-                TotalCount = totalCount,
-                PageNumber = parameters.PageNumber,
-                PageSize = parameters.PageSize,
-            };
         }
 
         public async Task DeleteReviewAsync(Guid id)

@@ -328,7 +328,7 @@ export default function ContractorServiceRequestManager() {
                           <button
                             onClick={() =>
                               navigate(
-                                `/Contractor/service-request/${request.serviceRequestID}`
+                                `/Contractor/ServiceRequestManager/${request.serviceRequestID}`
                               )
                             }
                             className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-600 hover:to-orange-700 shadow-md shadow-orange-500/25 hover:shadow-lg hover:shadow-orange-500/40 transition-all duration-300 hover:-translate-y-0.5"
@@ -442,7 +442,7 @@ export default function ContractorServiceRequestManager() {
                           <button
                             onClick={() =>
                               navigate(
-                                `/Contractor/service-request/${request.serviceRequestID}`
+                                `/Contractor/ServiceRequestManager/${request.serviceRequestID}`
                               )
                             }
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-lg text-white bg-gradient-to-r from-blue-600 to-blue-700 shadow-sm shadow-blue-500/25 hover:shadow-md transition-all"

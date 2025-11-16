@@ -3,7 +3,7 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.User;
 using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
@@ -32,10 +32,10 @@ namespace BusinessLogic.Services.Interfaces
         private const string ERROR_MAXIMUM_IMAGE_SIZE = "MAXIMUM_IMAGE_SIZE";
         private const string INCLUDE_LISTALL =
             "ContractorApplications,SelectedContractorApplication,Review,Review.Images";
+        private const string INCLUDE_DETAIL =
+            "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents,Conversation,Review,Review.Images";
         private const string ERROR_MAXIMUM_DOCUMENT = "MAXIMUM_DOCUMENT";
         private const string ERROR_MAXIMUM_DOCUMENT_SIZE = "MAXIMUM_DOCUMENT_SIZE";
-        private const string INCLUDE_DETAIL =
-            "Images,Documents,ContractorApplications,ContractorApplications.Images,ContractorApplications.Documents,SelectedContractorApplication,SelectedContractorApplication.Images,SelectedContractorApplication.Documents,Conversation";
 
         public ServiceRequestService(
             IUnitOfWork unitOfWork,
@@ -68,6 +68,10 @@ namespace BusinessLogic.Services.Interfaces
                     s.ContractorApplications != null
                     && s.ContractorApplications.Any(ca => ca.ContractorID == parameters.FilterID)
                 );
+            }
+            if (role == ADMIN && parameters.FilterID != null)
+            {
+                query = query.Where(s => s.CustomerID == parameters.FilterID);
             }
             query = parameters.SortBy?.ToLower() switch
             {

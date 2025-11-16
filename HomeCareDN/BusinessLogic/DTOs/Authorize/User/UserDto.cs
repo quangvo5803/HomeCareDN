@@ -1,7 +1,4 @@
-﻿using BusinessLogic.DTOs.Application.ContractorApplication;
-using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
-using System.ComponentModel.DataAnnotations;
+﻿using BusinessLogic.DTOs.Application.ServiceRequest;
 
 namespace BusinessLogic.DTOs.Authorize.User
 {
@@ -14,7 +11,6 @@ namespace BusinessLogic.DTOs.Authorize.User
         public int ProjectCount { get; set; }
         public double AverageRating { get; set; }
         public string? Role { get; set; }
-        public List<ServiceRequestDto>? ServiceRequests { get; set; }
-        public List<AddressDto>? Address { get; set; }
+        public List<AddressDto>? Addresses { get; set; }
     }
 }

@@ -24,6 +24,7 @@ namespace BusinessLogic.DTOs.Application
         public bool? FilterBool { get; set; }
         public string? Search { get; set; }
         public string? SortBy { get; set; }
+        public int? Rating { get; set; }
         public bool SortDescending { get; set; } = false;
     }
 }

@@ -511,7 +511,12 @@
     "commissionCalculation": "Commission Calculation",
     "commissionRate": "Applied Commission Rate",
     "commissionToPay": "Commission to Pay",
-    "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion."
+    "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion.",
+    "customerReview": "Customer Review",
+    "reviewComment": "Review Comment",
+    "reviewImages": "Review Images",
+    "reviewedAt": "Reviewed At",
+    "reviewImageTitle": "Review Image"
   },
   "partnerDashboard": {
     "no": "No",
@@ -640,7 +645,20 @@
       "filesSelected": " selected file"
     }
   },
-
+  "partnerProfile": {
+    "title": "My Profile",
+    "noName": "No name",
+    "noPhone": "No phone number",
+    "noAddress": "No address",
+    "rating": "Rating",
+    "projects": "Projects",
+    "infoTitle": "Profile Information",
+    "infoNote": "Profile information cannot be edited. Please contact support if you need to update your details.",
+    "customerReviews": "Customer Reviews",
+    "totalReviews": "total reviews",
+    "noReviews": "No reviews yet",
+    "noReviewsDesc": "Complete projects to receive customer reviews"
+  },
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
     "logout": "Logout"
@@ -659,6 +677,7 @@
       "material": "Material",
       "partner": "Partner",
       "user": "User",
+      "review": "Review",
       "support": "Support",
       "commission": "Commission"
     },
@@ -883,7 +902,11 @@
       "images": "Project images",
       "paymentInfo": "Payment information",
       "orderCode": "Order code",
-      "amount": "Payment amount"
+      "amount": "Payment amount",
+      "reviewInfo": "Review Information",
+      "reviewComment": "Comment",
+      "reviewImages": "Review Images",
+      "reviewedAt": "Reviewed At"
     }
   },
   "adminPartnerManager": {
@@ -980,6 +1003,21 @@
     "action": "Action",
     "empty": "No transactions yet",
     "empty_description": "No transactions have been sent yet."
+  },
+  "adminReviewManager": {
+    "title": "Review Management",
+    "subtitle": "List of reviews from users and partners",
+    "reviews": "Reviews",
+    "no": "No.",
+    "user": "User",
+    "partner": "Partner",
+    "rating": "Rating",
+    "comment": "Comment",
+    "type": "Type",
+    "createdAt": "Created At",
+    "all": "All",
+    "empty": "No reviews found",
+    "empty_description": "There are currently no reviews available."
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",
@@ -1212,6 +1250,7 @@
     "REQUIRED_SERVICETYPE": "Please select the service type.",
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a request!",
+    "REQUIRED_PHONE_NUMBER": "Please provide phone number before creating a request!",
     "IN_USE_ADDRESS":"This address is in use and cannot be deleted!",
 
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
