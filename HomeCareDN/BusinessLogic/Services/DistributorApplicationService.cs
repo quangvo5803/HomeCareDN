@@ -151,7 +151,7 @@ namespace BusinessLogic.Services
                     break;
 
                 case { CanAddMaterial: false, CanEditQuantity: true }:
-                    application = await FTCase(createRequest, materialRequest);
+                    application = await FTCase(createRequest);
                     break;
 
                 case { CanAddMaterial: true, CanEditQuantity: false }:
@@ -264,8 +264,7 @@ namespace BusinessLogic.Services
         }
 
         private async Task<DistributorApplication> FTCase(
-            DistributorCreateApplicationDto createRequest,
-            MaterialRequest request
+            DistributorCreateApplicationDto createRequest
         )
         {
             var application = _mapper.Map<DistributorApplication>(createRequest);

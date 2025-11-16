@@ -95,11 +95,10 @@ export default function MaterialRequestDetail() {
 
     //  Permission flags
     const lockedStatuses = ["Pending", "PendingCommission", "Approved"];
+    const hasEditPermission = Boolean(materialRequest?.canEditQuantity);
+    const isLocked = lockedStatuses.includes(existingApplication?.status);
 
-    const canEditQuantity =
-        !!materialRequest?.canEditQuantity &&
-        !lockedStatuses.includes(existingApplication?.status);
-
+    const canEditQuantity = hasEditPermission && !isLocked;
     const canAddMaterial = !!materialRequest?.canAddMaterial;
     const canEnterPrice = !lockedStatuses.includes(existingApplication?.status);
 
@@ -300,7 +299,10 @@ export default function MaterialRequestDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message, materialRequest, newMaterials]);
 
-    if (loading || isChecking || !materialRequest) return <Loading />;
+    const isLoading = loading || isChecking;
+    const isMissingData = !materialRequest;
+
+    if (isLoading || isMissingData) return <Loading />;
 
     //  Derived address text
     const addressText = [
@@ -314,7 +316,21 @@ export default function MaterialRequestDetail() {
 
     const isRequestClosed = materialRequest.status === "Closed";
 
-
+    const isClosedAndNoApplication = isRequestClosed && !existingApplication;
+    const isOpenAndNoApplication = !isRequestClosed && !existingApplication;
+    const hasNewMaterials = newMaterials.length === 0 && canAddMaterial;
+    const statusList = [
+        {
+            canDo: canAddMaterial,
+            label: t('distributorMaterialRequest.canAddMaterial'),
+            nowrap: true,
+        },
+        {
+            canDo: canEditQuantity,
+            label: t('distributorMaterialRequest.canEditQuantity'),
+            nowrap: false,
+        },
+    ];
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">
             {/* Header */}
@@ -554,7 +570,7 @@ export default function MaterialRequestDetail() {
                     </div>
 
                     {/* Apply Form OR Application Details */}
-                    {isRequestClosed && !existingApplication ? (
+                    {isClosedAndNoApplication ? (
                         <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
                             <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
                             <p className="text-gray-700 font-semibold mb-1">
@@ -564,7 +580,7 @@ export default function MaterialRequestDetail() {
                                 {t('distributorMaterialRequestDetail.requestAlreadyClosed')}
                             </p>
                         </div>
-                    ) : !existingApplication && !isRequestClosed ? (
+                    ) : isOpenAndNoApplication ? (
                         // Apply Form - Show when NOT applied yet and request is not closed
                         <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
                             <h3 className="text-xl font-semibold text-gray-800 mb-6 inline-flex items-center gap-2">
@@ -585,7 +601,7 @@ export default function MaterialRequestDetail() {
                                         </label>
                                     )}
 
-                                    {newMaterials.length === 0 && canAddMaterial ? (
+                                    {hasNewMaterials ? (
                                         <div className="text-center py-1">
                                             <div className="text-center py-1">
                                                 <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -1336,50 +1352,27 @@ export default function MaterialRequestDetail() {
                                 {t('distributorMaterialRequestDetail.materialRights')}
                             </h3>
 
-                            <div className="grid grid-cols-2 gap-3">
-
-                                {/* Ô canAddMaterial */}
-                                <div
-                                    className={`p-4 rounded-lg text-center border 
-                                        ${canAddMaterial
-                                            ? "bg-green-50 border-green-200"
-                                            : "bg-red-50 border-red-200"
-                                        }`}
-                                >
-                                    <p className="text-sm text-gray-800 mb-2 whitespace-nowrap">
-                                        {t('distributorMaterialRequest.canAddMaterial')}
-                                    </p>
-
-                                    <div className="flex flex-col items-center gap-1">
-                                        <i
-                                            className={`fa-solid text-xl 
-                                            ${canAddMaterial ? "fa-check text-green-600" : "fa-xmark text-red-600"}
-                                        `}
-                                        />
+                            <div className="grid grid-cols-2 gap-4">
+                                {statusList.map((status, index) => (
+                                    <div
+                                        key={index}
+                                        className={`p-4 rounded-lg text-center border ${status.canDo ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
+                                            }`}
+                                    >
+                                        <p
+                                            className={`text-sm text-gray-800 mb-2 ${status.nowrap ? "whitespace-nowrap" : "whitespace-normal"
+                                                }`}
+                                        >
+                                            {status.label}
+                                        </p>
+                                        <div className="flex flex-col items-center gap-1">
+                                            <i
+                                                className={`fa-solid text-xl ${status.canDo ? "fa-check text-green-600" : "fa-xmark text-red-600"
+                                                    }`}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-
-                                {/* Ô canEditQuantity */}
-                                <div
-                                    className={`p-4 rounded-lg text-center border 
-                                        ${canEditQuantity
-                                            ? "bg-green-50 border-green-200"
-                                            : "bg-red-50 border-red-200"
-                                        }`}
-                                >
-                                    <p className="text-sm text-gray-800 mb-2 whitespace-normal">
-                                        {t('distributorMaterialRequest.canEditQuantity')}
-                                    </p>
-
-                                    <div className="flex flex-col items-center gap-1">
-                                        <i
-                                            className={`fa-solid text-xl 
-                                            ${canEditQuantity ? "fa-check text-green-600" : "fa-xmark text-red-600"}
-                                        `}
-                                        />
-                                    </div>
-                                </div>
-
+                                ))}
                             </div>
                         </div>
 
