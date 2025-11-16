@@ -37,7 +37,7 @@ export default function MaterialRequestDetail() {
 
   // Distributor list pagination
   const [selectedDistributor, setSelectedDistributor] = useState(null);
-  const [distributorsApplications, setDistributorApplications] = useState([]);
+  const [distributorApplications, setDistributorApplications] = useState([]);
   const [currentApplicationPage, setCurrentApplicationPage] = useState(1);
   const [loadingApplications, setLoadingApplications] = useState(false);
   const pageSize = 5;
@@ -952,7 +952,7 @@ export default function MaterialRequestDetail() {
           </span>
         </div>
 
-        {distributorsApplications.length === 0 ? (
+        {distributorApplications.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <i className="fas fa-store text-slate-400 text-4xl"></i>
@@ -973,7 +973,7 @@ export default function MaterialRequestDetail() {
               </div>
             ) : (
               <>
-                {distributorsApplications.map((app) => (
+                {distributorApplications.map((app) => (
                   <button
                     key={app.distributorApplicationID}
                     onClick={() => setSelectedDistributor(app)}

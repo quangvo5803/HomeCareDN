@@ -97,7 +97,8 @@ export default function MaterialRequestDetail() {
     const hasEditPermission = Boolean(materialRequest?.canEditQuantity);
     const isLocked = lockedStatuses.has(existingApplication?.status);
 
-    const canEditQuantity = hasEditPermission && !isLocked;
+    const isUnlocked = !isLocked;
+    const canEditQuantity = hasEditPermission && isUnlocked;
     const canAddMaterial = Boolean(materialRequest?.canAddMaterial);
     const canEnterPrice = !lockedStatuses.has(existingApplication?.status);
 
@@ -307,8 +308,8 @@ export default function MaterialRequestDetail() {
 
     const isLoading = loading || isChecking;
     const isMissingData = !materialRequest;
-
-    if (isLoading || isMissingData) return <Loading />;
+    const checkLoading = isLoading || isMissingData;
+    if (checkLoading) return <Loading />;
 
     //  Derived address text
     const addressText = [
@@ -320,11 +321,14 @@ export default function MaterialRequestDetail() {
         .filter(Boolean)
         .join(", ");
 
-    const isRequestClosed = materialRequest.status === "Closed";
+    const noApplication = !existingApplication;
+    const noNewMaterials = newMaterials.length === 0;
 
-    const isClosedAndNoApplication = isRequestClosed && !existingApplication;
-    const isOpenAndNoApplication = !isRequestClosed && !existingApplication;
-    const hasNewMaterials = newMaterials.length === 0 && canAddMaterial;
+    const isRequestClosed = materialRequest.status === "Closed";
+    const isClosedAndNoApplication = isRequestClosed && noApplication;
+    const isOpenAndNoApplication = !isRequestClosed && noApplication;
+
+    const hasNewMaterials = noNewMaterials && canAddMaterial;
 
     const statusList = [
         {
@@ -343,171 +347,171 @@ export default function MaterialRequestDetail() {
     const isPending = status === "Pending";
     const isPendingCommission = status === "PendingCommission";
 
-    // ---------------- Commission Section ----------------
-    const CommissionSection = isPendingCommission && (
-        <>
-            {/* Commission Calculation Info Box */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
-                <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                    <i className="fas fa-calculator text-blue-600"></i>
-                    {t('distributorMaterialRequestDetail.commissionCalculation')}
-                </h4>
+    //Commission Section
+    let CommissionSection = null;
+    if (isPendingCommission) {
+        CommissionSection = (
+            <>
+                {/* Commission Calculation Info Box */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
+                    <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                        <i className="fas fa-calculator text-blue-600"></i>
+                        {t('distributorMaterialRequestDetail.commissionCalculation')}
+                    </h4>
 
-                {/* Commission tiers */}
-                <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
-                    <p className="text-xs font-semibold text-gray-700 mb-2">
-                        {t('distributorMaterialRequestDetail.publicCommissionTiers')}
-                    </p>
+                    {/* Commission tiers */}
+                    <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
+                        <p className="text-xs font-semibold text-gray-700 mb-2">
+                            {t('distributorMaterialRequestDetail.publicCommissionTiers')}
+                        </p>
 
-                    <table className="w-full text-xs text-gray-700">
-                        <thead>
-                            <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
-                                <th className="py-1">
-                                    {t('distributorMaterialRequestDetail.priceRange')}
-                                </th>
-                                <th className="py-1">
-                                    {t('distributorMaterialRequestDetail.rate')}
-                                </th>
-                            </tr>
-                        </thead>
+                        <table className="w-full text-xs text-gray-700">
+                            <thead>
+                                <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
+                                    <th className="py-1">
+                                        {t('distributorMaterialRequestDetail.priceRange')}
+                                    </th>
+                                    <th className="py-1">
+                                        {t('distributorMaterialRequestDetail.rate')}
+                                    </th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                            <tr>
-                                <td className="py-1 text-gray-500">
-                                    {t('distributorMaterialRequestDetail.tier1')}
-                                </td>
-                                <td className="py-1 text-blue-600 font-medium">2%</td>
-                            </tr>
-                            <tr>
-                                <td className="py-1 text-gray-500">
-                                    {t('distributorMaterialRequestDetail.tier2')}
-                                </td>
-                                <td className="py-1 text-blue-600 font-medium">1.5%</td>
-                            </tr>
-                            <tr>
-                                <td className="py-1 text-gray-500">
-                                    {t('distributorMaterialRequestDetail.tier3')}
-                                </td>
-                                <td className="py-1 text-blue-600 font-medium">1%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <tbody>
+                                <tr>
+                                    <td className="py-1 text-gray-500">
+                                        {t('distributorMaterialRequestDetail.tier1')}
+                                    </td>
+                                    <td className="py-1 text-blue-600 font-medium">2%</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-1 text-gray-500">
+                                        {t('distributorMaterialRequestDetail.tier2')}
+                                    </td>
+                                    <td className="py-1 text-blue-600 font-medium">1.5%</td>
+                                </tr>
+                                <tr>
+                                    <td className="py-1 text-gray-500">
+                                        {t('distributorMaterialRequestDetail.tier3')}
+                                    </td>
+                                    <td className="py-1 text-blue-600 font-medium">1%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-                {/* Current commission calculation */}
-                {(() => {
-                    const estimatePrice = Number(existingApplication.totalEstimatePrice);
-                    let commission = 0;
-                    let rate = 0;
-                    let tierInfo = '';
+                    {/* Current commission calculation */}
+                    {(() => {
+                        const estimatePrice = Number(existingApplication.totalEstimatePrice);
+                        let commission = 0;
+                        let rate = 0;
+                        let tierInfo = '';
 
-                    if (estimatePrice <= 500_000_000) {
-                        commission = estimatePrice * 0.02;
-                        rate = 2;
-                        tierInfo = t('distributorMaterialRequestDetail.tier1');
-                    } else if (estimatePrice <= 2_000_000_000) {
-                        commission = estimatePrice * 0.015;
-                        rate = 1.5;
-                        tierInfo = t('distributorMaterialRequestDetail.tier2');
-                    } else {
-                        commission = estimatePrice * 0.01;
-                        if (commission > 100_000_000) commission = 100_000_000;
-                        rate = 1;
-                        tierInfo = t('distributorMaterialRequestDetail.tier3');
-                    }
+                        if (estimatePrice <= 500_000_000) {
+                            commission = estimatePrice * 0.02;
+                            rate = 2;
+                            tierInfo = t('distributorMaterialRequestDetail.tier1');
+                        } else if (estimatePrice <= 2_000_000_000) {
+                            commission = estimatePrice * 0.015;
+                            rate = 1.5;
+                            tierInfo = t('distributorMaterialRequestDetail.tier2');
+                        } else {
+                            commission = estimatePrice * 0.01;
+                            if (commission > 100_000_000) commission = 100_000_000;
+                            rate = 1;
+                            tierInfo = t('distributorMaterialRequestDetail.tier3');
+                        }
 
-                    return (
-                        <div className="space-y-2">
-                            {/* Estimate Price */}
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('distributorMaterialRequestDetail.yourBid')}:
-                                </span>
-                                <span className="font-semibold text-gray-900">
-                                    {formatVND(estimatePrice)}
-                                </span>
-                            </div>
-
-                            {/* Commission Rate */}
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600">
-                                    {t('distributorMaterialRequestDetail.commissionRate')}:
-                                </span>
-                                <span className="font-semibold text-blue-600">
-                                    {rate}% ({tierInfo})
-                                </span>
-                            </div>
-
-                            <div className="border-t border-blue-200 my-2"></div>
-
-                            {/* Commission amount */}
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium text-gray-700">
-                                    {t('distributorMaterialRequestDetail.commissionToPay')}:
-                                </span>
-                                <div className="text-right">
-                                    <p className="text-lg font-bold text-blue-700">
-                                        {formatVND(commission)}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                        {numberToWordsByLang(commission, i18n.language)}
-                                    </p>
+                        return (
+                            <div className="space-y-2">
+                                {/* Estimate Price */}
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">
+                                        {t('distributorMaterialRequestDetail.yourBid')}:
+                                    </span>
+                                    <span className="font-semibold text-gray-900">
+                                        {formatVND(estimatePrice)}
+                                    </span>
                                 </div>
-                            </div>
 
-                            {/* Cap note */}
-                            {estimatePrice > 2_000_000_000 &&
-                                commission >= 100_000_000 && (
-                                    <div className="bg-yellow-50 rounded p-2 ring-1 ring-yellow-200">
-                                        <p className="text-xs text-yellow-700 flex items-center gap-1">
-                                            <i className="fas fa-info-circle"></i>
-                                            {t('distributorMaterialRequestDetail.maxCommissionNote')}
+                                {/* Commission Rate */}
+                                <div className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-600">
+                                        {t('distributorMaterialRequestDetail.commissionRate')}:
+                                    </span>
+                                    <span className="font-semibold text-blue-600">
+                                        {rate}% ({tierInfo})
+                                    </span>
+                                </div>
+
+                                <div className="border-t border-blue-200 my-2"></div>
+
+                                {/* Commission amount */}
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {t('distributorMaterialRequestDetail.commissionToPay')}:
+                                    </span>
+                                    <div className="text-right">
+                                        <p className="text-lg font-bold text-blue-700">
+                                            {formatVND(commission)}
+                                        </p>
+                                        <p className="text-sm text-gray-900">
+                                            {numberToWordsByLang(commission, i18n.language)}
                                         </p>
                                     </div>
-                                )}
-                        </div>
-                    );
-                })()}
-            </div>
-            {/* Pay Commission Button 
-            <button
-                onClick={handlePayCommission}
-                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
-            >
-                <i className="fas fa-hand-holding-usd" />
-                {t('distributorMaterialRequestDetail.payCommission')}
-            </button>
-            */}
-            {existingApplication.dueCommisionTime && (
-                <CommissionCountdown
-                    dueCommisionTime={existingApplication.dueCommisionTime}
-                    onExpired={() => {
-                        toast.warning(
-                            t('distributorMaterialRequestDetail.paymentDeadlineExpired')
+                                </div>
+
+                                {/* Cap note */}
+                                {estimatePrice > 2_000_000_000 &&
+                                    commission >= 100_000_000 && (
+                                        <div className="bg-yellow-50 rounded p-2 ring-1 ring-yellow-200">
+                                            <p className="text-xs text-yellow-700 flex items-center gap-1">
+                                                <i className="fas fa-info-circle"></i>
+                                                {t('distributorMaterialRequestDetail.maxCommissionNote')}
+                                            </p>
+                                        </div>
+                                    )}
+                            </div>
                         );
-                    }}
-                />
-            )}
-        </>
-    );
+                    })()}
 
-    // ---------------- Pending Section ----------------
-    const PendingSection = isPending && (
-        <>
-            <button
-                onClick={handleDeleteApplication}
-                className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
-            >
-                <i className="fas fa-trash-alt" />
-                {t('distributorMaterialRequestDetail.deleteApplication')}
-            </button>
+                </div>
 
-            <p className="text-xs text-gray-500 text-center">
-                <i className="fas fa-info-circle mr-1" />
-                {t('distributorMaterialRequestDetail.canDeleteWhilePending')}
-            </p>
-        </>
-    );
+                {existingApplication.dueCommisionTime && (
+                    <CommissionCountdown
+                        dueCommisionTime={existingApplication.dueCommisionTime}
+                        onExpired={() =>
+                            toast.warning(
+                                t('distributorMaterialRequestDetail.paymentDeadlineExpired')
+                            )
+                        }
+                    />
+                )}
+            </>
+        );
+    }
+    //Pending Section
+    let PendingSection = null
+    if (isPending) {
+        PendingSection = (
+            <>
+                <button
+                    onClick={handleDeleteApplication}
+                    className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+                >
+                    <i className="fas fa-trash-alt" />
+                    {t('distributorMaterialRequestDetail.deleteApplication')}
+                </button>
+
+                <p className="text-xs text-gray-500 text-center">
+                    <i className="fas fa-info-circle mr-1" />
+                    {t('distributorMaterialRequestDetail.canDeleteWhilePending')}
+                </p>
+            </>
+        )
+    }
+
+
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">

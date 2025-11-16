@@ -91,10 +91,10 @@ namespace BusinessLogic.Services
         }
 
         private async Task MapMaterialRequestListAllAsync(
-            IEnumerable<MaterialRequest> items,
-            IEnumerable<MaterialRequestDto> dtos,
-            string? role = ADMIN
-        )
+    IEnumerable<MaterialRequest> items,
+    IEnumerable<MaterialRequestDto> dtos,
+    string? role = ADMIN
+)
         {
             var itemDict = items.ToDictionary(i => i.MaterialRequestID);
 
@@ -105,13 +105,15 @@ namespace BusinessLogic.Services
                 .ToList();
 
             var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID))
+                .Addresses
+                .Where(a => addressIds.Contains(a.AddressID))
                 .ToListAsync();
 
             var addressDict = addresses.ToDictionary(a => a.AddressID);
 
-            Dictionary<string, string>? userNamesDict = null;
             var loadUserNames = role == DISTRIBUTOR || role == ADMIN;
+            Dictionary<string, string>? userNamesDict = null;
+
             if (loadUserNames)
             {
                 var userIds = items
@@ -128,9 +130,9 @@ namespace BusinessLogic.Services
 
             foreach (var dto in dtos)
             {
+                // --- Address mapping ---
                 if (dto.AddressID.HasValue &&
-                    addressDict.TryGetValue(dto.AddressID.Value, out var address)
-                )
+                    addressDict.TryGetValue(dto.AddressID.Value, out var address))
                 {
                     dto.Address = _mapper.Map<AddressDto>(address);
 
@@ -141,14 +143,14 @@ namespace BusinessLogic.Services
                     }
                 }
 
-                if (!loadUserNames || userNamesDict is null)
+                // --- User name mapping ---
+                if (!loadUserNames)
                     continue;
 
                 var idKey = dto.CustomerID.ToString();
-                if (!userNamesDict.TryGetValue(idKey, out var customerName))
-                    continue;
 
-                if (!string.IsNullOrWhiteSpace(customerName))
+                if (userNamesDict!.TryGetValue(idKey, out var customerName) &&
+                    !string.IsNullOrWhiteSpace(customerName))
                 {
                     dto.CustomerName = customerName;
                 }
