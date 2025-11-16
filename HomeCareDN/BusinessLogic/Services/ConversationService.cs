@@ -64,7 +64,14 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork
                 .ConversationRepository.GetQueryable()
-                .Where(c => c.AdminID == dto.AdminID)
+                .Where(c => c.AdminID == dto.AdminID);
+
+            if (!string.IsNullOrWhiteSpace(dto.Search))
+            {
+                query = await SearchDebounce(query, dto.Search);
+            }
+
+            query = query
                 .OrderByDescending(c => c.AdminUnreadCount)
                 .ThenByDescending(c => c.CreatedAt);
 
@@ -116,6 +123,23 @@ namespace BusinessLogic.Services
         // -----------------------------
         // PRIVATE HELPER
         // -----------------------------
+        private async Task<IQueryable<Conversation>> SearchDebounce(
+            IQueryable<Conversation> query,
+            string input
+        )
+        {
+            var search = input.ToLower().Trim();
+
+            var userID = await _userManager
+                .Users.Where(u =>
+                    (!string.IsNullOrEmpty(u.Email) && u.Email.ToLower().Contains(search))
+                    || (!string.IsNullOrEmpty(u.FullName) && u.FullName.ToLower().Contains(search))
+                )
+                .Select(u => u.Id)
+                .ToListAsync();
+            return query.Where(c => c.UserID != null && userID.Contains(c.UserID));
+        }
+
         private async Task IncludedUserDataWithConversation(ConversationDto conversationDto)
         {
             if (!string.IsNullOrEmpty(conversationDto.UserID))

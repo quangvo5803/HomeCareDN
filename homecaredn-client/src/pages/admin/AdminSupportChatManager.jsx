@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-  useMemo,
-  useRef,
-  useCallback,
-} from 'react';
+import { useEffect, useState, useContext, useRef, useCallback } from 'react';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import PropTypes from 'prop-types';
@@ -16,6 +9,7 @@ import RealtimeContext from '../../realtime/RealtimeContext';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { useDebounce } from 'use-debounce'; // ✅ ADD
 import notificationSoundNewConvesation from '../../assets/sounds/notification.mp3';
 import notificationSoundNewMessage from '../../assets/sounds/message.mp3';
 
@@ -53,7 +47,9 @@ export default function AdminSupportChatManager() {
   const [messageInput, setMessageInput] = useState('');
   const [loadingConversation, setLoadingConversation] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState(false);
-  const [filter, setFilter] = useState('');
+
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
 
   const [moreMessage, setMoreMessage] = useState(1);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
@@ -63,6 +59,7 @@ export default function AdminSupportChatManager() {
   const [hasMoreConversations, setHasMoreConversations] = useState(true);
   const [loadingMoreConversations, setLoadingMoreConversations] =
     useState(false);
+
   const messagesContainerRef = useRef(null);
   const conversationListRef = useRef(null);
 
@@ -175,6 +172,7 @@ export default function AdminSupportChatManager() {
             adminID: user.id,
             conversationNumber: conversationToLoad,
             conversationSize: CONVERSATION_SIZE,
+            search: debouncedSearch,
           });
 
         const isLastPage = conversationData.items.length < CONVERSATION_SIZE;
@@ -196,17 +194,17 @@ export default function AdminSupportChatManager() {
         setLoadingMoreConversations(false);
       }
     },
-    [user?.id, t]
+    [user?.id, t, debouncedSearch]
   );
 
   //Load conversation list
   useEffect(() => {
     if (!user?.id || !chatConnection) return;
+    setConversationPage(1);
     loadConversations(1, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id, chatConnection]);
+  }, [user?.id, chatConnection, debouncedSearch, loadConversations]);
 
-  //Infinite scroll for conversations
+  // Infinite scroll for conversations
   const handleScrollConversations = useCallback(() => {
     const container = conversationListRef.current;
     if (!container || loadingMoreConversations || !hasMoreConversations) return;
@@ -220,8 +218,12 @@ export default function AdminSupportChatManager() {
       setConversationPage(nextPage);
       loadConversations(nextPage, true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadingMoreConversations, hasMoreConversations, conversationPage]);
+  }, [
+    loadingMoreConversations,
+    hasMoreConversations,
+    conversationPage,
+    loadConversations,
+  ]);
 
   // Load message
   const loadMessages = useCallback(
@@ -241,10 +243,11 @@ export default function AdminSupportChatManager() {
 
         const items = conversation.items || [];
 
-        setHasMoreMessages(
-          items.length === MESSAGE_SIZE &&
-            messages.length + items.length < (conversation.totalCount || 0)
-        );
+        const isLastPage = items.length < MESSAGE_SIZE;
+        const totalFetched = messageToLoad * MESSAGE_SIZE;
+        const hasMore = !isLastPage && totalFetched < conversation.totalCount;
+
+        setHasMoreMessages(hasMore);
 
         if (append) {
           setMessages((prev) => [...items, ...prev]);
@@ -264,7 +267,6 @@ export default function AdminSupportChatManager() {
         setLoadingMoreMessage(false);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedConversation, t]
   );
 
@@ -351,19 +353,6 @@ export default function AdminSupportChatManager() {
     }
   };
 
-  // Filter conversations
-  const filteredConversations = useMemo(() => {
-    if (!filter) return conversations;
-
-    const searchTerm = filter.toLowerCase();
-
-    return conversations.filter(
-      (conversation) =>
-        conversation.userEmail?.toLowerCase()?.includes(searchTerm) ||
-        conversation.userName?.toLowerCase()?.includes(searchTerm)
-    );
-  }, [conversations, filter]);
-
   const renderConversationList = () => {
     if (loadingConversation) {
       return (
@@ -373,11 +362,11 @@ export default function AdminSupportChatManager() {
       );
     }
 
-    if (filteredConversations.length > 0) {
+    if (conversations.length > 0) {
       return (
         <>
           <ul className="divide-y">
-            {filteredConversations.map((conversation) => (
+            {conversations.map((conversation) => (
               <li key={conversation.conversationID}>
                 <button
                   type="button"
@@ -439,9 +428,11 @@ export default function AdminSupportChatManager() {
           </ul>
 
           {loadingMoreConversations && (
-            <div className="flex justify-center py-3">
-              <i className="fa-solid fa-spinner fa-spin text-orange-500"></i>
-              {t('adminSupportChatManager.loadingMoreConversation')}
+            <div className="flex flex-col items-center justify-center py-3">
+              <i className="fa-solid fa-spinner fa-spin text-orange-500 text-lg mb-1"></i>
+              <span className="text-xs text-gray-600">
+                {t('adminSupportChatManager.loadingMoreConversation')}
+              </span>
             </div>
           )}
 
@@ -458,7 +449,10 @@ export default function AdminSupportChatManager() {
       <div className="flex flex-col items-center justify-center h-full text-gray-400">
         <i className="fa-regular fa-inbox text-4xl mb-2"></i>
         <p className="text-sm">
-          {t('adminSupportChatManager.noConversations')}
+          {/* Message when searching */}
+          {search
+            ? t('adminSupportChatManager.noSearchResults')
+            : t('adminSupportChatManager.noConversations')}
         </p>
       </div>
     );
@@ -486,13 +480,17 @@ export default function AdminSupportChatManager() {
               <i className="fa-solid fa-list text-orange-500"></i>
               {t('adminSupportChatManager.conversationList')}
             </h4>
-            <input
-              type="text"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              placeholder={t('adminSupportChatManager.searchUser')}
-              className="w-full border rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
-            />
+            {/* Search input */}
+            <div className="relative group">
+              <i className="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm group-hover:text-orange-500 transition-colors" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('adminSupportChatManager.searchUser')}
+                className="w-full border rounded-xl pl-10 pr-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none hover:border-orange-300 transition-all"
+              />
+            </div>
           </div>
           <div
             ref={conversationListRef}
