@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { useAddress } from '../../hook/useAddress';
@@ -7,8 +7,16 @@ import { formatDate, formatVND } from '../../utils/formatters';
 import { toast } from 'react-toastify';
 import StatusBadge from '../../components/StatusBadge';
 import Loading from '../../components/Loading';
+import LoadingComponent from '../../components/LoadingComponent';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
 import Swal from 'sweetalert2';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import { distributorApplicationService } from '../../services/distributorApplicationService';
+import { handleApiError } from '../../utils/handleApiError';
+import { Pagination } from 'antd';
+import he from 'he';
+import Avatar from 'react-avatar';
 
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
@@ -22,13 +30,70 @@ export default function MaterialRequestDetail() {
   const [items, setItems] = useState([]);
   const [addressID, setAddressID] = useState('');
 
-  const { loading, getMaterialRequestById, updateMaterialRequest } =
-    useMaterialRequest();
+  const { setMaterialRequests, loading, getMaterialRequestById, updateMaterialRequest } = useMaterialRequest();
   const [materialRequest, setMaterialRequest] = useState(null);
-  const [selectedApplication, setSelectedApplication] = useState(null);
   const [open, setOpen] = useState(false);
   const [originalItems, setOriginalItems] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Distributor list pagination
+  const [selectedDistributor, setSelectedDistributor] = useState(null);
+  const [distributorsApplications, setDistributorApplications] = useState([]);
+  const [currentApplicationPage, setCurrentApplicationPage] = useState(1);
+  const [loadingApplications, setLoadingApplications] = useState(false);
+  const pageSize = 5;
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Use realtime
+  useRealtime({
+    [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
+            : sr
+        )
+      );
+      if (materialRequestId == payload.materialRequestID) {
+        setDistributorApplications((prev) => {
+          if (
+            prev.some(
+              (r) =>
+                r.distributorApplicationID === payload.distributorApplicationID
+            )
+          ) {
+            return prev;
+          }
+          return [payload, ...prev];
+        });
+        setTotalCount((prev) => prev + 1);
+      }
+    },
+    [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.filter((r) => r.materialRequestID !== payload.materialRequestID)
+      );
+      if (materialRequestId == payload.materialRequestID) {
+        setDistributorApplications((prev) =>
+          prev.filter(
+            (ca) =>
+              ca.distributorApplicationID !== payload.distributorApplicationID
+          )
+        );
+        if (
+          selectedDistributor?.distributorApplicationID ===
+          payload.distributorApplicationID
+        ) {
+          setSelectedDistributor(null);
+        }
+        setTotalCount((prev) => Math.max(0, prev - 1));
+      }
+    },
+
+  });
 
   // Check if request is in Draft status
   const isDraft = materialRequest?.status === 'Draft';
@@ -49,6 +114,29 @@ export default function MaterialRequestDetail() {
       });
     }
   }, [getMaterialRequestById, materialRequestId]);
+
+
+  const fetchDistributors = useCallback(async () => {
+    try {
+      setLoadingApplications(true);
+      const rs = await distributorApplicationService.getAllByMaterialRequestIdForCustomer({
+        PageNumber: currentApplicationPage,
+        PageSize: pageSize,
+        FilterID: materialRequestId,
+      });
+      setDistributorApplications(rs.items);
+      setTotalCount(rs.totalCount);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
+    } finally {
+      setLoadingApplications(false);
+    }
+  }, [t, materialRequestId, pageSize, currentApplicationPage]);
+
+  useEffect(() => {
+    if (materialRequest)
+      fetchDistributors();
+  }, [materialRequest, fetchDistributors]);
 
   // ===== Kiểm tra thay đổi =====
   const hasItemChanges =
@@ -190,7 +278,6 @@ export default function MaterialRequestDetail() {
 
   if (loading || !materialRequest) return <Loading />;
 
-  const applications = materialRequest.applications || [];
   const selectedAddress = addresses?.find((a) => a.addressID === addressID);
   const addressDisplay = selectedAddress
     ? `${selectedAddress.detail}, ${selectedAddress.ward}, ${selectedAddress.district}, ${selectedAddress.city}`
@@ -200,9 +287,8 @@ export default function MaterialRequestDetail() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div
-        className={`bg-white shadow-lg ${
-          hasAnyChanges ? 'sticky top-24 z-50' : ''
-        }`}
+        className={`bg-white shadow-lg ${hasAnyChanges ? 'sticky top-24 z-50' : ''
+          }`}
       >
         <div className="px-6 lg:px-12 py-3">
           <div className="flex items-center justify-between gap-3">
@@ -453,11 +539,10 @@ export default function MaterialRequestDetail() {
                       </div>
                       <div className="flex-shrink-0">
                         <i
-                          className={`fas fa-${
-                            canEditQuantity
-                              ? 'check-circle text-green-500'
-                              : 'circle text-gray-300'
-                          } text-xl transition-colors`}
+                          className={`fas fa-${canEditQuantity
+                            ? 'check-circle text-green-500'
+                            : 'circle text-gray-300'
+                            } text-xl transition-colors`}
                         ></i>
                       </div>
                     </label>
@@ -491,11 +576,10 @@ export default function MaterialRequestDetail() {
                       </div>
                       <div className="flex-shrink-0">
                         <i
-                          className={`fas fa-${
-                            canAddMaterial
-                              ? 'check-circle text-green-500'
-                              : 'circle text-gray-300'
-                          } text-xl transition-colors`}
+                          className={`fas fa-${canAddMaterial
+                            ? 'check-circle text-green-500'
+                            : 'circle text-gray-300'
+                            } text-xl transition-colors`}
                         ></i>
                       </div>
                     </label>
@@ -577,12 +661,12 @@ export default function MaterialRequestDetail() {
                         i18n.language === 'vi'
                           ? item.material.categoryName
                           : item.material.categoryNameEN ||
-                            item.material.categoryName;
+                          item.material.categoryName;
                       const displayBrand =
                         i18n.language === 'vi'
                           ? item.material.brandName
                           : item.material.brandNameEN ||
-                            item.material.brandName;
+                          item.material.brandName;
                       const displayUnit =
                         i18n.language === 'vi'
                           ? item.material.unit
@@ -618,9 +702,8 @@ export default function MaterialRequestDetail() {
                                   />
                                 ) : null}
                                 <div
-                                  className={`absolute inset-0 flex items-center justify-center ${
-                                    imageUrl ? 'hidden' : 'flex'
-                                  }`}
+                                  className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
+                                    }`}
                                 >
                                   <i className="fas fa-image text-slate-300 text-3xl"></i>
                                 </div>
@@ -773,9 +856,8 @@ export default function MaterialRequestDetail() {
                                   />
                                 ) : null}
                                 <div
-                                  className={`absolute inset-0 flex items-center justify-center ${
-                                    imageUrl ? 'hidden' : 'flex'
-                                  }`}
+                                  className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
+                                    }`}
                                 >
                                   <i className="fas fa-image text-slate-300 text-2xl"></i>
                                 </div>
@@ -806,7 +888,7 @@ export default function MaterialRequestDetail() {
                             <div className="pt-4 border-t-2 border-slate-200">
                               <div className="flex items-center justify-between mb-3">
                                 <span className="text-sm font-bold text-slate-700">
-                                  {t('Quantity')}:
+                                  {t('userPage.materialRequestDetail.quantity')}:
                                 </span>
                                 <div className="flex items-center gap-2">
                                   <button
@@ -883,172 +965,362 @@ export default function MaterialRequestDetail() {
           {/* Right Column - Applications */}
           <div className="xl:col-span-2">
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-42 max-h-[calc(100vh-100px)] overflow-y-auto">
-              {selectedApplication ? (
+              {selectedDistributor ? (
                 <>
-                  {/* Application Detail View */}
+                  {/* Back */}
                   <button
-                    onClick={() => setSelectedApplication(null)}
-                    className="flex items-center gap-2 text-slate-600 hover:text-orange-600 mb-8 transition-colors font-bold"
+                    onClick={() => setSelectedDistributor(null)}
+                    className="flex items-center gap-2 text-slate-600 hover:text-orange-600 mb-6 transition-colors font-semibold"
                   >
                     <i className="fas fa-arrow-left"></i>
                     <span>{t('BUTTON.Back')}</span>
                   </button>
 
-                  <div className="text-center mb-8 pb-8 border-b-2 border-slate-200">
-                    <div className="w-24 h-24 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center text-white font-bold text-4xl mx-auto mb-4 shadow-lg">
-                      {selectedApplication.supplierName.charAt(0)}
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-2 text-xl">
-                      {selectedApplication.supplierName}
+                  {/* Header */}
+                  <div className="text-center mb-8 pb-6 border-b border-slate-200">
+                    <Avatar
+                      name={selectedDistributor.distributorName}
+                      size="88"
+                      round={true}
+                      color="#FB8C00"
+                      fgColor="#FFF"
+                      textSizeRatio={1.5}
+                      className="shadow-md mb-4"
+                    />
+
+                    <h3 className="font-bold text-slate-900 mb-2 text-2xl">
+                      {selectedDistributor.distributorName}
                     </h3>
+
                     <div className="flex items-center justify-center gap-4 text-sm">
-                      <span className="flex items-center gap-1 text-yellow-500 font-bold">
+                      <span className="flex items-center gap-1 text-yellow-500 font-semibold">
                         <i className="fas fa-star"></i>
-                        <span>4.8</span>
+                        <span>{selectedDistributor.averageRating}</span>
                       </span>
+
                       <span className="text-slate-300">•</span>
-                      <span className="text-slate-600 font-semibold">
+
+                      <span className="text-slate-600 font-medium">
                         <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                        150 {t('orders')}
+                        {selectedDistributor.completedProjectCount} {t('userPage.materialRequestDetail.order')}
                       </span>
                     </div>
                   </div>
 
-                  {/* Price */}
+                  {/* Price Box */}
                   <div className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-6 mb-8">
-                    <p className="text-xs text-green-700 mb-2 uppercase tracking-widest font-bold">
-                      {t('Total Price')}
+                    <p className="text-xs text-green-700 mb-1 uppercase tracking-widest font-semibold">
+                      {t('userPage.materialRequestDetail.totalPrice')}
                     </p>
-                    <p className="text-4xl font-bold text-green-900 mb-2">
-                      {(selectedApplication.totalPrice / 1000000).toFixed(0)}
-                      <span className="text-lg font-normal ml-2">
-                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
-                      </span>
+
+                    <p className="text-3xl font-bold text-green-900 mb-1">
+                      {selectedDistributor.totalEstimatePrice < 1_000_000
+                        ? formatVND(selectedDistributor.totalEstimatePrice)
+                        : (selectedDistributor.totalEstimatePrice / 1_000_000).toFixed(0)
+                      }
+
+                      {selectedDistributor.totalEstimatePrice >= 1_000_000 && (
+                        <span className="text-lg font-normal ml-2">
+                          {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                        </span>
+                      )}
                     </p>
-                    <p className="text-xs text-green-700 font-semibold">
-                      {formatVND(selectedApplication.totalPrice)}
-                    </p>
+
+                    {selectedDistributor.totalEstimatePrice >= 1_000_000 && (
+                      <p className="text-xs text-green-700 font-medium">
+                        {formatVND(selectedDistributor.totalEstimatePrice)}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Material Items */}
+                  <div className="overflow-x-auto mb-6">
+                    {/* Header */}
+                    <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
+                      <div>#</div>
+                      <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
+                      <div className="col-span-5">{t('userPage.materialRequestDetail.infor')}</div>
+                      <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
+                      <div className="col-span-3">{t('userPage.materialRequestDetail.unit')}</div>
+                      <div className="col-span-4">{t('distributorMaterialRequestDetail.price')}</div>
+                      <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
+                    </div>
+
+                    {/* List */}
+                    <div className="space-y-4">
+                      {selectedDistributor.items.map((item, index) => {
+                        const imageUrl =
+                          item.images?.[0]?.imageUrl ||
+                          item.imageUrls?.[0];
+
+                        const displayName = i18n.language === 'vi'
+                          ? item.name
+                          : item.nameEN || item.name;
+
+                        const displayCategory = i18n.language === 'vi'
+                          ? item.categoryName
+                          : item.categoryNameEN || item.categoryName;
+
+                        const displayBrand = i18n.language === 'vi'
+                          ? item.brandName
+                          : item.brandNameEN || item.brandName;
+
+                        const displayUnit = i18n.language === 'vi'
+                          ? item.unit
+                          : item.unitEN || item.unit;
+
+                        return (
+                          <div
+                            key={item.materialID}
+                            className="border border-slate-200 rounded-xl p-5 hover:border-green-400 hover:shadow-md transition-all bg-white group"
+                          >
+                            <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
+
+                              {/* STT */}
+                              <div className="col-span-2 flex justify-center">
+                                <div className="w-5 h-5 bg-green-500 rounded-lg flex items-center justify-center">
+                                  <span className="text-white font-bold text-xs">
+                                    {index + 1}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Image */}
+                              <div className="col-span-3 flex justify-center">
+                                <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-green-400 transition-all">
+                                  {imageUrl ? (
+                                    <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="flex items-start justify-start h-full text-slate-300 text-3xl">
+                                      <i className="fas fa-image"></i>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Info */}
+                              <div className="col-span-5 text-left">
+                                <h3 className="font-bold text-slate-900 mb-2 line-clamp-2 text-sm">
+                                  {displayName}
+                                </h3>
+
+                                <div className="space-y-3">
+                                  {displayCategory && (
+                                    <div className="flex items-center text-xs text-slate-600">
+                                      <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
+                                      <span className="truncate">{displayCategory}</span>
+                                    </div>
+                                  )}
+
+                                  {displayBrand && (
+                                    <div className="flex items-center text-xs text-slate-600">
+                                      <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                                      <span className="truncate">{displayBrand}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Quantity */}
+                              <div className="col-span-3 flex justify-center">
+                                <div className="px-2 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm bg-slate-50 w-10">
+                                  {item.quantity}
+                                </div>
+                              </div>
+
+                              {/* Unit */}
+                              <div className="col-span-3 flex justify-center">
+                                <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                                  <p className="text-sm font-bold text-slate-900">
+                                    {displayUnit}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* Price */}
+                              <div className="col-span-4 flex justify-center">
+                                <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+                                  {formatVND(item.price)}
+                                </div>
+                              </div>
+
+                              {/* Total Price */}
+                              <div className="col-span-4 flex justify-center">
+                                <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+                                  {formatVND(item.price * item.quantity)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Notes */}
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
                       <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
-                      {t('Notes')}
+                      {t('userPage.materialRequestDetail.note')}
                     </h4>
                     <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200">
-                      {selectedApplication.notes || t('No notes')}
+                      {selectedDistributor.message || t('No notes')}
                     </p>
                   </div>
 
-                  {/* Contact Info */}
-                  <div className="mb-8">
-                    <h4 className="text-sm font-bold text-slate-700 mb-4 uppercase tracking-wide">
+                  {/* Contact */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
                       <i className="fas fa-address-book text-orange-600 mr-2"></i>
-                      {t('Contact')}
+                      {t('userPage.materialRequestDetail.contact')}
                     </h4>
+
                     <div className="space-y-3">
                       <a
-                        href={`tel:${selectedApplication.phone}`}
-                        className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border-2 border-blue-200 hover:border-blue-400 font-semibold text-slate-700"
+                        href={`tel:${selectedDistributor.distributorPhone}`}
+                        className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
                       >
                         <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
-                        <span>{selectedApplication.phone}</span>
+                        <span>{selectedDistributor.distributorPhone}</span>
                       </a>
+
                       <a
-                        href={`mailto:${selectedApplication.email}`}
-                        className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border-2 border-purple-200 hover:border-purple-400 font-semibold text-slate-700 break-all"
+                        href={`mailto:${selectedDistributor.distributorEmail}`}
+                        className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
                       >
                         <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
-                        <span>{selectedApplication.email}</span>
+                        <span>{selectedDistributor.distributorEmail}</span>
                       </a>
                     </div>
                   </div>
 
-                  {/* Action Buttons */}
+                  {/* Actions */}
                   <div className="grid grid-cols-2 gap-3">
                     <button className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold">
                       <i className="fas fa-check mr-2"></i>
                       {t('BUTTON.Accept')}
                     </button>
-                    <button className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border-2 border-red-300">
+
+                    <button className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border border-red-300">
                       <i className="fas fa-times mr-2"></i>
                       {t('BUTTON.Reject')}
                     </button>
                   </div>
                 </>
+
               ) : (
                 <>
                   {/* Application List View */}
                   <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-slate-200">
                     <h3 className="text-2xl font-bold text-slate-900">
                       <i className="fas fa-store text-orange-600 mr-2"></i>
-                      {t('Supplier Applications')}
+                      {t('userPage.materialRequestDetail.titleApplied')}
                     </h3>
+
                     <span className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-bold">
-                      {applications.length}
+                      {totalCount}
                     </span>
                   </div>
 
-                  {applications.length === 0 ? (
+                  {distributorsApplications.length === 0 ? (
                     <div className="text-center py-16">
                       <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <i className="fas fa-store text-slate-400 text-4xl"></i>
                       </div>
+
                       <h4 className="font-bold text-slate-700 mb-2 text-lg">
-                        {t('No applications yet')}
+                        {t('userPage.materialRequestDetail.noApplied')}
                       </h4>
                       <p className="text-sm text-slate-500">
-                        {t('Suppliers will send quotes for your request')}
+                        {t('userPage.materialRequestDetail.letStart')}
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {applications.map((app) => (
-                        <button
-                          key={app.id}
-                          onClick={() => setSelectedApplication(app)}
-                          className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent"
-                        >
-                          <div className="flex items-start gap-4 mb-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                              {app.supplierName.charAt(0)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-bold text-slate-900 group-hover:text-orange-600 transition truncate mb-2">
-                                {app.supplierName}
-                              </h4>
-                              <div className="flex items-center gap-3 text-xs text-slate-600">
-                                <span className="flex items-center gap-1 text-yellow-500 font-bold">
-                                  <i className="fas fa-star"></i>
-                                  <span>4.8</span>
+                      {loadingApplications ? (
+                        <div className="flex justify-center py-10">
+                          <LoadingComponent />
+                        </div>
+                      ) : (
+                        <>
+                          {distributorsApplications.map((app) => (
+                            <button
+                              key={app.distributorApplicationID}
+                              onClick={() => setSelectedDistributor(app)}
+                              className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent"
+                            >
+                              <div className="flex items-start gap-4 mb-4">
+                                <Avatar
+                                  name={app.distributorName}
+                                  size="56"
+                                  round={true}
+                                  color="#FB8C00"
+                                  fgColor="#FFF"
+                                  className="shadow-md"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-bold text-slate-900 group-hover:text-orange-600 transition truncate mb-2">
+                                    {app.distributorName}
+                                  </h4>
+
+                                  <div className="flex items-center gap-3 text-xs text-slate-600">
+                                    <span className="flex items-center gap-1 text-yellow-500 font-bold">
+                                      <i className="fas fa-star"></i>
+                                      <span>{app.averageRating}</span>
+                                    </span>
+
+                                    <span>•</span>
+
+                                    <span className="font-semibold">
+                                      <i className="fas fa-check-circle text-green-500 mr-1"></i>
+                                      {app.completedProjectCount} {t('userPage.materialRequestDetail.order')}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <p className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed bg-slate-50 p-3 rounded-lg"
+                                dangerouslySetInnerHTML={{
+                                  __html: he.decode(app.message),
+                                }}
+                              >
+                              </p>
+
+                              <div className="flex items-center justify-between pt-4 border-t-2 border-slate-200">
+                                <span className="text-xs text-slate-500 tracking-widest uppercase font-bold">
+                                  {t('userPage.materialRequestDetail.totalPrice')}
                                 </span>
-                                <span>•</span>
-                                <span className="font-semibold">
-                                  <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                                  150 {t('orders')}
+
+                                <span className="text-xl font-bold text-orange-600">
+                                  {app.totalEstimatePrice < 1_000_000
+                                    ? formatVND(app.totalEstimatePrice)
+                                    : (app.totalEstimatePrice / 1_000_000).toFixed(0)
+                                  }
+
+                                  {app.totalEstimatePrice >= 1_000_000 && (
+                                    <span className="text-xs font-normal ml-1">
+                                      {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                                    </span>
+                                  )}
                                 </span>
                               </div>
-                            </div>
-                          </div>
+                            </button>
+                          ))}
+                        </>
+                      )}
 
-                          <p className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed bg-slate-50 p-3 rounded-lg">
-                            {app.notes || t('No additional notes')}
-                          </p>
-
-                          <div className="flex items-center justify-between pt-4 border-t-2 border-slate-200">
-                            <span className="text-xs text-slate-500 tracking-widest uppercase font-bold">
-                              {t('Total')}
-                            </span>
-                            <span className="text-xl font-bold text-orange-600">
-                              {(app.totalPrice / 1000000).toFixed(0)}{' '}
-                              <span className="text-xs font-normal">
-                                {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
-                              </span>
-                            </span>
-                          </div>
-                        </button>
-                      ))}
+                      {totalCount > 0 && (
+                        <div className="flex justify-center py-4">
+                          <Pagination
+                            current={currentApplicationPage}
+                            pageSize={pageSize}
+                            total={totalCount}
+                            onChange={(page) => setCurrentApplicationPage(page)}
+                            showSizeChanger={false}
+                            size="small"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </>

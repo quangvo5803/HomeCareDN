@@ -46,6 +46,8 @@ import ContractorServiceRequestManager from './pages/contractor/ContractorServic
 import ContractorServiceRequestDetail from './pages/contractor/ContractorServiceRequestDetail';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
+import DistributorMaterialRequestManager from './pages/distributor/DistributorMaterialRequestManager';
+import DistributorMaterialRequestDetail from './pages/distributor/DistributorMaterialRequestDetail';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
 //Home Page
 import MaterialViewAll from './pages/MaterialViewAll';
@@ -354,6 +356,14 @@ function Layout() {
           }
         >
           <Route index element={<DistributorDashboard />} />
+          <Route
+            path="MaterialRequest"
+            element={<DistributorMaterialRequestManager />}
+          />
+          <Route
+            path="MaterialRequest/:materialRequestId"
+            element={<DistributorMaterialRequestDetail />}
+          />
           <Route
             path="MaterialManager"
             element={<DistributorMaterialManager />}

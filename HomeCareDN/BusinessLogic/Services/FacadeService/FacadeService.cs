@@ -22,6 +22,7 @@ namespace BusinessLogic.Services.FacadeService
         public IMaterialRequestService MaterialRequestService { get; }
         public IStatisticService StatisticService { get; }
         public IUserService UserService { get; }
+        public IDistributorApplicationService DistributorApplicationService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -103,6 +104,13 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 identityDeps.UserManager,
                 coreDeps.UnitOfWork
+            );
+
+            DistributorApplicationService = new DistributorApplicationService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                identityDeps.UserManager,
+                infraDeps.Notifier
             );
         }
     }

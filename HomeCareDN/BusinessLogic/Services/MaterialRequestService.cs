@@ -56,6 +56,15 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
                 includeProperties: INCLUDE
             );
+            query = query.Where(s => s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed);
+
+            if( parameters.FilterID != null && role == DISTRIBUTOR)
+            {
+                query = query.Where(s => s.DistributorApplications != null 
+                    && s.DistributorApplications.Any(x => x.DistributorID == parameters.FilterID)
+                );
+            }
+
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
@@ -101,6 +110,22 @@ namespace BusinessLogic.Services
 
             var addressDict = addresses.ToDictionary(a => a.AddressID);
 
+            Dictionary<string, string>? userNamesDict = null;
+            if (role == DISTRIBUTOR || role == ADMIN)
+            {
+                var userIds = items
+                    .Select(i => i.CustomerID.ToString())
+                    .Distinct()
+                    .ToList();
+
+                var users = await _userManager.Users
+                    .Where(u => userIds.Contains(u.Id))
+                    .Select(u => new { u.Id, u.FullName })
+                    .ToListAsync();
+
+                userNamesDict = users.ToDictionary(u => u.Id, u => u.FullName);
+            }
+
             foreach (var dto in dtos)
             {
                 if (dto.AddressID.HasValue)
@@ -113,6 +138,14 @@ namespace BusinessLogic.Services
                             dto.Address.Detail = string.Empty;
                             dto.Address.Ward = string.Empty;
                         }
+                    }
+                }
+
+                if ((role == DISTRIBUTOR || role == ADMIN) && userNamesDict != null )
+                {
+                    if (userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName))
+                    {
+                        dto.CustomerName = customerName;
                     }
                 }
             }
@@ -170,6 +203,15 @@ namespace BusinessLogic.Services
                 );
             }
             var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
+            if(role == DISTRIBUTOR || role == ADMIN)
+            {
+                var customerName = await _userManager.FindByIdAsync(dto.CustomerID.ToString());
+                if (customerName != null)
+                {
+                    dto.CustomerName = customerName.FullName ?? customerName.UserName;
+                }
+            }
+            
             await MapMaterialRequestDetailAsync(
                 materialRequest!,
                 dto,
