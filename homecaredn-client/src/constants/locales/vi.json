@@ -668,7 +668,6 @@
       "supportChat": "Quản lý hỗ trợ chat",
       "user": "Người dùng",
       "review": "Đánh giá",
-      "support": "Hỗ trợ",
       "commission": "Tiền hoa hồng"
     },
     "account": {
@@ -1016,7 +1015,8 @@
       "Customer":"Khách hàng",
       "Contractor":"Nhà thầu",
       "Distributor":"Nhà phân phối"
-    },
+    }
+  },
   "adminReviewManager": {
     "title": "Quản lý đánh giá",
     "subtitle": "Danh sách đánh giá từ người dùng và đối tác",
