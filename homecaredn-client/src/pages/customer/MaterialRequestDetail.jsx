@@ -137,6 +137,16 @@ export default function MaterialRequestDetail() {
       fetchDistributors();
   }, [materialRequest, fetchDistributors]);
 
+  const handleDetailDistributor = async (da) => {
+    try {
+      const detailDistributor = await distributorApplicationService.getByIdForCustomer(
+        da.distributorApplicationID
+      );
+      setSelectedDistributor(detailDistributor);
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
+    }
+  }
   // ===== Kiểm tra thay đổi =====
   const hasItemChanges =
     JSON.stringify(items) !== JSON.stringify(originalItems);
@@ -890,8 +900,11 @@ export default function MaterialRequestDetail() {
             <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
             {t('userPage.materialRequestDetail.note')}
           </h4>
-          <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200">
-            {selectedDistributor.message || t('No notes')}
+          <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
+            dangerouslySetInnerHTML={{
+              __html: he.decode(selectedDistributor.message),
+            }}
+          >
           </p>
         </div>
 
@@ -976,7 +989,7 @@ export default function MaterialRequestDetail() {
                 {distributorApplications.map((app) => (
                   <button
                     key={app.distributorApplicationID}
-                    onClick={() => setSelectedDistributor(app)}
+                    onClick={() => handleDetailDistributor(app)}
                     className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent"
                   >
                     <div className="flex items-start gap-4 mb-4">

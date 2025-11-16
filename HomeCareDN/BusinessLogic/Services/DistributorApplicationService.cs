@@ -111,6 +111,40 @@ namespace BusinessLogic.Services
             return dto;
         }
 
+        public async Task<DistributorApplicationDto> GetDistributorApplicationById(
+            Guid id, string role = "Customer"
+        )
+        {
+            var application = await _unitOfWork.DistributorApplicationRepository
+                .GetAsync(a => a.DistributorApplicationID == id, includeProperties: INCLUDE);
+
+            if (application == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR, new[] { ERROR_DISTRIBUTOR_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var dto = _mapper.Map<DistributorApplicationDto>(application);
+            var distributor = await _userManager.FindByIdAsync(application.DistributorID.ToString());
+
+            if (distributor != null)
+            {
+                dto.CompletedProjectCount = distributor.ProjectCount;
+                dto.AverageRating = distributor.AverageRating;
+                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
+                dto.DistributorEmail = distributor.Email ?? string.Empty;
+                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
+                if (role == "Customer" && application.Status != ApplicationStatus.Approved)
+                {
+                    dto.DistributorEmail = string.Empty;
+                    dto.DistributorPhone = string.Empty;
+                }
+            }
+            return dto;
+        }
+
         public async Task<DistributorApplicationDto> CreateDistributorApplicationAsync(
             DistributorCreateApplicationDto createRequest
         )

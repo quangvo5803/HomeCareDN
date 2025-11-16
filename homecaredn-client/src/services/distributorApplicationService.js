@@ -7,6 +7,10 @@ export const distributorApplicationService = {
             .get('/DistributorApplications/customer/all', { params });
         return response.data;
     },
+    getByIdForCustomer: async (id) => {
+        const response = await api.get(`/DistributorApplications/customer/${id}`);
+        return response.data;
+    },
 
     // ====================== DISTRIBUTOR ======================
     getByMaterialRequestIdForContractor: async (dto) => {

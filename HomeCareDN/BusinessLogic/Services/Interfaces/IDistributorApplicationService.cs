@@ -11,6 +11,9 @@ namespace BusinessLogic.Services.Interfaces
         Task<DistributorApplicationDto?> GetDistributorApplicationByMaterialRequestId(
             DistributorApplicationGetByIdDto byIdDto
         );
+        Task<DistributorApplicationDto> GetDistributorApplicationById(
+            Guid id, string role = "Customer"
+        );
         Task<DistributorApplicationDto> CreateDistributorApplicationAsync(
             DistributorCreateApplicationDto createRequest
         );

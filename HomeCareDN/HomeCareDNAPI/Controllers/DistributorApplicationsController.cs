@@ -31,6 +31,15 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Customer")]
+        [HttpGet("customer/{id:guid}")]
+        public async Task<IActionResult> GetByIdForCustomer(Guid id)
+        {
+            var result = await _facadeService.DistributorApplicationService
+                .GetDistributorApplicationById(id, "Customer");
+            return Ok(result);
+        }
+
         // ====================== DISTRIBUTOR ======================
         [Authorize(Roles = "Distributor")]
         [HttpGet("distributor/applied")]
