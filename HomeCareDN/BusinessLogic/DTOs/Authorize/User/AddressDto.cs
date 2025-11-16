@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.DTOs.Authorize.AddressDtos
+﻿namespace BusinessLogic.DTOs.Authorize.User
 {
     public class AddressDto
     {

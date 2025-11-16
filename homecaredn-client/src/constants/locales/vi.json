@@ -506,7 +506,12 @@
     "commissionCalculation": "Tính toán hoa hồng",
     "commissionRate": "Tỷ lệ hoa hồng áp dụng",
     "commissionToPay": "Hoa hồng phải trả",
-    "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ"
+    "maxCommissionNote": "Hoa hồng tối đa là 100 triệu cho các gói > 2 tỷ",
+    "customerReview": "Đánh giá từ khách hàng",
+    "reviewComment": "Nội dung đánh giá",
+    "reviewImages": "Hình ảnh đánh giá",
+    "reviewedAt": "Ngày đánh giá",
+    "reviewImageTitle": "Ảnh đánh giá"
   },
   "partnerDashboard": {
     "no": "STT",
@@ -628,7 +633,20 @@
     "noCategory": "Chưa có danh mục nào",
     "letStart": "Bắt đầu bằng cách thêm danh mục đầu tiên của bạn"
   },
-
+  "partnerProfile": {
+    "title": "Hồ sơ của tôi",
+    "noName": "Không có tên",
+    "noPhone": "Không có số điện thoại",
+    "noAddress": "Chưa có địa chỉ",
+    "rating": "Đánh giá",
+    "projects": "Dự án",
+    "infoTitle": "Thông tin hồ sơ",
+    "infoNote": "Thông tin hồ sơ không thể chỉnh sửa. Vui lòng liên hệ hỗ trợ nếu bạn cần cập nhật.",
+    "customerReviews": "Đánh giá từ khách hàng",
+    "totalReviews": "lượt đánh giá",
+    "noReviews": "Chưa có đánh giá",
+    "noReviewsDesc": "Hãy hoàn thành các dự án để nhận đánh giá từ khách hàng"
+  },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
     "logout": "Đăng Xuất"
@@ -649,6 +667,8 @@
       "support": "Quản lý hỗ trợ",
       "supportChat": "Quản lý hỗ trợ chat",
       "user": "Người dùng",
+      "review": "Đánh giá",
+      "support": "Hỗ trợ",
       "commission": "Tiền hoa hồng"
     },
     "account": {
@@ -829,7 +849,11 @@
       "images": "Hình ảnh dự án",
       "paymentInfo": "Thông tin thanh toán",
       "orderCode": "Mã đơn hàng",
-      "amount": "Tiền thanh toán"
+      "amount": "Tiền thanh toán",
+      "reviewInfo": "Thông tin đánh giá",
+      "reviewComment": "Bình luận",
+      "reviewImages": "Hình ảnh đánh giá",
+      "reviewedAt": "Đánh giá lúc"
     }
   },
   "adminMaterialManager": {
@@ -992,7 +1016,21 @@
       "Customer":"Khách hàng",
       "Contractor":"Nhà thầu",
       "Distributor":"Nhà phân phối"
-    }
+    },
+  "adminReviewManager": {
+    "title": "Quản lý đánh giá",
+    "subtitle": "Danh sách đánh giá từ người dùng và đối tác",
+    "reviews": "Đánh giá",
+    "no": "STT",
+    "user": "Người dùng",
+    "partner": "Đối tác",
+    "rating": "Xếp hạng",
+    "comment": "Bình luận",
+    "type": "Loại",
+    "createdAt": "Ngày tạo",
+    "all": "Tất cả",
+    "empty": "Không có đánh giá nào",
+    "empty_description": "Hiện chưa có đánh giá nào được ghi nhận."
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
@@ -1219,6 +1257,7 @@
     "REQUIRED_SERVICETYPE": "Vui lòng chọn loại dịch vụ.",
     "REQUIRED_BUILDINGTYPE": "Vui lòng chọn loại công trình.",
     "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu",
+    "REQUIRED_PHONE_NUMBER": "Vui lòng cung cấp số điện thoại liên lạc trước khi tạo yêu cầu",
     "IN_USE_ADDRESS":"Địa chỉ này đang được sử dụng không thể xóa được!",
 
     "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",

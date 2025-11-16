@@ -12,9 +12,6 @@ using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
-using BusinessLogic.DTOs.Authorize.Address;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
-using BusinessLogic.DTOs.Authorize.Profiles;
 using BusinessLogic.DTOs.Authorize.User;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -73,7 +70,7 @@ namespace BusinessLogic.Mapping
                 .ForMember(d => d.AddressID, opt => opt.Ignore())
                 .ForMember(d => d.UserId, opt => opt.Ignore());
 
-            CreateMap<UpdateProfileDto, ApplicationUser>()
+            CreateMap<UpdateUserDto, ApplicationUser>()
                 // Ignore Id to prevent overwriting them
                 .ForMember(d => d.Id, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
@@ -279,10 +276,6 @@ namespace BusinessLogic.Mapping
 
             CreateMap<Address, AddressDto>();
 
-            CreateMap<ApplicationUser, ProfileDto>()
-                .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.Id))
-                .ForMember(d => d.Email, opt => opt.MapFrom(s => s.Email ?? string.Empty));
-
             // ContactSupport
             CreateMap<ContactSupportCreateRequestDto, ContactSupport>();
             CreateMap<ContactSupport, ContactSupportDto>();
@@ -368,6 +361,8 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => src.AdminUnreadCount)
                 );
 
+                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
+            CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
 
