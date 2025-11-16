@@ -111,42 +111,42 @@ namespace BusinessLogic.Services
             var addressDict = addresses.ToDictionary(a => a.AddressID);
 
             Dictionary<string, string>? userNamesDict = null;
-            if (role == DISTRIBUTOR || role == ADMIN)
+            var loadUserNames = role == DISTRIBUTOR || role == ADMIN;
+            if (loadUserNames)
             {
                 var userIds = items
                     .Select(i => i.CustomerID.ToString())
                     .Distinct()
                     .ToList();
 
-                var users = await _userManager.Users
+                userNamesDict = (await _userManager.Users
                     .Where(u => userIds.Contains(u.Id))
                     .Select(u => new { u.Id, u.FullName })
-                    .ToListAsync();
-
-                userNamesDict = users.ToDictionary(u => u.Id, u => u.FullName);
+                    .ToListAsync())
+                    .ToDictionary(u => u.Id, u => u.FullName);
             }
 
             foreach (var dto in dtos)
             {
-                if (dto.AddressID.HasValue)
+                if (dto.AddressID.HasValue &&
+                    addressDict.TryGetValue(dto.AddressID.Value, out var address)
+                )
                 {
-                    if (addressDict.TryGetValue(dto.AddressID.Value, out var address))
+                    dto.Address = _mapper.Map<AddressDto>(address);
+
+                    if (role == DISTRIBUTOR)
                     {
-                        dto.Address = _mapper.Map<AddressDto>(address);
-                        if (role == DISTRIBUTOR)
-                        {
-                            dto.Address.Detail = string.Empty;
-                            dto.Address.Ward = string.Empty;
-                        }
+                        dto.Address.Detail = string.Empty;
+                        dto.Address.Ward = string.Empty;
                     }
                 }
 
-                if ((role == DISTRIBUTOR || role == ADMIN) && userNamesDict != null )
+                if (loadUserNames &&
+                    userNamesDict != null &&
+                    userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName)
+                )
                 {
-                    if (userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName))
-                    {
-                        dto.CustomerName = customerName;
-                    }
+                    dto.CustomerName = customerName;
                 }
             }
         }

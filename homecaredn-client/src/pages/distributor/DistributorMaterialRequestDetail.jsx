@@ -1332,7 +1332,7 @@ export default function MaterialRequestDetail() {
                         </div>
                         <div className="pb-4 border-b border-gray-200">
                             <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
-                                <i class="fa-solid fa-user-shield text-gray-500" />
+                                <i className="fa-solid fa-user-shield text-gray-500" />
                                 {t('distributorMaterialRequestDetail.materialRights')}
                             </h3>
 

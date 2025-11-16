@@ -100,10 +100,10 @@ namespace BusinessLogic.Services
 
             var distributor = await _userManager
                 .FindByIdAsync(distributorApplication.DistributorID.ToString());
-            dto.CompletedProjectCount = distributor!.ProjectCount;
-
-            if (distributor != null)
+            
+            if (distributor is not null)
             {
+                dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
                 dto.DistributorEmail = distributor.Email ?? "";
                 dto.DistributorPhone = distributor.PhoneNumber ?? "";
@@ -112,14 +112,14 @@ namespace BusinessLogic.Services
         }
 
         public async Task<DistributorApplicationDto> CreateDistributorApplicationAsync(
-            DistributorCreateApplicationDto createDto
+            DistributorCreateApplicationDto createRequest
         )
          {
             var materialRequestTask = _unitOfWork.MaterialRequestRepository
-                .GetAsync(m => m.MaterialRequestID == createDto.MaterialRequestID, 
+                .GetAsync(m => m.MaterialRequestID == createRequest.MaterialRequestID, 
                     includeProperties:"MaterialRequestItems"
                 );
-            var distributorTask = _userManager.FindByIdAsync(createDto.DistributorID.ToString());
+            var distributorTask = _userManager.FindByIdAsync(createRequest.DistributorID.ToString());
 
             await Task.WhenAll(materialRequestTask, distributorTask);
             var materialRequest = materialRequestTask.Result;
@@ -147,19 +147,19 @@ namespace BusinessLogic.Services
             switch (materialRequest)
             {
                 case { CanAddMaterial: false, CanEditQuantity: false }:
-                    application = await FFCase(createDto, materialRequest);
+                    application = await FFCase(createRequest, materialRequest);
                     break;
 
                 case { CanAddMaterial: false, CanEditQuantity: true }:
-                    application = await FTCase(createDto, materialRequest);
+                    application = await FTCase(createRequest, materialRequest);
                     break;
 
                 case { CanAddMaterial: true, CanEditQuantity: false }:
-                    application = await TFCase(createDto, materialRequest);
+                    application = await TFCase(createRequest, materialRequest);
                     break;
 
                 default:
-                    application = await TTCase(createDto, materialRequest);
+                    application = await TTCase(createRequest);
                     break;
             }
 
@@ -234,31 +234,26 @@ namespace BusinessLogic.Services
 
         #region Handle Cases
         private async Task<DistributorApplication> FFCase(
-            DistributorCreateApplicationDto createDto,
+            DistributorCreateApplicationDto createRequest,
             MaterialRequest request
         )
         {
-            var allowedIds = request.MaterialRequestItems!.Select(x => x.MaterialID).ToList();
-            var submittedIds = createDto.Items!.Select(x => x.MaterialID).ToList();
-
-            if (submittedIds == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
             // Map application
-            var application = _mapper.Map<DistributorApplication>(createDto);
+            var application = _mapper.Map<DistributorApplication>(createRequest);
             application.Items = new List<DistributorApplicationItem>();
 
-            foreach (var item in createDto.Items!)
+            foreach (var item in createRequest.Items!)
             {
-                var reqItem = request.MaterialRequestItems!.First(x => x.MaterialID == item.MaterialID);
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
+                if (!request.MaterialRequestItems!.Any(x => x.MaterialID == item.MaterialID))
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
+                    };
+                    throw new CustomValidationException(errors);
+                }
 
+                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
                 application.Items.Add(entityItem);
             }
 
@@ -269,32 +264,17 @@ namespace BusinessLogic.Services
         }
 
         private async Task<DistributorApplication> FTCase(
-            DistributorCreateApplicationDto createDto,
+            DistributorCreateApplicationDto createRequest,
             MaterialRequest request
         )
         {
-            var allowedIds = request.MaterialRequestItems!.Select(x => x.MaterialID).ToList();
-            var submittedIds = createDto.Items!.Select(x => x.MaterialID).ToList();
-
-            if (submittedIds == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
-                };
-                throw new CustomValidationException(errors);
-            }
-
-            var application = _mapper.Map<DistributorApplication>(createDto);
+            var application = _mapper.Map<DistributorApplication>(createRequest);
             application.Items = new List<DistributorApplicationItem>();
 
-            foreach (var item in createDto.Items!)
+            foreach (var item in createRequest.Items!.Where(i => i != null))
             {
-                if (item != null)
-                {
-                    var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-                    application.Items.Add(entityItem);
-                }       
+                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
+                application.Items.Add(entityItem);
             }
 
             await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
@@ -303,14 +283,14 @@ namespace BusinessLogic.Services
         }
 
         private async Task<DistributorApplication> TFCase(
-            DistributorCreateApplicationDto createDto,
+            DistributorCreateApplicationDto createRequest,
             MaterialRequest request
         )
         {
-            var application = _mapper.Map<DistributorApplication>(createDto);
+            var application = _mapper.Map<DistributorApplication>(createRequest);
             application.Items = new List<DistributorApplicationItem>();
 
-            foreach (var item in createDto.Items!)
+            foreach (var item in createRequest.Items!)
             {
                 var reqItem = request.MaterialRequestItems!
                     .FirstOrDefault(x => x.MaterialID == item.MaterialID);
@@ -331,20 +311,16 @@ namespace BusinessLogic.Services
         }
 
         private async Task<DistributorApplication> TTCase(
-            DistributorCreateApplicationDto createDto,
-            MaterialRequest request
+            DistributorCreateApplicationDto createRequest
         )
         {
-            var application = _mapper.Map<DistributorApplication>(createDto);
+            var application = _mapper.Map<DistributorApplication>(createRequest);
             application.Items = new List<DistributorApplicationItem>();
 
-            foreach (var item in createDto.Items!)
+            foreach (var item in createRequest.Items!.Where(i => i != null))
             {
-                if (item != null)
-                {
-                    var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-                    application.Items.Add(entityItem);
-                }   
+                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
+                application.Items.Add(entityItem);
             }
 
             await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
