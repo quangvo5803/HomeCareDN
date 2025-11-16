@@ -97,8 +97,8 @@ export default function MaterialRequestDetail() {
     const hasEditPermission = Boolean(materialRequest?.canEditQuantity);
     const isLocked = lockedStatuses.has(existingApplication?.status);
 
-    const isUnlocked = !isLocked;
-    const canEditQuantity = hasEditPermission && isUnlocked;
+    const isUnlocked = hasEditPermission && !isLocked;
+    const canEditQuantity = isUnlocked;
     const canAddMaterial = Boolean(materialRequest?.canAddMaterial);
     const canEnterPrice = !lockedStatuses.has(existingApplication?.status);
 
@@ -306,10 +306,9 @@ export default function MaterialRequestDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [message, materialRequest, newMaterials]);
 
-    const isLoading = loading || isChecking;
-    const isMissingData = !materialRequest;
-    const checkLoading = isLoading || isMissingData;
-    if (checkLoading) return <Loading />;
+    // Helper function to check if we should show the loading state
+    const shouldShowLoading = () => loading || isChecking || !materialRequest;
+    if (shouldShowLoading()) return <Loading />;
 
     //  Derived address text
     const addressText = [
