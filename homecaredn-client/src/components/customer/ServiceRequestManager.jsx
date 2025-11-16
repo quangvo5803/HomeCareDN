@@ -10,7 +10,7 @@ import StatusBadge from '../StatusBadge';
 import Loading from '../Loading';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
-import { useAddress } from '../../hook/useAddress';
+import { useUser } from '../../hook/useUser';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
 import ReviewCountdown from '../customer/ReviewCountdown';
@@ -18,7 +18,7 @@ import ReviewCountdown from '../customer/ReviewCountdown';
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { addresses } = useAddress();
+  const { profile, addresses } = useUser();
   const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
     useServiceRequest();
 
@@ -96,6 +96,10 @@ export default function ServiceRequestManager() {
       }
       if (addresses.length == 0) {
         toast.error(t('ERROR.REQUIRED_ADDRESS'));
+        return;
+      }
+      if (!profile.phoneNumber) {
+        toast.error(t('ERROR.REQUIRED_PHONE_NUMBER'));
         return;
       }
       navigate('/Customer/ServiceRequest');
@@ -348,7 +352,7 @@ export default function ServiceRequestManager() {
                       <i className="fa-solid fa-location-dot text-orange-500"></i>
                       {t('userPage.serviceRequest.label_address')}
                       <span className="font-semibold">
-                        {req.address?.detail}, {req.address.ward},{' '}
+                        {req.address.detail}, {req.address.ward},{' '}
                         {req.address.district}, {req.address.city}
                       </span>
                     </div>

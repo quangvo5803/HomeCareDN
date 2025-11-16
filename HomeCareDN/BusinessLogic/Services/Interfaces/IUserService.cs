@@ -7,5 +7,9 @@ namespace BusinessLogic.Services.Interfaces
     {
         Task<PagedResultDto<UserDto>> GetAllUserAsync(QueryParameters parameters);
         Task<UserDto> GetUserByIdAsync(string userID);
+        Task UpdateUserAsync(UpdateUserDto dto);
+        Task<AddressDto> CreateAddressByUserIdAsync(CreateAddressDto dto);
+        Task<AddressDto> UpdateAddressAsync(UpdateAddressDto dto);
+        Task DeleteAddressAsync(Guid addressId);
     }
 }

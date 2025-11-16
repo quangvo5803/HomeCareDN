@@ -7,8 +7,6 @@ import './configs/i18n';
 
 import AuthProvider from './context/AuthProvider.jsx';
 import { RealtimeProvider } from './realtime/RealtimeProvider.jsx';
-import { ProfileProvider } from './context/ProfileProvider.jsx';
-import { AddressProvider } from './context/AddressProvider.jsx';
 import { BrandProvider } from './context/BrandProvider.jsx';
 import { CategoryProvider } from './context/CategoryProvider.jsx';
 import { MaterialProvider } from './context/MaterialProvider.jsx';
@@ -17,34 +15,33 @@ import { PartnerRequestProvider } from './context/PartnerRequestProvider.jsx';
 import { ServiceRequestProvider } from './context/ServiceRequestProvider.jsx';
 import { MaterialRequestProvider } from './context/MaterialRequestProvider.jsx';
 import { UserProvider } from './context/UserProvider.jsx';
+import { ReviewProvider } from './context/ReviewProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <RealtimeProvider>
-          <ProfileProvider>
-            <AddressProvider>
-              <BrandProvider>
-                <CategoryProvider>
-                  <MaterialProvider>
-                    <ServiceProvider>
-                      <PartnerRequestProvider>
-                        <ServiceRequestProvider>
-                          <MaterialRequestProvider>
-                            <UserProvider>
-                              <App />
-                            </UserProvider>
-                          </MaterialRequestProvider>
-                        </ServiceRequestProvider>
-                      </PartnerRequestProvider>
-                    </ServiceProvider>
-                  </MaterialProvider>
-                </CategoryProvider>
-              </BrandProvider>
-            </AddressProvider>
-          </ProfileProvider>
-        </RealtimeProvider>
+        <UserProvider>
+          <RealtimeProvider>
+            <BrandProvider>
+              <CategoryProvider>
+                <MaterialProvider>
+                  <ServiceProvider>
+                    <PartnerRequestProvider>
+                      <ServiceRequestProvider>
+                        <MaterialRequestProvider>
+                          <ReviewProvider>
+                            <App />
+                          </ReviewProvider>
+                        </MaterialRequestProvider>
+                      </ServiceRequestProvider>
+                    </PartnerRequestProvider>
+                  </ServiceProvider>
+                </MaterialProvider>
+              </CategoryProvider>
+            </BrandProvider>
+          </RealtimeProvider>
+        </UserProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
