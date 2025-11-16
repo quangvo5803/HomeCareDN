@@ -342,8 +342,8 @@ namespace BusinessLogic.Mapping
 
             CreateMap<ApplicationUser, UserDto>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Addresses));
-                
+                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
+
             CreateMap<Conversation, ConversationDto>()
                 .ForMember(
                     dest => dest.ConversationID,
@@ -360,9 +360,6 @@ namespace BusinessLogic.Mapping
                     dest => dest.AdminUnreadCount,
                     opt => opt.MapFrom(src => src.AdminUnreadCount)
                 );
-
-                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
-            CreateMap<Conversation, ConversationDto>();
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
 
