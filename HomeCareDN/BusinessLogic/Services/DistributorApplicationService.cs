@@ -144,24 +144,9 @@ namespace BusinessLogic.Services
 
             DistributorApplication application;
 
-            switch (materialRequest)
-            {
-                case { CanAddMaterial: false, CanEditQuantity: false }:
-                    application = await FFCase(createRequest, materialRequest);
-                    break;
-
-                case { CanAddMaterial: false, CanEditQuantity: true }:
-                    application = await FTCase(createRequest);
-                    break;
-
-                case { CanAddMaterial: true, CanEditQuantity: false }:
-                    application = await TFCase(createRequest, materialRequest);
-                    break;
-
-                default:
-                    application = await TTCase(createRequest);
-                    break;
-            }
+            application = materialRequest.CanEditQuantity
+                ? await AddAndEditCase(createRequest)
+                : await AddAndNoCase(createRequest, materialRequest);
 
             var dto = _mapper.Map<DistributorApplicationDto>(application);
             dto.DistributorName = distributor.FullName ?? string.Empty;
@@ -233,37 +218,7 @@ namespace BusinessLogic.Services
         }
 
         #region Handle Cases
-        private async Task<DistributorApplication> FFCase(
-            DistributorCreateApplicationDto createRequest,
-            MaterialRequest request
-        )
-        {
-            // Map application
-            var application = _mapper.Map<DistributorApplication>(createRequest);
-            application.Items = new List<DistributorApplicationItem>();
-
-            foreach (var item in createRequest.Items!)
-            {
-                if (!request.MaterialRequestItems!.Any(x => x.MaterialID == item.MaterialID))
-                {
-                    var errors = new Dictionary<string, string[]>
-                    {
-                        { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
-                    };
-                    throw new CustomValidationException(errors);
-                }
-
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-                application.Items.Add(entityItem);
-            }
-
-            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
-            await _unitOfWork.SaveAsync();
-
-            return application;
-        }
-
-        private async Task<DistributorApplication> FTCase(
+        private async Task<DistributorApplication> AddAndEditCase(
             DistributorCreateApplicationDto createRequest
         )
         {
@@ -281,7 +236,7 @@ namespace BusinessLogic.Services
             return application;
         }
 
-        private async Task<DistributorApplication> TFCase(
+        private async Task<DistributorApplication> AddAndNoCase(
             DistributorCreateApplicationDto createRequest,
             MaterialRequest request
         )
@@ -301,24 +256,6 @@ namespace BusinessLogic.Services
                 {
                     entityItem.Quantity = reqItem.Quantity;
                 }
-                application.Items.Add(entityItem);
-            }
-
-            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
-            await _unitOfWork.SaveAsync();
-            return application;
-        }
-
-        private async Task<DistributorApplication> TTCase(
-            DistributorCreateApplicationDto createRequest
-        )
-        {
-            var application = _mapper.Map<DistributorApplication>(createRequest);
-            application.Items = new List<DistributorApplicationItem>();
-
-            foreach (var item in createRequest.Items!.Where(i => i != null))
-            {
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
                 application.Items.Add(entityItem);
             }
 

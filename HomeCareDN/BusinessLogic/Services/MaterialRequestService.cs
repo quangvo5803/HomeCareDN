@@ -143,7 +143,10 @@ namespace BusinessLogic.Services
 
                 if (loadUserNames && userNamesDict != null)
                 {
-                    if (userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName))
+                    if (
+                        userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName) 
+                            && !string.IsNullOrEmpty(customerName)
+                    )
                     {
                         dto.CustomerName = customerName;
                     }

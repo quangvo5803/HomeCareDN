@@ -92,15 +92,15 @@ export default function MaterialRequestDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [materialRequestId, user]);
 
-
-    //  Permission flags
-    const lockedStatuses = ["Pending", "PendingCommission", "Approved"];
+    // Permission flags
+    const lockedStatuses = new Set(["Pending", "PendingCommission", "Approved"]);
     const hasEditPermission = Boolean(materialRequest?.canEditQuantity);
-    const isLocked = lockedStatuses.includes(existingApplication?.status);
+    const isLocked = lockedStatuses.has(existingApplication?.status);
 
     const canEditQuantity = hasEditPermission && !isLocked;
-    const canAddMaterial = !!materialRequest?.canAddMaterial;
-    const canEnterPrice = !lockedStatuses.includes(existingApplication?.status);
+    const canAddMaterial = Boolean(materialRequest?.canAddMaterial);
+    const canEnterPrice = !lockedStatuses.has(existingApplication?.status);
+
 
     //  Select material
     const handleSelectMaterial = (selectedMaterials) => {
@@ -128,6 +128,12 @@ export default function MaterialRequestDetail() {
 
             return updated;
         });
+    };
+    //Delete material
+    const handleDeleteMaterial = (materialRequestItemID) => {
+        setNewMaterials((prev) =>
+            prev.filter((item) => item.materialRequestItemID !== materialRequestItemID)
+        );
     };
 
     const calculateTotalAll = (existingItems, newItems) => {
@@ -319,18 +325,24 @@ export default function MaterialRequestDetail() {
     const isClosedAndNoApplication = isRequestClosed && !existingApplication;
     const isOpenAndNoApplication = !isRequestClosed && !existingApplication;
     const hasNewMaterials = newMaterials.length === 0 && canAddMaterial;
+
     const statusList = [
         {
-            canDo: canAddMaterial,
+            canDo: materialRequest.canAddMaterial,
             label: t('distributorMaterialRequest.canAddMaterial'),
             nowrap: true,
         },
         {
-            canDo: canEditQuantity,
+            canDo: materialRequest.canEditQuantity,
             label: t('distributorMaterialRequest.canEditQuantity'),
             nowrap: false,
         },
     ];
+    const status = existingApplication?.status;
+
+    const isPending = status === "Pending";
+    const isPendingCommission = status === "PendingCommission";
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">
             {/* Header */}
@@ -811,11 +823,7 @@ export default function MaterialRequestDetail() {
                                                                 <div className="col-span-4 flex justify-center">
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => {
-                                                                            setNewMaterials((prev) =>
-                                                                                prev.filter((i) => i.materialRequestItemID !== item.materialRequestItemID)
-                                                                            );
-                                                                        }}
+                                                                        onClick={() => handleDeleteMaterial(item.materialRequestItemID)}
                                                                         disabled={!canAddMaterial}
                                                                         className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                                                     >
@@ -1142,7 +1150,7 @@ export default function MaterialRequestDetail() {
 
                             {/* Action Buttons */}
                             <div className="border-t pt-6 space-y-3">
-                                {existingApplication.status === 'PendingCommission' && (
+                                {isPendingCommission && (
                                     <>
                                         {/* Commission Calculation Info Box */}
                                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
@@ -1313,7 +1321,7 @@ export default function MaterialRequestDetail() {
                                     </>
                                 )}
 
-                                {existingApplication.status === 'Pending' && (
+                                {isPending && (
                                     <>
                                         <button
                                             onClick={handleDeleteApplication}
@@ -1353,9 +1361,9 @@ export default function MaterialRequestDetail() {
                             </h3>
 
                             <div className="grid grid-cols-2 gap-4">
-                                {statusList.map((status, index) => (
+                                {statusList.map((status) => (
                                     <div
-                                        key={index}
+                                        key={status.label}
                                         className={`p-4 rounded-lg text-center border ${status.canDo ? "bg-green-50 border-green-200" : "bg-red-50 border-red-200"
                                             }`}
                                     >
@@ -1375,7 +1383,6 @@ export default function MaterialRequestDetail() {
                                 ))}
                             </div>
                         </div>
-
 
                         {/* Status Badge */}
                         <div className="pb-4 border-b border-gray-200">
