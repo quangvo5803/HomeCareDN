@@ -141,15 +141,16 @@ namespace BusinessLogic.Services
                     }
                 }
 
-                if (loadUserNames && userNamesDict != null)
+                if (!loadUserNames || userNamesDict is null)
+                    continue;
+
+                var idKey = dto.CustomerID.ToString();
+                if (!userNamesDict.TryGetValue(idKey, out var customerName))
+                    continue;
+
+                if (!string.IsNullOrWhiteSpace(customerName))
                 {
-                    if (
-                        userNamesDict.TryGetValue(dto.CustomerID.ToString(), out var customerName) 
-                            && !string.IsNullOrEmpty(customerName)
-                    )
-                    {
-                        dto.CustomerName = customerName;
-                    }
+                    dto.CustomerName = customerName;
                 }
             }
         }
