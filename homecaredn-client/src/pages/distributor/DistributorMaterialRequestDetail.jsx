@@ -1079,7 +1079,13 @@ export default function MaterialRequestDetail() {
             </div>
         </div>
     );
+    const getApplyView = () => {
+        if (isClosedAndNoApplication) return ClosedView;
+        if (isOpenAndNoApplication) return ApplyFormView;
+        return ApplicationDetailView;
+    };
 
+    const ApplyView = getApplyView();
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">
@@ -1320,14 +1326,7 @@ export default function MaterialRequestDetail() {
                     </div>
 
                     {/* Apply Form OR Application Details */}
-                    {isClosedAndNoApplication
-                        ? ClosedView
-                        : isOpenAndNoApplication
-                            // Apply Form - Show when NOT applied yet and request is not closed
-                            ? ApplyFormView
-                            // Application Details - Show when ALREADY applied
-                            : ApplicationDetailView
-                    }
+                    {ApplyView}
                 </div>
 
                 {/* RIGHT SIDEBAR */}
