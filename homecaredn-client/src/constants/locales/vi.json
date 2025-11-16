@@ -581,7 +581,8 @@
     "requestApprovedNote": "Yêu cầu này đã được phê duyệt và được giao cho bạn.",
     "requestClosedNote": "Yêu cầu này đã đóng. Đơn đăng ký của bạn sẽ không còn được xử lý nữa.",
     "notAppliedYet": "Chưa đăng ký",
-    "deleteApplication": "Xóa đơn ứng tuyển"
+    "deleteApplication": "Xóa đơn ứng tuyển",
+    "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới"
   },
   "partnerDashboard": {
     "no": "STT",

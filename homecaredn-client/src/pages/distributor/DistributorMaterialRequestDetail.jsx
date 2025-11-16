@@ -94,14 +94,10 @@ export default function MaterialRequestDetail() {
 
     // Permission flags
     const lockedStatuses = new Set(["Pending", "PendingCommission", "Approved"]);
-    const hasEditPermission = Boolean(materialRequest?.canEditQuantity);
     const isLocked = lockedStatuses.has(existingApplication?.status);
-
-    const isUnlocked = hasEditPermission && !isLocked;
-    const canEditQuantity = isUnlocked;
+    const canEditQuantity = Boolean(materialRequest?.canEditQuantity && !isLocked);
     const canAddMaterial = Boolean(materialRequest?.canAddMaterial);
     const canEnterPrice = !lockedStatuses.has(existingApplication?.status);
-
 
     //  Select material
     const handleSelectMaterial = (selectedMaterials) => {
@@ -307,8 +303,9 @@ export default function MaterialRequestDetail() {
     }, [message, materialRequest, newMaterials]);
 
     // Helper function to check if we should show the loading state
-    const shouldShowLoading = () => loading || isChecking || !materialRequest;
-    if (shouldShowLoading()) return <Loading />;
+    if (loading || isChecking || !materialRequest) {
+        return <Loading />;
+    }
 
     //  Derived address text
     const addressText = [
@@ -347,9 +344,8 @@ export default function MaterialRequestDetail() {
     const isPendingCommission = status === "PendingCommission";
 
     //Commission Section
-    let CommissionSection = null;
-    if (isPendingCommission) {
-        CommissionSection = (
+    const CommissionSection = isPendingCommission
+        ? (
             <>
                 {/* Commission Calculation Info Box */}
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
@@ -487,12 +483,11 @@ export default function MaterialRequestDetail() {
                     />
                 )}
             </>
-        );
-    }
+        ) : null;
+
     //Pending Section
-    let PendingSection = null
-    if (isPending) {
-        PendingSection = (
+    const PendingSection = isPending
+        ? (
             <>
                 <button
                     onClick={handleDeleteApplication}
@@ -507,9 +502,583 @@ export default function MaterialRequestDetail() {
                     {t('distributorMaterialRequestDetail.canDeleteWhilePending')}
                 </p>
             </>
-        )
-    }
+        ) : null;
 
+    const ClosedView = (
+        <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
+            <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
+            <p className="text-gray-700 font-semibold mb-1">
+                {t('distributorMaterialRequestDetail.closedApplication')}
+            </p>
+            <p className="text-sm text-gray-500">
+                {t('distributorMaterialRequestDetail.requestAlreadyClosed')}
+            </p>
+        </div>
+    );
+
+    const ApplyFormView = (
+        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 inline-flex items-center gap-2">
+                <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-green-50 ring-4 ring-green-100">
+                    <i className="fas fa-clipboard-list text-green-600" />
+                </span>
+                {t('distributorMaterialRequestDetail.applyFormTitle')}
+            </h3>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                    {/* New Material */}
+                    {canAddMaterial && (
+                        <label className="flex items-center text-sm font-medium text-gray-700 mb-4">
+                            <i className="fas fa-cubes text-blue-500 mr-2"></i>
+                            {t('distributorMaterialRequestDetail.additionalSupplies')} ({newMaterials.length || 0})
+                            <span className="text-red-500 ml-1">*</span>
+                        </label>
+                    )}
+
+                    {hasNewMaterials ? (
+                        <div className="text-center py-1">
+                            <div className="text-center py-1">
+                                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <i className="fas fa-inbox text-slate-400 text-4xl"></i>
+                                </div>
+                                <h4 className="font-bold text-slate-700 mb-2 text-lg">
+                                    {t('userPage.materialRequestDetail.noMaterial')}
+                                </h4>
+                                <p className="text-sm text-slate-500 mb-6">
+                                    {t('userPage.materialRequestDetail.addMaterial')}
+                                </p>
+
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center mb-6 gap-2 text-sm px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer"
+                                    onClick={() => setOpen(true)}
+                                >
+                                    <i className="fas fa-plus-circle"></i>
+                                    {t('BUTTON.AddNewMaterial')}
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <>
+                            {newMaterials.length > 0 && canAddMaterial && (
+                                <>
+                                    {/* Table Header */}
+                                    <div className="hidden lg:grid lg:grid-cols-28 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700">
+                                        <div className="col-span-2 text-center">#</div>
+                                        <div className="col-span-3 text-center">{t('userPage.materialRequestDetail.image')}</div>
+                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.infor')}</div>
+                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.quantity')}</div>
+                                        <div className="col-span-3 text-center">{t('userPage.materialRequestDetail.unit')}</div>
+                                        <div className="col-span-4 text-center">{t('distributorMaterialRequestDetail.price')}</div>
+                                        <div className="col-span-4 text-center">{t('distributorMaterialRequestDetail.totalPrice')}</div>
+                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.action')}</div>
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Items List */}
+                            <div className="space-y-4">
+                                {newMaterials.map((item, index) => {
+                                    const imageUrl =
+                                        item.material.images?.[0]?.imageUrl ||
+                                        item.material.imageUrls?.[0];
+
+                                    const displayName =
+                                        i18n.language === 'vi'
+                                            ? item.material.name
+                                            : item.material.nameEN || item.material.name;
+
+                                    const displayCategory =
+                                        i18n.language === 'vi'
+                                            ? item.material.categoryName
+                                            : item.material.categoryNameEN || item.material.categoryName;
+
+                                    const displayBrand =
+                                        i18n.language === 'vi'
+                                            ? item.material.brandName
+                                            : item.material.brandNameEN || item.material.brandName;
+
+                                    const displayUnit =
+                                        i18n.language === 'vi'
+                                            ? item.material.unit
+                                            : item.material.unitEN || item.material.unit;
+
+                                    return (
+                                        <div
+                                            key={item.materialRequestItemID}
+                                            className="border-2 border-slate-200 rounded-xl p-5 hover:border-green-300 hover:shadow-lg transition-all bg-white group"
+                                        >
+                                            {/* Desktop Layout */}
+                                            <div className="hidden lg:grid lg:grid-cols-28 gap-4 items-center">
+
+                                                {/* Index */}
+                                                <div className="col-span-2 flex justify-center">
+                                                    <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                                                        <span className="text-white font-bold text-xs">
+                                                            {index + 1}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Image */}
+                                                <div className="col-span-3 flex justify-center">
+                                                    <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group-hover:border-green-300 transition-all">
+                                                        {imageUrl ? (
+                                                            <img
+                                                                src={imageUrl}
+                                                                alt={displayName}
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    e.target.style.display = 'none';
+                                                                    e.target.nextElementSibling.style.display = 'flex';
+                                                                }}
+                                                            />
+                                                        ) : null}
+                                                        <div
+                                                            className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'}`}
+                                                        >
+                                                            <i className="fas fa-image text-slate-300 text-3xl"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* Info */}
+                                                <div className="col-span-4">
+                                                    <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
+                                                        {displayName}
+                                                    </h3>
+
+                                                    <div className="space-y-2">
+                                                        {displayCategory && (
+                                                            <div className="flex items-center text-xs text-slate-600">
+                                                                <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
+                                                                <span className="truncate font-medium">
+                                                                    {displayCategory}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                        {displayBrand && (
+                                                            <div className="flex items-center text-xs text-slate-600">
+                                                                <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                                                                <span className="truncate font-medium">
+                                                                    {displayBrand}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Quantity */}
+                                                <div className="col-span-4 flex justify-center">
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                if (item.quantity > 1) {
+                                                                    handleQuantityChangeNew(item.materialRequestItemID, item.quantity - 1);
+                                                                }
+                                                            }}
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            disabled={item.quantity <= 1 || !canAddMaterial}
+                                                        >
+                                                            <i className="fas fa-minus text-xs"></i>
+                                                        </button>
+
+                                                        <input
+                                                            type="number"
+                                                            min={1}
+                                                            value={item.quantity}
+                                                            onChange={(e) =>
+                                                                handleQuantityChangeNew(item.materialRequestItemID, e.target.value)
+                                                            }
+                                                            disabled={!canAddMaterial}
+                                                            className="w-16 px-2 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
+                                                        />
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleQuantityChangeNew(item.materialRequestItemID, item.quantity + 1)
+                                                            }
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            disabled={!canAddMaterial}
+                                                        >
+                                                            <i className="fas fa-plus text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Unit */}
+                                                <div className="col-span-3 flex justify-center">
+                                                    {displayUnit && (
+                                                        <div className="bg-slate-50 rounded-lg w-10 h-10 flex items-center justify-center border border-slate-200">
+                                                            <p className="text-sm font-bold text-slate-900">
+                                                                {displayUnit}
+                                                            </p>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* Price */}
+                                                <div className="col-span-4 flex justify-center">
+                                                    <input
+                                                        type="number"
+                                                        min={0}
+                                                        value={item.price || ""}
+                                                        className="w-25 px-3 py-2 border-2 border-slate-200 rounded-lg text-center 
+                                                                            focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
+                                                        placeholder="0"
+                                                        onChange={(e) =>
+                                                            handlePriceChangeNew(item.materialRequestItemID, Number(e.target.value))
+                                                        }
+                                                    />
+                                                </div>
+
+                                                {/* Total Price */}
+                                                <div className="col-span-4 flex justify-center">
+                                                    <div className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+                                                        {formatVND(item.price * item.quantity)}
+                                                    </div>
+                                                </div>
+
+                                                {/* Delete */}
+                                                <div className="col-span-4 flex justify-center">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteMaterial(item.materialRequestItemID)}
+                                                        disabled={!canAddMaterial}
+                                                        className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                    >
+                                                        <i className="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+
+                            {/* Add Material Button */}
+                            {canAddMaterial && (
+                                <button
+                                    type="button"
+                                    className="w-full mt-6 flex items-center mb-6 justify-center gap-2 py-4 px-6 border-2 border-dashed border-green-300 rounded-xl text-green-600 font-bold hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer"
+                                    onClick={() => setOpen(true)}
+                                >
+                                    <i className="fas fa-plus-circle text-lg"></i>
+                                    {t('BUTTON.AddNewMaterial')}
+                                </button>
+                            )}
+                        </>
+                    )}
+
+
+                    {/* estimate Price */}
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                        <i className="fas fa-coins text-orange-500 mr-2"></i>
+                        {t('distributorMaterialRequestDetail.totalEstimatePrice')}
+                        <span className="text-red-500 ml-1">*</span>
+                    </label>
+
+                    <div
+                        className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    >
+                        {formatVND(totalEstimatePrice)}
+                    </div>
+                    {totalEstimatePrice && (
+                        <div className="mt-2 space-y-1 text-sm text-gray-500">
+                            <p>
+                                {t('distributorMaterialRequestDetail.bidPriceLabel')}{' '}
+                                <span className="font-semibold text-orange-600">
+                                    {formatVND(Number(totalEstimatePrice))}
+                                </span>
+                            </p>
+                            <p>
+                                {t('distributorMaterialRequestDetail.bidPriceInWords')}{' '}
+                                <span className="font-semibold">
+                                    {numberToWordsByLang(
+                                        Number(totalEstimatePrice),
+                                        i18n.language
+                                    )}
+                                </span>
+                            </p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Note (TinyMCE Editor) */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <i className="fas fa-comment-alt mr-2 text-gray-500" />
+                        {t('distributorMaterialRequestDetail.noteToOwner')}
+                        <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <Editor
+                        value={message}
+                        init={{
+                            license_key: 'gpl',
+                            height: 500,
+                            menubar: false,
+                            plugins: 'lists link image code',
+                            toolbar:
+                                'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
+                            skin: false,
+                            content_css: false,
+                        }}
+                        onEditorChange={(content) => setMessage(content)}
+                    />
+                </div>
+
+                {/* Submit */}
+                <div>
+                    <button
+                        type="submit"
+                        className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        disabled={!canSubmit}
+                    >
+                        <i className="fas fa-paper-plane" />
+                        {t('distributorMaterialRequestDetail.applyForProject')}
+                    </button>
+                    <p className="mt-3 text-xs text-gray-500 text-center">
+                        <i className="fas fa-shield-alt mr-1" />
+                        {t('distributorMaterialRequestDetail.privacyNotice')}
+                    </p>
+                </div>
+            </form>
+        </div>
+    );
+
+    const ApplicationDetailView = (
+        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
+            <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
+                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-50 ring-4 ring-blue-100">
+                        <i className="fas fa-clipboard-check text-blue-600" />
+                    </span>
+                    {t('distributorMaterialRequestDetail.yourApplication')}
+                </h3>
+                <StatusBadge
+                    status={existingApplication?.status}
+                    type="Application"
+                />
+            </div>
+
+            {/* Selected Badge for PendingCommission */}
+            {isPendingCommission && (
+                <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-4 ring-2 ring-yellow-400">
+                    <div className="flex items-center gap-3">
+                        <i className="fas fa-trophy text-yellow-500 text-3xl"></i>
+                        <div>
+                            <p className="font-bold text-green-700 text-lg">
+                                {t('distributorMaterialRequestDetail.youAreSelected')}
+                            </p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                {t(
+                                    'distributorMaterialRequestDetail.selectedPendingCommissionNote'
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="overflow-x-auto">
+                {/* Header */}
+                <div className="hidden lg:grid lg:grid-cols-18 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
+                    <div className="col-span-1">#</div>
+                    <div className="col-span-2">{t('userPage.materialRequestDetail.image')}</div>
+                    <div className="col-span-4">{t('userPage.materialRequestDetail.infor')}</div>
+                    <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
+                    <div className="col-span-2">{t('userPage.materialRequestDetail.unit')}</div>
+                    <div className="col-span-3">{t('distributorMaterialRequestDetail.price')}</div>
+                    <div className="col-span-3">{t('distributorMaterialRequestDetail.totalPrice')}</div>
+                </div>
+
+                {/* Material */}
+                <div className="space-y-4">
+                    {existingApplication?.items?.map((item, index) => {
+                        const imageUrl =
+                            item.images?.[0]?.imageUrl ||
+                            item.imageUrls?.[0];
+
+                        const displayName =
+                            i18n.language === 'vi'
+                                ? item.name
+                                : item.nameEN || item.name;
+
+                        const displayCategory =
+                            i18n.language === 'vi'
+                                ? item.categoryName
+                                : item.categoryNameEN || item.categoryName;
+
+                        const displayBrand =
+                            i18n.language === 'vi'
+                                ? item.brandName
+                                : item.brandNameEN || item.brandName;
+
+                        const displayUnit =
+                            i18n.language === 'vi'
+                                ? item.unit
+                                : item.unitEN || item.unit;
+
+                        return (
+                            <div
+                                key={item.materialID}
+                                className="border-2 border-slate-200 rounded-xl p-5 hover:border-green-300 hover:shadow-lg transition-all bg-white group"
+                            >
+                                <div className="hidden lg:grid lg:grid-cols-18 gap-4 items-center text-center">
+
+                                    {/* STT */}
+                                    <div className="col-span-1 flex justify-center">
+                                        <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                                            <span className="text-white font-bold text-xs">
+                                                {index + 1}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Image */}
+                                    <div className="col-span-2 flex justify-center">
+                                        <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-green-300 transition-all">
+                                            {imageUrl ? (
+                                                <img
+                                                    src={imageUrl}
+                                                    alt={displayName}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <i className="fas fa-image text-slate-300 text-3xl"></i>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Info */}
+                                    <div className="col-span-4 text-left">
+                                        <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
+                                            {displayName}
+                                        </h3>
+
+                                        <div className="space-y-2">
+                                            {displayCategory && (
+                                                <div className="flex items-center justify-start text-xs text-slate-600">
+                                                    <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
+                                                    <span className="truncate font-medium">
+                                                        {displayCategory}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                            {displayBrand && (
+                                                <div className="flex items-center justify-start text-xs text-slate-600">
+                                                    <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                                                    <span className="truncate font-medium">
+                                                        {displayBrand}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Quantity */}
+                                    <div className="col-span-3 flex justify-center">
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="w-13 px-2 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm disabled:bg-slate-50"
+                                            >
+                                                {item.quantity}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Unit */}
+                                    <div className="col-span-2 flex justify-center">
+                                        <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+                                            <p className="text-sm w-7 h-5 font-bold text-slate-900">
+                                                {displayUnit}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Price */}
+                                    <div className="col-span-3 flex justify-center">
+                                        <div
+                                            className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
+                                        >
+                                            {formatVND(item.price)}
+                                        </div>
+                                    </div>
+                                    {/* Total Price */}
+                                    <div className="col-span-3 flex justify-center">
+                                        <div className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+                                            {formatVND(item.price * item.quantity)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Bid Price */}
+            <div className="bg-orange-50 rounded-lg p-5 ring-1 ring-orange-200">
+                <div className="flex items-center gap-3 mb-2">
+                    <i className="fas fa-coins text-orange-500 text-xl"></i>
+                    <p className="text-sm font-medium text-gray-700">
+                        {t('distributorMaterialRequestDetail.yourBid')}
+                    </p>
+                </div>
+                <p className="text-2xl font-bold text-gray-900 mb-1">
+                    {formatVND(existingApplication?.totalEstimatePrice)}
+                </p>
+                <p className="text-sm text-gray-600">
+                    {numberToWordsByLang(
+                        existingApplication?.estimatePrice,
+                        i18n.language
+                    )}
+                </p>
+            </div>
+
+            {/* Description */}
+            {existingApplication?.message && (
+                <div className="border-t pt-6">
+                    <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                        <i className="fas fa-comment-alt text-gray-700"></i>
+                        {t('distributorMaterialRequestDetail.noteToOwner')}
+                    </h4>
+                    <div
+                        className="prose prose-sm max-w-none text-gray-900 bg-gray-50 rounded-lg p-4"
+                        dangerouslySetInnerHTML={{
+                            __html: existingApplication?.message,
+                        }}
+                    />
+                </div>
+            )}
+
+            {/* Applied Date */}
+            {existingApplication?.createdAt && (
+                <div className="border-t pt-4">
+                    <p className="text-sm text-gray-900 flex items-center gap-2">
+                        <i className="fas fa-calendar text-gray-700"></i>
+                        {t('distributorMaterialRequestDetail.appliedDate')}:{' '}
+                        <span className="font-medium">
+                            {formatDate(existingApplication?.createdAt, i18n.language)}
+                        </span>
+                    </p>
+                </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="border-t pt-6 space-y-3">
+                {CommissionSection}
+                {PendingSection}
+            </div>
+        </div>
+    );
 
 
     return (
@@ -751,579 +1320,14 @@ export default function MaterialRequestDetail() {
                     </div>
 
                     {/* Apply Form OR Application Details */}
-                    {isClosedAndNoApplication ? (
-                        <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
-                            <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
-                            <p className="text-gray-700 font-semibold mb-1">
-                                {t('distributorMaterialRequestDetail.closedApplication')}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                                {t('distributorMaterialRequestDetail.requestAlreadyClosed')}
-                            </p>
-                        </div>
-                    ) : isOpenAndNoApplication ? (
-                        // Apply Form - Show when NOT applied yet and request is not closed
-                        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-6 inline-flex items-center gap-2">
-                                <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-green-50 ring-4 ring-green-100">
-                                    <i className="fas fa-clipboard-list text-green-600" />
-                                </span>
-                                {t('distributorMaterialRequestDetail.applyFormTitle')}
-                            </h3>
-
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div>
-                                    {/* New Material */}
-                                    {canAddMaterial && (
-                                        <label className="flex items-center text-sm font-medium text-gray-700 mb-4">
-                                            <i className="fas fa-cubes text-blue-500 mr-2"></i>
-                                            {t('distributorMaterialRequestDetail.additionalSupplies')} ({newMaterials.length || 0})
-                                            <span className="text-red-500 ml-1">*</span>
-                                        </label>
-                                    )}
-
-                                    {hasNewMaterials ? (
-                                        <div className="text-center py-1">
-                                            <div className="text-center py-1">
-                                                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                                    <i className="fas fa-inbox text-slate-400 text-4xl"></i>
-                                                </div>
-                                                <h4 className="font-bold text-slate-700 mb-2 text-lg">
-                                                    {t('userPage.materialRequestDetail.noMaterial')}
-                                                </h4>
-                                                <p className="text-sm text-slate-500 mb-6">
-                                                    {t('userPage.materialRequestDetail.addMaterial')}
-                                                </p>
-
-                                                <button
-                                                    type="button"
-                                                    className="inline-flex items-center mb-6 gap-2 text-sm px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer"
-                                                    onClick={() => setOpen(true)}
-                                                >
-                                                    <i className="fas fa-plus-circle"></i>
-                                                    {t('BUTTON.AddNewMaterial')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            {newMaterials.length > 0 && canAddMaterial && (
-                                                <>
-                                                    {/* Table Header */}
-                                                    <div className="hidden lg:grid lg:grid-cols-28 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700">
-                                                        <div className="col-span-2 text-center">#</div>
-                                                        <div className="col-span-3 text-center">{t('userPage.materialRequestDetail.image')}</div>
-                                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.infor')}</div>
-                                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.quantity')}</div>
-                                                        <div className="col-span-3 text-center">{t('userPage.materialRequestDetail.unit')}</div>
-                                                        <div className="col-span-4 text-center">{t('distributorMaterialRequestDetail.price')}</div>
-                                                        <div className="col-span-4 text-center">{t('distributorMaterialRequestDetail.totalPrice')}</div>
-                                                        <div className="col-span-4 text-center">{t('userPage.materialRequestDetail.action')}</div>
-                                                    </div>
-                                                </>
-                                            )}
-
-                                            {/* Items List */}
-                                            <div className="space-y-4">
-                                                {newMaterials.map((item, index) => {
-                                                    const imageUrl =
-                                                        item.material.images?.[0]?.imageUrl ||
-                                                        item.material.imageUrls?.[0];
-
-                                                    const displayName =
-                                                        i18n.language === 'vi'
-                                                            ? item.material.name
-                                                            : item.material.nameEN || item.material.name;
-
-                                                    const displayCategory =
-                                                        i18n.language === 'vi'
-                                                            ? item.material.categoryName
-                                                            : item.material.categoryNameEN || item.material.categoryName;
-
-                                                    const displayBrand =
-                                                        i18n.language === 'vi'
-                                                            ? item.material.brandName
-                                                            : item.material.brandNameEN || item.material.brandName;
-
-                                                    const displayUnit =
-                                                        i18n.language === 'vi'
-                                                            ? item.material.unit
-                                                            : item.material.unitEN || item.material.unit;
-
-                                                    return (
-                                                        <div
-                                                            key={item.materialRequestItemID}
-                                                            className="border-2 border-slate-200 rounded-xl p-5 hover:border-green-300 hover:shadow-lg transition-all bg-white group"
-                                                        >
-                                                            {/* Desktop Layout */}
-                                                            <div className="hidden lg:grid lg:grid-cols-28 gap-4 items-center">
-
-                                                                {/* Index */}
-                                                                <div className="col-span-2 flex justify-center">
-                                                                    <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                                                                        <span className="text-white font-bold text-xs">
-                                                                            {index + 1}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Image */}
-                                                                <div className="col-span-3 flex justify-center">
-                                                                    <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group-hover:border-green-300 transition-all">
-                                                                        {imageUrl ? (
-                                                                            <img
-                                                                                src={imageUrl}
-                                                                                alt={displayName}
-                                                                                className="w-full h-full object-cover"
-                                                                                onError={(e) => {
-                                                                                    e.target.style.display = 'none';
-                                                                                    e.target.nextElementSibling.style.display = 'flex';
-                                                                                }}
-                                                                            />
-                                                                        ) : null}
-                                                                        <div
-                                                                            className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'}`}
-                                                                        >
-                                                                            <i className="fas fa-image text-slate-300 text-3xl"></i>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Info */}
-                                                                <div className="col-span-4">
-                                                                    <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
-                                                                        {displayName}
-                                                                    </h3>
-
-                                                                    <div className="space-y-2">
-                                                                        {displayCategory && (
-                                                                            <div className="flex items-center text-xs text-slate-600">
-                                                                                <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
-                                                                                <span className="truncate font-medium">
-                                                                                    {displayCategory}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-                                                                        {displayBrand && (
-                                                                            <div className="flex items-center text-xs text-slate-600">
-                                                                                <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
-                                                                                <span className="truncate font-medium">
-                                                                                    {displayBrand}
-                                                                                </span>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Quantity */}
-                                                                <div className="col-span-4 flex justify-center">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() => {
-                                                                                if (item.quantity > 1) {
-                                                                                    handleQuantityChangeNew(item.materialRequestItemID, item.quantity - 1);
-                                                                                }
-                                                                            }}
-                                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                                                            disabled={item.quantity <= 1 || !canAddMaterial}
-                                                                        >
-                                                                            <i className="fas fa-minus text-xs"></i>
-                                                                        </button>
-
-                                                                        <input
-                                                                            type="number"
-                                                                            min={1}
-                                                                            value={item.quantity}
-                                                                            onChange={(e) =>
-                                                                                handleQuantityChangeNew(item.materialRequestItemID, e.target.value)
-                                                                            }
-                                                                            disabled={!canAddMaterial}
-                                                                            className="w-16 px-2 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm disabled:bg-slate-50 disabled:cursor-not-allowed"
-                                                                        />
-
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={() =>
-                                                                                handleQuantityChangeNew(item.materialRequestItemID, item.quantity + 1)
-                                                                            }
-                                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                                                            disabled={!canAddMaterial}
-                                                                        >
-                                                                            <i className="fas fa-plus text-xs"></i>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Unit */}
-                                                                <div className="col-span-3 flex justify-center">
-                                                                    {displayUnit && (
-                                                                        <div className="bg-slate-50 rounded-lg w-10 h-10 flex items-center justify-center border border-slate-200">
-                                                                            <p className="text-sm font-bold text-slate-900">
-                                                                                {displayUnit}
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                {/* Price */}
-                                                                <div className="col-span-4 flex justify-center">
-                                                                    <input
-                                                                        type="number"
-                                                                        min={0}
-                                                                        value={item.price || ""}
-                                                                        className="w-25 px-3 py-2 border-2 border-slate-200 rounded-lg text-center 
-                                                                            focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
-                                                                        placeholder="0"
-                                                                        onChange={(e) =>
-                                                                            handlePriceChangeNew(item.materialRequestItemID, Number(e.target.value))
-                                                                        }
-                                                                    />
-                                                                </div>
-
-                                                                {/* Total Price */}
-                                                                <div className="col-span-4 flex justify-center">
-                                                                    <div className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
-                                                                        {formatVND(item.price * item.quantity)}
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* Delete */}
-                                                                <div className="col-span-4 flex justify-center">
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => handleDeleteMaterial(item.materialRequestItemID)}
-                                                                        disabled={!canAddMaterial}
-                                                                        className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                                                    >
-                                                                        <i className="fas fa-trash-alt"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-
-
-                                            {/* Add Material Button */}
-                                            {canAddMaterial && (
-                                                <button
-                                                    type="button"
-                                                    className="w-full mt-6 flex items-center mb-6 justify-center gap-2 py-4 px-6 border-2 border-dashed border-green-300 rounded-xl text-green-600 font-bold hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer"
-                                                    onClick={() => setOpen(true)}
-                                                >
-                                                    <i className="fas fa-plus-circle text-lg"></i>
-                                                    {t('BUTTON.AddNewMaterial')}
-                                                </button>
-                                            )}
-                                        </>
-                                    )}
-
-
-                                    {/* estimate Price */}
-                                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-coins text-orange-500 mr-2"></i>
-                                        {t('distributorMaterialRequestDetail.totalEstimatePrice')}
-                                        <span className="text-red-500 ml-1">*</span>
-                                    </label>
-
-                                    <div
-                                        className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                                    >
-                                        {formatVND(totalEstimatePrice)}
-                                    </div>
-                                    {totalEstimatePrice && (
-                                        <div className="mt-2 space-y-1 text-sm text-gray-500">
-                                            <p>
-                                                {t('distributorMaterialRequestDetail.bidPriceLabel')}{' '}
-                                                <span className="font-semibold text-orange-600">
-                                                    {formatVND(Number(totalEstimatePrice))}
-                                                </span>
-                                            </p>
-                                            <p>
-                                                {t('distributorMaterialRequestDetail.bidPriceInWords')}{' '}
-                                                <span className="font-semibold">
-                                                    {numberToWordsByLang(
-                                                        Number(totalEstimatePrice),
-                                                        i18n.language
-                                                    )}
-                                                </span>
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Note (TinyMCE Editor) */}
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        <i className="fas fa-comment-alt mr-2 text-gray-500" />
-                                        {t('distributorMaterialRequestDetail.noteToOwner')}
-                                        <span className="text-red-500 ml-1">*</span>
-                                    </label>
-                                    <Editor
-                                        value={message}
-                                        init={{
-                                            license_key: 'gpl',
-                                            height: 500,
-                                            menubar: false,
-                                            plugins: 'lists link image code',
-                                            toolbar:
-                                                'undo redo | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
-                                            skin: false,
-                                            content_css: false,
-                                        }}
-                                        onEditorChange={(content) => setMessage(content)}
-                                    />
-                                </div>
-
-                                {/* Submit */}
-                                <div>
-                                    <button
-                                        type="submit"
-                                        className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                                        disabled={!canSubmit}
-                                    >
-                                        <i className="fas fa-paper-plane" />
-                                        {t('distributorMaterialRequestDetail.applyForProject')}
-                                    </button>
-                                    <p className="mt-3 text-xs text-gray-500 text-center">
-                                        <i className="fas fa-shield-alt mr-1" />
-                                        {t('distributorMaterialRequestDetail.privacyNotice')}
-                                    </p>
-                                </div>
-                            </form>
-                        </div>
-                    ) : (
-                        // Application Details - Show when ALREADY applied
-                        <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
-                                    <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-50 ring-4 ring-blue-100">
-                                        <i className="fas fa-clipboard-check text-blue-600" />
-                                    </span>
-                                    {t('distributorMaterialRequestDetail.yourApplication')}
-                                </h3>
-                                <StatusBadge
-                                    status={existingApplication.status}
-                                    type="Application"
-                                />
-                            </div>
-
-                            {/* Selected Badge for PendingCommission */}
-                            {isPendingCommission && (
-                                <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-4 ring-2 ring-yellow-400">
-                                    <div className="flex items-center gap-3">
-                                        <i className="fas fa-trophy text-yellow-500 text-3xl"></i>
-                                        <div>
-                                            <p className="font-bold text-green-700 text-lg">
-                                                {t('distributorMaterialRequestDetail.youAreSelected')}
-                                            </p>
-                                            <p className="text-sm text-gray-600 mt-1">
-                                                {t(
-                                                    'distributorMaterialRequestDetail.selectedPendingCommissionNote'
-                                                )}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="overflow-x-auto">
-                                {/* Header */}
-                                <div className="hidden lg:grid lg:grid-cols-18 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
-                                    <div className="col-span-1">#</div>
-                                    <div className="col-span-2">{t('userPage.materialRequestDetail.image')}</div>
-                                    <div className="col-span-4">{t('userPage.materialRequestDetail.infor')}</div>
-                                    <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
-                                    <div className="col-span-2">{t('userPage.materialRequestDetail.unit')}</div>
-                                    <div className="col-span-3">{t('distributorMaterialRequestDetail.price')}</div>
-                                    <div className="col-span-3">{t('distributorMaterialRequestDetail.totalPrice')}</div>
-                                </div>
-
-                                {/* Material */}
-                                <div className="space-y-4">
-                                    {existingApplication.items.map((item, index) => {
-                                        const imageUrl =
-                                            item.images?.[0]?.imageUrl ||
-                                            item.imageUrls?.[0];
-
-                                        const displayName =
-                                            i18n.language === 'vi'
-                                                ? item.name
-                                                : item.nameEN || item.name;
-
-                                        const displayCategory =
-                                            i18n.language === 'vi'
-                                                ? item.categoryName
-                                                : item.categoryNameEN || item.categoryName;
-
-                                        const displayBrand =
-                                            i18n.language === 'vi'
-                                                ? item.brandName
-                                                : item.brandNameEN || item.brandName;
-
-                                        const displayUnit =
-                                            i18n.language === 'vi'
-                                                ? item.unit
-                                                : item.unitEN || item.unit;
-
-                                        return (
-                                            <div
-                                                key={item.materialID}
-                                                className="border-2 border-slate-200 rounded-xl p-5 hover:border-green-300 hover:shadow-lg transition-all bg-white group"
-                                            >
-                                                <div className="hidden lg:grid lg:grid-cols-18 gap-4 items-center text-center">
-
-                                                    {/* STT */}
-                                                    <div className="col-span-1 flex justify-center">
-                                                        <div className="w-5 h-5 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
-                                                            <span className="text-white font-bold text-xs">
-                                                                {index + 1}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Image */}
-                                                    <div className="col-span-2 flex justify-center">
-                                                        <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-green-300 transition-all">
-                                                            {imageUrl ? (
-                                                                <img
-                                                                    src={imageUrl}
-                                                                    alt={displayName}
-                                                                    className="w-full h-full object-cover"
-                                                                />
-                                                            ) : (
-                                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                                    <i className="fas fa-image text-slate-300 text-3xl"></i>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Info */}
-                                                    <div className="col-span-4 text-left">
-                                                        <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
-                                                            {displayName}
-                                                        </h3>
-
-                                                        <div className="space-y-2">
-                                                            {displayCategory && (
-                                                                <div className="flex items-center justify-start text-xs text-slate-600">
-                                                                    <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
-                                                                    <span className="truncate font-medium">
-                                                                        {displayCategory}
-                                                                    </span>
-                                                                </div>
-                                                            )}
-
-                                                            {displayBrand && (
-                                                                <div className="flex items-center justify-start text-xs text-slate-600">
-                                                                    <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
-                                                                    <span className="truncate font-medium">
-                                                                        {displayBrand}
-                                                                    </span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Quantity */}
-                                                    <div className="col-span-3 flex justify-center">
-                                                        <div className="flex items-center gap-2">
-                                                            <div
-                                                                className="w-13 px-2 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm disabled:bg-slate-50"
-                                                            >
-                                                                {item.quantity}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Unit */}
-                                                    <div className="col-span-2 flex justify-center">
-                                                        <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-                                                            <p className="text-sm w-7 h-5 font-bold text-slate-900">
-                                                                {displayUnit}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Price */}
-                                                    <div className="col-span-3 flex justify-center">
-                                                        <div
-                                                            className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
-                                                        >
-                                                            {formatVND(item.price)}
-                                                        </div>
-                                                    </div>
-                                                    {/* Total Price */}
-                                                    <div className="col-span-3 flex justify-center">
-                                                        <div className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
-                                                            {formatVND(item.price * item.quantity)}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-
-                            {/* Bid Price */}
-                            <div className="bg-orange-50 rounded-lg p-5 ring-1 ring-orange-200">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <i className="fas fa-coins text-orange-500 text-xl"></i>
-                                    <p className="text-sm font-medium text-gray-700">
-                                        {t('distributorMaterialRequestDetail.yourBid')}
-                                    </p>
-                                </div>
-                                <p className="text-2xl font-bold text-gray-900 mb-1">
-                                    {formatVND(existingApplication.totalEstimatePrice)}
-                                </p>
-                                <p className="text-sm text-gray-600">
-                                    {numberToWordsByLang(
-                                        existingApplication.estimatePrice,
-                                        i18n.language
-                                    )}
-                                </p>
-                            </div>
-
-                            {/* Description */}
-                            {existingApplication.message && (
-                                <div className="border-t pt-6">
-                                    <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                        <i className="fas fa-comment-alt text-gray-700"></i>
-                                        {t('distributorMaterialRequestDetail.noteToOwner')}
-                                    </h4>
-                                    <div
-                                        className="prose prose-sm max-w-none text-gray-900 bg-gray-50 rounded-lg p-4"
-                                        dangerouslySetInnerHTML={{
-                                            __html: existingApplication.message,
-                                        }}
-                                    />
-                                </div>
-                            )}
-
-                            {/* Applied Date */}
-                            {existingApplication.createdAt && (
-                                <div className="border-t pt-4">
-                                    <p className="text-sm text-gray-900 flex items-center gap-2">
-                                        <i className="fas fa-calendar text-gray-700"></i>
-                                        {t('distributorMaterialRequestDetail.appliedDate')}:{' '}
-                                        <span className="font-medium">
-                                            {formatDate(existingApplication.createdAt, i18n.language)}
-                                        </span>
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="border-t pt-6 space-y-3">
-                                {CommissionSection}
-                                {PendingSection}
-                            </div>
-                        </div>
-                    )}
+                    {isClosedAndNoApplication
+                        ? ClosedView
+                        : isOpenAndNoApplication
+                            // Apply Form - Show when NOT applied yet and request is not closed
+                            ? ApplyFormView
+                            // Application Details - Show when ALREADY applied
+                            : ApplicationDetailView
+                    }
                 </div>
 
                 {/* RIGHT SIDEBAR */}

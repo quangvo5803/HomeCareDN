@@ -586,7 +586,8 @@
     "requestApprovedNote": "This request has been approved and assigned to you.",
     "requestClosedNote": "This request is closed. Your application will no longer be processed.",
     "notAppliedYet": "Not Yet Applied",
-    "deleteApplication": "Delete Application"
+    "deleteApplication": "Delete Application",
+    "canDeleteWhilePending": "You can delete your current application to submit a new one."
   },
   "partnerDashboard": {
     "no": "No",
