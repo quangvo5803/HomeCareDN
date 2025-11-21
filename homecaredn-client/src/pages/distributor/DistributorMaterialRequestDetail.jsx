@@ -512,9 +512,11 @@ export default function MaterialRequestDetail() {
         </div>
     );
 
-    const bidPriceInWords = Number(totalEstimatePrice) === 0
-        ? (i18n.language === 'vi' ? "Không đồng" : "Zero VND")
-        : numberToWordsByLang(Number(totalEstimatePrice), i18n.language);
+    const bidPriceInWords = () => {
+        const num = Number(totalEstimatePrice);
+        if (num === 0) return i18n.language === "vi" ? "Không đồng" : "Zero VND";
+        return numberToWordsByLang(num, i18n.language);
+    };
 
     const ApplyFormView = (
         <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
@@ -759,7 +761,6 @@ export default function MaterialRequestDetail() {
                                 })}
                             </div>
 
-
                             {/* Add Material Button */}
                             {canAddMaterial && (
                                 <button
@@ -791,9 +792,7 @@ export default function MaterialRequestDetail() {
                             </p>
                             <p>
                                 {t('distributorMaterialRequestDetail.bidPriceInWords')}{' '}
-                                <span className="font-semibold">
-                                    {bidPriceInWords}
-                                </span>
+                                <span className="font-semibold">{bidPriceInWords()}</span>
                             </p>
                         </div>
                     )}
