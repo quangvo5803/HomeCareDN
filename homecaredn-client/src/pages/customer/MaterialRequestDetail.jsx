@@ -364,7 +364,7 @@ export default function MaterialRequestDetail() {
       {canEdit && (
         <button
           type="button"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition font-bold"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer"
           onClick={() => setOpen(true)}
         >
           <i className="fas fa-plus-circle"></i>
@@ -472,7 +472,7 @@ export default function MaterialRequestDetail() {
                     );
                   }
                 }}
-                className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={item.quantity <= 1 || !canEdit}
               >
                 <i className="fas fa-minus text-xs"></i>
@@ -498,7 +498,7 @@ export default function MaterialRequestDetail() {
                     item.quantity + 1
                   )
                 }
-                className="w-9 h-9 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!canEdit}
               >
                 <i className="fas fa-plus text-xs"></i>
@@ -529,7 +529,7 @@ export default function MaterialRequestDetail() {
                 );
               }}
               disabled={!canEdit}
-              className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <i className="fas fa-trash-alt"></i>
             </button>
@@ -561,7 +561,7 @@ export default function MaterialRequestDetail() {
                 );
               }}
               disabled={!canEdit}
-              className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-10 h-10 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <i className="fas fa-trash-alt text-sm"></i>
             </button>
@@ -689,7 +689,7 @@ export default function MaterialRequestDetail() {
       {canEdit && (
         <button
           type="button"
-          className="w-full mt-6 flex items-center justify-center gap-2 py-4 px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all"
+          className="w-full mt-6 flex items-center justify-center gap-2 py-4 px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer"
           onClick={() => setOpen(true)}
         >
           <i className="fas fa-plus-circle text-lg"></i>
@@ -706,7 +706,7 @@ export default function MaterialRequestDetail() {
         {/* Back */}
         <button
           onClick={() => setSelectedDistributor(null)}
-          className="flex items-center gap-2 text-slate-600 hover:text-orange-600 mb-6 transition-colors font-semibold"
+          className="flex items-center gap-2 text-slate-600 hover:text-orange-600 mb-6 transition-colors font-semibold cursor-pointer"
         >
           <i className="fas fa-arrow-left"></i>
           <span>{t('BUTTON.Back')}</span>
@@ -737,7 +737,7 @@ export default function MaterialRequestDetail() {
 
               <span className="flex items-center gap-1 text-green-600 font-semibold">
                 <i className="fas fa-check-circle" />
-                {selectedDistributor.completedProjectCount ?? 0} đơn hàng
+                {selectedDistributor.completedProjectCount ?? 0} {t('userPage.materialRequestDetail.order')}
               </span>
             </div>
           </div>
@@ -808,13 +808,13 @@ export default function MaterialRequestDetail() {
               return (
                 <div
                   key={item.materialID}
-                  className="border border-slate-200 rounded-xl p-5 hover:border-green-400 hover:shadow-md transition-all bg-white group"
+                  className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group"
                 >
                   <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
 
                     {/* STT */}
                     <div className="col-span-2 flex justify-center">
-                      <div className="w-5 h-5 bg-green-500 rounded-lg flex items-center justify-center">
+                      <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
                         <span className="text-white font-bold text-xs">
                           {index + 1}
                         </span>
@@ -823,7 +823,7 @@ export default function MaterialRequestDetail() {
 
                     {/* Image */}
                     <div className="col-span-3 flex justify-center">
-                      <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-green-400 transition-all">
+                      <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-orange-400 transition-all">
                         {imageUrl ? (
                           <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
                         ) : (
@@ -895,53 +895,57 @@ export default function MaterialRequestDetail() {
         </div>
 
         {/* Notes */}
-        <div className="mb-6">
-          <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-            <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
-            {t('userPage.materialRequestDetail.note')}
-          </h4>
-          <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
-            dangerouslySetInnerHTML={{
-              __html: he.decode(selectedDistributor.message),
-            }}
-          >
-          </p>
-        </div>
+        {selectedDistributor.message && (
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+              <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
+              {t('userPage.materialRequestDetail.note')}
+            </h4>
+            <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
+              dangerouslySetInnerHTML={{
+                __html: he.decode(selectedDistributor.message),
+              }}
+            >
+            </p>
+          </div>
+        )}
 
         {/* Contact */}
-        <div className="mb-6">
-          <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-            <i className="fas fa-address-book text-orange-600 mr-2"></i>
-            {t('userPage.materialRequestDetail.contact')}
-          </h4>
+        {selectedDistributor.status === 'Approved' && (
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+              <i className="fas fa-address-book text-orange-600 mr-2"></i>
+              {t('userPage.materialRequestDetail.contact')}
+            </h4>
 
-          <div className="space-y-3">
-            <a
-              href={`tel:${selectedDistributor.distributorPhone}`}
-              className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
-            >
-              <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
-              <span>{selectedDistributor.distributorPhone}</span>
-            </a>
+            <div className="space-y-3">
+              <a
+                href={`tel:${selectedDistributor.distributorPhone}`}
+                className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
+              >
+                <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
+                <span>{selectedDistributor.distributorPhone}</span>
+              </a>
 
-            <a
-              href={`mailto:${selectedDistributor.distributorEmail}`}
-              className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
-            >
-              <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
-              <span>{selectedDistributor.distributorEmail}</span>
-            </a>
+              <a
+                href={`mailto:${selectedDistributor.distributorEmail}`}
+                className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
+              >
+                <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
+                <span>{selectedDistributor.distributorEmail}</span>
+              </a>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
-          <button className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold">
+          <button className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer">
             <i className="fas fa-check mr-2"></i>
             {t('BUTTON.Accept')}
           </button>
 
-          <button className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border border-red-300">
+          <button className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border border-red-300 cursor-pointer">
             <i className="fas fa-times mr-2"></i>
             {t('BUTTON.Reject')}
           </button>
@@ -990,7 +994,7 @@ export default function MaterialRequestDetail() {
                   <button
                     key={app.distributorApplicationID}
                     onClick={() => handleDetailDistributor(app)}
-                    className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent"
+                    className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent cursor-pointer"
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
@@ -1088,7 +1092,7 @@ export default function MaterialRequestDetail() {
                   state: { tab: 'material_requests' },
                 })
               }
-              className="flex items-center gap-2 text-slate-600 hover:text-orange-600 transition-colors font-semibold flex-shrink-0"
+              className="flex items-center gap-2 text-slate-600 hover:text-orange-600 transition-colors font-semibold flex-shrink-0 cursor-pointer"
             >
               <i className="fas fa-arrow-left"></i>
               <span className="hidden sm:inline text-sm">
@@ -1218,7 +1222,7 @@ export default function MaterialRequestDetail() {
 
       {/* Main Content */}
       <div className="px-6 lg:px-12 py-8">
-        <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-6 gap-8">
           {/* Left Column - Request Details & Materials */}
           <div className="xl:col-span-3 space-y-6">
             {/* Basic Info Card */}
@@ -1369,7 +1373,7 @@ export default function MaterialRequestDetail() {
           </div>
 
           {/* Right Column - Applications */}
-          <div className="xl:col-span-2">
+          <div className="xl:col-span-3">
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-42 max-h-[calc(100vh-100px)] overflow-y-auto">
               {selectedDistributor
                 ? renderAppliedDetail()

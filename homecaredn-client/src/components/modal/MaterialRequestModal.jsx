@@ -6,7 +6,7 @@ import LoadingComponent from '../LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { useMaterial } from '../../hook/useMaterial';
 
-export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
+export default function MaterialRequestModal({ isOpen, onClose, onSelect, excludedMaterialIDs = [] }) {
   const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,10 +66,14 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
 
   if (!isOpen) return null;
 
+  const filteredMaterials = materials.filter(
+    (m) => !excludedMaterialIDs.includes(m.materialID)
+  );
+
   const renderContent = () => {
     if (loading) return <LoadingComponent />;
 
-    if (materials.length === 0) {
+    if (filteredMaterials.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 py-16 space-y-4 min-h-[400px]">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
@@ -99,7 +103,7 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {materials.map((m) => {
+        {filteredMaterials.map((m) => {
           const isSelected = selectedMaterials.some(
             (item) => item.materialID === m.materialID
           );
@@ -115,11 +119,10 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
             <button
               key={m.materialID}
               onClick={() => handleToggleMaterial(m)}
-              className={`border-2 rounded-lg p-3 text-left hover:shadow-lg transition-all duration-200 w-full group ${
-                isSelected
-                  ? 'border-blue-500 bg-blue-50 shadow-md'
-                  : 'border-gray-200 hover:border-blue-300 bg-white'
-              }`}
+              className={`border-2 rounded-lg p-3 text-left hover:shadow-lg transition-all duration-200 w-full group ${isSelected
+                ? 'border-blue-500 bg-blue-50 shadow-md'
+                : 'border-gray-200 hover:border-blue-300 bg-white'
+                }`}
             >
               <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden relative">
                 {imageUrl ? (
@@ -135,9 +138,8 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
                   />
                 ) : null}
                 <div
-                  className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${
-                    imageUrl ? 'hidden' : 'flex'
-                  }`}
+                  className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${imageUrl ? 'hidden' : 'flex'
+                    }`}
                 >
                   <i className="fas fa-image text-3xl text-gray-300"></i>
                 </div>
@@ -276,11 +278,10 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
             <button
               disabled={selectedMaterials.length === 0}
               onClick={handleAdd}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-                selectedMaterials.length > 0
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-              }`}
+              className={`px-6 py-2 rounded-lg font-semibold transition-all ${selectedMaterials.length > 0
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+                }`}
             >
               {t('BUTTON.Add')}
             </button>

@@ -47,34 +47,6 @@ export default function MaterialRequestManager() {
             );
             setTotalMaterialRequests((prev) => Math.max(0, prev - 1));
         },
-
-        [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
-            setMaterialRequests((prev) =>
-                prev.map((sr) =>
-                    sr.materialRequestID === payload.materialRequestID
-                        ? {
-                            ...sr,
-                            distributorApplyCount:
-                                (sr.distributorApplyCount || 0) + 1,
-                        }
-                        : sr
-                )
-            );
-        },
-
-        [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
-            setMaterialRequests((prev) =>
-                prev.map((sr) =>
-                    sr.materialRequestID === payload.materialRequestID
-                        ? {
-                            ...sr,
-                            distributorApplyCount:
-                                (sr.distributorApplyCount || 0) - 1,
-                        }
-                        : sr
-                )
-            );
-        },
     });
 
     useEffect(() => {
@@ -96,11 +68,11 @@ export default function MaterialRequestManager() {
 
     if (loading) return <Loading />;
     return (
-        <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-green-50/30 to-slate-50">
+        <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-orange-50/30 to-slate-50">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-8">
-                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-md">
+                    <div className="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-xl shadow-md">
                         <i className="fa-solid fa-box-open text-white text-xl" />
                     </div>
                     <div>
@@ -131,15 +103,15 @@ export default function MaterialRequestManager() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-green-300 transition-all cursor-pointer group">
+                            <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-orange-300 transition-all cursor-pointer group">
                                 <input
                                     type="checkbox"
                                     checked={showAppliedOnly}
                                     onChange={(e) => handleFilterChange(e.target.checked)}
-                                    className="w-4 h-4 text-green-500 bg-white border-gray-300 rounded focus:ring-2 focus:ring-green-500/20 cursor-pointer"
+                                    className="w-4 h-4 text-orange-500 bg-white border-gray-300 rounded focus:ring-2 focus:ring-orange-500/20 cursor-pointer"
                                 />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-green-600 transition-colors flex items-center gap-2">
-                                    <i className="fa-solid fa-user-check text-green-500"></i>
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors flex items-center gap-2">
+                                    <i className="fa-solid fa-user-check text-orange-500"></i>
                                     {t('distributorMaterialRequest.appliedOnly') ||
                                         'Đã ứng tuyển'}
                                 </span>
@@ -151,7 +123,7 @@ export default function MaterialRequestManager() {
                                     setSortOption(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-green-300 focus:ring-2 focus:ring-green-500/20 focus:border-green-500 transition-all cursor-pointer"
+                                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
                                 aria-label="Sort service requests"
                             >
                                 <option value="">
@@ -177,36 +149,34 @@ export default function MaterialRequestManager() {
                                 return (
                                     <div
                                         key={req.materialRequestID}
-                                        className="group relative bg-white border border-gray-200 rounded-2xl p-6 hover:border-green-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1"
+                                        className="group relative bg-white border border-gray-200 rounded-2xl p-6 hover:border-orange-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1"
                                     >
                                         {/* Left Accent */}
-                                        <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-b from-green-400 to-green-600" />
+                                        <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-orange-500" />
 
                                         {/* Header */}
                                         <div className="flex justify-between items-start mb-4 pl-4">
                                             <div>
-                                                <h3 className="text-xl font-bold text-gray-900">{req.customerName}</h3>
-
-                                                <p className="text-sm text-gray-600 mt-1">
+                                                <h3 className="text-xl text-gray-600 mt-1">
                                                     <i className="fa-solid fa-location-dot text-orange-500 mr-2" />
                                                     {addressText}
-                                                </p>
+                                                </h3>
                                             </div>
                                             <StatusBadge status={req.status} type="Request" />
                                         </div>
 
                                         {/* Description */}
-                                        <p className="text-gray-700 text-sm mb-4 pl-4">{req.description}</p>
+                                        <p className="text-gray-600 text-lg mb-4 pl-4">
+                                            {req.description.length > 60
+                                                ? req.description.substring(0, 60) + "..."
+                                                : req.description}
+                                        </p>
 
                                         {/* Info chips */}
-                                        <div className="flex flex-wrap gap-2 mb-5 pl-4 text-xs">
+                                        <div className="flex flex-wrap gap-2 mb-5 pl-4 text-sm">
                                             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
                                                 <i className="fa-solid fa-cubes" />
                                                 {req.materialRequestItems?.length || 0} {t('distributorMaterialRequest.materialType')}
-                                            </span>
-                                            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200">
-                                                <i className="fa-solid fa-users" />
-                                                {req.distributorApplyCount} {t('distributorMaterialRequest.applied')}
                                             </span>
                                             <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-50 text-gray-700 border border-gray-200">
                                                 <i className="fa-regular fa-calendar" />
@@ -249,7 +219,7 @@ export default function MaterialRequestManager() {
                                                 onClick={() =>
                                                     navigate(`/Distributor/MaterialRequest/${req.materialRequestID}`)
                                                 }
-                                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-md hover:from-green-600 hover:to-green-700 transition-all duration-300"
+                                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md hover:from-orange-600 hover:to-orange-700 transition-all duration-300 cursor-pointer"
                                             >
                                                 <i className="fa-solid fa-eye" />
                                                 {t('BUTTON.View')}

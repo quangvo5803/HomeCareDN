@@ -205,13 +205,7 @@ namespace BusinessLogic.Services
                     $"user_{materialRequest.CustomerID}",   
                     "DistributorApplication.Created",
                     customerDto
-                ),
-                _notifier.SendToApplicationGroupAsync(
-                    $"role_Distributor",
-                    "DistributorApplication.Created",
-                    dto
                 )
-
             };
             await Task.WhenAll(notifyTasks);
             return dto;
@@ -240,11 +234,6 @@ namespace BusinessLogic.Services
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
-                "DistributorApplication.Delete",
-                new { application.MaterialRequestID, application.DistributorApplicationID }
-            );
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Distributor",
                 "DistributorApplication.Delete",
                 new { application.MaterialRequestID, application.DistributorApplicationID }
             );

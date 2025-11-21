@@ -111,23 +111,6 @@ namespace BusinessLogic.Services
 
             var addressDict = addresses.ToDictionary(a => a.AddressID);
 
-            var loadUserNames = role == DISTRIBUTOR || role == ADMIN;
-            Dictionary<string, string>? userNamesDict = null;
-
-            if (loadUserNames)
-            {
-                var userIds = items
-                    .Select(i => i.CustomerID.ToString())
-                    .Distinct()
-                    .ToList();
-
-                userNamesDict = (await _userManager.Users
-                    .Where(u => userIds.Contains(u.Id))
-                    .Select(u => new { u.Id, u.FullName })
-                    .ToListAsync())
-                    .ToDictionary(u => u.Id, u => u.FullName);
-            }
-
             foreach (var dto in dtos)
             {
                 // --- Address mapping ---
@@ -141,18 +124,6 @@ namespace BusinessLogic.Services
                         dto.Address.Detail = string.Empty;
                         dto.Address.Ward = string.Empty;
                     }
-                }
-
-                // --- User name mapping ---
-                if (!loadUserNames)
-                    continue;
-
-                var idKey = dto.CustomerID.ToString();
-
-                if (userNamesDict!.TryGetValue(idKey, out var customerName) &&
-                    !string.IsNullOrWhiteSpace(customerName))
-                {
-                    dto.CustomerName = customerName;
                 }
             }
         }
@@ -208,16 +179,7 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
-            if(role == DISTRIBUTOR || role == ADMIN)
-            {
-                var customerName = await _userManager.FindByIdAsync(dto.CustomerID.ToString());
-                if (customerName != null)
-                {
-                    dto.CustomerName = customerName.FullName ?? customerName.UserName;
-                }
-            }
-            
+            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);           
             await MapMaterialRequestDetailAsync(
                 materialRequest!,
                 dto,
