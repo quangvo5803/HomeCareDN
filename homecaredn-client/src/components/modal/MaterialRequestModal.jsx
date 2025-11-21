@@ -296,4 +296,5 @@ MaterialRequestModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSelect: PropTypes.func,
+  excludedMaterialIDs: PropTypes.arrayOf(PropTypes.string),
 };

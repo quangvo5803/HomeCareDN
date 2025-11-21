@@ -512,6 +512,10 @@ export default function MaterialRequestDetail() {
         </div>
     );
 
+    const bidPriceInWords = Number(totalEstimatePrice) === 0
+        ? (i18n.language === 'vi' ? "Không đồng" : "Zero VND")
+        : numberToWordsByLang(Number(totalEstimatePrice), i18n.language);
+
     const ApplyFormView = (
         <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
             <h3 className="text-xl font-semibold text-gray-800 mb-6 inline-flex items-center gap-2">
@@ -788,9 +792,7 @@ export default function MaterialRequestDetail() {
                             <p>
                                 {t('distributorMaterialRequestDetail.bidPriceInWords')}{' '}
                                 <span className="font-semibold">
-                                    {Number(totalEstimatePrice) === 0
-                                        ? i18n.language === 'vi' ? "Không đồng" : "Zero VND"
-                                        : numberToWordsByLang(Number(totalEstimatePrice), i18n.language)}
+                                    {bidPriceInWords}
                                 </span>
                             </p>
                         </div>
