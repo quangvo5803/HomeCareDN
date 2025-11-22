@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext, useRef, useCallback } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import PropTypes from 'prop-types';
@@ -40,6 +41,7 @@ export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
+  const { fetchUnreadCount } = useOutletContext() || {};
 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -121,6 +123,9 @@ export default function AdminSupportChatManager() {
         if (isViewing) {
           conversationService
             .markAsRead(payload.conversationID)
+            .then(() => {
+              if (fetchUnreadCount) fetchUnreadCount();
+            })
             .catch(() => {});
         } else {
           const msg = payload.message;
@@ -139,14 +144,14 @@ export default function AdminSupportChatManager() {
 
           const currentConversation = prev[index];
 
-          let newAdminUnreadMessageCount;
+          let newAdminUnreadCount;
           let newIsAdminRead;
 
           if (isViewing) {
-            newAdminUnreadMessageCount = 0;
+            newAdminUnreadCount = 0;
             newIsAdminRead = true;
           } else {
-            newAdminUnreadMessageCount =
+            newAdminUnreadCount =
               (currentConversation.adminUnreadMessageCount || 0) + 1;
             newIsAdminRead = false;
           }
@@ -155,7 +160,7 @@ export default function AdminSupportChatManager() {
             ...currentConversation,
             lastMessageContent: currentConversation.lastMessageContent,
             lastMessageTime: payload.message?.sentAt,
-            adminUnreadMessageCount: newAdminUnreadMessageCount,
+            adminUnreadMessageCount: newAdminUnreadCount,
             isAdminRead: newIsAdminRead,
           };
 
@@ -327,16 +332,19 @@ export default function AdminSupportChatManager() {
     }
   }, [loadingMoreMessage, hasMoreMessages, moreMessage, loadMessages]);
 
-  // Selected Conversation
-  const handleSelectConversation = (conversation) => {
+  const handleSelectConversation = async (conversation) => {
     setSelectedConversation(conversation);
 
     if (conversation.adminUnreadMessageCount > 0 || !conversation.isAdminRead) {
-      conversationService
-        .markAsRead(conversation.conversationID)
-        .catch((error) => {
-          toast.error(t(handleApiError(error)));
-        });
+      try {
+        await conversationService.markAsRead(conversation.conversationID);
+
+        if (fetchUnreadCount) {
+          fetchUnreadCount();
+        }
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      }
 
       setConversations((prev) =>
         prev.map((c) =>
@@ -426,6 +434,7 @@ export default function AdminSupportChatManager() {
                       </div>
                     </div>
 
+                    {/* Display Badge based on correct property */}
                     {conversation.adminUnreadMessageCount > 0 && (
                       <span className="flex-shrink-0 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
                         {conversation.adminUnreadMessageCount > 9

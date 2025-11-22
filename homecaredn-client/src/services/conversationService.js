@@ -16,7 +16,7 @@ export const conversationService = {
   markAsRead: async (id) => {
     api.post(`/conversations/admin/mark-as-read/${id}`);
   },
-  GetUnreadConversationCount: async (id) => {
+  getUnreadConversationCount: async (id) => {
     const res = await api.get(
       `/conversations/admin/get-unread-conversation/${id}`
     );

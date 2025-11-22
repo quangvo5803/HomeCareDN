@@ -29,21 +29,20 @@ export default function AdminLayout() {
   );
   const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
 
-  // Hàm lấy số lượng tin nhắn chưa đọc
+  // Hàm lấy số lượng hội thoại chưa đọc
   const fetchUnreadCount = async () => {
     if (user?.id) {
       try {
-        const count = await conversationService.GetUnreadConversationCount(
+        const count = await conversationService.getUnreadConversationCount(
           user.id
         );
         setUnreadCount(count);
       } catch (error) {
-        console.error('Failed to fetch unread count:', error);
+        toast.error(t(handleApiError(error)));
       }
     }
   };
 
-  // Gọi API lần đầu khi mount
   useEffect(() => {
     fetchUnreadCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -148,7 +147,7 @@ export default function AdminLayout() {
         <Navbar />
         <div className="w-full px-6 py-6 mx-auto flex-1">
           {/* Nơi render các trang con của admin */}
-          <Outlet />
+          <Outlet context={{ fetchUnreadCount }} />
         </div>
         <Footer />
       </div>
