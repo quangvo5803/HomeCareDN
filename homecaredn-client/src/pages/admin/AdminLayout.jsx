@@ -2,7 +2,7 @@ import Sidebar from '../../components/admin/Sidebar';
 import Navbar from '../../components/admin/Navbar';
 import Footer from '../../components/admin/Footer';
 import { Outlet, useLocation } from 'react-router-dom';
-import { useEffect, useContext, useRef, useState } from 'react'; // Import useState
+import { useEffect, useContext, useRef, useState, useCallback } from 'react'; // Import useState
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import RealtimeContext from '../../realtime/RealtimeContext';
@@ -43,12 +43,26 @@ export default function AdminLayout() {
     }
   };
 
+  const increaseUnreadCount = useCallback(() => {
+    setUnreadCount((prev) => {
+      const newCount = prev + 1;
+      return newCount;
+    });
+  }, []);
+
+  const decreaseUnreadCount = useCallback(() => {
+    setUnreadCount((prev) => {
+      const newCount = Math.max(0, prev - 1);
+      return newCount;
+    });
+  }, []);
+
   useEffect(() => {
     fetchUnreadCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  // Logic Join Group (Giữ nguyên của bạn)
+  // Logic Join Group
   useEffect(() => {
     if (!user?.id || !chatConnection || adminGroupJoinedRef.current) return;
 
@@ -111,7 +125,7 @@ export default function AdminLayout() {
   useRealtime(
     {
       [RealtimeEvents.NewConversationForAdmin]: (payload) => {
-        fetchUnreadCount();
+        increaseUnreadCount();
 
         if (location.pathname.includes('/Admin/SupportChatManager')) {
           return;
@@ -124,17 +138,17 @@ export default function AdminLayout() {
       },
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
-        fetchUnreadCount();
-
-        if (location.pathname.includes('/Admin/SupportChatManager')) {
-          return;
+        if (!payload.isAdminRead) {
+          fetchUnreadCount();
         }
-        const msg = payload.message;
-        if (!user?.id || msg?.senderID === user.id) {
-          return;
+        if (!location.pathname.includes('/Admin/SupportChatManager')) {
+          const msg = payload.message;
+          if (!user?.id || msg?.senderID === user.id) {
+            return;
+          }
+          toast.info(t('adminSupportChatManager.newMessage'));
+          notificationNewMessage.current.play().catch(() => {});
         }
-        toast.info(t('adminSupportChatManager.newMessage'));
-        notificationNewMessage.current.play().catch(() => {});
       },
     },
     'chat'
@@ -147,7 +161,7 @@ export default function AdminLayout() {
         <Navbar />
         <div className="w-full px-6 py-6 mx-auto flex-1">
           {/* Nơi render các trang con của admin */}
-          <Outlet context={{ fetchUnreadCount }} />
+          <Outlet context={{ fetchUnreadCount, decreaseUnreadCount }} />
         </div>
         <Footer />
       </div>

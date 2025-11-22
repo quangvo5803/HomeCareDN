@@ -41,7 +41,7 @@ export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
-  const { fetchUnreadCount } = useOutletContext() || {};
+  const { fetchUnreadCount, decreaseUnreadCount } = useOutletContext();
 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -124,7 +124,9 @@ export default function AdminSupportChatManager() {
           conversationService
             .markAsRead(payload.conversationID)
             .then(() => {
-              if (fetchUnreadCount) fetchUnreadCount();
+              if (decreaseUnreadCount && !payload.isAdminRead) {
+                decreaseUnreadCount();
+              }
             })
             .catch(() => {});
         } else {
@@ -339,10 +341,13 @@ export default function AdminSupportChatManager() {
       try {
         await conversationService.markAsRead(conversation.conversationID);
 
+        if (decreaseUnreadCount) {
+          decreaseUnreadCount();
+        }
+      } catch (error) {
         if (fetchUnreadCount) {
           fetchUnreadCount();
         }
-      } catch (error) {
         toast.error(t(handleApiError(error)));
       }
 
