@@ -418,7 +418,7 @@
       "totalPrice": "Total price",
       "note": "Note",
       "contact": "Contact us",
-      "additionalMaterials": "Additional Materials",
+      "additionalMaterials": "Materials proposed by the contractor",
       "customerRequestedMaterials": "Customer Requested Materials"
     }
   },

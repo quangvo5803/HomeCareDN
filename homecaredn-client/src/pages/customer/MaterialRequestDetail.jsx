@@ -720,9 +720,11 @@ export default function MaterialRequestDetail() {
       <div className="col-span-3">{t('userPage.materialRequestDetail.unit')}</div>
       <div className="col-span-4">{t('distributorMaterialRequestDetail.price')}</div>
       <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
-
     </div>
   );
+  MaterialHeader.propTypes = {
+    t: PropTypes.func.isRequired,
+  };
 
   const MaterialItemRow = ({ item, index }) => {
     const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
@@ -847,6 +849,7 @@ export default function MaterialRequestDetail() {
     }).isRequired,
     index: PropTypes.number.isRequired
   };
+
   const renderAppliedDetail = () => {
     return (
       <div>

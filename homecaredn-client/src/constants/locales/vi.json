@@ -417,8 +417,8 @@
       "totalPrice": "Tổng giá",
       "note": "Ghi chú",
       "contact": "Liên hệ với chúng tôi",
-      "additionalMaterials": "Danh sách vật liệu bổ sung",
-      "customerRequestedMaterials": "Danh sách vật liệu khách hàng yêu cầu"
+      "additionalMaterials": "Vật liệu nhà thầu đề xuất",
+      "customerRequestedMaterials": "Vật liệu khách hàng yêu cầu"
     }
   },
   "contractorServiceRequestManager": {
