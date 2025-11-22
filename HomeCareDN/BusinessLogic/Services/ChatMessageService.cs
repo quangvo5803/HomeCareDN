@@ -174,7 +174,7 @@ namespace BusinessLogic.Services
                     {
                         dto.ConversationID,
                         Message = result,
-                        conversation.IsAdminUnread,
+                        conversation.IsAdminRead,
                     }
                 );
             }
@@ -219,7 +219,7 @@ namespace BusinessLogic.Services
                     throw new CustomValidationException(errors);
                 }
 
-                conversation.IsAdminUnread = true;
+                conversation.IsAdminRead = true;
 
                 return conversation;
             }

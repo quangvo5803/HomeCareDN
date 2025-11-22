@@ -18,7 +18,7 @@ namespace DataAccess.Entities.Application
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ConversationType ConversationType { get; set; }
-        public bool IsAdminUnread { get; set; } = false;
+        public bool IsAdminRead { get; set; } = false;
         public ServiceRequest? ServiceRequest { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }

@@ -71,9 +71,7 @@ namespace BusinessLogic.Services
                 query = await SearchDebounce(query, dto.Search);
             }
 
-            query = query
-                .OrderByDescending(c => c.IsAdminUnread)
-                .ThenByDescending(c => c.CreatedAt);
+            query = query.OrderByDescending(c => c.IsAdminRead).ThenByDescending(c => c.CreatedAt);
 
             var totalCount = await query.CountAsync();
 
@@ -123,7 +121,7 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            conversation.IsAdminUnread = false;
+            conversation.IsAdminRead = false;
 
             var unreadMessages = await _unitOfWork
                 .ChatMessageRepository.GetQueryable()
