@@ -96,7 +96,7 @@ export default function AdminSupportChatManager() {
         const newConversation = payload.conversation;
 
         newConversation.isAdminRead = false;
-        newConversation.adminUnreadCount = 1;
+        newConversation.adminUnreadMessageCount = 1;
 
         setConversations((prev) => {
           if (
@@ -139,15 +139,15 @@ export default function AdminSupportChatManager() {
 
           const currentConversation = prev[index];
 
-          let newAdminUnreadCount;
+          let newAdminUnreadMessageCount;
           let newIsAdminRead;
 
           if (isViewing) {
-            newAdminUnreadCount = 0;
+            newAdminUnreadMessageCount = 0;
             newIsAdminRead = true;
           } else {
-            newAdminUnreadCount =
-              (currentConversation.adminUnreadCount || 0) + 1;
+            newAdminUnreadMessageCount =
+              (currentConversation.adminUnreadMessageCount || 0) + 1;
             newIsAdminRead = false;
           }
 
@@ -155,7 +155,7 @@ export default function AdminSupportChatManager() {
             ...currentConversation,
             lastMessageContent: currentConversation.lastMessageContent,
             lastMessageTime: payload.message?.sentAt,
-            adminUnreadCount: newAdminUnreadCount,
+            adminUnreadMessageCount: newAdminUnreadMessageCount,
             isAdminRead: newIsAdminRead,
           };
 
@@ -331,7 +331,7 @@ export default function AdminSupportChatManager() {
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
 
-    if (conversation.adminUnreadCount > 0 || conversation.isAdminRead) {
+    if (conversation.adminUnreadMessageCount > 0 || !conversation.isAdminRead) {
       conversationService
         .markAsRead(conversation.conversationID)
         .catch((error) => {
@@ -341,7 +341,7 @@ export default function AdminSupportChatManager() {
       setConversations((prev) =>
         prev.map((c) =>
           c.conversationID === conversation.conversationID
-            ? { ...c, adminUnreadCount: 0, isAdminRead: true }
+            ? { ...c, adminUnreadMessageCount: 0, isAdminRead: true }
             : c
         )
       );
@@ -426,11 +426,11 @@ export default function AdminSupportChatManager() {
                       </div>
                     </div>
 
-                    {conversation.adminUnreadCount > 0 && (
+                    {conversation.adminUnreadMessageCount > 0 && (
                       <span className="flex-shrink-0 bg-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                        {conversation.adminUnreadCount > 9
+                        {conversation.adminUnreadMessageCount > 9
                           ? '9+'
-                          : conversation.adminUnreadCount}
+                          : conversation.adminUnreadMessageCount}
                       </span>
                     )}
                   </div>

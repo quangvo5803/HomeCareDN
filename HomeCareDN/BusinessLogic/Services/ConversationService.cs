@@ -71,7 +71,9 @@ namespace BusinessLogic.Services
                 query = await SearchDebounce(query, dto.Search);
             }
 
-            query = query.OrderByDescending(c => c.IsAdminRead).ThenByDescending(c => c.CreatedAt);
+            query = query
+                .OrderByDescending(c => c.IsAdminRead == false)
+                .ThenByDescending(c => c.CreatedAt);
 
             var totalCount = await query.CountAsync();
 
