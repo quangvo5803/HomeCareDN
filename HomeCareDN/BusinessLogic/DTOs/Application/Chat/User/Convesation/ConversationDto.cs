@@ -15,7 +15,5 @@
         public int AdminUnreadMessageCount { get; set; }
         public required string ConversationType { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string? LastMessageContent { get; set; }
-        public DateTime? LastMessageTime { get; set; }
     }
 }

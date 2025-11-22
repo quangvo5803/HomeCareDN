@@ -160,8 +160,6 @@ export default function AdminSupportChatManager() {
 
           const updatedConversation = {
             ...currentConversation,
-            lastMessageContent: currentConversation.lastMessageContent,
-            lastMessageTime: payload.message?.sentAt,
             adminUnreadMessageCount: newAdminUnreadCount,
             isAdminRead: newIsAdminRead,
           };
