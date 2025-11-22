@@ -711,7 +711,7 @@ export default function MaterialRequestDetail() {
   );
 
   //Right Column - Applications
-  const MaterialHeader = ({ t }) => (
+  const renderHeader = () => (
     <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
       <div>#</div>
       <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
@@ -722,9 +722,6 @@ export default function MaterialRequestDetail() {
       <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
     </div>
   );
-  MaterialHeader.propTypes = {
-    t: PropTypes.func.isRequired,
-  };
 
   const MaterialItemRow = ({ item, index }) => {
     const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
@@ -926,7 +923,7 @@ export default function MaterialRequestDetail() {
         </h2>
 
         {/* Header */}
-        <MaterialHeader t={t} />
+        {renderHeader()}
         {existingMaterial.map((item, index) => (
 
           <MaterialItemRow
@@ -945,7 +942,7 @@ export default function MaterialRequestDetail() {
             </h2>
 
             {/* Header */}
-            <MaterialHeader t={t} />
+            {renderHeader()}
 
             {/* List extra items */}
             {extraMaterial.map((item, index) => (
