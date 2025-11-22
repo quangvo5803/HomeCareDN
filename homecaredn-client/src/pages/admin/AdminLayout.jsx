@@ -29,7 +29,12 @@ export default function AdminLayout() {
   );
   const notificationNewMessage = useRef(new Audio(notificationSoundNewMessage));
 
-  // Hàm lấy số lượng hội thoại chưa đọc
+  const pendingNewConversations = useRef(0);
+  const pendingNewMessages = useRef(0);
+
+  const notificationTimerRef = useRef(null);
+
+  // Unread Conversation Count
   const fetchUnreadCount = async () => {
     if (user?.id) {
       try {
@@ -57,6 +62,50 @@ export default function AdminLayout() {
     });
   }, []);
 
+  const showGroupedNotification = useCallback(() => {
+    const convCount = pendingNewConversations.current;
+    const msgCount = pendingNewMessages.current;
+
+    if (convCount > 0) {
+      if (convCount === 1) {
+        toast.success(t('adminSupportChatManager.newConversation'), {
+          autoClose: 3000,
+          position: 'top-right',
+        });
+      } else {
+        toast.success(
+          t('adminSupportChatManager.newConversations', { count: convCount }),
+          {
+            autoClose: 3000,
+            position: 'top-right',
+          }
+        );
+      }
+
+      notificationNewConvesation.current.play().catch(() => {});
+      pendingNewConversations.current = 0;
+    }
+
+    if (msgCount > 0) {
+      if (msgCount === 1) {
+        toast.info(t('adminSupportChatManager.newMessage'), {
+          autoClose: 3000,
+          position: 'top-right',
+        });
+      } else {
+        toast.info(
+          t('adminSupportChatManager.newMessages', { count: msgCount }),
+          {
+            autoClose: 3000,
+            position: 'top-right',
+          }
+        );
+      }
+
+      notificationNewMessage.current.play().catch(() => {});
+      pendingNewMessages.current = 0;
+    }
+  }, [t]);
   useEffect(() => {
     fetchUnreadCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,32 +176,71 @@ export default function AdminLayout() {
       [RealtimeEvents.NewConversationForAdmin]: (payload) => {
         increaseUnreadCount();
 
-        if (location.pathname.includes('/Admin/SupportChatManager')) {
-          return;
+        const isOnChatPage = location.pathname.includes(
+          '/Admin/SupportChatManager'
+        );
+
+        if (!isOnChatPage) {
+          if (!user?.id || payload.senderID === user.id) {
+            return;
+          }
+
+          pendingNewConversations.current += 1;
+          if (notificationTimerRef.current) {
+            clearTimeout(notificationTimerRef.current);
+          }
+
+          notificationTimerRef.current = setTimeout(() => {
+            showGroupedNotification();
+          }, 2000);
         }
-        if (!user?.id || payload.senderID === user.id) {
-          return;
-        }
-        toast.success(t('adminSupportChatManager.newConversation'));
-        notificationNewConvesation.current.play().catch(() => {});
       },
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
         if (!payload.isAdminRead) {
           fetchUnreadCount();
         }
-        if (!location.pathname.includes('/Admin/SupportChatManager')) {
+
+        const isOnChatPage = location.pathname.includes(
+          '/Admin/SupportChatManager'
+        );
+
+        if (!isOnChatPage) {
           const msg = payload.message;
+
           if (!user?.id || msg?.senderID === user.id) {
             return;
           }
-          toast.info(t('adminSupportChatManager.newMessage'));
-          notificationNewMessage.current.play().catch(() => {});
+
+          pendingNewMessages.current += 1;
+
+          if (notificationTimerRef.current) {
+            clearTimeout(notificationTimerRef.current);
+          }
+
+          notificationTimerRef.current = setTimeout(() => {
+            showGroupedNotification();
+          }, 2000);
         }
       },
     },
     'chat'
   );
+  useEffect(() => {
+    return () => {
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+        notificationTimerRef.current = null;
+      }
+
+      if (
+        pendingNewConversations.current > 0 ||
+        pendingNewMessages.current > 0
+      ) {
+        showGroupedNotification();
+      }
+    };
+  }, [showGroupedNotification]);
   return (
     <div className="flex flex-col min-h-screen font-sans text-base antialiased font-normal leading-default bg-gray-50 text-slate-500">
       <div className="absolute w-full bg-blue-500 min-h-75"></div>

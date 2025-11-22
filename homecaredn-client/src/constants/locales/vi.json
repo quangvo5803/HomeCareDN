@@ -1010,7 +1010,9 @@
     "noMoreMessages": "Không còn tin nhắn nào nữa",
     "noMoreConversations": "Không còn cuộc trò chuyện nào nữa",
     "newConversation":"Bạn có cuộc trò chuyện mới!",
+    "newConversations": "Bạn có {{count}} cuộc trò chuyện mới!", 
     "newMessage":"Bạn có tin nhắn mới!",
+    "newMessages": "Bạn có {{count}} tin nhắn mới!",
     "roles":{
       "Customer":"Khách hàng",
       "Contractor":"Nhà thầu",

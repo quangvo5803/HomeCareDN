@@ -999,8 +999,10 @@
     "noMessagesInChat": "No messages in this conversation yet",
     "noMoreMessages": "No more messages",
     "noMoreConversations": "No more conversations",
-    "newConversation":"You have received new Convesation!",
+    "newConversation":"You have received new Conversation!",
+    "newConversations": "You have {{count}} new Conversations!",
     "newMessage":"You have received new Message!",
+    "newMessages": "You have {{count}} new Messages!",
     "roles":{
       "Customer":"Customer",
       "Contractor":"Contractor",
