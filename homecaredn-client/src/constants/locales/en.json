@@ -417,7 +417,9 @@
       "order": "orders",
       "totalPrice": "Total price",
       "note": "Note",
-      "contact": "Contact us"
+      "contact": "Contact us",
+      "additionalMaterials": "Additional Materials",
+      "customerRequestedMaterials": "Customer Requested Materials"
     }
   },
   "contractorServiceRequestManager": {

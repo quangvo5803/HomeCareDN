@@ -286,6 +286,16 @@ export default function MaterialRequestDetail() {
       }
     });
   };
+  //Check materialID
+  const customerMaterialIDs = items.map(item => item.materialID);
+
+  const existingMaterial = selectedDistributor?.items?.filter(item =>
+    customerMaterialIDs.includes(item.materialID)
+  );
+
+  const extraMaterial = selectedDistributor?.items?.filter(item =>
+    !customerMaterialIDs.includes(item.materialID)
+  );
 
   const isLoading = loading || !materialRequest;
   if (isLoading) return <Loading />;
@@ -700,6 +710,125 @@ export default function MaterialRequestDetail() {
   );
 
   //Right Column - Applications
+  const MaterialHeader = () => (
+    <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
+      <div>#</div>
+      <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
+      <div className="col-span-5">{t('userPage.materialRequestDetail.infor')}</div>
+      <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
+      <div className="col-span-3">{t('userPage.materialRequestDetail.unit')}</div>
+      <div className="col-span-4">{t('distributorMaterialRequestDetail.price')}</div>
+      <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
+
+    </div>
+  );
+
+  const MaterialItemRow = ({ item, index }) => {
+    const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
+
+    const displayName = i18n.language === 'vi'
+      ? item.name
+      : item.nameEN || item.name;
+
+    const displayCategory = i18n.language === 'vi'
+      ? item.categoryName
+      : item.categoryNameEN || item.categoryName;
+
+    const displayBrand = i18n.language === 'vi'
+      ? item.brandName
+      : item.brandNameEN || item.brandName;
+
+    const displayUnit = i18n.language === 'vi'
+      ? item.unit
+      : item.unitEN || item.unit;
+
+    return (
+      <div
+        key={item.materialID}
+        className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group"
+      >
+        <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
+
+          {/* STT */}
+          <div className="col-span-2 flex justify-center">
+            <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-xs">
+                {index + 1}
+              </span>
+            </div>
+          </div>
+
+          {/* Image */}
+          <div className="col-span-3 flex justify-center">
+            <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-orange-400 transition-all">
+              {imageUrl ? (
+                <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex items-start justify-start h-full text-slate-300 text-3xl">
+                  <i className="fas fa-image"></i>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Info */}
+          <div className="col-span-5 text-left">
+            <h3 className="font-bold text-slate-900 mb-2 line-clamp-2 text-sm">
+              {displayName}
+            </h3>
+
+            <div className="space-y-3">
+              {displayCategory && (
+                <div className="flex items-center text-xs text-slate-600">
+                  <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
+                  <span className="truncate">{displayCategory}</span>
+                </div>
+              )}
+
+              {displayBrand && (
+                <div className="flex items-center text-xs text-slate-600">
+                  <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                  <span className="truncate">{displayBrand}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quantity */}
+          <div className="col-span-3 flex justify-center">
+            <div className="px-2 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm bg-slate-50 w-10">
+              {item.quantity}
+            </div>
+          </div>
+
+          {/* Unit */}
+          <div className="col-span-3 flex justify-center">
+            <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
+              <p className="text-sm font-bold text-slate-900">
+                {displayUnit}
+              </p>
+            </div>
+          </div>
+
+          {/* Price */}
+          <div className="col-span-4 flex justify-center">
+            <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+              {formatVND(item.price)}
+            </div>
+          </div>
+
+          {/* Total Price */}
+          <div className="col-span-4 flex justify-center">
+            <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
+              {formatVND(item.price * item.quantity)}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    );
+  };
+
   const renderAppliedDetail = () => {
     return (
       <div>
@@ -769,177 +898,95 @@ export default function MaterialRequestDetail() {
           )}
         </div>
 
-        {/* Material Items */}
-        <div className="overflow-x-auto mb-6">
-          {/* Header */}
-          <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
-            <div>#</div>
-            <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
-            <div className="col-span-5">{t('userPage.materialRequestDetail.infor')}</div>
-            <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
-            <div className="col-span-3">{t('userPage.materialRequestDetail.unit')}</div>
-            <div className="col-span-4">{t('distributorMaterialRequestDetail.price')}</div>
-            <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
-          </div>
+        {/* Material existing */}
+        <h2 className="font-bold text-lg mb-3 text-black">
+          <i className="fas fa-layer-group mr-3 text-orange-600"></i>
+          {t('userPage.materialRequestDetail.customerRequestedMaterials')}
+        </h2>
 
-          {/* List */}
-          <div className="space-y-4">
-            {selectedDistributor.items.map((item, index) => {
-              const imageUrl =
-                item.images?.[0]?.imageUrl ||
-                item.imageUrls?.[0];
+        {/* Header */}
+        <MaterialHeader />
+        {existingMaterial.map((item, index) => (
 
-              const displayName = i18n.language === 'vi'
-                ? item.name
-                : item.nameEN || item.name;
+          <MaterialItemRow
+            key={item.materialID}
+            item={item}
+            index={index}
+          />
+        ))}
 
-              const displayCategory = i18n.language === 'vi'
-                ? item.categoryName
-                : item.categoryNameEN || item.categoryName;
+        {canAddMaterial && (
+          <>
+            {/* Material bổ sung */}
+            <h2 className="font-bold text-lg mb-3 mt-4 text-black">
+              <i className="fas fa-plus-circle mr-3 text-orange-500"></i>
+              {t('userPage.materialRequestDetail.additionalMaterials')}
+            </h2>
 
-              const displayBrand = i18n.language === 'vi'
-                ? item.brandName
-                : item.brandNameEN || item.brandName;
+            {/* Header */}
+            <MaterialHeader />
 
-              const displayUnit = i18n.language === 'vi'
-                ? item.unit
-                : item.unitEN || item.unit;
-
-              return (
-                <div
-                  key={item.materialID}
-                  className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group"
-                >
-                  <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
-
-                    {/* STT */}
-                    <div className="col-span-2 flex justify-center">
-                      <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-xs">
-                          {index + 1}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Image */}
-                    <div className="col-span-3 flex justify-center">
-                      <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-orange-400 transition-all">
-                        {imageUrl ? (
-                          <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="flex items-start justify-start h-full text-slate-300 text-3xl">
-                            <i className="fas fa-image"></i>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="col-span-5 text-left">
-                      <h3 className="font-bold text-slate-900 mb-2 line-clamp-2 text-sm">
-                        {displayName}
-                      </h3>
-
-                      <div className="space-y-3">
-                        {displayCategory && (
-                          <div className="flex items-center text-xs text-slate-600">
-                            <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
-                            <span className="truncate">{displayCategory}</span>
-                          </div>
-                        )}
-
-                        {displayBrand && (
-                          <div className="flex items-center text-xs text-slate-600">
-                            <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
-                            <span className="truncate">{displayBrand}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Quantity */}
-                    <div className="col-span-3 flex justify-center">
-                      <div className="px-2 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm bg-slate-50 w-10">
-                        {item.quantity}
-                      </div>
-                    </div>
-
-                    {/* Unit */}
-                    <div className="col-span-3 flex justify-center">
-                      <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-                        <p className="text-sm font-bold text-slate-900">
-                          {displayUnit}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Price */}
-                    <div className="col-span-4 flex justify-center">
-                      <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
-                        {formatVND(item.price)}
-                      </div>
-                    </div>
-
-                    {/* Total Price */}
-                    <div className="col-span-4 flex justify-center">
-                      <div className="w-28 px-3 py-2 border border-slate-200 rounded-lg text-center font-bold text-slate-900 text-sm">
-                        {formatVND(item.price * item.quantity)}
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+            {/* List extra items */}
+            {extraMaterial.map((item, index) => (
+              <MaterialItemRow
+                key={item.materialID}
+                item={item}
+                index={index}
+              />
+            ))}
+          </>
+        )}
 
         {/* Notes */}
-        {selectedDistributor.message && (
-          <div className="mb-6">
-            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-              <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
-              {t('userPage.materialRequestDetail.note')}
-            </h4>
-            <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
-              dangerouslySetInnerHTML={{
-                __html: he.decode(selectedDistributor.message),
-              }}
-            >
-            </p>
-          </div>
-        )}
+        {
+          selectedDistributor.message && (
+            <div className="mb-6 mt-4">
+              <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+                <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
+                {t('userPage.materialRequestDetail.note')}
+              </h4>
+              <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
+                dangerouslySetInnerHTML={{
+                  __html: he.decode(selectedDistributor.message),
+                }}
+              >
+              </p>
+            </div>
+          )
+        }
 
         {/* Contact */}
-        {selectedDistributor.status === 'Approved' && (
-          <div className="mb-6">
-            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-              <i className="fas fa-address-book text-orange-600 mr-2"></i>
-              {t('userPage.materialRequestDetail.contact')}
-            </h4>
+        {
+          selectedDistributor.status === 'Approved' && (
+            <div className="mb-6">
+              <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+                <i className="fas fa-address-book text-orange-600 mr-2"></i>
+                {t('userPage.materialRequestDetail.contact')}
+              </h4>
 
-            <div className="space-y-3">
-              <a
-                href={`tel:${selectedDistributor.distributorPhone}`}
-                className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
-              >
-                <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
-                <span>{selectedDistributor.distributorPhone}</span>
-              </a>
+              <div className="space-y-3">
+                <a
+                  href={`tel:${selectedDistributor.distributorPhone}`}
+                  className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
+                >
+                  <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
+                  <span>{selectedDistributor.distributorPhone}</span>
+                </a>
 
-              <a
-                href={`mailto:${selectedDistributor.distributorEmail}`}
-                className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
-              >
-                <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
-                <span>{selectedDistributor.distributorEmail}</span>
-              </a>
+                <a
+                  href={`mailto:${selectedDistributor.distributorEmail}`}
+                  className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
+                >
+                  <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
+                  <span>{selectedDistributor.distributorEmail}</span>
+                </a>
+              </div>
             </div>
-          </div>
-        )}
+          )
+        }
 
         {/* Actions */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 mt-6">
           <button className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer">
             <i className="fas fa-check mr-2"></i>
             {t('BUTTON.Accept')}
@@ -950,7 +997,7 @@ export default function MaterialRequestDetail() {
             {t('BUTTON.Reject')}
           </button>
         </div>
-      </div>
+      </div >
     );
   };
 

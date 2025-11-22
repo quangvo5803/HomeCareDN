@@ -616,7 +616,7 @@ export default function MaterialRequestDetail() {
 
                                                 {/* Index */}
                                                 <div className="col-span-2 flex justify-center">
-                                                    <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
+                                                    <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-bold text-xs">
                                                             {index + 1}
                                                         </span>
@@ -681,7 +681,7 @@ export default function MaterialRequestDetail() {
                                                                     handleQuantityChangeNew(item.materialRequestItemID, item.quantity - 1);
                                                                 }
                                                             }}
-                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                                             disabled={item.quantity <= 1 || !canAddMaterial}
                                                         >
                                                             <i className="fas fa-minus text-xs"></i>
@@ -703,7 +703,7 @@ export default function MaterialRequestDetail() {
                                                             onClick={() =>
                                                                 handleQuantityChangeNew(item.materialRequestItemID, item.quantity + 1)
                                                             }
-                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                                             disabled={!canAddMaterial}
                                                         >
                                                             <i className="fas fa-plus text-xs"></i>
@@ -1177,7 +1177,7 @@ export default function MaterialRequestDetail() {
                                             <div className="hidden lg:grid lg:grid-cols-19 gap-4 items-center text-center">
                                                 {/* STT */}
                                                 <div className="col-span-1 flex justify-center">
-                                                    <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
+                                                    <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-bold text-xs">
                                                             {index + 1}
                                                         </span>
@@ -1239,7 +1239,7 @@ export default function MaterialRequestDetail() {
                                                                 )
                                                             }
                                                             disabled={item.quantity <= 1 || !canEditQuantity}
-                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                                         >
                                                             <i className="fas fa-minus text-xs"></i>
                                                         </button>
@@ -1267,7 +1267,7 @@ export default function MaterialRequestDetail() {
                                                                     item.quantity + 1
                                                                 )
                                                             }
-                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                                            className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                                         >
                                                             <i className="fas fa-plus text-xs"></i>
                                                         </button>
