@@ -16,6 +16,7 @@ import { distributorApplicationService } from '../../services/distributorApplica
 import { handleApiError } from '../../utils/handleApiError';
 import { Pagination } from 'antd';
 import he from 'he';
+import PropTypes from 'prop-types';
 
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
@@ -287,14 +288,14 @@ export default function MaterialRequestDetail() {
     });
   };
   //Check materialID
-  const customerMaterialIDs = items.map(item => item.materialID);
+  const customerMaterialIDs = new Set(items.map(item => item.materialID));
 
   const existingMaterial = selectedDistributor?.items?.filter(item =>
-    customerMaterialIDs.includes(item.materialID)
+    customerMaterialIDs.has(item.materialID)
   );
 
   const extraMaterial = selectedDistributor?.items?.filter(item =>
-    !customerMaterialIDs.includes(item.materialID)
+    !customerMaterialIDs.has(item.materialID)
   );
 
   const isLoading = loading || !materialRequest;
@@ -710,7 +711,7 @@ export default function MaterialRequestDetail() {
   );
 
   //Right Column - Applications
-  const MaterialHeader = () => (
+  const MaterialHeader = ({ t }) => (
     <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
       <div>#</div>
       <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
@@ -828,7 +829,24 @@ export default function MaterialRequestDetail() {
       </div>
     );
   };
-
+  MaterialItemRow.propTypes = {
+    item: PropTypes.shape({
+      materialID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      images: PropTypes.array,
+      imageUrls: PropTypes.array,
+      name: PropTypes.string,
+      nameEN: PropTypes.string,
+      categoryName: PropTypes.string,
+      categoryNameEN: PropTypes.string,
+      brandName: PropTypes.string,
+      brandNameEN: PropTypes.string,
+      unit: PropTypes.string,
+      unitEN: PropTypes.string,
+      quantity: PropTypes.number,
+      price: PropTypes.number
+    }).isRequired,
+    index: PropTypes.number.isRequired
+  };
   const renderAppliedDetail = () => {
     return (
       <div>
@@ -905,7 +923,7 @@ export default function MaterialRequestDetail() {
         </h2>
 
         {/* Header */}
-        <MaterialHeader />
+        <MaterialHeader t={t} />
         {existingMaterial.map((item, index) => (
 
           <MaterialItemRow
@@ -924,7 +942,7 @@ export default function MaterialRequestDetail() {
             </h2>
 
             {/* Header */}
-            <MaterialHeader />
+            <MaterialHeader t={t} />
 
             {/* List extra items */}
             {extraMaterial.map((item, index) => (
