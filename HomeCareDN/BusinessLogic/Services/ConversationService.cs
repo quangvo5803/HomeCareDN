@@ -72,7 +72,7 @@ namespace BusinessLogic.Services
             }
 
             query = query
-                .OrderByDescending(c => c.AdminUnreadCount)
+                .OrderByDescending(c => c.IsAdminUnread)
                 .ThenByDescending(c => c.CreatedAt);
 
             var totalCount = await query.CountAsync();
@@ -88,6 +88,16 @@ namespace BusinessLogic.Services
             foreach (var conversationDto in result)
             {
                 await IncludedUserDataWithConversation(conversationDto);
+
+                var unreadMessagesCount = await _unitOfWork
+                    .ChatMessageRepository.GetQueryable()
+                    .Where(m =>
+                        m.ConversationID == conversationDto.ConversationID
+                        && !m.IsAdminRead
+                        && m.SenderID != dto.AdminID
+                    )
+                    .CountAsync();
+                conversationDto.AdminUnreadCount = unreadMessagesCount;
             }
 
             return new PagedResultDto<ConversationDto>
@@ -113,11 +123,19 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            else
+            conversation.IsAdminUnread = false;
+
+            var unreadMessages = await _unitOfWork
+                .ChatMessageRepository.GetQueryable()
+                .Where(m => m.ConversationID == id && !m.IsAdminRead)
+                .ToListAsync();
+
+            foreach (var message in unreadMessages)
             {
-                conversation.AdminUnreadCount = 0;
-                await _unitOfWork.SaveAsync();
+                message.IsAdminRead = true;
             }
+
+            await _unitOfWork.SaveAsync();
         }
 
         // -----------------------------

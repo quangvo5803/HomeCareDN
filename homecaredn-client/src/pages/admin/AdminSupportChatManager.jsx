@@ -95,6 +95,9 @@ export default function AdminSupportChatManager() {
         }
         const newConversation = payload.conversation;
 
+        newConversation.isAdminUnread = true;
+        newConversation.adminUnreadCount = 1;
+
         setConversations((prev) => {
           if (
             prev.some(
@@ -136,16 +139,22 @@ export default function AdminSupportChatManager() {
 
           const currentConversation = prev[index];
 
-          let newUnreadCount;
+          let newAdminUnreadCount;
+          let newIsAdminUnread;
+
           if (isViewing) {
-            newUnreadCount = currentConversation.adminUnreadCount;
+            newAdminUnreadCount = 0;
+            newIsAdminUnread = false;
           } else {
-            newUnreadCount = payload.adminUnreadCount;
+            newAdminUnreadCount =
+              (currentConversation.adminUnreadCount || 0) + 1;
+            newIsAdminUnread = true;
           }
 
           const updatedConversation = {
             ...currentConversation,
-            adminUnreadCount: newUnreadCount,
+            adminUnreadCount: newAdminUnreadCount,
+            isAdminUnread: newIsAdminUnread,
           };
 
           const filtered = prev.filter(
@@ -319,22 +328,22 @@ export default function AdminSupportChatManager() {
   // Selected Conversation
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
-    if (!conversation.adminUnreadCount || conversation.adminUnreadCount === 0) {
-      return;
-    }
-    conversationService
-      .markAsRead(conversation.conversationID)
-      .catch((error) => {
-        toast.error(t(handleApiError(error)));
-      });
 
-    setConversations((prev) =>
-      prev.map((c) =>
-        c.conversationID === conversation.conversationID
-          ? { ...c, adminUnreadCount: 0 } // Reset count
-          : c
-      )
-    );
+    if (conversation.adminUnreadCount > 0 || conversation.isAdminUnread) {
+      conversationService
+        .markAsRead(conversation.conversationID)
+        .catch((error) => {
+          toast.error(t(handleApiError(error)));
+        });
+
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.conversationID === conversation.conversationID
+            ? { ...c, adminUnreadCount: 0, isAdminUnread: false }
+            : c
+        )
+      );
+    }
   };
 
   // Send message
@@ -394,7 +403,8 @@ export default function AdminSupportChatManager() {
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold">
                           {conversation.userEmail?.charAt(0).toUpperCase()}
                         </div>
-                        {conversation.adminUnreadCount > 0 && (
+
+                        {conversation.isAdminUnread && (
                           <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
                         )}
                       </div>

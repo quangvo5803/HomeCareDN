@@ -11,8 +11,11 @@
         public string? UserName { get; set; }
         public string? UserRole { get; set; }
         public Guid? ServiceRequestID { get; set; }
+        public bool IsAdminUnread { get; set; }
         public int AdminUnreadCount { get; set; }
         public required string ConversationType { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? LastMessageContent { get; set; }
+        public DateTime? LastMessageTime { get; set; }
     }
 }

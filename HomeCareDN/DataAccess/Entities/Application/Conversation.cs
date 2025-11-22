@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DataAccess.Entities.Authorize;
 
 namespace DataAccess.Entities.Application
 {
@@ -19,7 +18,7 @@ namespace DataAccess.Entities.Application
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ConversationType ConversationType { get; set; }
-        public int AdminUnreadCount { get; set; } = 0;
+        public bool IsAdminUnread { get; set; } = false;
         public ServiceRequest? ServiceRequest { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }

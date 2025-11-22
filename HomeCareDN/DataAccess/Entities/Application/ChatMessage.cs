@@ -11,6 +11,7 @@ namespace DataAccess.Entities.Application
         public string? ReceiverID { get; set; }
         public string? Content { get; set; } = "";
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public bool IsAdminRead { get; set; } = false;
         public Conversation? Conversation { get; set; }
     }
 }

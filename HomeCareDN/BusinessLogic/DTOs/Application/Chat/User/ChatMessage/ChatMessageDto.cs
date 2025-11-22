@@ -7,6 +7,7 @@
         public required string SenderID { get; set; }
         public required string ReceiverID { get; set; }
         public string Content { get; set; } = "";
+        public bool IsAdminRead { get; set; } = false;
         public DateTime SentAt { get; set; }
     }
 }

@@ -174,7 +174,7 @@ namespace BusinessLogic.Services
                     {
                         dto.ConversationID,
                         Message = result,
-                        conversation.AdminUnreadCount,
+                        conversation.IsAdminUnread,
                     }
                 );
             }
@@ -196,7 +196,6 @@ namespace BusinessLogic.Services
                     AdminID = dto.ReceiverID,
                     ConversationType = ConversationType.AdminSupport,
                     CreatedAt = DateTime.UtcNow,
-                    AdminUnreadCount = 1,
                 };
 
                 await _unitOfWork.ConversationRepository.AddAsync(conversation);
@@ -220,7 +219,8 @@ namespace BusinessLogic.Services
                     throw new CustomValidationException(errors);
                 }
 
-                conversation.AdminUnreadCount++;
+                conversation.IsAdminUnread = true;
+
                 return conversation;
             }
         }
