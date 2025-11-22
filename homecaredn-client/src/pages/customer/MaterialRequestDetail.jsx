@@ -16,7 +16,6 @@ import { distributorApplicationService } from '../../services/distributorApplica
 import { handleApiError } from '../../utils/handleApiError';
 import { Pagination } from 'antd';
 import he from 'he';
-import PropTypes from 'prop-types';
 
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
