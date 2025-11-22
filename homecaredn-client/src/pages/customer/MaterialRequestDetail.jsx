@@ -723,7 +723,7 @@ export default function MaterialRequestDetail() {
     </div>
   );
 
-  const MaterialItemRow = ({ item, index }) => {
+  const renderMaterialRow = (item, index) => {
     const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
 
     const displayName = i18n.language === 'vi'
@@ -744,7 +744,6 @@ export default function MaterialRequestDetail() {
 
     return (
       <div
-        key={item.materialID}
         className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group"
       >
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
@@ -828,24 +827,7 @@ export default function MaterialRequestDetail() {
       </div>
     );
   };
-  MaterialItemRow.propTypes = {
-    item: PropTypes.shape({
-      materialID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      images: PropTypes.array,
-      imageUrls: PropTypes.array,
-      name: PropTypes.string,
-      nameEN: PropTypes.string,
-      categoryName: PropTypes.string,
-      categoryNameEN: PropTypes.string,
-      brandName: PropTypes.string,
-      brandNameEN: PropTypes.string,
-      unit: PropTypes.string,
-      unitEN: PropTypes.string,
-      quantity: PropTypes.number,
-      price: PropTypes.number
-    }).isRequired,
-    index: PropTypes.number.isRequired
-  };
+
 
   const renderAppliedDetail = () => {
     return (
@@ -925,12 +907,9 @@ export default function MaterialRequestDetail() {
         {/* Header */}
         {renderHeader()}
         {existingMaterial.map((item, index) => (
-
-          <MaterialItemRow
-            key={item.materialID}
-            item={item}
-            index={index}
-          />
+          <div key={item.materialID}>
+            {renderMaterialRow(item, index)}
+          </div>
         ))}
 
         {canAddMaterial && (
@@ -946,11 +925,9 @@ export default function MaterialRequestDetail() {
 
             {/* List extra items */}
             {extraMaterial.map((item, index) => (
-              <MaterialItemRow
-                key={item.materialID}
-                item={item}
-                index={index}
-              />
+              <div key={item.materialID}>
+                {renderMaterialRow(item, index)}
+              </div>
             ))}
           </>
         )}
