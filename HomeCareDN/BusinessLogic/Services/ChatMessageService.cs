@@ -219,7 +219,7 @@ namespace BusinessLogic.Services
                     throw new CustomValidationException(errors);
                 }
 
-                conversation.IsAdminRead = true;
+                conversation.IsAdminRead = false;
 
                 return conversation;
             }

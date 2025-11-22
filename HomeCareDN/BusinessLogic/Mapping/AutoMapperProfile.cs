@@ -355,11 +355,7 @@ namespace BusinessLogic.Mapping
                     dest => dest.ConversationType,
                     opt => opt.MapFrom(src => src.ConversationType)
                 )
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-                .ForMember(
-                    dest => dest.AdminUnreadCount,
-                    opt => opt.MapFrom(src => src.IsAdminRead)
-                );
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
 

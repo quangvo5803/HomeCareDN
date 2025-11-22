@@ -47,12 +47,21 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
-        [HttpPost("mark-as-read/{id:guid}")]
+        [HttpPost("admin/mark-as-read/{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> MarkAsRead(Guid id)
         {
             await _facadeService.ConversationService.MarkConversationAsReadAsync(id);
             return Ok();
+        }
+
+        [HttpGet("admin/get-unread-conversation/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUnreadConversationCount(string id)
+        {
+            var result =
+                await _facadeService.ConversationService.CountUnreadConversationsByAdminIDAsync(id);
+            return Ok(result);
         }
     }
 }

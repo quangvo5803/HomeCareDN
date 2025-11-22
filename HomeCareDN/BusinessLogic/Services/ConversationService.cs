@@ -95,7 +95,7 @@ namespace BusinessLogic.Services
                         && m.SenderID != dto.AdminID
                     )
                     .CountAsync();
-                conversationDto.AdminUnreadCount = unreadMessagesCount;
+                conversationDto.AdminUnreadMessageCount = unreadMessagesCount;
             }
 
             return new PagedResultDto<ConversationDto>
@@ -121,19 +121,21 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            conversation.IsAdminRead = false;
+            conversation.IsAdminRead = true;
 
-            var unreadMessages = await _unitOfWork
+            await _unitOfWork
                 .ChatMessageRepository.GetQueryable()
                 .Where(m => m.ConversationID == id && !m.IsAdminRead)
-                .ToListAsync();
-
-            foreach (var message in unreadMessages)
-            {
-                message.IsAdminRead = true;
-            }
+                .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsAdminRead, true));
 
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<int> CountUnreadConversationsByAdminIDAsync(string id)
+        {
+            return await _unitOfWork
+                .ConversationRepository.GetQueryable()
+                .CountAsync(c => c.AdminID == id && !c.IsAdminRead);
         }
 
         // -----------------------------

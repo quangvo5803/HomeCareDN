@@ -11,5 +11,6 @@ namespace BusinessLogic.Services.Interfaces
             ConversationGetByIdDto dto
         );
         Task MarkConversationAsReadAsync(Guid id);
+        Task<int> CountUnreadConversationsByAdminIDAsync(string id);
     }
 }

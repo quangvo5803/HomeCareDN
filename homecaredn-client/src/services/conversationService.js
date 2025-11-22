@@ -14,6 +14,12 @@ export const conversationService = {
     return res.data;
   },
   markAsRead: async (id) => {
-    api.post(`/conversations/mark-as-read/${id}`);
+    api.post(`/conversations/admin/mark-as-read/${id}`);
+  },
+  GetUnreadConversationCount: async (id) => {
+    const res = await api.get(
+      `/conversations/admin/get-unread-conversation/${id}`
+    );
+    return res.data;
   },
 };

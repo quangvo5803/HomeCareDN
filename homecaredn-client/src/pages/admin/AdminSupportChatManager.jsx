@@ -95,7 +95,7 @@ export default function AdminSupportChatManager() {
         }
         const newConversation = payload.conversation;
 
-        newConversation.isAdminUnread = true;
+        newConversation.isAdminRead = false;
         newConversation.adminUnreadCount = 1;
 
         setConversations((prev) => {
@@ -140,21 +140,23 @@ export default function AdminSupportChatManager() {
           const currentConversation = prev[index];
 
           let newAdminUnreadCount;
-          let newIsAdminUnread;
+          let newIsAdminRead;
 
           if (isViewing) {
             newAdminUnreadCount = 0;
-            newIsAdminUnread = false;
+            newIsAdminRead = true;
           } else {
             newAdminUnreadCount =
               (currentConversation.adminUnreadCount || 0) + 1;
-            newIsAdminUnread = true;
+            newIsAdminRead = false;
           }
 
           const updatedConversation = {
             ...currentConversation,
+            lastMessageContent: currentConversation.lastMessageContent,
+            lastMessageTime: payload.message?.sentAt,
             adminUnreadCount: newAdminUnreadCount,
-            isAdminUnread: newIsAdminUnread,
+            isAdminRead: newIsAdminRead,
           };
 
           const filtered = prev.filter(
@@ -329,7 +331,7 @@ export default function AdminSupportChatManager() {
   const handleSelectConversation = (conversation) => {
     setSelectedConversation(conversation);
 
-    if (conversation.adminUnreadCount > 0 || conversation.isAdminUnread) {
+    if (conversation.adminUnreadCount > 0 || conversation.isAdminRead) {
       conversationService
         .markAsRead(conversation.conversationID)
         .catch((error) => {
@@ -339,7 +341,7 @@ export default function AdminSupportChatManager() {
       setConversations((prev) =>
         prev.map((c) =>
           c.conversationID === conversation.conversationID
-            ? { ...c, adminUnreadCount: 0, isAdminUnread: false }
+            ? { ...c, adminUnreadCount: 0, isAdminRead: true }
             : c
         )
       );
@@ -404,7 +406,7 @@ export default function AdminSupportChatManager() {
                           {conversation.userEmail?.charAt(0).toUpperCase()}
                         </div>
 
-                        {conversation.isAdminUnread && (
+                        {conversation.isAdminRead === false && (
                           <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-red-500 ring-2 ring-white" />
                         )}
                       </div>
