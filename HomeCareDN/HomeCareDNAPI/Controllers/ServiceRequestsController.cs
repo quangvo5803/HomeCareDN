@@ -105,13 +105,13 @@ namespace HomeCareDNAPI.Controllers
             return NoContent();
         }
 
-        // ====================== DISTRIBUTOR ======================
+        // ====================== CONTRACTOR ======================
         [Authorize(
             AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
             Roles = "Contractor"
         )]
         [HttpGet("contractor/all")]
-        public async Task<IActionResult> GetAllForDistributor(
+        public async Task<IActionResult> GetAllForContractor(
             [FromQuery] QueryParameters parameters
         )
         {
@@ -127,7 +127,7 @@ namespace HomeCareDNAPI.Controllers
             Roles = "Contractor"
         )]
         [HttpGet("contractor/detail")]
-        public async Task<IActionResult> GetByIdForDistributor(
+        public async Task<IActionResult> GetByIdForContractor(
             [FromQuery] ServiceRequestGetByIdDto getByIdDto
         )
         {
