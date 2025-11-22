@@ -8,9 +8,9 @@ namespace BusinessLogic.DTOs.Application.Chat.User.ChatMessage
         public Guid ConversationID { get; set; }
 
         [Required]
-        public int messageSize { get; set; } = 10;
+        public int MessageSize { get; set; } = 10;
 
         [Required]
-        public int messageNumber { get; set; } = 1;
+        public int MessageNumber { get; set; } = 1;
     }
 }

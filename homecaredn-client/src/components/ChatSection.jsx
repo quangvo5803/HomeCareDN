@@ -243,7 +243,6 @@ export default function ChatSection({
     // No conversation
     if (!conversation) {
       return (
-        // SỬA LẠI: Chỉ render placeholder
         <div className="flex items-center justify-center h-full text-gray-400">
           <div className="text-center">
             <i className="fas fa-comment-slash text-4xl mb-2"></i>
@@ -252,6 +251,8 @@ export default function ChatSection({
         </div>
       );
     }
+
+    // No messages
     if (messages.length === 0) {
       return (
         <div className="flex items-center justify-center h-full text-gray-400">

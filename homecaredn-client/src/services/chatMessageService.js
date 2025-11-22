@@ -9,4 +9,8 @@ export const chatMessageService = {
     const res = await api.post('/chat-messages', dto);
     return res.data;
   },
+  sendMessageToAdmin: async (dto) => {
+    const res = await api.post('/chat-messages/send-admin', dto);
+    return res.data;
+  },
 };

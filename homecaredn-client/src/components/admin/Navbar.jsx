@@ -38,7 +38,7 @@ export default function Navbar() {
           </div>
 
           {/* 🌐 Language Switcher */}
-          <div className="relative">
+          <div className="relative z-500">
             <button
               onClick={() => setOpenLang(!openLang)}
               className="w-10 h-10 flex items-center justify-center text-gray-600 bg-white border border-gray-300 hover:border-blue-500 rounded-full shadow-sm hover:text-blue-600 transition-all duration-300"
@@ -75,7 +75,7 @@ export default function Navbar() {
 
           {/* 👤 Avatar */}
           {/* 👤 Avatar + Logout */}
-          <div className="relative">
+          <div className="relative z-500">
             <button
               onClick={() => setOpenAvatar(!openAvatar)}
               className="w-10 h-10 rounded-full overflow-hidden border border-gray-300 hover:border-blue-500 transition-all duration-300"

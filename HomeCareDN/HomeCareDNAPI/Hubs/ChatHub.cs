@@ -1,4 +1,5 @@
-﻿using DataAccess.UnitOfWork;
+﻿using DataAccess.Entities.Application;
+using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HomeCareDNAPI.Hubs
@@ -25,9 +26,16 @@ namespace HomeCareDNAPI.Hubs
             if (conversation == null)
                 throw new HubException("CONVERSATION_NOT_FOUND");
 
-            bool isMember =
-                conversation.CustomerID.ToString() == userId
-                || conversation.ContractorID.ToString() == userId;
+            bool isMember = false;
+
+            if (conversation.ConversationType == ConversationType.ServiceRequest)
+            {
+                isMember = conversation.CustomerID == userId || conversation.ContractorID == userId;
+            }
+            else if (conversation.ConversationType == ConversationType.AdminSupport)
+            {
+                isMember = conversation.UserID == userId || conversation.AdminID == userId;
+            }
 
             if (!isMember)
                 throw new HubException("PERMISSION_DENIED");
@@ -38,6 +46,16 @@ namespace HomeCareDNAPI.Hubs
         public async Task LeaveConversation(Guid id)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation_{id}");
+        }
+
+        public async Task JoinAdminGroup(Guid id)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"admin_{id}");
+        }
+
+        public async Task LeaveAdminGroup(Guid id)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"admin_{id}");
         }
     }
 }
