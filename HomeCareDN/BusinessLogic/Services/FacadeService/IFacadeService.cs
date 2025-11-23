@@ -22,5 +22,6 @@ namespace BusinessLogic.Services.FacadeService
         IReviewService ReviewService { get; }
         IStatisticService StatisticService { get; }
         IUserService UserService { get; }
+        IDistributorApplicationService DistributorApplicationService { get; }
     }
 }
