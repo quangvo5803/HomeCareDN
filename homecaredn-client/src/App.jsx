@@ -73,6 +73,7 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
+import SupportChatWidget from './components/SupportChatWidget';
 function App() {
   const [showBackTop, setShowBackTop] = useState(false);
   const handleBackTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -137,6 +138,7 @@ function Layout() {
         user.role !== 'Contractor' &&
         user.role !== 'Distributor'));
 
+  const showChatWidget = !user || user.role !== 'Admin';
   return (
     <>
       <ScrollToTop />
@@ -381,6 +383,11 @@ function Layout() {
         {/* 404 fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {showChatWidget && (
+        <div className="fixed bottom-6 right-24 z-[60]">
+          <SupportChatWidget brand="HomeCareDN" />
+        </div>
+      )}
       {showHeaderFooter && <Footer />}
     </>
   );
