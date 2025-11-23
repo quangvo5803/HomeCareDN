@@ -392,7 +392,7 @@
       "title": "Material Request Details",
       "description": "Description",
       "descriptionsPlaceholder": "Enter a description to help the distributor provide better consultation...",
-      "address":"Address",
+      "address": "Address",
       "selectAddress": "Select address",
       "allowEditQuantity": "Allow distributor to edit quantity",
       "allowEditQuantityDes": "Enable this option to allow the distributors to adjust material quantities when submitting an application",
@@ -410,7 +410,16 @@
       "unsavedChanges": "You have unsaved changes",
       "unsavedChangesDesc": "Your changes will be lost if you leave this page.",
       "cancleModalTitle": "Revert changes?",
-      "cancleModalText": "This action cannot be undone"
+      "cancleModalText": "This action cannot be undone",
+      "titleApplied": "Distributor application list",
+      "noApplied": "No distributor application yet",
+      "letStart": "Distributor will send quotes for your request",
+      "order": "orders",
+      "totalPrice": "Total price",
+      "note": "Note",
+      "contact": "Contact us",
+      "additionalMaterials": "Materials proposed by the contractor",
+      "customerRequestedMaterials": "Customer requested materials"
     }
   },
   "contractorServiceRequestManager": {
@@ -518,6 +527,70 @@
     "reviewedAt": "Reviewed At",
     "reviewImageTitle": "Review Image"
   },
+  "distributorMaterialRequest": {
+    "title": "Material requests manager",
+    "subtitle": "Track material purchase requests from customers",
+    "noRequest": "No material requests yet",
+    "letStart": "Clients will be displayed here when sending new requests.",
+    "appliedOnly": "Applied material request",
+    "materialRequests": "material requests",
+    "materialType": "type of material",
+    "applied": "distributor application",
+    "canEditQuantity": "Can edit quantity",
+    "canAddMaterial": "Can add material",
+    "noEditQuantity": "No edit quality",
+    "noAddMaterial": "No add material"
+  },
+  "distributorMaterialRequestDetail": {
+    "realTime": "Materials request deleted",
+    "backToList": "Back to List",
+    "title": "Material requirement details",
+    "subtitle": "Track material purchase requests from customers",
+    "info": "Required information",
+    "listMaterial": "List of required materials",
+    "price": "Price",
+    "totalPrice": "Total price",
+    "applyFormTitle": "Register for material distribution",
+    "closedApplication": "Application Closed",
+    "requestAlreadyClosed": "This service request has already been closed.",
+    "additionalSupplies": "List of additional supplies",
+    "totalEstimatePrice": "Total material price",
+    "bidPriceLabel": "Bid Amount:",
+    "bidPriceInWords": "In Words:",
+    "noteToOwner": "Note to customers",
+    "applyForProject": "Apply for This Project",
+    "privacyNotice": "Your information is only visible to the project owner.",
+    "yourApplication": "Your Application",
+    "youAreSelected": "You Have Been Selected",
+    "selectedPendingCommissionNote": "Pending Commission Payment",
+    "yourBid": "Your distribution price",
+    "appliedDate": "Applied on",
+    "commissionCalculation": "Commission Calculation",
+    "publicCommissionTiers": "Public Commission Tiers",
+    "priceRange": "Price Range",
+    "rate": "Commission Rate",
+    "note": "Note",
+    "tier1": "≤ 500 million VND",
+    "tier2": "From 500 million to 2 billion VND",
+    "tier3": "> 2 billion VND (maximum 100 million)",
+    "commissionRate": "Applied Commission Rate",
+    "commissionToPay": "Commission to Pay",
+    "maxCommissionNote": "The maximum commission is 100 million VND for packages over 2 billion.",
+    "payCommission": "Pay Commission",
+    "createAt": "Creation date",
+    "materialRights": "Material handling rights",
+    "yes": "Yes",
+    "no": "No",
+    "projectStatus": "Request status",
+    "distributorApplied": "Number of distributor applied",
+    "totalApplications": "Total",
+    "applicationStatus": "Application Status",
+    "requestApprovedNote": "This request has been approved and assigned to you.",
+    "requestClosedNote": "This request is closed. Your application will no longer be processed.",
+    "notAppliedYet": "Not Yet Applied",
+    "deleteApplication": "Delete Application",
+    "canDeleteWhilePending": "You can delete your current application to submit a new one."
+  },
   "partnerDashboard": {
     "no": "No",
     "service_type": "Service Type",
@@ -550,6 +623,7 @@
     "view": "View",
     "search_placeholder": "Search applications",
     "service_requests": "Service Requests",
+    "material_requests": "Material Requests",
     "materials": "Materials Manager",
     "you_have_notifications": "You have {{count}} notifications",
     "notification_item": "Notification #{{number}}",
@@ -558,7 +632,7 @@
     "my_projects": "My Projects",
     "applications": "Applications",
     "profile": "Profile",
-    
+
     "retry": "Retry",
     "no_requests": "No requests",
     "access_denied": "Access denied. Contractor role required.",
@@ -582,19 +656,10 @@
     "send": "Send",
     "launcherTitle": "Live support",
     "typing": "Bot is typing…",
-    "demoBadge": "Demo • Version 1.0",
-    "suggestions": [
-      "How to use this website?",
-      "Add rounded avatar",
-      "Suggest modern colors"
-    ],
-    "fakeReply": "Do you want me to {{text}}? I can illustrate right on this UI.",
-    "seed": {
-      "user1": "I want a React chat support widget. Please split components.",
-      "bot1": "Sure! I'll design a modern widget with a round launcher button.",
-      "user2": "Prioritize mobile and match the context: 'React support widget'.",
-      "bot2": "Got it! I'll seed sample data and keep components clean."
-    }
+    "tabAI":"Chat with AI",
+    "tabAdmin":"Chat with Admin",
+    "startAdminChat":"Send message to Admin to start convesation",
+    "sendAdminChatError":"Send message to Admin ERROR"
   },
   "distributorCategoryManager": {
     "title": "Category Manager",
@@ -676,9 +741,10 @@
       "serviceRequest": "Service Request",
       "material": "Material",
       "partner": "Partner",
+      "support": "Support Manager",
+      "supportChat": "Chat",
       "user": "User",
       "review": "Review",
-      "support": "Support",
       "commission": "Commission"
     },
     "account": {
@@ -990,6 +1056,33 @@
     "all": "All",
     "supports": "request(s)"
   },
+  "adminSupportChatManager": {
+    "title": "User Support Chat Manager",
+    "subtitle": "Manage and respond to support chat requests",
+    "conversationList": "Conversation List",
+    "searchUser": "Search user...",
+    "noConversations": "No support chat requests yet",
+    "noSearchResults":"Don't have any Conversation match with your input",
+    "noMessage": "No messages yet",
+    "selectConversation": "Select a conversation to start",
+    "online": "Online",
+    "inputPlaceholder": "Enter message...",
+    "loadingMoreMessage": "Loading more messages...",
+    "loadingMoreConversation": "Loading more conversations...",
+    "send": "Send",
+    "noMessagesInChat": "No messages in this conversation yet",
+    "noMoreMessages": "No more messages",
+    "noMoreConversations": "No more conversations",
+    "newConversation":"You have received new Conversation!",
+    "newConversations": "You have {{count}} new Conversations!",
+    "newMessage":"You have received new Message!",
+    "newMessages": "You have {{count}} new Messages!",
+    "roles":{
+      "Customer":"Customer",
+      "Contractor":"Contractor",
+      "Distributor":"Distributor"
+    }
+  },
   "adminPaymentManager": {
     "title": "Manage commissions",
     "subtitle": "Manage transaction list",
@@ -1116,16 +1209,16 @@
   },
   "ModalPopup": {
     "ReviewModal": {
-    "view": "Your Review",
-    "create": "Tell us about your experience with this contractor.",
-    "rating": "Rating",
-    "ratingStar": "Star",
-    "comment": "Comment",
-    "commentPlaceholder": "Write your comment here...",
-    "images": "Images",
-    "uploadImages": "Upload Images",
-    "warning": "You cannot edit after submitting. Your review may affect service quality and partners."
-  },
+      "view": "Your Review",
+      "create": "Tell us about your experience with this contractor.",
+      "rating": "Rating",
+      "ratingStar": "Star",
+      "comment": "Comment",
+      "commentPlaceholder": "Write your comment here...",
+      "images": "Images",
+      "uploadImages": "Upload Images",
+      "warning": "You cannot edit after submitting. Your review may affect service quality and partners."
+    },
     "DeleteBrandModal": {
       "title": "Are you sure?",
       "text": "This brand will be deleted and cannot be restored!"
@@ -1251,7 +1344,7 @@
     "REQUIRED_BUILDINGTYPE": "Please select the building type.",
     "REQUIRED_ADDRESS": "Please provide address information before creating a request!",
     "REQUIRED_PHONE_NUMBER": "Please provide phone number before creating a request!",
-    "IN_USE_ADDRESS":"This address is in use and cannot be deleted!",
+    "IN_USE_ADDRESS": "This address is in use and cannot be deleted!",
 
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
 

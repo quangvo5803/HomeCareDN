@@ -53,6 +53,15 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
                 includeProperties: INCLUDE
             );
+            query = query.Where(s => s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed);
+
+            if( parameters.FilterID != null && role == DISTRIBUTOR)
+            {
+                query = query.Where(s => s.DistributorApplications != null 
+                    && s.DistributorApplications.Any(x => x.DistributorID == parameters.FilterID)
+                );
+            }
+
             var totalCount = await query.CountAsync();
 
             query = parameters.SortBy?.ToLower() switch
@@ -79,10 +88,10 @@ namespace BusinessLogic.Services
         }
 
         private async Task MapMaterialRequestListAllAsync(
-            IEnumerable<MaterialRequest> items,
-            IEnumerable<MaterialRequestDto> dtos,
-            string? role = ADMIN
-        )
+    IEnumerable<MaterialRequest> items,
+    IEnumerable<MaterialRequestDto> dtos,
+    string? role = ADMIN
+)
         {
             var itemDict = items.ToDictionary(i => i.MaterialRequestID);
 
@@ -93,23 +102,24 @@ namespace BusinessLogic.Services
                 .ToList();
 
             var addresses = await _authorizeDbContext
-                .Addresses.Where(a => addressIds.Contains(a.AddressID))
+                .Addresses
+                .Where(a => addressIds.Contains(a.AddressID))
                 .ToListAsync();
 
             var addressDict = addresses.ToDictionary(a => a.AddressID);
 
             foreach (var dto in dtos)
             {
-                if (dto.AddressID.HasValue)
+                // --- Address mapping ---
+                if (dto.AddressID.HasValue &&
+                    addressDict.TryGetValue(dto.AddressID.Value, out var address))
                 {
-                    if (addressDict.TryGetValue(dto.AddressID.Value, out var address))
+                    dto.Address = _mapper.Map<AddressDto>(address);
+
+                    if (role == DISTRIBUTOR)
                     {
-                        dto.Address = _mapper.Map<AddressDto>(address);
-                        if (role == DISTRIBUTOR)
-                        {
-                            dto.Address.Detail = string.Empty;
-                            dto.Address.Ward = string.Empty;
-                        }
+                        dto.Address.Detail = string.Empty;
+                        dto.Address.Ward = string.Empty;
                     }
                 }
             }
@@ -166,7 +176,7 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
+            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);           
             await MapMaterialRequestDetailAsync(
                 materialRequest!,
                 dto,

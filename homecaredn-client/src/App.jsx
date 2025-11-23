@@ -36,6 +36,7 @@ import AdminMaterialManager from './pages/admin/AdminMaterialManager';
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
+import AdminSupportChatManager from './pages/admin/AdminSupportChatManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminReviewManager from './pages/admin/AdminReviewManager';
@@ -47,6 +48,8 @@ import ContractorServiceRequestManager from './pages/contractor/ContractorServic
 import ContractorServiceRequestDetail from './pages/contractor/ContractorServiceRequestDetail';
 //Distributor pages
 import DistributorDashboard from './pages/distributor/DistributorDashboard';
+import DistributorMaterialRequestManager from './pages/distributor/DistributorMaterialRequestManager';
+import DistributorMaterialRequestDetail from './pages/distributor/DistributorMaterialRequestDetail';
 import DistributorMaterialManager from './pages/distributor/DistributorMaterialManager';
 //Partner pages
 import PartnerProfile from './pages/partner/PartnerProfile';
@@ -93,7 +96,7 @@ function App() {
         <button
           onClick={handleBackTop}
           aria-label="Back to top"
-          className={`fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full bg-orange-500 text-white shadow-lg 
+          className={`fixed bottom-6 right-22 z-50 w-14 h-14 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
                     ${
                       showBackTop
@@ -313,6 +316,10 @@ function Layout() {
             path="PartnerRequestManager"
             element={<AdminPartnerRequestManager />}
           />
+          <Route
+            path="SupportChatManager"
+            element={<AdminSupportChatManager />}
+          />
           <Route path="UserManager" element={<AdminUserManager />} />
           <Route path="UserManager/:userID" element={<AdminUserDetail />} />
           <Route path="ReviewManager" element={<AdminReviewManager />} />
@@ -348,6 +355,14 @@ function Layout() {
           }
         >
           <Route index element={<DistributorDashboard />} />
+          <Route
+            path="MaterialRequest"
+            element={<DistributorMaterialRequestManager />}
+          />
+          <Route
+            path="MaterialRequest/:materialRequestId"
+            element={<DistributorMaterialRequestDetail />}
+          />
           <Route
             path="MaterialManager"
             element={<DistributorMaterialManager />}

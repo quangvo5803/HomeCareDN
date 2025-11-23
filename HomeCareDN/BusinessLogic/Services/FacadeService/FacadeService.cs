@@ -23,6 +23,7 @@ namespace BusinessLogic.Services.FacadeService
         public IReviewService ReviewService { get; }
         public IStatisticService StatisticService { get; }
         public IUserService UserService { get; }
+        public IDistributorApplicationService DistributorApplicationService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -58,11 +59,16 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.GroqClient,
                 infraDeps.Http
             );
-            ConversationService = new ConversationService(coreDeps.UnitOfWork, coreDeps.Mapper);
+            ConversationService = new ConversationService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                identityDeps.UserManager
+            );
             ChatMessageService = new ChatMessageService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                identityDeps.UserManager
             );
             ContactSupportService = new ContactSupportService(
                 coreDeps.UnitOfWork,
@@ -109,6 +115,13 @@ namespace BusinessLogic.Services.FacadeService
                 identityDeps.UserManager,
                 coreDeps.UnitOfWork,
                 coreDeps.AuthorizeDbContext
+            );
+
+            DistributorApplicationService = new DistributorApplicationService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                identityDeps.UserManager,
+                infraDeps.Notifier
             );
         }
     }

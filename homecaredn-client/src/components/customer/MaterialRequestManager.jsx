@@ -9,16 +9,51 @@ import Loading from '../Loading';
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import StatusBadge from '../../components/StatusBadge';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const {
+    setMaterialRequests,
     loading,
     materialRequests,
     createMaterialRequest,
     deleteMaterialRequest,
   } = useMaterialRequest();
+
+  useRealtime({
+    [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
+      console.log("dto", payload);
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
+            : sr
+        )
+      );
+    },
+    [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+              ...sr,
+              distributorApplyCount: Math.max(
+                0,
+                (sr.distributorApplyCount || 1) - 1
+              ),
+            }
+            : sr
+        )
+      );
+    },
+  });
 
   const handleViewDetail = (materialRequestID) => {
     navigate(`/Customer/MaterialRequestDetail/${materialRequestID}`);
@@ -175,7 +210,7 @@ export default function MaterialRequestManager({ user }) {
                                 {i18n.language === 'vi'
                                   ? item.material?.name
                                   : item.material?.nameEN ||
-                                    item.material?.name}
+                                  item.material?.name}
                                 :
                               </span>
                               <span className="text-black font-semibold">

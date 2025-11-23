@@ -5,6 +5,8 @@ using BusinessLogic.DTOs.Application.Chat.User.ChatMessage;
 using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.DTOs.Application.ContactSupport;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.DistributorApplication;
+using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Partner;
@@ -57,6 +59,9 @@ namespace BusinessLogic.Mapping
                 .ForMember(dest => dest.Images, opt => opt.Ignore())
                 .ForMember(dest => dest.Documents, opt => opt.Ignore());
             CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
+            CreateMap<DistributorCreateApplicationDto, DistributorApplication>();
+            CreateMap<DistributorCreateApplicationItemDto, DistributorApplicationItem>();
+
             // ------------------------
             // Update DTO -> Entity (Write)
             // ------------------------
@@ -343,11 +348,46 @@ namespace BusinessLogic.Mapping
             CreateMap<ApplicationUser, UserDto>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
-            CreateMap<Conversation, ConversationDto>();
+
+            CreateMap<Conversation, ConversationDto>()
+                .ForMember(
+                    dest => dest.ConversationID,
+                    opt => opt.MapFrom(src => src.ConversationID)
+                )
+                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.UserID))
+                .ForMember(dest => dest.AdminID, opt => opt.MapFrom(src => src.AdminID))
+                .ForMember(
+                    dest => dest.ConversationType,
+                    opt => opt.MapFrom(src => src.ConversationType)
+                )
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
 
             CreateMap<PaymentTransaction, PaymentTransactionDto>();
+
+            CreateMap<DistributorApplication, DistributorApplicationDto>();
+            CreateMap<DistributorApplicationItem, DistributorApplicationItemDto>()
+                 .ForMember(dest => dest.Name,
+                    opt => opt.MapFrom(src => src.Material!.Name))
+                .ForMember(dest => dest.BrandName,
+                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandName))
+                .ForMember(dest => dest.CategoryName,
+                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryName))
+                .ForMember(dest => dest.NameEN,
+                    opt => opt.MapFrom(src => src.Material!.NameEN))
+                .ForMember(dest => dest.BrandNameEN,
+                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandNameEN))
+                .ForMember(dest => dest.CategoryNameEN,
+                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryNameEN))
+                .ForMember(dest => dest.Unit,
+                    opt => opt.MapFrom(src => src.Material!.Unit))
+                .ForMember(dest => dest.UnitEN,
+                    opt => opt.MapFrom(src => src.Material!.UnitEN))
+                .ForMember(
+                    dest => dest.ImageUrls,
+                    opt => opt.MapFrom(src => ImagesToUrls(src.Material!.Images))
+                );
         }
 
         // ------------------------
@@ -365,6 +405,7 @@ namespace BusinessLogic.Mapping
             CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<RequestStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<Gender, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<ConversationType, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------
