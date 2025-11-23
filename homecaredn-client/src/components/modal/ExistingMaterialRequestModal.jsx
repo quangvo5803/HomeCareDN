@@ -69,10 +69,6 @@ export default function ExsitingMaterialRequestModal({
     setQuantity(1);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Escape') handleCloseModal();
-  };
-
   if (!isOpen) return null;
 
   const renderContent = () => {
@@ -104,21 +100,14 @@ export default function ExsitingMaterialRequestModal({
           </label>
           <div className="space-y-2 max-h-[300px] overflow-y-auto">
             {availableRequests.map((req) => (
-              <div
+              <button
                 key={req.materialRequestID}
-                role="button"
-                tabIndex={0}
+                type="button"
                 onClick={() => setSelectedRequest(req)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedRequest(req);
-                  }
-                }}
                 aria-pressed={
                   selectedRequest?.materialRequestID === req.materialRequestID
                 }
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
+                className={`w-full text-left p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
     ${
       selectedRequest?.materialRequestID === req.materialRequestID
         ? 'border-orange-500 bg-orange-50 shadow-md'
@@ -171,7 +160,7 @@ export default function ExsitingMaterialRequestModal({
                     )}
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -218,11 +207,8 @@ export default function ExsitingMaterialRequestModal({
 
   return (
     <div
+      open
       className="fixed inset-0 flex items-center justify-center z-50 p-4"
-      role="dialog"
-      aria-modal="true"
-      tabIndex={-1}
-      onKeyDown={handleKeyDown}
     >
       <button
         onClick={handleCloseModal}

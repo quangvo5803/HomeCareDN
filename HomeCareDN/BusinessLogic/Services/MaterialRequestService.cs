@@ -471,7 +471,7 @@ namespace BusinessLogic.Services
         {
             DeleteItemsAsync(dto.DeleteItemIDs, materialRequest);
             UpdateItems(dto.UpdateItems, materialRequest);
-            await AddItemsAsync(dto, materialRequest);
+            await AddItemsAsync(dto);
         }
 
         private void DeleteItemsAsync(IEnumerable<Guid>? deleteIds, MaterialRequest materialRequest)
@@ -490,7 +490,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        private void UpdateItems(
+        private static void UpdateItems(
             IEnumerable<MaterialRequestItemUpdateDto>? updates,
             MaterialRequest materialRequest
         )
@@ -513,10 +513,7 @@ namespace BusinessLogic.Services
             }
         }
 
-        private async Task AddItemsAsync(
-            MaterialRequestUpdateRequestDto dto,
-            MaterialRequest materialRequest
-        )
+        private async Task AddItemsAsync(MaterialRequestUpdateRequestDto dto)
         {
             if (dto.AddItems == null)
                 return;
