@@ -653,19 +653,11 @@
     "send": "Gửi",
     "launcherTitle": "Hỗ trợ trực tuyến",
     "typing": "Bot đang soạn…",
-    "demoBadge": "Demo • Phiên bản 1.0",
-    "suggestions": [
-      "Làm sao để sử dụng website này?",
-      "Thêm avatar hình tròn",
-      "Gợi ý màu sắc hiện đại"
-    ],
-    "fakeReply": "Bạn muốn mình {{text}}? Mình có thể minh họa ngay trên UI này.",
-    "seed": {
-      "user1": "Mình muốn tạo giao diện React cho bot chat hỗ trợ. Tách component nhé.",
-      "bot1": "Được chứ! Mình sẽ thiết kế widget hiện đại, có nút tròn để mở chat.",
-      "user2": "Ưu tiên mobile và khớp ngữ cảnh gần đây: 'Hỗ trợ giao diện React'.",
-      "bot2": "Ok! Mình sẽ seed dữ liệu mẫu và tách component rõ ràng."
-    }
+    "tabAI":"Nhắn với AI",
+    "tabAdmin":"Nhắn với Quản Trị Viên",
+    "startAdminChat":"Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện",
+    "sendAdminChatError":"Gửi tin nhắn cho Quản Trị Viên BỊ LỖI"
+
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
@@ -746,9 +738,10 @@
       "serviceRequest": "Dịch vụ đã yêu cầu",
       "material": "Vật liệu",
       "partner": "Đối tác",
+      "support": "Quản lý hỗ trợ",
+      "supportChat": "Chat",
       "user": "Người dùng",
       "review": "Đánh giá",
-      "support": "Hỗ trợ",
       "commission": "Tiền hoa hồng"
     },
     "account": {
@@ -1072,6 +1065,33 @@
     "action": "Thao tác",
     "empty": "Chưa có giao dịch nào",
     "empty_description": "Chưa có giao dịch nào được gửi."
+  },
+  "adminSupportChatManager": {
+    "title": "Chat hỗ trợ khách hàng",
+    "subtitle": "Quản lý và trả lời các yêu cầu hỗ trợ",
+    "conversationList": "Danh sách hội thoại",
+    "searchUser": "Tìm kiếm người dùng...",
+    "noConversations": "Chưa có yêu cầu hỗ trợ nào",
+    "noSearchResults":"Không có hội thoại nào phù hợp với tìm kiếm",
+    "noMessage": "Chưa có tin nhắn",
+    "selectConversation": "Chọn một hội thoại để bắt đầu",
+    "online": "Đang hoạt động",
+    "inputPlaceholder": "Nhập tin nhắn...",
+    "loadingMoreMessage": "Đang tải thêm tin nhắn...",
+    "loadingMoreConversation": "Đang tải thêm cuộc trò chuyện...",
+    "send": "Gửi",
+    "noMessagesInChat": "Chưa có tin nhắn nào trong cuộc trò chuyện này",
+    "noMoreMessages": "Không còn tin nhắn nào nữa",
+    "noMoreConversations": "Không còn cuộc trò chuyện nào nữa",
+    "newConversation":"Bạn có cuộc trò chuyện mới!",
+    "newConversations": "Bạn có {{count}} cuộc trò chuyện mới!", 
+    "newMessage":"Bạn có tin nhắn mới!",
+    "newMessages": "Bạn có {{count}} tin nhắn mới!",
+    "roles":{
+      "Customer":"Khách hàng",
+      "Contractor":"Nhà thầu",
+      "Distributor":"Nhà phân phối"
+    }
   },
   "adminReviewManager": {
     "title": "Quản lý đánh giá",

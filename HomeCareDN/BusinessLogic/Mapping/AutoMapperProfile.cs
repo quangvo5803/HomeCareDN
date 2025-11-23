@@ -348,7 +348,19 @@ namespace BusinessLogic.Mapping
             CreateMap<ApplicationUser, UserDto>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
-            CreateMap<Conversation, ConversationDto>();
+
+            CreateMap<Conversation, ConversationDto>()
+                .ForMember(
+                    dest => dest.ConversationID,
+                    opt => opt.MapFrom(src => src.ConversationID)
+                )
+                .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.UserID))
+                .ForMember(dest => dest.AdminID, opt => opt.MapFrom(src => src.AdminID))
+                .ForMember(
+                    dest => dest.ConversationType,
+                    opt => opt.MapFrom(src => src.ConversationType)
+                )
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
             CreateMap<ChatMessage, ChatMessageDto>()
                 .ForMember(d => d.SentAt, opt => opt.MapFrom(s => s.SentAt));
 
@@ -393,6 +405,7 @@ namespace BusinessLogic.Mapping
             CreateMap<PartneRequestrStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<RequestStatus, string>().ConvertUsing(src => src.GetDisplayName());
             CreateMap<Gender, string>().ConvertUsing(src => src.GetDisplayName());
+            CreateMap<ConversationType, string>().ConvertUsing(src => src.GetDisplayName());
         }
 
         // ------------------------

@@ -3,6 +3,7 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251122063227_ChangeUnreadToRead")]
+    partial class ChangeUnreadToRead
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -245,9 +248,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<Guid>("DistributorID")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("DueCommisionTime")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<Guid>("MaterialRequestID")
                         .HasColumnType("uuid");
 
@@ -256,9 +256,6 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
-
-                    b.Property<double>("TotalEstimatePrice")
-                        .HasColumnType("double precision");
 
                     b.HasKey("DistributorApplicationID");
 
@@ -288,8 +285,6 @@ namespace DataAccess.Migrations.Application
                     b.HasKey("DistributorApplicationItemID");
 
                     b.HasIndex("DistributorApplicationID");
-
-                    b.HasIndex("MaterialID");
 
                     b.ToTable("DistributorApplicationItems", "app");
                 });
@@ -813,225 +808,6 @@ namespace DataAccess.Migrations.Application
                         .IsRequired();
                 });
 
-                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ContractorApplicationID");
-
-                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("PartnerRequestID");
-
-                    b.HasOne("DataAccess.Entities.Application.Service", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ServiceID");
-
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
-                        .WithMany("Documents")
-                        .HasForeignKey("ServiceRequestID");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
-                {
-                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ContractorApplicationID");
-
-                    b.HasOne("DataAccess.Entities.Application.Material", null)
-                        .WithMany("Images")
-                        .HasForeignKey("MaterialID");
-
-                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
-                        .WithMany("Images")
-                        .HasForeignKey("PartnerRequestID");
-
-                    b.HasOne("DataAccess.Entities.Application.Service", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ServiceID");
-
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
-                        .WithMany("Images")
-                        .HasForeignKey("ServiceRequestID");
-                });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.Brand", "Brand")
-                    .WithMany("Materials")
-                    .HasForeignKey("BrandID");
-
-                b.HasOne("DataAccess.Entities.Application.DistributorApplication", null)
-                    .WithMany("Items")
-                    .HasForeignKey("DistributorApplicationID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.HasOne("DataAccess.Entities.Application.Material", "Material")
-                    .WithMany()
-                    .HasForeignKey("MaterialID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.Brand", "Brand")
-                    .WithMany("Materials")
-                    .HasForeignKey("BrandID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.HasOne("DataAccess.Entities.Application.Category", "Category")
-                    .WithMany("Materials")
-                    .HasForeignKey("CategoryID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.Navigation("Brand");
-                b.Navigation("Category");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.Material", null)
-                    .WithMany("Images")
-                    .HasForeignKey("MaterialID");
-
-                b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
-                    .WithMany("Images")
-                    .HasForeignKey("PartnerRequestID");
-
-                b.HasOne("DataAccess.Entities.Application.Service", null)
-                    .WithMany("Images")
-                    .HasForeignKey("ServiceID");
-
-                b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
-                    .WithMany("Images")
-                    .HasForeignKey("ServiceRequestID");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.DistributorApplication", "SelectedDistributorApplication")
-                    .WithMany()
-                    .HasForeignKey("SelectedDistributorApplicationDistributorApplicationID");
-
-                b.Navigation("SelectedDistributorApplication");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequestItem", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.Material", "Material")
-                    .WithMany()
-                    .HasForeignKey("MaterialID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.HasOne("DataAccess.Entities.Application.MaterialRequest", null)
-                    .WithMany("MaterialRequestItems")
-                    .HasForeignKey("MaterialRequestID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.Navigation("Material");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.PaymentTransaction", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.ContractorApplication", "ContractorApplication")
-                    .WithMany()
-                    .HasForeignKey("ContractorApplicationID")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.Navigation("ContractorApplication");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
-            {
-                b.Navigation("Documents");
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
-            {
-                b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
-                    .WithOne("ServiceRequest")
-                    .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "ConversationID");
-
-                b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
-                    .WithOne()
-                    .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "SelectedContractorApplicationID");
-
-                b.Navigation("Conversation");
-                b.Navigation("SelectedContractorApplication");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
-            {
-                b.Navigation("Materials");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Category", b =>
-            {
-                b.Navigation("Materials");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
-            {
-                b.Navigation("Documents");
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
-            {
-                b.Navigation("Documents");
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
-            {
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
-            {
-                b.Navigation("Messages");
-                b.Navigation("ServiceRequest");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
-            {
-                b.Navigation("Items");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
-            {
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
-            {
-                b.Navigation("DistributorApplications");
-                b.Navigation("MaterialRequestItems");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
-            {
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
-            {
-                b.Navigation("Images");
-            });
-
-            modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
-            {
-                b.Navigation("ContractorApplications");
-                b.Navigation("Documents");
-                b.Navigation("Images");
-            });
-
             modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
@@ -1211,7 +987,6 @@ namespace DataAccess.Migrations.Application
 
                     b.Navigation("Images");
                 });
-
 
             modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
                 {
