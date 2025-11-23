@@ -32,7 +32,7 @@ export const MaterialRequestProvider = ({ children }) => {
             PageNumber,
             PageSize,
             SortBy,
-            FilterID: user.id,
+            FilterID,
           });
         } else if (user?.role === 'Customer') {
           data = await materialRequestService.getAllForCustomer({

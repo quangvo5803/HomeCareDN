@@ -6,7 +6,12 @@ import LoadingComponent from '../LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { useMaterial } from '../../hook/useMaterial';
 
-export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
+export default function MaterialRequestModal({
+  isOpen,
+  onClose,
+  onSelect,
+  excludedMaterialIDs = [],
+}) {
   const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,10 +71,14 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
 
   if (!isOpen) return null;
 
+  const filteredMaterials = materials.filter(
+    (m) => !excludedMaterialIDs.includes(m.materialID)
+  );
+
   const renderContent = () => {
     if (loading) return <LoadingComponent />;
 
-    if (materials.length === 0) {
+    if (filteredMaterials.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center text-gray-500 py-16 space-y-4 min-h-[400px]">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
@@ -99,17 +108,21 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect }) {
 
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {materials.map((m) => {
+        {filteredMaterials.map((m) => {
           const isSelected = selectedMaterials.some(
             (item) => item.materialID === m.materialID
           );
           const imageUrl = m.imageUrls?.[0];
-          const displayName = i18n.language == 'vi' ? m.name : m.nameEN;
+          const displayName =
+            i18n.language == 'vi' ? m.name : m.nameEN || m.name;
           const displayCategory =
-            i18n.language == 'vi' ? m.categoryName : m.categoryNameEN;
+            i18n.language == 'vi'
+              ? m.categoryName
+              : m.categoryNameEN || m.categoryName;
           const displayBrand =
-            i18n.language == 'vi' ? m.brandName : m.brandNameEN;
-          const displayUnit = i18n.language == 'vi' ? m.unit : m.unitEN;
+            i18n.language == 'vi' ? m.brandName : m.brandNameEN || m.brandName;
+          const displayUnit =
+            i18n.language == 'vi' ? m.unit : m.unitEN || m.unit;
 
           return (
             <button
@@ -295,4 +308,5 @@ MaterialRequestModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSelect: PropTypes.func,
+  excludedMaterialIDs: PropTypes.arrayOf(PropTypes.string),
 };

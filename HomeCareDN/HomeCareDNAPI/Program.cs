@@ -45,7 +45,7 @@ namespace HomeCareDNAPI
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(
+                options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlOptions =>
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
@@ -53,7 +53,7 @@ namespace HomeCareDNAPI
             );
 
             builder.Services.AddDbContext<AuthorizeDbContext>(options =>
-                options.UseNpgsql(
+                options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlOptions =>
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
@@ -146,8 +146,6 @@ namespace HomeCareDNAPI
             /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
-            builder.Services.AddScoped<IProfileService, ProfileService>();
-            builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
             builder.Services.AddSingleton<EmailSender>();
             builder.Services.AddHostedService<BackgroundEmailSender>();

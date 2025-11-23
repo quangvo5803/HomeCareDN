@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../hook/useAuth';
 import { NavLink } from 'react-router-dom';
 
-export default function Sidebar() {
+export default function Sidebar({ unreadCount = 0 }) {
   const { t } = useTranslation();
   const { logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -67,15 +68,26 @@ export default function Sidebar() {
       link: '/Admin/PaymentManager',
     },
     {
+      icon: 'text-yellow-500 fa-solid fa-star',
+      title: 'review',
+      link: '/Admin/ReviewManager',
+    },
+    {
       icon: 'text-emerald-600 fa-solid fa-headset',
       title: 'support',
       link: '/Admin/SupportManager',
+    },
+    {
+      icon: 'text-emerald-600 fa-solid fa-comments',
+      title: 'supportChat',
+      link: '/Admin/SupportChatManager',
+      showBadge: true,
     },
   ];
 
   return (
     <>
-      {/* Mobile Menu Button - Fixed at top */}
+      {/* Mobile Menu Button */}
       <button
         onClick={toggleMobileMenu}
         className="xl:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-lg shadow-lg hover:bg-gray-50 transition-colors"
@@ -170,6 +182,12 @@ export default function Sidebar() {
                         <span className="ml-1 duration-300 opacity-100 pointer-events-none ease">
                           {t(`adminSidebar.menu.${menuItem.title}`)}
                         </span>
+
+                        {menuItem.showBadge && unreadCount > 0 && (
+                          <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white shadow-sm">
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                          </span>
+                        )}
                       </>
                     )}
                   </NavLink>
@@ -198,3 +216,7 @@ export default function Sidebar() {
     </>
   );
 }
+
+Sidebar.propTypes = {
+  unreadCount: PropTypes.number,
+};

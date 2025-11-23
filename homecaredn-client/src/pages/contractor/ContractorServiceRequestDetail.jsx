@@ -87,9 +87,9 @@ export default function ContractorServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -260,22 +260,22 @@ export default function ContractorServiceRequestDetail() {
       const imageUploadPromise =
         newImageFiles.length > 0
           ? uploadToCloudinary(
-              newImageFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setImageProgress(progress),
-              'HomeCareDN/ContractorAppication'
-            )
+            newImageFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setImageProgress(progress),
+            'HomeCareDN/ContractorAppication'
+          )
           : Promise.resolve(null);
 
       const documentUploadPromise =
         newDocumentFiles.length > 0
           ? uploadToCloudinary(
-              newDocumentFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setDocumentProgress(progress),
-              'HomeCareDN/ContractorAppication/Documents',
-              'raw'
-            )
+            newDocumentFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setDocumentProgress(progress),
+            'HomeCareDN/ContractorAppication/Documents',
+            'raw'
+          )
           : Promise.resolve(null);
 
       const [imageResults, documentResults] = await Promise.all([
@@ -461,7 +461,7 @@ export default function ContractorServiceRequestDetail() {
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 h-12 sm:h-32">
         {/* Back Button */}
         <button
-          onClick={() => navigate('/Contractor/service-requests')}
+          onClick={() => navigate('/Contractor/ServiceRequestManager')}
           className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex items-center px-4 py-2 text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors"
         >
           <i className="fas fa-arrow-left mr-2" />
@@ -780,12 +780,12 @@ export default function ContractorServiceRequestDetail() {
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                            { est: formatVND(serviceRequest.estimatePrice) }
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                          { est: formatVND(serviceRequest.estimatePrice) }
+                        )
                         : t(
-                            'contractorServiceRequestDetail.bidPricePlaceholder'
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholder'
+                        )
                     }
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -988,7 +988,8 @@ export default function ContractorServiceRequestDetail() {
                     disabled={
                       !estimatePrice.trim() ||
                       !description.trim() ||
-                      images.length === 0
+                      images.length === 0 ||
+                      documents.length === 0
                     }
                   >
                     <i className="fas fa-paper-plane" />
@@ -1396,7 +1397,90 @@ export default function ContractorServiceRequestDetail() {
               </div>
             </div>
           )}
+          {/* Review Section - Show when Approved and user is the selected contractor */}
+          {existingApplication?.status === 'Approved' &&
+            serviceRequest.selectedContractorApplication?.contractorID ===
+            user?.id &&
+            serviceRequest.review && (
+              <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
+                  <i className="fas fa-star text-amber-500" />
+                  {t('contractorServiceRequestDetail.customerReview')}
+                </h3>
 
+                {/* Rating */}
+                <div className="flex items-center gap-4 mb-4 pb-4 border-b border-gray-100">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <i
+                        key={star}
+                        className={`fa-solid fa-star text-2xl ${star <= serviceRequest.review.rating
+                          ? 'text-amber-400'
+                          : 'text-gray-300'
+                          }`}
+                      ></i>
+                    ))}
+                  </div>
+                  <span className="text-2xl font-bold text-amber-600">
+                    {serviceRequest.review.rating.toFixed(1)}
+                  </span>
+                </div>
+
+                {/* Comment */}
+                {serviceRequest.review.comment && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">
+                      {t('contractorServiceRequestDetail.reviewComment')}
+                    </p>
+                    <div
+                      className="text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-4"
+                      dangerouslySetInnerHTML={{
+                        __html: serviceRequest.review.comment,
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Review Images */}
+                {serviceRequest.review.imageUrls?.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-3">
+                      {t('contractorServiceRequestDetail.reviewImages')}
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                      {serviceRequest.review.imageUrls.map((url, i) => (
+                        <a
+                          key={`review-${url}-${i}`}
+                          href={url}
+                          className="venobox aspect-square rounded-lg overflow-hidden bg-gray-100 group cursor-pointer block ring-1 ring-gray-200"
+                          data-gall="customer-review-gallery"
+                        >
+                          <img
+                            src={url}
+                            alt={`review-${i}`}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Review Date */}
+                <div className="mt-4 pt-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                    <i className="fa-regular fa-calendar"></i>
+                    {t('contractorServiceRequestDetail.reviewedAt')}:{' '}
+                    <span className="font-medium text-gray-700">
+                      {formatDate(
+                        serviceRequest.review.createdAt,
+                        i18n.language
+                      )}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
           {/* Chat Section */}
           <ChatSection
             conversationID={serviceRequest.conversation?.conversationID}

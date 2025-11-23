@@ -15,10 +15,15 @@ export const RealtimeEvents = Object.freeze({
   ContractorApplicationRejected: 'ContractorApplication.Rejected',
   ContractorApplicationDelete: 'ContractorApplication.Delete',
 
+  // DistributorApplication
+  DistributorApplicationCreated: 'DistributorApplication.Created',
+  DistributorApplicationDelete: 'DistributorApplication.Delete',
   // Payment
   PaymentTransactionUpdated: 'PaymentTransation.Updated',
 
   // Chat
   ChatMessageCreated: 'Chat.MessageCreated',
   ConversationUnlocked: 'Chat.ConversationUnlocked',
+  NewAdminMessage: 'Chat.NewAdminMessage',
+  NewConversationForAdmin: 'Chat.NewConversationForAdmin',
 });

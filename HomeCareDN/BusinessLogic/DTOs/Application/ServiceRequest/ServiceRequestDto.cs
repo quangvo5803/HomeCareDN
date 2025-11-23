@@ -1,7 +1,7 @@
 ﻿using BusinessLogic.DTOs.Application.Chat.User.Convesation;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Review;
-using BusinessLogic.DTOs.Authorize.AddressDtos;
+using BusinessLogic.DTOs.Authorize.User;
 
 namespace BusinessLogic.DTOs.Application.ServiceRequest
 {

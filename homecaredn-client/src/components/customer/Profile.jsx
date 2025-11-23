@@ -2,14 +2,13 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useAddress } from '../../hook/useAddress';
-import { useProfile } from '../../hook/useProfile';
 import { geoService } from '../../services/public/geoService';
 import { isSafeText } from '../../utils/validateText';
 import { isSafePhone } from '../../utils/validatePhone';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import { useServiceRequest } from '../../hook/useServiceRequest';
+import { useUser } from '../../hook/useUser';
 
 const emptyAddrForm = {
   id: null,
@@ -34,13 +33,14 @@ export default function Profile({ user }) {
   const [addrSubmitting, setAddrSubmitting] = useState(false);
 
   const {
+    profile,
+    updateUser,
     addresses,
     totalAddressess,
     createAddress,
     updateAddress,
     deleteAddress,
-  } = useAddress();
-  const { profile, updateProfile } = useProfile();
+  } = useUser();
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
@@ -95,7 +95,7 @@ export default function Profile({ user }) {
 
     setSaving(true);
     try {
-      await updateProfile({
+      await updateUser({
         UserId: user.id,
         FullName: form.fullName,
         PhoneNumber: form.phoneNumber || null,
