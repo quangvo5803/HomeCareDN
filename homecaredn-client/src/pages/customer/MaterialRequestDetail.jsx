@@ -1,22 +1,21 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { useUser } from '../../hook/useUser';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatVND } from '../../utils/formatters';
 import { toast } from 'react-toastify';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import { distributorApplicationService } from '../../services/distributorApplicationService';
+import { handleApiError } from '../../utils/handleApiError';
+import { Pagination } from 'antd';
+import he from 'he';
 import StatusBadge from '../../components/StatusBadge';
 import Loading from '../../components/Loading';
 import LoadingComponent from '../../components/LoadingComponent';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
 import Swal from 'sweetalert2';
 import useRealtime from '../../realtime/useRealtime';
-import { RealtimeEvents } from '../../realtime/realtimeEvents';
-import { distributorApplicationService } from '../../services/distributorApplicationService';
-import { handleApiError } from '../../utils/handleApiError';
-import { Pagination } from 'antd';
-import he from 'he';
-
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
   const { materialRequestId } = useParams();
@@ -29,7 +28,12 @@ export default function MaterialRequestDetail() {
   const [items, setItems] = useState([]);
   const [addressID, setAddressID] = useState('');
 
-  const { setMaterialRequests, loading, getMaterialRequestById, updateMaterialRequest } = useMaterialRequest();
+  const {
+    setMaterialRequests,
+    loading,
+    getMaterialRequestById,
+    updateMaterialRequest,
+  } = useMaterialRequest();
   const [materialRequest, setMaterialRequest] = useState(null);
   const [open, setOpen] = useState(false);
   const [originalItems, setOriginalItems] = useState([]);
@@ -50,9 +54,9 @@ export default function MaterialRequestDetail() {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-              ...sr,
-              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-            }
+                ...sr,
+                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+              }
             : sr
         )
       );
@@ -91,7 +95,6 @@ export default function MaterialRequestDetail() {
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
-
   });
 
   // Check if request is in Draft status
@@ -114,15 +117,17 @@ export default function MaterialRequestDetail() {
     }
   }, [getMaterialRequestById, materialRequestId]);
 
-
   const fetchDistributors = useCallback(async () => {
     try {
       setLoadingApplications(true);
-      const rs = await distributorApplicationService.getAllByMaterialRequestIdForCustomer({
-        PageNumber: currentApplicationPage,
-        PageSize: pageSize,
-        FilterID: materialRequestId,
-      });
+      const rs =
+        await distributorApplicationService.getAllByMaterialRequestIdForCustomer(
+          {
+            PageNumber: currentApplicationPage,
+            PageSize: pageSize,
+            FilterID: materialRequestId,
+          }
+        );
       setDistributorApplications(rs.items);
       setTotalCount(rs.totalCount);
     } catch (err) {
@@ -133,20 +138,20 @@ export default function MaterialRequestDetail() {
   }, [t, materialRequestId, pageSize, currentApplicationPage]);
 
   useEffect(() => {
-    if (materialRequest)
-      fetchDistributors();
+    if (materialRequest) fetchDistributors();
   }, [materialRequest, fetchDistributors]);
 
   const handleDetailDistributor = async (da) => {
     try {
-      const detailDistributor = await distributorApplicationService.getByIdForCustomer(
-        da.distributorApplicationID
-      );
+      const detailDistributor =
+        await distributorApplicationService.getByIdForCustomer(
+          da.distributorApplicationID
+        );
       setSelectedDistributor(detailDistributor);
     } catch (err) {
       toast.error(t(handleApiError(err)));
     }
-  }
+  };
   // ===== Kiểm tra thay đổi =====
   const hasItemChanges =
     JSON.stringify(items) !== JSON.stringify(originalItems);
@@ -165,9 +170,7 @@ export default function MaterialRequestDetail() {
     hasCanAddMaterialChanges;
 
   const canShowSaveCancel = hasAnyChanges;
-  const hasItems = items.length > 0;
-  const hasAddress = Boolean(addressID);
-  const canShowSend = hasItems && hasAddress;
+  const canShowSend = items.length > 0 && addressID;
 
   const handleQuantityChange = (id, value) => {
     setItems((prev) =>
@@ -287,21 +290,21 @@ export default function MaterialRequestDetail() {
     });
   };
   //Check materialID
-  const customerMaterialIDs = new Set(items.map(item => item.materialID));
+  const customerMaterialIDs = new Set(items.map((item) => item.materialID));
 
-  const existingMaterial = selectedDistributor?.items?.filter(item =>
+  const existingMaterial = selectedDistributor?.items?.filter((item) =>
     customerMaterialIDs.has(item.materialID)
   );
 
-  const extraMaterial = selectedDistributor?.items?.filter(item =>
-    !customerMaterialIDs.has(item.materialID)
+  const extraMaterial = selectedDistributor?.items?.filter(
+    (item) => !customerMaterialIDs.has(item.materialID)
   );
 
   const isLoading = loading || !materialRequest;
   if (isLoading) return <Loading />;
 
   const getAddressDisplay = (addresses, id) => {
-    const address = addresses?.find(a => a.addressID === id);
+    const address = addresses?.find((a) => a.addressID === id);
     if (!address) return '';
     return `${address.detail}, ${address.ward}, ${address.district}, ${address.city}`;
   };
@@ -339,8 +342,10 @@ export default function MaterialRequestDetail() {
           ))}
         </select>
 
-        <i className="fas fa-chevron-down absolute right-3 top-1/2 
-                    transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+        <i
+          className="fas fa-chevron-down absolute right-3 top-1/2 
+                    transform -translate-y-1/2 text-gray-400 pointer-events-none"
+        ></i>
       </div>
     );
   };
@@ -417,9 +422,7 @@ export default function MaterialRequestDetail() {
         <div className="hidden lg:grid lg:grid-cols-13 gap-4 items-center">
           <div className="col-span-1 text-center">
             <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center mx-auto">
-              <span className="text-white font-bold text-sm">
-                {index + 1}
-              </span>
+              <span className="text-white font-bold text-sm">{index + 1}</span>
             </div>
           </div>
 
@@ -432,14 +435,14 @@ export default function MaterialRequestDetail() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display =
-                      'flex';
+                    e.target.nextElementSibling.style.display = 'flex';
                   }}
                 />
               ) : null}
               <div
-                className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
-                  }`}
+                className={`absolute inset-0 flex items-center justify-center ${
+                  imageUrl ? 'hidden' : 'flex'
+                }`}
               >
                 <i className="fas fa-image text-slate-300 text-3xl"></i>
               </div>
@@ -462,9 +465,7 @@ export default function MaterialRequestDetail() {
               {displayBrand && (
                 <div className="flex items-center text-xs text-slate-600">
                   <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
-                  <span className="truncate font-medium">
-                    {displayBrand}
-                  </span>
+                  <span className="truncate font-medium">{displayBrand}</span>
                 </div>
               )}
             </div>
@@ -533,8 +534,7 @@ export default function MaterialRequestDetail() {
                 setItems((prev) =>
                   prev.filter(
                     (i) =>
-                      i.materialRequestItemID !==
-                      item.materialRequestItemID
+                      i.materialRequestItemID !== item.materialRequestItemID
                   )
                 );
               }}
@@ -565,8 +565,7 @@ export default function MaterialRequestDetail() {
                 setItems((prev) =>
                   prev.filter(
                     (i) =>
-                      i.materialRequestItemID !==
-                      item.materialRequestItemID
+                      i.materialRequestItemID !== item.materialRequestItemID
                   )
                 );
               }}
@@ -586,14 +585,14 @@ export default function MaterialRequestDetail() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display =
-                      'flex';
+                    e.target.nextElementSibling.style.display = 'flex';
                   }}
                 />
               ) : null}
               <div
-                className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
-                  }`}
+                className={`absolute inset-0 flex items-center justify-center ${
+                  imageUrl ? 'hidden' : 'flex'
+                }`}
               >
                 <i className="fas fa-image text-slate-300 text-2xl"></i>
               </div>
@@ -604,17 +603,13 @@ export default function MaterialRequestDetail() {
                 {displayCategory && (
                   <div className="flex items-center text-xs text-slate-600">
                     <i className="fas fa-tag text-slate-400 mr-2 w-3"></i>
-                    <span className="truncate">
-                      {displayCategory}
-                    </span>
+                    <span className="truncate">{displayCategory}</span>
                   </div>
                 )}
                 {displayBrand && (
                   <div className="flex items-center text-xs text-slate-600">
                     <i className="fas fa-star text-yellow-500 mr-2 w-3"></i>
-                    <span className="truncate">
-                      {displayBrand}
-                    </span>
+                    <span className="truncate">{displayBrand}</span>
                   </div>
                 )}
               </div>
@@ -685,11 +680,21 @@ export default function MaterialRequestDetail() {
     <>
       <div className="hidden lg:grid lg:grid-cols-13 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700">
         <div className="col-span-1 text-center">#</div>
-        <div className="col-span-2">{t('userPage.materialRequestDetail.image')}</div>
-        <div className="col-span-4">{t('userPage.materialRequestDetail.infor')}</div>
-        <div className="col-span-2 text-center">{t('userPage.materialRequestDetail.quantity')}</div>
-        <div className="col-span-2 text-center">{t('userPage.materialRequestDetail.unit')}</div>
-        <div className="col-span-2 text-center">{t('userPage.materialRequestDetail.action')}</div>
+        <div className="col-span-2">
+          {t('userPage.materialRequestDetail.image')}
+        </div>
+        <div className="col-span-4">
+          {t('userPage.materialRequestDetail.infor')}
+        </div>
+        <div className="col-span-2 text-center">
+          {t('userPage.materialRequestDetail.quantity')}
+        </div>
+        <div className="col-span-2 text-center">
+          {t('userPage.materialRequestDetail.unit')}
+        </div>
+        <div className="col-span-2 text-center">
+          {t('userPage.materialRequestDetail.action')}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -713,46 +718,53 @@ export default function MaterialRequestDetail() {
   const renderHeader = () => (
     <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
       <div>#</div>
-      <div className="col-span-3">{t('userPage.materialRequestDetail.image')}</div>
-      <div className="col-span-5">{t('userPage.materialRequestDetail.infor')}</div>
-      <div className="col-span-3">{t('userPage.materialRequestDetail.quantity')}</div>
-      <div className="col-span-3">{t('userPage.materialRequestDetail.unit')}</div>
-      <div className="col-span-4">{t('distributorMaterialRequestDetail.price')}</div>
-      <div className="col-span-4">{t('distributorMaterialRequestDetail.totalPrice')}</div>
+      <div className="col-span-3">
+        {t('userPage.materialRequestDetail.image')}
+      </div>
+      <div className="col-span-5">
+        {t('userPage.materialRequestDetail.infor')}
+      </div>
+      <div className="col-span-3">
+        {t('userPage.materialRequestDetail.quantity')}
+      </div>
+      <div className="col-span-3">
+        {t('userPage.materialRequestDetail.unit')}
+      </div>
+      <div className="col-span-4">
+        {t('distributorMaterialRequestDetail.price')}
+      </div>
+      <div className="col-span-4">
+        {t('distributorMaterialRequestDetail.totalPrice')}
+      </div>
     </div>
   );
 
   const renderMaterialRow = (item, index) => {
     const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
 
-    const displayName = i18n.language === 'vi'
-      ? item.name
-      : item.nameEN || item.name;
+    const displayName =
+      i18n.language === 'vi' ? item.name : item.nameEN || item.name;
 
-    const displayCategory = i18n.language === 'vi'
-      ? item.categoryName
-      : item.categoryNameEN || item.categoryName;
+    const displayCategory =
+      i18n.language === 'vi'
+        ? item.categoryName
+        : item.categoryNameEN || item.categoryName;
 
-    const displayBrand = i18n.language === 'vi'
-      ? item.brandName
-      : item.brandNameEN || item.brandName;
+    const displayBrand =
+      i18n.language === 'vi'
+        ? item.brandName
+        : item.brandNameEN || item.brandName;
 
-    const displayUnit = i18n.language === 'vi'
-      ? item.unit
-      : item.unitEN || item.unit;
+    const displayUnit =
+      i18n.language === 'vi' ? item.unit : item.unitEN || item.unit;
 
     return (
-      <div
-        className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group"
-      >
+      <div className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group">
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
-
           {/* STT */}
           <div className="col-span-2 flex justify-center">
             <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">
-                {index + 1}
-              </span>
+              <span className="text-white font-bold text-xs">{index + 1}</span>
             </div>
           </div>
 
@@ -760,7 +772,11 @@ export default function MaterialRequestDetail() {
           <div className="col-span-3 flex justify-center">
             <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border border-slate-200 group-hover:border-orange-400 transition-all">
               {imageUrl ? (
-                <img src={imageUrl} alt={displayName} className="w-full h-full object-cover" />
+                <img
+                  src={imageUrl}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="flex items-start justify-start h-full text-slate-300 text-3xl">
                   <i className="fas fa-image"></i>
@@ -802,9 +818,7 @@ export default function MaterialRequestDetail() {
           {/* Unit */}
           <div className="col-span-3 flex justify-center">
             <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-              <p className="text-sm font-bold text-slate-900">
-                {displayUnit}
-              </p>
+              <p className="text-sm font-bold text-slate-900">{displayUnit}</p>
             </div>
           </div>
 
@@ -821,12 +835,10 @@ export default function MaterialRequestDetail() {
               {formatVND(item.price * item.quantity)}
             </div>
           </div>
-
         </div>
       </div>
     );
   };
-
 
   const renderAppliedDetail = () => {
     return (
@@ -852,7 +864,10 @@ export default function MaterialRequestDetail() {
                 {selectedDistributor.distributorName}
               </h2>
 
-              <StatusBadge status={selectedDistributor.status} type="Application" />
+              <StatusBadge
+                status={selectedDistributor.status}
+                type="Application"
+              />
             </div>
 
             <div className="flex items-center gap-3 mt-2 text-slate-600 text-sm">
@@ -865,7 +880,8 @@ export default function MaterialRequestDetail() {
 
               <span className="flex items-center gap-1 text-green-600 font-semibold">
                 <i className="fas fa-check-circle" />
-                {selectedDistributor.completedProjectCount ?? 0} {t('userPage.materialRequestDetail.order')}
+                {selectedDistributor.completedProjectCount ?? 0}{' '}
+                {t('userPage.materialRequestDetail.order')}
               </span>
             </div>
           </div>
@@ -880,8 +896,7 @@ export default function MaterialRequestDetail() {
           <p className="text-3xl font-bold text-green-900 mb-1">
             {selectedDistributor.totalEstimatePrice < 1_000_000
               ? formatVND(selectedDistributor.totalEstimatePrice)
-              : (selectedDistributor.totalEstimatePrice / 1_000_000).toFixed(0)
-            }
+              : (selectedDistributor.totalEstimatePrice / 1_000_000).toFixed(0)}
 
             {selectedDistributor.totalEstimatePrice >= 1_000_000 && (
               <span className="text-lg font-normal ml-2">
@@ -906,9 +921,7 @@ export default function MaterialRequestDetail() {
         {/* Header */}
         {renderHeader()}
         {existingMaterial.map((item, index) => (
-          <div key={item.materialID}>
-            {renderMaterialRow(item, index)}
-          </div>
+          <div key={item.materialID}>{renderMaterialRow(item, index)}</div>
         ))}
 
         {canAddMaterial && (
@@ -924,60 +937,54 @@ export default function MaterialRequestDetail() {
 
             {/* List extra items */}
             {extraMaterial.map((item, index) => (
-              <div key={item.materialID}>
-                {renderMaterialRow(item, index)}
-              </div>
+              <div key={item.materialID}>{renderMaterialRow(item, index)}</div>
             ))}
           </>
         )}
 
         {/* Notes */}
-        {
-          selectedDistributor.message && (
-            <div className="mb-6 mt-4">
-              <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-                <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
-                {t('userPage.materialRequestDetail.note')}
-              </h4>
-              <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
-                dangerouslySetInnerHTML={{
-                  __html: he.decode(selectedDistributor.message),
-                }}
-              >
-              </p>
-            </div>
-          )
-        }
+        {selectedDistributor.message && (
+          <div className="mb-6 mt-4">
+            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+              <i className="fas fa-sticky-note text-orange-600 mr-2"></i>
+              {t('userPage.materialRequestDetail.note')}
+            </h4>
+            <p
+              className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-lg border border-slate-200"
+              dangerouslySetInnerHTML={{
+                __html: he.decode(selectedDistributor.message),
+              }}
+            ></p>
+          </div>
+        )}
 
         {/* Contact */}
-        {
-          selectedDistributor.status === 'Approved' && (
-            <div className="mb-6">
-              <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
-                <i className="fas fa-address-book text-orange-600 mr-2"></i>
-                {t('userPage.materialRequestDetail.contact')}
-              </h4>
+        {selectedDistributor.status === 'Approved' && (
+          <div className="mb-6">
+            <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+              <i className="fas fa-address-book text-orange-600 mr-2"></i>
+              {t('userPage.materialRequestDetail.contact')}
+            </h4>
 
-              <div className="space-y-3">
-                <a
-                  href={`tel:${selectedDistributor.distributorPhone}`}
-                  className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
-                >
-                  <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
-                  <span>{selectedDistributor.distributorPhone}</span>
-                </a>
+            <div className="space-y-3">
+              <a
+                href={`tel:${selectedDistributor.distributorPhone}`}
+                className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
+              >
+                <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
+                <span>{selectedDistributor.distributorPhone}</span>
+              </a>
 
-                <a
-                  href={`mailto:${selectedDistributor.distributorEmail}`}
-                  className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
-                >
-                  <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
-                  <span>{selectedDistributor.distributorEmail}</span>
-                </a>
-              </div>
+              <a
+                href={`mailto:${selectedDistributor.distributorEmail}`}
+                className="flex items-center gap-4 p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition border border-purple-200 hover:border-purple-400 font-medium text-slate-700"
+              >
+                <i className="fas fa-envelope text-purple-600 text-lg w-6"></i>
+                <span>{selectedDistributor.distributorEmail}</span>
+              </a>
             </div>
-          )
-        }
+          </div>
+        )}
 
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3 mt-6">
@@ -991,7 +998,7 @@ export default function MaterialRequestDetail() {
             {t('BUTTON.Reject')}
           </button>
         </div>
-      </div >
+      </div>
     );
   };
 
@@ -1055,9 +1062,7 @@ export default function MaterialRequestDetail() {
                         <div className="flex items-center gap-3 text-sm text-slate-700">
                           <span className="flex items-center gap-1 text-yellow-500 font-bold">
                             <i className="fas fa-star text-base"></i>
-                            <span className="text-sm">
-                              {app.averageRating}
-                            </span>
+                            <span className="text-sm">{app.averageRating}</span>
                           </span>
 
                           <span className="text-slate-400">•</span>
@@ -1065,7 +1070,8 @@ export default function MaterialRequestDetail() {
                           <span className="font-semibold flex items-center">
                             <i className="fas fa-check-circle text-green-500 mr-1 text-base"></i>
                             <span className="text-sm">
-                              {app.completedProjectCount} {t('userPage.materialRequestDetail.order')}
+                              {app.completedProjectCount}{' '}
+                              {t('userPage.materialRequestDetail.order')}
                             </span>
                           </span>
                         </div>
@@ -1087,8 +1093,7 @@ export default function MaterialRequestDetail() {
                       <span className="text-xl font-bold text-orange-600">
                         {app.totalEstimatePrice < 1_000_000
                           ? formatVND(app.totalEstimatePrice)
-                          : (app.totalEstimatePrice / 1_000_000).toFixed(0)
-                        }
+                          : (app.totalEstimatePrice / 1_000_000).toFixed(0)}
 
                         {app.totalEstimatePrice >= 1_000_000 && (
                           <span className="text-xs font-normal ml-1">
@@ -1120,11 +1125,14 @@ export default function MaterialRequestDetail() {
     );
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className={`bg-white shadow-lg ${hasAnyChanges ? 'sticky top-24 z-50' : ''}`} >
+      <div
+        className={`bg-white shadow-lg ${
+          hasAnyChanges ? 'sticky top-24 z-50' : ''
+        }`}
+      >
         <div className="px-6 lg:px-12 py-3">
           <div className="flex items-center justify-between gap-3">
             <button
@@ -1349,7 +1357,9 @@ export default function MaterialRequestDetail() {
                         </p>
                       </div>
                       <div className="flex-shrink-0">
-                        <i className={`fas fa-${renderQuantityIcon()} text-xl transition-colors`} />
+                        <i
+                          className={`fas fa-${renderQuantityIcon()} text-xl transition-colors`}
+                        />
                       </div>
                     </label>
                   </div>
@@ -1408,8 +1418,7 @@ export default function MaterialRequestDetail() {
 
               {items.length === 0
                 ? renderEmptyMaterialList()
-                : renderMaterialList()
-              }
+                : renderMaterialList()}
             </div>
           </div>
 
@@ -1418,8 +1427,7 @@ export default function MaterialRequestDetail() {
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-42 max-h-[calc(100vh-100px)] overflow-y-auto">
               {selectedDistributor
                 ? renderAppliedDetail()
-                : renderAppliedList()
-              }
+                : renderAppliedList()}
             </div>
           </div>
         </div>
