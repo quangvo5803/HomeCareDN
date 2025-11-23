@@ -140,7 +140,7 @@ function Layout() {
         user.role !== 'Contractor' &&
         user.role !== 'Distributor'));
 
-  const showChatWidget = !user || user.role !== 'Admin';
+  const showChatWidget = user?.role !== 'Admin';
   return (
     <>
       <ScrollToTop />
