@@ -61,7 +61,6 @@ namespace BusinessLogic.Services.Interfaces
                 includeProperties: INCLUDE_LISTALL
             );
 
-            var totalCount = await query.CountAsync();
             if (role == CONTRACTOR && parameters.FilterID != null)
             {
                 query = query.Where(s =>
@@ -69,10 +68,14 @@ namespace BusinessLogic.Services.Interfaces
                     && s.ContractorApplications.Any(ca => ca.ContractorID == parameters.FilterID)
                 );
             }
+
+            var totalCount = await query.CountAsync();
+            
             if (role == ADMIN && parameters.FilterID != null)
             {
                 query = query.Where(s => s.CustomerID == parameters.FilterID);
             }
+
             query = parameters.SortBy?.ToLower() switch
             {
                 "createdat" => query.OrderBy(sr => sr.CreatedAt),

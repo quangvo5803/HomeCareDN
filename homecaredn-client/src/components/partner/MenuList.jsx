@@ -30,10 +30,10 @@ export default function Sidebar({
           to: '/Distributor',
         },
         {
-          key: 'service_requests',
-          label: t('partnerDashboard.service_requests'),
-          icon: <i className="fa-solid fa-calendar"></i>,
-          to: '/Distributor/service-requests',
+          key: 'material-request',
+          label: t('partnerDashboard.material_requests'),
+          icon: <i className="fas fa-boxes"></i>,
+          to: '/Distributor/MaterialRequest',
           badge: serviceRequestsCount,
         },
         {
@@ -181,11 +181,6 @@ export default function Sidebar({
             >
               <span className="mr-2">{it.icon}</span>
               <span>{it.label}</span>
-              {typeof it.badge === 'number' && it.badge > 0 && (
-                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 align-middle">
-                  {it.badge}
-                </span>
-              )}
             </NavLink>
           )
         )}
