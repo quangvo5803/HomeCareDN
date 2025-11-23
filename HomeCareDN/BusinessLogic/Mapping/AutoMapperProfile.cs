@@ -372,7 +372,8 @@ namespace BusinessLogic.Mapping
         // ------------------------
         private static List<string> ImagesToUrls(IEnumerable<Image>? images)
         {
-            return images?.Select(i => i.ImageUrl).ToList() ?? new List<string>();
+            return images?.OrderBy(i => i.ImageID).Select(i => i.ImageUrl).ToList()
+                ?? new List<string>();
         }
 
         private static List<string> DocumentsToUrls(IEnumerable<Document>? documents)

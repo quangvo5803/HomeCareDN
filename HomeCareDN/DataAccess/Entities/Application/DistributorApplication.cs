@@ -7,6 +7,7 @@
         public Guid DistributorID { get; set; }
         public string? Message { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? DueCommisionTime { get; set; }
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<DistributorApplicationItem>? Items { get; set; }
     }

@@ -1,12 +1,9 @@
-﻿using System.Diagnostics.Contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
-using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
-using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -464,33 +461,43 @@ namespace BusinessLogic.Services
                 }
             }
 
-            if (materialRequestUpdateRequestDto.UpdateItems != null)
+            if (materialRequestUpdateRequestDto.UpdateItems?.Any() == true)
             {
-                foreach (var updateDto in materialRequestUpdateRequestDto.UpdateItems)
+                var updateIds = materialRequestUpdateRequestDto
+                    .UpdateItems.Select(u => u.MaterialRequestItemID)
+                    .ToList();
+
+                var itemsToUpdate = materialRequest
+                    .MaterialRequestItems?.Where(i => updateIds.Contains(i.MaterialRequestItemID))
+                    .ToList();
+
+                if (itemsToUpdate?.Count > 0)
                 {
-                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(
-                        i => i.MaterialRequestItemID == updateDto.MaterialRequestItemID,
-                        asNoTracking: false
+                    var updateDict = materialRequestUpdateRequestDto.UpdateItems.ToDictionary(u =>
+                        u.MaterialRequestItemID
                     );
-                    if (updateItem != null)
+
+                    foreach (var item in itemsToUpdate)
                     {
-                        updateItem.Quantity = updateDto.Quantity;
+                        if (updateDict.TryGetValue(item.MaterialRequestItemID, out var updateDto))
+                        {
+                            item.Quantity = updateDto.Quantity;
+                        }
                     }
                 }
             }
             if (materialRequestUpdateRequestDto.AddItems != null)
             {
-                foreach (var newItem in materialRequestUpdateRequestDto.AddItems)
-                {
-                    await _unitOfWork.MaterialRequestItemRepository.AddAsync(
-                        new MaterialRequestItem
-                        {
-                            MaterialRequestID = materialRequestUpdateRequestDto.MaterialRequestID,
-                            MaterialID = newItem.MaterialID,
-                            Quantity = newItem.Quantity,
-                        }
-                    );
-                }
+                var newItems = materialRequestUpdateRequestDto
+                    .AddItems.Select(a => new MaterialRequestItem
+                    {
+                        MaterialRequestItemID = Guid.NewGuid(),
+                        MaterialRequestID = materialRequestUpdateRequestDto.MaterialRequestID,
+                        MaterialID = a.MaterialID,
+                        Quantity = a.Quantity,
+                    })
+                    .ToList();
+                await _unitOfWork.MaterialRequestItemRepository.AddRangeAsync(newItems);
             }
         }
 

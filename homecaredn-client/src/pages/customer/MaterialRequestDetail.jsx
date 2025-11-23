@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import {
+  useParams,
+  useNavigate,
+  unstable_useBlocker as useBlocker,
+} from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { useUser } from '../../hook/useUser';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +34,7 @@ export default function MaterialRequestDetail() {
   const [originalItems, setOriginalItems] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Unsaved comfirm
   // Check if request is in Draft status
   const isDraft = materialRequest?.status === 'Draft';
   const canEdit = isDraft;
@@ -69,7 +74,43 @@ export default function MaterialRequestDetail() {
 
   const canShowSaveCancel = hasAnyChanges;
   const canShowSend = items.length > 0 && addressID;
+  // Unsaved comfirm
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!hasAnyChanges) return;
 
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasAnyChanges]);
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasAnyChanges && currentLocation.pathname !== nextLocation.pathname
+  );
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      Swal.fire({
+        title: 'Bạn chắc chắn muốn rời trang?',
+        text: 'Dữ liệu chưa được lưu sẽ mất.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Rời trang',
+        cancelButtonText: 'Ở lại',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          blocker.proceed();
+        } else {
+          blocker.reset();
+        }
+      });
+    }
+  }, [blocker]);
   const handleQuantityChange = (id, value) => {
     setItems((prev) =>
       prev.map((item) =>
@@ -201,7 +242,7 @@ export default function MaterialRequestDetail() {
       {/* Header */}
       <div
         className={`bg-white shadow-lg ${
-          hasAnyChanges ? 'sticky top-24 z-50' : ''
+          hasAnyChanges ? 'sticky top-24 z-10' : ''
         }`}
       >
         <div className="px-6 lg:px-12 py-3">
