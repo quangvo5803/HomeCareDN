@@ -1,12 +1,9 @@
-﻿using System.Diagnostics.Contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
-using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
-using CloudinaryDotNet.Actions;
 using DataAccess.Data;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -56,11 +53,14 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRequestRepository.GetQueryable(
                 includeProperties: INCLUDE
             );
-            query = query.Where(s => s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed);
+            query = query.Where(s =>
+                s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed
+            );
 
-            if( parameters.FilterID != null && role == DISTRIBUTOR)
+            if (parameters.FilterID != null && role == DISTRIBUTOR)
             {
-                query = query.Where(s => s.DistributorApplications != null 
+                query = query.Where(s =>
+                    s.DistributorApplications != null
                     && s.DistributorApplications.Any(x => x.DistributorID == parameters.FilterID)
                 );
             }
@@ -91,10 +91,10 @@ namespace BusinessLogic.Services
         }
 
         private async Task MapMaterialRequestListAllAsync(
-    IEnumerable<MaterialRequest> items,
-    IEnumerable<MaterialRequestDto> dtos,
-    string? role = ADMIN
-)
+            IEnumerable<MaterialRequest> items,
+            IEnumerable<MaterialRequestDto> dtos,
+            string? role = ADMIN
+        )
         {
             var itemDict = items.ToDictionary(i => i.MaterialRequestID);
 
@@ -105,8 +105,7 @@ namespace BusinessLogic.Services
                 .ToList();
 
             var addresses = await _authorizeDbContext
-                .Addresses
-                .Where(a => addressIds.Contains(a.AddressID))
+                .Addresses.Where(a => addressIds.Contains(a.AddressID))
                 .ToListAsync();
 
             var addressDict = addresses.ToDictionary(a => a.AddressID);
@@ -114,8 +113,10 @@ namespace BusinessLogic.Services
             foreach (var dto in dtos)
             {
                 // --- Address mapping ---
-                if (dto.AddressID.HasValue &&
-                    addressDict.TryGetValue(dto.AddressID.Value, out var address))
+                if (
+                    dto.AddressID.HasValue
+                    && addressDict.TryGetValue(dto.AddressID.Value, out var address)
+                )
                 {
                     dto.Address = _mapper.Map<AddressDto>(address);
 
@@ -179,7 +180,7 @@ namespace BusinessLogic.Services
                     }
                 );
             }
-            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);           
+            var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
             await MapMaterialRequestDetailAsync(
                 materialRequest!,
                 dto,
@@ -378,10 +379,18 @@ namespace BusinessLogic.Services
                 var materialRequestItem = new MaterialRequestItem();
                 materialRequestItem.MaterialRequestID = materialRequest.MaterialRequestID;
                 materialRequestItem.MaterialID = materialRequestCreateDto.FirstMaterialID.Value;
+                materialRequestItem.Quantity = 1;
                 await _unitOfWork.MaterialRequestItemRepository.AddAsync(materialRequestItem);
             }
             await _unitOfWork.MaterialRequestRepository.AddAsync(materialRequest);
             await _unitOfWork.SaveAsync();
+            if (materialRequestCreateDto.FirstMaterialID.HasValue)
+            {
+                materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                    m => m.MaterialRequestID == materialRequest.MaterialRequestID,
+                    includeProperties: "MaterialRequestItems,MaterialRequestItems.Material"
+                );
+            }
             var dto = _mapper.Map<MaterialRequestDto>(materialRequest);
             return dto;
         }
@@ -456,52 +465,70 @@ namespace BusinessLogic.Services
         }
 
         private async Task UpdateMaterialListAsync(
-            MaterialRequestUpdateRequestDto materialRequestUpdateRequestDto,
+            MaterialRequestUpdateRequestDto dto,
             MaterialRequest materialRequest
         )
         {
-            if (materialRequestUpdateRequestDto.DeleteItemIDs != null)
-            {
-                foreach (var itemId in materialRequestUpdateRequestDto.DeleteItemIDs)
-                {
-                    var item = materialRequest.MaterialRequestItems?.FirstOrDefault(m =>
-                        m.MaterialRequestItemID == itemId
-                    );
-                    if (item != null)
-                    {
-                        _unitOfWork.MaterialRequestItemRepository.Remove(item);
-                    }
-                }
-            }
+            DeleteItemsAsync(dto.DeleteItemIDs, materialRequest);
+            UpdateItems(dto.UpdateItems, materialRequest);
+            await AddItemsAsync(dto);
+        }
 
-            if (materialRequestUpdateRequestDto.UpdateItems != null)
+        private void DeleteItemsAsync(IEnumerable<Guid>? deleteIds, MaterialRequest materialRequest)
+        {
+            if (deleteIds == null)
+                return;
+
+            foreach (var id in deleteIds)
             {
-                foreach (var updateDto in materialRequestUpdateRequestDto.UpdateItems)
-                {
-                    var updateItem = await _unitOfWork.MaterialRequestItemRepository.GetAsync(
-                        i => i.MaterialRequestItemID == updateDto.MaterialRequestItemID,
-                        asNoTracking: false
-                    );
-                    if (updateItem != null)
-                    {
-                        updateItem.Quantity = updateDto.Quantity;
-                    }
-                }
+                var item = materialRequest.MaterialRequestItems?.FirstOrDefault(x =>
+                    x.MaterialRequestItemID == id
+                );
+
+                if (item != null)
+                    _unitOfWork.MaterialRequestItemRepository.Remove(item);
             }
-            if (materialRequestUpdateRequestDto.AddItems != null)
+        }
+
+        private static void UpdateItems(
+            IEnumerable<MaterialRequestItemUpdateDto>? updates,
+            MaterialRequest materialRequest
+        )
+        {
+            if (updates?.Any() != true)
+                return;
+
+            var updateDict = updates.ToDictionary(x => x.MaterialRequestItemID);
+            var itemsToUpdate = materialRequest
+                .MaterialRequestItems?.Where(i => updateDict.ContainsKey(i.MaterialRequestItemID))
+                .ToList();
+
+            if (itemsToUpdate == null)
+                return;
+
+            foreach (var item in itemsToUpdate)
             {
-                foreach (var newItem in materialRequestUpdateRequestDto.AddItems)
-                {
-                    await _unitOfWork.MaterialRequestItemRepository.AddAsync(
-                        new MaterialRequestItem
-                        {
-                            MaterialRequestID = materialRequestUpdateRequestDto.MaterialRequestID,
-                            MaterialID = newItem.MaterialID,
-                            Quantity = newItem.Quantity,
-                        }
-                    );
-                }
+                var updateDto = updateDict[item.MaterialRequestItemID];
+                item.Quantity = updateDto.Quantity;
             }
+        }
+
+        private async Task AddItemsAsync(MaterialRequestUpdateRequestDto dto)
+        {
+            if (dto.AddItems == null)
+                return;
+
+            var newItems = dto
+                .AddItems.Select(a => new MaterialRequestItem
+                {
+                    MaterialRequestItemID = Guid.NewGuid(),
+                    MaterialRequestID = dto.MaterialRequestID,
+                    MaterialID = a.MaterialID,
+                    Quantity = a.Quantity,
+                })
+                .ToList();
+
+            await _unitOfWork.MaterialRequestItemRepository.AddRangeAsync(newItems);
         }
 
         public async Task DeleteMaterialRequest(Guid materialRequestID)

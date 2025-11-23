@@ -6,6 +6,7 @@ import { useAuth } from '../../hook/useAuth';
 import { useUser } from '../../hook/useUser';
 import LoadingComponent from '../../components/LoadingComponent';
 import { formatDate } from '../../utils/formatters';
+import { useReview } from '../../hook/useReview';
 
 export default function PartnerProfile() {
   const { t, i18n } = useTranslation();
@@ -14,6 +15,12 @@ export default function PartnerProfile() {
   const [userDetail, setUserDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const {
+    loading: reviewsLoading,
+    totalReviews,
+    reviews,
+    fetchReviews,
+  } = useReview();
   const pageSize = 5;
 
   useEffect(() => {
@@ -22,6 +29,11 @@ export default function PartnerProfile() {
         setLoading(true);
         if (!user) return;
         const data = await getUserById(user.id);
+        fetchReviews({
+          PageNumber: currentPage,
+          PageSize: pageSize,
+          FilterID: user.id,
+        });
         setUserDetail(data);
       } catch {
         // Handle error on provider

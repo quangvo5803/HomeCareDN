@@ -28,33 +28,44 @@ namespace HomeCareDNAPI.BackgroundServices
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
             var now = DateTime.UtcNow;
-            var expired = await db
+
+            var expiredApps = await db
                 .ContractorApplications.Where(ca =>
                     ca.Status == ApplicationStatus.Pending && ca.DueCommisionTime < now
                 )
                 .ToListAsync();
 
-            if (expired.Count == 0)
+            if (expiredApps.Count == 0)
                 return;
 
-            foreach (var app in expired)
+            var relatedRequestIds = expiredApps.Select(x => x.ServiceRequestID).Distinct().ToList();
+
+            var relatedRequests = await db
+                .ServiceRequests.Where(sr => relatedRequestIds.Contains(sr.ServiceRequestID))
+                .ToListAsync();
+
+            var allAppsOfRequests = await db
+                .ContractorApplications.Where(ca => relatedRequestIds.Contains(ca.ServiceRequestID))
+                .ToListAsync();
+
+            foreach (var app in expiredApps)
             {
                 app.Status = ApplicationStatus.Rejected;
+            }
 
-                var serviceRequest = await db.ServiceRequests.FirstOrDefaultAsync(sr =>
-                    sr.ServiceRequestID == app.ServiceRequestID
-                );
+            foreach (var req in relatedRequests)
+            {
+                req.Status = RequestStatus.Opening;
 
-                if (serviceRequest != null && serviceRequest.Status == RequestStatus.Closed)
+                var apps = allAppsOfRequests
+                    .Where(a => a.ServiceRequestID == req.ServiceRequestID)
+                    .ToList();
+
+                foreach (var app in apps)
                 {
-                    bool hasApproved = await db.ContractorApplications.AnyAsync(ca =>
-                        ca.ServiceRequestID == serviceRequest.ServiceRequestID
-                        && ca.Status == ApplicationStatus.Approved
-                    );
-
-                    if (!hasApproved)
+                    if (app.Status == ApplicationStatus.Rejected && !expiredApps.Contains(app))
                     {
-                        serviceRequest.Status = RequestStatus.Opening;
+                        app.Status = ApplicationStatus.Pending;
                     }
                 }
             }

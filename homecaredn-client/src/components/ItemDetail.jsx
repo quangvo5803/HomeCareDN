@@ -7,12 +7,15 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
 import { useMaterialRequest } from '../hook/useMaterialRequest';
+import ExsitingMaterialRequestModal from './modal/ExistingMaterialRequestModal';
 
 export default function ItemDetail({ item, relatedItems = [] }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const [mainImage, setMainImage] = useState(item.imageUrls?.[0]);
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [showAddToExistingModal, setShowAddToExistingModal] = useState(false);
+
   const navigate = useNavigate();
   const MAX_LENGTH = 500;
   const { createMaterialRequest } = useMaterialRequest();
@@ -61,10 +64,18 @@ export default function ItemDetail({ item, relatedItems = [] }) {
     }
     createMaterialRequest({ CustomerID: user.id, FirstMaterialID: materialID });
   };
+  const handleAddExsitingMaterialRequest = () => {
+    if (!user) {
+      toast.error(t('common.notLogin'));
+      navigate('/Login');
+      return;
+    }
+    setShowAddToExistingModal(true);
+  };
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="relative h-[40vh] md:h-[50vh] lg:h-[60vh] overflow-hidden">
+      <section className="relative h-[20vh] md:h-[30vh] lg:h-[40vh] overflow-hidden">
         <img
           src={item.imageUrls?.[0]}
           alt={item.name}
@@ -72,10 +83,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
 
-        <div className="relative z-10 flex flex-col justify-end h-full pb-12">
+        <div className="relative z-10 flex flex-col justify-end h-full pb-8">
           <div className="container px-4 mx-auto md:px-6 lg:px-8">
             {/* Breadcrumb */}
-            <nav className="flex items-center mb-4 space-x-2 text-sm">
+            <nav className="flex items-center mb-4 space-x-2 text-xl">
               <Link
                 to="/"
                 className="flex items-center transition-colors text-white/70 hover:text-white"
@@ -101,11 +112,6 @@ export default function ItemDetail({ item, relatedItems = [] }) {
               <span className="text-white/40">/</span>
               <span className="font-medium text-white">{showName}</span>
             </nav>
-
-            {/* Title */}
-            <h1 className="text-3xl font-bold text-white md:text-4xl lg:text-5xl">
-              {showName}
-            </h1>
           </div>
         </div>
       </section>
@@ -132,10 +138,11 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     <button
                       key={src}
                       onClick={() => setMainImage(src)}
-                      className={`relative bg-white rounded-xl overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg ${mainImage === src
-                        ? 'ring-2 ring-orange-500 shadow-md scale-105'
-                        : 'hover:scale-105 shadow-sm'
-                        }`}
+                      className={`relative bg-white rounded-xl overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg ${
+                        mainImage === src
+                          ? 'ring-2 ring-orange-500 shadow-md scale-105'
+                          : 'hover:scale-105 shadow-sm'
+                      }`}
                       aria-label={`${item.name} thumbnail ${i + 1}`}
                     >
                       <img
@@ -235,11 +242,19 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                         <i className="mr-2 fa-solid fa-plus"></i>
                         {t('BUTTON.AddNewRequest')}
                       </button>
-                      <button className="flex-1 px-6 py-3 bg-white border-2 text-gray-700 font-semibold rounded-xl hover:border-orange-500 hover:text-orange-600 hover:scale-[1.02] transition-all">
+                      <button
+                        className="flex-1 px-6 py-3 bg-white border-2 text-gray-700 font-semibold rounded-xl hover:border-orange-500 hover:text-orange-600 hover:scale-[1.02] transition-all"
+                        onClick={() => handleAddExsitingMaterialRequest()}
+                      >
                         <i className="mr-2 fa-solid fa-clipboard"></i>
                         {t('BUTTON.AddToExisting')}
                       </button>
                     </div>
+                    <ExsitingMaterialRequestModal
+                      isOpen={showAddToExistingModal}
+                      onClose={() => setShowAddToExistingModal(false)}
+                      materialID={item.materialID}
+                    />
                   </>
                 )}
 
@@ -294,8 +309,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             <p className="font-semibold text-gray-800">
                               {item.packageOption
                                 ? t(`Enums.PackageOption.${item.packageOption}`)
-                                : t(`sharedEnums.updating`)
-                              }
+                                : t(`sharedEnums.updating`)}
                             </p>
                           </div>
                         </div>
@@ -315,8 +329,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                               <p className="font-semibold text-gray-800">
                                 {item.designStyle
                                   ? t(`Enums.DesignStyle.${item.designStyle}`)
-                                  : t(`sharedEnums.updating`)
-                                }
+                                  : t(`sharedEnums.updating`)}
                               </p>
                             </div>
                           </div>
@@ -334,9 +347,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                               </p>
                               <p className="font-semibold text-gray-800">
                                 {item.mainStructureType
-                                  ? t(`Enums.MainStructure.${item.mainStructureType}`)
-                                  : t(`sharedEnums.updating`)
-                                }
+                                  ? t(
+                                      `Enums.MainStructure.${item.mainStructureType}`
+                                    )
+                                  : t(`sharedEnums.updating`)}
                               </p>
                             </div>
                           </div>
@@ -437,8 +451,9 @@ export default function ItemDetail({ item, relatedItems = [] }) {
           {relatedItems.map((m) => (
             <Link
               key={m.serviceID || m.materialID}
-              to={`/${item.type === 'material' ? 'MaterialDetail' : 'ServiceDetail'
-                }/${m.serviceID || m.materialID}`}
+              to={`/${
+                item.type === 'material' ? 'MaterialDetail' : 'ServiceDetail'
+              }/${m.serviceID || m.materialID}`}
               className="overflow-hidden transition-all bg-white shadow-lg rounded-2xl hover:shadow-2xl hover:-translate-y-1"
             >
               <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">

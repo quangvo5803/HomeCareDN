@@ -418,7 +418,8 @@
       "note": "Ghi chú",
       "contact": "Liên hệ với chúng tôi",
       "additionalMaterials": "Vật liệu nhà thầu đề xuất",
-      "customerRequestedMaterials": "Vật liệu khách hàng yêu cầu"
+      "customerRequestedMaterials": "Vật liệu khách hàng yêu cầu",
+      "selectMaterialRequest": "Vui lòng chọn yêu cầu muốn thêm vào"
     }
   },
   "contractorServiceRequestManager": {

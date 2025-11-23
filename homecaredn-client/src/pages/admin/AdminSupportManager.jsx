@@ -8,6 +8,7 @@ import LoadingComponent from '../../components/LoadingComponent';
 import { contactSupportService } from '../../services/contactSupportService';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
+import { withMinLoading } from '../../utils/withMinLoading';
 import StatusBadge from '../../components/StatusBadge';
 
 export default function AdminSupportManager() {
@@ -24,39 +25,76 @@ export default function AdminSupportManager() {
   const [supportID, setSupportID] = useState(null);
   const [supports, setSupports] = useState([]);
   const [totalSupports, setTotalSupports] = useState(0);
+  // ------------------------------
+  // 1. Fetch thuần giống Payment.executeFetchPayments
+  // ------------------------------
+  const executeFetchSupports = useCallback(
+    async ({
+      PageNumber = 1,
+      PageSize = 10,
+      SortBy = '',
+      Search = '',
+      Filter,
+    } = {}) => {
+      try {
+        const isProcessedParam =
+          Filter === 'all' ? undefined : Filter === 'processed';
 
-  const fetchSupports = useCallback(async () => {
-    try {
-      setLoading(true);
-      const isProcessedParam =
-        filter === 'all' ? undefined : filter === 'processed';
-      const result = await contactSupportService.getAll({
-        PageNumber: currentPage,
-        PageSize: pageSize,
-        Search: debouncedSearch,
-        SortBy: sortBy,
-        FilterBool: isProcessedParam,
-      });
-      if (result) {
-        setSupports(result.items);
-        setTotalSupports(result.totalCount);
+        const result = await contactSupportService.getAll({
+          PageNumber,
+          PageSize,
+          SortBy,
+          Search,
+          FilterBool: isProcessedParam,
+        });
+
+        setSupports(result.items || []);
+        setTotalSupports(result.totalCount || 0);
+
+        return result.items || [];
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+        setSupports([]);
+        setTotalSupports(0);
+        return [];
       }
-    } catch (error) {
-      toast.error(t(handleApiError(error)));
-    } finally {
-      setLoading(false);
-    }
-  }, [t, currentPage, pageSize, debouncedSearch, filter, sortBy]);
+    },
+    [t]
+  );
 
+  // ------------------------------
+  // 2. Wrapper withMinLoading
+  // ------------------------------
+  const fetchSupports = useCallback(
+    async (params = {}) =>
+      withMinLoading(() => executeFetchSupports(params), setLoading),
+    [executeFetchSupports]
+  );
+
+  // ------------------------------
+  // 3. Trigger fetch
+  // ------------------------------
   useEffect(() => {
-    fetchSupports();
-  }, [fetchSupports]);
+    fetchSupports({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      SortBy: sortBy,
+      Search: debouncedSearch || '',
+      Filter: filter,
+    });
+  }, [t, currentPage, sortBy, debouncedSearch, filter, fetchSupports]);
 
+  // ------------------------------
+  // 4. Search handler
+  // ------------------------------
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
   };
 
+  // ------------------------------
+  // 5. Delete handler
+  // ------------------------------
   const handleDelete = async (id) => {
     showDeleteModal({
       t,

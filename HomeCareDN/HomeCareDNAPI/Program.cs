@@ -45,7 +45,7 @@ namespace HomeCareDNAPI
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(
+                options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlOptions =>
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
@@ -53,7 +53,7 @@ namespace HomeCareDNAPI
             );
 
             builder.Services.AddDbContext<AuthorizeDbContext>(options =>
-                options.UseNpgsql(
+                options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlOptions =>
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)

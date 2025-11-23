@@ -419,7 +419,8 @@
       "note": "Note",
       "contact": "Contact us",
       "additionalMaterials": "Materials proposed by the contractor",
-      "customerRequestedMaterials": "Customer requested materials"
+      "customerRequestedMaterials": "Customer requested materials",
+      "selectMaterialRequest": "Please select request want to add"
     }
   },
   "contractorServiceRequestManager": {

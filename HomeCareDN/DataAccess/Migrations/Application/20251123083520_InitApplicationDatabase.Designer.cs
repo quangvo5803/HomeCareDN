@@ -3,17 +3,17 @@ using System;
 using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251030081738_InitDatabase")]
-    partial class InitDatabase
+    [Migration("20251123083520_InitApplicationDatabase")]
+    partial class InitApplicationDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,34 +22,34 @@ namespace DataAccess.Migrations.Application
             modelBuilder
                 .HasDefaultSchema("app")
                 .HasAnnotation("ProductVersion", "8.0.17")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("DataAccess.Entities.Application.Brand", b =>
                 {
                     b.Property<Guid>("BrandID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BrandDescription")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BrandDescriptionEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("BrandLogoID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BrandName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("BrandNameEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("BrandID");
 
@@ -62,27 +62,27 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("CategoryID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CategoryLogoID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CategoryNameEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<Guid>("UserID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("CategoryID");
 
@@ -93,34 +93,31 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ChatMessage", b =>
                 {
-                    b.Property<Guid>("ChatMessageId")
+                    b.Property<Guid>("ChatMessageID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("ConversationId")
-                        .HasColumnType("uuid");
+                    b.Property<Guid?>("ConversationID")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("boolean");
+                    b.Property<bool>("IsAdminRead")
+                        .HasColumnType("bit");
 
-                    b.Property<string>("ReceiverId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("ReceiverID")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SenderId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("SenderID")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("ChatMessageId");
+                    b.HasKey("ChatMessageID");
 
-                    b.HasIndex("ConversationId");
+                    b.HasIndex("ConversationID");
 
                     b.ToTable("ChatMessages", "app");
                 });
@@ -129,35 +126,35 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreateAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsProcessed")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReplyBy")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ReplyContent")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -168,30 +165,30 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("ContractorApplicationID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ContractorID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DueCommisionTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("EstimatePrice")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<Guid>("ServiceRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ContractorApplicationID");
 
@@ -202,28 +199,40 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
-                    b.Property<Guid>("ConversationId")
+                    b.Property<Guid>("ConversationID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("AdminID")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ContractorId")
+                    b.Property<string>("ContractorID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConversationType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("CustomerID")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("LastMessageAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsAdminRead")
+                        .HasColumnType("bit");
 
-                    b.HasKey("ConversationId");
+                    b.Property<Guid?>("ServiceRequestID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ConversationID");
+
+                    b.HasIndex("ServiceRequestID")
+                        .IsUnique()
+                        .HasFilter("[ServiceRequestID] IS NOT NULL");
 
                     b.ToTable("Conversations", "app");
                 });
@@ -232,22 +241,28 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("DistributorApplicationID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("DistributorID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("DueCommisionTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("MaterialRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Message")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalEstimatePrice")
+                        .HasColumnType("float");
 
                     b.HasKey("DistributorApplicationID");
 
@@ -260,21 +275,25 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("DistributorApplicationItemID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("DistributorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MaterialID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Price")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("DistributorApplicationItemID");
+
+                    b.HasIndex("DistributorApplicationID");
+
+                    b.HasIndex("MaterialID");
 
                     b.ToTable("DistributorApplicationItems", "app");
                 });
@@ -283,23 +302,37 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("DocumentID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ContractorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DocumentUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PartnerRequestID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ServiceID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ServiceRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("DocumentID");
+
+                    b.HasIndex("ContractorApplicationID");
+
+                    b.HasIndex("PartnerRequestID");
+
+                    b.HasIndex("ServiceID");
+
+                    b.HasIndex("ServiceRequestID");
 
                     b.ToTable("Documents", "app");
                 });
@@ -308,36 +341,39 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("ImageID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("BrandID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CategoryID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ContractorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("MaterialID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("PartnerRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ReviewID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ServiceID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ServiceRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("ImageID");
 
@@ -346,6 +382,8 @@ namespace DataAccess.Migrations.Application
                     b.HasIndex("MaterialID");
 
                     b.HasIndex("PartnerRequestID");
+
+                    b.HasIndex("ReviewID");
 
                     b.HasIndex("ServiceID");
 
@@ -358,41 +396,41 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("MaterialID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("BrandID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CategoryID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("NameEN")
                         .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("Unit")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UnitEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserID")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialID");
 
@@ -407,29 +445,35 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("MaterialRequestID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AddressId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("CanAddMaterial")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("CanEditQuantity")
-                        .HasColumnType("boolean");
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CustomerID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("SelectedDistributorApplicationDistributorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("SelectedDistributorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialRequestID");
 
@@ -442,16 +486,16 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("MaterialRequestItemID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MaterialID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("MaterialRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.HasKey("MaterialRequestItemID");
 
@@ -466,41 +510,41 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("PartnerRequestID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("PartnerRequestType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                        .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PartnerRequestID");
 
@@ -511,7 +555,7 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("PaymentTransactionID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
@@ -519,40 +563,40 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("CheckoutUrl")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<Guid>("ContractorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<long>("OrderCode")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("PaymentLinkID")
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<Guid>("ServiceRequestID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PaymentTransactionID");
 
@@ -561,44 +605,85 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("PaymentTransactions", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
+                {
+                    b.Property<Guid>("ReviewID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("MaterialRequestID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PartnerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rating")
+                        .HasMaxLength(5)
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("ServiceRequestID")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ReviewID");
+
+                    b.HasIndex("MaterialRequestID");
+
+                    b.HasIndex("ServiceRequestID")
+                        .IsUnique()
+                        .HasFilter("[ServiceRequestID] IS NOT NULL");
+
+                    b.ToTable("Review", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
                     b.Property<Guid>("ServiceID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BuildingType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DesignStyle")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<int?>("MainStructureType")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NameEN")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PackageOption")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ServiceType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ServiceID");
 
@@ -609,62 +694,71 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Property<Guid>("ServiceRequestID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("AddressId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("BuildingType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ConversationID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("CustomerID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DesignStyle")
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double?>("EstimatePrice")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<int>("Floors")
-                        .HasColumnType("integer");
+                        .HasColumnType("int");
 
                     b.Property<double>("Length")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.Property<string>("MainStructureType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PackageOption")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("SelectedContractorApplicationID")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ServiceType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("Width")
-                        .HasColumnType("double precision");
+                        .HasColumnType("float");
 
                     b.HasKey("ServiceRequestID");
 
-                    b.HasIndex("SelectedContractorApplicationID");
+                    b.HasIndex("ConversationID")
+                        .IsUnique()
+                        .HasFilter("[ConversationID] IS NOT NULL");
+
+                    b.HasIndex("SelectedContractorApplicationID")
+                        .IsUnique()
+                        .HasFilter("[SelectedContractorApplicationID] IS NOT NULL");
 
                     b.ToTable("ServiceRequests", "app");
                 });
@@ -691,20 +785,21 @@ namespace DataAccess.Migrations.Application
                 {
                     b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
                         .WithMany("Messages")
-                        .HasForeignKey("ConversationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ConversationID")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Conversation");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
                         .WithMany("ContractorApplications")
                         .HasForeignKey("ServiceRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ServiceRequest");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
@@ -714,6 +809,42 @@ namespace DataAccess.Migrations.Application
                         .HasForeignKey("MaterialRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplicationItem", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.DistributorApplication", null)
+                        .WithMany("Items")
+                        .HasForeignKey("DistributorApplicationID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entities.Application.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Document", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.ContractorApplication", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ContractorApplicationID");
+
+                    b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("PartnerRequestID");
+
+                    b.HasOne("DataAccess.Entities.Application.Service", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceID");
+
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("ServiceRequestID");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Image", b =>
@@ -729,6 +860,10 @@ namespace DataAccess.Migrations.Application
                     b.HasOne("DataAccess.Entities.Application.PartnerRequest", null)
                         .WithMany("Images")
                         .HasForeignKey("PartnerRequestID");
+
+                    b.HasOne("DataAccess.Entities.Application.Review", null)
+                        .WithMany("Images")
+                        .HasForeignKey("ReviewID");
 
                     b.HasOne("DataAccess.Entities.Application.Service", null)
                         .WithMany("Images")
@@ -795,11 +930,32 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("ContractorApplication");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
+                {
+                    b.HasOne("DataAccess.Entities.Application.MaterialRequest", "MaterialRequest")
+                        .WithMany()
+                        .HasForeignKey("MaterialRequestID");
+
+                    b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
+                        .WithOne("Review")
+                        .HasForeignKey("DataAccess.Entities.Application.Review", "ServiceRequestID");
+
+                    b.Navigation("MaterialRequest");
+
+                    b.Navigation("ServiceRequest");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.ServiceRequest", b =>
                 {
+                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
+                        .WithOne("ServiceRequest")
+                        .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "ConversationID");
+
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "SelectedContractorApplication")
-                        .WithMany()
-                        .HasForeignKey("SelectedContractorApplicationID");
+                        .WithOne()
+                        .HasForeignKey("DataAccess.Entities.Application.ServiceRequest", "SelectedContractorApplicationID");
+
+                    b.Navigation("Conversation");
 
                     b.Navigation("SelectedContractorApplication");
                 });
@@ -816,12 +972,21 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.ContractorApplication", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
                     b.Navigation("Messages");
+
+                    b.Navigation("ServiceRequest");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Material", b =>
@@ -838,11 +1003,20 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
+                    b.Navigation("Documents");
+
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
+                {
                     b.Navigation("Images");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
                 });
 
@@ -850,7 +1024,11 @@ namespace DataAccess.Migrations.Application
                 {
                     b.Navigation("ContractorApplications");
 
+                    b.Navigation("Documents");
+
                     b.Navigation("Images");
+
+                    b.Navigation("Review");
                 });
 #pragma warning restore 612, 618
         }
