@@ -106,12 +106,25 @@ export default function ExsitingMaterialRequestModal({
             {availableRequests.map((req) => (
               <div
                 key={req.materialRequestID}
+                role="button"
+                tabIndex={0}
                 onClick={() => setSelectedRequest(req)}
-                className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedRequest(req);
+                  }
+                }}
+                aria-pressed={
                   selectedRequest?.materialRequestID === req.materialRequestID
-                    ? 'border-orange-500 bg-orange-50 shadow-md'
-                    : 'border-gray-200 hover:border-orange-300 bg-white'
-                }`}
+                }
+                className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200
+    ${
+      selectedRequest?.materialRequestID === req.materialRequestID
+        ? 'border-orange-500 bg-orange-50 shadow-md'
+        : 'border-gray-200 hover:border-orange-300 bg-white'
+    }
+  `}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -183,7 +196,9 @@ export default function ExsitingMaterialRequestModal({
                 type="number"
                 min={1}
                 value={quantity}
-                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+                onChange={(e) =>
+                  setQuantity(Number.parseInt(e.target.value) || 1)
+                }
                 className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-transparent font-semibold text-lg"
               />
 
@@ -204,6 +219,9 @@ export default function ExsitingMaterialRequestModal({
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-50 p-4"
+      role="dialog"
+      aria-modal="true"
+      tabIndex={-1}
       onKeyDown={handleKeyDown}
     >
       <button
@@ -258,5 +276,4 @@ ExsitingMaterialRequestModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   materialID: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
     .isRequired,
-  user: PropTypes.object,
 };
