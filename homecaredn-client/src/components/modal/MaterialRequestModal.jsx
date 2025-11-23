@@ -6,7 +6,12 @@ import LoadingComponent from '../LoadingComponent';
 import { useTranslation } from 'react-i18next';
 import { useMaterial } from '../../hook/useMaterial';
 
-export default function MaterialRequestModal({ isOpen, onClose, onSelect, excludedMaterialIDs = [] }) {
+export default function MaterialRequestModal({
+  isOpen,
+  onClose,
+  onSelect,
+  excludedMaterialIDs = [],
+}) {
   const { t, i18n } = useTranslation();
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -108,21 +113,26 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect, exclud
             (item) => item.materialID === m.materialID
           );
           const imageUrl = m.imageUrls?.[0];
-          const displayName = i18n.language == 'vi' ? m.name : m.nameEN;
+          const displayName =
+            i18n.language == 'vi' ? m.name : m.nameEN || m.name;
           const displayCategory =
-            i18n.language == 'vi' ? m.categoryName : m.categoryNameEN;
+            i18n.language == 'vi'
+              ? m.categoryName
+              : m.categoryNameEN || m.categoryName;
           const displayBrand =
-            i18n.language == 'vi' ? m.brandName : m.brandNameEN;
-          const displayUnit = i18n.language == 'vi' ? m.unit : m.unitEN;
+            i18n.language == 'vi' ? m.brandName : m.brandNameEN || m.brandName;
+          const displayUnit =
+            i18n.language == 'vi' ? m.unit : m.unitEN || m.unit;
 
           return (
             <button
               key={m.materialID}
               onClick={() => handleToggleMaterial(m)}
-              className={`border-2 rounded-lg p-3 text-left hover:shadow-lg transition-all duration-200 w-full group ${isSelected
-                ? 'border-blue-500 bg-blue-50 shadow-md'
-                : 'border-gray-200 hover:border-blue-300 bg-white'
-                }`}
+              className={`border-2 rounded-lg p-3 text-left hover:shadow-lg transition-all duration-200 w-full group ${
+                isSelected
+                  ? 'border-blue-500 bg-blue-50 shadow-md'
+                  : 'border-gray-200 hover:border-blue-300 bg-white'
+              }`}
             >
               <div className="aspect-square bg-gray-100 rounded-lg mb-3 overflow-hidden relative">
                 {imageUrl ? (
@@ -138,8 +148,9 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect, exclud
                   />
                 ) : null}
                 <div
-                  className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${imageUrl ? 'hidden' : 'flex'
-                    }`}
+                  className={`absolute inset-0 flex items-center justify-center bg-gray-100 ${
+                    imageUrl ? 'hidden' : 'flex'
+                  }`}
                 >
                   <i className="fas fa-image text-3xl text-gray-300"></i>
                 </div>
@@ -278,10 +289,11 @@ export default function MaterialRequestModal({ isOpen, onClose, onSelect, exclud
             <button
               disabled={selectedMaterials.length === 0}
               onClick={handleAdd}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${selectedMaterials.length > 0
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
-                : 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                }`}
+              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
+                selectedMaterials.length > 0
+                  ? 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-gray-300 text-gray-600 cursor-not-allowed'
+              }`}
             >
               {t('BUTTON.Add')}
             </button>

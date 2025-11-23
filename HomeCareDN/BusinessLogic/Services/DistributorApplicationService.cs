@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.Contracts;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
@@ -9,7 +10,6 @@ using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -25,12 +25,12 @@ namespace BusinessLogic.Services
         private const string DISTRIBUTOR = "Distributor";
         private const string ERROR_MATERIAL_REQUEST_NOT_FOUND = "MATERIAL_REQUEST_NOT_FOUND";
         private const string ERROR_DISTRIBUTOR_NOT_FOUND = "DISTRIBUTOR_NOT_FOUND";
-        private const string INCLUDE = "Items,Items.Material,Items.Material.Brand,Items.Material.Category,Items.Material.Images";
+        private const string INCLUDE =
+            "Items,Items.Material,Items.Material.Brand,Items.Material.Category,Items.Material.Images";
 
-        public DistributorApplicationService
-        (
-            IUnitOfWork unitOfWork, 
-            IMapper mapper, 
+        public DistributorApplicationService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
             UserManager<ApplicationUser> userManager,
             ISignalRNotifier notifier
         )
@@ -41,16 +41,21 @@ namespace BusinessLogic.Services
             _notifier = notifier;
         }
 
-        public async Task<PagedResultDto<DistributorApplicationDto>> GetAllDistributorApplicationByMaterialRequestId(
-            QueryParameters parameters, string role = "Customer"
+        public async Task<
+            PagedResultDto<DistributorApplicationDto>
+        > GetAllDistributorApplicationByMaterialRequestId(
+            QueryParameters parameters,
+            string role = "Customer"
         )
         {
-            var query = _unitOfWork.DistributorApplicationRepository.GetQueryable(includeProperties: INCLUDE)
+            var query = _unitOfWork
+                .DistributorApplicationRepository.GetQueryable(includeProperties: INCLUDE)
                 .Where(x => x.MaterialRequestID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
 
             query = query
+                .OrderBy(d => d.CreatedAt)
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
 
@@ -62,7 +67,8 @@ namespace BusinessLogic.Services
                 dto.Message = string.Empty;
 
                 var distributor = await _userManager.FindByIdAsync(dto.DistributorID.ToString());
-                if (distributor == null) continue;
+                if (distributor == null)
+                    continue;
 
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
 
@@ -86,21 +92,25 @@ namespace BusinessLogic.Services
             DistributorApplicationGetByIdDto byIdDto
         )
         {
-            var distributorApplication = await _unitOfWork.DistributorApplicationRepository
-                .GetAsync(d => d.DistributorID == byIdDto.DistributorID
-                    && d.MaterialRequestID == byIdDto.MaterialRequestID, includeProperties:INCLUDE
+            var distributorApplication =
+                await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                    d =>
+                        d.DistributorID == byIdDto.DistributorID
+                        && d.MaterialRequestID == byIdDto.MaterialRequestID,
+                    includeProperties: INCLUDE
                 );
 
-            if(distributorApplication == null)
+            if (distributorApplication == null)
             {
                 return null;
             }
 
             var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
 
-            var distributor = await _userManager
-                .FindByIdAsync(distributorApplication.DistributorID.ToString());
-            
+            var distributor = await _userManager.FindByIdAsync(
+                distributorApplication.DistributorID.ToString()
+            );
+
             if (distributor is not null)
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
@@ -112,11 +122,14 @@ namespace BusinessLogic.Services
         }
 
         public async Task<DistributorApplicationDto> GetDistributorApplicationById(
-            Guid id, string role = "Customer"
+            Guid id,
+            string role = "Customer"
         )
         {
-            var application = await _unitOfWork.DistributorApplicationRepository
-                .GetAsync(a => a.DistributorApplicationID == id, includeProperties: INCLUDE);
+            var application = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                a => a.DistributorApplicationID == id,
+                includeProperties: INCLUDE
+            );
 
             if (application == null)
             {
@@ -127,7 +140,9 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
             var dto = _mapper.Map<DistributorApplicationDto>(application);
-            var distributor = await _userManager.FindByIdAsync(application.DistributorID.ToString());
+            var distributor = await _userManager.FindByIdAsync(
+                application.DistributorID.ToString()
+            );
 
             if (distributor != null)
             {
@@ -148,12 +163,14 @@ namespace BusinessLogic.Services
         public async Task<DistributorApplicationDto> CreateDistributorApplicationAsync(
             DistributorCreateApplicationDto createRequest
         )
-         {
-            var materialRequestTask = _unitOfWork.MaterialRequestRepository
-                .GetAsync(m => m.MaterialRequestID == createRequest.MaterialRequestID, 
-                    includeProperties:"MaterialRequestItems"
-                );
-            var distributorTask = _userManager.FindByIdAsync(createRequest.DistributorID.ToString());
+        {
+            var materialRequestTask = _unitOfWork.MaterialRequestRepository.GetAsync(
+                m => m.MaterialRequestID == createRequest.MaterialRequestID,
+                includeProperties: "MaterialRequestItems"
+            );
+            var distributorTask = _userManager.FindByIdAsync(
+                createRequest.DistributorID.ToString()
+            );
 
             await Task.WhenAll(materialRequestTask, distributorTask);
             var materialRequest = materialRequestTask.Result;
@@ -187,7 +204,7 @@ namespace BusinessLogic.Services
             dto.DistributorEmail = distributor.Email ?? string.Empty;
             dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
             dto.Status = ApplicationStatus.Pending.ToString();
-            
+
             var customerDto = _mapper.Map<DistributorApplicationDto>(application);
             dto.DistributorName = string.Empty;
             dto.DistributorEmail = string.Empty;
@@ -202,10 +219,10 @@ namespace BusinessLogic.Services
                     dto
                 ),
                 _notifier.SendToApplicationGroupAsync(
-                    $"user_{materialRequest.CustomerID}",   
+                    $"user_{materialRequest.CustomerID}",
                     "DistributorApplication.Created",
                     customerDto
-                )
+                ),
             };
             await Task.WhenAll(notifyTasks);
             return dto;
@@ -213,8 +230,10 @@ namespace BusinessLogic.Services
 
         public async Task DeleteDistributorApplicationAsync(Guid id)
         {
-            var application = await _unitOfWork.DistributorApplicationRepository
-                .GetAsync(a => a.DistributorApplicationID == id, asNoTracking: false);
+            var application = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                a => a.DistributorApplicationID == id,
+                asNoTracking: false
+            );
             if (application == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -223,8 +242,10 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-            var materialRequest = await _unitOfWork.MaterialRequestRepository
-                .GetAsync(m => m.MaterialRequestID == application.MaterialRequestID, asNoTracking: false);
+            var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                m => m.MaterialRequestID == application.MaterialRequestID,
+                asNoTracking: false
+            );
             _unitOfWork.DistributorApplicationRepository.Remove(application);
 
             await _notifier.SendToApplicationGroupAsync(
@@ -269,8 +290,9 @@ namespace BusinessLogic.Services
 
             foreach (var item in createRequest.Items!)
             {
-                var reqItem = request.MaterialRequestItems!
-                    .FirstOrDefault(x => x.MaterialID == item.MaterialID);
+                var reqItem = request.MaterialRequestItems!.FirstOrDefault(x =>
+                    x.MaterialID == item.MaterialID
+                );
 
                 var entityItem = _mapper.Map<DistributorApplicationItem>(item);
 

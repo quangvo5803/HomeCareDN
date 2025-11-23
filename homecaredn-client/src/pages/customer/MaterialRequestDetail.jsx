@@ -1,26 +1,21 @@
 import { useEffect, useState, useCallback } from 'react';
-import {
-  useParams,
-  useNavigate,
-  unstable_useBlocker as useBlocker,
-} from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { useUser } from '../../hook/useUser';
 import { useTranslation } from 'react-i18next';
 import { formatDate, formatVND } from '../../utils/formatters';
 import { toast } from 'react-toastify';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import { distributorApplicationService } from '../../services/distributorApplicationService';
+import { handleApiError } from '../../utils/handleApiError';
+import { Pagination } from 'antd';
+import he from 'he';
 import StatusBadge from '../../components/StatusBadge';
 import Loading from '../../components/Loading';
 import LoadingComponent from '../../components/LoadingComponent';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
 import Swal from 'sweetalert2';
 import useRealtime from '../../realtime/useRealtime';
-import { RealtimeEvents } from '../../realtime/realtimeEvents';
-import { distributorApplicationService } from '../../services/distributorApplicationService';
-import { handleApiError } from '../../utils/handleApiError';
-import { Pagination } from 'antd';
-import he from 'he';
-
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
   const { materialRequestId } = useParams();
@@ -176,42 +171,7 @@ export default function MaterialRequestDetail() {
 
   const canShowSaveCancel = hasAnyChanges;
   const canShowSend = items.length > 0 && addressID;
-  // Unsaved comfirm
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (!hasAnyChanges) return;
-      e.preventDefault();
-      e.returnValue = '';
-    };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [hasAnyChanges]);
-  const blocker = useBlocker(
-    ({ currentLocation, nextLocation }) =>
-      hasAnyChanges && currentLocation.pathname !== nextLocation.pathname
-  );
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      Swal.fire({
-        title: 'Bạn chắc chắn muốn rời trang?',
-        text: 'Dữ liệu chưa được lưu sẽ mất.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Rời trang',
-        cancelButtonText: 'Ở lại',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          blocker.proceed();
-        } else {
-          blocker.reset();
-        }
-      });
-    }
-  }, [blocker]);
   const handleQuantityChange = (id, value) => {
     setItems((prev) =>
       prev.map((item) =>

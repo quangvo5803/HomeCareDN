@@ -100,7 +100,7 @@ export default function ExsitingMaterialRequestModal({
         <div>
           <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
             <i className="fas fa-clipboard-list text-orange-500"></i>
-            {t('SELECT_MATERIAL_REQUEST')}
+            {t('userPage.materialRequestDetail.selectMaterialRequest')}
           </label>
           <div className="space-y-2 max-h-[300px] overflow-y-auto">
             {availableRequests.map((req) => (
