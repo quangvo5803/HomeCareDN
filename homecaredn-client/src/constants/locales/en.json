@@ -382,7 +382,6 @@
       "letStart": "Get started by creating your first material request",
       "lbl_address": "Address",
       "lbl_distributor": "supplier",
-      "lbl_canEditQuantity": "Allow supplier to edit quantity",
       "lbl_materialList": "Material List",
       "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
@@ -403,7 +402,7 @@
       "noMaterial": "No materials in the list",
       "addMaterial": "Add materials to your list",
       "image": "Image",
-      "infor": "Information",
+      "infor": "Material Name",
       "quantity": "Quantity",
       "unit": "Unit",
       "action": "Action",
@@ -420,7 +419,12 @@
       "contact": "Contact us",
       "additionalMaterials": "Materials proposed by the contractor",
       "customerRequestedMaterials": "Customer requested materials",
-      "selectMaterialRequest": "Please select request want to add"
+      "selectMaterialRequest": "Please select request want to add",
+      "selectExtraMaterialsNote": "You can choose what materials you want to add!",
+      "confirmAccept":"Are you sure you accept this application?",
+      "acceptSuccess":"Accept Successfully!",
+      "confirmReject":"Are you sure you reject this application?",
+      "rejectSuccess": "Reject Successfully!"
     }
   },
   "contractorServiceRequestManager": {
@@ -537,7 +541,6 @@
     "materialRequests": "material requests",
     "materialType": "type of material",
     "applied": "distributor application",
-    "canEditQuantity": "Can edit quantity",
     "canAddMaterial": "Can add material",
     "noEditQuantity": "No edit quality",
     "noAddMaterial": "No add material"
@@ -741,6 +744,7 @@
       "service": "Services",
       "serviceRequest": "Service Request",
       "material": "Material",
+      "materialRequest": "Material Request",
       "partner": "Partner",
       "support": "Support Manager",
       "supportChat": "Chat",
@@ -900,6 +904,46 @@
       "noFile": "No files selected",
       "filesSelected": " selected file"
     }
+  },
+  "adminMaterialRequestManager": {
+      "title": "Material Request Manager",
+      "subtitle": "Manage all material requests from customers",
+      "materialRequests": "Material Requests",
+      "address": "Address",
+      "description": "Description",
+      "materials": "Materials",
+      "items": "material(s)",
+      "distributors": "Distributor Applications",
+      "status": "Status",
+      "action": "Action",
+      "no": "No.",
+      "type": "Type",
+      "empty": "No Material Requests",
+      "empty_description": "No material requests found. Start creating new one.",
+      "customer": "Customer",
+      "materialsList": "Materials List",
+      "materialName": "Material Name",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "listDistributors": "List of Distributors",
+      "totalDistributors": "Total Distributors",
+      "noDistributor": "No Distributor",
+      "noDistributorYet": "No distributors have applied for this request yet",
+      "viewProfile": "View Details",
+      "customerInfo":"Customer Information",
+      "customerName": "Customer name",
+      "customerEmail": "Customer email",
+      "customerPhone":"Customer phone nubmer",
+      "distributorDetail": {
+        "title": "Distributor Details",
+        "totalPrice": "Estimated Total Price",
+        "completedProject": "Completed Projects",
+        "project": "projects",
+        "rating": "Rating",
+        "createAt": "Created At",
+        "quotedItems": "Quoted Items List",
+        "price": "Price"
+      }
   },
   "adminServiceManager": {
     "title": "Service Manager",

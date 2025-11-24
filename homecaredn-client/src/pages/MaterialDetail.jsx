@@ -31,6 +31,8 @@ export default function MaterialDetail() {
           PageSize: 8,
           SortBy: 'random',
           FilterCategoryID: material.categoryID || null,
+          FilterBrandID: material.brandID || null,
+          ExcludedID: materialID,
         });
         setRandomMaterials(data || []);
       } catch (err) {
@@ -40,7 +42,7 @@ export default function MaterialDetail() {
     };
 
     loadMaterials();
-  }, [fetchMaterials, material.categoryID]);
+  }, [fetchMaterials, material.categoryID, material.brandID, materialID]);
 
   if (loading) return <Loading />;
   return <ItemDetail item={material} relatedItems={randomMaterials} />;

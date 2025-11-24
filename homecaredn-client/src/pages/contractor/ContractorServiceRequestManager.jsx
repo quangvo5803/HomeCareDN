@@ -57,7 +57,7 @@ export default function ContractorServiceRequestManager() {
       );
     },
 
-    onNewContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -69,7 +69,7 @@ export default function ContractorServiceRequestManager() {
         )
       );
     },
-    onAcceptedContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -81,7 +81,7 @@ export default function ContractorServiceRequestManager() {
         )
       );
     },
-    onDeleteContractorApplication: (payload) => {
+    [RealtimeEvents.ContractorApplicationDelete]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -98,7 +98,7 @@ export default function ContractorServiceRequestManager() {
     },
 
     // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
-    onPaymentUpdate: (payload) => {
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID

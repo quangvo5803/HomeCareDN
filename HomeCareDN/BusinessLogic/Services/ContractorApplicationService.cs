@@ -66,6 +66,7 @@ namespace BusinessLogic.Services
                 .Where(ca => ca.ServiceRequestID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
+            query = query.OrderByDescending(c => c.CreatedAt);
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
@@ -109,11 +110,10 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork
                 .ContractorApplicationRepository.GetQueryable(includeProperties: "ServiceRequest")
-                .Where(ca => ca.ContractorID == parameters.FilterID)
-                .AsSingleQuery()
-                .AsNoTracking();
+                .Where(ca => ca.ContractorID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
+            query = query.OrderBy(c => c.CreatedAt);
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);

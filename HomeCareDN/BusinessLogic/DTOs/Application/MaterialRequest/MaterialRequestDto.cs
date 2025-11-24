@@ -22,7 +22,7 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public required string Status { get; set; }
         public int DistributorApplyCount { get; set; }
 
-        public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }
+        public ICollection<MaterialRequestItemDto>? MaterialRequestItems { get; set; }
         public DistributorApplicationDto? SelectedDistributorApplication { get; set; }
     }
 }

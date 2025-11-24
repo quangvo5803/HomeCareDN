@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
+using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
@@ -27,7 +28,7 @@ namespace BusinessLogic.Services
         private const string DISTRIBUTOR = "Distributor";
         private const string INCLUDE_DELETE = "MaterialRequestItems,DistributorApplications";
         private const string INCLUDE =
-            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication";
+            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Brand,MaterialRequestItems.Material.Category,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material.Brand,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material";
         private const string ERROR_MATERIAL_SERVICE = "MATERIAL_SERVICE";
         private const string ERROR_MATERIAL_SERVICE_NOT_FOUND = "MATERIAL_SERVICE_NOT_FOUND";
 
@@ -260,6 +261,13 @@ namespace BusinessLogic.Services
         // ==================== Admin ====================
         private async Task MapForAdminAsync(MaterialRequest item, MaterialRequestDto dto)
         {
+            var customer = await _userManager.FindByIdAsync(item.CustomerID.ToString());
+            if (customer != null)
+            {
+                dto.CustomerName = customer.FullName ?? customer.Email;
+                dto.CustomerEmail = customer.Email;
+                dto.CustomerPhone = customer.PhoneNumber;
+            }
             if (item.SelectedDistributorApplication != null)
             {
                 var selected = item.SelectedDistributorApplication;
@@ -276,6 +284,7 @@ namespace BusinessLogic.Services
                     Status = selected.Status.ToString(),
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
+                    Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
                     CompletedProjectCount = 0,
                     AverageRating = 0,
                 };

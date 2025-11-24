@@ -23,6 +23,7 @@ export const MaterialProvider = ({ children }) => {
       FilterCategoryID,
       FilterBrandID,
       Search,
+      ExcludedID,
     } = {}) => {
       try {
         const data = await materialService.getAll({
@@ -33,6 +34,7 @@ export const MaterialProvider = ({ children }) => {
           FilterCategoryID,
           FilterBrandID,
           Search,
+          ExcludedID,
         });
 
         const itemsWithType = (data.items || []).map((m) => ({
