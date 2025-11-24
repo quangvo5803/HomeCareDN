@@ -33,6 +33,8 @@ import AdminCategoryManager from './pages/admin/AdminCategoryManager';
 import AdminServiceManager from './pages/admin/AdminServiceManager';
 import AdminSupportManager from './pages/admin/AdminSupportManager';
 import AdminMaterialManager from './pages/admin/AdminMaterialManager';
+import AdminMaterialRequestManager from './pages/admin/AdminMaterialRequestManager';
+import AdminMaterialRequestDetail from './pages/admin/AdminMaterialRequestDetail';
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
@@ -312,6 +314,14 @@ function Layout() {
           />
           <Route path="SupportManager" element={<AdminSupportManager />} />
           <Route path="MaterialManager" element={<AdminMaterialManager />} />
+          <Route
+            path="MaterialRequestManager"
+            element={<AdminMaterialRequestManager />}
+          />
+          <Route
+            path="MaterialRequestManager/:materialRequestId"
+            element={<AdminMaterialRequestDetail />}
+          />
           <Route
             path="PartnerRequestManager"
             element={<AdminPartnerRequestManager />}

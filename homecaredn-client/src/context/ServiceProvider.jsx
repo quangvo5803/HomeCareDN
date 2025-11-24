@@ -22,6 +22,7 @@ export const ServiceProvider = ({ children }) => {
       SortBy,
       FilterID,
       Search,
+      ExcludedID,
     } = {}) => {
       try {
         const data = await serviceService.getAll({
@@ -30,6 +31,7 @@ export const ServiceProvider = ({ children }) => {
           SortBy,
           FilterID,
           Search,
+          ExcludedID,
         });
         const itemsWithType = (data.items || []).map((s) => ({
           ...s,

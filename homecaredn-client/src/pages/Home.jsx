@@ -6,6 +6,7 @@ import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
 import CardItem from '../components/CardItem';
 import LoadingComponent from '../components/LoadingComponent';
+import { Link } from 'react-router-dom';
 
 const slides = [
   {
@@ -19,6 +20,7 @@ const slides = [
       'home.slider_category2',
       'home.slider_category3',
     ],
+    link: '/ConstructionViewAll',
   },
   {
     id: 2,
@@ -31,6 +33,7 @@ const slides = [
       'home.slider_category2',
       'home.slider_category3',
     ],
+    link: '/RepairViewAll',
   },
   {
     id: 3,
@@ -43,6 +46,7 @@ const slides = [
       'home.slider_category2',
       'home.slider_category3',
     ],
+    link: '/MaterialViewAll',
   },
 ];
 
@@ -52,32 +56,24 @@ const FACT_ITEMS = [
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-1_gdm2t1.jpg',
     titleKey: 'home.fact_step1_title',
     descKey: 'home.fact_step1_desc',
-    ctaKey: 'BUTTON.ReadMore',
-    href: '#',
   },
   {
     no: '02',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-4_jhvrtl.jpg',
     titleKey: 'home.fact_step2_title',
     descKey: 'home.fact_step2_desc',
-    ctaKey: 'BUTTON.ReadMore',
-    href: '#',
   },
   {
     no: '03',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286667/fact-3_ag7tin.jpg',
     titleKey: 'home.fact_step3_title',
     descKey: 'home.fact_step3_desc',
-    ctaKey: 'BUTTON.ReadMore',
-    href: '#',
   },
   {
     no: '04',
     img: 'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749286666/fact-2_fxjryy.jpg',
     titleKey: 'home.fact_step4_title',
     descKey: 'home.fact_step4_desc',
-    ctaKey: 'BUTTON.ReadMore',
-    href: '#',
   },
 ];
 
@@ -154,10 +150,10 @@ export default function Home() {
   // 👉 tạo extSlides với id mới để tránh trùng key
   const extSlides = hasMany
     ? [
-      { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
-      ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
-      { ...baseSlides[0], cloneId: 'tail' },
-    ]
+        { ...baseSlides[baseSlides.length - 1], cloneId: 'head' },
+        ...baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` })),
+        { ...baseSlides[0], cloneId: 'tail' },
+      ]
     : baseSlides.map((s, i) => ({ ...s, cloneId: `orig-${i}` }));
 
   const [idx, setIdx] = useState(hasMany ? 1 : 0);
@@ -217,14 +213,16 @@ export default function Home() {
               <div className="absolute inset-0 flex items-center bg-gradient-to-t from-black/70 via-black/40 to-black/10">
                 <div className="container px-6 mx-auto text-left md:px-20">
                   <h5
-                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white uppercase mb-3 text-sm md:text-base tracking-wider animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.subtitle)}
                   </h5>
                   <h1
-                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${current === i ? 'slideInDown' : ''
-                      }`}
+                    className={`text-white text-3xl md:text-6xl font-extrabold leading-tight mb-6 max-w-3xl animated ${
+                      current === i ? 'slideInDown' : ''
+                    }`}
                   >
                     {t(slide.title)}
                   </h1>
@@ -239,12 +237,12 @@ export default function Home() {
                       </li>
                     ))}
                   </ol>
-                  <a
-                    href="https://github.com/"
+                  <Link
+                    to={slide.link}
                     className="inline-block px-8 py-3 font-medium text-white transition bg-orange-500 rounded-md shadow-lg hover:bg-orange-600 "
                   >
                     {t('home.slider_button')}
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -355,34 +353,13 @@ export default function Home() {
                       {it.no}
                     </h1>
 
-                    <h4 className="mt-2 mb-3 text-2xl font-extrabold text-white">
+                    <h4 className="mt-2 mb-3 text-xl font-extrabold text-white">
                       {t(it.titleKey)}
                     </h4>
 
                     <p className="text-white/95 text-sm md:text-base max-w-[46ch] leading-relaxed">
                       {t(it.descKey)}
                     </p>
-
-                    <a
-                      href={it.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        window.location.reload();
-                      }}
-                      className="inline-flex items-center gap-2 mt-6 text-sm font-semibold tracking-wide text-white transition-colors hover:text-primary "
-                      aria-label={`${t('BUTTON.ReadMore')} ${t(it.titleKey)}`}
-                    >
-                      {t(it.ctaKey)}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="w-4 h-4"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
-                      >
-                        <path d="M13.172 12 9.88 8.707l1.415-1.414L16 12l-4.707 4.707-1.414-1.414z" />
-                      </svg>
-                    </a>
                   </div>
                 </article>
               ))}
@@ -637,8 +614,9 @@ export default function Home() {
               >
                 <div className="relative overflow-hidden">
                   <div
-                    className={`flex ${anim ? 'transition-transform duration-700 ease-out' : ''
-                      }`}
+                    className={`flex ${
+                      anim ? 'transition-transform duration-700 ease-out' : ''
+                    }`}
                     style={{ transform: `translateX(-${idx * 100}%)` }}
                     onTransitionEnd={handleTransitionEnd}
                   >

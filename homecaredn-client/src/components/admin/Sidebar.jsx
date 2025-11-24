@@ -43,6 +43,11 @@ export default function Sidebar({ unreadCount = 0 }) {
       link: '/Admin/MaterialManager',
     },
     {
+      icon: 'text-orange-600 fa-solid fa-boxes',
+      title: 'materialRequest',
+      link: '/Admin/MaterialRequestManager',
+    },
+    {
       icon: 'text-rose-600 fa-solid fa-gear',
       title: 'service',
       link: '/Admin/ServiceManager',
@@ -163,7 +168,7 @@ export default function Sidebar({ unreadCount = 0 }) {
                     end={menuItem.link === '/Admin'}
                     onClick={closeMobileMenu}
                     className={({ isActive }) =>
-                      `py-3 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${
+                      `py-2.5 my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4 font-semibold transition-colors ${
                         isActive
                           ? 'bg-blue-500 text-white'
                           : 'text-slate-700 hover:bg-blue-100'
