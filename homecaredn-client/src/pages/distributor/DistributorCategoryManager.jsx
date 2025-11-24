@@ -7,6 +7,7 @@ import { Pagination } from 'antd';
 import CategoryModal from '../../components/modal/CategoryModal';
 import { useAuth } from '../../hook/useAuth';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
+import { useDebounce } from 'use-debounce';
 
 export default function DistributorCategoryManager() {
   const { t, i18n } = useTranslation();
@@ -14,6 +15,9 @@ export default function DistributorCategoryManager() {
   const { user } = useAuth();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [debouncedSearch] = useDebounce(search, 500);
 
   const pageSize = 10;
 
@@ -34,9 +38,10 @@ export default function DistributorCategoryManager() {
     fetchCategories({
       PageNumber: currentPage,
       PageSize: pageSize,
-      FilterID: user?.id,
+      SortBy: sortBy,
+      Search: debouncedSearch || '',
     });
-  }, [fetchCategories, currentPage, pageSize, user]);
+  }, [fetchCategories, currentPage, pageSize, sortBy, debouncedSearch]);
 
   // Delete Category
   const handleDelete = async (categoryID) => {
@@ -54,7 +59,6 @@ export default function DistributorCategoryManager() {
           await fetchCategories({
             PageNumber: currentPage,
             PageSize: pageSize,
-            FilterID: user?.id,
           });
         }
 
@@ -83,6 +87,21 @@ export default function DistributorCategoryManager() {
       setSubmitting(false);
     }
   };
+  // Search
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
+  // Determine action permissions
+  const getActionPermissions = (category) => {
+    const isOwner = user?.id === category.userID;
+    const isInactive = !category.isActive;
+
+    return {
+      canEdit: isOwner && isInactive,
+      canDelete: isOwner,
+    };
+  };
 
   if (submitting || uploadProgress || loading)
     return <Loading progress={uploadProgress} />;
@@ -104,16 +123,62 @@ export default function DistributorCategoryManager() {
             </span>
           </div>
         </div>
-        <button
-          className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
-          onClick={() => {
-            setEditingCategoryID(null);
-            setIsModalOpen(true);
-          }}
-        >
-          <i className="mr-2 fa-solid fa-plus"></i>
-          {t('BUTTON.AddNewCategory')}
-        </button>
+        {/* Right Side: Actions (Filter - Search - Add) */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          {/*  Filter Select */}
+          <select
+            className="w-full sm:w-auto px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="">{t('common.sortDefault')}</option>
+            <option
+              value={i18n.language === 'vi' ? 'categoryname' : 'categorynameen'}
+            >
+              {t('common.sortName')}
+            </option>
+            <option
+              value={
+                i18n.language === 'vi'
+                  ? 'categoryname_desc'
+                  : 'categorynameen_desc'
+              }
+            >
+              {t('common.sortNameDesc')}
+            </option>
+            <option value="materialcount">
+              {t('common.sortMaterialCount')}
+            </option>
+            <option value="materialcount_desc">
+              {t('common.sortMaterialCountDesc')}
+            </option>
+          </select>
+
+          {/* Search Input */}
+          <div className="relative group w-full sm:w-auto">
+            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm group-hover:text-orange-500 transition-colors" />
+            <input
+              id="search-input"
+              type="text"
+              value={search}
+              onChange={handleSearchChange}
+              placeholder={t('common.search')}
+              className="pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm hover:border-orange-300 bg-white"
+            />
+          </div>
+
+          {/* Add Button */}
+          <button
+            className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600 shadow-sm flex items-center justify-center"
+            onClick={() => {
+              setEditingCategoryID(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <i className="mr-2 fa-solid fa-plus"></i>
+            {t('BUTTON.AddNewCategory')}
+          </button>
+        </div>
       </div>
 
       {/*  render modal */}
@@ -154,85 +219,92 @@ export default function DistributorCategoryManager() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {categories && categories.length > 0 ? (
-              categories.map((category, index) => (
-                <tr
-                  key={category.categoryID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                  }`}
-                >
-                  {/* STT */}
-                  <td className="px-4 py-4 text-center align-middle">
-                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
-                      {(currentPage - 1) * pageSize + index + 1}
-                    </span>
-                  </td>
+              categories.map((category, index) => {
+                const { canEdit, canDelete } = getActionPermissions(category);
+                return (
+                  <tr
+                    key={category.categoryID}
+                    className={`hover:bg-sky-50 transition-colors duration-150 ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
+                  >
+                    {/* STT */}
+                    <td className="px-4 py-4 text-center align-middle">
+                      <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </span>
+                    </td>
 
-                  {/* Category Name + Avatar */}
-                  <td className="flex items-center gap-3 px-6 py-4 text-left">
-                    {category.categoryLogo ? (
-                      <img
-                        src={category.categoryLogo}
-                        alt={category.categoryName}
-                        className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
-                      />
-                    ) : (
-                      <img
-                        src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                        alt="No image"
-                        className="object-cover border border-gray-200 rounded-lg w-13 h-13"
-                      />
-                    )}
-                    <span className="font-medium text-gray-900">
-                      {i18n.language === 'vi'
-                        ? category.categoryName
-                        : category.categoryNameEN || category.categoryName}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-center align-middle">
-                    <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                      {category.materials?.length || 0}{' '}
-                      {t('distributorCategoryManager.materials')}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-center align-middle">
-                    {category.isActive ? (
+                    {/* Category Name + Avatar */}
+                    <td className="flex items-center gap-3 px-6 py-4 text-left">
+                      {category.categoryLogo ? (
+                        <img
+                          src={category.categoryLogo}
+                          alt={category.categoryName}
+                          className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
+                        />
+                      ) : (
+                        <img
+                          src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                          alt="No image"
+                          className="object-cover border border-gray-200 rounded-lg w-13 h-13"
+                        />
+                      )}
+                      <span className="font-medium text-gray-900">
+                        {i18n.language === 'vi'
+                          ? category.categoryName
+                          : category.categoryNameEN || category.categoryName}
+                      </span>
+                    </td>
+                    <td className="px-4 py-4 text-center align-middle">
                       <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
-                        {t('BUTTON.Activate')}
+                        {category.materials?.length || 0}{' '}
+                        {t('distributorCategoryManager.materials')}
                       </span>
-                    ) : (
-                      <span className="px-3 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
-                        {t('BUTTON.Deactivate')}
-                      </span>
-                    )}
-                  </td>
+                    </td>
+                    <td className="px-4 py-4 text-center align-middle">
+                      {category.isActive ? (
+                        <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                          {t('BUTTON.Activate')}
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full">
+                          {t('BUTTON.Deactivate')}
+                        </span>
+                      )}
+                    </td>
 
-                  {/* Actions */}
-                  <td className="px-4 py-4 text-center">
-                    {category.materials?.length === 0 && (
-                      <div className="flex justify-center gap-2">
-                        <button
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                          onClick={() => {
-                            setEditingCategoryID(category.categoryID);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          <i className="fa-solid fa-pen"></i> {t('BUTTON.Edit')}
-                        </button>
-
-                        <button
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
-                          onClick={() => handleDelete(category.categoryID)}
-                        >
-                          <i className="fa-solid fa-trash"></i>{' '}
-                          {t('BUTTON.Delete')}
-                        </button>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              ))
+                    {/* Actions */}
+                    <td className="px-4 py-4 text-center">
+                      {category.materials?.length === 0 && (
+                        <div className="flex justify-center gap-2">
+                          {canEdit && (
+                            <button
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                              onClick={() => {
+                                setEditingCategoryID(category.categoryID);
+                                setIsModalOpen(true);
+                              }}
+                            >
+                              <i className="fa-solid fa-pen"></i>{' '}
+                              {t('BUTTON.Edit')}
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button
+                              className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
+                              onClick={() => handleDelete(category.categoryID)}
+                            >
+                              <i className="fa-solid fa-trash"></i>{' '}
+                              {t('BUTTON.Delete')}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={6} className="py-4 text-center text-gray-500">
