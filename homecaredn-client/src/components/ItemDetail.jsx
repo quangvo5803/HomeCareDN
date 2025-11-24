@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
 import { useMaterialRequest } from '../hook/useMaterialRequest';
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
 import ExsitingMaterialRequestModal from './modal/ExistingMaterialRequestModal';
 
 export default function ItemDetail({ item, relatedItems = [] }) {
@@ -24,7 +26,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
       setMainImage(item.imageUrls[0]);
     }
   }, [item]);
-
+  useEffect(() => {
+    const vb = new VenoBox({ selector: '.venobox' });
+    return () => vb.close();
+  });
   const serviceTypeConfig = {
     Construction: {
       route: '/ConstructionViewAll',
@@ -124,14 +129,31 @@ export default function ItemDetail({ item, relatedItems = [] }) {
             <div className="sticky space-y-4 top-4">
               <div className="p-8 overflow-hidden bg-white shadow-xl rounded-2xl">
                 <div className="flex items-center justify-center aspect-square">
-                  <img
-                    src={mainImage}
-                    alt={item.name}
-                    className="object-contain max-w-full max-h-full"
-                  />
+                  <a
+                    key={mainImage}
+                    href={mainImage}
+                    className="venobox  aspect-square rounded-lg overflow-hidden hover:opacity-90 transition-opacity flex items-center justify-center"
+                    data-gall="item-gallery"
+                  >
+                    <img
+                      src={mainImage}
+                      alt={item.name}
+                      className="object-contain max-w-full max-h-full"
+                    />
+                  </a>
                 </div>
               </div>
-
+              {/* Hidden anchors for Venobox gallery */}
+              {item.imageUrls?.map((src) =>
+                src !== mainImage ? (
+                  <a
+                    key={'hidden-' + src}
+                    href={src}
+                    className="venobox hidden"
+                    data-gall="item-gallery"
+                  />
+                ) : null
+              )}
               {item.imageUrls?.length > 1 && (
                 <div className="grid grid-cols-4 gap-3">
                   {item.imageUrls.slice(0, 4).map((src, i) => (
@@ -456,7 +478,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
               }/${m.serviceID || m.materialID}`}
               className="overflow-hidden transition-all bg-white shadow-lg rounded-2xl hover:shadow-2xl hover:-translate-y-1"
             >
-              <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="relative p-4 aspect-square bg-white">
                 <img
                   src={
                     m.imageUrls?.[0] ||

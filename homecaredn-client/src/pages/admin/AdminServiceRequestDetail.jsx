@@ -281,6 +281,65 @@ export default function AdminServiceRequestDetail() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto p-4 lg:p-6 space-y-6">
+        {/* Customer Information Section */}
+        <div className="bg-white rounded-2xl shadow-sm p-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-5 flex items-center gap-2">
+            <i className="fa-solid fa-user-tie text-orange-500"></i>
+            {t('adminServiceRequestManager.customerInfo') ||
+              'Thông tin khách hàng'}
+          </h3>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Customer Name */}
+            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i className="fa-solid fa-circle-user text-blue-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">
+                  {t('adminServiceRequestManager.customerName') ||
+                    'Tên khách hàng'}
+                </p>
+                <p className="font-semibold text-gray-800">
+                  {serviceRequestDetail.customerName || 'N/A'}
+                </p>
+              </div>
+            </div>
+
+            {/* Customer Email */}
+            <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i className="fa-solid fa-envelope text-green-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">
+                  {t('adminServiceRequestManager.customerEmail') ||
+                    'Email khách hàng'}
+                </p>
+                <p className="font-semibold text-gray-800 break-all">
+                  {serviceRequestDetail.customerEmail || 'N/A'}
+                </p>
+              </div>
+            </div>
+
+            {/* Customer Phone */}
+            <div className="flex items-start gap-3 p-4 bg-purple-50 rounded-xl border border-purple-100">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i className="fa-solid fa-phone text-purple-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 font-medium">
+                  {t('adminServiceRequestManager.customerPhone') ||
+                    'Số điện thoại'}
+                </p>
+                <p className="font-semibold text-gray-800">
+                  {serviceRequestDetail.customerPhone || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Service Request Info */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="mb-6">

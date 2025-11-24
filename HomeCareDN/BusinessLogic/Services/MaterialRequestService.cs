@@ -257,6 +257,13 @@ namespace BusinessLogic.Services
         // ==================== Admin ====================
         private async Task MapForAdminAsync(MaterialRequest item, MaterialRequestDto dto)
         {
+            var customer = await _userManager.FindByIdAsync(item.CustomerID.ToString());
+            if (customer != null)
+            {
+                dto.CustomerName = customer.FullName ?? customer.Email;
+                dto.CustomerEmail = customer.Email;
+                dto.CustomerPhone = customer.PhoneNumber;
+            }
             if (item.SelectedDistributorApplication != null)
             {
                 var selected = item.SelectedDistributorApplication;

@@ -49,6 +49,12 @@ export default function Sidebar({
           to: '/Distributor/MaterialManager',
         },
         {
+          key: 'profile',
+          label: t('partnerDashboard.profile'),
+          icon: <i className="fa-solid fa-id-card"></i>,
+          to: '/Distributor/Profile',
+        },
+        {
           key: 'logout',
           label: t('header.logout'),
           icon: <i className="text-red-500 fa-solid fa-right-from-bracket"></i>,

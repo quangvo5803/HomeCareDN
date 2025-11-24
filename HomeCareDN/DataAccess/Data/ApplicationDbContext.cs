@@ -93,6 +93,19 @@ namespace DataAccess.Data
                 .HasOne(sr => sr.SelectedContractorApplication)
                 .WithOne()
                 .HasForeignKey<ServiceRequest>(sr => sr.SelectedContractorApplicationID);
+            // 1 MaterialRequest có nhiều DistributorApplications
+            modelBuilder
+                .Entity<DistributorApplication>()
+                .HasOne(ca => ca.MaterialRequest)
+                .WithMany(sr => sr.DistributorApplications)
+                .HasForeignKey(ca => ca.MaterialRequestID);
+
+            // 1 MaterialRequest có 1 SelectedDistributorApplications (1-1)
+            modelBuilder
+                .Entity<MaterialRequest>()
+                .HasOne(sr => sr.SelectedDistributorApplication)
+                .WithOne()
+                .HasForeignKey<MaterialRequest>(sr => sr.SelectedDistributorApplicationID);
 
             modelBuilder.Entity<Conversation>().HasIndex(c => c.ServiceRequestID).IsUnique();
             base.OnModelCreating(modelBuilder);

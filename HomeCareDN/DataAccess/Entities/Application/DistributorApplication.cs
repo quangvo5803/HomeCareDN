@@ -1,4 +1,6 @@
-﻿namespace DataAccess.Entities.Application
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DataAccess.Entities.Application
 {
     public class DistributorApplication
     {
@@ -11,5 +13,8 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public ICollection<DistributorApplicationItem>? Items { get; set; }
+
+        [ForeignKey("MaterialRequestID")]
+        public MaterialRequest? MaterialRequest { get; set; }
     }
 }

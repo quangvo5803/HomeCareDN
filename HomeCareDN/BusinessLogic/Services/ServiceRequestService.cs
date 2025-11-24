@@ -70,7 +70,7 @@ namespace BusinessLogic.Services.Interfaces
             }
 
             var totalCount = await query.CountAsync();
-            
+
             if (role == ADMIN && parameters.FilterID != null)
             {
                 query = query.Where(s => s.CustomerID == parameters.FilterID);
@@ -443,6 +443,13 @@ namespace BusinessLogic.Services.Interfaces
         // ==================== Admin ====================
         private async Task MapForAdminAsync(ServiceRequest item, ServiceRequestDto dto)
         {
+            var customer = await _userManager.FindByIdAsync(item.CustomerID.ToString());
+            if (customer != null)
+            {
+                dto.CustomerName = customer.FullName ?? customer.Email;
+                dto.CustomerEmail = customer.Email;
+                dto.CustomerPhone = customer.PhoneNumber;
+            }
             if (item.SelectedContractorApplication != null)
             {
                 var selected = item.SelectedContractorApplication;

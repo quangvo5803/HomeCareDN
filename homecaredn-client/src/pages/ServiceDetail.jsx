@@ -37,6 +37,7 @@ export default function ServiceDetail() {
           PageSize: 8,
           SortBy: 'random',
           FilterServiceType: service.serviceType || null,
+          ExcludedID: serviceID,
         });
         setRandomServices(data || []);
       } catch (err) {
@@ -46,7 +47,7 @@ export default function ServiceDetail() {
     };
 
     loadServices();
-  }, [fetchServices, service.serviceType]);
+  }, [fetchServices, service.serviceType, serviceID]);
 
   if (loading) return <Loading />;
 
