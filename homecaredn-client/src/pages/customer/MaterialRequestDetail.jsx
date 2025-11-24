@@ -1183,7 +1183,7 @@ export default function MaterialRequestDetail() {
         )}
 
         {/* Action Buttons */}
-        {materialRequest.selectedDistributorApplication == null && (
+        {selectedDistributor.status == 'Pending' && (
           <div className="grid grid-cols-2 gap-3 mt-6">
             <button
               onClick={handleAccept}

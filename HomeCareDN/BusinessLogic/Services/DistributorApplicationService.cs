@@ -459,7 +459,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.DistributorApplicationID}",
+                $"user_{dto.DistributorID}",
                 DISTRIBUTOR_APPLICATION_REJECT,
                 new
                 {
