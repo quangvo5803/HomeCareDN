@@ -1,15 +1,16 @@
-﻿using System.Diagnostics.Contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -20,6 +21,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string DISTRIBUTOR_APPLY = "DistributorApply";
         private const string DISTRIBUTOR = "Distributor";
@@ -32,13 +34,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<
@@ -224,6 +228,14 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
+            //await _notificationService.NotifyApplyToRequestAsync(new ApplyNotificationDto
+            //{
+            //    TargetUserId = materialRequest.CustomerID,
+            //    Title = "Có nhà phân phối mới đã tham gia vào yêu cầu vật liệu của bạn",
+            //    Message = $"Nhà phân phối đã tham gia vào yêu cầu {materialRequest.MaterialRequestID}",
+            //    DataKey = $"MaterialRequest_{materialRequest.MaterialRequestID}_APPLY",
+            //    Action = NotificationAction.Apply.ToString()
+            //});
             await Task.WhenAll(notifyTasks);
             return dto;
         }

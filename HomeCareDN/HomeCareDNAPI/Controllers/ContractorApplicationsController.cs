@@ -10,7 +10,7 @@ namespace HomeCareDNAPI.Controllers
 {
     [ApiController]
     [Route("api/contractor-applications")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ContractorApplicationsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
@@ -59,7 +59,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         // ====================== CUSTOMER ======================
-        [Authorize(Roles = "Customer")]
+        //[Authorize(Roles = "Customer")]
         [HttpGet("customer")]
         public async Task<IActionResult> GetAllForCustomer([FromQuery] QueryParameters parameters)
         {

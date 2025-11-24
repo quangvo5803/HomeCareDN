@@ -25,6 +25,7 @@ namespace DataAccess.Data
         public DbSet<DistributorApplication> DistributorApplications { get; set; }
         public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -95,6 +96,11 @@ namespace DataAccess.Data
                 .HasForeignKey<ServiceRequest>(sr => sr.SelectedContractorApplicationID);
 
             modelBuilder.Entity<Conversation>().HasIndex(c => c.ServiceRequestID).IsUnique();
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.Property(n => n.Type).HasConversion<string>();
+                entity.Property(n => n.Action).HasConversion<string>();
+            });
             base.OnModelCreating(modelBuilder);
         }
     }

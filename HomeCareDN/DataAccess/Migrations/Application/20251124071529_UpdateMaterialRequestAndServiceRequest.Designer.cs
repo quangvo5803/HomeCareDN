@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251124071529_UpdateMaterialRequestAndServiceRequest")]
+    partial class UpdateMaterialRequestAndServiceRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -462,6 +465,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
+
                     b.Property<Guid?>("SelectedDistributorApplicationDistributorApplicationID")
                         .HasColumnType("uniqueidentifier");
 
@@ -509,10 +515,6 @@ namespace DataAccess.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -525,9 +527,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PendingCount")
-                        .HasColumnType("int");
 
                     b.Property<string>("TargetRoles")
                         .HasColumnType("nvarchar(max)");
@@ -769,6 +768,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<int>("Floors")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsNotified")
+                        .HasColumnType("bit");
 
                     b.Property<double>("Length")
                         .HasColumnType("float");

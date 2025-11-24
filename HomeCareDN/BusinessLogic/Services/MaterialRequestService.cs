@@ -21,6 +21,7 @@ namespace BusinessLogic.Services
         private readonly AuthorizeDbContext _authorizeDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string ADMIN = "Admin";
         private const string DISTRIBUTOR = "Distributor";
@@ -35,7 +36,8 @@ namespace BusinessLogic.Services
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
@@ -43,6 +45,7 @@ namespace BusinessLogic.Services
             _authorizeDbContext = authorizeDbContext;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
@@ -450,6 +453,7 @@ namespace BusinessLogic.Services
                     new[] { distributorDto },
                     DISTRIBUTOR
                 );
+                await _notificationService.NotifyNewMaterialRequestAsync(materialRequest);
                 await _notifier.SendToApplicationGroupAsync(
                     "role_Admin",
                     "MaterialRequest.Created",

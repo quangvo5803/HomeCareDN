@@ -9,6 +9,7 @@ using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Review;
@@ -61,6 +62,8 @@ namespace BusinessLogic.Mapping
             CreateMap<MaterialRequestCreateRequestDto, MaterialRequest>();
             CreateMap<DistributorCreateApplicationDto, DistributorApplication>();
             CreateMap<DistributorCreateApplicationItemDto, DistributorApplicationItem>();
+            CreateMap<NotificationPersonalCreateOrUpdateDto, Notification>();
+            CreateMap<NotificationSystemCreateOrUpdateDto, Notification>();
 
             // ------------------------
             // Update DTO -> Entity (Write)
@@ -91,6 +94,8 @@ namespace BusinessLogic.Mapping
 
             CreateMap<ServiceUpdateRequestDto, Service>()
                 .ForMember(dest => dest.Images, opt => opt.Ignore());
+            CreateMap<NotificationPersonalCreateOrUpdateDto, Notification>();
+            CreateMap<NotificationSystemCreateOrUpdateDto, Notification>();
 
             // ------------------------
             // Entity -> DTO (Read / Response)
@@ -388,6 +393,8 @@ namespace BusinessLogic.Mapping
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Material!.Images))
                 );
+
+            CreateMap<Notification, NotificationDto>();
         }
 
         // ------------------------

@@ -1,7 +1,7 @@
-﻿using System.Data;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
@@ -11,6 +11,8 @@ using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -21,6 +23,7 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string CONTRACTOR_APPLY = "ContractorApply";
         private const string CONTRACTOR = "Contractor";
@@ -38,13 +41,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<
@@ -314,6 +319,23 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
+            //await _notificationService.NotifyApplyToRequestAsync(new ApplyNotificationDto
+            //{
+            //    TargetUserId = serviceRequest.CustomerID,
+            //    Title = "Có nhà thầu mới đã tham gia vào yêu cầu dịch vụ của bạn",
+            //    Message = $"Nhà thầu đã tham gia vào yêu cầu {serviceRequest.ServiceType}",
+            //    DataKey = $"ServiceRequest_{serviceRequest.ServiceRequestID}_APPLY",
+            //    Action = NotificationAction.Apply
+            //});
+            await _notificationService.NotifyPersonalAsync(new ApplyNotificationDto
+            {
+                TargetUserId = serviceRequest.CustomerID,
+                Title = "Distributor apply vào yêu cầu vật tư",
+                Message = $"Distributor đã apply vào yêu cầu {serviceRequest.ServiceType}",
+                DataKey = $"MaterialRequest_{serviceRequest.ServiceRequestID}_APPLY",
+                Action = NotificationAction.Apply
+            });
+
             await Task.WhenAll(notifyTasks);
             return dto;
         }
@@ -406,6 +428,15 @@ namespace BusinessLogic.Services
                 "ContractorApplication.Accept",
                 payloadAccept
             );
+            await _notificationService.NotifyPersonalAsync(new ApplyNotificationDto
+            {
+                TargetUserId = contractorApplication.ContractorID,
+                Title = "Yêu cầu dịch vụ được chấp nhận",
+                Message = $"Customer đã chấp nhận yêu cầu {serviceRequest.ServiceType}",
+                DataKey = $"ServiceRequest_{serviceRequest.ServiceRequestID}_ACCEPT",
+                Action = NotificationAction.Accept
+            });
+
             return dto;
         }
 

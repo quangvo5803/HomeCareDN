@@ -24,6 +24,7 @@ namespace BusinessLogic.Services.FacadeService
         public IStatisticService StatisticService { get; }
         public IUserService UserService { get; }
         public IDistributorApplicationService DistributorApplicationService { get; }
+        public INotificationService NotificationService { get; }
 
         public FacadeService(
             CoreDependencies coreDeps,
@@ -36,7 +37,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 coreDeps.AuthorizeDbContext,
                 coreDeps.UserManager,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.NotificationService
             );
 
             MaterialService = new MaterialService(
@@ -49,7 +51,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 identityDeps.UserManager,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.NotificationService
             );
             CategoryService = new CategoryService(coreDeps.UnitOfWork, coreDeps.Mapper);
             BrandService = new BrandService(coreDeps.UnitOfWork, coreDeps.Mapper);
@@ -99,7 +102,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 coreDeps.AuthorizeDbContext,
                 coreDeps.UserManager,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.NotificationService
             );
 
             ReviewService = new ReviewService(
@@ -121,7 +125,15 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
                 identityDeps.UserManager,
-                infraDeps.Notifier
+                infraDeps.Notifier,
+                coreDeps.NotificationService
+            );
+
+            NotificationService = new NotificationService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                infraDeps.Notifier,
+                identityDeps.UserManager
             );
         }
     }

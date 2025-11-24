@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessLogic.Services.Interfaces;
 using DataAccess.Data;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
@@ -14,13 +15,15 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public AuthorizeDbContext AuthorizeDbContext { get; }
         public UserManager<ApplicationUser> UserManager { get; }
         public PayOS PayOS { get; }
+        public INotificationService NotificationService { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            PayOS payOS
+            PayOS payOS,
+            INotificationService notificationService
         )
         {
             UnitOfWork = unitOfWork;
@@ -28,6 +31,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             AuthorizeDbContext = authorizeDbContext;
             UserManager = userManager;
             PayOS = payOS;
+            NotificationService = notificationService;
         }
     }
 }
