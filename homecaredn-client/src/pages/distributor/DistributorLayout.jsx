@@ -4,7 +4,6 @@ import AvatarMenu from '../../components/AvatarMenu';
 import LanguageSwitch from '../../components/LanguageSwitch';
 import NotificationBell from '../../components/NotificationBell';
 import { Outlet } from 'react-router-dom';
-import SupportChatWidget from '../../components/SupportChatWidget';
 
 export default function DistributorLayout() {
   const { t } = useTranslation();
@@ -33,9 +32,6 @@ export default function DistributorLayout() {
         <main className="p-6 space-y-6">
           {/* nơi chứa nội dung distributor */}
           <Outlet />
-          <div className="fixed bottom-6 right-24 z-[60]">
-            <SupportChatWidget brand="HomeCareDN" />
-          </div>
         </main>
 
         <footer className="p-6 text-center text-gray-500 text-sm">

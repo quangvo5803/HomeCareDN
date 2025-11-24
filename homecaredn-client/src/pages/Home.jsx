@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import SupportChatWidget from '../components/SupportChatWidget';
 import { useMaterial } from '../hook/useMaterial';
 import { useService } from '../hook/useService';
 import Reveal from '../components/Reveal';
@@ -702,10 +701,6 @@ export default function Home() {
           </div>
         </section>
       </Reveal>
-
-      <div className="fixed bottom-6 right-24 z-[60]">
-        <SupportChatWidget brand="HomeCareDN" />
-      </div>
     </div>
   );
 }
