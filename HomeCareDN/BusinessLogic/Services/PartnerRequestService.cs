@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Security.Cryptography;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.Services.Interfaces;
@@ -125,7 +126,7 @@ namespace BusinessLogic.Services
                     new Dictionary<string, string[]> { { EMAIL, new[] { ERROR_EMAIL_REGISTED } } }
                 );
 
-            var otp = new Random().Next(0, 1000000).ToString("D6");
+            var otp = RandomNumberGenerator.GetInt32(0, 1000000).ToString("D6");
 
             _memoryCache.Set($"PartnerOTP_{request.Email}", otp, TimeSpan.FromMinutes(5));
 
