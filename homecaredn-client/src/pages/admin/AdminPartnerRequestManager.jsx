@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ Thêm import
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
-import PartnerRequestModal from '../../components/modal/PartnerRequestModal';
 import LoadingComponent from '../../components/LoadingComponent';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useDebounce } from 'use-debounce';
@@ -11,6 +11,7 @@ import StatusBadge from '../../components/StatusBadge';
 
 export default function AdminPartnerRequestManager() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const pageSize = 10;
 
   const {
@@ -22,11 +23,9 @@ export default function AdminPartnerRequestManager() {
   } = usePartnerRequest();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
-  const [partnerRequestID, setPartnerRequestID] = useState(null);
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
@@ -48,6 +47,10 @@ export default function AdminPartnerRequestManager() {
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
     setCurrentPage(1);
+  };
+
+  const handleViewDetail = (id) => {
+    navigate(`/admin/PartnerRequestManager/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -256,15 +259,16 @@ export default function AdminPartnerRequestManager() {
                           </td>
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
+                              {/* ✅ Thay đổi onClick handler */}
                               <button
                                 className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
-                                onClick={() => {
-                                  setIsModalOpen(true);
-                                  setPartnerRequestID(
+                                onClick={() =>
+                                  handleViewDetail(
                                     partnerRequest.partnerRequestID
-                                  );
-                                }}
+                                  )
+                                }
                               >
+                                <i className="fas fa-eye mr-2" />
                                 {t('BUTTON.View')}
                               </button>
                               {partnerRequest?.status === 'Rejected' && (
@@ -276,6 +280,7 @@ export default function AdminPartnerRequestManager() {
                                     )
                                   }
                                 >
+                                  <i className="fas fa-trash mr-2" />
                                   {t('BUTTON.Delete')}
                                 </button>
                               )}
@@ -359,15 +364,14 @@ export default function AdminPartnerRequestManager() {
                       </div>
 
                       <div className="flex space-x-2">
+                        {/* ✅ Thay đổi onClick handler mobile */}
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
-                          onClick={() => {
-                            setIsModalOpen(true);
-                            setPartnerRequestID(
-                              partnerRequest.partnerRequestID
-                            );
-                          }}
+                          onClick={() =>
+                            handleViewDetail(partnerRequest.partnerRequestID)
+                          }
                         >
+                          <i className="fas fa-eye mr-2" />
                           {t('BUTTON.View')}
                         </button>
                         {partnerRequest?.status === 'Rejected' && (
@@ -377,6 +381,7 @@ export default function AdminPartnerRequestManager() {
                               handleDelete(partnerRequest.partnerRequestID)
                             }
                           >
+                            <i className="fas fa-trash mr-2" />
                             {t('BUTTON.Delete')}
                           </button>
                         )}
@@ -423,16 +428,6 @@ export default function AdminPartnerRequestManager() {
           </div>
         </div>
       </div>
-
-      {/* Modal */}
-      <PartnerRequestModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setPartnerRequestID(null);
-        }}
-        partnerRequestID={partnerRequestID}
-      />
     </div>
   );
 }

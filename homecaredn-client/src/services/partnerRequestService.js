@@ -39,7 +39,6 @@ export const partnerRequestService = {
     return response.data;
   },
 
-  // Delete partner request
   delete: async (id) => {
     const response = await api.delete(`/partner-requests/${id}`);
     return response.data;
