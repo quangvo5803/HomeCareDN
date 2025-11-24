@@ -84,6 +84,30 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Customer")]
+        [HttpPut("customer/accept")]
+        public async Task<IActionResult> Accept(
+            [FromBody] DistributorApplicationAcceptRequestDto dto
+        )
+        {
+            var request =
+                await _facadeService.DistributorApplicationService.AcceptDistributorApplicationAsync(
+                    dto
+                );
+            return Ok(request);
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpPut("customer/{distributorApplicationID:guid}/reject")]
+        public async Task<IActionResult> Reject(Guid distributorApplicationID)
+        {
+            var request =
+                await _facadeService.DistributorApplicationService.RejectDistributorApplicationAsync(
+                    distributorApplicationID
+                );
+            return Ok(request);
+        }
+
         // ====================== DISTRIBUTOR ======================
         [Authorize(Roles = "Distributor")]
         [HttpGet("distributor/applied")]
