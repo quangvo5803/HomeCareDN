@@ -9,7 +9,7 @@ using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
-using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Application.Service;
@@ -368,22 +368,26 @@ namespace BusinessLogic.Mapping
 
             CreateMap<DistributorApplication, DistributorApplicationDto>();
             CreateMap<DistributorApplicationItem, DistributorApplicationItemDto>()
-                 .ForMember(dest => dest.Name,
-                    opt => opt.MapFrom(src => src.Material!.Name))
-                .ForMember(dest => dest.BrandName,
-                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandName))
-                .ForMember(dest => dest.CategoryName,
-                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryName))
-                .ForMember(dest => dest.NameEN,
-                    opt => opt.MapFrom(src => src.Material!.NameEN))
-                .ForMember(dest => dest.BrandNameEN,
-                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandNameEN))
-                .ForMember(dest => dest.CategoryNameEN,
-                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryNameEN))
-                .ForMember(dest => dest.Unit,
-                    opt => opt.MapFrom(src => src.Material!.Unit))
-                .ForMember(dest => dest.UnitEN,
-                    opt => opt.MapFrom(src => src.Material!.UnitEN))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Material!.Name))
+                .ForMember(
+                    dest => dest.BrandName,
+                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandName)
+                )
+                .ForMember(
+                    dest => dest.CategoryName,
+                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryName)
+                )
+                .ForMember(dest => dest.NameEN, opt => opt.MapFrom(src => src.Material!.NameEN))
+                .ForMember(
+                    dest => dest.BrandNameEN,
+                    opt => opt.MapFrom(src => src.Material!.Brand!.BrandNameEN)
+                )
+                .ForMember(
+                    dest => dest.CategoryNameEN,
+                    opt => opt.MapFrom(src => src.Material!.Category!.CategoryNameEN)
+                )
+                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Material!.Unit))
+                .ForMember(dest => dest.UnitEN, opt => opt.MapFrom(src => src.Material!.UnitEN))
                 .ForMember(
                     dest => dest.ImageUrls,
                     opt => opt.MapFrom(src => ImagesToUrls(src.Material!.Images))

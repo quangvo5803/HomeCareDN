@@ -2,16 +2,15 @@ import api from './public/api';
 
 export const partnerRequestService = {
   // ====================== ANONYMOUS ======================
+  sendOtp: async (dto) => {
+    const response = await api.post('/partner-requests/send-otp', dto);
+    return response.data;
+  },
+  verifyOtp: async (dto) => {
+    const response = await api.post('/partner-requests/verify-otp', dto);
+    return response.data;
+  },
   create: async (dto) => {
-    // dto = {
-    //   PartnerRequestType: "Distributor" | "Contractor" | ...,
-    //   CompanyName: string,
-    //   Email: string,
-    //   PhoneNumber: string,
-    //   Description?: string,
-    //   ImageUrls: string[],
-    //   ImagePublicIds: string[]
-    // }
     const response = await api.post(
       '/partner-requests/create-partner-request',
       dto
@@ -21,7 +20,6 @@ export const partnerRequestService = {
 
   // ====================== ADMIN ======================
   getAll: async (params) => {
-    // params = { PageNumber, PageSize, SortBy, Search, FilterID, ... }
     const response = await api.get('/partner-requests', { params });
     return response.data;
   },
@@ -37,10 +35,6 @@ export const partnerRequestService = {
   },
 
   reject: async (dto) => {
-    // dto = {
-    //   PartnerRequestID: string (guid),
-    //   RejectionReason: string
-    // }
     const response = await api.put('/partner-requests/reject', dto);
     return response.data;
   },
