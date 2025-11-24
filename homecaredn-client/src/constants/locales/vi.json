@@ -249,7 +249,45 @@
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
       "form_documents": "Tài liệu",
-      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
+      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác",
+      "step2": {
+      "title": "Xác thực Email",
+      "otpSent": "Mã xác thực (OTP) đã được gửi đến email:",
+      "checkSpam": "Vui lòng kiểm tra cả hộp thư Spam/Rác",
+      "enterOtp": "Nhập mã 6 số",
+      "otpPlaceholder": "------",
+      "backButton": "Quay lại",
+      "verifyButton": "Xác thực"
+    },
+    "step3": {
+      "title": "Ký Hợp đồng điện tử",
+      "contractTitle": "Hợp đồng hợp tác",
+      "contractPartyA": "Bên A:",
+      "contractPartyB": "Bên B:",
+      "contractRepresentative": "Đại diện:",
+      "contractContent": "Hai bên thống nhất ký kết thỏa thuận hợp tác với các điều khoản sau...",
+      "contractDetails": "(Nội dung hợp đồng chi tiết...)",
+      "contractCommitment": "Bằng việc ký tên dưới đây, Bên B cam kết tuân thủ các quy định và chính sách của HomeCareDN.",
+      "signatureLabel": "Ký tên xác nhận (Vẽ vào khung dưới)",
+      "signatureClear": "Xóa",
+      "signatureNote": "Vui lòng ký rõ họ tên hoặc chữ ký đại diện.",
+      "reviewButton": "Xem lại thông tin",
+      "submitButton": "Gửi hồ sơ & Ký hợp đồng",
+      "contractor": "Nhà thầu",
+      "distributor": "Nhà phân phối"
+    },
+    "validation": {
+      "otpInvalid": "Vui lòng nhập mã OTP hợp lệ",
+      "otpSuccess": "Xác thực thành công!",
+      "otpError": "Không nhận được token xác thực.",
+      "canvasNotReady": "Khung ký tên chưa sẵn sàng. Vui lòng đợi và thử lại.",
+      "signatureEmpty": "Vui lòng ký tên xác nhận hợp đồng.",
+      "signatureError": "Không thể lấy dữ liệu chữ ký. Vui lòng vẽ lại.",
+      "signatureClearWarning": "Khung ký tên chưa sẵn sàng"
+    },
+    "notification": {
+      "otpSent": "Mã OTP đã được gửi tới"
+    }
     }
   },
 
@@ -994,6 +1032,11 @@
     "delete": "Xóa",
     "viewDetails": "Xem chi tiết",
     "total": "Tổng",
+    "tab": {
+      "info": "Thông tin ",
+      "documents": "Tài liệu",
+      "contract": "Hợp đồng"
+    },
     "partnerRequestModal": {
       "title": "Thông tin đăng kí",
       "companyName": "Tên công ty",
@@ -1002,7 +1045,20 @@
       "partnerRequestType": "Vai trò đăng kí",
       "status": "Trạng thái",
       "rejectReason": "Lí do từ chối",
-      "rejectReasonPlaceHolder": "Nhập lí do từ chối"
+      "rejectReasonPlaceHolder": "Nhập lí do từ chối",
+      "documents": "Tài liệu",
+      "signature": "Chữ ký",
+      "noDocuments": "Không có tài liệu",
+      "noSignature": "Không có chữ ký",
+      "clickToView": "Nhấn để xem",
+      "contractTitle": "Hợp đồng hợp tác",
+      "contractStatus": "Trạng thái hợp đồng",
+      "signed": "Đã ký",
+      "unsigned": "Chưa ký",
+      "signedAt": "Ký vào lúc",
+      "images": "Hình ảnh",
+      "description": "Mô tả",
+      "email": "Email"
     }
   },
   "adminUserManager": {
@@ -1176,6 +1232,7 @@
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
     "Edit": "Sửa",
+    "Continue": "Tiếp tục",
     "Delete": "Xóa",
     "Cancel": "Hủy bỏ",
     "Reply": "Trả lời",

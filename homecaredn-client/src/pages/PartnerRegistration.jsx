@@ -26,6 +26,7 @@ export default function PartnerRegistration() {
   const [verificationToken, setVerificationToken] = useState(null);
   const sigCanvas = useRef(null);
   const [loading, setLoading] = useState(false);
+  const [isCanvasReady, setIsCanvasReady] = useState(false);
 
   const [partnerRequestType, setPartnerRequestType] =
     useState(partnerTypeFromUrl);
@@ -49,6 +50,7 @@ export default function PartnerRegistration() {
     setPhoneNumber('');
     setDescription('');
     setImages([]);
+    setDocuments([]);
     setUploadProgress(0);
     setImageProgress({ loaded: 0, total: 0 });
     setDocumentProgress({ loaded: 0, total: 0 });
@@ -66,6 +68,26 @@ export default function PartnerRegistration() {
     setUploadProgress(percent);
   }, [imageProgress, documentProgress, uploadProgress]);
 
+  useEffect(() => {
+    if (currentStep === 3) {
+      const timer = setTimeout(() => {
+        if (sigCanvas.current) {
+          setIsCanvasReady(true);
+        } else {
+          setIsCanvasReady(false);
+          console.warn('SignatureCanvas chưa sẵn sàng sau 200ms');
+        }
+      }, 200);
+
+      return () => {
+        clearTimeout(timer);
+        setIsCanvasReady(false);
+      };
+    } else {
+      setIsCanvasReady(false);
+    }
+  }, [currentStep]);
+
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 5) {
@@ -78,6 +100,7 @@ export default function PartnerRegistration() {
     }));
     setImages((prev) => [...prev, ...mapped]);
   };
+
   const handleRemoveImage = (img) =>
     setImages((prev) => prev.filter((i) => i.url !== img.url));
 
@@ -95,6 +118,7 @@ export default function PartnerRegistration() {
     }));
     setDocuments((prev) => [...prev, ...mapped]);
   };
+
   const handleRemoveDocument = (doc) =>
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
 
@@ -142,6 +166,7 @@ export default function PartnerRegistration() {
     }
     return true;
   };
+
   const handleFileUploads = async () => {
     const newImageFiles = images
       .filter((img) => img.file)
@@ -207,7 +232,11 @@ export default function PartnerRegistration() {
     setLoading(true);
     try {
       await partnerRequestService.sendOtp({ email, companyName });
-      toast.success(`Mã OTP đã được gửi tới ${email}`);
+      toast.success(
+        `${t(
+          'partnerRequest.partnerRegistration.notification.otpSent'
+        )} ${email}`
+      );
       setCurrentStep(2);
     } catch (error) {
       toast.error(t(handleApiError(error)));
@@ -219,7 +248,9 @@ export default function PartnerRegistration() {
   const handleStep2Submit = async (e) => {
     e.preventDefault();
     if (!otpCode || otpCode.length < 6) {
-      toast.warning('Vui lòng nhập mã OTP hợp lệ');
+      toast.warning(
+        t('partnerRequest.partnerRegistration.validation.otpInvalid')
+      );
       return;
     }
     setLoading(true);
@@ -231,10 +262,14 @@ export default function PartnerRegistration() {
       const token = typeof response === 'string' ? response : response?.token;
       if (token) {
         setVerificationToken(token);
-        toast.success('Xác thực thành công!');
+        toast.success(
+          t('partnerRequest.partnerRegistration.validation.otpSuccess')
+        );
         setCurrentStep(3);
       } else {
-        toast.error('Không nhận được token xác thực.');
+        toast.error(
+          t('partnerRequest.partnerRegistration.validation.otpError')
+        );
       }
     } catch (error) {
       toast.error(t(handleApiError(error)));
@@ -246,17 +281,37 @@ export default function PartnerRegistration() {
   const clearSignature = () => {
     if (sigCanvas.current) {
       sigCanvas.current.clear();
+    } else {
+      toast.warning(
+        t('partnerRequest.partnerRegistration.validation.signatureClearWarning')
+      );
     }
   };
 
   const handleSubmitFinal = async () => {
-    if (!sigCanvas.current) {
-      toast.error('Lỗi: Không tìm thấy khung ký tên. Vui lòng tải lại trang.');
+    if (!isCanvasReady || !sigCanvas.current) {
+      toast.error(
+        t('partnerRequest.partnerRegistration.validation.canvasNotReady')
+      );
       return;
     }
 
     if (sigCanvas.current.isEmpty()) {
-      toast.warning('Vui lòng ký tên xác nhận hợp đồng.');
+      toast.warning(
+        t('partnerRequest.partnerRegistration.validation.signatureEmpty')
+      );
+      return;
+    }
+
+    let signatureDataURL;
+    try {
+      const canvas = sigCanvas.current.getCanvas();
+      signatureDataURL = canvas.toDataURL('image/png');
+    } catch (error) {
+      toast.error(
+        t('partnerRequest.partnerRegistration.validation.signatureError')
+      );
+      console.error('Canvas extraction error:', error);
       return;
     }
 
@@ -268,9 +323,7 @@ export default function PartnerRegistration() {
       const { urls: DocumentUrls, publicIds: DocumentPublicIds } =
         formatUploadResults(documentResults);
 
-      const canvas = sigCanvas.current.getTrimmedCanvas();
-      const dataURL = canvas.toDataURL('image/png');
-      const blob = await (await fetch(dataURL)).blob();
+      const blob = await (await fetch(signatureDataURL)).blob();
       const signatureFile = new File([blob], 'signature.png', {
         type: 'image/png',
       });
@@ -349,8 +402,10 @@ export default function PartnerRegistration() {
               <p className="text-gray-600 mt-1">
                 {currentStep === 1 &&
                   t('partnerRequest.partnerRegistration.subtitle')}
-                {currentStep === 2 && 'Xác thực Email'}
-                {currentStep === 3 && 'Ký Hợp đồng điện tử'}
+                {currentStep === 2 &&
+                  t('partnerRequest.partnerRegistration.step2.title')}
+                {currentStep === 3 &&
+                  t('partnerRequest.partnerRegistration.step3.title')}
               </p>
             </div>
             {/* Step Indicator */}
@@ -389,7 +444,6 @@ export default function PartnerRegistration() {
           {/* --- STEP 1: INFO --- */}
           {currentStep === 1 && (
             <form onSubmit={handleStep1Submit} className="space-y-5">
-              {/* ... (Giữ nguyên các input companyName, email, phoneNumber, description) ... */}
               <div className="relative">
                 <input
                   id="companyName"
@@ -465,7 +519,7 @@ export default function PartnerRegistration() {
                 </label>
               </div>
 
-              {/* Images Upload (Code cũ của bạn) */}
+              {/* Images Upload */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center text-sm font-medium text-gray-700">
@@ -498,7 +552,6 @@ export default function PartnerRegistration() {
                     </div>
                   </div>
                 )}
-                {/* Image Preview */}
                 {images.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {images.map((img, idx) => (
@@ -559,7 +612,6 @@ export default function PartnerRegistration() {
                     </div>
                   </div>
                 )}
-                {/* Doc Preview */}
                 {documents.length > 0 && (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                     {documents.map((doc) => (
@@ -615,16 +667,16 @@ export default function PartnerRegistration() {
             <div className="space-y-6 text-center py-4">
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <p className="text-gray-700">
-                  Mã xác thực (OTP) đã được gửi đến email:{' '}
+                  {t('partnerRequest.partnerRegistration.step2.otpSent')}{' '}
                   <strong>{email}</strong>
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
-                  Vui lòng kiểm tra cả hộp thư Spam/Rác
+                  {t('partnerRequest.partnerRegistration.step2.checkSpam')}
                 </p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Nhập mã 6 số
+                  {t('partnerRequest.partnerRegistration.step2.enterOtp')}
                 </label>
                 <input
                   type="text"
@@ -634,7 +686,9 @@ export default function PartnerRegistration() {
                     setOtpCode(e.target.value.replace(/[^0-9]/g, ''))
                   }
                   className="block w-full text-center text-3xl tracking-[0.5em] font-bold text-blue-600 border-2 border-gray-300 rounded-lg p-4 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="------"
+                  placeholder={t(
+                    'partnerRequest.partnerRegistration.step2.otpPlaceholder'
+                  )}
                 />
               </div>
               <div className="flex gap-4 pt-4">
@@ -643,14 +697,16 @@ export default function PartnerRegistration() {
                   onClick={() => setCurrentStep(1)}
                   className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-50"
                 >
-                  <i className="fas fa-arrow-left mr-2" /> Quay lại
+                  <i className="fas fa-arrow-left mr-2" />{' '}
+                  {t('partnerRequest.partnerRegistration.step2.backButton')}
                 </button>
                 <button
                   onClick={handleStep2Submit}
                   disabled={otpCode.length < 6}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-200 disabled:opacity-50"
                 >
-                  Xác thực <i className="fas fa-check ml-2" />
+                  {t('partnerRequest.partnerRegistration.step2.verifyButton')}{' '}
+                  <i className="fas fa-check ml-2" />
                 </button>
               </div>
             </div>
@@ -661,37 +717,56 @@ export default function PartnerRegistration() {
             <div className="space-y-6">
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 h-64 overflow-y-auto text-sm text-gray-700 shadow-inner">
                 <h4 className="text-center font-bold text-lg mb-4 uppercase">
-                  Hợp đồng hợp tác{' '}
+                  {t('partnerRequest.partnerRegistration.step3.contractTitle')}{' '}
                   {partnerRequestType === 'Contractor'
-                    ? 'Nhà thầu'
-                    : 'Nhà phân phối'}
+                    ? t('partnerRequest.partnerRegistration.step3.contractor')
+                    : t('partnerRequest.partnerRegistration.step3.distributor')}
                 </h4>
                 <p className="mb-2">
-                  <strong>Bên A:</strong> CÔNG TY CỔ PHẦN HOMECARE ĐÀ NẴNG
+                  <strong>
+                    {t(
+                      'partnerRequest.partnerRegistration.step3.contractPartyA'
+                    )}
+                  </strong>{' '}
+                  CÔNG TY CỔ PHẦN HOMECARE ĐÀ NẴNG
                 </p>
                 <p className="mb-2">
-                  <strong>Bên B:</strong> {companyName.toUpperCase()}
+                  <strong>
+                    {t(
+                      'partnerRequest.partnerRegistration.step3.contractPartyB'
+                    )}
+                  </strong>{' '}
+                  {companyName.toUpperCase()}
                 </p>
                 <p className="mb-2">
-                  <strong>Đại diện:</strong> {email}
+                  <strong>
+                    {t(
+                      'partnerRequest.partnerRegistration.step3.contractRepresentative'
+                    )}
+                  </strong>{' '}
+                  {email}
                 </p>
                 <p className="mt-4">
-                  Hai bên thống nhất ký kết thỏa thuận hợp tác với các điều
-                  khoản sau...
+                  {t(
+                    'partnerRequest.partnerRegistration.step3.contractContent'
+                  )}
                 </p>
                 <p className="italic text-gray-500 mt-2">
-                  (Nội dung hợp đồng chi tiết...)
+                  {t(
+                    'partnerRequest.partnerRegistration.step3.contractDetails'
+                  )}
                 </p>
                 <p className="mt-4">
-                  Bằng việc ký tên dưới đây, Bên B cam kết tuân thủ các quy định
-                  và chính sách của HomeCareDN.
+                  {t(
+                    'partnerRequest.partnerRegistration.step3.contractCommitment'
+                  )}
                 </p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <i className="fas fa-pen-nib mr-1 text-blue-600"></i> Ký tên
-                  xác nhận (Vẽ vào khung dưới){' '}
+                  <i className="fas fa-pen-nib mr-1 text-blue-600"></i>{' '}
+                  {t('partnerRequest.partnerRegistration.step3.signatureLabel')}{' '}
                   <span className="text-red-500">*</span>
                 </label>
                 <div
@@ -710,11 +785,14 @@ export default function PartnerRegistration() {
                     onClick={clearSignature}
                     className="absolute top-2 right-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-gray-700"
                   >
-                    <i className="fas fa-eraser"></i> Xóa
+                    <i className="fas fa-eraser"></i>{' '}
+                    {t(
+                      'partnerRequest.partnerRegistration.step3.signatureClear'
+                    )}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1 text-right">
-                  Vui lòng ký rõ họ tên hoặc chữ ký đại diện.
+                  {t('partnerRequest.partnerRegistration.step3.signatureNote')}
                 </p>
               </div>
 
@@ -724,14 +802,18 @@ export default function PartnerRegistration() {
                   onClick={() => setCurrentStep(1)}
                   className="py-3 px-6 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-50"
                 >
-                  Xem lại thông tin
+                  {t('partnerRequest.partnerRegistration.step3.reviewButton')}
                 </button>
                 <button
                   onClick={handleSubmitFinal}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-4 rounded-lg font-bold hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-200 flex items-center justify-center uppercase tracking-wide"
+                  disabled={!isCanvasReady}
+                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-4 rounded-lg font-bold hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-200 flex items-center justify-center uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <i className="fas fa-file-signature mr-2" /> Gửi hồ sơ & Ký
-                  hợp đồng
+                  {!isCanvasReady && (
+                    <i className="fas fa-spinner fa-spin mr-2" />
+                  )}
+                  <i className="fas fa-file-signature mr-2" />{' '}
+                  {t('partnerRequest.partnerRegistration.step3.submitButton')}
                 </button>
               </div>
             </div>
