@@ -58,7 +58,7 @@ export default function AdminPartnerRequestDetail() {
       if (action === 'approve') {
         await approvePartnerRequest(partnerRequestID);
         toast.success(t('SUCCESS.APPROVE'));
-        navigate('PartnerRequestManager');
+        navigate('/Admin/PartnerRequestManager');
       } else if (action === 'reject') {
         if (!reason.trim()) {
           toast.error(t('ERROR.REQUIRD_REJECT_REASON'));
@@ -69,7 +69,7 @@ export default function AdminPartnerRequestDetail() {
           RejectionReason: reason.trim(),
         });
         toast.success(t('SUCCESS.REJECT'));
-        navigate('PartnerRequestManager');
+        navigate('/Admin/PartnerRequestManager');
       }
     } catch (err) {
       toast.error(handleApiError(err));

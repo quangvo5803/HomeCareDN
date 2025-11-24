@@ -717,7 +717,7 @@ export default function PartnerRegistration() {
             <div className="space-y-6">
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 h-64 overflow-y-auto text-sm text-gray-700 shadow-inner">
                 <h4 className="text-center font-bold text-lg mb-4 uppercase">
-                  {t('partnerRequest.partnerRegistration.step3.contractTitle')}{' '}
+                  {t('partnerRequest.partnerRegistration.step3.contractTitle')}
                   {partnerRequestType === 'Contractor'
                     ? t('partnerRequest.partnerRegistration.step3.contractor')
                     : t('partnerRequest.partnerRegistration.step3.distributor')}
@@ -727,23 +727,23 @@ export default function PartnerRegistration() {
                     {t(
                       'partnerRequest.partnerRegistration.step3.contractPartyA'
                     )}
-                  </strong>{' '}
-                  CÔNG TY CỔ PHẦN HOMECARE ĐÀ NẴNG
+                  </strong>
+                  {t('partnerRequest.partnerRegistration.step3.partyA')}
                 </p>
                 <p className="mb-2">
                   <strong>
                     {t(
                       'partnerRequest.partnerRegistration.step3.contractPartyB'
                     )}
-                  </strong>{' '}
-                  {companyName.toUpperCase()}
+                  </strong>
+                  {companyName}
                 </p>
                 <p className="mb-2">
                   <strong>
                     {t(
                       'partnerRequest.partnerRegistration.step3.contractRepresentative'
                     )}
-                  </strong>{' '}
+                  </strong>
                   {email}
                 </p>
                 <p className="mt-4">
@@ -751,11 +751,11 @@ export default function PartnerRegistration() {
                     'partnerRequest.partnerRegistration.step3.contractContent'
                   )}
                 </p>
-                <p className="italic text-gray-500 mt-2">
+                <div className="whitespace-pre-wrap text-justify border-t border-gray-100 pt-4">
                   {t(
                     'partnerRequest.partnerRegistration.step3.contractDetails'
                   )}
-                </p>
+                </div>
                 <p className="mt-4">
                   {t(
                     'partnerRequest.partnerRegistration.step3.contractCommitment'
