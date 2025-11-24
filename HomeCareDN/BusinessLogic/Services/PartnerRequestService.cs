@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
@@ -39,16 +38,16 @@ namespace BusinessLogic.Services
         public PartnerRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IMemoryCache memoryCache,
             UserManager<ApplicationUser> userManager,
-            IEmailQueue emailQueue,
-            IMemoryCache memoryCache
+            IEmailQueue emailQueue
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _memoryCache = memoryCache;
             _userManager = userManager;
             _emailQueue = emailQueue;
-            _memoryCache = memoryCache;
         }
 
         public async Task<PagedResultDto<PartnerRequestDto>> GetAllPartnerRequestsAsync(

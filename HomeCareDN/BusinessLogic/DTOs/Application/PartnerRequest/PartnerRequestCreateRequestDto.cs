@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataAccess.Entities.Application;
 
-namespace BusinessLogic.DTOs.Application.Partner
+namespace BusinessLogic.DTOs.Application.PartnerRequest
 {
     public class PartnerRequestCreateRequestDto
     {

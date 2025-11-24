@@ -1,5 +1,4 @@
 ﻿using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Partner;
 using BusinessLogic.DTOs.Application.PartnerRequest;
 
 namespace BusinessLogic.Services.Interfaces

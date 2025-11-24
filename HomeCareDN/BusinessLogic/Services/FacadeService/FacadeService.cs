@@ -81,6 +81,7 @@ namespace BusinessLogic.Services.FacadeService
             PartnerService = new PartnerRequestService(
                 coreDeps.UnitOfWork,
                 coreDeps.Mapper,
+                coreDeps.MemoryCache,
                 identityDeps.UserManager,
                 infraDeps.EmailQueue
             );
