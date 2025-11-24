@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -57,6 +58,22 @@ namespace HomeCareDNAPI.Controllers
         {
             await _facadeService.PartnerService.DeletePartnerRequestAsync(id);
             return NoContent();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendOtp([FromBody] SendPartnerOtpRequestDto request)
+        {
+            await _facadeService.PartnerService.SendPartnerOtpAsync(request);
+            return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost("verify-otp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyPartnerOtpRequestDto request)
+        {
+            var token = await _facadeService.PartnerService.VerifyPartnerOtpAsync(request);
+            return Ok(token);
         }
 
         [AllowAnonymous]

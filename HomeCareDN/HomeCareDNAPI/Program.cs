@@ -122,6 +122,7 @@ namespace HomeCareDNAPI
             builder.Services.AddScoped<IFacadeService, FacadeService>();
 
             builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddMemoryCache();
             builder.Services.AddHttpContextAccessor();
 
             // LLM client
