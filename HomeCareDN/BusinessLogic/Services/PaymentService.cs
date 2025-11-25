@@ -284,6 +284,15 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = serviceRequest!.CustomerID,
+                Title = "Yêu cầu của bạn đã được chấp thuận",
+                Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
+                DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
+                DataValue = serviceRequest.ServiceRequestID.ToString(),
+                Action = NotificationAction.Paid
+            });
         }
 
         private async Task HandleDistributorPaymentAsync(PaymentTransaction payment)
@@ -343,6 +352,15 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = materialRequest!.CustomerID,
+                Title = "Yêu cầu của bạn đã được chấp thuận",
+                Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
+                DataKey = $"ContractorApplication_{payment.DistributorApplication}_PAID",
+                DataValue = materialRequest.MaterialRequestID.ToString(),
+                Action = NotificationAction.Paid
+            });
         }
     }
 }
