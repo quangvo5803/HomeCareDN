@@ -78,7 +78,7 @@ export default function MaterialRequestDetail() {
       }));
     },
     //Reject
-    [RealtimeEvents.DistributorApplicationReject]: () => {
+    [RealtimeEvents.DistributorApplicationRejected]: () => {
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',

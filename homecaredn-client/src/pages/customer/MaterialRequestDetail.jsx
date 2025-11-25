@@ -337,15 +337,23 @@ export default function MaterialRequestDetail() {
       if (result.isConfirmed) {
         try {
           const acceptedExtraItemIDs = Array.from(acceptingItems);
-          await distributorApplicationService.accept({
+          const approved = await distributorApplicationService.accept({
             DistributorApplicationID:
               selectedDistributor.distributorApplicationID,
             AcceptedExtraItemIDs:
               acceptedExtraItemIDs.length > 0 ? acceptedExtraItemIDs : null,
           });
-          toast.success(t('userPage.materialRequestDetail.acceptSuccess'));
-          setSelectedDistributor(null);
+          setSelectedDistributor(approved);
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+              selectedDistributor.distributorApplicationID
+                ? approved
+                : c
+            )
+          );
           setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.ACCEPT_APPLICATION'));
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }
@@ -368,12 +376,20 @@ export default function MaterialRequestDetail() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await distributorApplicationService.reject(
+          const rejected = await distributorApplicationService.reject(
             selectedDistributor.distributorApplicationID
           );
-          toast.success(t('userPage.materialRequestDetail.rejectSuccess'));
-          setSelectedDistributor(null);
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+              selectedDistributor.distributorApplicationID
+                ? rejected
+                : c
+            )
+          );
+          setSelectedDistributor(rejected);
           setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.REJECT_APPLICATION'));
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }
@@ -1207,8 +1223,15 @@ export default function MaterialRequestDetail() {
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
             <p className="text-red-700 font-semibold">
               <i className="fas fa-times-circle mr-2"></i>
-              {t('userPage.materialRequestDetail.alreadyRejected') ||
-                'Đơn hàng này đã bị từ chối'}
+              {t('userPage.materialRequestDetail.alreadyRejected')}
+            </p>
+          </div>
+        )}
+        {selectedDistributor.status === 'PendingCommission' && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+            <p className="text-green-700 font-semibold">
+              <i className="fas fa-check-circle mr-2"></i>
+              {t('userPage.materialRequestDetail.waiting')}
             </p>
           </div>
         )}

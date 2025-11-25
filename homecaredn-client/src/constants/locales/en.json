@@ -422,9 +422,10 @@
       "selectMaterialRequest": "Please select request want to add",
       "selectExtraMaterialsNote": "You can choose what materials you want to add!",
       "confirmAccept":"Are you sure you accept this application?",
-      "acceptSuccess":"Accept Successfully!",
       "confirmReject":"Are you sure you reject this application?",
-      "rejectSuccess": "Reject Successfully!"
+      "waiting": "Application has been accepted please wait for distributor confirmation.",
+      "alreadyRejected": "The application was rejected."
+
     }
   },
   "contractorServiceRequestManager": {
@@ -1447,9 +1448,11 @@
     "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
-    "DELETE_APPLICATION": "Delete Application Successful",
-    "APPLICATION_CREATE": "Create Application Successful",
-    "RECONNECTED": "Reconnected to the server!"
+    "DELETE_APPLICATION": "Delete application successfully",
+    "APPLICATION_CREATE": "Create application successfully",
+    "RECONNECTED": "Reconnected to the server!",
+    "ACCEPT_APPLICATION": "Accept application successfully!",
+    "REJECT_APPLICATION": "Reject application successfully!"
   },
   "roles": {
     "Distributor": "Distributor",

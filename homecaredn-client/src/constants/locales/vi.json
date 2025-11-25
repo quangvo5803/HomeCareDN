@@ -421,9 +421,9 @@
       "selectMaterialRequest": "Vui lòng chọn yêu cầu muốn thêm vào",
       "selectExtraMaterialsNote": "Bạn có thể lựa chọn những vật liệu bạn muốn thêm vào!",
       "confirmAccept": "Bạn có chắc chắn muốn chấp nhận đơn này không?",
-      "acceptSuccess": "Chấp nhận thành công!",
       "confirmReject": "Bạn có chắc chắn muốn từ chối đơn này không?",
-      "rejectSuccess": "Từ chối thành công!"
+      "waiting": "Đơn ứng tuyển đã được chấp nhận vui lòng chờ nhà phân phối xác nhận.",
+      "alreadyRejected": "Đơn ứng tuyển đã bị từ chối."
     }
   },
   "contractorServiceRequestManager": {
@@ -1439,7 +1439,9 @@
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
-    "RECONNECTED": "Đã kết nối lại với server!"
+    "RECONNECTED": "Đã kết nối lại với server!",
+    "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
+    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!"
   },
   "roles": {
     "Distributor": "Nhà phân phối",

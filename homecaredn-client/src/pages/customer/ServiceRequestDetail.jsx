@@ -171,6 +171,7 @@ export default function ServiceRequestDetail() {
           c.contractorApplicationID === contractorApplicationID ? rejected : c
         )
       );
+      toast.success(t('SUCCESS.REJECT_APPLICATION'));
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
@@ -835,6 +836,22 @@ export default function ServiceRequestDetail() {
                     <i className="fas fa-times mr-2"></i>
                     {t('BUTTON.Reject')}
                   </button>
+                </div>
+              )}
+              {selectedContractor.status === 'Rejected' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                  <p className="text-red-700 font-semibold">
+                    <i className="fas fa-times-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.alreadyRejected')}
+                  </p>
+                </div>
+              )}
+              {selectedContractor.status === 'PendingCommission' && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+                  <p className="text-green-700 font-semibold">
+                    <i className="fas fa-check-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.waiting')}
+                  </p>
                 </div>
               )}
             </>
