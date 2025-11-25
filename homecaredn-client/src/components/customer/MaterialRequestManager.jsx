@@ -11,6 +11,8 @@ import PropTypes from 'prop-types';
 import StatusBadge from '../../components/StatusBadge';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import ReviewCountdown from './ReviewCountdown';
+import { reviewService } from '../../services/reviewService';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
@@ -23,6 +25,10 @@ export default function MaterialRequestManager({ user }) {
     createMaterialRequest,
     deleteMaterialRequest,
   } = useMaterialRequest();
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedMaterialRequest, setSelectedMaterialRequest] = useState(null);
+  const [reviewReadOnly, setReviewReadOnly] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
@@ -113,8 +119,38 @@ export default function MaterialRequestManager({ user }) {
       },
     });
   };
+  const handleCreateReview = (serviceRequest) => {
+    setSelectedMaterialRequest(serviceRequest);
+    setReviewReadOnly(false);
+    setIsReviewModalOpen(true);
+  };
 
-  if (loading) return <Loading />;
+  const handleViewReview = (serviceRequest) => {
+    setSelectedMaterialRequest(serviceRequest);
+    setReviewReadOnly(true);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSaveReview = async (reviewData) => {
+    try {
+      const response = await reviewService.create(reviewData);
+      toast.success(t('SUCCESS.CREATE_REVIEW'));
+
+      // Update service request with new review
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === response.materialRequestID
+            ? { ...sr, review: response }
+            : sr
+        )
+      );
+      setIsReviewModalOpen(false);
+      setSelectedMaterialRequest(null);
+    } catch (err) {
+      handleApiError(err, t);
+    }
+  };
+  if (loading || uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div>
@@ -141,7 +177,23 @@ export default function MaterialRequestManager({ user }) {
           {t('BUTTON.CreateMaterialRequest')}
         </button>
       </div>
-
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setSelectedMaterialRequest(null);
+          setReviewReadOnly(false);
+        }}
+        onSave={handleSaveReview}
+        review={reviewReadOnly ? selectedMaterialRequest?.review : null}
+        serviceRequestID={null}
+        materialRequestID={selectedMaterialRequest?.materialRequestID}
+        partnerID={
+          selectedMaterialRequest?.selectedDistributorApplication.distributorID
+        }
+        setUploadProgress={setUploadProgress}
+        readOnly={reviewReadOnly}
+      />
       {/* Empty state */}
       {!materialRequests || materialRequests.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
@@ -297,6 +349,11 @@ export default function MaterialRequestManager({ user }) {
                         )}
                     </div>
                   </div>
+                  <ReviewCountdown
+                    request={req}
+                    onCreateReview={handleCreateReview}
+                    onViewReview={handleViewReview}
+                  />
                 </div>
               </div>
             </div>

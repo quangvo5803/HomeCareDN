@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 
 export default function ReviewCountdown({
-  serviceRequest,
+  request,
   onCreateReview,
   onViewReview,
 }) {
   const { t } = useTranslation();
 
   const getCountdown = () => {
-    if (!serviceRequest.startReviewDate) return null;
+    if (!request.startReviewDate) return null;
 
     const now = new Date();
-    const reviewDate = new Date(serviceRequest.startReviewDate);
+    const reviewDate = new Date(request.startReviewDate);
     const diff = reviewDate - now;
 
     if (diff <= 0) return { expired: true };
@@ -29,7 +29,7 @@ export default function ReviewCountdown({
   const [countdown, setCountdown] = useState(getCountdown);
 
   useEffect(() => {
-    if (!serviceRequest.startReviewDate || serviceRequest.review) return;
+    if (!request.startReviewDate || request.review) return;
 
     const timer = setInterval(() => {
       setCountdown(getCountdown());
@@ -37,13 +37,13 @@ export default function ReviewCountdown({
 
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceRequest]);
+  }, [request]);
 
   // Ẩn nếu status khác Closed
-  if (serviceRequest.status !== 'Closed') return null;
+  if (request.status !== 'Closed') return null;
 
   // Hiển thị nút View nếu đã review
-  if (serviceRequest.review) {
+  if (request.review) {
     return (
       <div className="mt-4 pt-4 border-t border-gray-200">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -54,12 +54,12 @@ export default function ReviewCountdown({
             </span>
             <div className="flex items-center gap-1 ml-2">
               {Array.from({ length: 5 }, (_, i) => {
-                const key = `star-${serviceRequest?.id || 'sr'}-${i}`;
+                const key = `star-${request?.id || 'sr'}-${i}`;
                 return (
                   <i
                     key={key}
                     className={`fas fa-star text-sm ${
-                      i < serviceRequest.review.rating
+                      i < request.review.rating
                         ? 'text-yellow-400'
                         : 'text-gray-300'
                     }`}
@@ -69,7 +69,7 @@ export default function ReviewCountdown({
             </div>
           </div>
           <button
-            onClick={() => onViewReview(serviceRequest)}
+            onClick={() => onViewReview(request)}
             className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200"
           >
             <i className="fas fa-eye mr-2"></i>
@@ -92,7 +92,7 @@ export default function ReviewCountdown({
             </span>
           </div>
           <button
-            onClick={() => onCreateReview(serviceRequest)}
+            onClick={() => onCreateReview(request)}
             className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-md"
           >
             <i className="fas fa-star mr-2"></i>

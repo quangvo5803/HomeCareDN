@@ -24,8 +24,8 @@ export default function ServiceRequestManager() {
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedServiceRequest, setSelectedServiceRequest] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [reviewReadOnly, setReviewReadOnly] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useRealtime({
     [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
@@ -240,6 +240,7 @@ export default function ServiceRequestManager() {
         onSave={handleSaveReview}
         review={reviewReadOnly ? selectedServiceRequest?.review : null}
         serviceRequestID={selectedServiceRequest?.serviceRequestID}
+        materialRequestID={null}
         partnerID={
           selectedServiceRequest?.selectedContractorApplication.contractorID
         }
@@ -422,7 +423,7 @@ export default function ServiceRequestManager() {
 
                   {/* Review Countdown Section */}
                   <ReviewCountdown
-                    serviceRequest={req}
+                    request={req}
                     onCreateReview={handleCreateReview}
                     onViewReview={handleViewReview}
                   />
