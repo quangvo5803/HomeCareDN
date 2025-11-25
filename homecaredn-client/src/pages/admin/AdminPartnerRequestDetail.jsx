@@ -121,8 +121,7 @@ const NotFoundView = ({ onBack, text }) => (
         onClick={onBack}
         className="px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium shadow-lg shadow-orange-200"
       >
-        <i className="fas fa-arrow-left mr-2"></i>
-        Back
+        <i className="fas fa-arrow-left mr-2"></i>{' '}
       </button>
     </div>
   </div>
