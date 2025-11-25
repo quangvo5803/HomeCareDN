@@ -201,7 +201,6 @@ export default function AdminBrandManager() {
           onSave={handleSave}
           brandID={editingBrandID}
           setUploadProgress={setUploadProgress}
-          setSubmitting={setSubmitting}
         />
 
         {/* Table Container */}
