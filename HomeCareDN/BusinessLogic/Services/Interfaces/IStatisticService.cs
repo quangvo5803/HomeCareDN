@@ -11,13 +11,13 @@ namespace BusinessLogic.Services.Interfaces
             int year,
             string role,
             Guid? contractorId = null,
-            Guid? ditributorId = null
+            Guid? distributorId = null
         );
         Task<IEnumerable<LineChartDto>> GetLineChartAsync(
             int year,
             string role,
             Guid? contractorId = null,
-            Guid? ditributorId = null
+            Guid? distributorId = null
         );
 
         //================= Admin =================
