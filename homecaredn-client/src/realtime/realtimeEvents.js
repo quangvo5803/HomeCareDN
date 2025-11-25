@@ -21,7 +21,7 @@ export const RealtimeEvents = Object.freeze({
   DistributorApplicationRejected: 'DistributorApplication.Rejected',
   DistributorApplicationDelete: 'DistributorApplication.Delete',
   // Payment
-  PaymentTransactionUpdated: 'PaymentTransation.Updated',
+  PaymentTransactionUpdated: 'PaymentTransaction.Updated',
 
   // Chat
   ChatMessageCreated: 'Chat.MessageCreated',

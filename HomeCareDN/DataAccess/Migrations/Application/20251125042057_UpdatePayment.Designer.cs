@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125042057_UpdatePayment")]
+    partial class UpdatePayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -216,14 +219,8 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("CustomerID")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DistributorID")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsAdminRead")
                         .HasColumnType("bit");
-
-                    b.Property<Guid?>("MaterialRequestID")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ServiceRequestID")
                         .HasColumnType("uniqueidentifier");
@@ -456,9 +453,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<bool>("CanAddMaterial")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("ConversationID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -476,10 +470,6 @@ namespace DataAccess.Migrations.Application
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("MaterialRequestID");
-
-                    b.HasIndex("ConversationID")
-                        .IsUnique()
-                        .HasFilter("[ConversationID] IS NOT NULL");
 
                     b.HasIndex("SelectedDistributorApplicationID")
                         .IsUnique()
@@ -651,9 +641,7 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("ReviewID");
 
-                    b.HasIndex("MaterialRequestID")
-                        .IsUnique()
-                        .HasFilter("[MaterialRequestID] IS NOT NULL");
+                    b.HasIndex("MaterialRequestID");
 
                     b.HasIndex("ServiceRequestID")
                         .IsUnique()
@@ -913,15 +901,9 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
-                        .WithOne("MaterialRequest")
-                        .HasForeignKey("DataAccess.Entities.Application.MaterialRequest", "ConversationID");
-
                     b.HasOne("DataAccess.Entities.Application.DistributorApplication", "SelectedDistributorApplication")
                         .WithOne()
                         .HasForeignKey("DataAccess.Entities.Application.MaterialRequest", "SelectedDistributorApplicationID");
-
-                    b.Navigation("Conversation");
 
                     b.Navigation("SelectedDistributorApplication");
                 });
@@ -961,8 +943,8 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.MaterialRequest", "MaterialRequest")
-                        .WithOne("Review")
-                        .HasForeignKey("DataAccess.Entities.Application.Review", "MaterialRequestID");
+                        .WithMany()
+                        .HasForeignKey("MaterialRequestID");
 
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
                         .WithOne("Review")
@@ -1007,8 +989,6 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
-                    b.Navigation("MaterialRequest");
-
                     b.Navigation("Messages");
 
                     b.Navigation("ServiceRequest");
@@ -1029,8 +1009,6 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("DistributorApplications");
 
                     b.Navigation("MaterialRequestItems");
-
-                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>

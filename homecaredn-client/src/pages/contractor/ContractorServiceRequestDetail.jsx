@@ -87,9 +87,9 @@ export default function ContractorServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -267,22 +267,22 @@ export default function ContractorServiceRequestDetail() {
       const imageUploadPromise =
         newImageFiles.length > 0
           ? uploadToCloudinary(
-              newImageFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setImageProgress(progress),
-              'HomeCareDN/ContractorAppication'
-            )
+            newImageFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setImageProgress(progress),
+            'HomeCareDN/ContractorAppication'
+          )
           : Promise.resolve(null);
 
       const documentUploadPromise =
         newDocumentFiles.length > 0
           ? uploadToCloudinary(
-              newDocumentFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setDocumentProgress(progress),
-              'HomeCareDN/ContractorAppication/Documents',
-              'raw'
-            )
+            newDocumentFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setDocumentProgress(progress),
+            'HomeCareDN/ContractorAppication/Documents',
+            'raw'
+          )
           : Promise.resolve(null);
 
       const [imageResults, documentResults] = await Promise.all([
@@ -366,6 +366,7 @@ export default function ContractorServiceRequestDetail() {
       const result = await paymentService.createPayCommission({
         contractorApplicationID: existingApplication.contractorApplicationID,
         serviceRequestID: serviceRequestId,
+        role: user.role,
         amount: commission,
         description: serviceRequestId.slice(0, 19),
         itemName: 'Service Request Commission',
@@ -787,12 +788,12 @@ export default function ContractorServiceRequestDetail() {
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                            { est: formatVND(serviceRequest.estimatePrice) }
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                          { est: formatVND(serviceRequest.estimatePrice) }
+                        )
                         : t(
-                            'contractorServiceRequestDetail.bidPricePlaceholder'
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholder'
+                        )
                     }
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -1331,18 +1332,18 @@ export default function ContractorServiceRequestDetail() {
                           dueCommisionTime={
                             existingApplication.dueCommisionTime
                           }
-                          onExpired={() => {}}
+                          onExpired={() => { }}
                         />
                         {new Date(existingApplication.dueCommisionTime) >
                           new Date() && (
-                          <button
-                            onClick={handlePayCommission}
-                            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
-                          >
-                            <i className="fas fa-hand-holding-usd" />
-                            {t('contractorServiceRequestDetail.payCommission')}
-                          </button>
-                        )}
+                            <button
+                              onClick={handlePayCommission}
+                              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+                            >
+                              <i className="fas fa-hand-holding-usd" />
+                              {t('contractorServiceRequestDetail.payCommission')}
+                            </button>
+                          )}
                       </>
                     )}
                   </>
@@ -1407,7 +1408,7 @@ export default function ContractorServiceRequestDetail() {
           {/* Review Section - Show when Approved and user is the selected contractor */}
           {existingApplication?.status === 'Approved' &&
             serviceRequest.selectedContractorApplication?.contractorID ===
-              user?.id &&
+            user?.id &&
             serviceRequest.review && (
               <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
@@ -1421,11 +1422,10 @@ export default function ContractorServiceRequestDetail() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <i
                         key={star}
-                        className={`fa-solid fa-star text-2xl ${
-                          star <= serviceRequest.review.rating
+                        className={`fa-solid fa-star text-2xl ${star <= serviceRequest.review.rating
                             ? 'text-amber-400'
                             : 'text-gray-300'
-                        }`}
+                          }`}
                       ></i>
                     ))}
                   </div>
