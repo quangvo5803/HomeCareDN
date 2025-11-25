@@ -1,20 +1,25 @@
 import { useState, useEffect, useRef } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, CheckCheck } from 'lucide-react';
 import LoadingComponent from '../components/LoadingComponent'
 import { formatDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
+import { notificationService } from '../services/notificationService';
 
-export default function NotificationPanel({ notifications = [], loading }) {
+export default function NotificationPanel({ notifications = [], loading, user }) {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
+
+    const [notify, setNotify] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
     const [open, setOpen] = useState(false);
     const [tab, setTab] = useState('personal');
     const panelRef = useRef(null);
 
-    const systemNoti = notifications.filter(n => n.type === 'System');
-    const personalNoti = notifications.filter(n => n.type === 'Personal');
-    const unreadCount = notifications.filter(n => !n.isRead).length;
+    const systemNoti = notify.filter(n => n.type === 'System');
+    const personalNoti = notify.filter(n => n.type === 'Personal');
     const currentNoti = tab === 'system' ? systemNoti : personalNoti;
 
     // Click outside to close
@@ -30,51 +35,64 @@ export default function NotificationPanel({ notifications = [], loading }) {
         }
     }, [open]);
 
+    useEffect(() => {
+        setNotify(notifications);
+        setUnreadCount(notifications.filter(n => !n.isRead).length);
+    }, [notifications]);
+
+    const routeMap = {
+        ContractorApplication: {
+            APPLY: (value) => `/Customer/ServiceRequestDetail/${value}`,
+            ACCEPT: (value) => `/Contractor/ServiceRequestManager/${value}`,
+            REJECT: (value) => `/Contractor/ServiceRequestManager/${value}`,
+            PAID: (value) => `/Customer/ServiceRequestDetail/${value}`,
+        },
+        DistributorApplication: {
+            APPLY: (value) => `/Customer/MaterialRequestDetail/${value}`,
+            ACCEPT: (value) => `/Distributor/MaterialRequestManager/${value}`,
+            REJECT: (value) => `/Distributor/MaterialRequestManager/${value}`,
+            PAID: (value) => `/Customer/MaterialRequestDetail/${value}`,
+        },
+        ServiceRequest: (value) => `/Contractor/${value}`,
+        MaterialRequest: (value) => `/Distributor/${value}`,
+    };
+
     const resolveNotificationRoute = (n) => {
         const { dataKey, dataValue } = n;
 
-        // 1. ServiceRequest
-        if (dataKey === "ServiceRequest") {
-            return `/Contractor/${dataValue}`;
+        if (routeMap[dataKey]) {
+            return routeMap[dataKey](dataValue);
         }
 
-        // 2. MaterialRequest
-        if (dataKey === "MaterialRequest") {
-            return `/Distributor/${dataValue}`;
+        const [type, , status] = dataKey.split("_");
+        if (routeMap[type] && routeMap[type][status]) {
+            return routeMap[type][status](dataValue);
         }
 
-        if (dataKey.startsWith("ContractorApplication_")) {
-
-            const parts = dataKey.split("_");
-            const action = parts[2]; // APPLY, ACCEPT, REJECT
-
-            if (action === "APPLY") {
-                return `/Customer/ServiceRequestDetail/${dataValue}`;
-            }
-
-            if (action === "ACCEPT") {
-                return `/Contractor/ServiceRequestManager/${dataValue}`;
-            }
-
-            if (action === "REJECT") {
-                return `/Contractor/ServiceRequestManager/${dataValue}`;
-            }
-
-            if (action === "PAID") {
-                return `/Customer/ServiceRequestDetail/${dataValue}`;
-            }
-        }
-
-        return null; // fallback
+        return null;
     };
 
-    const handleClickNotification = (n) => {
-        const route = resolveNotificationRoute(n);
+    const handleClickNotification = async (n) => {
+        try {
+            await notificationService.readNotification(n.notificationID);
+            const route = resolveNotificationRoute(n);
+            if (route) {
+                navigate(route);
+            } else {
+                toast.error("Không tìm thấy thông báo", n);
+            }
+        } catch (err) {
+            toast.error(handleApiError(err));
+        }
+    };
 
-        if (route) {
-            navigate(route);
-        } else {
-            console.warn("Không tìm thấy route cho notification", n);
+    const handleReadAllNotifications = async () => {
+        try {
+            await notificationService.readAllNotifications(user.id);
+            setNotify(prev => prev.map(n => ({ ...n, isRead: true })));
+            setUnreadCount(0);
+        } catch (err) {
+            toast.error(handleApiError(err));
         }
     };
 
@@ -98,24 +116,27 @@ export default function NotificationPanel({ notifications = [], loading }) {
             {open && (
                 <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-orange-100 overflow-hidden z-50 animate-fadeIn">
                     {/* Header Tabs */}
-                    <div className="flex border-b border-orange-100 bg-gradient-to-b from-orange-50/50 to-white">
+                    <div className="flex items-center border-b border-orange-100">
                         <button
                             onClick={() => setTab('personal')}
-                            className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'personal'
-                                ? 'text-orange-600 border-b-2 border-orange-500'
-                                : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30'
+                            className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'personal' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30 cursor-pointer'
                                 }`}
                         >
                             Thông báo
                         </button>
                         <button
                             onClick={() => setTab('system')}
-                            className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'system'
-                                ? 'text-orange-600 border-b-2 border-orange-500'
-                                : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30'
+                            className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'system' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30  cursor-pointer'
                                 }`}
                         >
                             Hệ thống
+                        </button>
+                        <button
+                            onClick={handleReadAllNotifications}
+                            className="p-2 mr-2 text-orange-500 hover:bg-orange-50 rounded-full transition-all duration-200 cursor-pointer"
+                            title="Đánh dấu tất cả đã đọc"
+                        >
+                            <CheckCheck size={18} />
                         </button>
                     </div>
 

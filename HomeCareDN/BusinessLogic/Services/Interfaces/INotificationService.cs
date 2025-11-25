@@ -12,5 +12,7 @@ namespace BusinessLogic.Services.Interfaces
         Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto);
         Task<NotificationDto> NotifyNewServiceRequestAsync(ServiceRequest request);
         Task<NotificationDto> NotifyNewMaterialRequestAsync(MaterialRequest request);
+        Task<Notification?> ReadNotificationAsync(Guid id);
+        Task<bool> ReadAllNotificationsAsync(Guid userId);
     }
 }

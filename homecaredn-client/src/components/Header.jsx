@@ -267,7 +267,7 @@ export default function Header() {
             <div className="flex items-center gap-6">
               {user ? (
                 <>
-                  <NotificationPanel notifications={notifications} loading={loading} />
+                  <NotificationPanel notifications={notifications} loading={loading} user={user} />
                   {/* Avatar menu */}
                   <div className="relative" ref={avatarRef}>
                     <button

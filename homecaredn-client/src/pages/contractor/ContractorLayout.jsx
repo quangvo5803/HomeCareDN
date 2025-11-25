@@ -120,7 +120,7 @@ export default function ContractorLayout() {
                 placeholder={t('partnerDashboard.search_placeholder')}
               />
             </div>
-            <NotificationPanel notifications={notifications} loading={loading} />
+            <NotificationPanel notifications={notifications} loading={loading} user={user} />
             <LanguageSwitch />
             <AvatarMenu />
           </div>

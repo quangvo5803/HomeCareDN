@@ -47,6 +47,32 @@ export default function DistributorLayout() {
         }
       );
     },
+    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
   });
 
   useEffect(() => {
@@ -85,7 +111,7 @@ export default function DistributorLayout() {
                 placeholder={t('partnerDashboard.search_placeholder')}
               />
             </div>
-            <NotificationPanel notifications={notifications} loading={loading} />
+            <NotificationPanel notifications={notifications} loading={loading} user={user} />
             <LanguageSwitch />
             <AvatarMenu />
           </div>

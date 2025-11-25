@@ -8,6 +8,7 @@ using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {
@@ -41,7 +42,7 @@ namespace BusinessLogic.Services
                             && (n.TargetRoles!.Contains(role) || n.TargetRoles.ToLower() == "all"));
 
             var query = personalQuery.Union(systemQuery)
-                .OrderByDescending(n => n.CreatedAt);
+                .OrderByDescending(n => n.UpdatedAt);
 
             var totalCount = await query.CountAsync();
 
@@ -79,7 +80,6 @@ namespace BusinessLogic.Services
         {
             var existing = await _unitOfWork.NotificationRepository
                 .GetAsync(n => n.Type == NotificationType.Personal
-                                && n.TargetUserId == dto.TargetUserId
                                 && n.DataKey == dto.DataKey, asNoTracking: false);
 
             Notification noti;
@@ -137,16 +137,56 @@ namespace BusinessLogic.Services
             return mapped;
         }
 
-        public async Task MarkReadAsync(Guid id)
+        public async Task<Notification?> ReadNotificationAsync(Guid id)
         {
             var noti = await _unitOfWork.NotificationRepository
-                .GetAsync(n => n.NotificationID == id, asNoTracking:false);
+                .GetAsync(n => n.NotificationID == id, asNoTracking: false);
             if (noti != null)
             {
                 noti.IsRead = true;
                 noti.PendingCount = 0;
                 await _unitOfWork.SaveAsync();
             }
+            return noti;
+        }
+
+        public async Task<bool> ReadAllNotificationsAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "UserId", new[] { "UserId Not Found" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var allNotifications = await _unitOfWork.NotificationRepository
+                .GetRangeAsync(n => !n.IsRead
+                    && (n.TargetUserId == userId || (n.TargetUserId == null && n.TargetRoles != null)),
+                    asNoTracking:false
+                );
+
+            var notificationsToMark = allNotifications
+                .Where(n => n.TargetUserId == userId
+                    || (n.TargetUserId == null
+                        && n.TargetRoles!
+                            .Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                            .Any(r => userRoles.Contains(r))
+                    ))
+                .ToList();
+
+            foreach (var noti in notificationsToMark)
+            {
+                noti.IsRead = true;
+                noti.PendingCount = 0;
+                noti.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _unitOfWork.SaveAsync();
+            return true;
         }
 
         public async Task<NotificationDto> NotifyNewServiceRequestAsync(ServiceRequest request)

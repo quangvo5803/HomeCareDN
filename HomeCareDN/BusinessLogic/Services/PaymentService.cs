@@ -357,7 +357,7 @@ namespace BusinessLogic.Services
                 TargetUserId = materialRequest!.CustomerID,
                 Title = "Yêu cầu của bạn đã được chấp thuận",
                 Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
-                DataKey = $"ContractorApplication_{payment.DistributorApplication}_PAID",
+                DataKey = $"DistributorApplication_{payment.DistributorApplicationID}_PAID",
                 DataValue = materialRequest.MaterialRequestID.ToString(),
                 Action = NotificationAction.Paid
             });

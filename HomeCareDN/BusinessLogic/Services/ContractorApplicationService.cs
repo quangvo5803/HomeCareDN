@@ -324,7 +324,7 @@ namespace BusinessLogic.Services
                 TargetUserId = serviceRequest.CustomerID,
                 Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
                 Message = $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
-                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_APPLY",
+                DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
                 DataValue = dto.ServiceRequestID.ToString(),
                 Action = NotificationAction.Apply
             });
