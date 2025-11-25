@@ -207,6 +207,7 @@
     "title": "Login",
     "subtitle": "Welcome back!",
     "email_placeholder": "Enter your email",
+    "password": "Password",
     "another_login": "Or login with",
     "not_have_account": "Don't have an account? ",
     "register_link": " Register now",
@@ -646,6 +647,7 @@
     "no": "No",
     "service_type": "Service Type",
     "title": "Contractor Dashboard",
+    "title_dis": "Distributor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
       "open_requests": "Open Requests",
@@ -692,7 +694,8 @@
     },
     "repair": "Repair",
     "construction": "Construction",
-    "revenue": "Revenue"
+    "revenue": "Revenue",
+    "no_applications":"No data to display" 
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",
@@ -1235,7 +1238,7 @@
     "noMoreMessages": "No more messages",
     "locked_des": {
       "title": "Chat is locked",
-      "description": "Chat will be unlocked after the contractor pays the partnership fee",
+      "description": "Chat will be unlocked after the Partner pays the partnership fee",
       "noMessages": "Chat is locked",
       "placeholder": "Chat is locked..."
     }
@@ -1419,6 +1422,7 @@
     "NULL_COMPANYNAME": "Please enter the company name.",
     "NULL_PARTNERTYPE": "Please select a role.",
     "NULL_IMAGES": "Please upload company images.",
+    "NULL_PASSWORD": "Please enter password",
 
     "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
     "INVALID_PHONE": "Invalid phone number.",

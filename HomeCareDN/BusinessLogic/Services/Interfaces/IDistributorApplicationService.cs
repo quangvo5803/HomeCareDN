@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 
 namespace BusinessLogic.Services.Interfaces
@@ -14,6 +15,7 @@ namespace BusinessLogic.Services.Interfaces
         Task<PagedResultDto<DistributorApplicationDto>> GetAllDistributorApplicationByUserIdAsync(
             QueryParameters parameters
         );
+
         Task<DistributorApplicationDto?> GetDistributorApplicationByMaterialRequestId(
             DistributorApplicationGetByIdDto byIdDto
         );

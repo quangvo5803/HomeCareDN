@@ -1,9 +1,9 @@
-﻿using BusinessLogic.Services.FacadeService;
+﻿using System.Security.Claims;
+using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace HomeCareDNAPI.Controllers
 {
@@ -19,30 +19,38 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [Authorize(Roles = "Admin, Contractor")]
+        [Authorize(Roles = "Admin, Contractor, Distributor")]
         [HttpGet("bar-chart")]
         public async Task<IActionResult> GetBarChart(
-            [FromQuery] int year, [FromQuery] string role, [FromQuery] Guid? contractorId = null
+            [FromQuery] int year,
+            [FromQuery] string role,
+            [FromQuery] Guid? contractorId = null,
+            [FromQuery] Guid? distributorId = null
         )
         {
             var statistics = await _facadeService.StatisticService.GetBarChartAsync(
-                year, 
-                role, 
-                contractorId
+                year,
+                role,
+                contractorId,
+                distributorId
             );
             return Ok(statistics);
         }
 
-        [Authorize(Roles = "Admin, Contractor")]
+        [Authorize(Roles = "Admin, Contractor, Distributor")]
         [HttpGet("line-chart")]
         public async Task<IActionResult> GetLineStatistics(
-            [FromQuery] int year, [FromQuery] string role, [FromQuery] Guid? contractorId = null
+            [FromQuery] int year,
+            [FromQuery] string role,
+            [FromQuery] Guid? contractorId = null,
+            [FromQuery] Guid? ditributorId = null
         )
         {
             var statistics = await _facadeService.StatisticService.GetLineChartAsync(
                 year,
                 role,
-                contractorId
+                contractorId,
+                ditributorId
             );
             return Ok(statistics);
         }
@@ -83,10 +91,22 @@ namespace HomeCareDNAPI.Controllers
             if (!Guid.TryParse(sub, out var contractorId))
                 return Unauthorized("Invalid contractor ID.");
 
-            var result =
-                await _facadeService.StatisticService.GetContractorStatAsync(
-                    contractorId
-                );
+            var result = await _facadeService.StatisticService.GetContractorStatAsync(contractorId);
+            return Ok(result);
+        }
+
+        //================= Distributor =================
+        [Authorize(Roles = "Distributor")]
+        [HttpGet("distributor/stat-statistics")]
+        public async Task<IActionResult> GetStatForDistributorStatistics()
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(sub, out var distributorId))
+                return Unauthorized("Invalid distributor ID.");
+
+            var result = await _facadeService.StatisticService.GetDistributorStatAsync(
+                distributorId
+            );
             return Ok(result);
         }
     }

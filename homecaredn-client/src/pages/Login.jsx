@@ -12,10 +12,14 @@ import { isSafeEmail } from '../utils/validateEmail';
 export default function Login() {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState('otp'); // 'otp' or 'password'
   const navigate = useNavigate();
   const location = useLocation();
   const { setPendingEmail, login } = useContext(AuthContext);
+
   const TOAST_ID = useMemo(
     () => ({
       notice: 'notice_once',
@@ -25,6 +29,7 @@ export default function Login() {
     []
   );
   const noticeShownRef = useRef(false);
+
   const getStatusCodes = (err) => {
     const d = err?.response?.data ?? {};
     const rootUpper = Array.isArray(d.STATUS) ? d.STATUS : [];
@@ -33,6 +38,7 @@ export default function Login() {
     const modelState = Array.isArray(errs.STATUS) ? errs.STATUS : [];
     return [...rootUpper, ...rootLower, ...modelState];
   };
+
   useEffect(() => {
     const noticeKey = location.state?.notice;
     if (noticeKey && !noticeShownRef.current) {
@@ -54,12 +60,28 @@ export default function Login() {
       return;
     }
 
+    if (authMethod === 'password' && !password.trim()) {
+      toast.error(t('ERROR.NULL_PASSWORD'));
+      return;
+    }
+
     setLoading(true);
     try {
-      await authService.login(email);
-      setPendingEmail(email);
-      toast.success(t('SUCCESS.SEND_OTP'));
-      navigate('/VerifyOTP', { state: { email } });
+      const response = await authService.login(
+        email,
+        authMethod === 'password' ? password : undefined
+      );
+
+      if (authMethod === 'password' && response?.data?.accessToken) {
+        // Direct password login
+        toast.success(t('SUCCESS.LOGIN'));
+        login(response.data.accessToken);
+      } else {
+        // OTP login
+        setPendingEmail(email);
+        toast.success(t('SUCCESS.SEND_OTP'));
+        navigate('/VerifyOTP', { state: { email } });
+      }
     } catch (err) {
       const codes = getStatusCodes(err);
 
@@ -150,8 +172,34 @@ export default function Login() {
               <p className="text-gray-600">{t('login.subtitle')}</p>
             </div>
 
+            {/* Authentication Method Toggle */}
+            <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setAuthMethod('otp')}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+                  authMethod === 'otp'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-transparent text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                OTP
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMethod('password')}
+                className={`flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200 ${
+                  authMethod === 'password'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-transparent text-gray-700 hover:text-gray-900'
+                }`}
+              >
+                {t('login.password') || 'Password'}
+              </button>
+            </div>
+
             <div className="space-y-6">
-              {/* Floating Label Input */}
+              {/* Email Input */}
               <div className="relative">
                 <input
                   type="email"
@@ -180,12 +228,47 @@ export default function Login() {
                 </label>
               </div>
 
+              {/* Password Input - Only show when password method is selected */}
+              {authMethod === 'password' && (
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 text-gray-800 placeholder-transparent peer pr-12"
+                    placeholder=" "
+                  />
+                  <label
+                    htmlFor="password"
+                    className={`absolute left-4 transition-all duration-200 pointer-events-none ${
+                      password
+                        ? '-top-2 text-xs bg-white px-1 text-blue-600'
+                        : 'top-3 text-base text-gray-500 peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600'
+                    }`}
+                  >
+                    {t('login.password') || 'Password'}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-gray-600 hover:text-gray-800"
+                  >
+                    <i
+                      className={`fa-solid ${
+                        showPassword ? 'fa-eye-slash' : 'fa-eye'
+                      }`}
+                    ></i>
+                  </button>
+                </div>
+              )}
+
               <button
                 onClick={handleLogin}
-                disabled={!email}
+                disabled={!email || (authMethod === 'password' && !password)}
                 className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {t('BUTTON.SendOTP')}
+                {authMethod === 'otp' ? t('BUTTON.SendOTP') : t('BUTTON.Login')}
               </button>
             </div>
 

@@ -206,6 +206,7 @@
     "title": "Đăng Nhập",
     "subtitle": "Chào mừng bạn quay trở lại!",
     "email_placeholder": "Nhập email của bạn",
+    "password": "Mật khẩu",
     "another_login": "Hoặc đăng nhập với",
     "not_have_account": "Bạn chưa có tài khoản? ",
     "register_link": " Đăng ký ngay",
@@ -1230,7 +1231,7 @@
     "noMoreMessages": "Không còn tin nhắn nào nữa",
     "locked_des": {
       "title": "Chat đang bị khóa",
-      "description": "Chat sẽ được mở sau khi nhà thầu thanh toán phí hợp tác",
+      "description": "Chat sẽ được mở sau khi đối tác thanh toán phí hợp tác",
       "noMessages": "Chat đang bị khóa",
       "placeholder": "Chat đang bị khóa..."
     }
@@ -1411,7 +1412,7 @@
     "NULL_COMPANYNAME": "Vui lòng nhập tên doanh nghiệp",
     "NULL_PARTNERTYPE": "Vui lòng lựa chọn vai trò",
     "NULL_IMAGES": "Vui lòng tải lên hình ảnh doanh nghiệp",
-
+    "NULL_PASSWORD": "Vui lòng nhập mật khẩu",
     "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
     "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "INVALID_EMAIL": "Email không hợp lệ.",
