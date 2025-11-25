@@ -14,6 +14,7 @@ import { useUser } from '../../hook/useUser';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
 import ReviewCountdown from '../customer/ReviewCountdown';
+import { formatVND } from '../../utils/formatters';
 
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
@@ -363,7 +364,7 @@ export default function ServiceRequestManager() {
                       {req.estimatePrice ? (
                         <span className="text-emerald-600 font-semibold">
                           {t('userPage.serviceRequest.label_estimatePrice')}
-                          {req.estimatePrice.toLocaleString('vi-VN')} VNĐ
+                          {formatVND(req.estimatePrice)}
                         </span>
                       ) : (
                         <span className="text-gray-500 italic">
