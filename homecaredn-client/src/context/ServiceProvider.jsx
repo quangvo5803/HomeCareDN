@@ -20,8 +20,12 @@ export const ServiceProvider = ({ children }) => {
       PageNumber = 1,
       PageSize = 10,
       SortBy,
-      FilterID,
       Search,
+      FilterServiceType,
+      FilterPackageOption,
+      FilterBuildingType,
+      FilterMainStructureType,
+      FilterDesignStyle,
       ExcludedID,
     } = {}) => {
       try {
@@ -29,8 +33,12 @@ export const ServiceProvider = ({ children }) => {
           PageNumber,
           PageSize,
           SortBy,
-          FilterID,
           Search,
+          FilterServiceType,
+          FilterPackageOption,
+          FilterBuildingType,
+          FilterMainStructureType,
+          FilterDesignStyle,
           ExcludedID,
         });
         const itemsWithType = (data.items || []).map((s) => ({
