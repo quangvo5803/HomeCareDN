@@ -129,7 +129,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
             <div className="sticky space-y-4 top-4">
               {/* Main Image */}
               <div className="p-6 overflow-hidden bg-white shadow-xl rounded-2xl">
-                <div className="w-full bg-gray-100 rounded-lg aspect-square flex items-center justify-center">
+                <div className="w-full bg-white rounded-lg aspect-square flex items-center justify-center">
                   <a
                     key={mainImage}
                     href={mainImage}
@@ -164,7 +164,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     <button
                       key={src}
                       onClick={() => setMainImage(src)}
-                      className={`relative bg-gray-100 rounded-lg overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 ${
+                      className={`relative bg-white rounded-lg overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 ${
                         mainImage === src
                           ? 'ring-2 ring-orange-500 shadow-md scale-105'
                           : 'hover:scale-105 shadow-sm hover:shadow-md'
