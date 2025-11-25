@@ -17,8 +17,14 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+
         private const string SERVICE_REQUEST_INCLUDE = "ServiceRequest";
         private const string MATERIAL_REQUEST_INCLUDE = "MaterialRequest";
+
+        private const string ROLE_ADMIN = "Admin";
+        private const string ROLE_CONTRACTOR = "Contractor";
+        private const string ROLE_DISTRIBUTOR = "Distributor";
+        private const string ROLE_CUSTOMER = "Customer";
 
         public StatisticService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
@@ -38,7 +44,7 @@ namespace BusinessLogic.Services
             IEnumerable<DistributorApplication> distributor =
                 Enumerable.Empty<DistributorApplication>();
 
-            if (role == "Admin")
+            if (role == ROLE_ADMIN)
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                     x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
@@ -50,7 +56,7 @@ namespace BusinessLogic.Services
                     includeProperties: "Items"
                 );
             }
-            else if (role == "Contractor" && contractorId.HasValue)
+            else if (role == ROLE_CONTRACTOR && contractorId.HasValue)
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                     x =>
@@ -60,7 +66,7 @@ namespace BusinessLogic.Services
                     includeProperties: SERVICE_REQUEST_INCLUDE
                 );
             }
-            else if (role == "Distributor" && distributorId.HasValue)
+            else if (role == ROLE_DISTRIBUTOR && distributorId.HasValue)
             {
                 distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
                     x =>
@@ -73,7 +79,7 @@ namespace BusinessLogic.Services
 
             var result = BuildBarChart(
                 contractor,
-                (role == "Admin" || role == "Distributor") ? distributor : null,
+                (role == ROLE_ADMIN || role == ROLE_DISTRIBUTOR) ? distributor : null,
                 year,
                 x => x.CreatedAt,
                 x => x.ServiceRequest?.ServiceType,
@@ -90,7 +96,7 @@ namespace BusinessLogic.Services
             Guid? distributorId = null
         )
         {
-            if (role == "Admin")
+            if (role == ROLE_ADMIN)
             {
                 var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(p =>
                     p.Status == PaymentStatus.Paid
@@ -102,7 +108,7 @@ namespace BusinessLogic.Services
 
                 return result;
             }
-            else if (role == "Contractor" && contractorId.HasValue)
+            else if (role == ROLE_CONTRACTOR && contractorId.HasValue)
             {
                 var contractorApps =
                     await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
@@ -122,7 +128,7 @@ namespace BusinessLogic.Services
 
                 return result;
             }
-            else if (role == "Distributor" && distributorId.HasValue)
+            else if (role == ROLE_DISTRIBUTOR && distributorId.HasValue)
             {
                 var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
                     x =>
@@ -272,9 +278,9 @@ namespace BusinessLogic.Services
         {
             var dto = new AdminStatDto();
 
-            var customers = await _userManager.GetUsersInRoleAsync("Customer");
-            var contractors = await _userManager.GetUsersInRoleAsync("Contractor");
-            var distributors = await _userManager.GetUsersInRoleAsync("Distributor");
+            var customers = await _userManager.GetUsersInRoleAsync(ROLE_CUSTOMER);
+            var contractors = await _userManager.GetUsersInRoleAsync(ROLE_CONTRACTOR);
+            var distributors = await _userManager.GetUsersInRoleAsync(ROLE_DISTRIBUTOR);
 
             dto.TotalCustomer = customers.Count;
             dto.TotalContactor = contractors.Count;
