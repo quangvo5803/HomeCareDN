@@ -171,6 +171,7 @@ export default function ServiceRequestDetail() {
           c.contractorApplicationID === contractorApplicationID ? rejected : c
         )
       );
+      toast.success(t('SUCCESS.REJECT_APPLICATION'));
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
@@ -837,6 +838,22 @@ export default function ServiceRequestDetail() {
                   </button>
                 </div>
               )}
+              {selectedContractor.status === 'Rejected' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                  <p className="text-red-700 font-semibold">
+                    <i className="fas fa-times-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.alreadyRejected')}
+                  </p>
+                </div>
+              )}
+              {selectedContractor.status === 'PendingCommission' && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+                  <p className="text-green-700 font-semibold">
+                    <i className="fas fa-check-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.waiting')}
+                  </p>
+                </div>
+              )}
             </>
           ) : contractorApplications.length === 0 ? (
             <div className="text-center py-10 text-gray-500">
@@ -918,7 +935,7 @@ export default function ServiceRequestDetail() {
             serviceRequest.conversationID ||
             serviceRequest.conversation?.conversationID
           }
-          contractorApplicationStatus={selectedContractor?.status}
+          applicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />
       </div>

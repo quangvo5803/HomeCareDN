@@ -406,7 +406,7 @@ export default function ServiceRequestManager() {
                       )}
 
                       {req.status === 'Opening' &&
-                        req.contractorApplyCount == 0 && (
+                        req.selectedContractorApplicationID == null && (
                           <button
                             className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
                             onClick={() =>

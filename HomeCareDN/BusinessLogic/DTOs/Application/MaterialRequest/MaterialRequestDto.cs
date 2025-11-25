@@ -1,4 +1,6 @@
-﻿using BusinessLogic.DTOs.Application.DistributorApplication;
+﻿using BusinessLogic.DTOs.Application.Chat.User.Convesation;
+using BusinessLogic.DTOs.Application.DistributorApplication;
+using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Authorize.User;
 using DataAccess.Entities.Application;
 
@@ -22,7 +24,10 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public required string Status { get; set; }
         public int DistributorApplyCount { get; set; }
 
-        public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }
+        public ICollection<MaterialRequestItemDto>? MaterialRequestItems { get; set; }
         public DistributorApplicationDto? SelectedDistributorApplication { get; set; }
+        public ConversationDto? Conversation { get; set; }
+        public ReviewDto? Review { get; set; }
+        public DateTime? StartReviewDate { get; set; }
     }
 }

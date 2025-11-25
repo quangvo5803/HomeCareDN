@@ -144,7 +144,7 @@ export default function AdminMaterialManager() {
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
-                <i className="fa-solid fa-tags text-white text-2xl" />
+                <i className="fa-solid fa-suitcase text-white text-2xl" />
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-1">
@@ -166,7 +166,7 @@ export default function AdminMaterialManager() {
               <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                    <i className="fa-solid fa-tags text-white text-lg" />
+                    <i className="fa-solid fa-suitcase text-white text-lg" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-white">
@@ -424,7 +424,7 @@ export default function AdminMaterialManager() {
                         <td colSpan="7" className="px-6 py-16 text-center">
                           <div className="flex flex-col items-center text-center mt-5 mb-5">
                             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                              <i className="fa-solid fa-tags text-gray-400 text-3xl" />
+                              <i className="fa-solid fa-suitcase text-gray-400 text-3xl" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">
                               {t('adminMaterialManager.noMaterial')}
@@ -601,7 +601,7 @@ export default function AdminMaterialManager() {
                 ) : (
                   <div className="py-16 text-center">
                     <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <i className="fa-solid fa-tags text-gray-400 text-3xl" />
+                      <i className="fa-solid fa-suitcase text-gray-400 text-3xl" />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
                       {t('adminMaterialManager.noMaterial')}

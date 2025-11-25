@@ -32,6 +32,11 @@ namespace HomeCareDNAPI.Hubs
             {
                 isMember = conversation.CustomerID == userId || conversation.ContractorID == userId;
             }
+            else if (conversation.ConversationType == ConversationType.MaterialRequest)
+            {
+                isMember =
+                    conversation.CustomerID == userId || conversation.DistributorID == userId;
+            }
             else if (conversation.ConversationType == ConversationType.AdminSupport)
             {
                 isMember = conversation.UserID == userId || conversation.AdminID == userId;

@@ -31,6 +31,10 @@ namespace BusinessLogic.Services
         )
         {
             var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
+            if (parameters.ExcludedID != null)
+            {
+                query = query.Where(s => s.ServiceID != parameters.ExcludedID);
+            }
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();

@@ -11,6 +11,7 @@ using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BusinessLogic.Services
 {
@@ -21,7 +22,11 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
 
-        private const string DISTRIBUTOR_APPLY = "DistributorApply";
+        private const string DISTRIBUTOR_APPLICATION_REJECT = "DistributorApplication.Rejected";
+        private const string DISTRIBUTOR_APPLICATION_ACCEPT = "DistributorApplication.Accept";
+
+        private const string ERROR_APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND";
+        private const string DISTRIBUTOR_APPLICATION = "DistributorApplication";
         private const string DISTRIBUTOR = "Distributor";
         private const string ERROR_MATERIAL_REQUEST_NOT_FOUND = "MATERIAL_REQUEST_NOT_FOUND";
         private const string ERROR_DISTRIBUTOR_NOT_FOUND = "DISTRIBUTOR_NOT_FOUND";
@@ -70,10 +75,10 @@ namespace BusinessLogic.Services
                 if (distributor == null)
                     continue;
 
-                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
-
                 if (role == "Admin")
                 {
+                    dto.DistributorName =
+                        distributor.FullName ?? distributor.UserName ?? string.Empty;
                     dto.DistributorEmail = distributor.Email ?? string.Empty;
                     dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
                 }
@@ -100,6 +105,8 @@ namespace BusinessLogic.Services
                 .Where(ca => ca.DistributorID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
+            query = query.OrderByDescending(c => c.CreatedAt);
+
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
@@ -176,13 +183,13 @@ namespace BusinessLogic.Services
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
-                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
-                dto.DistributorEmail = distributor.Email ?? string.Empty;
-                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
-                if (role == "Customer" && application.Status != ApplicationStatus.Approved)
+
+                if (role == "Customer" && application.Status == ApplicationStatus.Approved)
                 {
-                    dto.DistributorEmail = string.Empty;
-                    dto.DistributorPhone = string.Empty;
+                    dto.DistributorName =
+                        distributor.FullName ?? distributor.UserName ?? string.Empty;
+                    dto.DistributorEmail = distributor.Email ?? string.Empty;
+                    dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
                 }
             }
             return dto;
@@ -208,7 +215,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -223,9 +230,7 @@ namespace BusinessLogic.Services
 
             DistributorApplication application;
 
-            application = materialRequest.CanEditQuantity
-                ? await AddAndEditCase(createRequest)
-                : await AddAndNoCase(createRequest, materialRequest);
+            application = await AddAndNoCase(createRequest, materialRequest);
 
             var dto = _mapper.Map<DistributorApplicationDto>(application);
             dto.DistributorName = distributor.FullName ?? string.Empty;
@@ -266,7 +271,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -290,24 +295,6 @@ namespace BusinessLogic.Services
         }
 
         #region Handle Cases
-        private async Task<DistributorApplication> AddAndEditCase(
-            DistributorCreateApplicationDto createRequest
-        )
-        {
-            var application = _mapper.Map<DistributorApplication>(createRequest);
-            application.Items = new List<DistributorApplicationItem>();
-
-            foreach (var item in createRequest.Items!.Where(i => i != null))
-            {
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-                application.Items.Add(entityItem);
-            }
-
-            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
-            await _unitOfWork.SaveAsync();
-            return application;
-        }
-
         private async Task<DistributorApplication> AddAndNoCase(
             DistributorCreateApplicationDto createRequest,
             MaterialRequest request
@@ -335,6 +322,167 @@ namespace BusinessLogic.Services
             await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
             await _unitOfWork.SaveAsync();
             return application;
+        }
+
+        public async Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
+            DistributorApplicationAcceptRequestDto dto
+        )
+        {
+            var application = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                x => x.DistributorApplicationID == dto.DistributorApplicationID,
+                includeProperties: "Items",
+                asNoTracking: false
+            );
+            if (application == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var request = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                x => x.MaterialRequestID == application.MaterialRequestID,
+                includeProperties: "MaterialRequestItems,DistributorApplications",
+                asNoTracking: false
+            );
+            if (request == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MaterialRequest", new[] { "Material request not found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var originalMaterialIDs =
+                request.MaterialRequestItems?.Select(x => x.MaterialID).ToHashSet()
+                ?? new HashSet<Guid>();
+
+            if (application.Items != null && dto.AcceptedExtraItemIDs != null)
+            {
+                var originalItems = application
+                    .Items.Where(x => originalMaterialIDs.Contains(x.MaterialID))
+                    .ToList();
+
+                var extraItems = application
+                    .Items.Where(x => !originalMaterialIDs.Contains(x.MaterialID))
+                    .ToList();
+
+                var acceptedExtraItems = extraItems
+                    .Where(x => dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID))
+                    .ToList();
+
+                application.Items = originalItems.Concat(acceptedExtraItems).ToList();
+            }
+            application.Status = ApplicationStatus.PendingCommission;
+            application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+
+            request.Status = RequestStatus.Closed;
+            request.SelectedDistributorApplicationID = application.DistributorApplicationID;
+            if (request.DistributorApplications != null)
+            {
+                foreach (var other in request.DistributorApplications)
+                {
+                    if (other.DistributorApplicationID != application.DistributorApplicationID)
+                    {
+                        other.Status = ApplicationStatus.Rejected;
+
+                        var rejectPayload = new
+                        {
+                            other.DistributorApplicationID,
+                            request.MaterialRequestID,
+                            Status = "Rejected",
+                        };
+
+                        await _notifier.SendToApplicationGroupAsync(
+                            $"user_{other.DistributorID}",
+                            DISTRIBUTOR_APPLICATION_REJECT,
+                            rejectPayload
+                        );
+                    }
+                }
+            }
+            await _unitOfWork.SaveAsync();
+            var resultDto = _mapper.Map<DistributorApplicationDto>(application);
+
+            var acceptPayload = new
+            {
+                application.DistributorApplicationID,
+                application.MaterialRequestID,
+                Status = "PendingCommission",
+                application.DueCommisionTime,
+            };
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{request.CustomerID}",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{application.DistributorID}",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+
+            return resultDto;
+        }
+
+        public async Task<DistributorApplicationDto> RejectDistributorApplicationAsync(
+            Guid distributorApplicationID
+        )
+        {
+            var distributorApplication =
+                await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                    ca => ca.DistributorApplicationID == distributorApplicationID,
+                    asNoTracking: false
+                );
+
+            if (distributorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            if (distributorApplication.Status != ApplicationStatus.Pending)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { "APPLICATION_NOT_PENDING" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            distributorApplication.Status = ApplicationStatus.Rejected;
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{dto.DistributorID}",
+                DISTRIBUTOR_APPLICATION_REJECT,
+                new
+                {
+                    distributorApplication.DistributorApplicationID,
+                    distributorApplication.MaterialRequestID,
+                    Status = ApplicationStatus.Rejected.ToString(),
+                }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                DISTRIBUTOR_APPLICATION_REJECT,
+                new
+                {
+                    distributorApplication.DistributorApplicationID,
+                    distributorApplication.MaterialRequestID,
+                    Status = ApplicationStatus.Rejected.ToString(),
+                }
+            );
+            return dto;
         }
         #endregion
     }

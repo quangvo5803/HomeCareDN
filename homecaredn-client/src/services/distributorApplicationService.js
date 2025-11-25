@@ -1,41 +1,67 @@
 import api from './public/api';
 
 export const distributorApplicationService = {
+  // ====================== ADMIN ======================
+  getAllForAdmin: async (params) => {
+    const response = await api.get('/distributor-applications/admin', {
+      params,
+    });
+    return response.data;
+  },
+
+  getAllByUserIdForAdmin: async (params) => {
+    const response = await api.get(
+      '/distributor-applications/admin/get-all-by-user-id',
+      { params }
+    );
+    return response.data;
+  },
+
+  getByIdForAdmin: async (id) => {
+    const response = await api.get(`/distributor-applications/admin/${id}`);
+    return response.data;
+  },
   // ====================== CUSTOMER ======================
   getAllByMaterialRequestIdForCustomer: async (params) => {
-    const response = await api.get('/DistributorApplications/customer/all', {
+    const response = await api.get('/distributor-applications/customer/all', {
       params,
     });
     return response.data;
   },
   getByIdForCustomer: async (id) => {
-    const response = await api.get(`/DistributorApplications/customer/${id}`);
+    const response = await api.get(`/distributor-applications/customer/${id}`);
+    return response.data;
+  },
+  accept: async (params) => {
+    const response = await api.put(
+      `/distributor-applications/customer/accept`,
+
+      params
+    );
+    return response.data;
+  },
+
+  reject: async (id) => {
+    const response = await api.put(
+      `/distributor-applications/customer/${id}/reject`
+    );
     return response.data;
   },
 
   // ====================== DISTRIBUTOR ======================
   getByMaterialRequestIdForContractor: async (dto) => {
     const response = await api.get(
-      `/DistributorApplications/distributor/applied`,
+      `/distributor-applications/distributor/applied`,
       {
         params: dto,
       }
     );
     return response.data;
   },
-  getLatestApplications: async (params) => {
-    const { data } = await api.get(
-      '/DistributorApplications/distributor/applications',
-      {
-        params: params,
-      }
-    );
-    return data;
-  },
 
   create: async (dto) => {
     const response = await api.post(
-      '/DistributorApplications/distributor/create',
+      '/distributor-applications/distributor/create',
       dto,
       {
         headers: {
@@ -48,7 +74,7 @@ export const distributorApplicationService = {
 
   delete: async (id) => {
     const response = await api.delete(
-      `/DistributorApplications/distributor/delete/${id}`
+      `/distributor-applications/distributor/delete/${id}`
     );
     return response.data;
   },

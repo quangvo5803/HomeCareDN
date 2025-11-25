@@ -43,6 +43,10 @@ namespace BusinessLogic.Services
             var query = _unitOfWork.MaterialRepository.GetQueryable(
                 includeProperties: MATERIAL_INCLUDE
             );
+            if (parameters.ExcludedID != null)
+            {
+                query = query.Where(m => m.MaterialID != parameters.ExcludedID);
+            }
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();

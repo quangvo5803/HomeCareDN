@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BusinessLogic.DTOs.Application.Partner
+namespace BusinessLogic.DTOs.Application.PartnerRequest
 {
     public class RejectPartnerRequestDto
     {

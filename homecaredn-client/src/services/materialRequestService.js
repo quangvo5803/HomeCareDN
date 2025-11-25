@@ -39,7 +39,6 @@ export const materialRequestService = {
     // dto: {
     //   MaterialRequestID: string,
     //   Description?: string,
-    //   CanEditQuantity: boolean,
     //   AddItems?: [{ MaterialID: string, Quantity: number }],
     //   UpdateItems?: [{ MaterialRequestItemID: string, Quantity: number }],
     //   DeleteItemIDs?: [string]

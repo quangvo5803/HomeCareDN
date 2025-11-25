@@ -7,6 +7,8 @@ import PropTypes from 'prop-types';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
 import { useMaterialRequest } from '../hook/useMaterialRequest';
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
 import ExsitingMaterialRequestModal from './modal/ExistingMaterialRequestModal';
 
 export default function ItemDetail({ item, relatedItems = [] }) {
@@ -24,7 +26,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
       setMainImage(item.imageUrls[0]);
     }
   }, [item]);
-
+  useEffect(() => {
+    const vb = new VenoBox({ selector: '.venobox' });
+    return () => vb.close();
+  });
   const serviceTypeConfig = {
     Construction: {
       route: '/ConstructionViewAll',
@@ -122,26 +127,47 @@ export default function ItemDetail({ item, relatedItems = [] }) {
           {/* Gallery */}
           <div className="lg:col-span-5">
             <div className="sticky space-y-4 top-4">
-              <div className="p-8 overflow-hidden bg-white shadow-xl rounded-2xl">
-                <div className="flex items-center justify-center aspect-square">
-                  <img
-                    src={mainImage}
-                    alt={item.name}
-                    className="object-contain max-w-full max-h-full"
-                  />
+              {/* Main Image */}
+              <div className="p-6 overflow-hidden bg-white shadow-xl rounded-2xl">
+                <div className="w-full bg-white rounded-lg aspect-square flex items-center justify-center">
+                  <a
+                    key={mainImage}
+                    href={mainImage}
+                    className="venobox w-full h-full rounded-lg overflow-hidden hover:opacity-90 transition-opacity flex items-center justify-center"
+                    data-gall="item-gallery"
+                  >
+                    <img
+                      src={mainImage}
+                      alt={item.name}
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </a>
                 </div>
               </div>
 
+              {/* Hidden anchors for Venobox gallery */}
+              {item.imageUrls?.map((src) =>
+                src !== mainImage ? (
+                  <a
+                    key={'hidden-' + src}
+                    href={src}
+                    className="venobox hidden"
+                    data-gall="item-gallery"
+                  />
+                ) : null
+              )}
+
+              {/* Thumbnails */}
               {item.imageUrls?.length > 1 && (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid gap-3 p-4 bg-white rounded-2xl shadow-xl grid-cols-4">
                   {item.imageUrls.slice(0, 4).map((src, i) => (
                     <button
                       key={src}
                       onClick={() => setMainImage(src)}
-                      className={`relative bg-white rounded-xl overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 hover:shadow-lg ${
+                      className={`relative bg-white rounded-lg overflow-hidden aspect-square flex items-center justify-center transition-all duration-300 ${
                         mainImage === src
                           ? 'ring-2 ring-orange-500 shadow-md scale-105'
-                          : 'hover:scale-105 shadow-sm'
+                          : 'hover:scale-105 shadow-sm hover:shadow-md'
                       }`}
                       aria-label={`${item.name} thumbnail ${i + 1}`}
                     >
@@ -155,7 +181,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                             ? `${item.name} thumbnail ${i + 1}`
                             : 'No image'
                         }
-                        className="object-contain w-[95px] h-[95px]"
+                        className="w-full h-full object-contain p-1"
                       />
                       {mainImage === src && (
                         <div className="absolute inset-0 bg-orange-500/10" />
@@ -456,14 +482,14 @@ export default function ItemDetail({ item, relatedItems = [] }) {
               }/${m.serviceID || m.materialID}`}
               className="overflow-hidden transition-all bg-white shadow-lg rounded-2xl hover:shadow-2xl hover:-translate-y-1"
             >
-              <div className="relative p-4 aspect-square bg-gradient-to-br from-gray-50 to-gray-100">
+              <div className="relative p-4 aspect-square bg-gray-100 flex items-center justify-center">
                 <img
                   src={
                     m.imageUrls?.[0] ||
                     'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
                   }
                   alt={m.name || 'No image'}
-                  className="object-contain w-full h-full transition-transform duration-500 group-hover:scale-110"
+                  className="object-contain w-full h-full p-2 transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
               <div className="p-5">
@@ -496,7 +522,6 @@ ItemDetail.propTypes = {
     designStyle: PropTypes.string,
     packageOption: PropTypes.string,
     mainStructureType: PropTypes.string,
-    // ✅ Thêm vào đây
     materialID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     serviceID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   }).isRequired,

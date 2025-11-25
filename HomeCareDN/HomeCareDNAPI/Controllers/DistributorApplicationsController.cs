@@ -4,12 +4,11 @@ using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HomeCareDNAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/distributor-applications")]
     [ApiController]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class DistributorApplicationsController : ControllerBase
@@ -19,6 +18,44 @@ namespace HomeCareDNAPI.Controllers
         public DistributorApplicationsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
+        }
+
+        // ====================== ADMIN ======================
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetAllForAdmin([FromQuery] QueryParameters parameters)
+        {
+            var result =
+                await _facadeService.DistributorApplicationService.GetAllDistributorApplicationByMaterialRequestId(
+                    parameters,
+                    "Admin"
+                );
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin/get-all-by-user-id")]
+        public async Task<IActionResult> GetAllByUserIdForAdmin(
+            [FromQuery] QueryParameters parameters
+        )
+        {
+            var result =
+                await _facadeService.DistributorApplicationService.GetAllDistributorApplicationByUserIdAsync(
+                    parameters
+                );
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin/{id:guid}")]
+        public async Task<IActionResult> GetByIdForAdmin(Guid id)
+        {
+            var result =
+                await _facadeService.DistributorApplicationService.GetDistributorApplicationById(
+                    id,
+                    "Admin"
+                );
+            return Ok(result);
         }
 
         // ====================== CUSTOMER ======================
@@ -46,6 +83,30 @@ namespace HomeCareDNAPI.Controllers
                     "Customer"
                 );
             return Ok(result);
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpPut("customer/accept")]
+        public async Task<IActionResult> Accept(
+            [FromBody] DistributorApplicationAcceptRequestDto dto
+        )
+        {
+            var request =
+                await _facadeService.DistributorApplicationService.AcceptDistributorApplicationAsync(
+                    dto
+                );
+            return Ok(request);
+        }
+
+        [Authorize(Roles = "Customer")]
+        [HttpPut("customer/{distributorApplicationID:guid}/reject")]
+        public async Task<IActionResult> Reject(Guid distributorApplicationID)
+        {
+            var request =
+                await _facadeService.DistributorApplicationService.RejectDistributorApplicationAsync(
+                    distributorApplicationID
+                );
+            return Ok(request);
         }
 
         // ====================== DISTRIBUTOR ======================

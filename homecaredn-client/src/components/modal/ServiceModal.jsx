@@ -76,6 +76,7 @@ export default function ServiceModal({
             return;
           }
         }
+        setService(null);
         setName('');
         setNameEN('');
         setDescription('');
@@ -85,6 +86,7 @@ export default function ServiceModal({
         setBuildingType('');
         setMainStructureType('');
         setDesignStyle('');
+        setIsExpanded(false);
         setImages([]);
         setUploadProgress(0);
       }
