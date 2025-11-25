@@ -27,7 +27,7 @@ namespace BusinessLogic.Services
         private const string DISTRIBUTOR = "Distributor";
         private const string INCLUDE_DELETE = "MaterialRequestItems,DistributorApplications";
         private const string INCLUDE =
-            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Brand,MaterialRequestItems.Material.Category,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material.Brand,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material";
+            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Brand,MaterialRequestItems.Material.Category,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material.Brand,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,Conversation";
         private const string ERROR_MATERIAL_SERVICE = "MATERIAL_SERVICE";
         private const string ERROR_MATERIAL_SERVICE_NOT_FOUND = "MATERIAL_SERVICE_NOT_FOUND";
 
