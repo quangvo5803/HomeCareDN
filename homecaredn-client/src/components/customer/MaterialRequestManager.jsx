@@ -13,6 +13,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import ReviewCountdown from './ReviewCountdown';
 import { reviewService } from '../../services/reviewService';
+import ReviewModal from '../modal/ReviewModal';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
