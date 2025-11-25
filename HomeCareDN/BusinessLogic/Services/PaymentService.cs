@@ -28,6 +28,8 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
 
+        private const string PAYMENT = "PaymentTransaction.Updated";
+
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
@@ -59,23 +61,15 @@ namespace BusinessLogic.Services
             var baseUrl = _payOsOptions.BaseUrl;
             string cancelUrl = "";
             string returnUrl = "";
-            Guid applicationId;
-            Guid requestId;
 
             switch (requestDto.Role)
             {
                 case "Contractor":
-                    applicationId = requestDto.ContractorApplicationID!.Value;
-                    requestId = requestDto.ServiceRequestID!.Value;
-
                     cancelUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=cancelled";
                     returnUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=paid";
                     break;
 
                 case "Distributor":
-                    applicationId = requestDto.DistributorApplicationID!.Value;
-                    requestId = requestDto.MaterialRequestID!.Value;
-
                     cancelUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=cancelled";
                     returnUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=paid";
                     break;
@@ -249,7 +243,7 @@ namespace BusinessLogic.Services
                 s => s.ServiceRequestID == payment.ServiceRequestID, asNoTracking:false
             );
 
-            if (serviceRequest != null && contractorApp != null)
+            if (serviceRequest != null)
             {
                 var conversation = new Conversation
                 {
@@ -269,22 +263,10 @@ namespace BusinessLogic.Services
                     "Chat.ConversationUnlocked",
                     new { conversation.ConversationID }
                 );
-
-                await _notifier.SendToApplicationGroupAsync(
-                    $"user_{serviceRequest.CustomerID}",
-                    "PaymentTransaction.Updated",
-                    new
-                    {
-                        payment.ContractorApplicationID,
-                        Status = payment.Status.ToString(),
-                        StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
-                        serviceRequest.ConversationID,
-                    }
-                );
             }
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{serviceRequest?.CustomerID}",
-                "PaymentTransation.Updated",
+                PAYMENT,
                 new
                 {
                     payment.ContractorApplicationID,
@@ -295,7 +277,7 @@ namespace BusinessLogic.Services
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
-                "PaymentTransaction.Updated",
+                PAYMENT,
                 new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
             );
         }
@@ -343,7 +325,7 @@ namespace BusinessLogic.Services
             }
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{materialRequest!.CustomerID}",
-                "PaymentTransaction.Updated",
+                PAYMENT,
                 new
                 {
                     payment.DistributorApplicationID,
@@ -354,7 +336,7 @@ namespace BusinessLogic.Services
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
-                "PaymentTransaction.Updated",
+                PAYMENT,
                 new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
             );
         }

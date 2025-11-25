@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { toast } from 'react-toastify';
 
 import { Editor } from '@tinymce/tinymce-react';
@@ -21,6 +21,8 @@ import { useAuth } from '../../hook/useAuth';
 import StatusBadge from '../../components/StatusBadge';
 import Loading from '../../components/Loading';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
+import PaymentSuccessModal from '../../components/modal/PaymentSuccessModal';
+import PaymentCancelModal from '../../components/modal/PaymentCancelModal';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Swal from 'sweetalert2';
 
@@ -52,6 +54,11 @@ export default function MaterialRequestDetail() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [totalEstimatePrice, setTotalEstimatePrice] = useState(0);
+
+  const [searchParams] = useSearchParams();
+  const statusShownRef = useRef(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openCancel, setOpenCancel] = useState(false);
 
   //Realtime
   useRealtime({
@@ -350,6 +357,24 @@ export default function MaterialRequestDetail() {
       toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
+  // Handle query status
+  const status = searchParams.get('status');
+  useEffect(() => {
+    if (!status || statusShownRef.current) return;
+
+    if (status.toLowerCase() === 'paid') setOpenSuccess(true);
+    if (status.toLowerCase() === 'cancelled') setOpenCancel(true);
+
+    statusShownRef.current = true;
+
+    const timer = setTimeout(() => {
+      setOpenSuccess(false);
+      setOpenCancel(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [status]);
+
   // Disable button
   const isAllPricesFilled = () => {
     const existingOK = materialRequest?.materialRequestItems?.every(
@@ -399,10 +424,10 @@ export default function MaterialRequestDetail() {
       nowrap: true,
     },
   ];
-  const status = existingApplication?.status;
+  const statusApp = existingApplication?.status;
 
-  const isPending = status === 'Pending';
-  const isPendingCommission = status === 'PendingCommission';
+  const isPending = statusApp === 'Pending';
+  const isPendingCommission = statusApp === 'PendingCommission';
 
   //Commission Section
   const CommissionSection = isPendingCommission ? (
@@ -1583,6 +1608,14 @@ export default function MaterialRequestDetail() {
           ...materialRequest.materialRequestItems.map((x) => x.materialID),
           ...newMaterials.map((x) => x.material.materialID),
         ]}
+      />
+      <PaymentSuccessModal
+        open={openSuccess}
+        onClose={() => setOpenSuccess(false)}
+      />
+      <PaymentCancelModal
+        open={openCancel}
+        onClose={() => setOpenCancel(false)}
       />
     </div>
   );
