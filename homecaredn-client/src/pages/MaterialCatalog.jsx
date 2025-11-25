@@ -1,5 +1,5 @@
 // src/pages/MaterialCatalog.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCategory } from '../hook/useCategory';
 import { useBrand } from '../hook/useBrand';
@@ -34,8 +34,6 @@ export default function MaterialCatalog() {
     loadData();
   }, [fetchAllCategories, fetchAllBrands]);
 
-  if (loadingCategories || loadingBrands) return <Loading />;
-
   // Hàm xáo trộn ngẫu nhiên (Fisher–Yates shuffle)
   const shuffleArray = (array) => {
     const newArr = [...array];
@@ -46,30 +44,29 @@ export default function MaterialCatalog() {
     return newArr;
   };
 
-  // Tạo danh sách
-  const categoryItems = (categories || []).map((c) => ({
-    id: c.categoryID,
-    title: c.categoryName,
-    titleEN: c.categoryNameEN,
-    desc: c.categoryNameEN,
-    img: c.categoryLogo,
-    type: 'category',
-  }));
+  // Sử dụng useMemo để chỉ tính toán khi categories hoặc brands thay đổi
+  const allItems = useMemo(() => {
+    const categoryItems = (categories || []).map((c) => ({
+      id: c.categoryID,
+      title: c.categoryName,
+      titleEN: c.categoryNameEN,
+      desc: c.categoryNameEN,
+      img: c.categoryLogo,
+      type: 'category',
+    }));
 
-  const brandItems = (brands || []).map((b) => ({
-    id: b.brandID,
-    title: b.brandName,
-    titleEN: b.brandNameEN,
-    desc: b.brandNameEN,
-    img: b.brandLogo,
-    type: 'brand',
-  }));
+    const brandItems = (brands || []).map((b) => ({
+      id: b.brandID,
+      title: b.brandName,
+      titleEN: b.brandNameEN,
+      desc: b.brandNameEN,
+      img: b.brandLogo,
+      type: 'brand',
+    }));
 
-  // Xáo trộn riêng từng nhóm trước khi gộp
-  const allItems = [
-    ...shuffleArray(categoryItems),
-    ...shuffleArray(brandItems),
-  ];
+    // Xáo trộn riêng từng nhóm trước khi gộp
+    return [...shuffleArray(categoryItems), ...shuffleArray(brandItems)];
+  }, [categories, brands]);
 
   // Filter
   const filteredItems = allItems.filter((item) => {
@@ -89,6 +86,8 @@ export default function MaterialCatalog() {
     if (sort === 'desc') return b.title.localeCompare(a.title);
     return 0;
   });
+
+  if (loadingCategories || loadingBrands) return <Loading />;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -218,7 +217,9 @@ export default function MaterialCatalog() {
                             m.type === 'category' ? 'fa-tags' : 'fa-star'
                           }`}
                         ></i>
-                        {m.type === 'category' ? 'Danh mục' : 'Thương hiệu'}
+                        {m.type === 'category'
+                          ? t('materialsCatalog.tag_category')
+                          : t('materialsCatalog.tag_brand')}
                       </span>
                     </div>
                   </div>
