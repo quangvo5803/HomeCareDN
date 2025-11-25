@@ -98,7 +98,10 @@ namespace BusinessLogic.Services
         > GetAllDistributorApplicationByUserIdAsync(QueryParameters parameters)
         {
             var query = _unitOfWork
-                .DistributorApplicationRepository.GetQueryable(includeProperties: "MaterialRequest")
+                .DistributorApplicationRepository.GetQueryable(
+                    includeProperties: "Items,Items.Material,Items.Material.Brand,Items.Material.Category"
+                )
+                .AsSingleQuery()
                 .Where(ca => ca.DistributorID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();

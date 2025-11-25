@@ -647,6 +647,7 @@
     "no": "No",
     "service_type": "Service Type",
     "title": "Contractor Dashboard",
+    "title_dis": "Distributor Dashboard",
     "subtitle": "Project management and progress tracking",
     "kpi": {
       "open_requests": "Open Requests",
@@ -693,7 +694,8 @@
     },
     "repair": "Repair",
     "construction": "Construction",
-    "revenue": "Revenue"
+    "revenue": "Revenue",
+    "no_applications":"No data to display" 
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",

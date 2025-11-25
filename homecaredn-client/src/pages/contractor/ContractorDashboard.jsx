@@ -503,9 +503,6 @@ export default function ContractorDashboard() {
                     {t('partnerDashboard.service_type')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.description')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     {t('partnerDashboard.estimate')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -562,12 +559,6 @@ export default function ContractorDashboard() {
                             {t(`Enums.ServiceType.${app.serviceType}`)}
                           </span>
                         </div>
-                      </td>
-                      {/* Description */}
-                      <td className="px-6 py-4">
-                        <span className="text-sm font-medium text-gray-900 truncate max-w-xs">
-                          {app.description || '-'}
-                        </span>
                       </td>
                       {/* Estimate Price */}
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">

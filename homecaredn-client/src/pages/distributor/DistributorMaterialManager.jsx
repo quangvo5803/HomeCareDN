@@ -10,6 +10,7 @@ import { showDeleteModal } from '../../components/modal/DeleteModal';
 import { useBrand } from '../../hook/useBrand';
 import { useCategory } from '../../hook/useCategory';
 import { handleApiError } from '../../utils/handleApiError';
+import { useDebounce } from 'use-debounce';
 
 export default function DistributorMaterialManager() {
   const { t, i18n } = useTranslation();
@@ -20,11 +21,14 @@ export default function DistributorMaterialManager() {
   const { fetchAllCategories } = useCategory();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [sortBy, setSortBy] = useState('');
+  const [search, setSearch] = useState('');
+  const [debouncedSearch] = useDebounce(search, 1000);
   const {
     materials,
     totalMaterials,
     loading,
-    fetchMaterialsByUserId,
+    fetchMaterials,
     createMaterial,
     updateMaterial,
     deleteMaterial,
@@ -50,12 +54,13 @@ export default function DistributorMaterialManager() {
   }, [fetchAllBrands, fetchAllCategories]);
 
   useEffect(() => {
-    fetchMaterialsByUserId({
+    fetchMaterials({
       PageNumber: currentPage,
       PageSize: pageSize,
-      FilterID: user.id,
+      SortBy: sortBy,
+      Search: debouncedSearch || '',
     });
-  }, [fetchMaterialsByUserId, currentPage, pageSize, user.id]);
+  }, [fetchMaterials, currentPage, pageSize, sortBy, debouncedSearch]);
 
   // Delete Material
   const handleDelete = async (materialID) => {
@@ -70,10 +75,11 @@ export default function DistributorMaterialManager() {
         if (currentPage > lastPage) {
           setCurrentPage(lastPage || 1);
         } else {
-          await fetchMaterialsByUserId({
+          await fetchMaterials({
             PageNumber: currentPage,
             PageSize: pageSize,
-            FilterID: user.id,
+            SortBy: sortBy,
+            Search: debouncedSearch || '',
           });
         }
 
@@ -102,6 +108,22 @@ export default function DistributorMaterialManager() {
       setSubmitting(false);
     }
   };
+  // Search
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setCurrentPage(1);
+  };
+  // Determine action permissions
+  const getActionPermissions = (material) => {
+    const creatorID = material.userID || material.userId;
+    const isOwner = user?.id === creatorID;
+    const isInactive = !material.isActive;
+
+    return {
+      canEdit: isOwner && isInactive,
+      canDelete: isOwner,
+    };
+  };
 
   if (submitting || uploadProgress || loading)
     return <Loading progress={uploadProgress} />;
@@ -122,17 +144,54 @@ export default function DistributorMaterialManager() {
             </span>
           </div>
         </div>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          {/*  Filter Select */}
+          <select
+            className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="">{t('common.sortDefault')}</option>
+            <option
+              value={i18n.language === 'vi' ? 'materialname' : 'materialnameen'}
+            >
+              {t('common.sortName')}
+            </option>
+            <option
+              value={
+                i18n.language === 'vi'
+                  ? 'materialname_desc'
+                  : 'materialnameen_desc'
+              }
+            >
+              {t('common.sortNameDesc')}
+            </option>
+          </select>
+          {/* Search Input */}
+          <div className="relative group">
+            <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm group-hover:text-orange-500 transition-colors" />
+            <input
+              id="search-input"
+              type="text"
+              value={search}
+              onChange={handleSearchChange}
+              placeholder={t('common.search')}
+              className="pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm hover:border-orange-300 bg-white"
+            />
+          </div>
 
-        <button
-          className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
-          onClick={() => {
-            setEditingMaterialID(null);
-            setIsModalOpen(true);
-          }}
-        >
-          <i className="mr-2 fa-solid fa-plus"></i>
-          {t('BUTTON.AddNewMaterial')}
-        </button>
+          {/* Add Button */}
+          <button
+            className="px-4 py-2 text-sm text-white transition rounded-lg bg-emerald-500 hover:bg-emerald-600"
+            onClick={() => {
+              setEditingMaterialID(null);
+              setIsModalOpen(true);
+            }}
+          >
+            <i className="mr-2 fa-solid fa-plus"></i>
+            {t('BUTTON.AddNewMaterial')}
+          </button>
+        </div>
       </div>
 
       {/*  render modal */}
@@ -177,87 +236,100 @@ export default function DistributorMaterialManager() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {materials && materials.length > 0 ? (
-              materials.map((material, index) => (
-                <tr
-                  key={material.materialID}
-                  className={`hover:bg-sky-50 transition-colors duration-150 ${
-                    index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                  }`}
-                >
-                  {/* STT */}
-                  <td className="px-4 py-4 text-center align-middle">
-                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
-                      {(currentPage - 1) * pageSize + index + 1}
-                    </span>
-                  </td>
+              materials.map((material, index) => {
+                const { canEdit, canDelete } = getActionPermissions(material);
+                return (
+                  <tr
+                    key={material.materialID}
+                    className={`hover:bg-sky-50 transition-colors duration-150 ${
+                      index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                    }`}
+                  >
+                    {/* STT */}
+                    <td className="px-4 py-4 text-center align-middle">
+                      <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-semibold text-blue-700 bg-blue-100 rounded-full">
+                        {(currentPage - 1) * pageSize + index + 1}
+                      </span>
+                    </td>
 
-                  {/* Material Name + Avatar */}
-                  <td className="flex items-center gap-3 px-6 py-4 text-left">
-                    {material.imageUrls?.length > 0 && material.imageUrls[0] ? (
-                      <img
-                        src={material.imageUrls[0]}
-                        alt={material.name}
-                        className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
-                      />
-                    ) : (
-                      <img
-                        src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                        alt="No image"
-                        className="object-cover border border-gray-200 rounded-lg w-13 h-13"
-                      />
-                    )}
-                    <span className="font-medium text-gray-900">
+                    {/* Material Name + Avatar */}
+                    <td className="flex items-center gap-3 px-6 py-4 text-left">
+                      {material.imageUrls?.length > 0 &&
+                      material.imageUrls[0] ? (
+                        <img
+                          src={material.imageUrls[0]}
+                          alt={material.name}
+                          className="object-cover w-12 h-12 border border-gray-200 rounded-lg"
+                        />
+                      ) : (
+                        <img
+                          src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                          alt="No image"
+                          className="object-cover border border-gray-200 rounded-lg w-13 h-13"
+                        />
+                      )}
+                      <span className="font-medium text-gray-900">
+                        {i18n.language === 'vi'
+                          ? material.name
+                          : material.nameEN || material.name}
+                      </span>
+                    </td>
+
+                    {/* Brand */}
+                    <td className="px-6 py-4 text-center">
                       {i18n.language === 'vi'
-                        ? material.name
-                        : material.nameEN || material.name}
-                    </span>
-                  </td>
+                        ? material.brandName
+                        : material.brandNameEN || material.brandName}
+                    </td>
 
-                  {/* Brand */}
-                  <td className="px-6 py-4 text-center">
-                    {i18n.language === 'vi'
-                      ? material.brandName
-                      : material.brandNameEN || material.brandName}
-                  </td>
+                    {/* Category */}
+                    <td className="px-6 py-4 text-center">
+                      {i18n.language === 'vi'
+                        ? material.categoryName
+                        : material.categoryNameEN || material.categoryName}
+                    </td>
 
-                  {/* Category */}
-                  <td className="px-6 py-4 text-center">
-                    {i18n.language === 'vi'
-                      ? material.categoryName
-                      : material.categoryNameEN || material.categoryName}
-                  </td>
+                    {/* Unit */}
+                    <td className="px-6 py-4 text-center">
+                      {i18n.language === 'vi'
+                        ? material.unit
+                        : material.unitEN || material.unit}
+                    </td>
 
-                  {/* Unit */}
-                  <td className="px-6 py-4 text-center">
-                    {i18n.language === 'vi'
-                      ? material.unit
-                      : material.unitEN || material.unit}
-                  </td>
+                    {/* Actions */}
+                    <td className="px-4 py-4 text-center">
+                      <div className="flex justify-center gap-2">
+                        {canEdit && (
+                          <button
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
+                            onClick={async () => {
+                              setEditingMaterialID(material.materialID);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            <i className="fa-solid fa-pen"></i>{' '}
+                            {t('BUTTON.Edit')}
+                          </button>
+                        )}
 
-                  {/* Actions */}
-                  <td className="px-4 py-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100"
-                        onClick={async () => {
-                          setEditingMaterialID(material.materialID);
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        <i className="fa-solid fa-pen"></i> {t('BUTTON.Edit')}
-                      </button>
+                        {canDelete && (
+                          <button
+                            className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
+                            onClick={() => handleDelete(material.materialID)}
+                          >
+                            <i className="fa-solid fa-trash"></i>{' '}
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
 
-                      <button
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg transition border border-red-300 text-red-700 bg-red-50 hover:bg-red-100"
-                        onClick={() => handleDelete(material.materialID)}
-                      >
-                        <i className="fa-solid fa-trash"></i>{' '}
-                        {t('BUTTON.Delete')}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {!canEdit && !canDelete && (
+                          <span className="text-gray-400 text-xs">-</span>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td colSpan={6} className="py-4 text-center text-gray-500">
