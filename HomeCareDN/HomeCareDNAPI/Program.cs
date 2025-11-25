@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
-using StackExchange.Redis;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -123,6 +122,7 @@ namespace HomeCareDNAPI
             builder.Services.AddScoped<IFacadeService, FacadeService>();
 
             builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddMemoryCache();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddHostedService<ContractorApplicationMonitor>();
             builder.Services.AddHostedService<DistributorApplicationMonitor>();

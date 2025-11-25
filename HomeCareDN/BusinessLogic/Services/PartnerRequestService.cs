@@ -1,12 +1,14 @@
-﻿using AutoMapper;
+﻿using System.Security.Cryptography;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
-using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
@@ -17,11 +19,18 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
+        private readonly IMemoryCache _memoryCache;
 
         private const string PARTNER_REQUEST = "PartnerRequest";
+        private const string EMAIL = "Email";
+        private const string OTP = "OTP";
+        private const string TOKEN = "TOKEN";
+        private const string ERROR_TOKEN_EXPIRED = "TOKEN_OTP_EXPIRED";
+        private const string ERROR_EMAIL_REGISTED = "EMAIL_REGISTED";
+        private const string ERROR_OTP_VERIFY = "OTP_WRONG_OR_EXPIRED";
+        private const string ERROR_PARTNER_REQUEST = "REGISTER_ALREADY_EXISTS";
         private const string ERROR_PARTNER_REQUEST_NOT_FOUND = "PARTNER_REQUEST_NOT_FOUND";
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
         private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
@@ -30,12 +39,14 @@ namespace BusinessLogic.Services
         public PartnerRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
+            IMemoryCache memoryCache,
             UserManager<ApplicationUser> userManager,
             IEmailQueue emailQueue
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _memoryCache = memoryCache;
             _userManager = userManager;
             _emailQueue = emailQueue;
         }
@@ -107,21 +118,88 @@ namespace BusinessLogic.Services
             return _mapper.Map<PartnerRequestDto>(partnerRequest);
         }
 
+        public async Task SendPartnerOtpAsync(SendPartnerOtpRequestDto request)
+        {
+            var userExists = await _userManager.FindByEmailAsync(request.Email);
+            if (userExists != null)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]> { { EMAIL, new[] { ERROR_EMAIL_REGISTED } } }
+                );
+
+            var otp = RandomNumberGenerator.GetInt32(0, 1000000).ToString("D6");
+
+            _memoryCache.Set($"PartnerOTP_{request.Email}", otp, TimeSpan.FromMinutes(5));
+
+            QueueEmailOtp(request.Email, request.CompanyName, otp);
+        }
+
+        public Task<string> VerifyPartnerOtpAsync(VerifyPartnerOtpRequestDto request)
+        {
+            if (
+                !_memoryCache.TryGetValue($"PartnerOTP_{request.Email}", out string? storedOtp)
+                || storedOtp != request.OtpCode
+            )
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]> { { OTP, new[] { ERROR_OTP_VERIFY } } }
+                );
+            }
+
+            _memoryCache.Remove($"PartnerOTP_{request.Email}");
+
+            var token = Convert.ToBase64String(
+                System.Text.Encoding.UTF8.GetBytes(
+                    $"{request.Email}|VERIFIED|{DateTime.UtcNow.Ticks}"
+                )
+            );
+
+            _memoryCache.Set($"VerifiedToken_{request.Email}", token, TimeSpan.FromMinutes(30));
+
+            return Task.FromResult(token);
+        }
+
         public async Task<PartnerRequestDto> CreatePartnerRequestAsync(
             PartnerRequestCreateRequestDto request
         )
         {
             try
             {
+                if (
+                    string.IsNullOrEmpty(request.VerificationToken)
+                    || !_memoryCache.TryGetValue(
+                        $"VerifiedToken_{request.Email}",
+                        out string? storedToken
+                    )
+                    || storedToken != request.VerificationToken
+                )
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { TOKEN, new[] { ERROR_TOKEN_EXPIRED } },
+                        }
+                    );
+                }
+
                 await ValidatePartnerRequestAsync(request);
 
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);
-                await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
 
+                partnerRequest.SignatureUrl = request.SignatureUrl;
+                partnerRequest.IsContractSigned = !string.IsNullOrEmpty(request.SignatureUrl);
+                if (partnerRequest.IsContractSigned)
+                {
+                    partnerRequest.SignedAt = DateTime.UtcNow;
+                }
+
+                await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
                 await ProcessPartnerImagesAsync(request, partnerRequest.PartnerRequestID);
                 await ProcessPartnerDocumentsAsync(request, partnerRequest.PartnerRequestID);
 
                 await _unitOfWork.SaveAsync();
+
+                _memoryCache.Remove($"VerifiedToken_{request.Email}");
+
                 QueueEmailReceived(partnerRequest);
 
                 return _mapper.Map<PartnerRequestDto>(partnerRequest);
@@ -129,6 +207,7 @@ namespace BusinessLogic.Services
             catch (Exception)
             {
                 await HandleImageError(request.ImagePublicIds);
+                await HandleDocumentError(request.DocumentPublicIds);
                 throw;
             }
         }
@@ -238,6 +317,9 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
+        // -----------------------------
+        // PRIVATE HELPER
+        // -----------------------------
         private async Task ValidatePartnerRequestAsync(PartnerRequestCreateRequestDto request)
         {
             var user = await _userManager.FindByEmailAsync(request.Email);
@@ -246,7 +328,7 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { PARTNER_REQUEST, new[] { "REGISTER_ALREADY_EXISTS" } },
+                        { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST } },
                     }
                 );
             }
@@ -335,6 +417,28 @@ namespace BusinessLogic.Services
             await _unitOfWork.DocumentRepository.AddRangeAsync(documents);
         }
 
+        private async Task HandleImageError(ICollection<string> publicIds)
+        {
+            if (publicIds.Count > 0)
+            {
+                foreach (var publicId in publicIds)
+                {
+                    await _unitOfWork.ImageRepository.DeleteImageAsync(publicId);
+                }
+            }
+        }
+
+        private async Task HandleDocumentError(ICollection<string> publicIds)
+        {
+            if (publicIds.Count > 0)
+            {
+                foreach (var publicId in publicIds)
+                {
+                    await _unitOfWork.DocumentRepository.DeleteDocumentAsync(publicId);
+                }
+            }
+        }
+
         #region EmailTemplate
         private static string BuildBaseEmail(
             string title,
@@ -364,6 +468,17 @@ namespace BusinessLogic.Services
                 + "<p style=\"margin: 0; opacity: 0.9;\">📍 Người gửi: HomeCareDN</p>"
                 + "<p style=\"margin: 4px 0 0 0; opacity: 0.8;\">Khu đô thị FPT City, Ngũ Hành Sơn, Đà Nẵng 550000</p>"
                 + "</td></tr></table></td></tr></table>";
+        }
+
+        private void QueueEmailOtp(string email, string companyName, string otp)
+        {
+            var title = "Mã xác thực đăng ký Đối tác HomeCareDN";
+            var body =
+                $"<p>Xin chào <b>{companyName}</b>,</p>"
+                + $"<p>Mã xác thực (OTP) của bạn là: <b style='font-size: 24px; color: #ff6600; letter-spacing: 2px;'>{otp}</b></p>"
+                + $"<p>Mã này có hiệu lực trong vòng <b>5 phút</b>. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>";
+
+            _emailQueue.QueueEmail(email, title, BuildBaseEmail(title, body));
         }
 
         private void QueueEmailReceived(PartnerRequest p)
@@ -405,16 +520,5 @@ namespace BusinessLogic.Services
             _emailQueue.QueueEmail(p.Email, title, BuildBaseEmail(title, body));
         }
         #endregion
-
-        private async Task HandleImageError(ICollection<string> publicIds)
-        {
-            if (publicIds.Count > 0)
-            {
-                foreach (var publicId in publicIds)
-                {
-                    await _unitOfWork.ImageRepository.DeleteImageAsync(publicId);
-                }
-            }
-        }
     }
 }
