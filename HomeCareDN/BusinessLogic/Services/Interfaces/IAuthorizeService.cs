@@ -6,7 +6,7 @@ namespace BusinessLogic.Services.Interfaces
     public interface IAuthorizeService
     {
         Task SendRegisterOtpAsync(string email, string fullName);
-        Task SendLoginOtpAsync(string email);
+        Task<TokenResponseDto?> SendLoginOtpAsync(LoginRequestDto dto);
         Task<TokenResponseDto> VerifyOtpAsync(string email, string otp);
         Task<TokenResponseDto> RefreshTokenAsync();
         Task<string> GenerateToken(ApplicationUser user);

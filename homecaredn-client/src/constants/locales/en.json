@@ -207,6 +207,7 @@
     "title": "Login",
     "subtitle": "Welcome back!",
     "email_placeholder": "Enter your email",
+    "password": "Password",
     "another_login": "Or login with",
     "not_have_account": "Don't have an account? ",
     "register_link": " Register now",
@@ -1421,6 +1422,7 @@
     "NULL_COMPANYNAME": "Please enter the company name.",
     "NULL_PARTNERTYPE": "Please select a role.",
     "NULL_IMAGES": "Please upload company images.",
+    "NULL_PASSWORD": "Please enter password",
 
     "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
     "INVALID_PHONE": "Invalid phone number.",

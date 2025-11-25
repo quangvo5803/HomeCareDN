@@ -14,6 +14,7 @@ import { useUser } from '../../hook/useUser';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
 import ReviewCountdown from '../customer/ReviewCountdown';
+import { formatVND } from '../../utils/formatters';
 
 export default function ServiceRequestManager() {
   const { t } = useTranslation();
@@ -24,8 +25,8 @@ export default function ServiceRequestManager() {
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedServiceRequest, setSelectedServiceRequest] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [reviewReadOnly, setReviewReadOnly] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useRealtime({
     [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
@@ -240,6 +241,7 @@ export default function ServiceRequestManager() {
         onSave={handleSaveReview}
         review={reviewReadOnly ? selectedServiceRequest?.review : null}
         serviceRequestID={selectedServiceRequest?.serviceRequestID}
+        materialRequestID={null}
         partnerID={
           selectedServiceRequest?.selectedContractorApplication.contractorID
         }
@@ -362,7 +364,7 @@ export default function ServiceRequestManager() {
                       {req.estimatePrice ? (
                         <span className="text-emerald-600 font-semibold">
                           {t('userPage.serviceRequest.label_estimatePrice')}
-                          {req.estimatePrice.toLocaleString('vi-VN')} VNĐ
+                          {formatVND(req.estimatePrice)}
                         </span>
                       ) : (
                         <span className="text-gray-500 italic">
@@ -422,7 +424,7 @@ export default function ServiceRequestManager() {
 
                   {/* Review Countdown Section */}
                   <ReviewCountdown
-                    serviceRequest={req}
+                    request={req}
                     onCreateReview={handleCreateReview}
                     onViewReview={handleViewReview}
                   />

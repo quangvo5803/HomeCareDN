@@ -6,7 +6,7 @@ import 'venobox/dist/venobox.min.css';
 import Loading from '../../components/Loading';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '../../utils/formatters';
+import { formatDate, formatVND } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
@@ -618,6 +618,32 @@ export default function ServiceRequestDetail() {
                   status={selectedContractor.status}
                   type="Application"
                 />
+                {/* Price Box */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-6 mb-5 mt-5">
+                  <p className="text-xs text-green-700 mb-1 uppercase tracking-widest font-semibold">
+                    {t('userPage.serviceRequestDetail.label_estimatePrice')}
+                  </p>
+
+                  <p className="text-3xl font-bold text-green-900 mb-1">
+                    {selectedContractor.estimatePrice < 1_000_000
+                      ? formatVND(selectedContractor.estimatePrice)
+                      : (selectedContractor.estimatePrice / 1_000_000).toFixed(
+                          0
+                        )}
+
+                    {selectedContractor.estimatePrice >= 1_000_000 && (
+                      <span className="text-lg font-normal ml-2">
+                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                      </span>
+                    )}
+                  </p>
+
+                  {selectedContractor.estimatePrice >= 1_000_000 && (
+                    <p className="text-xs text-green-700 font-medium">
+                      {formatVND(selectedContractor.estimatePrice)}
+                    </p>
+                  )}
+                </div>
               </div>
               {/* Documents  */}
               {selectedContractor?.documentUrls?.length > 0 && (
@@ -756,10 +782,7 @@ export default function ServiceRequestDetail() {
                           </span>
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {selectedContractor.estimatePrice?.toLocaleString(
-                            'vi-VN'
-                          )}{' '}
-                          VNĐ
+                          {formatVND(selectedContractor.estimatePrice)}
                         </p>
                       </div>
                     </div>
