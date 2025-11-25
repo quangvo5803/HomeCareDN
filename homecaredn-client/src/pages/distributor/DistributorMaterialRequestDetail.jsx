@@ -35,6 +35,7 @@ import { numberToWordsByLang } from '../../utils/numberToWords';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { paymentService } from '../../services/paymentService';
+import ChatSection from '../../components/ChatSection';
 
 export default function MaterialRequestDetail() {
   const navigate = useNavigate();
@@ -68,9 +69,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-              ...mr,
-              status: 'Closed',
-            }
+                ...mr,
+                status: 'Closed',
+              }
             : mr
         )
       );
@@ -559,7 +560,7 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => { }}
+            onExpired={() => {}}
           />
           {new Date(existingApplication.dueCommisionTime) > new Date() && (
             <button
@@ -703,7 +704,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                      item.material.categoryName;
+                        item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -747,8 +748,9 @@ export default function MaterialRequestDetail() {
                               />
                             ) : null}
                             <div
-                              className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
-                                }`}
+                              className={`absolute inset-0 flex items-center justify-center ${
+                                imageUrl ? 'hidden' : 'flex'
+                              }`}
                             >
                               <i className="fas fa-image text-slate-300 text-3xl"></i>
                             </div>
@@ -1292,7 +1294,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                      item.material.categoryName;
+                        item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1421,6 +1423,13 @@ export default function MaterialRequestDetail() {
 
           {/* Apply Form OR Application Details */}
           {ApplyView}
+
+          {/* Chat Section */}
+          <ChatSection
+            conversationID={materialRequest.conversation?.conversationID}
+            applicationStatus={existingApplication?.status}
+            className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
+          />
         </div>
 
         {/* RIGHT SIDEBAR */}
@@ -1444,25 +1453,28 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${status.canDo
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
-                      }`}
+                    className={`p-4 rounded-lg text-center border ${
+                      status.canDo
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-red-50 border-red-200'
+                    }`}
                   >
                     <p
-                      className={`text-sm text-gray-800 mb-2 ${status.nowrap
-                        ? 'whitespace-nowrap'
-                        : 'whitespace-normal'
-                        }`}
+                      className={`text-sm text-gray-800 mb-2 ${
+                        status.nowrap
+                          ? 'whitespace-nowrap'
+                          : 'whitespace-normal'
+                      }`}
                     >
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${status.canDo
-                          ? 'fa-check text-green-600'
-                          : 'fa-xmark text-red-600'
-                          }`}
+                        className={`fa-solid text-xl ${
+                          status.canDo
+                            ? 'fa-check text-green-600'
+                            : 'fa-xmark text-red-600'
+                        }`}
                       />
                     </div>
                   </div>

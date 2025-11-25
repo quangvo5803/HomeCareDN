@@ -21,7 +21,7 @@ const MESSAGE_SIZE = 10;
 
 export default function ChatSection({
   conversationID,
-  contractorApplicationStatus,
+  applicationStatus,
   className = '',
 }) {
   const { t } = useTranslation();
@@ -40,8 +40,8 @@ export default function ChatSection({
   const [loadingMoreMessage, setLoadingMoreMessage] = useState(false);
 
   const chatIsLocked = useMemo(
-    () => contractorApplicationStatus === 'PendingCommission',
-    [contractorApplicationStatus]
+    () => applicationStatus === 'PendingCommission',
+    [applicationStatus]
   );
 
   // JOIN CONVERSATION GROUP
@@ -51,7 +51,7 @@ export default function ChatSection({
       return () => {
         chatConnection
           .invoke('LeaveConversation', conversationID)
-          .catch(() => { });
+          .catch(() => {});
       };
     }
   }, [chatConnection, conversationID]);
@@ -73,7 +73,7 @@ export default function ChatSection({
 
         setHasMoreMessages(
           data.items.length === MESSAGE_SIZE &&
-          messages.length + data.items.length < data.totalCount
+            messages.length + data.items.length < data.totalCount
         );
 
         if (append) {
@@ -135,7 +135,7 @@ export default function ChatSection({
     try {
       const receiverId =
         user.id === conversation.customerID.toString()
-          ? conversation.contractorID.toString()
+          ? (conversation.contractorID || conversation.distributorID).toString()
           : conversation.customerID.toString();
 
       await chatMessageService.sendMessage({
@@ -285,8 +285,9 @@ export default function ChatSection({
               </p>
             </div>
             <p
-              className={`text-[11px] text-gray-400 mt-1 ${isMyMessage ? 'text-right' : 'text-left'
-                }`}
+              className={`text-[11px] text-gray-400 mt-1 ${
+                isMyMessage ? 'text-right' : 'text-left'
+              }`}
             >
               {new Date(m.sentAt).toLocaleTimeString('vi-VN', {
                 hour: '2-digit',
@@ -379,6 +380,6 @@ export default function ChatSection({
 
 ChatSection.propTypes = {
   conversationID: PropTypes.string,
-  contractorApplicationStatus: PropTypes.string,
+  applicationStatus: PropTypes.string,
   className: PropTypes.string,
 };

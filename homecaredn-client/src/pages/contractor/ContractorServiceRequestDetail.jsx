@@ -1488,7 +1488,7 @@ export default function ContractorServiceRequestDetail() {
           {/* Chat Section */}
           <ChatSection
             conversationID={serviceRequest.conversation?.conversationID}
-            contractorApplicationStatus={existingApplication?.status}
+            applicationStatus={existingApplication?.status}
             className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
           />
         </div>

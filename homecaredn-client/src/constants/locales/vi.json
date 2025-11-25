@@ -1231,7 +1231,7 @@
     "noMoreMessages": "Không còn tin nhắn nào nữa",
     "locked_des": {
       "title": "Chat đang bị khóa",
-      "description": "Chat sẽ được mở sau khi nhà thầu thanh toán phí hợp tác",
+      "description": "Chat sẽ được mở sau khi đối tác thanh toán phí hợp tác",
       "noMessages": "Chat đang bị khóa",
       "placeholder": "Chat đang bị khóa..."
     }
