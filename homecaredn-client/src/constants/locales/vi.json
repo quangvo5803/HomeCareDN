@@ -256,7 +256,7 @@
       "represent": "Đại diện cho doanh nghiệp",
         "step2": {
           "title": "Xác thực Email",
-          "otpSent": "Mã xác thực (OTP) đã được gửi đến email:",
+          "otpSent": "Mã xác thực (OTP) đã được gửi đến email: ",
           "checkSpam": "Vui lòng kiểm tra cả hộp thư Spam/Rác",
           "enterOtp": "Nhập mã 6 số",
           "otpPlaceholder": "------",

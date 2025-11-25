@@ -75,7 +75,6 @@ export default function PartnerRegistration() {
           setIsCanvasReady(true);
         } else {
           setIsCanvasReady(false);
-          console.warn('SignatureCanvas chưa sẵn sàng sau 200ms');
         }
       }, 200);
 
@@ -307,11 +306,10 @@ export default function PartnerRegistration() {
     try {
       const canvas = sigCanvas.current.getCanvas();
       signatureDataURL = canvas.toDataURL('image/png');
-    } catch (error) {
+    } catch {
       toast.error(
         t('partnerRequest.partnerRegistration.validation.signatureError')
       );
-      console.error('Canvas extraction error:', error);
       return;
     }
 
@@ -353,7 +351,6 @@ export default function PartnerRegistration() {
       toast.success(t('SUCCESS.PARTNER_REQUEST_ADD'));
       navigate('/Login');
     } catch (error) {
-      console.error('Submit Error:', error);
       toast.error(t(handleApiError(error)));
     } finally {
       setLoading(false);

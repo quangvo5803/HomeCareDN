@@ -257,7 +257,7 @@
       "represent": "Representing the business",    
         "step2": {
           "title": "Email Verification",
-          "otpSent": "Verification code (OTP) has been sent to email:",
+          "otpSent": "Verification code (OTP) has been sent to email: ",
           "checkSpam": "Please check your Spam/Junk folder",
           "enterOtp": "Enter 6-digit code",
           "otpPlaceholder": "------",
