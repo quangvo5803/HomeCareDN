@@ -241,6 +241,9 @@
     },
     "partnerRegistration": {
       "title": "Đăng ký trở thành đối tác",
+      "profileDetail": "Chi tiết hồ sơ",
+      "electronicContract": "Hợp đồng điện tử",
+      "reviewDecision": "Quyết định - Lý do từ chối",
       "subtitle": "Vui lòng điền đầy đủ thông tin bên dưới",
       "notSelectedType": "Vui lòng chọn vai trò",
       "form_companyName": "Tên doanh nghiệp",
@@ -249,7 +252,50 @@
       "form_description": "Mô tả doanh nghiệp",
       "form_images": "Hình ảnh doanh nghiệp",
       "form_documents": "Tài liệu",
-      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác"
+      "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác",
+      "represent": "Đại diện cho doanh nghiệp",
+        "step2": {
+          "title": "Xác thực Email",
+          "otpSent": "Mã xác thực (OTP) đã được gửi đến email: ",
+          "checkSpam": "Vui lòng kiểm tra cả hộp thư Spam/Rác",
+          "enterOtp": "Nhập mã 6 số",
+          "otpPlaceholder": "------",
+          "backButton": "Quay lại",
+          "verifyButton": "Xác thực"
+          },
+        "step3": {
+          "title": "Ký Hợp đồng điện tử",
+          "contractTitle": "THỎA THUẬN HỢP TÁC CUNG ỨNG DỊCH VỤ",
+          "contractPartyA": "Bên A (Sàn TMĐT): ",
+          "partyA": "Công Ty Cổ Phần HomeCare Đà Nẵng",
+          "contractPartyB": "Bên B (Đối tác): ",
+          "contractRepresentative": "Đại diện: ",
+          "contractContent": "Hai bên thống nhất ký kết thỏa thuận hợp tác trên nguyên tắc tự nguyện, bình đẳng và cùng có lợi với các điều khoản sau:",
+          "contractDetails": "ĐIỀU 1: VAI TRÒ VÀ PHẠM VI HỢP TÁC\n1.1. HomeCareDN là đơn vị cung cấp nền tảng công nghệ trung gian kết nối giữa Khách hàng và Đối tác. HomeCareDN không trực tiếp tham gia vào quá trình thi công, sửa chữa hay sản xuất vật liệu.\n1.2. Đối tác (Bên B) là đơn vị độc lập, tham gia hệ thống để cung cấp dịch vụ hoặc hàng hóa cho Khách hàng.\n\nĐIỀU 2: TRÁCH NHIỆM CỦA ĐỐI TÁC (BÊN B)\n2.1. Cam kết cung cấp thông tin hồ sơ năng lực, giấy phép kinh doanh và nguồn gốc sản phẩm trung thực, chính xác.\n2.2. Chịu hoàn toàn trách nhiệm trước pháp luật và Khách hàng về chất lượng công trình, an toàn lao động (đối với Nhà thầu) hoặc chất lượng hàng hóa, bảo hành (đối với Nhà phân phối).\n2.3. Tuyệt đối không lôi kéo Khách hàng thực hiện giao dịch bên ngoài hệ thống (Off-platform) nhằm trốn tránh nghĩa vụ phí dịch vụ.\n\nĐIỀU 3: QUYỀN VÀ NGHĨA VỤ CỦA HOMECAREDN (BÊN A)\n3.1. Duy trì hoạt động ổn định của hệ thống Website/App.\n3.2. Thu phí hoa hồng (Commission) trên mỗi giao dịch thành công theo biểu phí hiện hành.\n3.3. Có quyền tạm khóa hoặc chấm dứt vĩnh viễn tài khoản Đối tác nếu phát hiện gian lận, chất lượng dịch vụ kém (bị đánh giá thấp liên tục) hoặc vi phạm quy tắc ứng xử.\n3.4. Đóng vai trò trung gian hòa giải khi có tranh chấp phát sinh.\n\nĐIỀU 4: CHÍNH SÁCH THANH TOÁN\n4.1. HomeCareDN đóng vai trò giữ hộ tiền thanh toán từ Khách hàng (Escrow).\n4.2. Khoản thanh toán sẽ được giải ngân vào Ví của Đối tác sau khi Khách hàng xác nhận hoàn thành công việc/đã nhận hàng và trừ đi phí hoa hồng của Sàn.\n\nĐIỀU 5: MIỄN TRỪ TRÁCH NHIỆM\nHomeCareDN được miễn trừ mọi trách nhiệm pháp lý liên quan đến các thiệt hại về người và tài sản, hư hỏng công trình hoặc lỗi sản phẩm do nguyên nhân chủ quan từ phía Đối tác gây ra cho Khách hàng.",
+          "contractCommitment": "Bằng việc ký tên dưới đây, Đối tác xác nhận đã đọc, hiểu rõ vai trò trung gian của HomeCareDN và cam kết tuân thủ đầy đủ các điều khoản trên.",
+          "signatureLabel": "Ký tên xác nhận",
+          "signatureNote": "Chữ ký này có giá trị pháp lý tương đương chữ ký thực tế.",
+          "signed": "ĐÃ KÝ HỢP ĐỒNG",
+          "unsigned": "CHƯA KÝ KẾT",
+          "signedAt": "Ký điện tử lúc",
+          "contractor": "(Dành cho nhà thầu)",
+          "distributor": "(Dành cho nhà phân phối)",
+          "signatureClear": "Xóa chữ ký",
+          "reviewButton": "Xem lại thông tin",
+          "submitButton": "Ký & Gửi hồ sơ"
+        },
+    "validation": {
+      "otpInvalid": "Vui lòng nhập mã OTP hợp lệ",
+      "otpSuccess": "Xác thực thành công!",
+      "otpError": "Không nhận được token xác thực.",
+      "canvasNotReady": "Khung ký tên chưa sẵn sàng. Vui lòng đợi và thử lại.",
+      "signatureEmpty": "Vui lòng ký tên xác nhận hợp đồng.",
+      "signatureError": "Không thể lấy dữ liệu chữ ký. Vui lòng vẽ lại.",
+      "signatureClearWarning": "Khung ký tên chưa sẵn sàng"
+    },
+    "notification": {
+      "otpSent": "Mã OTP đã được gửi tới"
+    }
     }
   },
 
@@ -421,9 +467,9 @@
       "selectMaterialRequest": "Vui lòng chọn yêu cầu muốn thêm vào",
       "selectExtraMaterialsNote": "Bạn có thể lựa chọn những vật liệu bạn muốn thêm vào!",
       "confirmAccept": "Bạn có chắc chắn muốn chấp nhận đơn này không?",
-      "acceptSuccess": "Chấp nhận thành công!",
       "confirmReject": "Bạn có chắc chắn muốn từ chối đơn này không?",
-      "rejectSuccess": "Từ chối thành công!"
+      "waiting": "Đơn ứng tuyển đã được chấp nhận vui lòng chờ nhà phân phối xác nhận.",
+      "alreadyRejected": "Đơn ứng tuyển đã bị từ chối."
     }
   },
   "contractorServiceRequestManager": {
@@ -1038,6 +1084,12 @@
     "delete": "Xóa",
     "viewDetails": "Xem chi tiết",
     "total": "Tổng",
+    "signaturePreview": "Xem trước chữ ký",
+    "tab": {
+      "info": "Thông tin ",
+      "documents": "Tài liệu",
+      "contract": "Hợp đồng"
+    },
     "partnerRequestModal": {
       "title": "Thông tin đăng kí",
       "companyName": "Tên công ty",
@@ -1046,7 +1098,20 @@
       "partnerRequestType": "Vai trò đăng kí",
       "status": "Trạng thái",
       "rejectReason": "Lí do từ chối",
-      "rejectReasonPlaceHolder": "Nhập lí do từ chối"
+      "rejectReasonPlaceHolder": "Nhập lí do từ chối",
+      "documents": "Tài liệu",
+      "signature": "Chữ ký",
+      "noDocuments": "Không có tài liệu",
+      "noSignature": "Không có chữ ký",
+      "clickToView": "Nhấn để xem",
+      "contractTitle": "Hợp đồng hợp tác",
+      "contractStatus": "Trạng thái hợp đồng",
+      "signed": "Đã ký",
+      "unsigned": "Chưa ký",
+      "signedAt": "Ký vào lúc",
+      "images": "Hình ảnh",
+      "description": "Mô tả",
+      "email": "Email"
     }
   },
   "adminUserManager": {
@@ -1220,6 +1285,7 @@
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
     "Edit": "Sửa",
+    "Continue": "Tiếp tục",
     "Delete": "Xóa",
     "Cancel": "Hủy bỏ",
     "Reply": "Trả lời",
@@ -1439,7 +1505,9 @@
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
     "DELETE_APPLICATION": "Đã xóa thành công đơn ứng tuyển của bạn",
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
-    "RECONNECTED": "Đã kết nối lại với server!"
+    "RECONNECTED": "Đã kết nối lại với server!",
+    "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
+    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!"
   },
   "roles": {
     "Distributor": "Nhà phân phối",

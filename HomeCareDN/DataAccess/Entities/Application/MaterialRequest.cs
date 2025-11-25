@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DataAccess.Entities.Application
 {
@@ -12,9 +13,14 @@ namespace DataAccess.Entities.Application
         public bool CanAddMaterial { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public RequestStatus Status { get; set; } = RequestStatus.Draft;
+        public Guid? ConversationID { get; set; }
         public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }
         public ICollection<DistributorApplication>? DistributorApplications { get; set; }
         public DistributorApplication? SelectedDistributorApplication { get; set; }
+
+        [ForeignKey("ConversationID")]
+        public Conversation? Conversation { get; set; }
+        public Review? Review { get; set; }
     }
 
     public enum RequestStatus

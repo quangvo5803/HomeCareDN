@@ -366,6 +366,7 @@ export default function ContractorServiceRequestDetail() {
       const result = await paymentService.createPayCommission({
         contractorApplicationID: existingApplication.contractorApplicationID,
         serviceRequestID: serviceRequestId,
+        role: user.role,
         amount: commission,
         description: serviceRequestId.slice(0, 19),
         itemName: 'Service Request Commission',
@@ -992,12 +993,7 @@ export default function ContractorServiceRequestDetail() {
                   <button
                     type="submit"
                     className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    disabled={
-                      !estimatePrice.trim() ||
-                      !description.trim() ||
-                      images.length === 0 ||
-                      documents.length === 0
-                    }
+                    disabled={!estimatePrice.trim() || !description.trim()}
                   >
                     <i className="fas fa-paper-plane" />
                     {t('contractorServiceRequestDetail.applyForProject')}

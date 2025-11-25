@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125064634_UpdateMaterialRequest1")]
+    partial class UpdateMaterialRequest1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -512,57 +515,6 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("MaterialRequestItems", "app");
                 });
 
-            modelBuilder.Entity("DataAccess.Entities.Application.Notification", b =>
-                {
-                    b.Property<Guid>("NotificationID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DataKey")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DataValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PendingCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TargetRoles")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("TargetUserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("NotificationID");
-
-                    b.ToTable("Notifications", "app");
-                });
-
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
                     b.Property<Guid>("PartnerRequestID")
@@ -586,9 +538,6 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<bool>("IsContractSigned")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PartnerRequestType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -601,12 +550,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("SignatureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SignedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()

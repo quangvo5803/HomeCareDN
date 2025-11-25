@@ -35,10 +35,12 @@
     "react-dom": "^19.1.0",
     "react-i18next": "^15.6.1",
     "react-router-dom": "^7.8.0",
+    "react-signature-canvas": "^1.1.0-alpha.2",
     "react-toastify": "^11.0.5",
     "sweetalert2": "^11.22.4",
     "tailwindcss": "^4.1.12",
     "tinymce": "^8.1.2",
+    "trim-canvas": "^0.1.2",
     "use-debounce": "^10.0.6",
     "venobox": "^2.1.8"
   },

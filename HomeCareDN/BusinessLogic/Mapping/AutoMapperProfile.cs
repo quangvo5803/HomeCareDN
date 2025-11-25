@@ -10,7 +10,7 @@ using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Notification;
-using BusinessLogic.DTOs.Application.Partner;
+using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Review;
 using BusinessLogic.DTOs.Application.Service;
@@ -166,15 +166,24 @@ namespace BusinessLogic.Mapping
                     opt => opt.MapFrom(src => ImagesToUrls(src.Images))
                 )
                 .ForMember(
-                    dest => dest.DocumentUrls,
-                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
-                )
-                .ForMember(
                     dest => dest.ImagePublicIds,
                     opt =>
                         opt.MapFrom(src =>
                             src.Images != null
                                 ? src.Images.Select(i => i.PublicId).ToList()
+                                : new List<string>()
+                        )
+                )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
+                    dest => dest.DocumentPublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Documents != null
+                                ? src.Documents.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
                 );
@@ -309,6 +318,19 @@ namespace BusinessLogic.Mapping
                                 ? s.Images.Select(i => i.PublicId).ToList()
                                 : new List<string>()
                         )
+                )
+                .ForMember(
+                    dest => dest.DocumentUrls,
+                    opt => opt.MapFrom(src => DocumentsToUrls(src.Documents))
+                )
+                .ForMember(
+                    dest => dest.DocumentPublicIds,
+                    opt =>
+                        opt.MapFrom(src =>
+                            src.Documents != null
+                                ? src.Documents.Select(d => d.PublicId).ToList()
+                                : new List<string>()
+                        )
                 );
             CreateMap<MaterialRequest, MaterialRequestDto>()
                 .ForMember(
@@ -402,7 +424,8 @@ namespace BusinessLogic.Mapping
 
         private static List<string> DocumentsToUrls(IEnumerable<Document>? documents)
         {
-            return documents?.Select(i => i.DocumentUrl).ToList() ?? new List<string>();
+            return documents?.OrderBy(i => i.DocumentID).Select(i => i.DocumentUrl).ToList()
+                ?? new List<string>();
         }
     }
 }

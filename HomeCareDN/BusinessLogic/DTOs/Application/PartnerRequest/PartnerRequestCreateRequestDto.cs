@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DataAccess.Entities.Application;
 
-namespace BusinessLogic.DTOs.Application.Partner
+namespace BusinessLogic.DTOs.Application.PartnerRequest
 {
     public class PartnerRequestCreateRequestDto
     {
@@ -19,6 +19,8 @@ namespace BusinessLogic.DTOs.Application.Partner
 
         [MaxLength(1000)]
         public string? Description { get; set; }
+        public string? SignatureUrl { get; set; }
+        public string? VerificationToken { get; set; }
         public required List<string> ImageUrls { get; set; }
         public required List<string> ImagePublicIds { get; set; }
         public required List<string> DocumentUrls { get; set; }

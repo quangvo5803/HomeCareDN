@@ -57,9 +57,9 @@ export default function MaterialRequestDetail() {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-              }
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -83,9 +83,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -117,6 +117,31 @@ export default function MaterialRequestDetail() {
           setSelectedDistributor(null);
         }
         setTotalCount((prev) => Math.max(0, prev - 1));
+      }
+    },
+    [RealtimeEvents.PaymentTransactionUpdated]: async (payload) => {
+      setMaterialRequest((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          startReviewDate: payload.startReviewDate,
+          conversationID: payload.conversationID,
+        };
+      });
+      if (
+        payload.distributorApplicationID ===
+        selectedDistributor?.distributorApplicationID
+      ) {
+        try {
+          const fullDistributor =
+            await distributorApplicationService.getByIdForCustomer(
+              payload.distributorApplicationID
+            );
+
+          setSelectedDistributor(fullDistributor);
+        } catch (error) {
+          toast.error(t(handleApiError(error)));
+        }
       }
     },
   });
@@ -337,15 +362,23 @@ export default function MaterialRequestDetail() {
       if (result.isConfirmed) {
         try {
           const acceptedExtraItemIDs = Array.from(acceptingItems);
-          await distributorApplicationService.accept({
+          const approved = await distributorApplicationService.accept({
             DistributorApplicationID:
               selectedDistributor.distributorApplicationID,
             AcceptedExtraItemIDs:
               acceptedExtraItemIDs.length > 0 ? acceptedExtraItemIDs : null,
           });
-          toast.success(t('userPage.materialRequestDetail.acceptSuccess'));
-          setSelectedDistributor(null);
+          setSelectedDistributor(approved);
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+                selectedDistributor.distributorApplicationID
+                ? approved
+                : c
+            )
+          );
           setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.ACCEPT_APPLICATION'));
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }
@@ -368,12 +401,20 @@ export default function MaterialRequestDetail() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await distributorApplicationService.reject(
+          const rejected = await distributorApplicationService.reject(
             selectedDistributor.distributorApplicationID
           );
-          toast.success(t('userPage.materialRequestDetail.rejectSuccess'));
-          setSelectedDistributor(null);
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+                selectedDistributor.distributorApplicationID
+                ? rejected
+                : c
+            )
+          );
+          setSelectedDistributor(rejected);
           setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.REJECT_APPLICATION'));
         } catch (err) {
           toast.error(t(handleApiError(err)));
         }
@@ -525,9 +566,8 @@ export default function MaterialRequestDetail() {
                 />
               ) : null}
               <div
-                className={`absolute inset-0 flex items-center justify-center ${
-                  imageUrl ? 'hidden' : 'flex'
-                }`}
+                className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
+                  }`}
               >
                 <i className="fas fa-image text-slate-300 text-3xl"></i>
               </div>
@@ -675,9 +715,8 @@ export default function MaterialRequestDetail() {
                 />
               ) : null}
               <div
-                className={`absolute inset-0 flex items-center justify-center ${
-                  imageUrl ? 'hidden' : 'flex'
-                }`}
+                className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
+                  }`}
               >
                 <i className="fas fa-image text-slate-300 text-2xl"></i>
               </div>
@@ -847,13 +886,12 @@ export default function MaterialRequestDetail() {
     return (
       <div
         key={item.materialID}
-        className={`border-2 rounded-xl p-5 transition-all bg-white group ${
-          isExtra
-            ? isChecked
-              ? 'border-green-300 bg-green-50'
-              : 'border-slate-200 hover:border-orange-400'
+        className={`border-2 rounded-xl p-5 transition-all bg-white group ${isExtra
+          ? isChecked
+            ? 'border-green-300 bg-green-50'
             : 'border-slate-200 hover:border-orange-400'
-        } hover:shadow-md`}
+          : 'border-slate-200 hover:border-orange-400'
+          } hover:shadow-md`}
       >
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
           {/* Checkbox or STT */}
@@ -1164,11 +1202,18 @@ export default function MaterialRequestDetail() {
 
             <div className="space-y-3">
               <a
+                href={`tel:${selectedDistributor.distributorName}`}
+                className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
+              >
+                <i className="fas fa-user text-orange-600 text-lg w-6"></i>
+                <span>{selectedDistributor.distributorName}</span>
+              </a>
+              <a
                 href={`tel:${selectedDistributor.distributorPhone}`}
                 className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition border border-blue-200 hover:border-blue-400 font-medium text-slate-700"
               >
                 <i className="fas fa-phone text-blue-600 text-lg w-6"></i>
-                <span>{selectedDistributor.distributorPhone}</span>
+                <span>{selectedDistributor.distributorPhone || "Đang cập nhật"}</span>
               </a>
 
               <a
@@ -1207,8 +1252,15 @@ export default function MaterialRequestDetail() {
           <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
             <p className="text-red-700 font-semibold">
               <i className="fas fa-times-circle mr-2"></i>
-              {t('userPage.materialRequestDetail.alreadyRejected') ||
-                'Đơn hàng này đã bị từ chối'}
+              {t('userPage.materialRequestDetail.alreadyRejected')}
+            </p>
+          </div>
+        )}
+        {selectedDistributor.status === 'PendingCommission' && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+            <p className="text-green-700 font-semibold">
+              <i className="fas fa-check-circle mr-2"></i>
+              {t('userPage.materialRequestDetail.waiting')}
             </p>
           </div>
         )}
@@ -1340,9 +1392,8 @@ export default function MaterialRequestDetail() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div
-        className={`bg-white shadow-lg ${
-          hasAnyChanges ? 'sticky top-24 z-50' : ''
-        }`}
+        className={`bg-white shadow-lg ${hasAnyChanges ? 'sticky top-24 z-50' : ''
+          }`}
       >
         <div className="px-6 lg:px-12 py-3">
           <div className="flex items-center justify-between gap-3">

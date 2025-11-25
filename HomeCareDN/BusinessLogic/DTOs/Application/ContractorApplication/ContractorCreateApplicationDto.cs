@@ -18,9 +18,9 @@ namespace BusinessLogic.DTOs.Application.ContractorApplication
 
         [Required(ErrorMessage = "REQUIRED_ESTIMATE_PRICE")]
         public double EstimatePrice { get; set; }
-        public required List<string> ImageUrls { get; set; }
-        public required List<string> ImagePublicIds { get; set; }
-        public required List<string> DocumentUrls { get; set; }
-        public required List<string> DocumentPublicIds { get; set; }
+        public List<string>? ImageUrls { get; set; }
+        public List<string>? ImagePublicIds { get; set; }
+        public List<string>? DocumentUrls { get; set; }
+        public List<string>? DocumentPublicIds { get; set; }
     }
 }

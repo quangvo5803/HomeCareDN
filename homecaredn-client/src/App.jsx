@@ -38,6 +38,7 @@ import AdminMaterialRequestDetail from './pages/admin/AdminMaterialRequestDetail
 import AdminServiceRequestManager from './pages/admin/AdminServiceRequestManager';
 import AdminServiceRequestDetail from './pages/admin/AdminServiceRequestDetail';
 import AdminPartnerRequestManager from './pages/admin/AdminPartnerRequestManager';
+import AdminPartnerRequestDetail from './pages/admin/AdminPartnerRequestDetail';
 import AdminSupportChatManager from './pages/admin/AdminSupportChatManager';
 import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
@@ -77,6 +78,7 @@ import PublicRoute from './components/PublicRoute';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import DistributorLayout from './pages/distributor/DistributorLayout';
+import SupportChatWidget from './components/SupportChatWidget';
 function App() {
   const [showBackTop, setShowBackTop] = useState(false);
   const handleBackTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -141,6 +143,7 @@ function Layout() {
         user.role !== 'Contractor' &&
         user.role !== 'Distributor'));
 
+  const showChatWidget = user?.role !== 'Admin';
   return (
     <>
       <ScrollToTop />
@@ -327,6 +330,11 @@ function Layout() {
             element={<AdminPartnerRequestManager />}
           />
           <Route
+            path="PartnerRequestManager/:partnerRequestID"
+            element={<AdminPartnerRequestDetail />}
+          />
+
+          <Route
             path="SupportChatManager"
             element={<AdminSupportChatManager />}
           />
@@ -401,6 +409,11 @@ function Layout() {
         {/* 404 fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      {showChatWidget && (
+        <div className="fixed bottom-6 right-24 z-[60]">
+          <SupportChatWidget brand="HomeCareDN" />
+        </div>
+      )}
       {showHeaderFooter && <Footer />}
     </>
   );

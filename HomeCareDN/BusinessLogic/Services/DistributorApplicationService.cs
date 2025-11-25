@@ -25,6 +25,7 @@ namespace BusinessLogic.Services
         private readonly INotificationService _notificationService;
 
         private const string DISTRIBUTOR_APPLICATION_REJECT = "DistributorApplication.Rejected";
+        private const string DISTRIBUTOR_APPLICATION_ACCEPT = "DistributorApplication.Accept";
 
         private const string ERROR_APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND";
         private const string DISTRIBUTOR_APPLICATION = "DistributorApplication";
@@ -384,7 +385,7 @@ namespace BusinessLogic.Services
                 application.Items = originalItems.Concat(acceptedExtraItems).ToList();
             }
             application.Status = ApplicationStatus.PendingCommission;
-            application.DueCommisionTime = DateTime.UtcNow.AddMinutes(5);
+            application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
@@ -405,7 +406,7 @@ namespace BusinessLogic.Services
 
                         await _notifier.SendToApplicationGroupAsync(
                             $"user_{other.DistributorID}",
-                            "DistributorApplication.Reject",
+                            DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
                     }
@@ -423,17 +424,17 @@ namespace BusinessLogic.Services
             };
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{request.CustomerID}",
-                "DistributorApplication.Accept",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{application.DistributorID}",
-                "DistributorApplication.Accept",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
-                "DistributorApplication.Accept",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
 

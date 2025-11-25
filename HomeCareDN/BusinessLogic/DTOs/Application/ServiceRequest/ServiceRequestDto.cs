@@ -29,6 +29,7 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; } = string.Empty;
         public bool IsOpen { get; set; }
+        public Guid? SelectedContractorApplicationID { get; set; }
 
         public int ContractorApplyCount { get; set; }
         public ICollection<string>? ImageUrls { get; set; }

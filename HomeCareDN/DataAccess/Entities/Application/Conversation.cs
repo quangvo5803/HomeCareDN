@@ -10,7 +10,9 @@ namespace DataAccess.Entities.Application
         // Request chat
         public string? CustomerID { get; set; }
         public string? ContractorID { get; set; }
+        public string? DistributorID { get; set; }
         public Guid? ServiceRequestID { get; set; }
+        public Guid? MaterialRequestID { get; set; }
 
         // Support chat
         public string? AdminID { get; set; }
@@ -20,6 +22,7 @@ namespace DataAccess.Entities.Application
         public ConversationType ConversationType { get; set; }
         public bool IsAdminRead { get; set; } = false;
         public ServiceRequest? ServiceRequest { get; set; }
+        public MaterialRequest? MaterialRequest { get; set; }
         public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
     }
 
@@ -30,5 +33,8 @@ namespace DataAccess.Entities.Application
 
         [Display(Name = "AdminSupport")]
         AdminSupport,
+
+        [Display(Name = "MaterialRequest")]
+        MaterialRequest
     }
 }

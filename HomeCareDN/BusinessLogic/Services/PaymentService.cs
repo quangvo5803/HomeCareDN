@@ -30,6 +30,8 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
 
+        private const string PAYMENT = "PaymentTransaction.Updated";
+
         public PaymentService(
             PayOS payOS,
             IUnitOfWork unitOfWork,
@@ -61,11 +63,28 @@ namespace BusinessLogic.Services
             };
 
             var baseUrl = _payOsOptions.BaseUrl;
+            string cancelUrl = "";
+            string returnUrl = "";
 
-            var cancelUrl =
-                $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=cancelled";
-            var returnUrl =
-                $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=paid";
+            switch (requestDto.Role)
+            {
+                case "Contractor":
+                    cancelUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=cancelled";
+                    returnUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=paid";
+                    break;
+
+                case "Distributor":
+                    cancelUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=cancelled";
+                    returnUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=paid";
+                    break;
+
+                default:
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { "Role", new[] { "Role must be 'Contractor' or 'Distributor' not found" } },
+                    };
+                    throw new CustomValidationException(errors);
+            }
 
             var paymentData = new PaymentData(
                 orderCode,
@@ -80,8 +99,16 @@ namespace BusinessLogic.Services
 
             var payment = new PaymentTransaction
             {
-                ContractorApplicationID = requestDto.ContractorApplicationID,
-                ServiceRequestID = requestDto.ServiceRequestID,
+                ContractorApplicationID = requestDto.Role == "Contractor" 
+                    ? requestDto.ContractorApplicationID : null,
+                ServiceRequestID = requestDto.Role == "Contractor" 
+                    ? requestDto.ServiceRequestID : null,
+
+                DistributorApplicationID = requestDto.Role == "Distributor" 
+                    ? requestDto.DistributorApplicationID : null,
+                MaterialRequestID = requestDto.Role == "Distributor" 
+                    ? requestDto.MaterialRequestID : null,
+
                 Amount = requestDto.Amount,
                 Description = requestDto.Description ?? "Thanh toán hoa hồng",
                 ItemName = "Thanh toán",
@@ -108,7 +135,7 @@ namespace BusinessLogic.Services
             }
             var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
                 p => p.OrderCode == data.OrderCode,
-                includeProperties: "ContractorApplication",
+                includeProperties: "ContractorApplication,DistributorApplication",
                 asNoTracking: false
             );
 
@@ -117,22 +144,13 @@ namespace BusinessLogic.Services
                 return;
             }
 
+            bool isContractorPayment = payment.ContractorApplicationID != null;
+            bool isDistributorPayment = payment.DistributorApplicationID != null;
+
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
-                if (payment.ContractorApplication != null)
-                {
-                    payment.ContractorApplication.Status = ApplicationStatus.Approved;
-                    payment.ContractorApplication.DueCommisionTime = null;
 
-                    var contractorID = payment.ContractorApplication.ContractorID;
-                    var contractor = await _userManager.FindByIdAsync(contractorID.ToString());
-                    if (contractor != null)
-                    {
-                        contractor.ProjectCount += 1;
-                        await _userManager.UpdateAsync(contractor);
-                    }
-                }
                 if (
                     DateTime.TryParseExact(
                         data.TransactionDateTime,
@@ -152,56 +170,14 @@ namespace BusinessLogic.Services
                     payment.PaidAt = DateTime.UtcNow;
                 }
 
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                    s => s.ServiceRequestID == payment.ServiceRequestID,
-                    asNoTracking: false
-                );
-                if (serviceRequest != null && payment.ContractorApplication != null)
-                {
-                    var conversation = new Conversation
-                    {
-                        ConversationID = Guid.NewGuid(),
-                        ServiceRequestID = serviceRequest.ServiceRequestID,
-                        CustomerID = serviceRequest.CustomerID.ToString(),
-                        ContractorID = payment.ContractorApplication.ContractorID.ToString(),
-                        ConversationType = ConversationType.ServiceRequest,
-                        CreatedAt = DateTime.UtcNow,
-                    };
-                    serviceRequest.ConversationID = conversation.ConversationID;
-                    await _unitOfWork.ConversationRepository.AddAsync(conversation);
-                    await _unitOfWork.SaveAsync();
-                    await _notifier.SendToChatGroupAsync(
-                        conversation.ConversationID.ToString(),
-                        "Chat.ConversationUnlocked",
-                        new { conversation.ConversationID }
-                    );
-                }
+                var tasks = new List<Task>();
+                if (isContractorPayment)
+                    tasks.Add(HandleContractorPaymentAsync(payment));
+                if (isDistributorPayment)
+                    tasks.Add(HandleDistributorPaymentAsync(payment));
 
-                await _notifier.SendToApplicationGroupAsync(
-                    $"user_{serviceRequest?.CustomerID}",
-                    "PaymentTransation.Updated",
-                    new
-                    {
-                        payment.ContractorApplicationID,
-                        Status = payment.Status.ToString(),
-                        StartReviewDate = payment.PaidAt.Value.AddMinutes(5),
-                        serviceRequest?.ConversationID,
-                    }
-                );
-                await _notifier.SendToApplicationGroupAsync(
-                    $"role_Admin",
-                    "PaymentTransation.Updated",
-                    new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
-                );
-                await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-                {
-                    TargetUserId = serviceRequest!.CustomerID,
-                    Title = "Yêu cầu của bạn đã được chấp thuận",
-                    Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
-                    DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
-                    DataValue = serviceRequest.ServiceRequestID.ToString(),
-                    Action = NotificationAction.Paid
-                });
+                await Task.WhenAll(tasks);
+
             }
             else
             {
@@ -251,6 +227,122 @@ namespace BusinessLogic.Services
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
             };
+        }
+
+        private async Task HandleContractorPaymentAsync(PaymentTransaction payment)
+        {
+            var contractorApp = payment.ContractorApplication;
+
+            contractorApp!.Status = ApplicationStatus.Approved;
+            contractorApp.DueCommisionTime = null;
+
+            var contractor = await _userManager.FindByIdAsync(contractorApp.ContractorID.ToString());
+            if (contractor != null)
+            {
+                contractor.ProjectCount += 1;
+                await _userManager.UpdateAsync(contractor);
+            }
+
+            var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                s => s.ServiceRequestID == payment.ServiceRequestID, asNoTracking:false
+            );
+
+            if (serviceRequest != null)
+            {
+                var conversation = new Conversation
+                {
+                    ConversationID = Guid.NewGuid(),
+                    ServiceRequestID = serviceRequest.ServiceRequestID,
+                    CustomerID = serviceRequest.CustomerID.ToString(),
+                    ContractorID = contractorApp.ContractorID.ToString(),
+                    ConversationType = ConversationType.ServiceRequest,
+                    CreatedAt = DateTime.UtcNow,
+                };
+                serviceRequest.ConversationID = conversation.ConversationID;
+                await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                await _unitOfWork.SaveAsync();
+
+                await _notifier.SendToChatGroupAsync(
+                    conversation.ConversationID.ToString(),
+                    "Chat.ConversationUnlocked",
+                    new { conversation.ConversationID }
+                );
+            }
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{serviceRequest?.CustomerID}",
+                PAYMENT,
+                new
+                {
+                    payment.ContractorApplicationID,
+                    Status = payment.Status.ToString(),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    serviceRequest?.ConversationID,
+                }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                PAYMENT,
+                new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+            );
+        }
+
+        private async Task HandleDistributorPaymentAsync(PaymentTransaction payment)
+        {
+            var distributorApp = payment.DistributorApplication;
+
+            distributorApp!.Status = ApplicationStatus.Approved;
+            distributorApp.DueCommisionTime = null;
+
+            var distributor = await _userManager.FindByIdAsync(distributorApp.DistributorID.ToString());
+            if (distributor != null)
+            {
+                distributor.ProjectCount += 1;
+                await _userManager.UpdateAsync(distributor);
+            }
+
+            var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                s => s.MaterialRequestID == payment.MaterialRequestID,
+                asNoTracking: false
+            );
+
+            if (materialRequest != null)
+            {
+                var conversation = new Conversation
+                {
+                    ConversationID = Guid.NewGuid(),
+                    MaterialRequestID = materialRequest.MaterialRequestID,
+                    CustomerID = materialRequest.CustomerID.ToString(),
+                    DistributorID = distributorApp.DistributorID.ToString(),
+                    ConversationType = ConversationType.MaterialRequest,
+                    CreatedAt = DateTime.UtcNow,
+                };
+
+                materialRequest.ConversationID = conversation.ConversationID;
+                await _unitOfWork.ConversationRepository.AddAsync(conversation);
+                await _unitOfWork.SaveAsync();
+
+                await _notifier.SendToChatGroupAsync(
+                    conversation.ConversationID.ToString(),
+                    "Chat.ConversationUnlocked",
+                    new { conversation.ConversationID }
+                );
+            }
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{materialRequest!.CustomerID}",
+                PAYMENT,
+                new
+                {
+                    payment.DistributorApplicationID,
+                    Status = payment.Status.ToString(),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    materialRequest.ConversationID,
+                }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                PAYMENT,
+                new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
+            );
         }
     }
 }
