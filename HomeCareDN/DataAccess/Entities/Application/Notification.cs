@@ -5,7 +5,7 @@ namespace DataAccess.Entities.Application
     public class Notification
     {
         [Key]
-        public Guid NotificationID { get; set; } = new Guid();
+        public Guid NotificationID { get; set; } = Guid.NewGuid();
         public NotificationType Type { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;

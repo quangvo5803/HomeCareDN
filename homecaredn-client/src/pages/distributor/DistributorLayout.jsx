@@ -3,7 +3,6 @@ import MenuList from '../../components/partner/MenuList';
 import AvatarMenu from '../../components/AvatarMenu';
 import LanguageSwitch from '../../components/LanguageSwitch';
 import { Outlet } from 'react-router-dom';
-import SupportChatWidget from '../../components/SupportChatWidget';
 import NotificationPanel from '../../components/NotificationPanel';
 import { notificationService } from '../../services/notificationService';
 import { toast } from 'react-toastify';

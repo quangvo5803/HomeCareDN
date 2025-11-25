@@ -255,49 +255,49 @@
       "form_images": "Company Images",
       "form_documents": "Documents",
       "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner.",
-      "represent": "Representing the business",    
-        "step2": {
-          "title": "Email Verification",
-          "otpSent": "Verification code (OTP) has been sent to email: ",
-          "checkSpam": "Please check your Spam/Junk folder",
-          "enterOtp": "Enter 6-digit code",
-          "otpPlaceholder": "------",
-          "backButton": "Back",
-          "verifyButton": "Verify"
-        },
-        "step3": {
-          "title": "Electronic Contract Signing",
-          "contractTitle": "SERVICE SUPPLY COOPERATION AGREEMENT",
-          "contractPartyA": "Party A (Platform): ",
-          "partyA": "HOMECAREDN Joint Stock Company",
-          "contractPartyB": "Party B (Partner): ",
-          "contractRepresentative": "Representative: ",
-          "contractContent": "Both parties agree to enter into a cooperation agreement based on voluntary, equality, and mutual benefit principles with the following terms:",
-          "contractDetails": "ARTICLE 1: ROLE AND SCOPE\n1.1. HomeCareDN provides the intermediary technology platform connecting Customers and Partners. HomeCareDN does not directly participate in construction, repair, or material manufacturing processes.\n1.2. The Partner (Party B) is an independent entity joining the system to provide services or goods to Customers.\n\nARTICLE 2: PARTNER RESPONSIBILITIES\n2.1. Commit to providing truthful and accurate capability profiles, business licenses, and product origins.\n2.2. Bear full legal responsibility to the Customer regarding construction quality, labor safety (for Contractors), or product quality and warranty (for Distributors).\n2.3. Strictly prohibited from soliciting Customers to conduct transactions off-platform to evade service fee obligations.\n\nARTICLE 3: RIGHTS AND OBLIGATIONS OF HOMECAREDN\n3.1. Maintain stable operation of the Website/App system.\n3.2. Collect commission fees on each successful transaction according to the current fee schedule.\n3.3. Right to suspend or permanently terminate Partner accounts upon detection of fraud, poor service quality (consistently low ratings), or violation of conduct rules.\n3.4. Act as a mediator in case of disputes.\n\nARTICLE 4: PAYMENT POLICY\n4.1. HomeCareDN acts as an escrow agent holding payments from Customers.\n4.2. Payments will be disbursed to the Partner's Wallet after the Customer confirms job completion/receipt of goods, minus the Platform's commission fee.\n\nARTICLE 5: DISCLAIMER OF LIABILITY\nHomeCareDN is indemnified from all legal liability regarding damages to persons or property, construction defects, or product faults caused by the Partner to the Customer.",
-          "contractCommitment": "By signing below, the Partner acknowledges having read and understood HomeCareDN's intermediary role and commits to fully complying with the above terms.",
-          "signatureLabel": "Signature Confirmation",
-          "signatureNote": "This signature has the same legal validity as a wet ink signature.",
-          "signed": "CONTRACT SIGNED",
-          "unsigned": "NOT SIGNED",
-          "signedAt": "Digitally signed at",
-          "contractor": "(For Contractor)",
-          "distributor": "(For Distributor)",
-          "signatureClear": "Clear signature",
-          "reviewButton": "Review Information",
-          "submitButton": "Sign & Submit"
-        },
-    "validation": {
-      "otpInvalid": "Please enter a valid OTP code",
-      "otpSuccess": "Verification successful!",
-      "otpError": "Could not receive verification token.",
-      "canvasNotReady": "Signature canvas not ready. Please wait and try again.",
-      "signatureEmpty": "Please sign to confirm the contract.",
-      "signatureError": "Cannot get signature data. Please redraw.",
-      "signatureClearWarning": "Signature canvas not ready"
-    },
-    "notification": {
-      "otpSent": "OTP code has been sent to"
-    }
+      "represent": "Representing the business",
+      "step2": {
+        "title": "Email Verification",
+        "otpSent": "Verification code (OTP) has been sent to email: ",
+        "checkSpam": "Please check your Spam/Junk folder",
+        "enterOtp": "Enter 6-digit code",
+        "otpPlaceholder": "------",
+        "backButton": "Back",
+        "verifyButton": "Verify"
+      },
+      "step3": {
+        "title": "Electronic Contract Signing",
+        "contractTitle": "SERVICE SUPPLY COOPERATION AGREEMENT",
+        "contractPartyA": "Party A (Platform): ",
+        "partyA": "HOMECAREDN Joint Stock Company",
+        "contractPartyB": "Party B (Partner): ",
+        "contractRepresentative": "Representative: ",
+        "contractContent": "Both parties agree to enter into a cooperation agreement based on voluntary, equality, and mutual benefit principles with the following terms:",
+        "contractDetails": "ARTICLE 1: ROLE AND SCOPE\n1.1. HomeCareDN provides the intermediary technology platform connecting Customers and Partners. HomeCareDN does not directly participate in construction, repair, or material manufacturing processes.\n1.2. The Partner (Party B) is an independent entity joining the system to provide services or goods to Customers.\n\nARTICLE 2: PARTNER RESPONSIBILITIES\n2.1. Commit to providing truthful and accurate capability profiles, business licenses, and product origins.\n2.2. Bear full legal responsibility to the Customer regarding construction quality, labor safety (for Contractors), or product quality and warranty (for Distributors).\n2.3. Strictly prohibited from soliciting Customers to conduct transactions off-platform to evade service fee obligations.\n\nARTICLE 3: RIGHTS AND OBLIGATIONS OF HOMECAREDN\n3.1. Maintain stable operation of the Website/App system.\n3.2. Collect commission fees on each successful transaction according to the current fee schedule.\n3.3. Right to suspend or permanently terminate Partner accounts upon detection of fraud, poor service quality (consistently low ratings), or violation of conduct rules.\n3.4. Act as a mediator in case of disputes.\n\nARTICLE 4: PAYMENT POLICY\n4.1. HomeCareDN acts as an escrow agent holding payments from Customers.\n4.2. Payments will be disbursed to the Partner's Wallet after the Customer confirms job completion/receipt of goods, minus the Platform's commission fee.\n\nARTICLE 5: DISCLAIMER OF LIABILITY\nHomeCareDN is indemnified from all legal liability regarding damages to persons or property, construction defects, or product faults caused by the Partner to the Customer.",
+        "contractCommitment": "By signing below, the Partner acknowledges having read and understood HomeCareDN's intermediary role and commits to fully complying with the above terms.",
+        "signatureLabel": "Signature Confirmation",
+        "signatureNote": "This signature has the same legal validity as a wet ink signature.",
+        "signed": "CONTRACT SIGNED",
+        "unsigned": "NOT SIGNED",
+        "signedAt": "Digitally signed at",
+        "contractor": "(For Contractor)",
+        "distributor": "(For Distributor)",
+        "signatureClear": "Clear signature",
+        "reviewButton": "Review Information",
+        "submitButton": "Sign & Submit"
+      },
+      "validation": {
+        "otpInvalid": "Please enter a valid OTP code",
+        "otpSuccess": "Verification successful!",
+        "otpError": "Could not receive verification token.",
+        "canvasNotReady": "Signature canvas not ready. Please wait and try again.",
+        "signatureEmpty": "Please sign to confirm the contract.",
+        "signatureError": "Cannot get signature data. Please redraw.",
+        "signatureClearWarning": "Signature canvas not ready"
+      },
+      "notification": {
+        "otpSent": "OTP code has been sent to"
+      }
     }
   },
   "userPage": {
@@ -468,11 +468,10 @@
       "customerRequestedMaterials": "Customer requested materials",
       "selectMaterialRequest": "Please select request want to add",
       "selectExtraMaterialsNote": "You can choose what materials you want to add!",
-      "confirmAccept":"Are you sure you accept this application?",
-      "confirmReject":"Are you sure you reject this application?",
+      "confirmAccept": "Are you sure you accept this application?",
+      "confirmReject": "Are you sure you reject this application?",
       "waiting": "Application has been accepted please wait for distributor confirmation.",
       "alreadyRejected": "The application was rejected."
-
     }
   },
   "contractorServiceRequestManager": {
@@ -695,7 +694,7 @@
     "repair": "Repair",
     "construction": "Construction",
     "revenue": "Revenue",
-    "no_applications":"No data to display" 
+    "no_applications": "No data to display"
   },
   "supportChat": {
     "headerTitle": "Assistant — Support for {{brand}}",
@@ -710,10 +709,10 @@
     "send": "Send",
     "launcherTitle": "Live support",
     "typing": "Bot is typing…",
-    "tabAI":"Chat with AI",
-    "tabAdmin":"Chat with Admin",
-    "startAdminChat":"Send message to Admin to start convesation",
-    "sendAdminChatError":"Send message to Admin ERROR"
+    "tabAI": "Chat with AI",
+    "tabAdmin": "Chat with Admin",
+    "startAdminChat": "Send message to Admin to start convesation",
+    "sendAdminChatError": "Send message to Admin ERROR"
   },
   "distributorCategoryManager": {
     "title": "Category Manager",
@@ -956,44 +955,44 @@
     }
   },
   "adminMaterialRequestManager": {
-      "title": "Material Request Manager",
-      "subtitle": "Manage all material requests from customers",
-      "materialRequests": "Material Requests",
-      "address": "Address",
-      "description": "Description",
-      "materials": "Materials",
-      "items": "material(s)",
-      "distributors": "Distributor Applications",
-      "status": "Status",
-      "action": "Action",
-      "no": "No.",
-      "type": "Type",
-      "empty": "No Material Requests",
-      "empty_description": "No material requests found. Start creating new one.",
-      "customer": "Customer",
-      "materialsList": "Materials List",
-      "materialName": "Material Name",
-      "quantity": "Quantity",
-      "unit": "Unit",
-      "listDistributors": "List of Distributors",
-      "totalDistributors": "Total Distributors",
-      "noDistributor": "No Distributor",
-      "noDistributorYet": "No distributors have applied for this request yet",
-      "viewProfile": "View Details",
-      "customerInfo":"Customer Information",
-      "customerName": "Customer name",
-      "customerEmail": "Customer email",
-      "customerPhone":"Customer phone nubmer",
-      "distributorDetail": {
-        "title": "Distributor Details",
-        "totalPrice": "Estimated Total Price",
-        "completedProject": "Completed Projects",
-        "project": "projects",
-        "rating": "Rating",
-        "createAt": "Created At",
-        "quotedItems": "Quoted Items List",
-        "price": "Price"
-      }
+    "title": "Material Request Manager",
+    "subtitle": "Manage all material requests from customers",
+    "materialRequests": "Material Requests",
+    "address": "Address",
+    "description": "Description",
+    "materials": "Materials",
+    "items": "material(s)",
+    "distributors": "Distributor Applications",
+    "status": "Status",
+    "action": "Action",
+    "no": "No.",
+    "type": "Type",
+    "empty": "No Material Requests",
+    "empty_description": "No material requests found. Start creating new one.",
+    "customer": "Customer",
+    "materialsList": "Materials List",
+    "materialName": "Material Name",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "listDistributors": "List of Distributors",
+    "totalDistributors": "Total Distributors",
+    "noDistributor": "No Distributor",
+    "noDistributorYet": "No distributors have applied for this request yet",
+    "viewProfile": "View Details",
+    "customerInfo": "Customer Information",
+    "customerName": "Customer name",
+    "customerEmail": "Customer email",
+    "customerPhone": "Customer phone nubmer",
+    "distributorDetail": {
+      "title": "Distributor Details",
+      "totalPrice": "Estimated Total Price",
+      "completedProject": "Completed Projects",
+      "project": "projects",
+      "rating": "Rating",
+      "createAt": "Created At",
+      "quotedItems": "Quoted Items List",
+      "price": "Price"
+    }
   },
   "adminServiceManager": {
     "title": "Service Manager",
@@ -1107,7 +1106,7 @@
       "status": "Status",
       "rejectReason": "Rejection Reason",
       "rejectReasonPlaceHolder": "Enter rejection reason",
-      "documents": "Documents",      
+      "documents": "Documents",
       "signature": "Signature",
       "noDocuments": "No documents",
       "noSignature": "No signature",
@@ -1176,7 +1175,7 @@
     "conversationList": "Conversation List",
     "searchUser": "Search user...",
     "noConversations": "No support chat requests yet",
-    "noSearchResults":"Don't have any Conversation match with your input",
+    "noSearchResults": "Don't have any Conversation match with your input",
     "noMessage": "No messages yet",
     "selectConversation": "Select a conversation to start",
     "online": "Online",
@@ -1187,14 +1186,14 @@
     "noMessagesInChat": "No messages in this conversation yet",
     "noMoreMessages": "No more messages",
     "noMoreConversations": "No more conversations",
-    "newConversation":"You have received new Conversation!",
+    "newConversation": "You have received new Conversation!",
     "newConversations": "You have {{count}} new Conversations!",
-    "newMessage":"You have received new Message!",
+    "newMessage": "You have received new Message!",
     "newMessages": "You have {{count}} new Messages!",
-    "roles":{
-      "Customer":"Customer",
-      "Contractor":"Contractor",
-      "Distributor":"Distributor"
+    "roles": {
+      "Customer": "Customer",
+      "Contractor": "Contractor",
+      "Distributor": "Distributor"
     }
   },
   "adminPaymentManager": {
@@ -1674,5 +1673,12 @@
     "hours": "Hours",
     "minutes": "Minutes",
     "seconds": "Seconds"
+  },
+  "notifyPanel": {
+    "no_Notify": "No notification",
+    "system": "system",
+    "personal": "personal",
+    "tabPer": "Notification",
+    "tabSys": "System"
   }
 }

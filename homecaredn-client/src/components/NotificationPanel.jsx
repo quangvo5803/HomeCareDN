@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import { notificationService } from '../services/notificationService';
+import PropTypes from 'prop-types';
 
 export default function NotificationPanel({ notifications = [], loading, user }) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
 
     const [notify, setNotify] = useState([]);
@@ -60,16 +61,11 @@ export default function NotificationPanel({ notifications = [], loading, user })
     const resolveNotificationRoute = (n) => {
         const { dataKey, dataValue } = n;
 
-        if (routeMap[dataKey]) {
-            return routeMap[dataKey](dataValue);
-        }
+        const directRoute = routeMap[dataKey]?.(dataValue);
+        if (directRoute) return directRoute;
 
         const [type, , status] = dataKey.split("_");
-        if (routeMap[type] && routeMap[type][status]) {
-            return routeMap[type][status](dataValue);
-        }
-
-        return null;
+        return routeMap[type]?.[status]?.(dataValue) ?? null;
     };
 
     const handleClickNotification = async (n) => {
@@ -96,6 +92,50 @@ export default function NotificationPanel({ notifications = [], loading, user })
         }
     };
 
+    const renderNotifications = () => {
+        if (loading) {
+            return <LoadingComponent />;
+        }
+
+        if (currentNoti.length > 0) {
+            return currentNoti.map((n) => (
+                <div
+                    key={n.notificationID}
+                    onClick={() => handleClickNotification(n)}
+                    className={`p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
+                        }`}
+                >
+                    <div className="flex items-start gap-3">
+                        {!n.isRead && (
+                            <div className="w-2 h-2 mt-2 rounded-full bg-orange-500 flex-shrink-0 shadow-sm shadow-orange-300" />
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+                                {n.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                                {n.message}
+                            </p>
+                            <span className="text-xs text-orange-600 font-medium">
+                                {formatDate(n.updatedAt, i18n.language)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            ));
+        }
+
+        return (
+            <div className="p-10 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-orange-50">
+                    <Bell size={28} className="text-orange-300" />
+                </div>
+                <p className="text-sm text-gray-500">
+                    {t('notifyPanel.no_Notify')} {tab === "system" ? t('notifyPanel.system') : t('notifyPanel.personal')}
+                </p>
+            </div>
+        );
+    };
 
     return (
         <div className="relative" ref={panelRef}>
@@ -122,14 +162,14 @@ export default function NotificationPanel({ notifications = [], loading, user })
                             className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'personal' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30 cursor-pointer'
                                 }`}
                         >
-                            Thông báo
+                            {t('notifyPanel.tabPer')}
                         </button>
                         <button
                             onClick={() => setTab('system')}
                             className={`flex-1 py-3 text-sm font-semibold transition-all duration-200 ${tab === 'system' ? 'text-orange-600 border-b-2 border-orange-500' : 'text-gray-500 hover:text-orange-500 hover:bg-orange-50/30  cursor-pointer'
                                 }`}
                         >
-                            Hệ thống
+                            {t('notifyPanel.tabSys')}
                         </button>
                         <button
                             onClick={handleReadAllNotifications}
@@ -142,47 +182,17 @@ export default function NotificationPanel({ notifications = [], loading, user })
 
                     {/* Content */}
                     <div className="max-h-80 overflow-y-auto">
-                        {loading ? (
-                            <LoadingComponent />
-                        ) : currentNoti.length > 0 ? (
-                            currentNoti.map((n) => (
-                                <div
-                                    key={n.notificationID}
-                                    onClick={() => handleClickNotification(n)}
-                                    className={`p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
-                                        }`}
-                                >
-                                    <div className="flex items-start gap-3">
-                                        {!n.isRead && (
-                                            <div className="w-2 h-2 mt-2 rounded-full bg-orange-500 flex-shrink-0 shadow-sm shadow-orange-300" />
-                                        )}
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="text-sm font-semibold text-gray-800 mb-1">
-                                                {n.title}
-                                            </h4>
-                                            <p className="text-sm text-gray-600 leading-relaxed mb-2">
-                                                {n.message}
-                                            </p>
-                                            <span className="text-xs text-orange-600 font-medium">
-                                                {formatDate(n.updatedAt, i18n.language)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-10 text-center">
-                                <div className="inline-flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-orange-50">
-                                    <Bell size={28} className="text-orange-300" />
-                                </div>
-                                <p className="text-sm text-gray-500">
-                                    Không có thông báo {tab === "system" ? "hệ thống" : "cá nhân"}
-                                </p>
-                            </div>
-                        )}
+                        {renderNotifications()}
                     </div>
                 </div>
             )}
         </div>
     );
 }
+NotificationPanel.propTypes = {
+    notifications: PropTypes.array.isRequired,
+    loading: PropTypes.bool.isRequired,
+    user: PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    }),
+};
