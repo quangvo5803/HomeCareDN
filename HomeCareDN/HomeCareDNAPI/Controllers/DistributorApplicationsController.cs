@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application;
+﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -14,6 +15,7 @@ namespace HomeCareDNAPI.Controllers
     public class DistributorApplicationsController : ControllerBase
     {
         private readonly IFacadeService _facadeService;
+
         public DistributorApplicationsController(IFacadeService facadeService)
         {
             _facadeService = facadeService;
@@ -26,8 +28,11 @@ namespace HomeCareDNAPI.Controllers
             [FromQuery] QueryParameters parameters
         )
         {
-            var result = await _facadeService.DistributorApplicationService
-                .GetAllDistributorApplicationByMaterialRequestId(parameters, "Customer");
+            var result =
+                await _facadeService.DistributorApplicationService.GetAllDistributorApplicationByMaterialRequestId(
+                    parameters,
+                    "Customer"
+                );
             return Ok(result);
         }
 
@@ -35,19 +40,42 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("customer/{id:guid}")]
         public async Task<IActionResult> GetByIdForCustomer(Guid id)
         {
-            var result = await _facadeService.DistributorApplicationService
-                .GetDistributorApplicationById(id, "Customer");
+            var result =
+                await _facadeService.DistributorApplicationService.GetDistributorApplicationById(
+                    id,
+                    "Customer"
+                );
             return Ok(result);
         }
 
         // ====================== DISTRIBUTOR ======================
         [Authorize(Roles = "Distributor")]
+        [HttpGet("distributor/applications")]
+        public async Task<IActionResult> GetApplications([FromQuery] QueryParameters parameters)
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(sub, out var distributorId))
+                return Unauthorized("Invalid distributor ID.");
+
+            parameters.FilterID = distributorId;
+
+            var result =
+                await _facadeService.DistributorApplicationService.GetAllDistributorApplicationByUserIdAsync(
+                    parameters
+                );
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Distributor")]
         [HttpGet("distributor/applied")]
-        public async Task<IActionResult> GetByMaterialRequestId([FromQuery] DistributorApplicationGetByIdDto byIdRequest)
+        public async Task<IActionResult> GetByMaterialRequestId(
+            [FromQuery] DistributorApplicationGetByIdDto byIdRequest
+        )
         {
             return Ok(
-                await _facadeService.DistributorApplicationService
-                    .GetDistributorApplicationByMaterialRequestId(byIdRequest)
+                await _facadeService.DistributorApplicationService.GetDistributorApplicationByMaterialRequestId(
+                    byIdRequest
+                )
             );
         }
 
@@ -57,8 +85,10 @@ namespace HomeCareDNAPI.Controllers
             [FromBody] DistributorCreateApplicationDto createRequest
         )
         {
-            var result = await _facadeService.DistributorApplicationService
-                .CreateDistributorApplicationAsync(createRequest);
+            var result =
+                await _facadeService.DistributorApplicationService.CreateDistributorApplicationAsync(
+                    createRequest
+                );
             return Ok(result);
         }
 
@@ -66,8 +96,9 @@ namespace HomeCareDNAPI.Controllers
         [HttpDelete("distributor/delete/{id:guid}")]
         public async Task<IActionResult> DeleteDistributorApplication(Guid id)
         {
-            await _facadeService.DistributorApplicationService
-                .DeleteDistributorApplicationAsync(id);
+            await _facadeService.DistributorApplicationService.DeleteDistributorApplicationAsync(
+                id
+            );
             return NoContent();
         }
     }

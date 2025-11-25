@@ -148,6 +148,51 @@ export default function BarChart({
       </div>
     );
   }
+  if (type === 'Distributor') {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+        <div className="flex items-center justify-between mb-4">
+          <h6 className="text-xl font-semibold dark:text-white">{title}</h6>
+
+          {onYearChange && (
+            <select
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              value={year}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
+            >
+              {Array.from({ length: 6 }, (_, i) => {
+                const y = new Date().getFullYear() - i;
+                return (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                );
+              })}
+            </select>
+          )}
+        </div>
+
+        <div className="relative w-full h-[450px]">
+          <Bar data={data} options={options} />
+
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
+            </div>
+          )}
+
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+              <LoadingComponent />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 }
 BarChart.propTypes = {
   title: PropTypes.string.isRequired,

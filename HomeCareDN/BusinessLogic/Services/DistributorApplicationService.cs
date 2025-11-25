@@ -88,6 +88,34 @@ namespace BusinessLogic.Services
             };
         }
 
+        public async Task<
+            PagedResultDto<DistributorApplicationDto>
+        > GetAllDistributorApplicationByUserIdAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork
+                .DistributorApplicationRepository.GetQueryable(
+                    includeProperties: "Items,Items.Material,Items.Material.Brand,Items.Material.Category"
+                )
+                .AsSingleQuery()
+                .Where(ca => ca.DistributorID == parameters.FilterID);
+
+            var totalCount = await query.CountAsync();
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<DistributorApplicationDto>>(items);
+
+            return new PagedResultDto<DistributorApplicationDto>
+            {
+                Items = dtos,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
+
         public async Task<DistributorApplicationDto?> GetDistributorApplicationByMaterialRequestId(
             DistributorApplicationGetByIdDto byIdDto
         )
