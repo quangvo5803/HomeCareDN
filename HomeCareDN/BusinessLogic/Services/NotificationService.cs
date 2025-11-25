@@ -151,13 +151,14 @@ namespace BusinessLogic.Services
 
         public async Task<NotificationDto> NotifyNewServiceRequestAsync(ServiceRequest request)
         {
-            const string dataKey = "newServiceRequests";
+            const string dataKey = "ServiceRequest";
 
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu dịch vụ mới",
                 Message = "Có 1 yêu cầu dịch vụ mới.",
                 DataKey = dataKey,
+                DataValue = "ServiceRequestManager",
                 TargetRoles = "Contractor"
             };
 
@@ -168,13 +169,14 @@ namespace BusinessLogic.Services
 
         public async Task<NotificationDto> NotifyNewMaterialRequestAsync(MaterialRequest request)
         {
-            const string dataKey = "newMaterialRequests";
+            const string dataKey = "MaterialRequest";
 
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu vật tư mới",
                 Message = "Có 1 yêu cầu vật tư mới.",
                 DataKey = dataKey,
+                DataValue = "MaterialRequestManager",
                 TargetRoles = "Distributor"
             };
 

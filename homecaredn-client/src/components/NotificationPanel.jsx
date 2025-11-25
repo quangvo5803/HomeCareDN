@@ -1,11 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
 import LoadingComponent from '../components/LoadingComponent'
 import { formatDate } from '../utils/formatters';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotificationPanel({ notifications = [], loading }) {
     const { i18n } = useTranslation();
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [tab, setTab] = useState('personal');
     const panelRef = useRef(null);
@@ -27,6 +29,55 @@ export default function NotificationPanel({ notifications = [], loading }) {
             return () => document.removeEventListener('mousedown', handleClick);
         }
     }, [open]);
+
+    const resolveNotificationRoute = (n) => {
+        const { dataKey, dataValue } = n;
+
+        // 1. ServiceRequest
+        if (dataKey === "ServiceRequest") {
+            return `/Contractor/${dataValue}`;
+        }
+
+        // 2. MaterialRequest
+        if (dataKey === "MaterialRequest") {
+            return `/Distributor/${dataValue}`;
+        }
+
+        if (dataKey.startsWith("ContractorApplication_")) {
+
+            const parts = dataKey.split("_");
+            const action = parts[2]; // APPLY, ACCEPT, REJECT
+
+            if (action === "APPLY") {
+                return `/Customer/ServiceRequestDetail/${dataValue}`;
+            }
+
+            if (action === "ACCEPT") {
+                return `/Contractor/ServiceRequestManager/${dataValue}`;
+            }
+
+            if (action === "REJECT") {
+                return `/Contractor/ServiceRequestManager/${dataValue}`;
+            }
+
+            if (action === "PAID") {
+                return `/Customer/ServiceRequestDetail/${dataValue}`;
+            }
+        }
+
+        return null; // fallback
+    };
+
+    const handleClickNotification = (n) => {
+        const route = resolveNotificationRoute(n);
+
+        if (route) {
+            navigate(route);
+        } else {
+            console.warn("Không tìm thấy route cho notification", n);
+        }
+    };
+
 
     return (
         <div className="relative" ref={panelRef}>
@@ -76,6 +127,7 @@ export default function NotificationPanel({ notifications = [], loading }) {
                             currentNoti.map((n) => (
                                 <div
                                     key={n.notificationID}
+                                    onClick={() => handleClickNotification(n)}
                                     className={`p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
                                         }`}
                                 >

@@ -199,6 +199,7 @@ namespace BusinessLogic.Services
                     Title = "Yêu cầu của bạn đã được chấp thuận",
                     Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
                     DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
+                    DataValue = serviceRequest.ServiceRequestID.ToString(),
                     Action = NotificationAction.Paid
                 });
             }

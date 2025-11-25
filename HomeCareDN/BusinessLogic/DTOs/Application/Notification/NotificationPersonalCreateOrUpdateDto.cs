@@ -8,6 +8,7 @@ namespace BusinessLogic.DTOs.Application.Notification
         public required string Title { get; set; }
         public required string Message { get; set; }
         public required string DataKey { get; set; }
+        public required string DataValue { get; set; }
         public NotificationAction Action { get; set; }
     }
 }

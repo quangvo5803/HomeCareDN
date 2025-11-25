@@ -13,6 +13,7 @@ namespace DataAccess.Entities.Application
         public Guid? TargetUserId { get; set; }
         public bool IsRead { get; set; } = false;
         public string? DataKey { get; set; }
+        public string? DataValue { get; set; }
         public int PendingCount { get; set; } = 1;
         public NotificationAction Action { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

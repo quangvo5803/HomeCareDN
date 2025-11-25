@@ -257,14 +257,15 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
-            //await _notificationService.NotifyApplyToRequestAsync(new ApplyNotificationDto
-            //{
-            //    TargetUserId = materialRequest.CustomerID,
-            //    Title = "Có nhà phân phối mới đã tham gia vào yêu cầu vật liệu của bạn",
-            //    Message = $"Nhà phân phối đã tham gia vào yêu cầu {materialRequest.MaterialRequestID}",
-            //    DataKey = $"MaterialRequest_{materialRequest.MaterialRequestID}_APPLY",
-            //    Action = NotificationAction.Apply.ToString()
-            //});
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = materialRequest.CustomerID,
+                Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
+                Message = $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
+                DataKey = $"ContractorApplication_{dto.DistributorApplicationID}_APPLY",
+                DataValue = dto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Apply
+            });
             await Task.WhenAll(notifyTasks);
             return dto;
         }

@@ -12,7 +12,9 @@ namespace BusinessLogic.DTOs.Application.Notification
         public Guid? TargetUserId { get; set; }
         public bool IsRead { get; set; }
         public string? DataKey { get; set; }
+        public string? DataValue { get; set; }
         public int PendingCount { get; set; }
+        public required string Action { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
