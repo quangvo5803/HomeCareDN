@@ -99,10 +99,10 @@ export default function NotificationPanel({ notifications = [], loading, user })
 
         if (currentNoti.length > 0) {
             return currentNoti.map((n) => (
-                <div
+                <button
                     key={n.notificationID}
                     onClick={() => handleClickNotification(n)}
-                    className={`p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
+                    className={`w-full text-left p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
                         }`}
                 >
                     <div className="flex items-start gap-3">
@@ -110,18 +110,14 @@ export default function NotificationPanel({ notifications = [], loading, user })
                             <div className="w-2 h-2 mt-2 rounded-full bg-orange-500 flex-shrink-0 shadow-sm shadow-orange-300" />
                         )}
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-gray-800 mb-1">
-                                {n.title}
-                            </h4>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-2">
-                                {n.message}
-                            </p>
+                            <h4 className="text-sm font-semibold text-gray-800 mb-1">{n.title}</h4>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-2">{n.message}</p>
                             <span className="text-xs text-orange-600 font-medium">
                                 {formatDate(n.updatedAt, i18n.language)}
                             </span>
                         </div>
                     </div>
-                </div>
+                </button>
             ));
         }
 
