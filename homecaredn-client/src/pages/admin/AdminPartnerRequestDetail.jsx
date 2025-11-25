@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
 import { handleApiError } from '../../utils/handleApiError';
 import { formatDate } from '../../utils/formatters';
@@ -26,6 +27,112 @@ const InfoRow = ({ label, value, icon }) => (
   </div>
 );
 
+InfoRow.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  icon: PropTypes.string,
+};
+
+const ImageGallery = ({ imageUrls }) => {
+  if (!Array.isArray(imageUrls) || imageUrls.length === 0) return null;
+
+  return (
+    <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+      {imageUrls.map((url) => (
+        <a
+          key={url}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 border-transparent hover:border-orange-400 transition-all shadow-sm group relative"
+        >
+          <img
+            src={url}
+            alt="Evidence"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+            <i className="fas fa-search-plus text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+          </div>
+        </a>
+      ))}
+    </div>
+  );
+};
+
+ImageGallery.propTypes = {
+  imageUrls: PropTypes.arrayOf(PropTypes.string),
+};
+
+const DocumentList = ({ documentUrls, noDocsText }) => {
+  const getDocumentIcon = (url) => {
+    if (!url) return 'fas fa-file text-gray-400';
+    if (url.includes('.pdf')) return 'fas fa-file-pdf text-red-500';
+    if (url.includes('.doc') || url.includes('.docx'))
+      return 'fas fa-file-word text-blue-600';
+    if (url.includes('.txt')) return 'fas fa-file-alt text-gray-500';
+    return 'fas fa-file text-gray-400';
+  };
+
+  if (!Array.isArray(documentUrls) || documentUrls.length === 0) {
+    return (
+      <div className="text-center py-6">
+        <p className="text-xs text-gray-400">{noDocsText}</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {documentUrls.map((url) => (
+        <a
+          key={url}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-blue-300 hover:bg-blue-50 transition-all group"
+        >
+          <div className="w-8 h-8 rounded flex items-center justify-center bg-gray-50 group-hover:bg-white transition-colors shadow-sm">
+            <i className={`${getDocumentIcon(url)} text-lg`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-700 truncate group-hover:text-blue-700 transition-colors">
+              {url.split('/').pop()?.split('?')[0]}
+            </p>
+          </div>
+          <i className="fas fa-external-link-alt text-gray-300 text-xs group-hover:text-blue-400"></i>
+        </a>
+      ))}
+    </>
+  );
+};
+
+DocumentList.propTypes = {
+  documentUrls: PropTypes.arrayOf(PropTypes.string),
+  noDocsText: PropTypes.string,
+};
+
+const NotFoundView = ({ onBack, text }) => (
+  <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400 bg-orange-50/30">
+    <div className="bg-white p-8 rounded-2xl shadow-xl text-center border border-orange-100">
+      <i className="fas fa-search text-6xl mb-4 text-orange-200 animate-pulse"></i>
+      <p className="text-xl font-bold text-gray-700 mb-6">{text}</p>
+      <button
+        onClick={onBack}
+        className="px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium shadow-lg shadow-orange-200"
+      >
+        <i className="fas fa-arrow-left mr-2"></i>
+        Back
+      </button>
+    </div>
+  </div>
+);
+
+NotFoundView.propTypes = {
+  onBack: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+};
+
 export default function AdminPartnerRequestDetail() {
   const { partnerRequestID } = useParams();
   const navigate = useNavigate();
@@ -38,7 +145,6 @@ export default function AdminPartnerRequestDetail() {
   } = usePartnerRequest();
 
   const [activeTab, setActiveTab] = useState('info');
-
   const [reason, setReason] = useState('');
   const [data, setData] = useState();
 
@@ -53,56 +159,41 @@ export default function AdminPartnerRequestDetail() {
 
   const isPending = data?.status === 'Pending';
 
-  const handleSubmit = async (action) => {
+  const handleApprove = async () => {
     try {
-      if (action === 'approve') {
-        await approvePartnerRequest(partnerRequestID);
-        toast.success(t('SUCCESS.APPROVE'));
-        navigate('/Admin/PartnerRequestManager');
-      } else if (action === 'reject') {
-        if (!reason.trim()) {
-          toast.error(t('ERROR.REQUIRD_REJECT_REASON'));
-          return;
-        }
-        await rejectPartnerRequest({
-          PartnerRequestID: partnerRequestID,
-          RejectionReason: reason.trim(),
-        });
-        toast.success(t('SUCCESS.REJECT'));
-        navigate('/Admin/PartnerRequestManager');
-      }
+      await approvePartnerRequest(partnerRequestID);
+      toast.success(t('SUCCESS.APPROVE'));
+      navigate('/admin/PartnerRequestManager');
     } catch (err) {
       toast.error(handleApiError(err));
     }
   };
 
-  const getDocumentIcon = (url) => {
-    if (!url) return 'fas fa-file text-gray-400';
-    if (url.includes('.pdf')) return 'fas fa-file-pdf text-red-500';
-    if (url.includes('.doc') || url.includes('.docx'))
-      return 'fas fa-file-word text-blue-600';
-    if (url.includes('.txt')) return 'fas fa-file-alt text-gray-500';
-    return 'fas fa-file text-gray-400';
+  const handleReject = async () => {
+    try {
+      if (!reason.trim()) {
+        toast.error(t('ERROR.REQUIRD_REJECT_REASON'));
+        return;
+      }
+      await rejectPartnerRequest({
+        PartnerRequestID: partnerRequestID,
+        RejectionReason: reason.trim(),
+      });
+      toast.success(t('SUCCESS.REJECT'));
+      navigate('/admin/PartnerRequestManager');
+    } catch (err) {
+      toast.error(handleApiError(err));
+    }
   };
 
   if (loading) return <LoadingComponent />;
 
   if (!data)
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400 bg-orange-50/30">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center border border-orange-100">
-          <i className="fas fa-search text-6xl mb-4 text-orange-200 animate-pulse"></i>
-          <p className="text-xl font-bold text-gray-700 mb-6">
-            {t('common.notFound')}
-          </p>
-          <button
-            onClick={() => navigate('/admin/partner-requests')}
-            className="px-6 py-2.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium shadow-lg shadow-orange-200"
-          >
-            {t('BUTTON.Back')}
-          </button>
-        </div>
-      </div>
+      <NotFoundView
+        onBack={() => navigate('/admin/PartnerRequestManager')}
+        text={t('common.notFound')}
+      />
     );
 
   return (
@@ -183,8 +274,9 @@ export default function AdminPartnerRequestDetail() {
                   {/* Header Gradient Cam */}
                   <div className="px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 flex items-center justify-between">
                     <h2 className="font-bold text-white text-lg flex items-center gap-2">
+                      {/* Ambiguous spacing */}
                       <i className="fas fa-info-circle opacity-90"></i>
-                      Chi tiết hồ sơ
+                      {t('partnerRequest.partnerRegistration.profileDetail')}
                     </h2>
                     <span className="px-3 py-1 bg-white text-orange-600 font-bold text-xs rounded-full shadow-sm">
                       {t(`Enums.PartnerType.${data.partnerRequestType}`)}
@@ -243,26 +335,8 @@ export default function AdminPartnerRequestDetail() {
                               'adminPartnerManager.partnerRequestModal.images'
                             )}
                           </h3>
-                          <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
-                            {data.imageUrls.map((url, i) => (
-                              <a
-                                key={i}
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border-2 border-transparent hover:border-orange-400 transition-all shadow-sm group relative"
-                              >
-                                <img
-                                  src={url}
-                                  alt={`Evidence ${i}`}
-                                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                  <i className="fas fa-search-plus text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </div>
-                              </a>
-                            ))}
-                          </div>
+                          {/* Use extracted component */}
+                          <ImageGallery imageUrls={data.imageUrls} />
                         </div>
                       )}
                   </div>
@@ -277,7 +351,9 @@ export default function AdminPartnerRequestDetail() {
                       <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center border border-blue-200">
                         <i className="fas fa-file-contract text-sm"></i>
                       </span>
-                      Hợp đồng điện tử
+                      {t(
+                        'partnerRequest.partnerRegistration.electronicContract'
+                      )}
                     </h2>
 
                     <div
@@ -292,6 +368,7 @@ export default function AdminPartnerRequestDetail() {
                           data.isContractSigned ? 'fa-check-circle' : 'fa-clock'
                         }`}
                       ></i>
+                      {/* Ambiguous spacing handled by block or explicit string concat */}
                       {data.isContractSigned
                         ? t('partnerRequest.partnerRegistration.step3.signed')
                         : t(
@@ -461,7 +538,7 @@ export default function AdminPartnerRequestDetail() {
                     <div className="w-6 h-6 rounded bg-orange-200 text-orange-700 flex items-center justify-center text-xs">
                       <i className="fas fa-gavel"></i>
                     </div>
-                    Review Decision
+                    {t('partnerRequest.partnerRegistration.reviewDecision')}
                   </h3>
                 </div>
 
@@ -493,14 +570,14 @@ export default function AdminPartnerRequestDetail() {
                   {isPending && (
                     <div className="grid grid-cols-2 gap-3 mt-5">
                       <button
-                        onClick={() => handleSubmit('reject')}
+                        onClick={handleReject}
                         className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-sm text-red-600 bg-red-50 hover:bg-red-100 hover:shadow-sm transition-all border border-transparent hover:border-red-200"
                       >
                         <i className="fas fa-times"></i>
                         {t('BUTTON.Reject')}
                       </button>
                       <button
-                        onClick={() => handleSubmit('approve')}
+                        onClick={handleApprove}
                         className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-orange-200"
                       >
                         <i className="fas fa-check"></i>
@@ -519,60 +596,22 @@ export default function AdminPartnerRequestDetail() {
                   <i className="fas fa-folder-open text-orange-500"></i>
                   {t('adminPartnerManager.partnerRequestModal.documents')}
                 </h3>
+                {/* Ambiguous spacing */}
                 <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
                   {data.documentUrls?.length || 0}
                 </span>
               </div>
 
               <div className="p-4 space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar">
-                {Array.isArray(data.documentUrls) &&
-                data.documentUrls.length > 0 ? (
-                  data.documentUrls.map((url, i) => (
-                    <a
-                      key={i}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:border-blue-300 hover:bg-blue-50 transition-all group"
-                    >
-                      <div className="w-8 h-8 rounded flex items-center justify-center bg-gray-50 group-hover:bg-white transition-colors shadow-sm">
-                        <i className={`${getDocumentIcon(url)} text-lg`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-700 truncate group-hover:text-blue-700 transition-colors">
-                          {url.split('/').pop()?.split('?')[0]}
-                        </p>
-                      </div>
-                      <i className="fas fa-external-link-alt text-gray-300 text-xs group-hover:text-blue-400"></i>
-                    </a>
-                  ))
-                ) : (
-                  <div className="text-center py-6">
-                    <p className="text-xs text-gray-400">
-                      {t('adminPartnerManager.partnerRequestModal.noDocuments')}
-                    </p>
-                  </div>
-                )}
+                {/* Use Extracted Component */}
+                <DocumentList
+                  documentUrls={data.documentUrls}
+                  noDocsText={t(
+                    'adminPartnerManager.partnerRequestModal.noDocuments'
+                  )}
+                />
               </div>
             </div>
-
-            {/* 3. Signature Preview */}
-            {data.signatureUrl && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                <h3 className="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2">
-                  <i className="fas fa-signature text-blue-500"></i>
-                  {t('adminPartnerManager.signaturePreview')}
-                </h3>
-                <div className="bg-slate-50 rounded-lg p-3 border border-dashed border-gray-300 flex justify-center hover:bg-white transition-colors">
-                  <img
-                    src={data.signatureUrl}
-                    alt="Signature"
-                    className="h-12 object-contain opacity-80"
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

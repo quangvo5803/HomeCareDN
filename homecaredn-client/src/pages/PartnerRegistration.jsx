@@ -458,7 +458,7 @@ export default function PartnerRegistration() {
                   htmlFor="companyName"
                   className="absolute left-4 top-3 text-gray-500 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600 peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:bg-white peer-not-placeholder-shown:px-1"
                 >
-                  {t('partnerRequest.partnerRegistration.form_companyName')}{' '}
+                  {t('partnerRequest.partnerRegistration.form_companyName')}
                   <span className="text-red-500">*</span>
                 </label>
               </div>
@@ -477,7 +477,7 @@ export default function PartnerRegistration() {
                     htmlFor="email"
                     className="absolute left-4 top-3 text-gray-500 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600 peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:bg-white peer-not-placeholder-shown:px-1"
                   >
-                    {t('partnerRequest.partnerRegistration.form_email')}{' '}
+                    {t('partnerRequest.partnerRegistration.form_email')}
                     <span className="text-red-500">*</span>
                   </label>
                 </div>
@@ -495,7 +495,7 @@ export default function PartnerRegistration() {
                     htmlFor="phoneNumber"
                     className="absolute left-4 top-3 text-gray-500 transition-all duration-200 pointer-events-none peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2 peer-focus:text-xs peer-focus:bg-white peer-focus:px-1 peer-focus:text-blue-600 peer-not-placeholder-shown:-top-2 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:bg-white peer-not-placeholder-shown:px-1"
                   >
-                    {t('partnerRequest.partnerRegistration.form_phoneNumber')}{' '}
+                    {t('partnerRequest.partnerRegistration.form_phoneNumber')}
                     <span className="text-red-500">*</span>
                   </label>
                 </div>
@@ -523,7 +523,7 @@ export default function PartnerRegistration() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center text-sm font-medium text-gray-700">
-                    <i className="fas fa-images text-orange-500 mr-2"></i>{' '}
+                    <i className="fas fa-images text-orange-500 mr-2"></i>
                     {t('partnerRequest.partnerRegistration.form_images')}
                   </label>
                   <span className="text-xs text-gray-500">
@@ -546,7 +546,7 @@ export default function PartnerRegistration() {
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-orange-600">
                           {t('upload.clickToUploadImage')}
-                        </span>{' '}
+                        </span>
                         {t('upload.orDragAndDrop')}
                       </p>
                     </div>
@@ -583,7 +583,7 @@ export default function PartnerRegistration() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="flex items-center text-sm font-medium text-gray-700">
-                    <i className="fas fa-file-alt text-blue-500 mr-2"></i>{' '}
+                    <i className="fas fa-file-alt text-blue-500 mr-2"></i>
                     {t('partnerRequest.partnerRegistration.form_documents')}
                   </label>
                   <span className="text-xs text-gray-500">
@@ -606,7 +606,7 @@ export default function PartnerRegistration() {
                       <p className="text-gray-600 text-center mb-2">
                         <span className="font-semibold text-blue-600">
                           {t('upload.clickToUploadDocument')}
-                        </span>{' '}
+                        </span>
                         {t('upload.orDragAndDrop')}
                       </p>
                     </div>
@@ -655,7 +655,7 @@ export default function PartnerRegistration() {
                   type="submit"
                   className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                 >
-                  {t('BUTTON.Continue')} &nbsp;{' '}
+                  {t('BUTTON.Continue')} &nbsp;
                   <i className="fas fa-arrow-right" />
                 </button>
               </div>
@@ -667,7 +667,7 @@ export default function PartnerRegistration() {
             <div className="space-y-6 text-center py-4">
               <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <p className="text-gray-700">
-                  {t('partnerRequest.partnerRegistration.step2.otpSent')}{' '}
+                  {t('partnerRequest.partnerRegistration.step2.otpSent')}
                   <strong>{email}</strong>
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
@@ -683,7 +683,7 @@ export default function PartnerRegistration() {
                   maxLength={6}
                   value={otpCode}
                   onChange={(e) =>
-                    setOtpCode(e.target.value.replace(/[^0-9]/g, ''))
+                    setOtpCode(e.target.value.replaceAll(/\D/g, ''))
                   }
                   className="block w-full text-center text-3xl tracking-[0.5em] font-bold text-blue-600 border-2 border-gray-300 rounded-lg p-4 focus:ring-blue-500 focus:border-blue-500"
                   placeholder={t(
@@ -697,7 +697,7 @@ export default function PartnerRegistration() {
                   onClick={() => setCurrentStep(1)}
                   className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-50"
                 >
-                  <i className="fas fa-arrow-left mr-2" />{' '}
+                  <i className="fas fa-arrow-left mr-2" />
                   {t('partnerRequest.partnerRegistration.step2.backButton')}
                 </button>
                 <button
@@ -705,7 +705,7 @@ export default function PartnerRegistration() {
                   disabled={otpCode.length < 6}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-200 disabled:opacity-50"
                 >
-                  {t('partnerRequest.partnerRegistration.step2.verifyButton')}{' '}
+                  {t('partnerRequest.partnerRegistration.step2.verifyButton')}
                   <i className="fas fa-check ml-2" />
                 </button>
               </div>
@@ -765,8 +765,8 @@ export default function PartnerRegistration() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <i className="fas fa-pen-nib mr-1 text-blue-600"></i>{' '}
-                  {t('partnerRequest.partnerRegistration.step3.signatureLabel')}{' '}
+                  <i className="fas fa-pen-nib mr-1 text-blue-600"></i>
+                  {t('partnerRequest.partnerRegistration.step3.signatureLabel')}
                   <span className="text-red-500">*</span>
                 </label>
                 <div
@@ -776,6 +776,7 @@ export default function PartnerRegistration() {
                   <SignatureCanvas
                     ref={sigCanvas}
                     penColor="black"
+                    velocityFilterWeight={0.7}
                     canvasProps={{
                       className: 'w-full h-full cursor-crosshair',
                     }}
@@ -785,7 +786,7 @@ export default function PartnerRegistration() {
                     onClick={clearSignature}
                     className="absolute top-2 right-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-gray-700"
                   >
-                    <i className="fas fa-eraser"></i>{' '}
+                    <i className="fas fa-eraser"></i>
                     {t(
                       'partnerRequest.partnerRegistration.step3.signatureClear'
                     )}
@@ -812,7 +813,7 @@ export default function PartnerRegistration() {
                   {!isCanvasReady && (
                     <i className="fas fa-spinner fa-spin mr-2" />
                   )}
-                  <i className="fas fa-file-signature mr-2" />{' '}
+                  <i className="fas fa-file-signature mr-2" />
                   {t('partnerRequest.partnerRegistration.step3.submitButton')}
                 </button>
               </div>
