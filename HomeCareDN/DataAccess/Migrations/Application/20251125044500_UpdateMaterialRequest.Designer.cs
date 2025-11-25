@@ -4,6 +4,7 @@ using DataAccess.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251125044500_UpdateMaterialRequest")]
+    partial class UpdateMaterialRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -535,9 +538,6 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<bool>("IsContractSigned")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PartnerRequestType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -550,12 +550,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("SignatureUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("SignedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -660,9 +654,7 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("ReviewID");
 
-                    b.HasIndex("MaterialRequestID")
-                        .IsUnique()
-                        .HasFilter("[MaterialRequestID] IS NOT NULL");
+                    b.HasIndex("MaterialRequestID");
 
                     b.HasIndex("ServiceRequestID")
                         .IsUnique()
@@ -970,8 +962,8 @@ namespace DataAccess.Migrations.Application
             modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.MaterialRequest", "MaterialRequest")
-                        .WithOne("Review")
-                        .HasForeignKey("DataAccess.Entities.Application.Review", "MaterialRequestID");
+                        .WithMany()
+                        .HasForeignKey("MaterialRequestID");
 
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
                         .WithOne("Review")
@@ -1038,8 +1030,6 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("DistributorApplications");
 
                     b.Navigation("MaterialRequestItems");
-
-                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
