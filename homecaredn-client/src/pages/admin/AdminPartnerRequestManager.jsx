@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ Thêm import
+import { useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { usePartnerRequest } from '../../hook/usePartnerRequest';
@@ -259,7 +259,6 @@ export default function AdminPartnerRequestManager() {
                           </td>
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
-                              {/* ✅ Thay đổi onClick handler */}
                               <button
                                 className="inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onClick={() =>
@@ -364,7 +363,6 @@ export default function AdminPartnerRequestManager() {
                       </div>
 
                       <div className="flex space-x-2">
-                        {/* ✅ Thay đổi onClick handler mobile */}
                         <button
                           className="flex-1 px-3 py-2 text-xs font-medium border rounded-md border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                           onClick={() =>

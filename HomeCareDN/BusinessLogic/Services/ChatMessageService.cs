@@ -243,6 +243,11 @@ namespace BusinessLogic.Services
             {
                 return conversation.CustomerID == senderId || conversation.ContractorID == senderId;
             }
+            else if (conversation.ConversationType == ConversationType.MaterialRequest)
+            {
+                return conversation.CustomerID == senderId
+                    || conversation.DistributorID == senderId;
+            }
             else if (conversation.ConversationType == ConversationType.AdminSupport)
             {
                 return conversation.UserID == senderId || conversation.AdminID == senderId;
