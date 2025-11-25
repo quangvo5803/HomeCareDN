@@ -24,6 +24,12 @@ namespace BusinessLogic.Services.Interfaces
         Task<DistributorApplicationDto> CreateDistributorApplicationAsync(
             DistributorCreateApplicationDto createRequest
         );
+        Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
+            DistributorApplicationAcceptRequestDto dto
+        );
+        Task<DistributorApplicationDto> RejectDistributorApplicationAsync(
+            Guid contractorApplicationID
+        );
         Task DeleteDistributorApplicationAsync(Guid id);
     }
 }

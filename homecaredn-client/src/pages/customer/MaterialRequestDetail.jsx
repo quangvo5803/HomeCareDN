@@ -16,6 +16,8 @@ import LoadingComponent from '../../components/LoadingComponent';
 import MaterialRequestModal from '../../components/modal/MaterialRequestModal';
 import Swal from 'sweetalert2';
 import useRealtime from '../../realtime/useRealtime';
+import { withMinLoading } from '../../utils/withMinLoading';
+
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
   const { materialRequestId } = useParams();
@@ -23,7 +25,6 @@ export default function MaterialRequestDetail() {
   const { addresses } = useUser();
 
   const [description, setDescription] = useState('');
-  const [canEditQuantity, setCanEditQuantity] = useState(false);
   const [canAddMaterial, setCanAddMaterial] = useState(false);
   const [items, setItems] = useState([]);
   const [addressID, setAddressID] = useState('');
@@ -34,6 +35,7 @@ export default function MaterialRequestDetail() {
     getMaterialRequestById,
     updateMaterialRequest,
   } = useMaterialRequest();
+
   const [materialRequest, setMaterialRequest] = useState(null);
   const [open, setOpen] = useState(false);
   const [originalItems, setOriginalItems] = useState([]);
@@ -44,6 +46,7 @@ export default function MaterialRequestDetail() {
   const [distributorApplications, setDistributorApplications] = useState([]);
   const [currentApplicationPage, setCurrentApplicationPage] = useState(1);
   const [loadingApplications, setLoadingApplications] = useState(false);
+  const [acceptingItems, setAcceptingItems] = useState(new Set());
   const pageSize = 5;
   const [totalCount, setTotalCount] = useState(0);
 
@@ -74,6 +77,27 @@ export default function MaterialRequestDetail() {
         });
         setTotalCount((prev) => prev + 1);
       }
+    },
+    [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? {
+                ...mr,
+                status: 'Closed',
+              }
+            : mr
+        )
+      );
+      setMaterialRequest((prev) => {
+        if (materialRequestId == payload.materialRequestID) {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            status: 'Closed',
+          };
+        }
+      });
     },
     [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
       setMaterialRequests((prev) =>
@@ -108,7 +132,6 @@ export default function MaterialRequestDetail() {
           setMaterialRequest(data);
           setDescription(data.description || '');
           setCanAddMaterial(data.canAddMaterial || false);
-          setCanEditQuantity(data.canEditQuantity || false);
           setAddressID(data.addressID || '');
           setItems(data.materialRequestItems || []);
           setOriginalItems(data.materialRequestItems || []);
@@ -118,23 +141,22 @@ export default function MaterialRequestDetail() {
   }, [getMaterialRequestById, materialRequestId]);
 
   const fetchDistributors = useCallback(async () => {
-    try {
-      setLoadingApplications(true);
-      const rs =
-        await distributorApplicationService.getAllByMaterialRequestIdForCustomer(
-          {
-            PageNumber: currentApplicationPage,
-            PageSize: pageSize,
-            FilterID: materialRequestId,
-          }
-        );
-      setDistributorApplications(rs.items);
-      setTotalCount(rs.totalCount);
-    } catch (err) {
-      toast.error(t(handleApiError(err)));
-    } finally {
-      setLoadingApplications(false);
-    }
+    await withMinLoading(async () => {
+      try {
+        const rs =
+          await distributorApplicationService.getAllByMaterialRequestIdForCustomer(
+            {
+              PageNumber: currentApplicationPage,
+              PageSize: pageSize,
+              FilterID: materialRequestId,
+            }
+          );
+        setDistributorApplications(rs.items);
+        setTotalCount(rs.totalCount);
+      } catch (err) {
+        toast.error(t(handleApiError(err)));
+      }
+    }, setLoadingApplications);
   }, [t, materialRequestId, pageSize, currentApplicationPage]);
 
   useEffect(() => {
@@ -148,25 +170,24 @@ export default function MaterialRequestDetail() {
           da.distributorApplicationID
         );
       setSelectedDistributor(detailDistributor);
+      setAcceptingItems(new Set());
     } catch (err) {
       toast.error(t(handleApiError(err)));
     }
   };
+
   // ===== Kiểm tra thay đổi =====
   const hasItemChanges =
     JSON.stringify(items) !== JSON.stringify(originalItems);
   const hasDescriptionChanges =
     description !== (materialRequest?.description || '');
   const hasAddressChanges = addressID !== (materialRequest?.addressID || '');
-  const hasCanEditQuantityChanges =
-    canEditQuantity !== materialRequest?.canEditQuantity;
   const hasCanAddMaterialChanges =
     canAddMaterial !== materialRequest?.canAddMaterial;
   const hasAnyChanges =
     hasItemChanges ||
     hasDescriptionChanges ||
     hasAddressChanges ||
-    hasCanEditQuantityChanges ||
     hasCanAddMaterialChanges;
 
   const canShowSaveCancel = hasAnyChanges;
@@ -241,7 +262,6 @@ export default function MaterialRequestDetail() {
     const dto = {
       materialRequestID: materialRequestId,
       description: description,
-      canEditQuantity: canEditQuantity,
       canAddMaterial: canAddMaterial,
       isSubmit: isSubmit,
       addItems: addItems.map((a) => ({
@@ -280,7 +300,6 @@ export default function MaterialRequestDetail() {
           setItems(originalItems);
           setDescription(materialRequest?.description || '');
           setAddressID(materialRequest?.addressID || '');
-          setCanEditQuantity(materialRequest?.canEditQuantity || false);
           setCanAddMaterial(materialRequest?.canAddMaterial || false);
           Swal.close();
         } catch {
@@ -289,6 +308,95 @@ export default function MaterialRequestDetail() {
       }
     });
   };
+
+  const handleToggleExtraItem = (materialID) => {
+    setAcceptingItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(materialID)) {
+        newSet.delete(materialID);
+      } else {
+        newSet.add(materialID);
+      }
+      return newSet;
+    });
+  };
+
+  const handleAccept = async () => {
+    if (!selectedDistributor) return;
+
+    Swal.fire({
+      title: t('BUTTON.Accept'),
+      text: t('userPage.materialRequestDetail.confirmAccept'),
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#22c55e',
+      cancelButtonColor: '#ef4444',
+      confirmButtonText: t('BUTTON.Accept'),
+      cancelButtonText: t('BUTTON.Cancel'),
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const acceptedExtraItemIDs = Array.from(acceptingItems);
+          const approved = await distributorApplicationService.accept({
+            DistributorApplicationID:
+              selectedDistributor.distributorApplicationID,
+            AcceptedExtraItemIDs:
+              acceptedExtraItemIDs.length > 0 ? acceptedExtraItemIDs : null,
+          });
+          setSelectedDistributor(approved);
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+              selectedDistributor.distributorApplicationID
+                ? approved
+                : c
+            )
+          );
+          setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.ACCEPT_APPLICATION'));
+        } catch (err) {
+          toast.error(t(handleApiError(err)));
+        }
+      }
+    });
+  };
+
+  const handleReject = async () => {
+    if (!selectedDistributor) return;
+
+    Swal.fire({
+      title: t('BUTTON.Reject'),
+      text: t('userPage.materialRequestDetail.confirmReject'),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: t('BUTTON.Reject'),
+      cancelButtonText: t('BUTTON.Cancel'),
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const rejected = await distributorApplicationService.reject(
+            selectedDistributor.distributorApplicationID
+          );
+          setDistributorApplications((prev) =>
+            prev.map((c) =>
+              c.distributorApplicationID ===
+              selectedDistributor.distributorApplicationID
+                ? rejected
+                : c
+            )
+          );
+          setSelectedDistributor(rejected);
+          setAcceptingItems(new Set());
+          toast.success(t('SUCCESS.REJECT_APPLICATION'));
+        } catch (err) {
+          toast.error(t(handleApiError(err)));
+        }
+      }
+    });
+  };
+
   //Check materialID
   const customerMaterialIDs = new Set(items.map((item) => item.materialID));
 
@@ -350,18 +458,11 @@ export default function MaterialRequestDetail() {
     );
   };
 
-  const renderQuantityIcon = () => {
-    return canEditQuantity
-      ? 'check-circle text-green-500'
-      : 'circle text-gray-300';
-  };
-
   const renderAddMaterialIcon = () => {
     return canAddMaterial
       ? 'check-circle text-green-500'
       : 'circle text-gray-300';
   };
-
   const renderEmptyMaterialList = () => (
     <div className="text-center py-16">
       <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -464,7 +565,7 @@ export default function MaterialRequestDetail() {
               )}
               {displayBrand && (
                 <div className="flex items-center text-xs text-slate-600">
-                  <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                  <i className="fas fa-star text-slate-400 mr-2 w-4"></i>
                   <span className="truncate font-medium">{displayBrand}</span>
                 </div>
               )}
@@ -483,7 +584,7 @@ export default function MaterialRequestDetail() {
                     );
                   }
                 }}
-                className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-8 h-6 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={item.quantity <= 1 || !canEdit}
               >
                 <i className="fas fa-minus text-xs"></i>
@@ -509,7 +610,7 @@ export default function MaterialRequestDetail() {
                     item.quantity + 1
                   )
                 }
-                className="w-5 h-5 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white rounded-lg transition font-bold text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-8 h-6 flex items-center justify-center bg-slate-100 hover:bg-orange-500 hover:text-white transition font-bold text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
                 disabled={!canEdit}
               >
                 <i className="fas fa-plus text-xs"></i>
@@ -714,10 +815,9 @@ export default function MaterialRequestDetail() {
     </>
   );
 
-  //Right Column - Applications
   const renderHeader = () => (
-    <div className="hidden lg:grid lg:grid-cols-23 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
-      <div>#</div>
+    <div className="hidden lg:grid lg:grid-cols-24 gap-4 px-6 py-3 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-semibold text-xs text-slate-700 text-center">
+      <div className="col-span-2">#</div>
       <div className="col-span-3">
         {t('userPage.materialRequestDetail.image')}
       </div>
@@ -739,7 +839,7 @@ export default function MaterialRequestDetail() {
     </div>
   );
 
-  const renderMaterialRow = (item, index) => {
+  const renderMaterialRow = (item, index, isExtra = false) => {
     const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
 
     const displayName =
@@ -758,14 +858,36 @@ export default function MaterialRequestDetail() {
     const displayUnit =
       i18n.language === 'vi' ? item.unit : item.unitEN || item.unit;
 
+    const isChecked = acceptingItems.has(item.materialID);
+
     return (
-      <div className="border border-slate-200 rounded-xl p-5 hover:border-orange-400 hover:shadow-md transition-all bg-white group">
+      <div
+        key={item.materialID}
+        className={`border-2 rounded-xl p-5 transition-all bg-white group ${
+          isExtra
+            ? isChecked
+              ? 'border-green-300 bg-green-50'
+              : 'border-slate-200 hover:border-orange-400'
+            : 'border-slate-200 hover:border-orange-400'
+        } hover:shadow-md`}
+      >
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
-          {/* STT */}
+          {/* Checkbox or STT */}
           <div className="col-span-2 flex justify-center">
-            <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">{index + 1}</span>
-            </div>
+            {isExtra ? (
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => handleToggleExtraItem(item.materialID)}
+                className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
+              />
+            ) : (
+              <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-xs">
+                  {index + 1}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Image */}
@@ -778,7 +900,7 @@ export default function MaterialRequestDetail() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="flex items-start justify-start h-full text-slate-300 text-3xl">
+                <div className="flex items-center justify-center h-full text-slate-300 text-3xl">
                   <i className="fas fa-image"></i>
                 </div>
               )}
@@ -791,7 +913,7 @@ export default function MaterialRequestDetail() {
               {displayName}
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {displayCategory && (
                 <div className="flex items-center text-xs text-slate-600">
                   <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
@@ -801,7 +923,7 @@ export default function MaterialRequestDetail() {
 
               {displayBrand && (
                 <div className="flex items-center text-xs text-slate-600">
-                  <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                  <i className="fas fa-star text-slate-400 mr-2 w-4"></i>
                   <span className="truncate">{displayBrand}</span>
                 </div>
               )}
@@ -836,14 +958,89 @@ export default function MaterialRequestDetail() {
             </div>
           </div>
         </div>
+
+        {/* Mobile Layout */}
+        <div className="lg:hidden space-y-4">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            {isExtra && (
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => handleToggleExtraItem(item.materialID)}
+                className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer flex-shrink-0 mt-1"
+              />
+            )}
+            <div className="flex-1">
+              <h4 className="font-bold text-slate-900 line-clamp-2 text-sm">
+                {displayName}
+              </h4>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <div className="w-24 h-24 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={displayName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-300 text-2xl">
+                  <i className="fas fa-image"></i>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 space-y-2">
+              {displayCategory && (
+                <div className="flex items-center text-xs text-slate-600">
+                  <i className="fas fa-tag text-slate-400 mr-2"></i>
+                  <span className="truncate">{displayCategory}</span>
+                </div>
+              )}
+              {displayBrand && (
+                <div className="flex items-center text-xs text-slate-600">
+                  <i className="fas fa-star text-yellow-500 mr-2"></i>
+                  <span className="truncate">{displayBrand}</span>
+                </div>
+              )}
+              <div className="pt-2 space-y-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-slate-600">
+                    {t('userPage.materialRequestDetail.quantity')}:
+                  </span>
+                  <span className="font-bold text-slate-900">
+                    {item.quantity}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-600">
+                    {t('distributorMaterialRequestDetail.price')}:
+                  </span>
+                  <span className="font-bold text-slate-900">
+                    {formatVND(item.price)}
+                  </span>
+                </div>
+                <div className="flex justify-between border-t pt-1">
+                  <span className="text-slate-600 font-semibold">
+                    {t('distributorMaterialRequestDetail.totalPrice')}:
+                  </span>
+                  <span className="font-bold text-orange-600">
+                    {formatVND(item.price * item.quantity)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
-
   const renderAppliedDetail = () => {
     return (
       <div>
-        {/* Back */}
+        {/* Back Button */}
         <button
           onClick={() => setSelectedDistributor(null)}
           className="flex items-center gap-2 text-slate-600 hover:text-orange-600 mb-6 transition-colors font-semibold cursor-pointer"
@@ -852,18 +1049,20 @@ export default function MaterialRequestDetail() {
           <span>{t('BUTTON.Back')}</span>
         </button>
 
-        {/* Header */}
+        {/* Header with Status */}
         <div className="flex items-center gap-6 mb-6">
           <div className="w-[88px] h-[88px] rounded-full flex items-center justify-center bg-[#FB8C00] text-white text-[36px] font-bold shadow-md">
-            {selectedDistributor.distributorName?.charAt(0)?.toUpperCase()}
+            {selectedDistributor.distributorApplicationID
+              .substring(0, 8)
+              ?.charAt(0)
+              ?.toUpperCase()}
           </div>
 
           <div className="flex flex-col flex-1">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900">
-                {selectedDistributor.distributorName}
+                {selectedDistributor.distributorApplicationID.substring(0, 8)}
               </h2>
-
               <StatusBadge
                 status={selectedDistributor.status}
                 type="Application"
@@ -912,33 +1111,46 @@ export default function MaterialRequestDetail() {
           )}
         </div>
 
-        {/* Material existing */}
-        <h2 className="font-bold text-lg mb-3 text-black">
+        {/* Material Requested */}
+        <h2 className="font-bold text-lg mb-4 text-slate-900">
           <i className="fas fa-layer-group mr-3 text-orange-600"></i>
           {t('userPage.materialRequestDetail.customerRequestedMaterials')}
         </h2>
 
-        {/* Header */}
         {renderHeader()}
-        {existingMaterial.map((item, index) => (
-          <div key={item.materialID}>{renderMaterialRow(item, index)}</div>
-        ))}
+        <div className="space-y-4 mb-8">
+          {existingMaterial.map((item, index) =>
+            renderMaterialRow(item, index, false)
+          )}
+        </div>
 
-        {canAddMaterial && (
+        {/* Material Additional */}
+        {canAddMaterial && extraMaterial && extraMaterial.length > 0 && (
           <>
-            {/* Material bổ sung */}
-            <h2 className="font-bold text-lg mb-3 mt-4 text-black">
-              <i className="fas fa-plus-circle mr-3 text-orange-500"></i>
-              {t('userPage.materialRequestDetail.additionalMaterials')}
-            </h2>
+            <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-slate-200">
+              <h2 className="font-bold text-lg text-slate-900">
+                <i className="fas fa-plus-circle mr-3 text-green-600"></i>
+                {t('userPage.materialRequestDetail.additionalMaterials')}
+              </h2>
+              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                {acceptingItems.size}/{extraMaterial.length}
+              </span>
+            </div>
 
-            {/* Header */}
             {renderHeader()}
+            <div className="space-y-4 mb-8">
+              {extraMaterial.map((item, index) =>
+                renderMaterialRow(item, index, true)
+              )}
+            </div>
 
-            {/* List extra items */}
-            {extraMaterial.map((item, index) => (
-              <div key={item.materialID}>{renderMaterialRow(item, index)}</div>
-            ))}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+              <p className="text-sm text-green-700">
+                <i className="fas fa-info-circle mr-2"></i>
+                {t('userPage.materialRequestDetail.selectExtraMaterialsNote') ||
+                  'Chọn vật liệu bổ sung mà bạn muốn nhận từ nhà cung cấp này'}
+              </p>
+            </div>
           </>
         )}
 
@@ -958,7 +1170,7 @@ export default function MaterialRequestDetail() {
           </div>
         )}
 
-        {/* Contact */}
+        {/* Contact Info - Show only when Approved */}
         {selectedDistributor.status === 'Approved' && (
           <div className="mb-6">
             <h4 className="text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
@@ -986,18 +1198,43 @@ export default function MaterialRequestDetail() {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="grid grid-cols-2 gap-3 mt-6">
-          <button className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer">
-            <i className="fas fa-check mr-2"></i>
-            {t('BUTTON.Accept')}
-          </button>
+        {/* Action Buttons */}
+        {selectedDistributor.status == 'Pending' && (
+          <div className="grid grid-cols-2 gap-3 mt-6">
+            <button
+              onClick={handleAccept}
+              className="px-4 py-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer flex items-center justify-center gap-2"
+            >
+              <i className="fas fa-check mr-1"></i>
+              {t('BUTTON.Accept')}
+            </button>
 
-          <button className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border border-red-300 cursor-pointer">
-            <i className="fas fa-times mr-2"></i>
-            {t('BUTTON.Reject')}
-          </button>
-        </div>
+            <button
+              onClick={handleReject}
+              className="px-4 py-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition font-bold border border-red-300 cursor-pointer flex items-center justify-center gap-2"
+            >
+              <i className="fas fa-times mr-1"></i>
+              {t('BUTTON.Reject')}
+            </button>
+          </div>
+        )}
+
+        {selectedDistributor.status === 'Rejected' && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+            <p className="text-red-700 font-semibold">
+              <i className="fas fa-times-circle mr-2"></i>
+              {t('userPage.materialRequestDetail.alreadyRejected')}
+            </p>
+          </div>
+        )}
+        {selectedDistributor.status === 'PendingCommission' && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+            <p className="text-green-700 font-semibold">
+              <i className="fas fa-check-circle mr-2"></i>
+              {t('userPage.materialRequestDetail.waiting')}
+            </p>
+          </div>
+        )}
       </div>
     );
   };
@@ -1005,7 +1242,7 @@ export default function MaterialRequestDetail() {
   const renderAppliedList = () => {
     return (
       <div>
-        {/* Application List View */}
+        {/* Title */}
         <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-slate-200">
           <h3 className="text-2xl font-bold text-slate-900">
             <i className="fas fa-store text-orange-600 mr-2"></i>
@@ -1013,10 +1250,11 @@ export default function MaterialRequestDetail() {
           </h3>
 
           <span className="bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-bold">
-            {totalCount}
+            {loadingApplications ? 0 : totalCount}
           </span>
         </div>
 
+        {/* Empty State */}
         {distributorApplications.length === 0 ? (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1046,13 +1284,16 @@ export default function MaterialRequestDetail() {
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-                        {app.distributorName?.charAt(0)?.toUpperCase()}
+                        {app.distributorApplicationID
+                          .substring(0, 8)
+                          ?.charAt(0)
+                          ?.toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        {/* Row: Name + Status */}
+                        {/* Status Row */}
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-lg text-slate-900 group-hover:text-orange-600 transition truncate">
-                            {app.distributorName}
+                            {app.distributorApplicationID.substring(0, 8)}
                           </h4>
 
                           <StatusBadge status={app.status} type="Application" />
@@ -1078,13 +1319,6 @@ export default function MaterialRequestDetail() {
                       </div>
                     </div>
 
-                    <p
-                      className="text-sm text-slate-600 mb-4 line-clamp-2 leading-relaxed bg-slate-50 p-3 rounded-lg"
-                      dangerouslySetInnerHTML={{
-                        __html: he.decode(app.message),
-                      }}
-                    ></p>
-
                     <div className="flex items-center justify-between pt-4 border-t-2 border-slate-200">
                       <span className="text-xs text-slate-500 tracking-widest uppercase font-bold">
                         {t('userPage.materialRequestDetail.totalPrice')}
@@ -1107,7 +1341,7 @@ export default function MaterialRequestDetail() {
               </>
             )}
 
-            {totalCount > 0 && (
+            {!loadingApplications && totalCount > 0 && (
               <div className="flex justify-center py-4">
                 <Pagination
                   current={currentApplicationPage}
@@ -1250,7 +1484,7 @@ export default function MaterialRequestDetail() {
             )}
           </div>
 
-          {/* Mobile Alert - Show below header on small screens */}
+          {/* Mobile Alert */}
           {isDraft && hasAnyChanges && (
             <div className="lg:hidden mt-2 pt-2 border-t border-slate-200">
               <div className="p-2 bg-amber-50 border-l-4 border-amber-500 rounded flex items-start gap-2">
@@ -1272,7 +1506,7 @@ export default function MaterialRequestDetail() {
       {/* Main Content */}
       <div className="px-6 lg:px-12 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-6 gap-8">
-          {/* Left Column - Request Details & Materials */}
+          {/* Left Column */}
           <div className="xl:col-span-3 space-y-6">
             {/* Basic Info Card */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 hover:shadow-md transition-shadow">
@@ -1325,46 +1559,9 @@ export default function MaterialRequestDetail() {
                 />
               </div>
 
-              {/* Checkboxes */}
+              {/* Checkbox */}
               {canEdit && (
                 <div className="space-y-4">
-                  {/* Can Edit Quantity */}
-                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
-                    <label
-                      className="flex items-start gap-4 cursor-pointer"
-                      aria-label={t(
-                        'userPage.materialRequestDetail.allowEditQuantity'
-                      )}
-                    >
-                      <div className="flex items-center h-6 mt-1">
-                        <input
-                          type="checkbox"
-                          checked={canEditQuantity}
-                          onChange={(e) => setCanEditQuantity(e.target.checked)}
-                          className="w-6 h-6 text-orange-600 border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 cursor-pointer"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <span className="font-bold text-slate-900 block mb-1">
-                          {t(
-                            'userPage.materialRequestDetail.allowEditQuantity'
-                          )}
-                        </span>
-                        <p className="text-sm text-slate-600 leading-relaxed">
-                          {t(
-                            'userPage.materialRequestDetail.allowEditQuantityDes'
-                          )}
-                        </p>
-                      </div>
-                      <div className="flex-shrink-0">
-                        <i
-                          className={`fas fa-${renderQuantityIcon()} text-xl transition-colors`}
-                        />
-                      </div>
-                    </label>
-                  </div>
-
-                  {/* Can Add Material */}
                   <div className="bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-5 cursor-pointer hover:shadow-md transition-shadow">
                     <label
                       className="flex items-start gap-4 cursor-pointer"
@@ -1401,7 +1598,7 @@ export default function MaterialRequestDetail() {
               )}
             </div>
 
-            {/* Materials List Card */}
+            {/* Materials List */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center justify-between mb-8 pb-6 border-b-2 border-slate-200">
                 <h2 className="text-2xl font-bold text-slate-900">
@@ -1424,7 +1621,7 @@ export default function MaterialRequestDetail() {
 
           {/* Right Column - Applications */}
           <div className="xl:col-span-3">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-42 max-h-[calc(100vh-100px)] overflow-y-auto">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 sticky top-28 max-h-[calc(100vh-100px)] overflow-y-auto">
               {selectedDistributor
                 ? renderAppliedDetail()
                 : renderAppliedList()}
@@ -1432,6 +1629,7 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
       </div>
+
       <MaterialRequestModal
         isOpen={open}
         onClose={() => setOpen(false)}

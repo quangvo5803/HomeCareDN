@@ -10,6 +10,7 @@ using DataAccess.Entities.Authorize;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.UnitOfWork;
+using HomeCareDNAPI.BackgroundServices;
 using HomeCareDNAPI.Hubs;
 using HomeCareDNAPI.Realtime;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -123,6 +124,8 @@ namespace HomeCareDNAPI
 
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddHostedService<ContractorApplicationMonitor>();
+            builder.Services.AddHostedService<DistributorApplicationMonitor>();
 
             // LLM client
             builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>

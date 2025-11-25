@@ -32,6 +32,21 @@ export const distributorApplicationService = {
     const response = await api.get(`/distributor-applications/customer/${id}`);
     return response.data;
   },
+  accept: async (params) => {
+    const response = await api.put(
+      `/distributor-applications/customer/accept`,
+
+      params
+    );
+    return response.data;
+  },
+
+  reject: async (id) => {
+    const response = await api.put(
+      `/distributor-applications/customer/${id}/reject`
+    );
+    return response.data;
+  },
 
   // ====================== DISTRIBUTOR ======================
   getByMaterialRequestIdForContractor: async (dto) => {

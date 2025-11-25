@@ -58,6 +58,20 @@ export default function AdminMaterialRequestManager() {
         )
       );
     },
+    [RealtimeEvents.DistributorApplicationAcceptApplicationAccept]: (
+      payload
+    ) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? {
+                ...mr,
+                status: 'Closed',
+              }
+            : mr
+        )
+      );
+    },
     [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
       setMaterialRequests((prev) =>
         prev.map((mr) =>
@@ -68,6 +82,18 @@ export default function AdminMaterialRequestManager() {
                   0,
                   (mr.distributorApplyCount || 1) - 1
                 ),
+              }
+            : mr
+        )
+      );
+    },
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? {
+                ...mr,
+                status: 'Closed',
               }
             : mr
         )

@@ -382,7 +382,6 @@
       "letStart": "Get started by creating your first material request",
       "lbl_address": "Address",
       "lbl_distributor": "supplier",
-      "lbl_canEditQuantity": "Allow supplier to edit quantity",
       "lbl_materialList": "Material List",
       "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
@@ -403,7 +402,7 @@
       "noMaterial": "No materials in the list",
       "addMaterial": "Add materials to your list",
       "image": "Image",
-      "infor": "Information",
+      "infor": "Material Name",
       "quantity": "Quantity",
       "unit": "Unit",
       "action": "Action",
@@ -420,7 +419,13 @@
       "contact": "Contact us",
       "additionalMaterials": "Materials proposed by the contractor",
       "customerRequestedMaterials": "Customer requested materials",
-      "selectMaterialRequest": "Please select request want to add"
+      "selectMaterialRequest": "Please select request want to add",
+      "selectExtraMaterialsNote": "You can choose what materials you want to add!",
+      "confirmAccept":"Are you sure you accept this application?",
+      "confirmReject":"Are you sure you reject this application?",
+      "waiting": "Application has been accepted please wait for distributor confirmation.",
+      "alreadyRejected": "The application was rejected."
+
     }
   },
   "contractorServiceRequestManager": {
@@ -537,7 +542,6 @@
     "materialRequests": "material requests",
     "materialType": "type of material",
     "applied": "distributor application",
-    "canEditQuantity": "Can edit quantity",
     "canAddMaterial": "Can add material",
     "noEditQuantity": "No edit quality",
     "noAddMaterial": "No add material"
@@ -1001,10 +1005,6 @@
     "viewProfile": "View profile",
     "noContractor": "No contractor",
     "noContractorYet": "No contractor have registered yet.",
-    "customerInfo":"Customer Information",
-    "customerName": "Customer name",
-    "customerEmail": "Customer email",
-    "customerPhone":"Customer phone nubmer",
     "contractorDetail": {
       "title": "Contractor details",
       "completedProject": "Completed project",
@@ -1078,11 +1078,8 @@
       "rating": "Rating",
       "serviceRequest": "service requests",
       "contractorApplication": "participated service",
-      "distributorApplication": "participated request",
       "historySR": "Service requests history",
-      "historyMR": "Material request history",
       "historyCA": "Participated service history",
-      "historyDA": "Participated material request history",
       "history": "No history yet"
     }
   },
@@ -1451,9 +1448,11 @@
     "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
-    "DELETE_APPLICATION": "Delete Application Successful",
-    "APPLICATION_CREATE": "Create Application Successful",
-    "RECONNECTED": "Reconnected to the server!"
+    "DELETE_APPLICATION": "Delete application successfully",
+    "APPLICATION_CREATE": "Create application successfully",
+    "RECONNECTED": "Reconnected to the server!",
+    "ACCEPT_APPLICATION": "Accept application successfully!",
+    "REJECT_APPLICATION": "Reject application successfully!"
   },
   "roles": {
     "Distributor": "Distributor",

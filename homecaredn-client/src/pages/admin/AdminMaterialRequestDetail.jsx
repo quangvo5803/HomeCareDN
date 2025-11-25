@@ -74,6 +74,79 @@ export default function AdminMaterialRequestDetail() {
         setTotalCount((prev) => Math.max(0, prev - 1));
       }
     },
+    [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? { ...mr, status: 'Closed' }
+            : mr
+        )
+      );
+      if (materialRequestId == payload.serviceRequestID) {
+        setMaterialRequestDetail(
+          (prev) => prev && { ...prev, status: 'Closed' }
+        );
+        setDistributorApplicationList((prev) => {
+          const newList = prev.map((ca) =>
+            ca.distributorApplicationID === payload.distributorApplicationID
+              ? {
+                  ...ca,
+                  status: 'PendingCommission',
+                  dueCommisionTime: payload?.dueCommisionTime || null,
+                }
+              : { ...ca, status: 'Rejected' }
+          );
+
+          const selected = newList.find(
+            (ca) =>
+              ca.distributorApplicationID === payload.distributorApplicationID
+          );
+
+          if (selected) {
+            setSelectedDistributor(selected);
+            setViewingDistributorDetail(true);
+          }
+
+          return newList;
+        });
+      }
+    },
+
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      if (materialRequestId == payload.serviceRequestID) {
+        // Update contractor list
+        setDistributorApplicationList((prev) =>
+          prev.map((ca) =>
+            ca.distributorApplicationID === payload.distributorApplicationID
+              ? { ...ca, status: 'Rejected' }
+              : ca
+          )
+        );
+
+        if (
+          selectedDistributor?.distributorApplicationID ===
+          payload.distributorApplicationID
+        ) {
+          setSelectedDistributor((prev) => ({
+            ...prev,
+            status: 'Rejected',
+          }));
+        }
+      }
+    },
+
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      if (
+        payload.distributorApplicationID ===
+        selectedDistributor?.distributorApplicationID
+      ) {
+        setSelectedDistributor((prev) => ({
+          ...prev,
+          status: 'Approved',
+          dueCommisionTime: null,
+        }));
+      }
+    },
   });
 
   useEffect(() => {
@@ -356,16 +429,16 @@ export default function AdminMaterialRequestDetail() {
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                               {i18n.language === 'vi'
-                                ? item.material?.name
-                                : item.material?.nameEN || item.material?.name}
+                                ? item?.name
+                                : item?.nameEN || item?.name}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
                               {item.quantity}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center">
                               {i18n.language === 'vi'
-                                ? item.material?.unit
-                                : item.material?.unitEn || item.material?.unit}
+                                ? item?.unit
+                                : item?.unitEn || item?.unit}
                             </td>
                           </tr>
                         )
@@ -450,13 +523,13 @@ export default function AdminMaterialRequestDetail() {
                       </p>
                     </div>
 
-                    <div className="bg-gradient-to-br from-orange-50 to-cyan-50 p-4 rounded-2xl border border-orange-100">
+                    <div className="bg-cyan-50 p-4 rounded-2xl border border-orange-100">
                       <p className="text-orange-600 text-sm font-medium mb-1">
                         {t(
                           'adminMaterialRequestManager.distributorDetail.completedProject'
                         )}
                       </p>
-                      <p className="font-bold text-lg text-orange-700">
+                      <p className="font-bold text-lg text-orange-500">
                         {selectedDistributor.completedProjectCount ?? 0}{' '}
                         {t(
                           'adminMaterialRequestManager.distributorDetail.project'
@@ -491,22 +564,24 @@ export default function AdminMaterialRequestDetail() {
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 p-5 rounded-2xl mb-6">
-                    <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
-                      {t('adminMaterialRequestManager.description')}
-                    </p>
-                    <div
-                      className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
-                      dangerouslySetInnerHTML={{
-                        __html: he.decode(selectedDistributor.message || ''),
-                      }}
-                    />
-                  </div>
+                  {selectedDistributor.message && (
+                    <div className="bg-gray-50 p-5 rounded-2xl mb-6">
+                      <p className="text-gray-500 text-sm font-semibold mb-2 uppercase tracking-wide">
+                        {t('adminMaterialRequestManager.description')}
+                      </p>
+                      <div
+                        className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+                        dangerouslySetInnerHTML={{
+                          __html: he.decode(selectedDistributor.message || ''),
+                        }}
+                      />
+                    </div>
+                  )}
 
                   {selectedDistributor.items &&
                     selectedDistributor.items.length > 0 && (
-                      <div className="bg-gradient-to-br from-indigo-50 to-orange-50 p-5 rounded-2xl border border-indigo-100 mb-6">
-                        <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                      <div className="bg-white mb-6">
+                        <p className="text-orange-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
                           <i className="fa-solid fa-list"></i>
                           {t(
                             'adminMaterialRequestManager.distributorDetail.quotedItems'
@@ -515,23 +590,23 @@ export default function AdminMaterialRequestDetail() {
 
                         <div className="bg-white rounded-xl overflow-hidden shadow-sm">
                           <table className="w-full">
-                            <thead className="bg-gradient-to-r from-indigo-100 to-orange-100">
+                            <thead className="bg-gray-50">
                               <tr>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-orange-500 uppercase tracking-wider">
                                   {t('adminMaterialRequestManager.no')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-semibold text-orange-500 uppercase tracking-wider">
                                   {t(
                                     'adminMaterialRequestManager.materialName'
                                   )}
                                 </th>
-                                <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-center text-xs font-semibold text-orange-500 uppercase tracking-wider">
                                   {t('adminMaterialRequestManager.quantity')}
                                 </th>
-                                <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-center text-xs font-semibold text-orange-500 uppercase tracking-wider">
                                   {t('adminMaterialRequestManager.unit')}
                                 </th>
-                                <th className="px-4 py-3 text-right text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-right text-xs font-semibold text-orange-500 uppercase tracking-wider">
                                   {t(
                                     'adminMaterialRequestManager.distributorDetail.price'
                                   )}
@@ -543,7 +618,7 @@ export default function AdminMaterialRequestDetail() {
                               {selectedDistributor.items.map((item, idx) => (
                                 <tr
                                   key={item.distributorApplicationItemID}
-                                  className="hover:bg-indigo-50 transition-colors"
+                                  className="hover:bg-orange-50 transition-colors"
                                 >
                                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                                     {idx + 1}
@@ -551,9 +626,8 @@ export default function AdminMaterialRequestDetail() {
 
                                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                                     {i18n.language === 'vi'
-                                      ? item.material?.name
-                                      : item.material?.nameEN ||
-                                        item.material?.name}
+                                      ? item?.name
+                                      : item?.nameEN || item?.name}
                                   </td>
 
                                   <td className="px-4 py-3 text-sm text-gray-700 text-center font-semibold">
@@ -562,9 +636,8 @@ export default function AdminMaterialRequestDetail() {
 
                                   <td className="px-4 py-3 text-sm text-gray-700 text-center">
                                     {i18n.language === 'vi'
-                                      ? item.material?.unit
-                                      : item.material?.unitEn ||
-                                        item.material?.unit}
+                                      ? item?.unit
+                                      : item?.unitEn || item?.unit}
                                   </td>
 
                                   <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-right">

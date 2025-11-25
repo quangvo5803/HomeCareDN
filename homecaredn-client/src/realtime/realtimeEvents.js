@@ -8,7 +8,7 @@ export const RealtimeEvents = Object.freeze({
   //MaterialRequest
   MaterialRequestCreated: 'MaterialRequest.Created',
   MaterialRequestDelete: 'MaterialRequest.Delete',
-
+  MaterialRequestClosed: 'MaterialRequest.Closed',
   // ContractorApplication
   ContractorApplicationCreated: 'ContractorApplication.Created',
   ContractorApplicationAccept: 'ContractorApplication.Accept',
@@ -17,6 +17,8 @@ export const RealtimeEvents = Object.freeze({
 
   // DistributorApplication
   DistributorApplicationCreated: 'DistributorApplication.Created',
+  DistributorApplicationAccept: 'DistributorApplication.Accept',
+  DistributorApplicationRejected: 'DistributorApplication.Rejected',
   DistributorApplicationDelete: 'DistributorApplication.Delete',
   // Payment
   PaymentTransactionUpdated: 'PaymentTransation.Updated',

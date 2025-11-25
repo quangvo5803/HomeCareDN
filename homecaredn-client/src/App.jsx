@@ -368,11 +368,11 @@ function Layout() {
         >
           <Route index element={<DistributorDashboard />} />
           <Route
-            path="MaterialRequest"
+            path="MaterialRequestManager"
             element={<DistributorMaterialRequestManager />}
           />
           <Route
-            path="MaterialRequest/:materialRequestId"
+            path="MaterialRequestManager/:materialRequestId"
             element={<DistributorMaterialRequestDetail />}
           />
           <Route

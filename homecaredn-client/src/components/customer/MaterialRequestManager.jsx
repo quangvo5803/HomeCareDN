@@ -26,15 +26,26 @@ export default function MaterialRequestManager({ user }) {
 
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
-      console.log("dto", payload);
       setMaterialRequests((prev) =>
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-              ...sr,
-              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-            }
+                ...sr,
+                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+              }
             : sr
+        )
+      );
+    },
+    [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? {
+                ...mr,
+                status: 'Closed',
+              }
+            : mr
         )
       );
     },
@@ -43,12 +54,25 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-              ...sr,
-              distributorApplyCount: Math.max(
-                0,
-                (sr.distributorApplyCount || 1) - 1
-              ),
-            }
+                ...sr,
+                distributorApplyCount: Math.max(
+                  0,
+                  (sr.distributorApplyCount || 1) - 1
+                ),
+              }
+            : sr
+        )
+      );
+    },
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+                startReviewDate: payload.startReviewDate,
+              }
             : sr
         )
       );
@@ -103,7 +127,10 @@ export default function MaterialRequestManager({ user }) {
           </h2>
           <p className="text-sm text-gray-600">
             {t('userPage.materialRequest.subtitle')} (
-            {materialRequests?.length || 0}/3)
+            {materialRequests.filter(
+              (m) => m.status == 'Draft' || m.status == 'Opening'
+            ).length || 0}
+            /3)
           </p>
         </div>
         <button
@@ -210,7 +237,7 @@ export default function MaterialRequestManager({ user }) {
                                 {i18n.language === 'vi'
                                   ? item.material?.name
                                   : item.material?.nameEN ||
-                                  item.material?.name}
+                                    item.material?.name}
                                 :
                               </span>
                               <span className="text-black font-semibold">
@@ -258,13 +285,16 @@ export default function MaterialRequestManager({ user }) {
                       </button>
 
                       {/* Delete */}
-                      <button
-                        className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
-                        onClick={() => handleDelete(req.materialRequestID)}
-                      >
-                        <i className="fas fa-xmark"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
+                      {(req.status === 'Opening' || req.status === 'Draft') &&
+                        req.selectedDistributorApplicationID == null && (
+                          <button
+                            className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                            onClick={() => handleDelete(req.materialRequestID)}
+                          >
+                            <i className="fas fa-xmark"></i>
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
                     </div>
                   </div>
                 </div>
