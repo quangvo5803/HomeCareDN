@@ -120,7 +120,33 @@ export default function Header() {
         }
       );
     },
+    [RealtimeEvents.NotificationApplicationPaid]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
   });
+
   // Close popovers when clicking outside / pressing Esc
   useEffect(() => {
     const onDown = (e) => {

@@ -75,59 +75,7 @@ namespace BusinessLogic.Services
             return await CreateOrUpdateSystemAsync(requestDto);
         }
 
-        public async Task<NotificationDto> NotifyApplyToRequestAsync(ApplyNotificationDto dto)
-        {
-            var existing = await _unitOfWork.NotificationRepository
-                .GetAsync(n => n.Type == NotificationType.Personal
-                                && n.TargetUserId == dto.TargetUserId
-                                && n.DataKey == dto.DataKey, asNoTracking: false
-                );
-
-            if (existing != null && !existing.IsRead)
-            {
-                existing.Title = dto.Title;
-                existing.Message = dto.Message;
-                existing.UpdatedAt = DateTime.UtcNow;
-                await _unitOfWork.SaveAsync();
-
-                var updatedDto = _mapper.Map<NotificationDto>(existing);
-
-                await _notifier.SendToApplicationGroupAsync(
-                    $"user_{dto.TargetUserId}",
-                    "Notification.Application.Create",
-                    updatedDto
-                );
-
-                return updatedDto;
-            }
-
-            var noti = new Notification
-            {
-                Type = NotificationType.Personal,
-                TargetUserId = dto.TargetUserId,
-                Title = dto.Title,
-                Message = dto.Message,
-                DataKey = dto.DataKey,
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            await _unitOfWork.NotificationRepository.AddAsync(noti);
-            await _unitOfWork.SaveAsync();
-
-            var mapped = _mapper.Map<NotificationDto>(noti);
-
-            await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.TargetUserId}",
-                "Notification.Application.Create",
-                mapped
-            );
-
-            return mapped;
-        }
-
-        public async Task<NotificationDto> NotifyPersonalAsync(ApplyNotificationDto dto)
+        public async Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto)
         {
             var existing = await _unitOfWork.NotificationRepository
                 .GetAsync(n => n.Type == NotificationType.Personal
@@ -140,21 +88,17 @@ namespace BusinessLogic.Services
             {
                 if (dto.Action == NotificationAction.Apply)
                 {
-                    // Nếu apply mới → cộng PendingCount
                     existing.PendingCount++;
                 }
-                else if (dto.Action == NotificationAction.Accept 
-                    || dto.Action == NotificationAction.Reject)
+                else if (dto.Action == NotificationAction.Accept ||
+                    dto.Action == NotificationAction.Reject || dto.Action == NotificationAction.Paid)
                 {
-                    // Nếu accept/reject → reset PendingCount
                     existing.PendingCount = 0;
-                    existing.IsRead = true;
                 }
 
-                // Cập nhật message
                 existing.Title = dto.Title;
                 existing.Message = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
+                    ? $"Có {existing.PendingCount} {dto.Message.ToLower()}."
                     : dto.Message;
 
                 existing.Action = dto.Action;
@@ -164,21 +108,12 @@ namespace BusinessLogic.Services
             }
             else
             {
-                // Tạo mới notification
-                noti = new Notification
-                {
-                    Type = NotificationType.Personal,
-                    TargetUserId = dto.TargetUserId,
-                    Title = dto.Title,
-                    Message = dto.Message,
-                    DataKey = dto.DataKey,
-                    Action = dto.Action,
-                    IsRead = false,
-                    PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
-                };
-
+                noti = _mapper.Map<Notification>(dto);
+                noti.Type = NotificationType.Personal;
+                noti.IsRead = false;
+                noti.PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0;
+                noti.CreatedAt = DateTime.UtcNow;
+                noti.UpdatedAt = DateTime.UtcNow;
                 await _unitOfWork.NotificationRepository.AddAsync(noti);
             }
 
@@ -186,12 +121,16 @@ namespace BusinessLogic.Services
 
             var mapped = _mapper.Map<NotificationDto>(noti);
 
-            // Gửi realtime
+            var eventName = dto.Action switch
+            {
+                NotificationAction.Apply => "Notification.Application.Create",
+                NotificationAction.Paid => "Notification.Application.Paid",
+                _ => "Notification.Application.Update"
+            };
+
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{dto.TargetUserId}",
-                dto.Action == NotificationAction.Apply
-                    ? "Notification.Application.Create"
-                    : "Notification.Application.Update",
+                eventName,
                 mapped
             );
 

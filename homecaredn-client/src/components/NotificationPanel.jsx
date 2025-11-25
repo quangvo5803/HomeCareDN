@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 export default function NotificationPanel({ notifications = [], loading }) {
     const { i18n } = useTranslation();
     const [open, setOpen] = useState(false);
-    const [tab, setTab] = useState('system');
+    const [tab, setTab] = useState('personal');
     const panelRef = useRef(null);
 
     const systemNoti = notifications.filter(n => n.type === 'System');

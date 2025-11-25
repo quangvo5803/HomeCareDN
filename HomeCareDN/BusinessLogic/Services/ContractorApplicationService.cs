@@ -319,20 +319,12 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
-            //await _notificationService.NotifyApplyToRequestAsync(new ApplyNotificationDto
-            //{
-            //    TargetUserId = serviceRequest.CustomerID,
-            //    Title = "Có nhà thầu mới đã tham gia vào yêu cầu dịch vụ của bạn",
-            //    Message = $"Nhà thầu đã tham gia vào yêu cầu {serviceRequest.ServiceType}",
-            //    DataKey = $"ServiceRequest_{serviceRequest.ServiceRequestID}_APPLY",
-            //    Action = NotificationAction.Apply
-            //});
-            await _notificationService.NotifyPersonalAsync(new ApplyNotificationDto
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
             {
                 TargetUserId = serviceRequest.CustomerID,
-                Title = "Distributor apply vào yêu cầu vật tư",
-                Message = $"Distributor đã apply vào yêu cầu {serviceRequest.ServiceType}",
-                DataKey = $"MaterialRequest_{serviceRequest.ServiceRequestID}_APPLY",
+                Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
+                Message = $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
+                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_APPLY",
                 Action = NotificationAction.Apply
             });
 
@@ -428,12 +420,12 @@ namespace BusinessLogic.Services
                 "ContractorApplication.Accept",
                 payloadAccept
             );
-            await _notificationService.NotifyPersonalAsync(new ApplyNotificationDto
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
             {
                 TargetUserId = contractorApplication.ContractorID,
-                Title = "Yêu cầu dịch vụ được chấp nhận",
-                Message = $"Customer đã chấp nhận yêu cầu {serviceRequest.ServiceType}",
-                DataKey = $"ServiceRequest_{serviceRequest.ServiceRequestID}_ACCEPT",
+                Title = "Chúc mừng! Bạn đã được chọn",
+                Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
                 Action = NotificationAction.Accept
             });
 
@@ -490,6 +482,15 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = contractorApplication.ContractorID,
+                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
+                Action = NotificationAction.Reject
+            });
+
             return dto;
         }
 

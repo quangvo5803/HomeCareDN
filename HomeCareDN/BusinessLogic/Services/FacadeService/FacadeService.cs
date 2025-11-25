@@ -94,7 +94,8 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.PayOsOptions,
                 infraDeps.Notifier,
                 coreDeps.UserManager,
-                coreDeps.Mapper
+                coreDeps.Mapper,
+                coreDeps.NotificationService
             );
 
             MaterialRequestService = new MaterialRequestService(
