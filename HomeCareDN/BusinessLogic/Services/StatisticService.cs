@@ -2,6 +2,7 @@
 using BusinessLogic.DTOs.Application.Statistic;
 using BusinessLogic.DTOs.Application.Statistic.AdminStatistic;
 using BusinessLogic.DTOs.Application.Statistic.ContractorStatistic;
+using BusinessLogic.DTOs.Application.Statistic.DistributorStatistic;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
@@ -16,7 +17,14 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
+
         private const string SERVICE_REQUEST_INCLUDE = "ServiceRequest";
+        private const string MATERIAL_REQUEST_INCLUDE = "MaterialRequest";
+
+        private const string ROLE_ADMIN = "Admin";
+        private const string ROLE_CONTRACTOR = "Contractor";
+        private const string ROLE_DISTRIBUTOR = "Distributor";
+        private const string ROLE_CUSTOMER = "Customer";
 
         public StatisticService(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
         {
@@ -27,7 +35,8 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<BarChartDto>> GetBarChartAsync(
             int year,
             string role,
-            Guid? contractorId = null
+            Guid? contractorId = null,
+            Guid? distributorId = null
         )
         {
             IEnumerable<ContractorApplication> contractor =
@@ -35,7 +44,7 @@ namespace BusinessLogic.Services
             IEnumerable<DistributorApplication> distributor =
                 Enumerable.Empty<DistributorApplication>();
 
-            if (role == "Admin")
+            if (role == ROLE_ADMIN)
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                     x => x.Status == ApplicationStatus.Approved && x.CreatedAt.Year == year,
@@ -47,7 +56,7 @@ namespace BusinessLogic.Services
                     includeProperties: "Items"
                 );
             }
-            else if (role == "Contractor" && contractorId.HasValue)
+            else if (role == ROLE_CONTRACTOR && contractorId.HasValue)
             {
                 contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
                     x =>
@@ -57,10 +66,20 @@ namespace BusinessLogic.Services
                     includeProperties: SERVICE_REQUEST_INCLUDE
                 );
             }
+            else if (role == ROLE_DISTRIBUTOR && distributorId.HasValue)
+            {
+                distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
+                    x =>
+                        x.Status == ApplicationStatus.Approved
+                        && x.CreatedAt.Year == year
+                        && x.DistributorID == distributorId.Value,
+                    includeProperties: MATERIAL_REQUEST_INCLUDE
+                );
+            }
 
             var result = BuildBarChart(
                 contractor,
-                role == "Admin" ? distributor : null,
+                (role == ROLE_ADMIN || role == ROLE_DISTRIBUTOR) ? distributor : null,
                 year,
                 x => x.CreatedAt,
                 x => x.ServiceRequest?.ServiceType,
@@ -73,10 +92,11 @@ namespace BusinessLogic.Services
         public async Task<IEnumerable<LineChartDto>> GetLineChartAsync(
             int year,
             string role,
-            Guid? contractorId = null
+            Guid? contractorId = null,
+            Guid? distributorId = null
         )
         {
-            if (role == "Admin")
+            if (role == ROLE_ADMIN)
             {
                 var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(p =>
                     p.Status == PaymentStatus.Paid
@@ -88,7 +108,7 @@ namespace BusinessLogic.Services
 
                 return result;
             }
-            else if (role == "Contractor" && contractorId.HasValue)
+            else if (role == ROLE_CONTRACTOR && contractorId.HasValue)
             {
                 var contractorApps =
                     await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
@@ -106,6 +126,23 @@ namespace BusinessLogic.Services
                     x => (decimal)x.EstimatePrice
                 );
 
+                return result;
+            }
+            else if (role == ROLE_DISTRIBUTOR && distributorId.HasValue)
+            {
+                var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
+                    x =>
+                        x.Status == ApplicationStatus.Approved
+                        && x.CreatedAt.Year == year
+                        && x.DistributorID == distributorId.Value,
+                    includeProperties: MATERIAL_REQUEST_INCLUDE
+                );
+                var result = BuildLineChart(
+                    distributor,
+                    year,
+                    x => x.CreatedAt,
+                    x => (decimal)x.TotalEstimatePrice
+                );
                 return result;
             }
 
@@ -241,9 +278,9 @@ namespace BusinessLogic.Services
         {
             var dto = new AdminStatDto();
 
-            var customers = await _userManager.GetUsersInRoleAsync("Customer");
-            var contractors = await _userManager.GetUsersInRoleAsync("Contractor");
-            var distributors = await _userManager.GetUsersInRoleAsync("Distributor");
+            var customers = await _userManager.GetUsersInRoleAsync(ROLE_CUSTOMER);
+            var contractors = await _userManager.GetUsersInRoleAsync(ROLE_CONTRACTOR);
+            var distributors = await _userManager.GetUsersInRoleAsync(ROLE_DISTRIBUTOR);
 
             dto.TotalCustomer = customers.Count;
             dto.TotalContactor = contractors.Count;
@@ -312,6 +349,42 @@ namespace BusinessLogic.Services
             var dict = statusCounts.ToDictionary(x => x.Key, x => x.Count);
 
             return new ContractorStatDto
+            {
+                OpenRequests = openRequests,
+                Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)
+                    ? pending
+                    : 0,
+                PendingPayments = dict.TryGetValue(
+                    ApplicationStatus.PendingCommission,
+                    out var pendingCom
+                )
+                    ? pendingCom
+                    : 0,
+                Won = dict.TryGetValue(ApplicationStatus.Approved, out var approved) ? approved : 0,
+            };
+        }
+
+        //================= Distributor =================
+        public async Task<DistributorStatDto> GetDistributorStatAsync(Guid distributorID)
+        {
+            var openRequests = await _unitOfWork
+                .MaterialRequestRepository.GetQueryable()
+                .AsNoTracking()
+                .CountAsync(sr =>
+                    sr.Status != RequestStatus.Closed && sr.SelectedDistributorApplication == null
+                );
+
+            var statusCounts = await _unitOfWork
+                .DistributorApplicationRepository.GetQueryable()
+                .AsNoTracking()
+                .Where(ca => ca.DistributorID == distributorID)
+                .GroupBy(ca => ca.Status)
+                .Select(g => new { g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            var dict = statusCounts.ToDictionary(x => x.Key, x => x.Count);
+
+            return new DistributorStatDto
             {
                 OpenRequests = openRequests,
                 Applied = dict.TryGetValue(ApplicationStatus.Pending, out var pending)

@@ -58,6 +58,15 @@ export const distributorApplicationService = {
     );
     return response.data;
   },
+  getLatestApplications: async (params) => {
+    const { data } = await api.get(
+      '/distributor-applications/distributor/applications',
+      {
+        params: params,
+      }
+    );
+    return data;
+  },
 
   create: async (dto) => {
     const response = await api.post(

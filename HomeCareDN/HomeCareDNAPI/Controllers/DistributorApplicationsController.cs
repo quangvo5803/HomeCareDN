@@ -1,4 +1,5 @@
-﻿using BusinessLogic.DTOs.Application;
+﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -109,6 +110,23 @@ namespace HomeCareDNAPI.Controllers
         }
 
         // ====================== DISTRIBUTOR ======================
+        [Authorize(Roles = "Distributor")]
+        [HttpGet("distributor/applications")]
+        public async Task<IActionResult> GetApplications([FromQuery] QueryParameters parameters)
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!Guid.TryParse(sub, out var distributorId))
+                return Unauthorized("Invalid distributor ID.");
+
+            parameters.FilterID = distributorId;
+
+            var result =
+                await _facadeService.DistributorApplicationService.GetAllDistributorApplicationByUserIdAsync(
+                    parameters
+                );
+            return Ok(result);
+        }
+
         [Authorize(Roles = "Distributor")]
         [HttpGet("distributor/applied")]
         public async Task<IActionResult> GetByMaterialRequestId(

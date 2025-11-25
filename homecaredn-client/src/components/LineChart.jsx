@@ -187,6 +187,50 @@ export default function LineChart({
       </div>
     );
   }
+  if (type === 'Distributor') {
+    return (
+      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+        <div className="flex justify-between items-center mb-4">
+          <h6 className=" dark:text-white text-xl font-semibold">{title}</h6>
+
+          {onYearChange && (
+            <select
+              value={year}
+              onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
+              className="border border-green-400 rounded px-2 py-1 text-sm bg-white"
+            >
+              {Array.from({ length: 6 }, (_, i) => {
+                const y = new Date().getFullYear() - i;
+                return (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                );
+              })}
+            </select>
+          )}
+        </div>
+
+        <div className="flex-auto p-4 h-[450px] relative">
+          <Line data={data} options={options} height={200} />
+
+          {!hasData && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
+              <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
+            </div>
+          )}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+              <LoadingComponent />
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-100 p-4 rounded-xl">
