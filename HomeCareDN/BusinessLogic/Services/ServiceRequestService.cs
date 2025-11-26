@@ -356,7 +356,7 @@ namespace BusinessLogic.Services.Interfaces
                         dto.Address.Ward = string.Empty;
                     }
                 }
-                if (role == "Customer")
+                if (role == "Customer" && dto.Review == null)
                 {
                     await MapStartReviewDateForCustomerListAll(dto);
                 }
@@ -372,7 +372,7 @@ namespace BusinessLogic.Services.Interfaces
                 );
                 if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
                 {
-                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
                 }
             }
         }
@@ -474,9 +474,9 @@ namespace BusinessLogic.Services.Interfaces
                     Description = selected.Description,
                     DueCommisionTime = selected.DueCommisionTime,
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount,
-                    AverageRating = contractor!.AverageRating,
-                    ReviewCount = contractor!.RatingCount,
+                    CompletedProjectCount = contractor?.ProjectCount ?? 0,
+                    AverageRating = contractor?.AverageRating ?? 0,
+                    RatingCount = contractor?.RatingCount ?? 0,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -502,19 +502,21 @@ namespace BusinessLogic.Services.Interfaces
                         selected.Images?.Select(i => i.ImageUrl).ToList() ?? new List<string>(),
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = contractor!.ProjectCount,
-                    AverageRating = contractor.AverageRating,
-                    ReviewCount = contractor.RatingCount,
+                    CompletedProjectCount = contractor?.ProjectCount ?? 0,
+                    AverageRating = contractor?.AverageRating ?? 0,
+                    RatingCount = contractor?.RatingCount ?? 0,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor.FullName ?? ""
+                            ? contractor?.FullName ?? ""
                             : "",
                     ContractorEmail =
-                        selected.Status == ApplicationStatus.Approved ? contractor.Email ?? "" : "",
+                        selected.Status == ApplicationStatus.Approved
+                            ? contractor?.Email ?? ""
+                            : "",
                     ContractorPhone =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor.PhoneNumber ?? ""
+                            ? contractor?.PhoneNumber ?? ""
                             : "",
                 };
             }

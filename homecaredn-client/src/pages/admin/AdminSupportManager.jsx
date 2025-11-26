@@ -110,7 +110,19 @@ export default function AdminSupportManager() {
       },
     });
   };
-
+  // ------------------------------
+  // 6. Reply handler
+  // ------------------------------
+  const handleReply = (repliedId) => {
+    setSupports((prevSupports) =>
+      prevSupports.map((item) => {
+        if (item.id === repliedId) {
+          return { ...item, isProcessed: true };
+        }
+        return item;
+      })
+    );
+  };
   return (
     <div className="min-h-screen p-6 bg-white">
       <div className="max-w-7xl mx-auto">
@@ -207,7 +219,7 @@ export default function AdminSupportManager() {
             setSupportID(null);
           }}
           supportID={supportID}
-          onReplySent={() => fetchSupports()}
+          onReplySent={handleReply}
         />
 
         {/* Table Container */}

@@ -98,6 +98,7 @@ export default function MaterialRequestDetail() {
             status: 'Closed',
           };
         }
+        return prev;
       });
     },
     [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
@@ -335,13 +336,13 @@ export default function MaterialRequestDetail() {
     });
   };
 
-  const handleToggleExtraItem = (materialID) => {
+  const handleToggleExtraItem = (distributorApplicationItemID) => {
     setAcceptingItems((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(materialID)) {
-        newSet.delete(materialID);
+      if (newSet.has(distributorApplicationItemID)) {
+        newSet.delete(distributorApplicationItemID);
       } else {
-        newSet.add(materialID);
+        newSet.add(distributorApplicationItemID);
       }
       return newSet;
     });
@@ -424,15 +425,19 @@ export default function MaterialRequestDetail() {
   };
 
   //Check materialID
-  const customerMaterialIDs = new Set(items.map((item) => item.materialID));
-
-  const existingMaterial = selectedDistributor?.items?.filter((item) =>
-    customerMaterialIDs.has(item.materialID)
+  const customerMaterialIDs = new Set(
+    items.map((item) => item.material.materialID)
   );
 
-  const extraMaterial = selectedDistributor?.items?.filter(
-    (item) => !customerMaterialIDs.has(item.materialID)
-  );
+  const existingMaterial =
+    selectedDistributor?.items?.filter((item) =>
+      customerMaterialIDs.has(item.materialID)
+    ) || [];
+
+  const extraMaterial =
+    selectedDistributor?.items?.filter(
+      (item) => !customerMaterialIDs.has(item.materialID)
+    ) || [];
 
   const isLoading = loading || !materialRequest;
   if (isLoading) return <Loading />;
@@ -555,24 +560,18 @@ export default function MaterialRequestDetail() {
 
           <div className="col-span-2">
             <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div
-                className={`absolute inset-0 flex items-center justify-center ${
-                  imageUrl ? 'hidden' : 'flex'
-                }`}
-              >
-                <i className="fas fa-image text-slate-300 text-3xl"></i>
-              </div>
+              <img
+                src={
+                  imageUrl ??
+                  'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                }
+                alt={displayName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextElementSibling.style.display = 'flex';
+                }}
+              />
             </div>
           </div>
 
@@ -884,7 +883,7 @@ export default function MaterialRequestDetail() {
     const displayUnit =
       i18n.language === 'vi' ? item.unit : item.unitEN || item.unit;
 
-    const isChecked = acceptingItems.has(item.materialID);
+    const isChecked = acceptingItems.has(item.distributorApplicationItemID);
 
     return (
       <div
@@ -904,7 +903,9 @@ export default function MaterialRequestDetail() {
               <input
                 type="checkbox"
                 checked={isChecked}
-                onChange={() => handleToggleExtraItem(item.materialID)}
+                onChange={() =>
+                  handleToggleExtraItem(item.distributorApplicationItemID)
+                }
                 className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
               />
             ) : (
@@ -992,7 +993,9 @@ export default function MaterialRequestDetail() {
               <input
                 type="checkbox"
                 checked={isChecked}
-                onChange={() => handleToggleExtraItem(item.materialID)}
+                onChange={() =>
+                  handleToggleExtraItem(item.distributorApplicationItemID)
+                }
                 className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer flex-shrink-0 mt-1"
               />
             )}
@@ -1158,15 +1161,25 @@ export default function MaterialRequestDetail() {
                 <i className="fas fa-plus-circle mr-3 text-green-600"></i>
                 {t('userPage.materialRequestDetail.additionalMaterials')}
               </h2>
-              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
-                {acceptingItems.size}/{extraMaterial.length}
-              </span>
+              {selectedDistributor.status == 'Pending' ? (
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                  {acceptingItems.size}/{extraMaterial.length}
+                </span>
+              ) : (
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                  {extraMaterial.length}
+                </span>
+              )}
             </div>
 
             {renderHeader()}
             <div className="space-y-4 mb-8">
               {extraMaterial.map((item, index) =>
-                renderMaterialRow(item, index, true)
+                renderMaterialRow(
+                  item,
+                  index,
+                  selectedDistributor.status == 'Pending'
+                )
               )}
             </div>
 

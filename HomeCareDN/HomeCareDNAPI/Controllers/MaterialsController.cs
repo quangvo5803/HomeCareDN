@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
 using BusinessLogic.Services.FacadeService;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,20 @@ namespace HomeCareDNAPI.Controllers
         {
             var materials = await _facadeService.MaterialService.GetMaterialByBrandAsync(brandID);
             return Ok(materials);
+        }
+
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Admin,Distributor"
+        )]
+        [HttpGet("check-material")]
+        public async Task<IActionResult> CheckMaterial(string name, Guid? materialID = null)
+        {
+            var exists = await _facadeService.MaterialService.CheckMaterialExisiting(
+                name,
+                materialID
+            );
+            return Ok(exists); // true nếu tồn tại
         }
 
         [Authorize(

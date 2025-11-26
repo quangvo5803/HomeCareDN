@@ -1,18 +1,15 @@
-﻿using AutoMapper;
+﻿using System.Data;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
-using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -79,10 +76,11 @@ namespace BusinessLogic.Services
 
                 //Hidden to low loading => show when getById
                 dto.Description = string.Empty;
-
-                dto.ReviewCount = contractor!.RatingCount;
-                dto.AverageRating = contractor!.AverageRating;
-                dto.CompletedProjectCount = contractor!.ProjectCount;
+                if (contractor == null)
+                    continue;
+                dto.RatingCount = contractor.RatingCount;
+                dto.AverageRating = contractor.AverageRating;
+                dto.CompletedProjectCount = contractor.ProjectCount;
 
                 if (role == "Admin")
                 {
@@ -148,7 +146,9 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-            dto.CompletedProjectCount = contractor!.ProjectCount;
+            dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
+            dto.AverageRating = contractor?.AverageRating ?? 0;
+            dto.RatingCount = contractor?.RatingCount ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -179,9 +179,9 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-            dto.CompletedProjectCount = contractor!.ProjectCount;
-            dto.AverageRating = contractor.AverageRating;
-            dto.ReviewCount = contractor.RatingCount;
+            dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
+            dto.AverageRating = contractor?.AverageRating ?? 0;
+            dto.RatingCount = contractor?.RatingCount ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -319,15 +319,18 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = serviceRequest.CustomerID,
-                Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
-                Message = $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
-                DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
-                DataValue = dto.ServiceRequestID.ToString(),
-                Action = NotificationAction.Apply
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = serviceRequest.CustomerID,
+                    Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
+                    Message =
+                        $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
+                    DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
+                    DataValue = dto.ServiceRequestID.ToString(),
+                    Action = NotificationAction.Apply,
+                }
+            );
 
             await Task.WhenAll(notifyTasks);
             return dto;
@@ -389,15 +392,19 @@ namespace BusinessLogic.Services
                             CONTRACTOR_APPLICATION_REJECT,
                             payload
                         );
-                        await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-                        {
-                            TargetUserId = app.ContractorID,
-                            Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                            Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
-                            DataKey = $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
-                            DataValue = app.ServiceRequestID.ToString(),
-                            Action = NotificationAction.Reject
-                        });
+                        await _notificationService.NotifyPersonalAsync(
+                            new NotificationPersonalCreateOrUpdateDto
+                            {
+                                TargetUserId = app.ContractorID,
+                                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                                Message =
+                                    $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                DataKey =
+                                    $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
+                                DataValue = app.ServiceRequestID.ToString(),
+                                Action = NotificationAction.Reject,
+                            }
+                        );
                     }
                 }
             }
@@ -430,15 +437,17 @@ namespace BusinessLogic.Services
                 "ContractorApplication.Accept",
                 payloadAccept
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = contractorApplication.ContractorID,
-                Title = "Chúc mừng! Bạn đã được chọn",
-                Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
-                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
-                DataValue = dto.ServiceRequestID.ToString(),
-                Action = NotificationAction.Accept
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = contractorApplication.ContractorID,
+                    Title = "Chúc mừng! Bạn đã được chọn",
+                    Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                    DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
+                    DataValue = dto.ServiceRequestID.ToString(),
+                    Action = NotificationAction.Accept,
+                }
+            );
 
             return dto;
         }
@@ -493,15 +502,17 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = contractorApplication.ContractorID,
-                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
-                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
-                DataValue = dto.ServiceRequestID.ToString(),
-                Action = NotificationAction.Reject
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = contractorApplication.ContractorID,
+                    Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
+                    DataValue = dto.ServiceRequestID.ToString(),
+                    Action = NotificationAction.Reject,
+                }
+            );
 
             return dto;
         }

@@ -1,6 +1,4 @@
-﻿using BusinessLogic.DTOs.Application.ServiceRequest;
-
-namespace BusinessLogic.DTOs.Authorize.User
+﻿namespace BusinessLogic.DTOs.Authorize.User
 {
     public class UserDto
     {
@@ -11,6 +9,7 @@ namespace BusinessLogic.DTOs.Authorize.User
         public int ProjectCount { get; set; }
         public double AverageRating { get; set; }
         public string? Role { get; set; }
+        public string? Gender { get; set; }
         public List<AddressDto>? Addresses { get; set; }
     }
 }
