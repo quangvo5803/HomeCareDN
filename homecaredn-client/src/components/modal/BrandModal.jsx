@@ -6,6 +6,7 @@ import { handleApiError } from '../../utils/handleApiError';
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { useBrand } from '../../hook/useBrand';
 import LoadingComponent from '../LoadingComponent';
+import { brandService } from '../../services/brandService';
 
 export default function BrandModal({
   isOpen,
@@ -73,7 +74,15 @@ export default function BrandModal({
   const handleSubmit = async () => {
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
-
+    const exists = await brandService.checkBrand({
+      name: brandName,
+      brandID: brand?.brandID,
+    });
+    if (exists) {
+      toast.error(t('ERROR.BRAND_NAME_ALREADY_EXISTS'));
+      onClose();
+      return;
+    }
     try {
       const data = {
         BrandName: brandName,
@@ -282,7 +291,6 @@ BrandModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   brandID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
-  setSubmitting: PropTypes.func.isRequired,
 };
 // Default props
 BrandModal.defaultProps = {

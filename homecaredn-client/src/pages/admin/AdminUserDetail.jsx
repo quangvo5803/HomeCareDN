@@ -45,29 +45,6 @@ export default function AdminUserDetail() {
   const [activeTab, setActiveTab] = useState('service');
   const pageSize = 5;
 
-  const styles = {
-    service: {
-      icon: 'fa-hammer',
-      color: 'orange',
-      hover: 'hover:border-orange-200',
-    },
-    material: {
-      icon: 'fa-box',
-      color: 'orange',
-      hover: 'hover:border-orange-200',
-    },
-    contractor: {
-      icon: 'fa-hammer',
-      color: 'blue',
-      hover: 'hover:border-blue-200',
-    },
-    distributor: {
-      icon: 'fa-box',
-      color: 'green',
-      hover: 'hover:border-green-200',
-    },
-  };
-
   // --- Fetch user ---
   useEffect(() => {
     const fetchUserById = async () => {
@@ -310,11 +287,11 @@ export default function AdminUserDetail() {
       <p>{t('adminUserManager.userDetail.history')}</p>
     </div>
   );
+  // TIẾP TỤC TỪ PART 1...
 
   // --- Service Requests ---
   const renderServiceRequests = () => {
     if (totalServiceRequests == 0) return renderEmptyState();
-    const style = styles.service;
 
     return (
       <div className="p-6 space-y-4">
@@ -326,21 +303,15 @@ export default function AdminUserDetail() {
           serviceRequests.map((request) => (
             <div
               key={request.serviceRequestID}
-              className={`group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${style.hover}`}
+              className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-orange-200"
             >
-              <div
-                className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-${style.color}-500 to-${style.color}-600 transition-all duration-300 group-hover:w-2`}
-              />
+              <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-orange-500 to-orange-600 transition-all duration-300 group-hover:w-2" />
 
               <div className="flex justify-between items-start mb-5 pl-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span
-                      className={`inline-flex items-center justify-center h-10 w-10 rounded-xl bg-${style.color}-50 ring-2 ring-${style.color}-200 transition-transform duration-300 group-hover:scale-110`}
-                    >
-                      <i
-                        className={`fa-solid ${style.icon} text-${style.color}-600 text-lg`}
-                      />
+                    <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-orange-50 ring-2 ring-orange-200 transition-transform duration-300 group-hover:scale-110">
+                      <i className="fa-solid fa-hammer text-orange-600 text-lg" />
                     </span>
                     <h3 className="text-xl font-bold text-gray-900">
                       {t(`Enums.ServiceType.${request.serviceType}`)}
@@ -351,9 +322,7 @@ export default function AdminUserDetail() {
               </div>
 
               <div className="pl-4 mb-5 flex flex-wrap gap-2">
-                <span
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-${style.color}-50 text-${style.color}-700 border border-${style.color}-200`}
-                >
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200">
                   <i className="fa-solid fa-box-open" />
                   {t(`Enums.PackageOption.${request.packageOption}`)}
                 </span>
@@ -375,9 +344,7 @@ export default function AdminUserDetail() {
                   ) || '—'}{' '}
                   m²
                 </span>
-                <span
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-${style.color}-50 text-${style.color}-700 border border-${style.color}-200`}
-                >
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
                   <i className="fa-solid fa-coins" />
                   {request.estimatePrice
                     ? formatVND(request.estimatePrice)
@@ -398,7 +365,7 @@ export default function AdminUserDetail() {
                       `/Admin/ServiceRequestManager/${request.serviceRequestID}`
                     )
                   }
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-${style.color}-400 to-${style.color}-500 hover:from-${style.color}-500 hover:to-${style.color}-700 shadow-md transition-all duration-300 hover:-translate-y-0.5`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 shadow-md transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <i className="fa-solid fa-eye" />
                   {t('BUTTON.View')}
@@ -425,7 +392,6 @@ export default function AdminUserDetail() {
   // --- Material Requests ---
   const renderMaterialRequests = () => {
     if (totalMaterialRequests == 0) return renderEmptyState();
-    const style = styles.material;
 
     return (
       <div className="p-6 space-y-4">
@@ -437,21 +403,15 @@ export default function AdminUserDetail() {
           materialRequests.map((request) => (
             <div
               key={request.materialRequestID}
-              className={`group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${style.hover}`}
+              className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-orange-200"
             >
-              <div
-                className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-${style.color}-500 to-${style.color}-600 transition-all duration-300 group-hover:w-2`}
-              />
+              <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-orange-500 to-orange-600 transition-all duration-300 group-hover:w-2" />
 
               <div className="flex justify-between items-start mb-5 pl-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span
-                      className={`inline-flex items-center justify-center h-10 w-10 rounded-xl bg-${style.color}-50 ring-2 ring-${style.color}-200 transition-transform duration-300 group-hover:scale-110`}
-                    >
-                      <i
-                        className={`fa-solid ${style.icon} text-${style.color}-600 text-lg`}
-                      />
+                    <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-orange-50 ring-2 ring-orange-200 transition-transform duration-300 group-hover:scale-110">
+                      <i className="fa-solid fa-box text-orange-600 text-lg" />
                     </span>
                     <h3 className="text-xl font-bold text-gray-900">
                       {t(`Enums.ServiceType.Material`)}
@@ -463,24 +423,8 @@ export default function AdminUserDetail() {
 
               <div className="pl-4 mb-5 flex flex-wrap gap-2">
                 <span
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium ${
-                    request.canEditQuantity
-                      ? 'bg-green-50 text-green-700 border-green-200'
-                      : 'bg-red-50 text-red-700 border-red-200'
-                  }`}
-                >
-                  <i
-                    className={`fa-solid ${
-                      request.canEditQuantity ? 'fa-check' : 'fa-xmark'
-                    }`}
-                  />
-                  {request.canEditQuantity
-                    ? t('distributorMaterialRequest.canEditQuantity')
-                    : t('distributorMaterialRequest.noEditQuantity')}
-                </span>
-                <span
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium ${
-                    request.canEditQuantity
+                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium border ${
+                    request.canAddMaterial
                       ? 'bg-green-50 text-green-700 border-green-200'
                       : 'bg-red-50 text-red-700 border-red-200'
                   }`}
@@ -494,9 +438,7 @@ export default function AdminUserDetail() {
                     ? t('distributorMaterialRequest.canAddMaterial')
                     : t('distributorMaterialRequest.noAddMaterial')}
                 </span>
-                <span
-                  className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-${style.color}-50 text-${style.color}-700 border border-${style.color}-200`}
-                >
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200">
                   <i className="fa-solid fa-cube" />
                   {request.materialRequestItems.length}{' '}
                   {t('adminMaterialRequestManager.items')}
@@ -516,7 +458,7 @@ export default function AdminUserDetail() {
                       `/Admin/MaterialRequestManager/${request.materialRequestID}`
                     )
                   }
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-${style.color}-400 to-${style.color}-500 hover:from-${style.color}-500 hover:to-${style.color}-700 shadow-md transition-all duration-300 hover:-translate-y-0.5`}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 shadow-md transition-all duration-300 hover:-translate-y-0.5"
                 >
                   <i className="fa-solid fa-eye" />
                   {t('BUTTON.View')}
@@ -552,28 +494,20 @@ export default function AdminUserDetail() {
     }
     if (noContractor) return renderEmptyState();
 
-    const style = styles.contractor;
-
     return (
       <div className="space-y-3">
         {contractors.map((request) => (
           <div
             key={request.contractorApplicationID}
-            className={`group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${style.hover}`}
+            className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-blue-200"
           >
-            <div
-              className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-${style.color}-500 to-${style.color}-600 transition-all duration-300 group-hover:w-2`}
-            />
+            <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-blue-500 to-blue-600 transition-all duration-300 group-hover:w-2" />
 
-            <div className="flex justify-between items-start mb-3 pl-4">
+            <div className="flex justify-between items-start mb-5 pl-4">
               <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`inline-flex items-center justify-center h-10 w-10 rounded-xl bg-${style.color}-50 ring-2 ring-${style.color}-200 transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    <i
-                      className={`fa-solid ${style.icon} text-${style.color}-600 text-lg`}
-                    />
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-blue-50 ring-2 ring-blue-200 transition-transform duration-300 group-hover:scale-110">
+                    <i className="fa-solid fa-hammer text-blue-600 text-lg" />
                   </span>
                   <h3 className="text-xl font-bold text-gray-900">
                     {t(`Enums.ServiceType.${request.serviceType}`)}
@@ -583,15 +517,26 @@ export default function AdminUserDetail() {
               <StatusBadge status={request.status} type="Application" />
             </div>
 
-            <div className="pl-4 flex flex-wrap gap-2">
-              <span
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-${style.color}-50 text-${style.color}-700 border border-${style.color}-200`}
-              >
+            <div className="pl-4 mb-5 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                 <i className="fa-solid fa-coins" />
                 {request.estimatePrice
                   ? formatVND(request.estimatePrice)
                   : t('contractorServiceRequestManager.negotiable')}
               </span>
+              {request.completedProjectCount > 0 && (
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                  <i className="fa-solid fa-check-circle" />
+                  {request.completedProjectCount}{' '}
+                  {t('adminUserManager.projectCount')}
+                </span>
+              )}
+              {request.averageRating > 0 && (
+                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                  <i className="fa-solid fa-star" />
+                  {request.averageRating.toFixed(1)}
+                </span>
+              )}
             </div>
 
             <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
@@ -607,7 +552,7 @@ export default function AdminUserDetail() {
                     `/Admin/ServiceRequestManager/${request.serviceRequestID}`
                   )
                 }
-                className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-${style.color}-400 to-${style.color}-500 hover:from-${style.color}-600 hover:to-${style.color}-700 shadow-md transition-all duration-300 hover:-translate-y-0.5`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 shadow-md transition-all duration-300 hover:-translate-y-0.5"
               >
                 <i className="fa-solid fa-eye" />
                 {t('BUTTON.View')}
@@ -643,44 +588,45 @@ export default function AdminUserDetail() {
     }
     if (noDistributor) return renderEmptyState();
 
-    const style = styles.distributor;
-
     return (
       <div className="space-y-3">
         {distributors.map((request) => (
           <div
             key={request.distributorApplicationID}
-            className={`group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${style.hover}`}
+            className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border-green-200"
           >
-            <div
-              className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-${style.color}-500 to-${style.color}-600 transition-all duration-300 group-hover:w-2`}
-            />
+            <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-gradient-to-br from-green-500 to-green-600 transition-all duration-300 group-hover:w-2" />
 
-            <div className="flex justify-between items-start mb-3 pl-4">
+            <div className="flex justify-between items-start mb-5 pl-4">
               <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`inline-flex items-center justify-center h-10 w-10 rounded-xl bg-${style.color}-50 ring-2 ring-${style.color}-200 transition-transform duration-300 group-hover:scale-110`}
-                  >
-                    <i
-                      className={`fa-solid ${style.icon} text-${style.color}-600 text-lg`}
-                    />
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-green-50 ring-2 ring-green-200 transition-transform duration-300 group-hover:scale-110">
+                    <i className="fa-solid fa-box text-green-600 text-lg" />
                   </span>
                   <h3 className="text-xl font-bold text-gray-900">
-                    {t(`Enums.ServiceType.${request.serviceType}`)}
+                    {t(`Enums.ServiceType.Material`)}
                   </h3>
                 </div>
               </div>
               <StatusBadge status={request.status} type="Application" />
             </div>
 
-            <div className="pl-4 flex flex-wrap gap-2">
+            <div className="pl-4 mb-5 flex flex-wrap gap-2">
               <span
-                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-${style.color}-50 text-${style.color}-700 border border-${style.color}-200`}
+                className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold ${
+                  request.items && request.items.length > 0
+                    ? 'bg-green-50 text-green-700 border border-green-200'
+                    : 'bg-gray-50 text-gray-700 border border-gray-200'
+                }`}
               >
+                <i className="fa-solid fa-cube" />
+                {request.items ? request.items.length : 0}{' '}
+                {t('adminMaterialRequestManager.items')}
+              </span>
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
                 <i className="fa-solid fa-coins" />
-                {request.estimatePrice
-                  ? formatVND(request.estimatePrice)
+                {request.totalEstimatePrice
+                  ? formatVND(request.totalEstimatePrice)
                   : t('contractorServiceRequestManager.negotiable')}
               </span>
             </div>
@@ -695,10 +641,10 @@ export default function AdminUserDetail() {
               <button
                 onClick={() =>
                   navigate(
-                    `/Admin/ServiceRequestManager/${request.serviceRequestID}`
+                    `/Admin/MaterialRequestManager/${request.materialRequestID}`
                   )
                 }
-                className={`inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-${style.color}-400 to-${style.color}-500 hover:from-${style.color}-600 hover:to-${style.color}-700 shadow-md transition-all duration-300 hover:-translate-y-0.5`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 shadow-md transition-all duration-300 hover:-translate-y-0.5"
               >
                 <i className="fa-solid fa-eye" />
                 {t('BUTTON.View')}

@@ -12,6 +12,15 @@ export const brandService = {
     return response.data;
   },
   // ====================== ADMIN ======================
+  checkBrand: async ({ name, brandID = null }) => {
+    const params = { name };
+    if (brandID) params.brandID = brandID;
+
+    const response = await api.get(`/brands/check-brand`, {
+      params,
+    });
+    return response.data;
+  },
   create: async (dto) => {
     // dto = { BrandName, BrandDescription?, BrandNameEN?, BrandDescriptionEN?, BrandLogoUrl, BrandLogoPublicId }
     const response = await api.post('/brands', dto);

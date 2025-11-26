@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Category;
 using BusinessLogic.Services.FacadeService;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,20 @@ namespace HomeCareDNAPI.Controllers
         {
             var category = await _facadeService.CategoryService.GetCategoryByIdAsync(id);
             return Ok(category);
+        }
+
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Admin,Distributor"
+        )]
+        [HttpGet("check-category")]
+        public async Task<IActionResult> CheckCategory(string name, Guid? categoryID = null)
+        {
+            var exists = await _facadeService.CategoryService.CheckCategoryExisiting(
+                name,
+                categoryID
+            );
+            return Ok(exists);
         }
 
         [Authorize(

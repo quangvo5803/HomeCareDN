@@ -130,7 +130,7 @@ export const ServiceProvider = ({ children }) => {
   // ==================== DELETE IMAGE ====================
   const deleteServiceImage = useCallback(async (serviceID, imageUrl) => {
     try {
-      await imageService.deleteImage(imageUrl);
+      await imageService.delete(imageUrl);
       setServices((prev) =>
         prev.map((s) =>
           s.serviceID === serviceID

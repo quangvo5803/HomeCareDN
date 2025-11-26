@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Brand;
 using BusinessLogic.Services.FacadeService;
+using DataAccess.Entities.Application;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,14 @@ namespace HomeCareDNAPI.Controllers
         {
             var brand = await _facadeService.BrandService.GetBrandByID(id);
             return Ok(brand);
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpGet("check-brand")]
+        public async Task<IActionResult> CheckBrand(string name, Guid? brandID = null)
+        {
+            var exists = await _facadeService.BrandService.CheckBrandExisiting(name, brandID);
+            return Ok(exists);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
