@@ -27,7 +27,7 @@ export const materialService = {
     const response = await api.get(`/users/materials`, { params });
     return response.data;
   },
-  checkMaterial: async (name, materialID = null) => {
+  checkMaterial: async ({ name, materialID = null }) => {
     const params = { name };
     if (materialID) params.materialID = materialID;
 

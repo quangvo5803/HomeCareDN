@@ -12,7 +12,7 @@ export const brandService = {
     return response.data;
   },
   // ====================== ADMIN ======================
-  checkBrand: async (name, brandID = null) => {
+  checkBrand: async ({ name, brandID = null }) => {
     const params = { name };
     if (brandID) params.brandID = brandID;
 

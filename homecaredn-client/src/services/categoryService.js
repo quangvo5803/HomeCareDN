@@ -12,7 +12,7 @@ export const categoryService = {
     return response.data;
   },
   // ====================== ADMIN, DISTRIBUTOR ======================
-  checkCategory: async (name, categoryID = null) => {
+  checkCategory: async ({ name, categoryID = null }) => {
     const params = { name };
     if (categoryID) params.categoryID = categoryID;
 
