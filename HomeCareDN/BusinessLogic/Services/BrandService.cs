@@ -13,7 +13,6 @@ namespace BusinessLogic.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private const string INCLUDE = "LogoImage,Materials";
 
         public BrandService(IUnitOfWork unitOfWork, IMapper mapper)
         {
@@ -89,17 +88,6 @@ namespace BusinessLogic.Services
 
         public async Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto)
         {
-            var isDuplicate = await _unitOfWork
-                .BrandRepository.GetQueryable()
-                .AnyAsync(b => b.BrandName.ToLower() == requestDto.BrandName.ToLower());
-            if (isDuplicate)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" } },
-                };
-                throw new CustomValidationException(errors);
-            }
             var brand = _mapper.Map<Brand>(requestDto);
             brand.BrandID = Guid.NewGuid();
 
@@ -124,18 +112,6 @@ namespace BusinessLogic.Services
         public async Task<BrandDto> UpdateBrandAsync(BrandUpdateRequestDto requestDto)
         {
             var errors = new Dictionary<string, string[]>();
-            var isDuplicate = await _unitOfWork
-                .BrandRepository.GetQueryable()
-                .AnyAsync(b =>
-                    b.BrandName.ToLower() == requestDto.BrandName.ToLower()
-                    && b.BrandID != requestDto.BrandID
-                );
-
-            if (isDuplicate)
-            {
-                errors.Add("BrandName", new[] { "BRAND_NAME_ALREADY_EXISTS" });
-                throw new CustomValidationException(errors);
-            }
             var brand = await _unitOfWork.BrandRepository.GetAsync(
                 b => b.BrandID == requestDto.BrandID,
                 includeProperties: "LogoImage,Materials",
@@ -203,6 +179,14 @@ namespace BusinessLogic.Services
             }
             _unitOfWork.BrandRepository.Remove(brand);
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<bool> CheckBrandExisiting(string brandName)
+        {
+            var exisiting = await _unitOfWork.BrandRepository.GetAsync(b =>
+                b.BrandName == brandName || b.BrandNameEN == brandName
+            );
+            return exisiting != null;
         }
     }
 }

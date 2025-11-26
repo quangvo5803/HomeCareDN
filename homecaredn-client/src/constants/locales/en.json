@@ -1145,6 +1145,7 @@
       "rating": "Rating",
       "serviceRequest": "service requests",
       "contractorApplication": "participated service",
+      "distributorApplication": "participated order",
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
       "history": "No history yet"

@@ -5,6 +5,7 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IMaterialService
     {
+        Task<bool> CheckMaterialExisiting(string materialName);
         Task<PagedResultDto<MaterialDto>> GetAllMaterialAsync(QueryParameters parameters);
         Task<PagedResultDto<MaterialDto>> GetAllMaterialByUserIdAsync(QueryParameters parameters);
         Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto);

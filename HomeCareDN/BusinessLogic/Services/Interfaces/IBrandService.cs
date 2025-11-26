@@ -5,6 +5,7 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IBrandService
     {
+        Task<bool> CheckBrandExisiting(string brandName);
         Task<PagedResultDto<BrandDto>> GetAllBrands(QueryParameters parameters);
         Task<BrandDto> GetBrandByID(Guid id);
         Task<BrandDto> CreateBrandAsync(BrandCreateRequestDto requestDto);

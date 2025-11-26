@@ -23,6 +23,7 @@ import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+import { materialService } from '../../services/materialService';
 
 //For TINY MCE
 export default function MaterialModal({
@@ -182,7 +183,12 @@ export default function MaterialModal({
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
       return;
     }
-
+    const exists = materialService.checkMaterial(name);
+    if (exists) {
+      toast.error(t('ERROR.MATERIAL_NAME_ALREADY_EXISTS'));
+      onClose();
+      return;
+    }
     try {
       const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
 

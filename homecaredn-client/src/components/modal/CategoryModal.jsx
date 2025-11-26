@@ -7,6 +7,7 @@ import { handleApiError } from '../../utils/handleApiError';
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import { useCategory } from '../../hook/useCategory';
 import LoadingComponent from '../LoadingComponent';
+import { categoryService } from '../../services/categoryService';
 
 export default function CategoryModal({
   isOpen,
@@ -70,7 +71,12 @@ export default function CategoryModal({
     }
     if (!category && !logoFile)
       return toast.error(t('ERROR.REQUIRED_CATEGORYLOGO'));
-
+    const exists = categoryService.checkBrand(categoryName);
+    if (exists) {
+      toast.error(t('ERROR.CATEGORY_NAME_ALREADY_EXISTS'));
+      onClose();
+      return;
+    }
     const data = {
       CategoryName: categoryName,
       CategoryNameEN: categoryNameEN || null,
@@ -265,7 +271,6 @@ CategoryModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   categoryID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
-  setSubmitting: PropTypes.func.isRequired,
 };
 
 // Default props

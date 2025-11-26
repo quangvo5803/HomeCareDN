@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Material;
@@ -7,7 +6,6 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
@@ -186,17 +184,6 @@ namespace BusinessLogic.Services
 
         public async Task<MaterialDto> CreateMaterialAsync(MaterialCreateRequestDto requestDto)
         {
-            var isDuplicate = await _unitOfWork
-                .MaterialRepository.GetQueryable()
-                .AnyAsync(b => b.Name.ToLower() == requestDto.Name.ToLower());
-            if (isDuplicate)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" } },
-                };
-                throw new CustomValidationException(errors);
-            }
             var material = _mapper.Map<Material>(requestDto);
             await _unitOfWork.MaterialRepository.AddAsync(material);
             //check image
@@ -226,18 +213,6 @@ namespace BusinessLogic.Services
                 false
             );
             var errors = new Dictionary<string, string[]>();
-            var isDuplicate = await _unitOfWork
-                .MaterialRepository.GetQueryable()
-                .AnyAsync(b =>
-                    b.Name.ToLower() == requestDto.Name.ToLower()
-                    && b.MaterialID != requestDto.MaterialID
-                );
-
-            if (isDuplicate)
-            {
-                errors.Add("MaterialName", new[] { "MATERIAL_NAME_ALREADY_EXISTS" });
-                throw new CustomValidationException(errors);
-            }
 
             //check image
             ValidateImages(requestDto.ImageUrls, material!.Images?.Count ?? 0);
@@ -380,6 +355,14 @@ namespace BusinessLogic.Services
                     )
                 )
                 || matchingUserIds.Contains(m.UserID);
+        }
+
+        public async Task<bool> CheckMaterialExisiting(string materialName)
+        {
+            var existing = await _unitOfWork.MaterialRepository.GetAsync(m =>
+                m.Name == materialName || m.NameEN == materialName
+            );
+            return existing != null;
         }
     }
 }

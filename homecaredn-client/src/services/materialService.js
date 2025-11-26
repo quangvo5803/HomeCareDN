@@ -27,6 +27,12 @@ export const materialService = {
     const response = await api.get(`/users/materials`, { params });
     return response.data;
   },
+  checkMaterial: async (name) => {
+    const response = await api.get(`/materials/check-material`, {
+      params: { name },
+    });
+    return response.data;
+  },
   create: async (dto) => {
     // dto = { UserID, CategoryID, Name, NameEN?, BrandID?, Unit?, UnitEN?, Description?, DescriptionEN?, ImageUrls[], ImagePublicIds[] }
     const response = await api.post('/materials', dto);
