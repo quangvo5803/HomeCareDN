@@ -36,18 +36,19 @@ namespace BusinessLogic.Services
         {
             bool isAdmin = role == ADMIN;
 
-            var personalQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.Personal &&
-                            n.TargetUserId == parameters.FilterID);
+            IQueryable<Notification> GetPersonalQuery() =>
+                _unitOfWork.NotificationRepository.GetQueryable()
+                    .Where(n => n.Type == NotificationType.Personal &&
+                                n.TargetUserId == parameters.FilterID);
 
-            var systemQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.System &&
-                            (isAdmin
-                                ? n.TargetUserId == parameters.FilterID
-                                : n.TargetRoles!.Contains(role))
-                );
+            IQueryable<Notification> GetSystemQuery() =>
+                _unitOfWork.NotificationRepository.GetQueryable()
+                    .Where(n => n.Type == NotificationType.System &&
+                                (isAdmin
+                                    ? n.TargetUserId == parameters.FilterID
+                                    : n.TargetRoles!.Contains(role)));
 
-            var query = personalQuery.Union(systemQuery);
+            var query = GetPersonalQuery().Union(GetSystemQuery());
 
             if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
             {
@@ -59,19 +60,14 @@ namespace BusinessLogic.Services
 
             var totalCount = await query.CountAsync();
 
-            if (isAdmin)
-            {
-                query = parameters.SortBy?.ToLower() switch
+            query = isAdmin
+                ? (parameters.SortBy?.ToLower() switch
                 {
                     "updatedat" => query.OrderBy(u => u.UpdatedAt),
                     "updatedatdesc" => query.OrderByDescending(u => u.UpdatedAt),
                     _ => query.OrderBy(u => u.CreatedAt)
-                };
-            }
-            else
-            {
-                query.OrderByDescending(n => n.UpdatedAt);
-            }
+                })
+                : query.OrderByDescending(n => n.UpdatedAt);
 
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)

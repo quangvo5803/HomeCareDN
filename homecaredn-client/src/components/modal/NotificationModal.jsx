@@ -195,7 +195,9 @@ NotificationModal.propTypes = {
     notification: PropTypes.shape({
         title: PropTypes.string,
         message: PropTypes.string,
-        type: PropTypes.string
+        type: PropTypes.string,
+        targetRoles: PropTypes.string,
+        updatedAt: PropTypes.string,
     }),
     viewOnly: PropTypes.bool,
     user: PropTypes.shape({
