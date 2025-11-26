@@ -1161,9 +1161,15 @@ export default function MaterialRequestDetail() {
                 <i className="fas fa-plus-circle mr-3 text-green-600"></i>
                 {t('userPage.materialRequestDetail.additionalMaterials')}
               </h2>
-              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
-                {acceptingItems.size}/{extraMaterial.length}
-              </span>
+              {selectedDistributor.status == 'Pending' ? (
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                  {acceptingItems.size}/{extraMaterial.length}
+                </span>
+              ) : (
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">
+                  {extraMaterial.length}
+                </span>
+              )}
             </div>
 
             {renderHeader()}
