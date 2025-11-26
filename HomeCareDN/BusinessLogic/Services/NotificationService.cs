@@ -36,19 +36,12 @@ namespace BusinessLogic.Services
         {
             bool isAdmin = role == ADMIN;
 
-            IQueryable<Notification> GetPersonalQuery() =>
-                _unitOfWork.NotificationRepository.GetQueryable()
-                    .Where(n => n.Type == NotificationType.Personal &&
-                                n.TargetUserId == parameters.FilterID);
-
-            IQueryable<Notification> GetSystemQuery() =>
-                _unitOfWork.NotificationRepository.GetQueryable()
-                    .Where(n => n.Type == NotificationType.System &&
-                                (isAdmin
-                                    ? n.TargetUserId == parameters.FilterID
-                                    : n.TargetRoles!.Contains(role)));
-
-            var query = GetPersonalQuery().Union(GetSystemQuery());
+            var query = _unitOfWork.NotificationRepository.GetQueryable()
+                .Where(n =>
+                    (n.Type == NotificationType.Personal && n.TargetUserId == parameters.FilterID) ||
+                    (n.Type == NotificationType.System &&
+                     (isAdmin ? n.TargetUserId == parameters.FilterID : n.TargetRoles!.Contains(role)))
+                );
 
             if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
             {
