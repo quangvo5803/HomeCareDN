@@ -183,7 +183,7 @@ export default function MaterialModal({
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
       return;
     }
-    const exists = materialService.checkMaterial(name);
+    const exists = await materialService.checkMaterial(name);
     if (exists) {
       toast.error(t('ERROR.MATERIAL_NAME_ALREADY_EXISTS'));
       onClose();
