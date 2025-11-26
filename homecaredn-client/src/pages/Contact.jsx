@@ -155,8 +155,13 @@ export default function Contact() {
                 />
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white px-6 py-3 rounded-lg font-medium transition"
+                  disabled={loading ||
+                    !form.fullName.trim() ||
+                    !form.email.trim() ||
+                    !form.subject.trim() ||
+                    !form.message.trim()
+                  }
+                  className="bg-orange-500 hover:bg-orange-600 disabled:bg-gray-500 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition cursor-pointer"
                 >
                   {loading ? t('BUTTON.Sending') : t('BUTTON.Send')}
                 </button>

@@ -1,50 +1,116 @@
+import { notificationService } from '../../services/notificationService';
+import { useEffect, useState, useCallback } from 'react';
+import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
+import { useDebounce } from 'use-debounce';
+import { Pagination } from 'antd';
+import { handleApiError } from '../../utils/handleApiError';
+import { toast } from 'react-toastify';
+import { withMinLoading } from '../../utils/withMinLoading';
+import { formatDate } from '../../utils/formatters';
+import { useAuth } from '../../hook/useAuth';
+import NotificationModal from '../../components/modal/NotificationModal';
 
 export default function AdminNotificationManager() {
-    const { t } = useTranslation();
-    const notifications = [
-        {
-            NotificationID: '1a2b3c4d-1111-2222-3333-444455556666',
-            Type: 'Info',
-            Title: 'Thông báo hệ thống',
-            Message: 'Hệ thống sẽ bảo trì lúc 2 giờ sáng.',
-            TargetRoles: 'Admin,User',
-            TargetUserId: null,
-            IsRead: false,
-            DataKey: 'Maintenance',
-            DataValue: '2025-11-27',
-            PendingCount: 1,
-            Action: 'View',
-            CreatedAt: '2025-11-25T10:00:00Z',
-            UpdatedAt: '2025-11-25T10:00:00Z'
+    const { t, i18n } = useTranslation();
+    const { user } = useAuth();
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 10;
+    const [search, setSearch] = useState('');
+    const [debouncedSearch] = useDebounce(search, 1000);
+    const [sortOption, setSortOption] = useState('');
+    const [notifications, setNotifications] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [totalCount, setTotalCount] = useState(0);
+    const [notifyViewOnly, setNotifyViewOnly] = useState(false);
+    const [isNotifyModalOpen, setIsNotifyModalOpen] = useState(false);
+    const [selectedNotificationData, setSelectedNotificationData] = useState(null);
+
+    const executeFetchNotifications = useCallback(
+        async ({ PageNumber = 1, PageSize = 2, Search = '', SortBy, FilterID } = {}) => {
+            try {
+                const data = await notificationService.getAllForAdmin({
+                    PageNumber,
+                    PageSize,
+                    Search,
+                    SortBy,
+                    FilterID,
+                });
+
+                setNotifications(data.items || []);
+                setTotalCount(data.totalCount || 0);
+
+                return data.items || [];
+            } catch (err) {
+                toast.error(t(handleApiError(err)));
+                setNotifications([]);
+                setTotalCount(0);
+                return [];
+            }
         },
-        {
-            NotificationID: '2b3c4d5e-2222-3333-4444-555566667777',
-            Type: 'Warning',
-            Title: 'Cảnh báo đăng nhập',
-            Message: 'Có đăng nhập bất thường từ IP lạ.',
-            TargetRoles: 'Admin',
-            TargetUserId: null,
-            IsRead: true,
-            DataKey: 'LoginAlert',
-            DataValue: '192.168.1.100',
-            PendingCount: 0,
-            Action: 'View',
-            CreatedAt: '2025-11-24T15:30:00Z',
-            UpdatedAt: '2025-11-24T15:30:00Z'
+        [t]
+    );
+
+    // Wrapper có loading tối thiểu
+    const fetchNotifications = useCallback(
+        async (params = {}) =>
+            withMinLoading(() => executeFetchNotifications(params), setLoading),
+        [executeFetchNotifications]
+    );
+    useEffect(() => {
+        fetchNotifications({
+            PageNumber: currentPage,
+            PageSize: pageSize,
+            SortBy: sortOption,
+            Search: debouncedSearch || '',
+            FilterID: user.id,
+        });
+    }, [t, currentPage, sortOption, debouncedSearch, fetchNotifications, user]);
+
+    const handleOpenCreateNotify = () => {
+        setNotifyViewOnly(false);
+        setSelectedNotificationData(null);
+        setIsNotifyModalOpen(true);
+    };
+    const handleCloseNotifyModal = () => {
+        setIsNotifyModalOpen(false);
+    };
+
+    const handleSaveNotify = async (notifyData) => {
+        try {
+            await notificationService.createForAdmin(notifyData);
+            toast.success(t('SUCCESS.CREATE_REVIEW'));
+            setIsNotifyModalOpen(false);
+            fetchNotifications({
+                PageNumber: currentPage,
+                PageSize: pageSize,
+                SortBy: sortOption,
+                Search: debouncedSearch || '',
+                FilterID: user.id,
+            });
+        } catch (err) {
+            toast.error(handleApiError(err));
         }
-    ];
+    }
 
-    const loading = false;
-
+    const handleViewNotification = async (id) => {
+        try {
+            const data = await notificationService.getByIdForAdmin(id);
+            setSelectedNotificationData(data);
+            setNotifyViewOnly(true);
+            setIsNotifyModalOpen(true);
+        } catch (err) {
+            toast.error(handleApiError(err));
+        }
+    };
 
     let tableContent;
 
     if (loading) {
         tableContent = (
             <tr>
-                <td colSpan="8" className="py-10 text-center">
-                    <span>Loading...</span>
+                <td colSpan="9" className="py-10 text-center">
+                    <LoadingComponent />
                 </td>
             </tr>
         );
@@ -54,20 +120,31 @@ export default function AdminNotificationManager() {
                 key={item.NotificationID}
                 className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}
             >
-                <td className="px-4 py-4">{idx + 1}</td>
-                <td className="px-4 py-4 font-bold text-gray-900">{item.Title}</td>
-                <td className="px-4 py-4 text-gray-700">{item.Message}</td>
-                <td className="px-4 py-4 text-gray-700">{item.Type}</td>
-                <td className="px-4 py-4 text-gray-700">{item.TargetRoles || 'All'}</td>
-                <td className="px-4 py-4 text-gray-700">{item.IsRead ? 'Đã đọc' : 'Chưa đọc'}</td>
-                <td className="px-4 py-4 text-gray-700">{item.CreatedAt.slice(0, 10)}</td>
+                <td className="px-4 py-4 text-center align-middle">
+                    <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                        {(currentPage - 1) * pageSize + idx + 1}
+                    </span>
+                </td>
+                <td className="px-4 py-4 font-bold text-gray-900">{item.title}</td>
+                <td className="px-4 py-4 text-gray-700">
+                    <span className="px-3 py-1 text-sm font-medium text-purple-800 bg-purple-100 rounded-full">
+                        {t(`adminNotifyManager.${item.type}`)}
+                    </span>
+                </td>
+                <td className="px-4 py-4 text-gray-700">
+                    <span className="px-3 py-1 text-sm font-medium bg-amber-50 text-amber-700 rounded-full">
+                        {item.targetRoles}
+                    </span>
+                </td>
+                <td className="px-4 py-4 text-gray-800">{formatDate(item.createdAt, i18n.language)}</td>
                 <td className="px-4 py-4">
                     <button
                         type="button"
-                        onClick={() => alert(`Action: ${item.Action}`)}
-                        className="px-3 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                        onClick={() => handleViewNotification(item.notificationID)}
+                        className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
                     >
-                        {item.Action}
+                        <i className="fa-solid fa-eye" />
+                        {t('BUTTON.View')}
                     </button>
                 </td>
             </tr>
@@ -75,10 +152,17 @@ export default function AdminNotificationManager() {
     } else {
         tableContent = (
             <tr>
-                <td colSpan="8" className="py-16 text-center">
-                    <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Không có thông báo nào</h3>
-                        <p className="text-sm text-gray-500">Bạn chưa có thông báo mới.</p>
+                <td colSpan="9" className="px-6 py-16 text-center">
+                    <div className="flex flex-col items-center justify-center text-center mt-5 mb-5">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <i className="fas fa-bell text-gray-400 text-3xl" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                            {t('adminNotifyManager.empty')}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                            {t('adminNotifyManager.empty_description')}
+                        </p>
                     </div>
                 </td>
             </tr>
@@ -92,14 +176,14 @@ export default function AdminNotificationManager() {
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center">
-                                <i className="fa-solid fa-dollar text-white text-2xl" />
+                                <i className="fas fa-bell text-white text-2xl" />
                             </div>
                             <div>
                                 <h1 className="text-4xl font-bold text-gray-900 mb-1">
-                                    {t('adminPaymentManager.title')}
+                                    {t('adminNotifyManager.title')}
                                 </h1>
                                 <p className="text-gray-600 text-sm font-medium">
-                                    {t('adminPaymentManager.subtitle')}
+                                    {t('adminNotifyManager.subtitle')}
                                 </p>
                             </div>
                         </div>
@@ -114,14 +198,14 @@ export default function AdminNotificationManager() {
                             <div className="px-5 py-3 bg-orange-500 rounded-xl shadow-lg">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                                        <i className="fa-solid fa-dollar text-white text-lg" />
+                                        <i className="fas fa-bell text-white text-lg" />
                                     </div>
                                     <div>
                                         <div className="text-2xl font-bold text-white">
-                                            {loading ? 0 : notifications.length || 0}
+                                            {loading ? 0 : totalCount || 0}
                                         </div>
                                         <div className="text-xs text-white/90 font-medium">
-                                            {t('adminPaymentManager.transaction')}
+                                            {t('adminNotifyManager.notifications')}
                                         </div>
                                     </div>
                                 </div>
@@ -131,16 +215,16 @@ export default function AdminNotificationManager() {
                         {/* Search & Filter */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             <select
-                                // value={sortOption}
-                                // onChange={(e) => {
-                                //     setSortOption(e.target.value);
-                                //     setCurrentPage(1);
-                                // }}
+                                value={sortOption}
+                                onChange={(e) => {
+                                    setSortOption(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-white hover:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm cursor-pointer"
                             >
                                 <option value="">{t('common.sortDefault')}</option>
-                                <option value="paidat">{t('common.sortCreateDateOld')}</option>
-                                <option value="paidatdesc">
+                                <option value="updatedat">{t('common.sortCreateDateOld')}</option>
+                                <option value="updatedatdesc">
                                     {t('common.sortCreateDateNew')}
                                 </option>
                             </select>
@@ -149,35 +233,75 @@ export default function AdminNotificationManager() {
                                 <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm group-hover:text-orange-500 transition-colors" />
                                 <input
                                     type="text"
-                                    // value={search}
-                                    // onChange={(e) => setSearch(e.target.value)}
+                                    value={search}
+                                    onChange={(e) => setSearch(e.target.value)}
                                     placeholder={t('common.search')}
                                     className="pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm hover:border-orange-300 bg-white"
                                 />
                             </div>
+                            <button
+                                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-500 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
+                                onClick={handleOpenCreateNotify}
+                            >
+                                <i className="fa-solid fa-plus"></i>
+                                {t('adminNotifyManager.buttonCreate')}
+                            </button>
                         </div>
                     </div>
                 </div>
+                <NotificationModal
+                    isOpen={isNotifyModalOpen}
+                    onClose={handleCloseNotifyModal}
+                    onSave={handleSaveNotify}
+                    notification={null}
+                    viewOnly={notifyViewOnly}
+                    user={user}
+                />
                 <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-center">
                             <thead>
                                 <tr className="h-12 bg-gray-50 border-b">
-                                    <th className="px-4 py-4">#</th>
-                                    <th className="px-4 py-4">Tiêu đề</th>
-                                    <th className="px-4 py-4">Nội dung</th>
-                                    <th className="px-4 py-4">Loại</th>
-                                    <th className="px-4 py-4">Nhóm/Người nhận</th>
-                                    <th className="px-4 py-4">Trạng thái</th>
-                                    <th className="px-4 py-4">Ngày tạo</th>
-                                    <th className="px-4 py-4">Hành động</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.no')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.title1')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.type')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.receiver')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.createAt')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.action')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">{tableContent}</tbody>
                         </table>
                     </div>
                 </div>
+                {/* Pagination */}
+                {!loading && totalCount > 0 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
+                        <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 w-full sm:w-auto justify-center sm:justify-start">
+                            <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                            <span>
+                                {totalCount} {t('adminPaymentManager.transaction')}
+                            </span>
+                        </div>
+                        <Pagination
+                            current={currentPage}
+                            pageSize={pageSize}
+                            total={totalCount}
+                            onChange={(page) => setCurrentPage(page)}
+                            showSizeChanger={false}
+                            size="small"
+                        />
+                    </div>
+                )}
             </div>
+            <NotificationModal
+                isOpen={isNotifyModalOpen}
+                onClose={handleCloseNotifyModal}
+                onSave={handleSaveNotify}
+                notification={selectedNotificationData}
+                viewOnly={notifyViewOnly}
+                user={user}
+            />
         </div>
     );
 }

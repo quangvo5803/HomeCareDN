@@ -25,6 +25,15 @@ export default function AdminSupportManager() {
   const [supportID, setSupportID] = useState(null);
   const [supports, setSupports] = useState([]);
   const [totalSupports, setTotalSupports] = useState(0);
+
+  const getCurrentParams = useCallback(() => ({
+    PageNumber: currentPage,
+    PageSize: pageSize,
+    SortBy: sortBy,
+    Search: debouncedSearch || '',
+    Filter: filter,
+  }), [currentPage, pageSize, sortBy, debouncedSearch, filter]);
+
   // ------------------------------
   // 1. Fetch thuần giống Payment.executeFetchPayments
   // ------------------------------
@@ -66,23 +75,17 @@ export default function AdminSupportManager() {
   // 2. Wrapper withMinLoading
   // ------------------------------
   const fetchSupports = useCallback(
-    async (params = {}) =>
+    async (params = getCurrentParams()) =>
       withMinLoading(() => executeFetchSupports(params), setLoading),
-    [executeFetchSupports]
+    [executeFetchSupports, getCurrentParams]
   );
 
   // ------------------------------
   // 3. Trigger fetch
   // ------------------------------
   useEffect(() => {
-    fetchSupports({
-      PageNumber: currentPage,
-      PageSize: pageSize,
-      SortBy: sortBy,
-      Search: debouncedSearch || '',
-      Filter: filter,
-    });
-  }, [t, currentPage, sortBy, debouncedSearch, filter, fetchSupports]);
+    fetchSupports();
+  }, [fetchSupports]);
 
   // ------------------------------
   // 4. Search handler
@@ -183,11 +186,10 @@ export default function AdminSupportManager() {
                   <button
                     key={key}
                     onClick={() => setFilter(key)}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer ${
-                      filter === key
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-sm cursor-pointer ${filter === key
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     {t(`adminSupportManager.${key}`)}
                   </button>
@@ -251,9 +253,8 @@ export default function AdminSupportManager() {
                       supports.map((s, index) => (
                         <tr
                           key={s.id}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                          className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                            }`}
                         >
                           <td className="px-4 py-4 text-center align-middle">
                             <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -284,11 +285,10 @@ export default function AdminSupportManager() {
                           <td className="px-4 py-4 text-center align-middle">
                             <div className="flex items-center justify-center space-x-1">
                               <button
-                                className={`inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md cursor-pointer ${
-                                  s.isProcessed
-                                    ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
-                                    : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
-                                }`}
+                                className={`inline-flex items-center px-3 py-2 text-sm font-medium border rounded-md cursor-pointer ${s.isProcessed
+                                  ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
+                                  : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                                  }`}
                                 onClick={() => {
                                   setIsModalOpen(true);
                                   setSupportID(s.id);
@@ -368,11 +368,10 @@ export default function AdminSupportManager() {
 
                       <div className="flex space-x-2">
                         <button
-                          className={`flex-1 px-3 py-2 text-xs font-medium border rounded-md cursor-pointer ${
-                            s.isProcessed
-                              ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
-                              : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
-                          }`}
+                          className={`flex-1 px-3 py-2 text-xs font-medium border rounded-md cursor-pointer ${s.isProcessed
+                            ? 'border-blue-300 text-blue-700 bg-blue-50 hover:bg-blue-100'
+                            : 'border-amber-300 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                            }`}
                           onClick={() => {
                             setIsModalOpen(true);
                             setSupportID(s.id);

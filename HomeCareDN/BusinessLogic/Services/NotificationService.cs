@@ -18,6 +18,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly ISignalRNotifier _notifier;
         private readonly UserManager<ApplicationUser> _userManager;
+        private const string ADMIN = "Admin";
         public NotificationService
         (
             IUnitOfWork unitOfWork, IMapper mapper, 
@@ -33,18 +34,44 @@ namespace BusinessLogic.Services
         public async Task<PagedResultDto<NotificationDto>> GetAllNotificationsAsync
             (QueryParameters parameters, string role)
         {
+            bool isAdmin = role == ADMIN;
+
             var personalQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.Personal
-                            && n.TargetUserId == parameters.FilterID);
+                .Where(n => n.Type == NotificationType.Personal &&
+                            n.TargetUserId == parameters.FilterID);
 
             var systemQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.System
-                            && (n.TargetRoles!.Contains(role) || n.TargetRoles.ToLower() == "all"));
+                .Where(n => n.Type == NotificationType.System &&
+                            (isAdmin
+                                ? n.TargetUserId == parameters.FilterID
+                                : n.TargetRoles!.Contains(role))
+                );
 
-            var query = personalQuery.Union(systemQuery)
-                .OrderByDescending(n => n.UpdatedAt);
+            var query = personalQuery.Union(systemQuery);
+
+            if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(u =>
+                    u.Title.Contains(parameters.Search) ||
+                    u.Message.Contains(parameters.Search)
+                );
+            }
 
             var totalCount = await query.CountAsync();
+
+            if (isAdmin)
+            {
+                query = parameters.SortBy?.ToLower() switch
+                {
+                    "updatedat" => query.OrderBy(u => u.UpdatedAt),
+                    "updatedatdesc" => query.OrderByDescending(u => u.UpdatedAt),
+                    _ => query.OrderBy(u => u.CreatedAt)
+                };
+            }
+            else
+            {
+                query.OrderByDescending(n => n.UpdatedAt);
+            }
 
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
@@ -53,11 +80,14 @@ namespace BusinessLogic.Services
 
             var dtoItems = _mapper.Map<IEnumerable<NotificationDto>>(items);
 
-            foreach (var dto in dtoItems)
+            if (!isAdmin)
             {
-                if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
+                foreach (var dto in dtoItems)
                 {
-                    dto.Message = $"Có {dto.PendingCount} {dto.Title.ToLower()}.";
+                    if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
+                    {
+                        dto.Message = $"Có {dto.PendingCount} {dto.Title.ToLower()}.";
+                    }
                 }
             }
 
@@ -70,10 +100,24 @@ namespace BusinessLogic.Services
             };
         }
 
+        public async Task<NotificationDto> GetNotificationById(Guid id)
+        {
+            var notify = await _unitOfWork.NotificationRepository
+                .GetAsync(n => n.NotificationID == id);
+            if(notify == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Notification", new[] { "NotificationID NOT FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<NotificationDto>(notify);
+        }
         public async Task<NotificationDto> AdminSendSystemAsync
             (NotificationSystemCreateOrUpdateDto requestDto)
         {
-            return await CreateOrUpdateSystemAsync(requestDto);
+            return await CreateOrUpdateSystemAsync(requestDto, ADMIN);
         }
 
         public async Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto)
@@ -202,7 +246,7 @@ namespace BusinessLogic.Services
                 TargetRoles = "Contractor"
             };
 
-            var result = await CreateOrUpdateSystemAsync(dto);
+            var result = await CreateOrUpdateSystemAsync(dto, null);
 
             return result;
         }
@@ -220,7 +264,7 @@ namespace BusinessLogic.Services
                 TargetRoles = "Distributor"
             };
 
-            var result = await CreateOrUpdateSystemAsync(dto);
+            var result = await CreateOrUpdateSystemAsync(dto, null);
             
             await _unitOfWork.SaveAsync();
             return result;
@@ -228,7 +272,7 @@ namespace BusinessLogic.Services
 
         // ==================== Helper ====================
         private async Task<NotificationDto> CreateOrUpdateSystemAsync
-            (NotificationSystemCreateOrUpdateDto requestDto)
+            (NotificationSystemCreateOrUpdateDto requestDto, string? role)
         {
             var existing = await _unitOfWork.NotificationRepository
                 .GetAsync(n => n.Type == NotificationType.System
@@ -248,10 +292,14 @@ namespace BusinessLogic.Services
             {
                 noti = _mapper.Map<Notification>(requestDto);
                 noti.Type = NotificationType.System;
-                noti.PendingCount = 1;
                 noti.CreatedAt = DateTime.UtcNow;
                 noti.UpdatedAt = DateTime.UtcNow;
-
+                noti.PendingCount = 1;
+                if (role == ADMIN)
+                {
+                    noti.Action = NotificationAction.Send;
+                    noti.DataKey = "Admin_" + Guid.NewGuid().ToString("N").Substring(0, 10);
+                }
                 await _unitOfWork.NotificationRepository.AddAsync(noti);
             }
             await _unitOfWork.SaveAsync();
@@ -273,12 +321,6 @@ namespace BusinessLogic.Services
 
         private async Task SendToRolesAsync(string roles, string eventName, object payload)
         {
-            if (roles.ToLower() == "all")
-            {
-                await _notifier.SendToAllApplicationAsync(eventName, payload);
-                return;
-            }
-
             var roleList = roles.Split(",").Select(x => x.Trim());
             foreach (var role in roleList)
             {

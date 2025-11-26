@@ -40,6 +40,9 @@ namespace DataAccess.Entities.Application
         Reject,
 
         [Display(Name = "Paid")]
-        Paid
+        Paid,
+
+        [Display(Name = "Send")]
+        Send
     }
 }

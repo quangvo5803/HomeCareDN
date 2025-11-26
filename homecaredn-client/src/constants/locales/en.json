@@ -799,7 +799,8 @@
       "supportChat": "Chat",
       "user": "User",
       "review": "Review",
-      "commission": "Commission"
+      "commission": "Commission",
+      "notification": "Notification"
     },
     "account": {
       "title": "Account pages",
@@ -1224,6 +1225,25 @@
     "all": "All",
     "empty": "No reviews found",
     "empty_description": "There are currently no reviews available."
+  },
+  "adminNotifyManager": {
+    "title": "Notification Management",
+    "subtitle": "List of notifications for users in the system",
+    "notifications": "notifications",
+    "no": "No.",
+    "title1": "Title",
+    "message": "Message",
+    "type": "Type",
+    "System": "System",
+    "receiver": "Receiver",
+    "createAt": "Created At",
+    "action": "Action",
+    "buttonCreate": "Create a notification",
+    "detail": "Notification details",
+    "enterTitle": "Enter title ...",
+    "enterMess": "Enter message ...",
+    "empty": "No notifications found",
+    "empty_description": "There are currently no announcements."
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",

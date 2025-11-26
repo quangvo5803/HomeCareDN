@@ -8,6 +8,7 @@ namespace BusinessLogic.Services.Interfaces
     {
         Task<PagedResultDto<NotificationDto>> GetAllNotificationsAsync
             (QueryParameters parameters, string role);
+        Task<NotificationDto> GetNotificationById(Guid id);
         Task<NotificationDto> AdminSendSystemAsync(NotificationSystemCreateOrUpdateDto requestDto);
         Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto);
         Task<NotificationDto> NotifyNewServiceRequestAsync(ServiceRequest request);

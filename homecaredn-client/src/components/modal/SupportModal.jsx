@@ -134,7 +134,8 @@ export default function SupportModal({
           {!support?.isProcessed && (
             <button
               onClick={handleSubmit}
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+              disabled={!reply.trim()}
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
             >
               {t('BUTTON.Send')}
             </button>
