@@ -236,7 +236,7 @@ namespace BusinessLogic.Services
                 );
             Notification noti;
 
-            if (existing != null)
+            if (existing != null && !existing.IsRead)
             {
                 existing.PendingCount++;
                 existing.UpdatedAt = DateTime.UtcNow;
