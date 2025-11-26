@@ -63,25 +63,18 @@ export default function MaterialRequestDetail() {
 
   //Realtime
   useRealtime({
-    //Accept
     [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
       setMaterialRequests((prev) =>
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
-            ? {
-                ...mr,
-                status: 'Closed',
-              }
+            ? { ...mr, status: 'Closed' }
             : mr
         )
       );
       setMaterialRequest((prev) => {
         if (!prev) return prev;
         if (prev.materialRequestID === payload.materialRequestID) {
-          return {
-            ...prev,
-            status: 'Closed',
-          };
+          return { ...prev, status: 'Closed' };
         }
         return prev;
       });
@@ -101,12 +94,8 @@ export default function MaterialRequestDetail() {
         return prev;
       });
     },
-    //Reject
     [RealtimeEvents.DistributorApplicationRejected]: () => {
-      setExistingApplication((prev) => ({
-        ...prev,
-        status: 'Rejected',
-      }));
+      setExistingApplication((prev) => ({ ...prev, status: 'Rejected' }));
     },
     [RealtimeEvents.MaterialRequestDelete]: (payload) => {
       if (payload.materialRequestID === materialRequestId) {
@@ -172,6 +161,7 @@ export default function MaterialRequestDetail() {
       return updated;
     });
   };
+
   //Delete material
   const handleDeleteMaterial = (materialRequestItemID) => {
     setNewMaterials((prev) =>
@@ -210,6 +200,7 @@ export default function MaterialRequestDetail() {
       return updated;
     });
   };
+
   const handleQuantityChange = (id, value) =>
     updateExistingItem(id, { quantity: Number(value) });
 
@@ -261,8 +252,6 @@ export default function MaterialRequestDetail() {
         )?.quantity,
       }));
     }
-
-    if (!canAddMaterial) return base;
 
     if (canAddMaterial) {
       const baseFixed = base.map((item) => ({
@@ -343,6 +332,7 @@ export default function MaterialRequestDetail() {
       },
     });
   };
+
   // Pay commission
   const handlePayCommission = async () => {
     try {
@@ -374,6 +364,7 @@ export default function MaterialRequestDetail() {
       toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
+
   // Handle query status
   const status = searchParams.get('status');
   useEffect(() => {
@@ -407,10 +398,8 @@ export default function MaterialRequestDetail() {
 
   const canSubmit = useMemo(() => {
     return isAllPricesFilled();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [materialRequest, newMaterials]);
 
-  // Helper function to check if we should show the loading state
   if (loading || isChecking || !materialRequest) {
     return <Loading />;
   }
@@ -445,8 +434,6 @@ export default function MaterialRequestDetail() {
 
   const isPending = statusApp === 'Pending';
   const isPendingCommission = statusApp === 'PendingCommission';
-
-  //Commission Section
   const CommissionSection = isPendingCommission ? (
     <>
       {/* Commission Calculation Info Box */}
@@ -473,7 +460,6 @@ export default function MaterialRequestDetail() {
                 </th>
               </tr>
             </thead>
-
             <tbody>
               <tr>
                 <td className="py-1 text-gray-500">
@@ -521,7 +507,6 @@ export default function MaterialRequestDetail() {
 
           return (
             <div className="space-y-2">
-              {/* Estimate Price */}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">
                   {t('distributorMaterialRequestDetail.yourBid')}:
@@ -531,7 +516,6 @@ export default function MaterialRequestDetail() {
                 </span>
               </div>
 
-              {/* Commission Rate */}
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-600">
                   {t('distributorMaterialRequestDetail.commissionRate')}:
@@ -543,7 +527,6 @@ export default function MaterialRequestDetail() {
 
               <div className="border-t border-blue-200 my-2"></div>
 
-              {/* Commission amount */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">
                   {t('distributorMaterialRequestDetail.commissionToPay')}:
@@ -558,7 +541,6 @@ export default function MaterialRequestDetail() {
                 </div>
               </div>
 
-              {/* Cap note */}
               {estimatePrice > 2_000_000_000 && commission >= 100_000_000 && (
                 <div className="bg-yellow-50 rounded p-2 ring-1 ring-yellow-200">
                   <p className="text-xs text-yellow-700 flex items-center gap-1">
@@ -651,32 +633,30 @@ export default function MaterialRequestDetail() {
 
           {hasNewMaterials ? (
             <div className="text-center py-1">
-              <div className="text-center py-1">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <i className="fas fa-inbox text-slate-400 text-4xl"></i>
-                </div>
-                <h4 className="font-bold text-slate-700 mb-2 text-lg">
-                  {t('userPage.materialRequestDetail.noMaterial')}
-                </h4>
-                <p className="text-sm text-slate-500 mb-6">
-                  {t('userPage.materialRequestDetail.addMaterial')}
-                </p>
-
-                <button
-                  type="button"
-                  className="inline-flex items-center mb-6 gap-2 text-sm px-4 py-2 bg-orange-500 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer"
-                  onClick={() => setOpen(true)}
-                >
-                  <i className="fas fa-plus-circle"></i>
-                  {t('BUTTON.AddNewMaterial')}
-                </button>
+              <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i className="fas fa-inbox text-slate-400 text-4xl"></i>
               </div>
+              <h4 className="font-bold text-slate-700 mb-2 text-lg">
+                {t('userPage.materialRequestDetail.noMaterial')}
+              </h4>
+              <p className="text-sm text-slate-500 mb-6">
+                {t('userPage.materialRequestDetail.addMaterial')}
+              </p>
+
+              <button
+                type="button"
+                className="inline-flex items-center mb-6 gap-2 text-sm px-4 py-2 bg-orange-500 text-white rounded-lg hover:shadow-lg transition font-bold cursor-pointer"
+                onClick={() => setOpen(true)}
+              >
+                <i className="fas fa-plus-circle"></i>
+                {t('BUTTON.AddNewMaterial')}
+              </button>
             </div>
           ) : (
             <>
               {newMaterials.length > 0 && canAddMaterial && (
                 <>
-                  {/* Table Header */}
+                  {/* Table Header for New Materials */}
                   <div className="hidden lg:grid lg:grid-cols-28 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700">
                     <div className="col-span-1 text-center">#</div>
                     <div className="col-span-3 text-center">
@@ -704,29 +684,25 @@ export default function MaterialRequestDetail() {
                 </>
               )}
 
-              {/* Items List */}
+              {/* Items List for New Materials */}
               <div className="space-y-4">
                 {newMaterials.map((item, index) => {
                   const imageUrl =
                     item.material.images?.[0]?.imageUrl ||
                     item.material.imageUrls?.[0];
-
                   const displayName =
                     i18n.language === 'vi'
                       ? item.material.name
                       : item.material.nameEN || item.material.name;
-
                   const displayCategory =
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
                         item.material.categoryName;
-
                   const displayBrand =
                     i18n.language === 'vi'
                       ? item.material.brandName
                       : item.material.brandNameEN || item.material.brandName;
-
                   const displayUnit =
                     i18n.language === 'vi'
                       ? item.material.unit
@@ -859,8 +835,7 @@ export default function MaterialRequestDetail() {
                             type="number"
                             min={0}
                             value={item.price || ''}
-                            className="w-25 px-3 py-2 border-2 border-slate-200 rounded-lg text-center 
-                                                                            focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
+                            className="w-25 px-3 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm"
                             placeholder="0"
                             onChange={(e) =>
                               handlePriceChangeNew(
@@ -974,7 +949,6 @@ export default function MaterialRequestDetail() {
       </form>
     </div>
   );
-
   const ApplicationDetailView = (
     <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -1007,7 +981,7 @@ export default function MaterialRequestDetail() {
       )}
 
       <div className="overflow-x-auto">
-        {/* Header */}
+        {/* Header for Application Detail */}
         <div className="hidden lg:grid lg:grid-cols-18 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
           <div className="col-span-1">#</div>
           <div className="col-span-2">
@@ -1030,24 +1004,20 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
 
-        {/* Material */}
+        {/* Material Items in Application */}
         <div className="space-y-4">
           {existingApplication?.items?.map((item, index) => {
             const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
-
             const displayName =
               i18n.language === 'vi' ? item.name : item.nameEN || item.name;
-
             const displayCategory =
               i18n.language === 'vi'
                 ? item.categoryName
                 : item.categoryNameEN || item.categoryName;
-
             const displayBrand =
               i18n.language === 'vi'
                 ? item.brandName
                 : item.brandNameEN || item.brandName;
-
             const displayUnit =
               i18n.language === 'vi' ? item.unit : item.unitEN || item.unit;
 
@@ -1131,6 +1101,7 @@ export default function MaterialRequestDetail() {
                       {formatVND(item.price)}
                     </div>
                   </div>
+
                   {/* Total Price */}
                   <div className="col-span-3 flex justify-center">
                     <div className="w-full px-3 py-2 text-center font-bold text-slate-900 text-sm ">
@@ -1172,9 +1143,7 @@ export default function MaterialRequestDetail() {
           </h4>
           <div
             className="prose prose-sm max-w-none text-gray-900 bg-gray-50 rounded-lg p-4"
-            dangerouslySetInnerHTML={{
-              __html: existingApplication?.message,
-            }}
+            dangerouslySetInnerHTML={{ __html: existingApplication?.message }}
           />
         </div>
       )}
@@ -1199,6 +1168,7 @@ export default function MaterialRequestDetail() {
       </div>
     </div>
   );
+
   const getApplyView = () => {
     if (isClosedAndNoApplication) return ClosedView;
     if (isOpenAndNoApplication) return ApplyFormView;
@@ -1211,7 +1181,6 @@ export default function MaterialRequestDetail() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">
       {/* Header */}
       <div className="relative overflow-hidden rounded-2xl bg-orange-500 h-12 sm:h-32">
-        {/* Back Button */}
         <button
           onClick={() => navigate('/Distributor/MaterialRequestManager')}
           className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex items-center px-4 py-2 text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors cursor-pointer"
@@ -1229,6 +1198,7 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
       </div>
+
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
         {/* LEFT CONTENT */}
         <div className="lg:col-span-9 space-y-6">
@@ -1285,29 +1255,25 @@ export default function MaterialRequestDetail() {
                 </div>
               </div>
 
-              {/* Material */}
+              {/* Material Items */}
               <div className="space-y-4">
                 {materialRequest.materialRequestItems.map((item, index) => {
                   const imageUrl =
                     item.material.images?.[0]?.imageUrl ||
                     item.material.imageUrls?.[0];
-
                   const displayName =
                     i18n.language === 'vi'
                       ? item.material.name
                       : item.material.nameEN || item.material.name;
-
                   const displayCategory =
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
                         item.material.categoryName;
-
                   const displayBrand =
                     i18n.language === 'vi'
                       ? item.material.brandName
                       : item.material.brandNameEN || item.material.brandName;
-
                   const displayUnit =
                     i18n.language === 'vi'
                       ? item.material.unit
@@ -1447,6 +1413,7 @@ export default function MaterialRequestDetail() {
               </h3>
               {formatDate(materialRequest.createdAt, i18n.language)}
             </div>
+
             <div className="pb-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                 <i className="fa-solid fa-user-shield text-gray-500" />
@@ -1512,6 +1479,7 @@ export default function MaterialRequestDetail() {
                 </div>
               </div>
             </div>
+
             {/* Application Status Summary */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
@@ -1519,9 +1487,7 @@ export default function MaterialRequestDetail() {
                 {t('distributorMaterialRequestDetail.applicationStatus')}
               </h3>
 
-              {/* No application from current contractor */}
               {existingApplication ? (
-                /* existingApplication exists -> show details */
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 mb-4">
                     <StatusBadge
@@ -1530,7 +1496,7 @@ export default function MaterialRequestDetail() {
                     />
                   </div>
 
-                  <div className="bg-orange-50 rounded-lg  p-3 ring-1 ring-orange-200">
+                  <div className="bg-orange-50 rounded-lg p-3 ring-1 ring-orange-200">
                     <p className="text-xs text-black mb-1">
                       {t('distributorMaterialRequestDetail.yourBid')}
                     </p>
@@ -1539,10 +1505,8 @@ export default function MaterialRequestDetail() {
                     </p>
                   </div>
 
-                  {/* If request closed, show appropriate note */}
                   {isRequestClosed && (
                     <>
-                      {/* You were approved */}
                       {existingApplication.status === 'Approved' && (
                         <div className="bg-green-50 rounded-lg p-3 ring-1 ring-green-200">
                           <p className="text-xs text-green-700 flex items-center gap-2">
@@ -1554,7 +1518,6 @@ export default function MaterialRequestDetail() {
                         </div>
                       )}
 
-                      {/* Request closed and awarded to another contractor (not you) */}
                       {materialRequest.selectedDistributorApplication
                         ?.distributorID &&
                         materialRequest.selectedDistributorApplication
@@ -1587,7 +1550,6 @@ export default function MaterialRequestDetail() {
                         )}
                       </p>
 
-                      {/* If request closed and selected contractor is someone else -> show note */}
                       {materialRequest.selectedDistributorApplication
                         ?.distributorID &&
                         materialRequest.selectedDistributorApplication
@@ -1616,6 +1578,7 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
       </div>
+
       <MaterialRequestModal
         isOpen={open}
         onClose={() => setOpen(false)}
