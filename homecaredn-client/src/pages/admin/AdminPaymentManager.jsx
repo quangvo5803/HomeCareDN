@@ -107,7 +107,13 @@ export default function PaymentManager() {
           <button
             type="button"
             onClick={() =>
-              navigate(`/Admin/ServiceRequestManager/${item.serviceRequestID}`)
+              item.serviceRequestID
+                ? navigate(
+                    `/Admin/ServiceRequestManager/${item.serviceRequestID}`
+                  )
+                : navigate(
+                    `/Admin/MaterialRequestManager/${item.materialRequestID}`
+                  )
             }
             className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
           >

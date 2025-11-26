@@ -347,7 +347,7 @@ export default function AdminServiceRequestDetail() {
               {t('adminServiceRequestManager.description')}
             </p>
             <div
-              className="text-gray-700 leading-relaxed"
+              className="text-black leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: serviceRequestDetail.description,
               }}
@@ -630,7 +630,7 @@ export default function AdminServiceRequestDetail() {
                       {t('adminServiceRequestManager.description')}
                     </p>
                     <div
-                      className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+                      className="prose prose-sm max-w-none text-black bg-gray-50 rounded-lg p-4"
                       dangerouslySetInnerHTML={{
                         __html: he.decode(selectedContractor.description || ''),
                       }}
