@@ -24,7 +24,7 @@ export default function SupportModal({
       if (isOpen && supportID) {
         try {
           setLoading(true);
-          const data = await contactSupportService.gettById(supportID);
+          const data = await contactSupportService.getById(supportID);
           setSupport(data);
         } catch (err) {
           toast.error(handleApiError(err));

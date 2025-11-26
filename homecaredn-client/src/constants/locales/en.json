@@ -1613,6 +1613,7 @@
   "common": {
     "new": "New",
     "noRequirement": "No requirements",
+    "notLogin": "Please login before action",
     "search": "Search...",
     "sortDefault": "Default",
     "sortName": "Name: A-Z",
