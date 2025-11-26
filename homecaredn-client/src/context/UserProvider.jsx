@@ -81,7 +81,12 @@ export const UserProvider = ({ children }) => {
   const updateUser = useCallback(async (dto) => {
     try {
       const data = await userService.updateUser(dto);
-      setProfile(data);
+      setProfile((prev) => ({
+        ...prev,
+        fullName: dto.FullName,
+        phoneNumber: dto.PhoneNumber,
+        gender: dto.Gender,
+      }));
       return data;
     } catch (err) {
       toast.error(handleApiError(err));

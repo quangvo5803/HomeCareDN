@@ -13,7 +13,6 @@ export const contactSupportService = {
   },
 
   reply: async (dto) => {
-    // dto = { ID: guid, ReplyContent: string }
     const response = await api.put('/contactact-supports/reply', dto);
     return response.data;
   },
@@ -25,7 +24,6 @@ export const contactSupportService = {
 
   // ====================== ANONYMOUS ======================
   create: async (dto) => {
-    // dto = { FullName, Email, Subject, Message }
     const response = await api.post('/contactact-supports', dto);
     return response.data;
   },

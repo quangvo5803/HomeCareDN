@@ -47,7 +47,7 @@ export default function SupportModal({
         replyContent: reply,
       });
       toast.success(t('SUCCESS.REPLY'));
-      onReplySent();
+      if (onReplySent) onReplySent(supportID);
       onClose();
     } catch (err) {
       toast.error(handleApiError(err));
