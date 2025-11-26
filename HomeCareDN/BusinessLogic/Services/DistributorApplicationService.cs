@@ -457,6 +457,7 @@ namespace BusinessLogic.Services
                 application.MaterialRequestID,
                 Status = "PendingCommission",
                 application.DueCommisionTime,
+                resultDto.Items,
             };
 
             await _notifier.SendToApplicationGroupAsync(

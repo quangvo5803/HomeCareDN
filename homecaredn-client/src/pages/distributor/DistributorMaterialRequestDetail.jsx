@@ -94,6 +94,7 @@ export default function MaterialRequestDetail() {
             ...prev,
             status: 'PendingCommission',
             dueCommisionTime: payload.dueCommisionTime || null,
+            items: payload.items,
           };
         }
         return prev;
