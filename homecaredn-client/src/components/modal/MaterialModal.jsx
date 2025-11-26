@@ -184,8 +184,8 @@ export default function MaterialModal({
       return;
     }
     const exists = await materialService.checkMaterial({
-      name,
-      materialID: material.materialID,
+      name: name,
+      materialID: material?.materialID,
     });
     if (exists) {
       toast.error(t('ERROR.MATERIAL_NAME_ALREADY_EXISTS'));

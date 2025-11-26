@@ -3,6 +3,7 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Data;
@@ -101,6 +102,7 @@ namespace BusinessLogic.Services
         )
         {
             var itemDict = items.ToDictionary(i => i.MaterialRequestID);
+            var materialRequestIds = itemDict.Keys.ToList();
 
             var addressIds = items
                 .Where(i => i.AddressId.HasValue)
@@ -129,6 +131,24 @@ namespace BusinessLogic.Services
                         dto.Address.Detail = string.Empty;
                         dto.Address.Ward = string.Empty;
                     }
+                }
+                if (role == "Customer" && dto.Review == null)
+                {
+                    await MapStartReviewDateForCustomerListAll(dto);
+                }
+            }
+        }
+
+        private async Task MapStartReviewDateForCustomerListAll(MaterialRequestDto dto)
+        {
+            if (dto.SelectedDistributorApplication?.Status == ApplicationStatus.Approved.ToString())
+            {
+                var contractorPayment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(
+                    cp => cp.MaterialRequestID == dto.MaterialRequestID
+                );
+                if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
+                {
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
                 }
             }
         }

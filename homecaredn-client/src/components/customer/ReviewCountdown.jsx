@@ -48,14 +48,14 @@ export default function ReviewCountdown({
   if (request.review) {
     return (
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2">
-            <i className="fas fa-check-circle text-green-500"></i>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <i className="fas fa-check-circle text-green-500 text-lg"></i>
             <span className="text-sm font-medium text-gray-700">
               {t('ReviewCountdown.reviewed')}
             </span>
             {/* Rating */}
-            <div className="flex items-center gap-1 ml-2">
+            <div className="flex items-center gap-1">
               {Array.from({ length: 5 }, (_, i) => (
                 <i
                   key={`star-${request?.id}-${i}`}
@@ -71,7 +71,7 @@ export default function ReviewCountdown({
 
           <button
             onClick={() => onViewReview(request)}
-            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200"
+            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 whitespace-nowrap"
           >
             <i className="fas fa-eye mr-2"></i>
             {t('ReviewCountdown.viewReview')}
@@ -81,13 +81,15 @@ export default function ReviewCountdown({
     );
   }
 
+  if (!request.startReviewDate) return null;
+
   // ⭐ Nếu đã đến ngày (expired) → hiện nút Tạo Review
   if (!countdown || countdown.expired) {
     return (
       <div className="mt-4 pt-4 border-t border-gray-200">
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-2 text-orange-500">
-            <i className="fas fa-clock"></i>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-orange-500">
+            <i className="fas fa-clock text-lg"></i>
             <span className="text-sm font-medium">
               {t('ReviewCountdown.reviewTimeExpired')}
             </span>
@@ -95,7 +97,7 @@ export default function ReviewCountdown({
 
           <button
             onClick={() => onCreateReview(request)}
-            className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-md"
+            className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-all duration-200 shadow-md whitespace-nowrap"
           >
             <i className="fas fa-star mr-2"></i>
             {t('ReviewCountdown.createReview')}
@@ -108,16 +110,16 @@ export default function ReviewCountdown({
   // ⭐ Chưa đến ngày → HIỆN COUNTDOWN
   return (
     <div className="mt-4 pt-4 border-t border-gray-200">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-2 text-blue-600">
-          <i className="fas fa-hourglass-half"></i>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 text-blue-600">
+          <i className="fas fa-hourglass-half text-lg"></i>
           <span className="text-sm font-medium">
             {t('ReviewCountdown.reviewAvailableIn')}
           </span>
         </div>
 
         {/* Countdown UI */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
           {countdown.days > 0 && (
             <TimeBox label={t('ReviewCountdown.days')} value={countdown.days} />
           )}

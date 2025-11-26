@@ -75,8 +75,8 @@ export default function BrandModal({
     if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
     if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
     const exists = await brandService.checkBrand({
-      brandName,
-      brandID: brand.brandID,
+      name: brandName,
+      brandID: brand?.brandID,
     });
     if (exists) {
       toast.error(t('ERROR.BRAND_NAME_ALREADY_EXISTS'));

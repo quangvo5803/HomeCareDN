@@ -356,7 +356,7 @@ namespace BusinessLogic.Services.Interfaces
                         dto.Address.Ward = string.Empty;
                     }
                 }
-                if (role == "Customer")
+                if (role == "Customer" && dto.Review == null)
                 {
                     await MapStartReviewDateForCustomerListAll(dto);
                 }
@@ -372,7 +372,7 @@ namespace BusinessLogic.Services.Interfaces
                 );
                 if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
                 {
-                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(5);
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
                 }
             }
         }

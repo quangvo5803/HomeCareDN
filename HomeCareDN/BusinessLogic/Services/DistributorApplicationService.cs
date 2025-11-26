@@ -79,7 +79,9 @@ namespace BusinessLogic.Services
                 var distributor = await _userManager.FindByIdAsync(dto.DistributorID.ToString());
                 if (distributor == null)
                     continue;
-
+                dto.CompletedProjectCount = distributor.ProjectCount;
+                dto.AverageRating = distributor.AverageRating;
+                dto.RatingCount = distributor.RatingCount;
                 if (role == "Admin")
                 {
                     dto.DistributorName =
@@ -154,6 +156,8 @@ namespace BusinessLogic.Services
             if (distributor is not null)
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
+                dto.AverageRating = distributor.AverageRating;
+                dto.RatingCount = distributor.RatingCount;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
                 dto.DistributorEmail = distributor.Email ?? "";
                 dto.DistributorPhone = distributor.PhoneNumber ?? "";
@@ -188,6 +192,7 @@ namespace BusinessLogic.Services
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
+                dto.RatingCount = distributor.RatingCount;
 
                 if (role == "Customer" && application.Status == ApplicationStatus.Approved)
                 {

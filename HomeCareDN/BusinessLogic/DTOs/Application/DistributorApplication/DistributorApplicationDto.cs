@@ -16,6 +16,7 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         // Thông tin đánh giá nhà phân phối
         public int CompletedProjectCount { get; set; }
         public double AverageRating { get; set; }
+        public int RatingCount { get; set; }
 
         // Thông tin liên lạc nhà phân phối (mới hiển thị khi đóng phí)
         public required string DistributorID { get; set; }
