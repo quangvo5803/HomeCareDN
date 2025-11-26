@@ -348,7 +348,11 @@ namespace BusinessLogic.Mapping
 
             CreateMap<ApplicationUser, UserDto>()
                 .ForMember(dest => dest.UserID, opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses));
+                .ForMember(dest => dest.Addresses, opt => opt.MapFrom(src => src.Addresses))
+                .ForMember(
+                    dest => dest.Gender,
+                    opt => opt.MapFrom(src => src.Gender != null ? src.Gender.ToString() : null)
+                );
 
             CreateMap<Conversation, ConversationDto>()
                 .ForMember(
