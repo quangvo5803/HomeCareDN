@@ -102,8 +102,7 @@ export default function NotificationPanel({ notifications = [], loading, user })
                 <button
                     key={n.notificationID}
                     onClick={() => handleClickNotification(n)}
-                    className={`w-full text-left p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
-                        }`}
+                    className={`w-full text-left p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead && "bg-orange-50/40"}`}
                 >
                     <div className="flex items-start gap-3">
                         {!n.isRead && (
