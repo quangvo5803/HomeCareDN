@@ -1,15 +1,17 @@
-﻿using System.Diagnostics.Contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.Services.Interfaces;
+using CloudinaryDotNet;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -21,6 +23,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string DISTRIBUTOR_APPLICATION_REJECT = "DistributorApplication.Rejected";
         private const string DISTRIBUTOR_APPLICATION_ACCEPT = "DistributorApplication.Accept";
@@ -37,13 +40,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<
@@ -257,6 +262,15 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = materialRequest.CustomerID,
+                Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
+                Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
+                DataValue = dto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Apply
+            });
             await Task.WhenAll(notifyTasks);
             return dto;
         }
@@ -292,36 +306,6 @@ namespace BusinessLogic.Services
                 new { application.MaterialRequestID, application.DistributorApplicationID }
             );
             await _unitOfWork.SaveAsync();
-        }
-
-        #region Handle Cases
-        private async Task<DistributorApplication> AddAndNoCase(
-            DistributorCreateApplicationDto createRequest,
-            MaterialRequest request
-        )
-        {
-            var application = _mapper.Map<DistributorApplication>(createRequest);
-            application.Items = new List<DistributorApplicationItem>();
-
-            foreach (var item in createRequest.Items!)
-            {
-                var reqItem = request.MaterialRequestItems!.FirstOrDefault(x =>
-                    x.MaterialID == item.MaterialID
-                );
-
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-
-                // quantity từ vật liệu cũ
-                if (reqItem != null)
-                {
-                    entityItem.Quantity = reqItem.Quantity;
-                }
-                application.Items.Add(entityItem);
-            }
-
-            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
-            await _unitOfWork.SaveAsync();
-            return application;
         }
 
         public async Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
@@ -399,6 +383,15 @@ namespace BusinessLogic.Services
                             DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
+                        await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+                        {
+                            TargetUserId = other.DistributorID,
+                            Title = "Yêu cầu vật tư chưa được chấp nhận",
+                            Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                            DataKey = $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
+                            DataValue = other.MaterialRequestID.ToString(),
+                            Action = NotificationAction.Reject
+                        });
                     }
                 }
             }
@@ -427,6 +420,15 @@ namespace BusinessLogic.Services
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = application.DistributorID,
+                Title = "Chúc mừng! Bạn đã được chọn",
+                Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
+                DataValue = resultDto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Accept
+            });
 
             return resultDto;
         }
@@ -482,8 +484,46 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = distributorApplication.DistributorID,
+                Title = "Yêu cầu vật tư chưa được chấp nhận",
+                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
+                DataValue = dto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Reject
+            });
+
             return dto;
         }
-        #endregion
+
+        private async Task<DistributorApplication> AddAndNoCase(
+            DistributorCreateApplicationDto createRequest,
+            MaterialRequest request
+        )
+        {
+            var application = _mapper.Map<DistributorApplication>(createRequest);
+            application.Items = new List<DistributorApplicationItem>();
+
+            foreach (var item in createRequest.Items!)
+            {
+                var reqItem = request.MaterialRequestItems!.FirstOrDefault(x =>
+                    x.MaterialID == item.MaterialID
+                );
+
+                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
+
+                // quantity từ vật liệu cũ
+                if (reqItem != null)
+                {
+                    entityItem.Quantity = reqItem.Quantity;
+                }
+                application.Items.Add(entityItem);
+            }
+
+            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
+            await _unitOfWork.SaveAsync();
+            return application;
+        }
     }
 }

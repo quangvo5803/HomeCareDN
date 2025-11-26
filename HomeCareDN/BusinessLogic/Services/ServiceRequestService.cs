@@ -22,6 +22,7 @@ namespace BusinessLogic.Services.Interfaces
         private readonly AuthorizeDbContext _authorizeDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string ADMIN = "Admin";
         private const string CONTRACTOR = "Contractor";
@@ -42,7 +43,8 @@ namespace BusinessLogic.Services.Interfaces
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
@@ -50,6 +52,7 @@ namespace BusinessLogic.Services.Interfaces
             _authorizeDbContext = authorizeDbContext;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
@@ -213,7 +216,7 @@ namespace BusinessLogic.Services.Interfaces
                 new[] { contractorDto },
                 CONTRACTOR
             );
-
+            await _notificationService.NotifyNewServiceRequestAsync(serviceRequest);
             await _notifier.SendToApplicationGroupAsync(
                 "role_Admin",
                 "ServiceRequest.Created",

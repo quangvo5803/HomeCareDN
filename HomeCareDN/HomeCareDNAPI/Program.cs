@@ -104,6 +104,7 @@ namespace HomeCareDNAPI
             builder.Services.AddSignalR();
 
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
             /// Register Options
             ///
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));

@@ -4,6 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../hook/useAuth';
 import ReactCountryFlag from 'react-country-flag';
 import Avatar from 'react-avatar';
+import NotificationPanel from './NotificationPanel';
+import { notificationService } from '../services/notificationService';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../utils/handleApiError';
+import { RealtimeEvents } from '../realtime/realtimeEvents';
+import useRealtime from '../realtime/useRealtime';
 
 // Navigation data
 const navItems = [
@@ -39,6 +45,9 @@ export default function Header() {
   const langRef = useRef(null);
   const avatarRef = useRef(null);
 
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const toggleServices = () => setIsServicesOpen((v) => !v);
 
   const closeMobileNav = () => {
@@ -58,6 +67,85 @@ export default function Header() {
     closeMobileNav();
     navigate('/login', { replace: true });
   };
+  // Use realtime
+  useRealtime({
+    [RealtimeEvents.NotificationCreated]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
+    [RealtimeEvents.NotificationApplicationCreate]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
+    [RealtimeEvents.NotificationApplicationPaid]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
+  });
 
   // Close popovers when clicking outside / pressing Esc
   useEffect(() => {
@@ -82,6 +170,28 @@ export default function Header() {
       document.removeEventListener('keydown', onKey);
     };
   }, [openLang, openAvatarMenu]);
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchNotifications = async () => {
+      setLoading(true);
+      try {
+        const result = await notificationService.getAllForCustomer({
+          FilterID: user.id,
+          PageNumber: 1,
+          PageSize: 10
+        });
+        setNotifications(result.items);
+
+      } catch (err) {
+        toast.error(t(handleApiError(err)));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, [t, user]);
 
   return (
     <header
@@ -154,53 +264,56 @@ export default function Header() {
             </ul>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
+            <div className="flex items-center gap-6">
               {user ? (
-                <div className="relative" ref={avatarRef}>
-                  <button
-                    type="button"
-                    onClick={() => setOpenAvatarMenu((v) => !v)}
-                    className="w-10 h-10 overflow-hidden transition-all border-2 border-gray-300 rounded-full hover:border-blue-500"
-                    aria-haspopup="menu"
-                    aria-expanded={openAvatarMenu}
-                    title={t('partnerDashboard.account')}
-                  >
-                    <Avatar
-                      name={user?.email || 'User'}
-                      round={true}
-                      size="100%"
-                      className="object-cover w-full h-full"
-                      color="orange"
-                    />
-                  </button>
-                  {openAvatarMenu && (
-                    <div
-                      role="menu"
-                      className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44"
+                <>
+                  <NotificationPanel notifications={notifications} loading={loading} user={user} />
+                  {/* Avatar menu */}
+                  <div className="relative" ref={avatarRef}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenAvatarMenu((v) => !v)}
+                      className="w-10 h-10 overflow-hidden transition-all border-2 border-gray-300 rounded-full hover:border-blue-500"
+                      aria-haspopup="menu"
+                      aria-expanded={openAvatarMenu}
+                      title={t('partnerDashboard.account')}
                     >
-                      <Link
-                        to="/Customer"
-                        relative="path"
-                        onClick={() => setOpenAvatarMenu(false)}
-                        className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
-                        role="menuitem"
+                      <Avatar
+                        name={user?.email || 'User'}
+                        round={true}
+                        size="100%"
+                        className="object-cover w-full h-full"
+                        color="orange"
+                      />
+                    </button>
+                    {openAvatarMenu && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 z-50 mt-2 bg-white border rounded-lg shadow-lg w-44"
                       >
-                        <i className="fa-solid fa-user me-2"></i>
-                        {t('header.profile')}
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={handleLogout}
-                        className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
-                        role="menuitem"
-                      >
-                        <i className="fa-solid fa-right-from-bracket me-2"></i>
-                        {t('header.logout')}
-                      </button>
-                    </div>
-                  )}
-                </div>
+                        <Link
+                          to="/Customer"
+                          relative="path"
+                          onClick={() => setOpenAvatarMenu(false)}
+                          className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                          role="menuitem"
+                        >
+                          <i className="fa-solid fa-user me-2"></i>
+                          {t('header.profile')}
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleLogout}
+                          className="block w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                          role="menuitem"
+                        >
+                          <i className="fa-solid fa-right-from-bracket me-2"></i>
+                          {t('header.logout')}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
               ) : (
                 <div className="flex gap-3">
                   <Link
@@ -312,9 +425,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (

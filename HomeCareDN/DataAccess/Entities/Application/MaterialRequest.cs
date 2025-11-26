@@ -16,6 +16,8 @@ namespace DataAccess.Entities.Application
         public Guid? ConversationID { get; set; }
         public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }
         public ICollection<DistributorApplication>? DistributorApplications { get; set; }
+
+        [ForeignKey("SelectedDistributorApplicationID")]
         public DistributorApplication? SelectedDistributorApplication { get; set; }
 
         [ForeignKey("ConversationID")]
