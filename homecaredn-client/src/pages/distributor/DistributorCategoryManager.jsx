@@ -342,7 +342,7 @@ export default function DistributorCategoryManager() {
           </tbody>
         </table>
         {/* Pagination */}
-        {totalCategories.length > 0 && (
+        {totalCategories > 0 && (
           <div className="flex justify-center py-4">
             <Pagination
               current={currentPage}
