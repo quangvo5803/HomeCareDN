@@ -152,12 +152,11 @@ namespace BusinessLogic.Services
             var distributor = await _userManager.FindByIdAsync(
                 distributorApplication.DistributorID.ToString()
             );
-
+            dto.CompletedProjectCount = distributor?.ProjectCount ?? 0;
+            dto.AverageRating = distributor?.AverageRating ?? 0;
+            dto.RatingCount = distributor?.RatingCount ?? 0;
             if (distributor is not null)
             {
-                dto.CompletedProjectCount = distributor.ProjectCount;
-                dto.AverageRating = distributor.AverageRating;
-                dto.RatingCount = distributor.RatingCount;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
                 dto.DistributorEmail = distributor.Email ?? "";
                 dto.DistributorPhone = distributor.PhoneNumber ?? "";

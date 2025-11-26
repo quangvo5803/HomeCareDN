@@ -305,8 +305,9 @@ namespace BusinessLogic.Services
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
                     Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
-                    CompletedProjectCount = 0,
-                    AverageRating = 0,
+                    CompletedProjectCount = distributor?.ProjectCount ?? 0,
+                    AverageRating = distributor?.AverageRating ?? 0,
+                    RatingCount = distributor?.RatingCount ?? 0,
                 };
             }
         }
@@ -317,32 +318,33 @@ namespace BusinessLogic.Services
             if (item.SelectedDistributorApplication != null)
             {
                 var selected = item.SelectedDistributorApplication;
-                var contractor = await _userManager.FindByIdAsync(
+                var distributor = await _userManager.FindByIdAsync(
                     selected.DistributorID.ToString()
                 );
                 dto.SelectedDistributorApplication = new DistributorApplicationDto
                 {
                     DistributorID =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Id ?? string.Empty
+                            ? distributor?.Id ?? string.Empty
                             : string.Empty,
                     DistributorApplicationID = selected.DistributorApplicationID,
                     Message = selected.Message,
                     Status = selected.Status.ToString(),
                     CreatedAt = selected.CreatedAt,
-                    CompletedProjectCount = 0,
-                    AverageRating = 0,
+                    CompletedProjectCount = distributor?.ProjectCount ?? 0,
+                    AverageRating = distributor?.AverageRating ?? 0,
+                    RatingCount = distributor?.RatingCount ?? 0,
                     DistributorName =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.FullName ?? string.Empty
+                            ? distributor?.FullName ?? string.Empty
                             : string.Empty,
                     DistributorEmail =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.Email ?? string.Empty
+                            ? distributor?.Email ?? string.Empty
                             : string.Empty,
                     DistributorPhone =
                         selected.Status == ApplicationStatus.Approved
-                            ? contractor?.PhoneNumber ?? string.Empty
+                            ? distributor?.PhoneNumber ?? string.Empty
                             : string.Empty,
                 };
             }

@@ -76,10 +76,11 @@ namespace BusinessLogic.Services
 
                 //Hidden to low loading => show when getById
                 dto.Description = string.Empty;
-
-                dto.RatingCount = contractor!.RatingCount;
-                dto.AverageRating = contractor!.AverageRating;
-                dto.CompletedProjectCount = contractor!.ProjectCount;
+                if (contractor == null)
+                    continue;
+                dto.RatingCount = contractor.RatingCount;
+                dto.AverageRating = contractor.AverageRating;
+                dto.CompletedProjectCount = contractor.ProjectCount;
 
                 if (role == "Admin")
                 {
@@ -145,9 +146,9 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-            dto.CompletedProjectCount = contractor!.ProjectCount;
-            dto.AverageRating = contractor!.AverageRating;
-            dto.RatingCount = contractor.RatingCount;
+            dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
+            dto.AverageRating = contractor?.AverageRating ?? 0;
+            dto.RatingCount = contractor?.RatingCount ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -178,9 +179,9 @@ namespace BusinessLogic.Services
             var contractor = await _userManager.FindByIdAsync(
                 contractorApplication.ContractorID.ToString()
             );
-            dto.CompletedProjectCount = contractor!.ProjectCount;
-            dto.AverageRating = contractor.AverageRating;
-            dto.RatingCount = contractor.RatingCount;
+            dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
+            dto.AverageRating = contractor?.AverageRating ?? 0;
+            dto.RatingCount = contractor?.RatingCount ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
