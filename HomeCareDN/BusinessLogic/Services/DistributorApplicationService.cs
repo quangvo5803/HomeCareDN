@@ -458,6 +458,7 @@ namespace BusinessLogic.Services
                 Status = "PendingCommission",
                 application.DueCommisionTime,
                 resultDto.Items,
+                resultDto.TotalEstimatePrice,
             };
 
             await _notifier.SendToApplicationGroupAsync(
