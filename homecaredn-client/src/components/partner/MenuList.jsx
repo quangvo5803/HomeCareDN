@@ -84,18 +84,6 @@ export default function Sidebar({
           badge: serviceRequestsCount,
         },
         {
-          key: 'my_projects',
-          label: t('partnerDashboard.my_projects'),
-          icon: <i className="fa-solid fa-project-diagram"></i>,
-          to: '/Contractor/my-projects',
-        },
-        {
-          key: 'applications',
-          label: t('partnerDashboard.applications'),
-          icon: <i className="fa-solid fa-file-signature"></i>,
-          to: '/Contractor/applications',
-        },
-        {
           key: 'profile',
           label: t('partnerDashboard.profile'),
           icon: <i className="fa-solid fa-id-card"></i>,
