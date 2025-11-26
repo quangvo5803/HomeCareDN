@@ -75,15 +75,29 @@ export default function MaterialRequestDetail() {
             : mr
         )
       );
-      setMaterialRequest((prev) => ({
-        ...prev,
-        status: 'Closed',
-      }));
-      setExistingApplication((prev) => ({
-        ...prev,
-        status: 'PendingCommission',
-        dueCommisionTime: payload?.dueCommisionTime || null,
-      }));
+      setMaterialRequest((prev) => {
+        if (!prev) return prev;
+        if (prev.materialRequestID === payload.materialRequestID) {
+          return {
+            ...prev,
+            status: 'Closed',
+          };
+        }
+        return prev;
+      });
+      setExistingApplication((prev) => {
+        if (!prev) return prev;
+        if (
+          prev.distributorApplicationID === payload.distributorApplicationID
+        ) {
+          return {
+            ...prev,
+            status: 'PendingCommission',
+            dueCommisionTime: payload.dueCommisionTime || null,
+          };
+        }
+        return prev;
+      });
     },
     //Reject
     [RealtimeEvents.DistributorApplicationRejected]: () => {

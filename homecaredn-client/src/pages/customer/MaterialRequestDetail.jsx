@@ -1169,7 +1169,11 @@ export default function MaterialRequestDetail() {
             {renderHeader()}
             <div className="space-y-4 mb-8">
               {extraMaterial.map((item, index) =>
-                renderMaterialRow(item, index, true)
+                renderMaterialRow(
+                  item,
+                  index,
+                  selectedDistributor.status == 'Pending'
+                )
               )}
             </div>
 
