@@ -42,7 +42,7 @@ export default function ReviewCountdown({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request.startReviewDate, request.review]);
 
-  if (application.status !== 'Approved') return null;
+  if (!application || application.status !== 'Approved') return null;
 
   // ⭐ Nếu đã review → hiện block View
   if (request.review) {
