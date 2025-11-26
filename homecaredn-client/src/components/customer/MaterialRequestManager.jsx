@@ -352,6 +352,7 @@ export default function MaterialRequestManager({ user }) {
                   </div>
                   <ReviewCountdown
                     request={req}
+                    application={req.selectedDistributorApplication}
                     onCreateReview={handleCreateReview}
                     onViewReview={handleViewReview}
                   />

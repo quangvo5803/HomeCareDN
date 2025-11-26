@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function ReviewCountdown({
   request,
+  application,
   onCreateReview,
   onViewReview,
 }) {
@@ -41,8 +42,7 @@ export default function ReviewCountdown({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [request.startReviewDate, request.review]);
 
-  // ❌ Nếu không phải Closed → ẩn toàn bộ
-  if (request.status !== 'Closed') return null;
+  if (application.status !== 'Approved') return null;
 
   // ⭐ Nếu đã review → hiện block View
   if (request.review) {
@@ -148,6 +148,7 @@ function TimeBox({ label, value }) {
 
 ReviewCountdown.propTypes = {
   request: PropTypes.object.isRequired,
+  application: PropTypes.object.isRequired,
   onCreateReview: PropTypes.func.isRequired,
   onViewReview: PropTypes.func.isRequired,
 };
