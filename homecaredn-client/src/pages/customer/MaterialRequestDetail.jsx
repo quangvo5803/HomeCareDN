@@ -336,13 +336,13 @@ export default function MaterialRequestDetail() {
     });
   };
 
-  const handleToggleExtraItem = (materialID) => {
+  const handleToggleExtraItem = (distributorApplicationItemID) => {
     setAcceptingItems((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(materialID)) {
-        newSet.delete(materialID);
+      if (newSet.has(distributorApplicationItemID)) {
+        newSet.delete(distributorApplicationItemID);
       } else {
-        newSet.add(materialID);
+        newSet.add(distributorApplicationItemID);
       }
       return newSet;
     });
@@ -883,7 +883,7 @@ export default function MaterialRequestDetail() {
     const displayUnit =
       i18n.language === 'vi' ? item.unit : item.unitEN || item.unit;
 
-    const isChecked = acceptingItems.has(item.materialID);
+    const isChecked = acceptingItems.has(item.distributorApplicationItemID);
 
     return (
       <div
@@ -903,7 +903,9 @@ export default function MaterialRequestDetail() {
               <input
                 type="checkbox"
                 checked={isChecked}
-                onChange={() => handleToggleExtraItem(item.materialID)}
+                onChange={() =>
+                  handleToggleExtraItem(item.distributorApplicationItemID)
+                }
                 className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer"
               />
             ) : (
@@ -991,7 +993,9 @@ export default function MaterialRequestDetail() {
               <input
                 type="checkbox"
                 checked={isChecked}
-                onChange={() => handleToggleExtraItem(item.materialID)}
+                onChange={() =>
+                  handleToggleExtraItem(item.distributorApplicationItemID)
+                }
                 className="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500 cursor-pointer flex-shrink-0 mt-1"
               />
             )}
