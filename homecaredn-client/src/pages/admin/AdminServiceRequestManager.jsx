@@ -2,7 +2,6 @@ import { useServiceRequest } from '../../hook/useServiceRequest';
 import { useEffect, useState } from 'react';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
-import { useDebounce } from 'use-debounce';
 import { Pagination } from 'antd';
 import { formatVND } from '../../utils/formatters';
 import { useNavigate } from 'react-router-dom';
@@ -15,8 +14,6 @@ export default function ServiceRequest() {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const [search, setSearch] = useState('');
-  const [debouncedSearch] = useDebounce(search, 1000);
   const [sortOption, setSortOption] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'grid' or 'table'
 
@@ -103,10 +100,9 @@ export default function ServiceRequest() {
       PageNumber: currentPage,
       PageSize: pageSize,
       SortBy: sortOption,
-      Search: debouncedSearch || '',
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, currentPage, sortOption, debouncedSearch]);
+  }, [user, currentPage, sortOption]);
 
   const serviceTypeStyle = {
     Construction: {
@@ -215,17 +211,6 @@ export default function ServiceRequest() {
                   {t('common.sortCreateDateNew')}
                 </option>
               </select>
-
-              <div className="relative group">
-                <i className="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm group-hover:text-orange-500 transition-colors" />
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder={t('common.search')}
-                  className="pl-11 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm w-full sm:w-72 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-sm hover:border-orange-300 bg-white"
-                />
-              </div>
             </div>
           </div>
         </div>

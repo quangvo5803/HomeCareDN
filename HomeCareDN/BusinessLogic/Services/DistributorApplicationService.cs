@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics.Contracts;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
@@ -11,7 +12,6 @@ using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -79,7 +79,9 @@ namespace BusinessLogic.Services
                 var distributor = await _userManager.FindByIdAsync(dto.DistributorID.ToString());
                 if (distributor == null)
                     continue;
-
+                dto.CompletedProjectCount = distributor.ProjectCount;
+                dto.AverageRating = distributor.AverageRating;
+                dto.RatingCount = distributor.RatingCount;
                 if (role == "Admin")
                 {
                     dto.DistributorName =
@@ -150,10 +152,11 @@ namespace BusinessLogic.Services
             var distributor = await _userManager.FindByIdAsync(
                 distributorApplication.DistributorID.ToString()
             );
-
+            dto.CompletedProjectCount = distributor?.ProjectCount ?? 0;
+            dto.AverageRating = distributor?.AverageRating ?? 0;
+            dto.RatingCount = distributor?.RatingCount ?? 0;
             if (distributor is not null)
             {
-                dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
                 dto.DistributorEmail = distributor.Email ?? "";
                 dto.DistributorPhone = distributor.PhoneNumber ?? "";
@@ -188,6 +191,7 @@ namespace BusinessLogic.Services
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
+                dto.RatingCount = distributor.RatingCount;
 
                 if (role == "Customer" && application.Status == ApplicationStatus.Approved)
                 {
@@ -262,15 +266,17 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = materialRequest.CustomerID,
-                Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
-                Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
-                DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
-                DataValue = dto.MaterialRequestID.ToString(),
-                Action = NotificationAction.Apply
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = materialRequest.CustomerID,
+                    Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
+                    Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                    DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
+                    DataValue = dto.MaterialRequestID.ToString(),
+                    Action = NotificationAction.Apply,
+                }
+            );
             await Task.WhenAll(notifyTasks);
             return dto;
         }
@@ -314,9 +320,10 @@ namespace BusinessLogic.Services
         {
             var application = await _unitOfWork.DistributorApplicationRepository.GetAsync(
                 x => x.DistributorApplicationID == dto.DistributorApplicationID,
-                includeProperties: "Items",
+                includeProperties: INCLUDE,
                 asNoTracking: false
             );
+
             if (application == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -325,11 +332,13 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
             var request = await _unitOfWork.MaterialRequestRepository.GetAsync(
                 x => x.MaterialRequestID == application.MaterialRequestID,
                 includeProperties: "MaterialRequestItems,DistributorApplications",
                 asNoTracking: false
             );
+
             if (request == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -338,11 +347,12 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
             var originalMaterialIDs =
                 request.MaterialRequestItems?.Select(x => x.MaterialID).ToHashSet()
                 ?? new HashSet<Guid>();
 
-            if (application.Items != null && dto.AcceptedExtraItemIDs != null)
+            if (application.Items != null && application.Items.Any())
             {
                 var originalItems = application
                     .Items.Where(x => originalMaterialIDs.Contains(x.MaterialID))
@@ -352,17 +362,51 @@ namespace BusinessLogic.Services
                     .Items.Where(x => !originalMaterialIDs.Contains(x.MaterialID))
                     .ToList();
 
-                var acceptedExtraItems = extraItems
-                    .Where(x => dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID))
+                List<Guid> keepItemIds;
+
+                if (dto.AcceptedExtraItemIDs != null && dto.AcceptedExtraItemIDs.Any())
+                {
+                    var acceptedExtraItems = extraItems
+                        .Where(x =>
+                            dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID)
+                        )
+                        .ToList();
+
+                    keepItemIds = originalItems
+                        .Select(x => x.DistributorApplicationItemID)
+                        .Concat(acceptedExtraItems.Select(x => x.DistributorApplicationItemID))
+                        .ToList();
+                }
+                else
+                {
+                    keepItemIds = originalItems
+                        .Select(x => x.DistributorApplicationItemID)
+                        .ToList();
+                }
+
+                var itemsToRemove = application
+                    .Items.Where(x => !keepItemIds.Contains(x.DistributorApplicationItemID))
                     .ToList();
 
-                application.Items = originalItems.Concat(acceptedExtraItems).ToList();
+                if (itemsToRemove.Any())
+                {
+                    _unitOfWork.DistributorApplicationItemRepository.RemoveRange(itemsToRemove);
+
+                    foreach (var item in itemsToRemove)
+                    {
+                        application.Items.Remove(item);
+                    }
+                }
+
+                application.TotalEstimatePrice = application.Items.Sum(x => x.Price * x.Quantity);
             }
+
             application.Status = ApplicationStatus.PendingCommission;
             application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
+
             if (request.DistributorApplications != null)
             {
                 foreach (var other in request.DistributorApplications)
@@ -383,28 +427,44 @@ namespace BusinessLogic.Services
                             DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
-                        await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-                        {
-                            TargetUserId = other.DistributorID,
-                            Title = "Yêu cầu vật tư chưa được chấp nhận",
-                            Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
-                            DataKey = $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
-                            DataValue = other.MaterialRequestID.ToString(),
-                            Action = NotificationAction.Reject
-                        });
+
+                        await _notificationService.NotifyPersonalAsync(
+                            new NotificationPersonalCreateOrUpdateDto
+                            {
+                                TargetUserId = other.DistributorID,
+                                Title = "Yêu cầu vật tư chưa được chấp nhận",
+                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                DataKey =
+                                    $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
+                                DataValue = other.MaterialRequestID.ToString(),
+                                Action = NotificationAction.Reject,
+                            }
+                        );
                     }
                 }
             }
-            await _unitOfWork.SaveAsync();
-            var resultDto = _mapper.Map<DistributorApplicationDto>(application);
 
+            await _unitOfWork.SaveAsync();
+
+            var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                x => x.DistributorApplicationID == application.DistributorApplicationID,
+                includeProperties: INCLUDE,
+                asNoTracking: true
+            );
+
+            var resultDto = _mapper.Map<DistributorApplicationDto>(reloadedApp);
+
+            // Send notifications
             var acceptPayload = new
             {
                 application.DistributorApplicationID,
                 application.MaterialRequestID,
                 Status = "PendingCommission",
                 application.DueCommisionTime,
+                resultDto.Items,
+                resultDto.TotalEstimatePrice,
             };
+
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{request.CustomerID}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
@@ -420,15 +480,18 @@ namespace BusinessLogic.Services
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = application.DistributorID,
-                Title = "Chúc mừng! Bạn đã được chọn",
-                Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
-                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
-                DataValue = resultDto.MaterialRequestID.ToString(),
-                Action = NotificationAction.Accept
-            });
+
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = application.DistributorID,
+                    Title = "Chúc mừng! Bạn đã được chọn",
+                    Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                    DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
+                    DataValue = resultDto.MaterialRequestID.ToString(),
+                    Action = NotificationAction.Accept,
+                }
+            );
 
             return resultDto;
         }
@@ -484,15 +547,17 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = distributorApplication.DistributorID,
-                Title = "Yêu cầu vật tư chưa được chấp nhận",
-                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
-                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
-                DataValue = dto.MaterialRequestID.ToString(),
-                Action = NotificationAction.Reject
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = distributorApplication.DistributorID,
+                    Title = "Yêu cầu vật tư chưa được chấp nhận",
+                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
+                    DataValue = dto.MaterialRequestID.ToString(),
+                    Action = NotificationAction.Reject,
+                }
+            );
 
             return dto;
         }

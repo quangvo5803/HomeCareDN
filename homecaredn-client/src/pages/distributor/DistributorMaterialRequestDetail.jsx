@@ -75,15 +75,31 @@ export default function MaterialRequestDetail() {
             : mr
         )
       );
-      setMaterialRequest((prev) => ({
-        ...prev,
-        status: 'Closed',
-      }));
-      setExistingApplication((prev) => ({
-        ...prev,
-        status: 'PendingCommission',
-        dueCommisionTime: payload?.dueCommisionTime || null,
-      }));
+      setMaterialRequest((prev) => {
+        if (!prev) return prev;
+        if (prev.materialRequestID === payload.materialRequestID) {
+          return {
+            ...prev,
+            status: 'Closed',
+          };
+        }
+        return prev;
+      });
+      setExistingApplication((prev) => {
+        if (!prev) return prev;
+        if (
+          prev.distributorApplicationID === payload.distributorApplicationID
+        ) {
+          return {
+            ...prev,
+            status: 'PendingCommission',
+            dueCommisionTime: payload.dueCommisionTime || null,
+            items: payload.items,
+            totalEstimatePrice: payload.totalEstimatePrice,
+          };
+        }
+        return prev;
+      });
     },
     //Reject
     [RealtimeEvents.DistributorApplicationRejected]: () => {
@@ -735,25 +751,19 @@ export default function MaterialRequestDetail() {
                         {/* Image */}
                         <div className="col-span-3 flex justify-center">
                           <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-200 group-hover:border-orange-300 transition-all">
-                            {imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt={displayName}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextElementSibling.style.display =
-                                    'flex';
-                                }}
-                              />
-                            ) : null}
-                            <div
-                              className={`absolute inset-0 flex items-center justify-center ${
-                                imageUrl ? 'hidden' : 'flex'
-                              }`}
-                            >
-                              <i className="fas fa-image text-slate-300 text-3xl"></i>
-                            </div>
+                            <img
+                              src={
+                                imageUrl ??
+                                'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                              }
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextElementSibling.style.display =
+                                  'flex';
+                              }}
+                            />
                           </div>
                         </div>
 
@@ -998,7 +1008,7 @@ export default function MaterialRequestDetail() {
 
       <div className="overflow-x-auto">
         {/* Header */}
-        <div className="hidden lg:grid lg:grid-cols-18 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
+        <div className="hidden lg:grid lg:grid-cols-19 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
           <div className="col-span-1">#</div>
           <div className="col-span-2">
             {t('userPage.materialRequestDetail.image')}
@@ -1046,7 +1056,7 @@ export default function MaterialRequestDetail() {
                 key={item.materialID}
                 className="border-2 border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
               >
-                <div className="hidden lg:grid lg:grid-cols-18 gap-4 items-center text-center">
+                <div className="hidden lg:grid lg:grid-cols-19 gap-4 items-center text-center">
                   {/* STT */}
                   <div className="col-span-1 flex justify-center">
                     <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -1059,29 +1069,26 @@ export default function MaterialRequestDetail() {
                   {/* Image */}
                   <div className="col-span-2 flex justify-center">
                     <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={displayName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <i className="fas fa-image text-slate-300 text-3xl"></i>
-                        </div>
-                      )}
+                      <img
+                        src={
+                          imageUrl ??
+                          'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                        }
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
 
                   {/* Info */}
-                  <div className="col-span-4 text-left">
+                  <div className="col-span-4 text-center">
                     <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
                       {displayName}
                     </h3>
 
                     <div className="space-y-2">
                       {displayCategory && (
-                        <div className="flex items-center justify-start text-xs text-slate-600">
+                        <div className="flex items-center justify-center text-xs text-slate-600">
                           <i className="fas fa-tag text-slate-400 mr-2 w-4"></i>
                           <span className="truncate font-medium">
                             {displayCategory}
@@ -1090,8 +1097,8 @@ export default function MaterialRequestDetail() {
                       )}
 
                       {displayBrand && (
-                        <div className="flex items-center justify-start text-xs text-slate-600">
-                          <i className="fas fa-trademark text-slate-400 mr-2 w-4"></i>
+                        <div className="flex items-center justify-center text-xs text-slate-600">
+                          <i className="fas fa-star text-slate-400 mr-2 w-4"></i>
                           <span className="truncate font-medium">
                             {displayBrand}
                           </span>
@@ -1110,7 +1117,7 @@ export default function MaterialRequestDetail() {
                   </div>
 
                   {/* Unit */}
-                  <div className="col-span-2 flex justify-center">
+                  <div className="col-span-3 flex justify-center">
                     <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
                       <p className="text-sm w-7 h-5 font-bold text-slate-900">
                         {displayUnit}
@@ -1324,17 +1331,14 @@ export default function MaterialRequestDetail() {
                         {/* Image */}
                         <div className="col-span-3 flex justify-center">
                           <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
-                            {imageUrl ? (
-                              <img
-                                src={imageUrl}
-                                alt={displayName}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <i className="fas fa-image text-slate-300 text-3xl"></i>
-                              </div>
-                            )}
+                            <img
+                              src={
+                                imageUrl ??
+                                'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                              }
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                         </div>
 

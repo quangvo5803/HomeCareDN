@@ -425,6 +425,7 @@ export default function ServiceRequestManager() {
                   {/* Review Countdown Section */}
                   <ReviewCountdown
                     request={req}
+                    application={req.selectedContractorApplication}
                     onCreateReview={handleCreateReview}
                     onViewReview={handleViewReview}
                   />

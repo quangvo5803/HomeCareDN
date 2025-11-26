@@ -6,7 +6,6 @@ using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
-using static Org.BouncyCastle.Asn1.Cmp.Challenge;
 
 namespace BusinessLogic.Services
 {
@@ -99,17 +98,6 @@ namespace BusinessLogic.Services
 
         public async Task<CategoryDto> CreateCategoryAsync(CategoryCreateRequestDto requestDto)
         {
-            var isDuplicate = await _unitOfWork
-                .CategoryRepository.GetQueryable()
-                .AnyAsync(b => b.CategoryName.ToLower() == requestDto.CategoryName.ToLower());
-            if (isDuplicate)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" } },
-                };
-                throw new CustomValidationException(errors);
-            }
             var category = _mapper.Map<Category>(requestDto);
             category.CategoryID = Guid.NewGuid();
 
@@ -138,18 +126,6 @@ namespace BusinessLogic.Services
                 false
             );
             var errors = new Dictionary<string, string[]>();
-            var isDuplicate = await _unitOfWork
-                .CategoryRepository.GetQueryable()
-                .AnyAsync(b =>
-                    b.CategoryName.ToLower() == requestDto.CategoryName.ToLower()
-                    && b.CategoryID != requestDto.CategoryID
-                );
-
-            if (isDuplicate)
-            {
-                errors.Add("CategoryName", new[] { "CATEGORY_NAME_ALREADY_EXISTS" });
-                throw new CustomValidationException(errors);
-            }
 
             if (category == null)
             {
@@ -209,6 +185,15 @@ namespace BusinessLogic.Services
             }
             _unitOfWork.CategoryRepository.Remove(category);
             await _unitOfWork.SaveAsync();
+        }
+
+        public async Task<bool> CheckCategoryExisiting(string categoryName, Guid? categoryId = null)
+        {
+            var exisiting = await _unitOfWork.CategoryRepository.GetAsync(c =>
+                (!categoryId.HasValue || c.CategoryID != categoryId.Value)
+                && (c.CategoryName == categoryName || c.CategoryNameEN == categoryName)
+            );
+            return exisiting != null;
         }
     }
 }
