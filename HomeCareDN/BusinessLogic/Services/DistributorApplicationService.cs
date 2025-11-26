@@ -310,6 +310,9 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
+        // TÌM method AcceptDistributorApplicationAsync (khoảng line 193-296)
+        // THAY BẰNG phiên bản sửa lỗi:
+
         public async Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
             DistributorApplicationAcceptRequestDto dto
         )
@@ -319,6 +322,7 @@ namespace BusinessLogic.Services
                 includeProperties: INCLUDE,
                 asNoTracking: false
             );
+
             if (application == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -327,11 +331,13 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
             var request = await _unitOfWork.MaterialRequestRepository.GetAsync(
                 x => x.MaterialRequestID == application.MaterialRequestID,
                 includeProperties: "MaterialRequestItems,DistributorApplications",
                 asNoTracking: false
             );
+
             if (request == null)
             {
                 var errors = new Dictionary<string, string[]>
@@ -340,12 +346,15 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
+
+            // ✅ FIX: Xử lý items chính xác hơn
             var originalMaterialIDs =
                 request.MaterialRequestItems?.Select(x => x.MaterialID).ToHashSet()
                 ?? new HashSet<Guid>();
 
-            if (application.Items != null && dto.AcceptedExtraItemIDs != null)
+            if (application.Items != null && application.Items.Any())
             {
+                // Phân loại items
                 var originalItems = application
                     .Items.Where(x => originalMaterialIDs.Contains(x.MaterialID))
                     .ToList();
@@ -354,25 +363,57 @@ namespace BusinessLogic.Services
                     .Items.Where(x => !originalMaterialIDs.Contains(x.MaterialID))
                     .ToList();
 
-                var acceptedExtraItems = extraItems
-                    .Where(x => dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID))
-                    .ToList();
+                // ✅ FIX: Chỉ xử lý extra items nếu có AcceptedExtraItemIDs
+                List<Guid> keepItemIds;
 
-                var keepItemIds = originalItems
-                    .Select(x => x.DistributorApplicationItemID)
-                    .Concat(acceptedExtraItems.Select(x => x.DistributorApplicationItemID))
-                    .ToHashSet();
+                if (dto.AcceptedExtraItemIDs != null && dto.AcceptedExtraItemIDs.Any())
+                {
+                    // Khách hàng đã chọn một số extra items
+                    var acceptedExtraItems = extraItems
+                        .Where(x =>
+                            dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID)
+                        )
+                        .ToList();
+
+                    keepItemIds = originalItems
+                        .Select(x => x.DistributorApplicationItemID)
+                        .Concat(acceptedExtraItems.Select(x => x.DistributorApplicationItemID))
+                        .ToList();
+                }
+                else
+                {
+                    // Không chọn extra items nào -> chỉ giữ original items
+                    keepItemIds = originalItems
+                        .Select(x => x.DistributorApplicationItemID)
+                        .ToList();
+                }
+
+                // Xóa các items không được chọn
                 var itemsToRemove = application
                     .Items.Where(x => !keepItemIds.Contains(x.DistributorApplicationItemID))
                     .ToList();
 
-                _unitOfWork.DistributorApplicationItemRepository.RemoveRange(itemsToRemove);
+                if (itemsToRemove.Any())
+                {
+                    _unitOfWork.DistributorApplicationItemRepository.RemoveRange(itemsToRemove);
+                }
+
+                // ✅ Recalculate total price after removing items
+                var remainingItems = application
+                    .Items.Where(x => keepItemIds.Contains(x.DistributorApplicationItemID))
+                    .ToList();
+
+                application.TotalEstimatePrice = remainingItems.Sum(x => x.Price * x.Quantity);
             }
+
+            // Cập nhật status
             application.Status = ApplicationStatus.PendingCommission;
             application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
+
+            // Reject các applications khác
             if (request.DistributorApplications != null)
             {
                 foreach (var other in request.DistributorApplications)
@@ -393,6 +434,7 @@ namespace BusinessLogic.Services
                             DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
+
                         await _notificationService.NotifyPersonalAsync(
                             new NotificationPersonalCreateOrUpdateDto
                             {
@@ -409,8 +451,15 @@ namespace BusinessLogic.Services
                     }
                 }
             }
+
             await _unitOfWork.SaveAsync();
-            var resultDto = _mapper.Map<DistributorApplicationDto>(application);
+
+            var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                x => x.DistributorApplicationID == application.DistributorApplicationID,
+                includeProperties: INCLUDE
+            );
+
+            var resultDto = _mapper.Map<DistributorApplicationDto>(reloadedApp);
 
             var acceptPayload = new
             {
@@ -419,6 +468,7 @@ namespace BusinessLogic.Services
                 Status = "PendingCommission",
                 application.DueCommisionTime,
             };
+
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{request.CustomerID}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
@@ -434,6 +484,7 @@ namespace BusinessLogic.Services
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
+
             await _notificationService.NotifyPersonalAsync(
                 new NotificationPersonalCreateOrUpdateDto
                 {

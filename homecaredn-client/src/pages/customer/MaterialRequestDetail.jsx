@@ -98,6 +98,7 @@ export default function MaterialRequestDetail() {
             status: 'Closed',
           };
         }
+        return prev;
       });
     },
     [RealtimeEvents.DistributorApplicationDelete]: (payload) => {
@@ -424,15 +425,19 @@ export default function MaterialRequestDetail() {
   };
 
   //Check materialID
-  const customerMaterialIDs = new Set(items.map((item) => item.materialID));
-
-  const existingMaterial = selectedDistributor?.items?.filter((item) =>
-    customerMaterialIDs.has(item.materialID)
+  const customerMaterialIDs = new Set(
+    items.map((item) => item.material.materialID)
   );
 
-  const extraMaterial = selectedDistributor?.items?.filter(
-    (item) => !customerMaterialIDs.has(item.materialID)
-  );
+  const existingMaterial =
+    selectedDistributor?.items?.filter((item) =>
+      customerMaterialIDs.has(item.materialID)
+    ) || [];
+
+  const extraMaterial =
+    selectedDistributor?.items?.filter(
+      (item) => !customerMaterialIDs.has(item.materialID)
+    ) || [];
 
   const isLoading = loading || !materialRequest;
   if (isLoading) return <Loading />;
@@ -555,24 +560,18 @@ export default function MaterialRequestDetail() {
 
           <div className="col-span-2">
             <div className="aspect-square bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={displayName}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'flex';
-                  }}
-                />
-              ) : null}
-              <div
-                className={`absolute inset-0 flex items-center justify-center ${
-                  imageUrl ? 'hidden' : 'flex'
-                }`}
-              >
-                <i className="fas fa-image text-slate-300 text-3xl"></i>
-              </div>
+              <img
+                src={
+                  imageUrl ??
+                  'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                }
+                alt={displayName}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextElementSibling.style.display = 'flex';
+                }}
+              />
             </div>
           </div>
 
