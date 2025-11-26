@@ -38,9 +38,12 @@ namespace HomeCareDNAPI.Controllers
             Roles = "Admin,Distributor"
         )]
         [HttpGet("check-category")]
-        public async Task<IActionResult> CheckCategory(string name)
+        public async Task<IActionResult> CheckCategory(string name, Guid? categoryID = null)
         {
-            var exists = await _facadeService.CategoryService.CheckCategoryExisiting(name);
+            var exists = await _facadeService.CategoryService.CheckCategoryExisiting(
+                name,
+                categoryID
+            );
             return Ok(exists);
         }
 

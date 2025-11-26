@@ -71,7 +71,10 @@ export default function CategoryModal({
     }
     if (!category && !logoFile)
       return toast.error(t('ERROR.REQUIRED_CATEGORYLOGO'));
-    const exists = await categoryService.checkCategory(categoryName);
+    const exists = await categoryService.checkCategory({
+      category,
+      categoryID: category.categoryID,
+    });
     if (exists) {
       toast.error(t('ERROR.CATEGORY_NAME_ALREADY_EXISTS'));
       onClose();

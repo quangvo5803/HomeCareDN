@@ -64,9 +64,12 @@ namespace HomeCareDNAPI.Controllers
             Roles = "Admin,Distributor"
         )]
         [HttpGet("check-material")]
-        public async Task<IActionResult> CheckMaterial(string name)
+        public async Task<IActionResult> CheckMaterial(string name, Guid? materialID = null)
         {
-            var exists = await _facadeService.MaterialService.CheckMaterialExisiting(name);
+            var exists = await _facadeService.MaterialService.CheckMaterialExisiting(
+                name,
+                materialID
+            );
             return Ok(exists); // true nếu tồn tại
         }
 

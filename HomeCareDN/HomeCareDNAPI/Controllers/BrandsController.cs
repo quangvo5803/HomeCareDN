@@ -35,9 +35,9 @@ namespace HomeCareDNAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpGet("check-brand")]
-        public async Task<IActionResult> CheckBrand(string name)
+        public async Task<IActionResult> CheckBrand(string name, Guid? brandID = null)
         {
-            var exists = await _facadeService.BrandService.CheckBrandExisiting(name);
+            var exists = await _facadeService.BrandService.CheckBrandExisiting(name, brandID);
             return Ok(exists);
         }
 

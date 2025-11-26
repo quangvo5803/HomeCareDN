@@ -12,9 +12,12 @@ export const brandService = {
     return response.data;
   },
   // ====================== ADMIN ======================
-  checkBrand: async (name) => {
+  checkBrand: async (name, brandID = null) => {
+    const params = { name };
+    if (brandID) params.brandID = brandID;
+
     const response = await api.get(`/brands/check-brand`, {
-      params: { name },
+      params,
     });
     return response.data;
   },

@@ -12,9 +12,12 @@ export const categoryService = {
     return response.data;
   },
   // ====================== ADMIN, DISTRIBUTOR ======================
-  checkCategory: async (name) => {
+  checkCategory: async (name, categoryID = null) => {
+    const params = { name };
+    if (categoryID) params.categoryID = categoryID;
+
     const response = await api.get(`/categories/check-category`, {
-      params: { name },
+      params,
     });
     return response.data;
   },

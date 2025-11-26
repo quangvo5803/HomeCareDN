@@ -187,10 +187,11 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<bool> CheckCategoryExisiting(string categoryName)
+        public async Task<bool> CheckCategoryExisiting(string categoryName, Guid? categoryId = null)
         {
             var exisiting = await _unitOfWork.CategoryRepository.GetAsync(c =>
-                c.CategoryName == categoryName || c.CategoryNameEN == categoryName
+                (!categoryId.HasValue || c.CategoryID != categoryId.Value)
+                && (c.CategoryName == categoryName || c.CategoryNameEN == categoryName)
             );
             return exisiting != null;
         }

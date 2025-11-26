@@ -181,10 +181,11 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<bool> CheckBrandExisiting(string brandName)
+        public async Task<bool> CheckBrandExisiting(string brandName, Guid? brandId = null)
         {
             var exisiting = await _unitOfWork.BrandRepository.GetAsync(b =>
-                b.BrandName == brandName || b.BrandNameEN == brandName
+                (!brandId.HasValue || b.BrandID != brandId.Value)
+                && (b.BrandName == brandName || b.BrandNameEN == brandName)
             );
             return exisiting != null;
         }

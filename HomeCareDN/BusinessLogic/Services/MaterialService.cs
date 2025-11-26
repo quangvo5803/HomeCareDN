@@ -357,10 +357,11 @@ namespace BusinessLogic.Services
                 || matchingUserIds.Contains(m.UserID);
         }
 
-        public async Task<bool> CheckMaterialExisiting(string materialName)
+        public async Task<bool> CheckMaterialExisiting(string materialName, Guid? materialId = null)
         {
             var existing = await _unitOfWork.MaterialRepository.GetAsync(m =>
-                m.Name == materialName || m.NameEN == materialName
+                (!materialId.HasValue || m.BrandID != materialId.Value)
+                && (m.Name == materialName || m.NameEN == materialName)
             );
             return existing != null;
         }
