@@ -310,9 +310,6 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        // TÌM method AcceptDistributorApplicationAsync (khoảng line 193-296)
-        // THAY BẰNG phiên bản sửa lỗi:
-
         public async Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
             DistributorApplicationAcceptRequestDto dto
         )
@@ -347,14 +344,12 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(errors);
             }
 
-            // ✅ FIX: Xử lý items chính xác hơn
             var originalMaterialIDs =
                 request.MaterialRequestItems?.Select(x => x.MaterialID).ToHashSet()
                 ?? new HashSet<Guid>();
 
             if (application.Items != null && application.Items.Any())
             {
-                // Phân loại items
                 var originalItems = application
                     .Items.Where(x => originalMaterialIDs.Contains(x.MaterialID))
                     .ToList();
@@ -363,12 +358,10 @@ namespace BusinessLogic.Services
                     .Items.Where(x => !originalMaterialIDs.Contains(x.MaterialID))
                     .ToList();
 
-                // ✅ FIX: Chỉ xử lý extra items nếu có AcceptedExtraItemIDs
                 List<Guid> keepItemIds;
 
                 if (dto.AcceptedExtraItemIDs != null && dto.AcceptedExtraItemIDs.Any())
                 {
-                    // Khách hàng đã chọn một số extra items
                     var acceptedExtraItems = extraItems
                         .Where(x =>
                             dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID)
@@ -382,13 +375,11 @@ namespace BusinessLogic.Services
                 }
                 else
                 {
-                    // Không chọn extra items nào -> chỉ giữ original items
                     keepItemIds = originalItems
                         .Select(x => x.DistributorApplicationItemID)
                         .ToList();
                 }
 
-                // Xóa các items không được chọn
                 var itemsToRemove = application
                     .Items.Where(x => !keepItemIds.Contains(x.DistributorApplicationItemID))
                     .ToList();
@@ -396,24 +387,22 @@ namespace BusinessLogic.Services
                 if (itemsToRemove.Any())
                 {
                     _unitOfWork.DistributorApplicationItemRepository.RemoveRange(itemsToRemove);
+
+                    foreach (var item in itemsToRemove)
+                    {
+                        application.Items.Remove(item);
+                    }
                 }
 
-                // ✅ Recalculate total price after removing items
-                var remainingItems = application
-                    .Items.Where(x => keepItemIds.Contains(x.DistributorApplicationItemID))
-                    .ToList();
-
-                application.TotalEstimatePrice = remainingItems.Sum(x => x.Price * x.Quantity);
+                application.TotalEstimatePrice = application.Items.Sum(x => x.Price * x.Quantity);
             }
 
-            // Cập nhật status
             application.Status = ApplicationStatus.PendingCommission;
             application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
 
-            // Reject các applications khác
             if (request.DistributorApplications != null)
             {
                 foreach (var other in request.DistributorApplications)
@@ -440,8 +429,7 @@ namespace BusinessLogic.Services
                             {
                                 TargetUserId = other.DistributorID,
                                 Title = "Yêu cầu vật tư chưa được chấp nhận",
-                                Message =
-                                    $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                                 DataKey =
                                     $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
                                 DataValue = other.MaterialRequestID.ToString(),
@@ -456,11 +444,13 @@ namespace BusinessLogic.Services
 
             var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
                 x => x.DistributorApplicationID == application.DistributorApplicationID,
-                includeProperties: INCLUDE
+                includeProperties: INCLUDE,
+                asNoTracking: true
             );
 
             var resultDto = _mapper.Map<DistributorApplicationDto>(reloadedApp);
 
+            // Send notifications
             var acceptPayload = new
             {
                 application.DistributorApplicationID,
