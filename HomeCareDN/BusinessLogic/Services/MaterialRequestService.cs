@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
+using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
@@ -21,12 +22,13 @@ namespace BusinessLogic.Services
         private readonly AuthorizeDbContext _authorizeDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string ADMIN = "Admin";
         private const string DISTRIBUTOR = "Distributor";
         private const string INCLUDE_DELETE = "MaterialRequestItems,DistributorApplications";
         private const string INCLUDE =
-            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication";
+            "MaterialRequestItems,MaterialRequestItems.Material,MaterialRequestItems.Material.Brand,MaterialRequestItems.Material.Category,MaterialRequestItems.Material.Images,DistributorApplications,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material.Brand,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication,SelectedDistributorApplication.Items,SelectedDistributorApplication.Items.Material,Conversation,Review,Review.Images";
         private const string ERROR_MATERIAL_SERVICE = "MATERIAL_SERVICE";
         private const string ERROR_MATERIAL_SERVICE_NOT_FOUND = "MATERIAL_SERVICE_NOT_FOUND";
 
@@ -35,7 +37,8 @@ namespace BusinessLogic.Services
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
@@ -43,6 +46,7 @@ namespace BusinessLogic.Services
             _authorizeDbContext = authorizeDbContext;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResultDto<MaterialRequestDto>> GetAllMaterialRequestsAsync(
@@ -257,6 +261,13 @@ namespace BusinessLogic.Services
         // ==================== Admin ====================
         private async Task MapForAdminAsync(MaterialRequest item, MaterialRequestDto dto)
         {
+            var customer = await _userManager.FindByIdAsync(item.CustomerID.ToString());
+            if (customer != null)
+            {
+                dto.CustomerName = customer.FullName ?? customer.Email;
+                dto.CustomerEmail = customer.Email;
+                dto.CustomerPhone = customer.PhoneNumber;
+            }
             if (item.SelectedDistributorApplication != null)
             {
                 var selected = item.SelectedDistributorApplication;
@@ -273,6 +284,7 @@ namespace BusinessLogic.Services
                     Status = selected.Status.ToString(),
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
+                    Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
                     CompletedProjectCount = 0,
                     AverageRating = 0,
                 };
@@ -450,6 +462,7 @@ namespace BusinessLogic.Services
                     new[] { distributorDto },
                     DISTRIBUTOR
                 );
+                await _notificationService.NotifyNewMaterialRequestAsync(materialRequest);
                 await _notifier.SendToApplicationGroupAsync(
                     "role_Admin",
                     "MaterialRequest.Created",

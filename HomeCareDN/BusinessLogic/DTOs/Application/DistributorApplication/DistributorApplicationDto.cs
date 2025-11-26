@@ -10,6 +10,7 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         public string? Message { get; set; }
         public double TotalEstimatePrice { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? DueCommisionTime { get; set; }
         public required string Status { get; set; }
 
         // Thông tin đánh giá nhà phân phối
@@ -22,6 +23,5 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         public string DistributorEmail { get; set; } = string.Empty;
         public string DistributorPhone { get; set; } = string.Empty;
         public List<DistributorApplicationItemDto>? Items { get; set; }
-
     }
 }

@@ -1,7 +1,7 @@
-﻿using System.Data;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
@@ -11,6 +11,8 @@ using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
@@ -21,6 +23,7 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string CONTRACTOR_APPLY = "ContractorApply";
         private const string CONTRACTOR = "Contractor";
@@ -38,13 +41,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<
@@ -61,6 +66,7 @@ namespace BusinessLogic.Services
                 .Where(ca => ca.ServiceRequestID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
+            query = query.OrderByDescending(c => c.CreatedAt);
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
@@ -104,11 +110,10 @@ namespace BusinessLogic.Services
         {
             var query = _unitOfWork
                 .ContractorApplicationRepository.GetQueryable(includeProperties: "ServiceRequest")
-                .Where(ca => ca.ContractorID == parameters.FilterID)
-                .AsSingleQuery()
-                .AsNoTracking();
+                .Where(ca => ca.ContractorID == parameters.FilterID);
 
             var totalCount = await query.CountAsync();
+            query = query.OrderBy(c => c.CreatedAt);
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
@@ -314,6 +319,16 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = serviceRequest.CustomerID,
+                Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
+                Message = $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
+                DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
+                DataValue = dto.ServiceRequestID.ToString(),
+                Action = NotificationAction.Apply
+            });
+
             await Task.WhenAll(notifyTasks);
             return dto;
         }
@@ -374,6 +389,15 @@ namespace BusinessLogic.Services
                             CONTRACTOR_APPLICATION_REJECT,
                             payload
                         );
+                        await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+                        {
+                            TargetUserId = app.ContractorID,
+                            Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                            Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                            DataKey = $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
+                            DataValue = app.ServiceRequestID.ToString(),
+                            Action = NotificationAction.Reject
+                        });
                     }
                 }
             }
@@ -406,6 +430,16 @@ namespace BusinessLogic.Services
                 "ContractorApplication.Accept",
                 payloadAccept
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = contractorApplication.ContractorID,
+                Title = "Chúc mừng! Bạn đã được chọn",
+                Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
+                DataValue = dto.ServiceRequestID.ToString(),
+                Action = NotificationAction.Accept
+            });
+
             return dto;
         }
 
@@ -459,6 +493,16 @@ namespace BusinessLogic.Services
                     Status = ApplicationStatus.Rejected.ToString(),
                 }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = contractorApplication.ContractorID,
+                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
+                DataValue = dto.ServiceRequestID.ToString(),
+                Action = NotificationAction.Reject
+            });
+
             return dto;
         }
 

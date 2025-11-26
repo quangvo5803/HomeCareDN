@@ -25,8 +25,8 @@ namespace HomeCareDNAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto dto)
         {
-            await _authorizeService.SendLoginOtpAsync(dto.Email);
-            return Ok(new { message = "OTP đã được gửi đến email của bạn" });
+            var result = await _authorizeService.SendLoginOtpAsync(dto);
+            return Ok(result);
         }
 
         [HttpPost("verify-otp")]

@@ -7,12 +7,10 @@ namespace DataAccess.Entities.Application
     {
         [Key]
         public Guid PaymentTransactionID { get; set; } = Guid.NewGuid();
-
-        [Required]
-        public Guid ContractorApplicationID { get; set; }
-
-        [Required]
-        public Guid ServiceRequestID { get; set; }
+        public Guid? ContractorApplicationID { get; set; }
+        public Guid? ServiceRequestID { get; set; }
+        public Guid? DistributorApplicationID { get; set; }
+        public Guid? MaterialRequestID { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -39,8 +37,10 @@ namespace DataAccess.Entities.Application
 
         [ForeignKey("ContractorApplicationID")]
         public ContractorApplication? ContractorApplication { get; set; }
-    }
 
+        [ForeignKey("DistributorApplicationID")]
+        public DistributorApplication? DistributorApplication { get; set; }      
+    }
 
     public enum PaymentStatus
     {

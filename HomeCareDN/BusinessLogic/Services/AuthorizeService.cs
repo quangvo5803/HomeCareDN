@@ -58,19 +58,74 @@ namespace BusinessLogic.Services
 
         #region OTP
 
-        public async Task SendLoginOtpAsync(string email)
+        public async Task<TokenResponseDto?> SendLoginOtpAsync(LoginRequestDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(dto.Email);
 
             if (user == null)
+            {
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
                         { ACCOUNT_STR, new[] { "LOGIN_NOT_FOUND" } },
                     }
                 );
+            }
 
+            if (!string.IsNullOrEmpty(dto.Password))
+            {
+                var passwordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
+                if (!passwordValid)
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { "Password", new[] { "INCORRECT PASSWORD" } },
+                        }
+                    );
+                }
+                // Xóa refresh token cũ
+                var oldToken = await _refreshTokenRepository.GetByUserIdAsync(user.Id);
+                if (oldToken != null)
+                    await _refreshTokenRepository.DeleteAsync(oldToken);
+
+                // Tạo token mới
+                var tokenOptions = GenerateTokenOptions(await GetClaims(user));
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+                var refreshToken = GenerateRefreshToken();
+                var rt = new RefreshToken
+                {
+                    Token = refreshToken,
+                    UserId = user.Id,
+                    ExpiresAt = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                };
+                await _refreshTokenRepository.AddAsync(rt);
+                await _userManager.UpdateAsync(user);
+
+                // Gửi cookie HttpOnly
+                _httpContextAccessor.HttpContext.Response.Cookies.Append(
+                    REFRESH_TOKEN_STR,
+                    refreshToken,
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.None,
+                        Expires = DateTime.UtcNow.AddDays(RefreshTokenDays),
+                        Path = "/",
+                    }
+                );
+
+                return new TokenResponseDto
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                    AccessTokenExpiresAt = tokenOptions.ValidTo,
+                    UserId = user.Id,
+                };
+            }
             await SendOtpInternalAsync(user, "Login");
+            return null;
         }
 
         public async Task SendRegisterOtpAsync(string email, string fullName)

@@ -11,6 +11,9 @@ import PropTypes from 'prop-types';
 import StatusBadge from '../../components/StatusBadge';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import ReviewCountdown from './ReviewCountdown';
+import { reviewService } from '../../services/reviewService';
+import ReviewModal from '../modal/ReviewModal';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
@@ -23,18 +26,33 @@ export default function MaterialRequestManager({ user }) {
     createMaterialRequest,
     deleteMaterialRequest,
   } = useMaterialRequest();
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedMaterialRequest, setSelectedMaterialRequest] = useState(null);
+  const [reviewReadOnly, setReviewReadOnly] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
-      console.log("dto", payload);
       setMaterialRequests((prev) =>
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-              ...sr,
-              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-            }
+                ...sr,
+                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+              }
             : sr
+        )
+      );
+    },
+    [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) =>
+          mr.materialRequestID === payload.materialRequestID
+            ? {
+                ...mr,
+                status: 'Closed',
+              }
+            : mr
         )
       );
     },
@@ -43,12 +61,25 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-              ...sr,
-              distributorApplyCount: Math.max(
-                0,
-                (sr.distributorApplyCount || 1) - 1
-              ),
-            }
+                ...sr,
+                distributorApplyCount: Math.max(
+                  0,
+                  (sr.distributorApplyCount || 1) - 1
+                ),
+              }
+            : sr
+        )
+      );
+    },
+    [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+                startReviewDate: payload.startReviewDate,
+              }
             : sr
         )
       );
@@ -89,8 +120,38 @@ export default function MaterialRequestManager({ user }) {
       },
     });
   };
+  const handleCreateReview = (serviceRequest) => {
+    setSelectedMaterialRequest(serviceRequest);
+    setReviewReadOnly(false);
+    setIsReviewModalOpen(true);
+  };
 
-  if (loading) return <Loading />;
+  const handleViewReview = (serviceRequest) => {
+    setSelectedMaterialRequest(serviceRequest);
+    setReviewReadOnly(true);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleSaveReview = async (reviewData) => {
+    try {
+      const response = await reviewService.create(reviewData);
+      toast.success(t('SUCCESS.CREATE_REVIEW'));
+
+      // Update service request with new review
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === response.materialRequestID
+            ? { ...sr, review: response }
+            : sr
+        )
+      );
+      setIsReviewModalOpen(false);
+      setSelectedMaterialRequest(null);
+    } catch (err) {
+      handleApiError(err, t);
+    }
+  };
+  if (loading || uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div>
@@ -103,7 +164,10 @@ export default function MaterialRequestManager({ user }) {
           </h2>
           <p className="text-sm text-gray-600">
             {t('userPage.materialRequest.subtitle')} (
-            {materialRequests?.length || 0}/3)
+            {materialRequests.filter(
+              (m) => m.status == 'Draft' || m.status == 'Opening'
+            ).length || 0}
+            /3)
           </p>
         </div>
         <button
@@ -114,7 +178,23 @@ export default function MaterialRequestManager({ user }) {
           {t('BUTTON.CreateMaterialRequest')}
         </button>
       </div>
-
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => {
+          setIsReviewModalOpen(false);
+          setSelectedMaterialRequest(null);
+          setReviewReadOnly(false);
+        }}
+        onSave={handleSaveReview}
+        review={reviewReadOnly ? selectedMaterialRequest?.review : null}
+        serviceRequestID={null}
+        materialRequestID={selectedMaterialRequest?.materialRequestID}
+        partnerID={
+          selectedMaterialRequest?.selectedDistributorApplication.distributorID
+        }
+        setUploadProgress={setUploadProgress}
+        readOnly={reviewReadOnly}
+      />
       {/* Empty state */}
       {!materialRequests || materialRequests.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl">
@@ -210,7 +290,7 @@ export default function MaterialRequestManager({ user }) {
                                 {i18n.language === 'vi'
                                   ? item.material?.name
                                   : item.material?.nameEN ||
-                                  item.material?.name}
+                                    item.material?.name}
                                 :
                               </span>
                               <span className="text-black font-semibold">
@@ -258,15 +338,23 @@ export default function MaterialRequestManager({ user }) {
                       </button>
 
                       {/* Delete */}
-                      <button
-                        className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
-                        onClick={() => handleDelete(req.materialRequestID)}
-                      >
-                        <i className="fas fa-xmark"></i>
-                        {t('BUTTON.Delete')}
-                      </button>
+                      {(req.status === 'Opening' || req.status === 'Draft') &&
+                        req.selectedDistributorApplicationID == null && (
+                          <button
+                            className="text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-200 px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm font-medium"
+                            onClick={() => handleDelete(req.materialRequestID)}
+                          >
+                            <i className="fas fa-xmark"></i>
+                            {t('BUTTON.Delete')}
+                          </button>
+                        )}
                     </div>
                   </div>
+                  <ReviewCountdown
+                    request={req}
+                    onCreateReview={handleCreateReview}
+                    onViewReview={handleViewReview}
+                  />
                 </div>
               </div>
             </div>

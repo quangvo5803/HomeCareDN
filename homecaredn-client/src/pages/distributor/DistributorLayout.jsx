@@ -2,13 +2,99 @@ import { useTranslation } from 'react-i18next';
 import MenuList from '../../components/partner/MenuList';
 import AvatarMenu from '../../components/AvatarMenu';
 import LanguageSwitch from '../../components/LanguageSwitch';
-import NotificationBell from '../../components/NotificationBell';
 import { Outlet } from 'react-router-dom';
-import SupportChatWidget from '../../components/SupportChatWidget';
+import NotificationPanel from '../../components/NotificationPanel';
+import { notificationService } from '../../services/notificationService';
+import { toast } from 'react-toastify';
+import { handleApiError } from '../../utils/handleApiError';
+import { useAuth } from '../../hook/useAuth';
+import { useEffect, useState } from 'react';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import useRealtime from '../../realtime/useRealtime';
 
 export default function DistributorLayout() {
   const { t } = useTranslation();
+  const { user } = useAuth();
 
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  //Real time
+  useRealtime({
+    [RealtimeEvents.NotificationCreated]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
+    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => {
+      setNotifications(prev => {
+        const exists = prev.some(n => n.notificationID === payload.notificationID);
+
+        if (exists) {
+          return prev;
+        }
+
+        return [
+          { ...payload, isRead: false },
+          ...prev
+        ];
+      });
+
+      toast.info(
+        <div
+          dangerouslySetInnerHTML={{
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+          }}
+        />,
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+    },
+  });
+
+  useEffect(() => {
+    if (!user) return;
+    const fetchNotifications = async () => {
+      setLoading(true);
+      try {
+        const result = await notificationService.getAllForDistributor({
+          FilterID: user.id,
+          PageNumber: 1,
+          PageSize: 10
+        });
+        setNotifications(result.items);
+
+      } catch (err) {
+        toast.error(t(handleApiError(err)));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, [t, user]);
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-gray-50">
       <MenuList serviceRequestsCount={10} />
@@ -24,7 +110,7 @@ export default function DistributorLayout() {
                 placeholder={t('partnerDashboard.search_placeholder')}
               />
             </div>
-            <NotificationBell total={3} />
+            <NotificationPanel notifications={notifications} loading={loading} user={user} />
             <LanguageSwitch />
             <AvatarMenu />
           </div>
@@ -33,9 +119,6 @@ export default function DistributorLayout() {
         <main className="p-6 space-y-6">
           {/* nơi chứa nội dung distributor */}
           <Outlet />
-          <div className="fixed bottom-6 right-24 z-[60]">
-            <SupportChatWidget brand="HomeCareDN" />
-          </div>
         </main>
 
         <footer className="p-6 text-center text-gray-500 text-sm">

@@ -20,16 +20,26 @@ export const ServiceProvider = ({ children }) => {
       PageNumber = 1,
       PageSize = 10,
       SortBy,
-      FilterID,
       Search,
+      FilterServiceType,
+      FilterPackageOption,
+      FilterBuildingType,
+      FilterMainStructureType,
+      FilterDesignStyle,
+      ExcludedID,
     } = {}) => {
       try {
         const data = await serviceService.getAll({
           PageNumber,
           PageSize,
           SortBy,
-          FilterID,
           Search,
+          FilterServiceType,
+          FilterPackageOption,
+          FilterBuildingType,
+          FilterMainStructureType,
+          FilterDesignStyle,
+          ExcludedID,
         });
         const itemsWithType = (data.items || []).map((s) => ({
           ...s,

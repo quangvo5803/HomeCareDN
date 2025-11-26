@@ -216,8 +216,14 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("CustomerID")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DistributorID")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsAdminRead")
                         .HasColumnType("bit");
+
+                    b.Property<Guid?>("MaterialRequestID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("ServiceRequestID")
                         .HasColumnType("uniqueidentifier");
@@ -450,8 +456,8 @@ namespace DataAccess.Migrations.Application
                     b.Property<bool>("CanAddMaterial")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("CanEditQuantity")
-                        .HasColumnType("bit");
+                    b.Property<Guid?>("ConversationID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -462,9 +468,6 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SelectedDistributorApplicationDistributorApplicationID")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid?>("SelectedDistributorApplicationID")
                         .HasColumnType("uniqueidentifier");
 
@@ -474,7 +477,13 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("MaterialRequestID");
 
-                    b.HasIndex("SelectedDistributorApplicationDistributorApplicationID");
+                    b.HasIndex("ConversationID")
+                        .IsUnique()
+                        .HasFilter("[ConversationID] IS NOT NULL");
+
+                    b.HasIndex("SelectedDistributorApplicationID")
+                        .IsUnique()
+                        .HasFilter("[SelectedDistributorApplicationID] IS NOT NULL");
 
                     b.ToTable("MaterialRequests", "app");
                 });
@@ -503,6 +512,57 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("MaterialRequestItems", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Notification", b =>
+                {
+                    b.Property<Guid>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DataKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DataValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PendingCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TargetRoles")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("TargetUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("NotificationID");
+
+                    b.ToTable("Notifications", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
                     b.Property<Guid>("PartnerRequestID")
@@ -526,6 +586,9 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<bool>("IsContractSigned")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PartnerRequestType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -538,6 +601,12 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("SignatureUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("SignedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -562,7 +631,7 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("ContractorApplicationID")
+                    b.Property<Guid?>("ContractorApplicationID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -573,10 +642,16 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<Guid?>("DistributorApplicationID")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("ItemName")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid?>("MaterialRequestID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<long>("OrderCode")
                         .HasColumnType("bigint");
@@ -588,7 +663,7 @@ namespace DataAccess.Migrations.Application
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<Guid>("ServiceRequestID")
+                    b.Property<Guid?>("ServiceRequestID")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
@@ -598,6 +673,8 @@ namespace DataAccess.Migrations.Application
                     b.HasKey("PaymentTransactionID");
 
                     b.HasIndex("ContractorApplicationID");
+
+                    b.HasIndex("DistributorApplicationID");
 
                     b.ToTable("PaymentTransactions", "app");
                 });
@@ -634,7 +711,9 @@ namespace DataAccess.Migrations.Application
 
                     b.HasKey("ReviewID");
 
-                    b.HasIndex("MaterialRequestID");
+                    b.HasIndex("MaterialRequestID")
+                        .IsUnique()
+                        .HasFilter("[MaterialRequestID] IS NOT NULL");
 
                     b.HasIndex("ServiceRequestID")
                         .IsUnique()
@@ -801,11 +880,13 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplication", b =>
                 {
-                    b.HasOne("DataAccess.Entities.Application.MaterialRequest", null)
+                    b.HasOne("DataAccess.Entities.Application.MaterialRequest", "MaterialRequest")
                         .WithMany("DistributorApplications")
                         .HasForeignKey("MaterialRequestID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("MaterialRequest");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.DistributorApplicationItem", b =>
@@ -892,9 +973,15 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.MaterialRequest", b =>
                 {
+                    b.HasOne("DataAccess.Entities.Application.Conversation", "Conversation")
+                        .WithOne("MaterialRequest")
+                        .HasForeignKey("DataAccess.Entities.Application.MaterialRequest", "ConversationID");
+
                     b.HasOne("DataAccess.Entities.Application.DistributorApplication", "SelectedDistributorApplication")
-                        .WithMany()
-                        .HasForeignKey("SelectedDistributorApplicationDistributorApplicationID");
+                        .WithOne()
+                        .HasForeignKey("DataAccess.Entities.Application.MaterialRequest", "SelectedDistributorApplicationID");
+
+                    b.Navigation("Conversation");
 
                     b.Navigation("SelectedDistributorApplication");
                 });
@@ -920,18 +1007,22 @@ namespace DataAccess.Migrations.Application
                 {
                     b.HasOne("DataAccess.Entities.Application.ContractorApplication", "ContractorApplication")
                         .WithMany()
-                        .HasForeignKey("ContractorApplicationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ContractorApplicationID");
+
+                    b.HasOne("DataAccess.Entities.Application.DistributorApplication", "DistributorApplication")
+                        .WithMany()
+                        .HasForeignKey("DistributorApplicationID");
 
                     b.Navigation("ContractorApplication");
+
+                    b.Navigation("DistributorApplication");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Review", b =>
                 {
                     b.HasOne("DataAccess.Entities.Application.MaterialRequest", "MaterialRequest")
-                        .WithMany()
-                        .HasForeignKey("MaterialRequestID");
+                        .WithOne("Review")
+                        .HasForeignKey("DataAccess.Entities.Application.Review", "MaterialRequestID");
 
                     b.HasOne("DataAccess.Entities.Application.ServiceRequest", "ServiceRequest")
                         .WithOne("Review")
@@ -976,6 +1067,8 @@ namespace DataAccess.Migrations.Application
 
             modelBuilder.Entity("DataAccess.Entities.Application.Conversation", b =>
                 {
+                    b.Navigation("MaterialRequest");
+
                     b.Navigation("Messages");
 
                     b.Navigation("ServiceRequest");
@@ -996,6 +1089,8 @@ namespace DataAccess.Migrations.Application
                     b.Navigation("DistributorApplications");
 
                     b.Navigation("MaterialRequestItems");
+
+                    b.Navigation("Review");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>

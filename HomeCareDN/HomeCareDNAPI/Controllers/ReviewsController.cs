@@ -18,7 +18,10 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [Authorize(
+            AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,
+            Roles = "Admin,Distributor,Contractor"
+        )]
         [HttpGet("get-all-reviews")]
         public async Task<IActionResult> GetAll([FromQuery] QueryParameters parameters)
         {

@@ -1,16 +1,19 @@
-﻿using System.Diagnostics.Contracts;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.Services.Interfaces;
+using CloudinaryDotNet;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Contracts;
 using Ultitity.Exceptions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BusinessLogic.Services
 {
@@ -20,8 +23,13 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
-        private const string DISTRIBUTOR_APPLY = "DistributorApply";
+        private const string DISTRIBUTOR_APPLICATION_REJECT = "DistributorApplication.Rejected";
+        private const string DISTRIBUTOR_APPLICATION_ACCEPT = "DistributorApplication.Accept";
+
+        private const string ERROR_APPLICATION_NOT_FOUND = "APPLICATION_NOT_FOUND";
+        private const string DISTRIBUTOR_APPLICATION = "DistributorApplication";
         private const string DISTRIBUTOR = "Distributor";
         private const string ERROR_MATERIAL_REQUEST_NOT_FOUND = "MATERIAL_REQUEST_NOT_FOUND";
         private const string ERROR_DISTRIBUTOR_NOT_FOUND = "DISTRIBUTOR_NOT_FOUND";
@@ -32,13 +40,15 @@ namespace BusinessLogic.Services
             IUnitOfWork unitOfWork,
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<
@@ -70,10 +80,10 @@ namespace BusinessLogic.Services
                 if (distributor == null)
                     continue;
 
-                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
-
                 if (role == "Admin")
                 {
+                    dto.DistributorName =
+                        distributor.FullName ?? distributor.UserName ?? string.Empty;
                     dto.DistributorEmail = distributor.Email ?? string.Empty;
                     dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
                 }
@@ -82,6 +92,36 @@ namespace BusinessLogic.Services
             return new PagedResultDto<DistributorApplicationDto>
             {
                 Items = dtoItems,
+                TotalCount = totalCount,
+                PageNumber = parameters.PageNumber,
+                PageSize = parameters.PageSize,
+            };
+        }
+
+        public async Task<
+            PagedResultDto<DistributorApplicationDto>
+        > GetAllDistributorApplicationByUserIdAsync(QueryParameters parameters)
+        {
+            var query = _unitOfWork
+                .DistributorApplicationRepository.GetQueryable(
+                    includeProperties: "Items,Items.Material,Items.Material.Brand,Items.Material.Category"
+                )
+                .AsSingleQuery()
+                .Where(ca => ca.DistributorID == parameters.FilterID);
+
+            var totalCount = await query.CountAsync();
+            query = query.OrderByDescending(c => c.CreatedAt);
+
+            query = query
+                .Skip((parameters.PageNumber - 1) * parameters.PageSize)
+                .Take(parameters.PageSize);
+
+            var items = await query.ToListAsync();
+            var dtos = _mapper.Map<IEnumerable<DistributorApplicationDto>>(items);
+
+            return new PagedResultDto<DistributorApplicationDto>
+            {
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
@@ -148,13 +188,13 @@ namespace BusinessLogic.Services
             {
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
-                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
-                dto.DistributorEmail = distributor.Email ?? string.Empty;
-                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
-                if (role == "Customer" && application.Status != ApplicationStatus.Approved)
+
+                if (role == "Customer" && application.Status == ApplicationStatus.Approved)
                 {
-                    dto.DistributorEmail = string.Empty;
-                    dto.DistributorPhone = string.Empty;
+                    dto.DistributorName =
+                        distributor.FullName ?? distributor.UserName ?? string.Empty;
+                    dto.DistributorEmail = distributor.Email ?? string.Empty;
+                    dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
                 }
             }
             return dto;
@@ -180,7 +220,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -195,9 +235,7 @@ namespace BusinessLogic.Services
 
             DistributorApplication application;
 
-            application = materialRequest.CanEditQuantity
-                ? await AddAndEditCase(createRequest)
-                : await AddAndNoCase(createRequest, materialRequest);
+            application = await AddAndNoCase(createRequest, materialRequest);
 
             var dto = _mapper.Map<DistributorApplicationDto>(application);
             dto.DistributorName = distributor.FullName ?? string.Empty;
@@ -224,6 +262,15 @@ namespace BusinessLogic.Services
                     customerDto
                 ),
             };
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = materialRequest.CustomerID,
+                Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
+                Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
+                DataValue = dto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Apply
+            });
             await Task.WhenAll(notifyTasks);
             return dto;
         }
@@ -238,7 +285,7 @@ namespace BusinessLogic.Services
             {
                 var errors = new Dictionary<string, string[]>
                 {
-                    { DISTRIBUTOR_APPLY, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_MATERIAL_REQUEST_NOT_FOUND } },
                 };
                 throw new CustomValidationException(errors);
             }
@@ -261,23 +308,193 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        #region Handle Cases
-        private async Task<DistributorApplication> AddAndEditCase(
-            DistributorCreateApplicationDto createRequest
+        public async Task<DistributorApplicationDto> AcceptDistributorApplicationAsync(
+            DistributorApplicationAcceptRequestDto dto
         )
         {
-            var application = _mapper.Map<DistributorApplication>(createRequest);
-            application.Items = new List<DistributorApplicationItem>();
-
-            foreach (var item in createRequest.Items!.Where(i => i != null))
+            var application = await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                x => x.DistributorApplicationID == dto.DistributorApplicationID,
+                includeProperties: "Items",
+                asNoTracking: false
+            );
+            if (application == null)
             {
-                var entityItem = _mapper.Map<DistributorApplicationItem>(item);
-                application.Items.Add(entityItem);
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var request = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                x => x.MaterialRequestID == application.MaterialRequestID,
+                includeProperties: "MaterialRequestItems,DistributorApplications",
+                asNoTracking: false
+            );
+            if (request == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "MaterialRequest", new[] { "Material request not found." } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            var originalMaterialIDs =
+                request.MaterialRequestItems?.Select(x => x.MaterialID).ToHashSet()
+                ?? new HashSet<Guid>();
+
+            if (application.Items != null && dto.AcceptedExtraItemIDs != null)
+            {
+                var originalItems = application
+                    .Items.Where(x => originalMaterialIDs.Contains(x.MaterialID))
+                    .ToList();
+
+                var extraItems = application
+                    .Items.Where(x => !originalMaterialIDs.Contains(x.MaterialID))
+                    .ToList();
+
+                var acceptedExtraItems = extraItems
+                    .Where(x => dto.AcceptedExtraItemIDs.Contains(x.DistributorApplicationItemID))
+                    .ToList();
+
+                application.Items = originalItems.Concat(acceptedExtraItems).ToList();
+            }
+            application.Status = ApplicationStatus.PendingCommission;
+            application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+
+            request.Status = RequestStatus.Closed;
+            request.SelectedDistributorApplicationID = application.DistributorApplicationID;
+            if (request.DistributorApplications != null)
+            {
+                foreach (var other in request.DistributorApplications)
+                {
+                    if (other.DistributorApplicationID != application.DistributorApplicationID)
+                    {
+                        other.Status = ApplicationStatus.Rejected;
+
+                        var rejectPayload = new
+                        {
+                            other.DistributorApplicationID,
+                            request.MaterialRequestID,
+                            Status = "Rejected",
+                        };
+
+                        await _notifier.SendToApplicationGroupAsync(
+                            $"user_{other.DistributorID}",
+                            DISTRIBUTOR_APPLICATION_REJECT,
+                            rejectPayload
+                        );
+                        await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+                        {
+                            TargetUserId = other.DistributorID,
+                            Title = "Yêu cầu vật tư chưa được chấp nhận",
+                            Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                            DataKey = $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
+                            DataValue = other.MaterialRequestID.ToString(),
+                            Action = NotificationAction.Reject
+                        });
+                    }
+                }
+            }
+            await _unitOfWork.SaveAsync();
+            var resultDto = _mapper.Map<DistributorApplicationDto>(application);
+
+            var acceptPayload = new
+            {
+                application.DistributorApplicationID,
+                application.MaterialRequestID,
+                Status = "PendingCommission",
+                application.DueCommisionTime,
+            };
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{request.CustomerID}",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{application.DistributorID}",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                DISTRIBUTOR_APPLICATION_ACCEPT,
+                acceptPayload
+            );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = application.DistributorID,
+                Title = "Chúc mừng! Bạn đã được chọn",
+                Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
+                DataValue = resultDto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Accept
+            });
+
+            return resultDto;
+        }
+
+        public async Task<DistributorApplicationDto> RejectDistributorApplicationAsync(
+            Guid distributorApplicationID
+        )
+        {
+            var distributorApplication =
+                await _unitOfWork.DistributorApplicationRepository.GetAsync(
+                    ca => ca.DistributorApplicationID == distributorApplicationID,
+                    asNoTracking: false
+                );
+
+            if (distributorApplication == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { ERROR_APPLICATION_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
             }
 
-            await _unitOfWork.DistributorApplicationRepository.AddAsync(application);
+            if (distributorApplication.Status != ApplicationStatus.Pending)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { DISTRIBUTOR_APPLICATION, new[] { "APPLICATION_NOT_PENDING" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            distributorApplication.Status = ApplicationStatus.Rejected;
             await _unitOfWork.SaveAsync();
-            return application;
+            var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
+            await _notifier.SendToApplicationGroupAsync(
+                $"user_{dto.DistributorID}",
+                DISTRIBUTOR_APPLICATION_REJECT,
+                new
+                {
+                    distributorApplication.DistributorApplicationID,
+                    distributorApplication.MaterialRequestID,
+                    Status = ApplicationStatus.Rejected.ToString(),
+                }
+            );
+            await _notifier.SendToApplicationGroupAsync(
+                $"role_Admin",
+                DISTRIBUTOR_APPLICATION_REJECT,
+                new
+                {
+                    distributorApplication.DistributorApplicationID,
+                    distributorApplication.MaterialRequestID,
+                    Status = ApplicationStatus.Rejected.ToString(),
+                }
+            );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = distributorApplication.DistributorID,
+                Title = "Yêu cầu vật tư chưa được chấp nhận",
+                Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
+                DataValue = dto.MaterialRequestID.ToString(),
+                Action = NotificationAction.Reject
+            });
+
+            return dto;
         }
 
         private async Task<DistributorApplication> AddAndNoCase(
@@ -308,6 +525,5 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             return application;
         }
-        #endregion
     }
 }

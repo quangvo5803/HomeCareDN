@@ -22,6 +22,7 @@ namespace BusinessLogic.Services.Interfaces
         private readonly AuthorizeDbContext _authorizeDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ISignalRNotifier _notifier;
+        private readonly INotificationService _notificationService;
 
         private const string ADMIN = "Admin";
         private const string CONTRACTOR = "Contractor";
@@ -42,7 +43,8 @@ namespace BusinessLogic.Services.Interfaces
             IMapper mapper,
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            INotificationService notificationService
         )
         {
             _unitOfWork = unitOfWork;
@@ -50,6 +52,7 @@ namespace BusinessLogic.Services.Interfaces
             _authorizeDbContext = authorizeDbContext;
             _userManager = userManager;
             _notifier = notifier;
+            _notificationService = notificationService;
         }
 
         public async Task<PagedResultDto<ServiceRequestDto>> GetAllServiceRequestAsync(
@@ -70,7 +73,7 @@ namespace BusinessLogic.Services.Interfaces
             }
 
             var totalCount = await query.CountAsync();
-            
+
             if (role == ADMIN && parameters.FilterID != null)
             {
                 query = query.Where(s => s.CustomerID == parameters.FilterID);
@@ -213,7 +216,7 @@ namespace BusinessLogic.Services.Interfaces
                 new[] { contractorDto },
                 CONTRACTOR
             );
-
+            await _notificationService.NotifyNewServiceRequestAsync(serviceRequest);
             await _notifier.SendToApplicationGroupAsync(
                 "role_Admin",
                 "ServiceRequest.Created",
@@ -443,6 +446,13 @@ namespace BusinessLogic.Services.Interfaces
         // ==================== Admin ====================
         private async Task MapForAdminAsync(ServiceRequest item, ServiceRequestDto dto)
         {
+            var customer = await _userManager.FindByIdAsync(item.CustomerID.ToString());
+            if (customer != null)
+            {
+                dto.CustomerName = customer.FullName ?? customer.Email;
+                dto.CustomerEmail = customer.Email;
+                dto.CustomerPhone = customer.PhoneNumber;
+            }
             if (item.SelectedContractorApplication != null)
             {
                 var selected = item.SelectedContractorApplication;

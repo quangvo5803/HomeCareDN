@@ -47,6 +47,7 @@ namespace DataAccess.Data
                         NormalizedName = "DISTRIBUTOR",
                     }
                 );
+
             builder.Entity<ApplicationUser>(entity =>
             {
                 entity.Property(mr => mr.Gender).HasConversion<string>();

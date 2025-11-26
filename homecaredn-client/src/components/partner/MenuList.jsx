@@ -33,7 +33,7 @@ export default function Sidebar({
           key: 'material-request',
           label: t('partnerDashboard.material_requests'),
           icon: <i className="fas fa-boxes"></i>,
-          to: '/Distributor/MaterialRequest',
+          to: '/Distributor/MaterialRequestManager',
           badge: serviceRequestsCount,
         },
         {
@@ -47,6 +47,12 @@ export default function Sidebar({
           label: t('partnerDashboard.materials'),
           icon: <i className="fa-solid fa-box"></i>,
           to: '/Distributor/MaterialManager',
+        },
+        {
+          key: 'profile',
+          label: t('partnerDashboard.profile'),
+          icon: <i className="fa-solid fa-id-card"></i>,
+          to: '/Distributor/Profile',
         },
         {
           key: 'logout',

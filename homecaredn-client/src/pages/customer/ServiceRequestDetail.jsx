@@ -6,7 +6,7 @@ import 'venobox/dist/venobox.min.css';
 import Loading from '../../components/Loading';
 import LoadingComponent from '../../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '../../utils/formatters';
+import { formatDate, formatVND } from '../../utils/formatters';
 import { handleApiError } from '../../utils/handleApiError';
 import { toast } from 'react-toastify';
 import { contractorApplicationService } from '../../services/contractorApplicationService';
@@ -171,6 +171,7 @@ export default function ServiceRequestDetail() {
           c.contractorApplicationID === contractorApplicationID ? rejected : c
         )
       );
+      toast.success(t('SUCCESS.REJECT_APPLICATION'));
     } catch (error) {
       toast.error(t(handleApiError(error)));
     }
@@ -617,6 +618,32 @@ export default function ServiceRequestDetail() {
                   status={selectedContractor.status}
                   type="Application"
                 />
+                {/* Price Box */}
+                <div className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-6 mb-5 mt-5">
+                  <p className="text-xs text-green-700 mb-1 uppercase tracking-widest font-semibold">
+                    {t('userPage.serviceRequestDetail.label_estimatePrice')}
+                  </p>
+
+                  <p className="text-3xl font-bold text-green-900 mb-1">
+                    {selectedContractor.estimatePrice < 1_000_000
+                      ? formatVND(selectedContractor.estimatePrice)
+                      : (selectedContractor.estimatePrice / 1_000_000).toFixed(
+                          0
+                        )}
+
+                    {selectedContractor.estimatePrice >= 1_000_000 && (
+                      <span className="text-lg font-normal ml-2">
+                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
+                      </span>
+                    )}
+                  </p>
+
+                  {selectedContractor.estimatePrice >= 1_000_000 && (
+                    <p className="text-xs text-green-700 font-medium">
+                      {formatVND(selectedContractor.estimatePrice)}
+                    </p>
+                  )}
+                </div>
               </div>
               {/* Documents  */}
               {selectedContractor?.documentUrls?.length > 0 && (
@@ -755,10 +782,7 @@ export default function ServiceRequestDetail() {
                           </span>
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {selectedContractor.estimatePrice?.toLocaleString(
-                            'vi-VN'
-                          )}{' '}
-                          VNĐ
+                          {formatVND(selectedContractor.estimatePrice)}
                         </p>
                       </div>
                     </div>
@@ -835,6 +859,22 @@ export default function ServiceRequestDetail() {
                     <i className="fas fa-times mr-2"></i>
                     {t('BUTTON.Reject')}
                   </button>
+                </div>
+              )}
+              {selectedContractor.status === 'Rejected' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                  <p className="text-red-700 font-semibold">
+                    <i className="fas fa-times-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.alreadyRejected')}
+                  </p>
+                </div>
+              )}
+              {selectedContractor.status === 'PendingCommission' && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+                  <p className="text-green-700 font-semibold">
+                    <i className="fas fa-check-circle mr-2"></i>
+                    {t('userPage.materialRequestDetail.waiting')}
+                  </p>
                 </div>
               )}
             </>
@@ -918,7 +958,7 @@ export default function ServiceRequestDetail() {
             serviceRequest.conversationID ||
             serviceRequest.conversation?.conversationID
           }
-          contractorApplicationStatus={selectedContractor?.status}
+          applicationStatus={selectedContractor?.status}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6"
         />
       </div>

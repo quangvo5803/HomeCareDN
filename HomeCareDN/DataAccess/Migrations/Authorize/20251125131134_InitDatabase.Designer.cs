@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations.Authorize
 {
     [DbContext(typeof(AuthorizeDbContext))]
-    [Migration("20251123083545_InitAuthorizeDatabase")]
-    partial class InitAuthorizeDatabase
+    [Migration("20251125131134_InitDatabase")]
+    partial class InitDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

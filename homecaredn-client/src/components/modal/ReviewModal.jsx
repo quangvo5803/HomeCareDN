@@ -13,6 +13,7 @@ export default function ReviewModal({
   onSave,
   review,
   serviceRequestID,
+  materialRequestID,
   partnerID,
   setUploadProgress,
   readOnly,
@@ -67,10 +68,11 @@ export default function ReviewModal({
       return;
     }
     try {
-      const newFiles = images.map((i) => i.file);
+      const newFiles = images.map((i) => i.file).filter(Boolean);
       const data = {
         UserID: user?.id || null,
         ServiceRequestID: serviceRequestID || null,
+        MaterialRequestID: materialRequestID || null,
         PartnerID: partnerID || null,
         Rating: rating,
         Comment: comment || null,
@@ -104,11 +106,9 @@ export default function ReviewModal({
         <div className="flex items-center justify-between pb-4 border-b">
           <h3 className="text-2xl font-semibold text-gray-900">
             <i className="fas fa-star text-yellow-500 mr-2"></i>
-            {readOnly ? (
-              <>{t('ModalPopup.ReviewModal.view')}</>
-            ) : (
-              <>{t('ModalPopup.ReviewModal.create')}</>
-            )}
+            {readOnly
+              ? t('ModalPopup.ReviewModal.view')
+              : t('ModalPopup.ReviewModal.create')}
           </h3>
           <button
             onClick={onClose}
@@ -176,14 +176,13 @@ export default function ReviewModal({
                 disabled={readOnly}
                 className="w-full px-4 py-3 border rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-600"
                 rows="5"
-                placeholder={
-                  readOnly ? '' : t('ModalPopup.ReviewModal.commentPlaceholder')
-                }
+                placeholder={t('ModalPopup.ReviewModal.commentPlaceholder')}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
               />
             </div>
           )}
+
           {readOnly && review?.comment && (
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -194,6 +193,7 @@ export default function ReviewModal({
               </p>
             </div>
           )}
+
           {/* Images */}
           {!readOnly && (
             <div>
@@ -250,6 +250,7 @@ export default function ReviewModal({
               )}
             </div>
           )}
+
           {readOnly && review?.imageUrls?.length > 0 && (
             <div>
               <label className="block mb-2 text-sm font-medium text-gray-700">
@@ -271,6 +272,7 @@ export default function ReviewModal({
               </div>
             </div>
           )}
+
           {/* Review Info */}
           {readOnly && review && (
             <div className="pt-4 border-t">
@@ -281,12 +283,15 @@ export default function ReviewModal({
             </div>
           )}
         </div>
+
+        {/* Warning */}
         {!readOnly && (
           <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-xl flex gap-2 text-sm text-red-700">
             <i className="fa-solid fa-triangle-exclamation text-red-500 text-lg"></i>
             <p>{t('ModalPopup.ReviewModal.warning')}</p>
           </div>
         )}
+
         {/* Footer */}
         <div className="flex items-center justify-end gap-4 pt-4 mt-6 border-t">
           <button
@@ -319,6 +324,7 @@ ReviewModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   review: PropTypes.object,
   serviceRequestID: PropTypes.string,
+  materialRequestID: PropTypes.string,
   partnerID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,

@@ -13,21 +13,18 @@ export default function CardItem({ item }) {
   }
   return (
     <Link
-      to={link}   
+      to={link}
       className="flex flex-col h-full overflow-hidden transition-all duration-300 border border-gray-300 shadow-sm group bg-gray-50 rounded-xl hover:shadow-2xl hover:-translate-y-1"
     >
       {/* Ảnh */}
       <div className="relative flex items-center justify-center flex-shrink-0 overflow-hidden bg-gray-100 h-72">
         <img
           src={
-            item.imageUrls?.[0]
-            || "https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+            item.imageUrls?.[0] ||
+            'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
           }
-          alt={item.name || "No image"}
-          className={`object-contain duration-300 group-hover:scale-110
-            ${item.type === "material" ? "max-w-[250px] max-h-[250px]" : ""}
-            ${item.type === "service" ? "max-w-[350px] max-h-[360px]" : ""}
-          `}
+          alt={item.name || 'No image'}
+          className="object-cover w-full h-full duration-300 group-hover:scale-110"
         />
       </div>
 
