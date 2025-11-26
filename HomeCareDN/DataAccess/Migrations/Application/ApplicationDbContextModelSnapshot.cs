@@ -512,6 +512,57 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("MaterialRequestItems", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.Notification", b =>
+                {
+                    b.Property<Guid>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DataKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DataValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PendingCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TargetRoles")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("TargetUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("NotificationID");
+
+                    b.ToTable("Notifications", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.PartnerRequest", b =>
                 {
                     b.Property<Guid>("PartnerRequestID")

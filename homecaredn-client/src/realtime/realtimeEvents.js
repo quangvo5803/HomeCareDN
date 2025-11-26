@@ -28,4 +28,10 @@ export const RealtimeEvents = Object.freeze({
   ConversationUnlocked: 'Chat.ConversationUnlocked',
   NewAdminMessage: 'Chat.NewAdminMessage',
   NewConversationForAdmin: 'Chat.NewConversationForAdmin',
+
+  // Notification
+  NotificationCreated: 'Notification.Created',
+  NotificationApplicationCreate: 'Notification.Application.Create',
+  NotificationApplicationUpdate: 'Notification.Application.Update',
+  NotificationApplicationPaid: 'Notification.Application.Paid',
 });

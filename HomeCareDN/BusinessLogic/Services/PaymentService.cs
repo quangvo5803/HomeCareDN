@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogic.DTOs.Application;
+using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
@@ -27,6 +28,7 @@ namespace BusinessLogic.Services
         private readonly ISignalRNotifier _notifier;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
         private const string PAYMENT = "PaymentTransaction.Updated";
 
@@ -36,7 +38,8 @@ namespace BusinessLogic.Services
             IOptions<PayOsOptions> payOsOptions,
             ISignalRNotifier notifier,
             UserManager<ApplicationUser> userManager,
-            IMapper mapper
+            IMapper mapper,
+            INotificationService notificationService
         )
         {
             _payOS = payOS;
@@ -45,6 +48,7 @@ namespace BusinessLogic.Services
             _notifier = notifier;
             _userManager = userManager;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
 
         public async Task<CreatePaymentResult> CreatePaymentAsync(
@@ -280,6 +284,15 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = serviceRequest!.CustomerID,
+                Title = "Yêu cầu của bạn đã được chấp thuận",
+                Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
+                DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
+                DataValue = serviceRequest.ServiceRequestID.ToString(),
+                Action = NotificationAction.Paid
+            });
         }
 
         private async Task HandleDistributorPaymentAsync(PaymentTransaction payment)
@@ -339,6 +352,15 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
             );
+            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
+            {
+                TargetUserId = materialRequest!.CustomerID,
+                Title = "Yêu cầu của bạn đã được chấp thuận",
+                Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
+                DataKey = $"DistributorApplication_{payment.DistributorApplicationID}_PAID",
+                DataValue = materialRequest.MaterialRequestID.ToString(),
+                Action = NotificationAction.Paid
+            });
         }
     }
 }
