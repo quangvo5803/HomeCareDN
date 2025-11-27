@@ -107,10 +107,10 @@ export default function ChatSection({
     const loadConversation = async () => {
       try {
         setLoading(true);
-        const conversation = await conversationService.getConversationByID(
-          conversationID,
-          user.id
-        );
+        const conversation = await conversationService.getConversationByID({
+          conversationID: conversationID,
+          currentUserID: user.id,
+        });
         setConversation(conversation);
 
         if (!chatIsLocked) {
