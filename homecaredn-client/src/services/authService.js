@@ -17,7 +17,7 @@ export const authService = {
     const res = await api.post('/Authorize/verify-otp', { email, otp });
     return res;
   },
-  resentOtp: (email) => api.post('/Authorize/login', { email }),
+  resendOtp: (email) => api.post('/Authorize/login', { email }),
   refreshToken: () =>
     axios.post(
       `${BASE_URL}/Authorize/refresh-token`,
