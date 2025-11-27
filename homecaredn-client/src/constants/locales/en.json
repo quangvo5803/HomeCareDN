@@ -640,7 +640,10 @@
     "requestClosedNote": "This request is closed. Your application will no longer be processed.",
     "notAppliedYet": "Not Yet Applied",
     "deleteApplication": "Delete Application",
-    "canDeleteWhilePending": "You can delete your current application to submit a new one."
+    "canDeleteWhilePending": "You can delete your current application to submit a new one.",
+    "customerInfo": "Customer Information",
+    "customerName":"Customer name:",
+    "customerPhone":"Customer phone:"
   },
   "partnerDashboard": {
     "no": "No",
