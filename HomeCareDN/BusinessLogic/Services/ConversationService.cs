@@ -41,9 +41,9 @@ namespace BusinessLogic.Services
             {
                 return null;
             }
-            if (!IsUserInConversation(conversation, dto.CurrentUserId.ToString()))
+            if (!IsUserInConversation(conversation, dto.CurrentUserID.ToString()))
             {
-                return null; // Hoặc throw lỗi Unauthorized tuỳ vào thiết kế của bạn
+                return null;
             }
             var result = _mapper.Map<ConversationDto>(conversation);
             return result;

@@ -4,6 +4,6 @@
     {
         public required Guid ConversationID { get; set; }
 
-        public required Guid CurrentUserId { get; set; }
+        public required string CurrentUserID { get; set; }
     }
 }
