@@ -716,7 +716,8 @@
     "tabAI": "Chat with AI",
     "tabAdmin": "Chat with Admin",
     "startAdminChat": "Send message to Admin to start convesation",
-    "sendAdminChatError": "Send message to Admin ERROR"
+    "sendAdminChatError": "Send message to Admin ERROR",
+    "loadingAdminChat": "Loading conversation with Admin..."
   },
   "distributorCategoryManager": {
     "title": "Category Manager",

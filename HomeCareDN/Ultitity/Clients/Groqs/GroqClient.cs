@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 
 namespace Ultitity.Clients.Groqs
@@ -8,73 +8,60 @@ namespace Ultitity.Clients.Groqs
     public class GroqClient : IGroqClient
     {
         private readonly HttpClient _http;
-        private readonly string _chatPath;
+        private readonly string _apiKey;
+        private readonly string _model;
 
         public GroqClient(HttpClient http, IConfiguration cfg)
         {
             _http = http;
-
-            var _apiKey = (
-                cfg["Groq:ApiKey"] ?? throw new InvalidOperationException("Missing Groq:ApiKey")
-            ).Trim();
+            _apiKey =
+                cfg["Groq:ApiKey"]?.Trim()
+                ?? throw new InvalidOperationException("Missing Groq:ApiKey");
 
             if (!_apiKey.StartsWith("gsk_"))
-                throw new InvalidOperationException(
-                    "Groq:ApiKey probably wrong (must start with 'gsk_')."
-                );
+                throw new InvalidOperationException("Invalid Groq:ApiKey format.");
 
-            var baseUrl =
-                cfg["Groq:BaseUrl"] ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
-            if (!baseUrl.EndsWith('/'))
-                baseUrl += '/';
+            var baseUrl = cfg["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+            _http.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : baseUrl + "/");
+            _http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
 
-            _http.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
-
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                _apiKey
-            );
-            _http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-
-            _chatPath = cfg["Groq:ChatPath"] ?? "chat/completions";
+            _model = "llama-3.3-70b-versatile";
         }
 
-        public async Task<string> ChatAsync(
-            IEnumerable<(string Role, string Content)> messages,
-            double temperature = 0.7,
-            string model = "llama-3.3-70b-versatile"
-        )
+        public async Task<string> ChatAsync(object payload)
         {
-            var payload = new
+            // Tự động serialize payload sang JSON
+            using var response = await _http.PostAsJsonAsync("chat/completions", payload);
+
+            if (!response.IsSuccessStatusCode)
             {
-                model,
-                messages = messages
-                    .Select(m => new { role = m.Role, content = m.Content })
-                    .ToArray(),
-                temperature,
-            };
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Groq API Error {(int)response.StatusCode}: {error}"
+                );
+            }
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, _chatPath);
-            req.Content = new StringContent(
-                JsonSerializer.Serialize(payload),
-                Encoding.UTF8,
-                "application/json"
-            );
+            var result = await response.Content.ReadFromJsonAsync<GroqResponse>();
+            return result?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? "";
+        }
 
-            using var res = await _http.SendAsync(req);
-            var json = await res.Content.ReadAsStringAsync();
+        private class GroqResponse
+        {
+            [JsonPropertyName("choices")]
+            public List<Choice>? Choices { get; set; }
+        }
 
-            if (!res.IsSuccessStatusCode)
-                throw new HttpRequestException($"Groq error {(int)res.StatusCode}: {json}");
+        private class Choice
+        {
+            [JsonPropertyName("message")]
+            public Message? Message { get; set; }
+        }
 
-            using var doc = JsonDocument.Parse(json);
-            var content = doc
-                .RootElement.GetProperty("choices")[0]
-                .GetProperty("message")
-                .GetProperty("content")
-                .GetString();
-
-            return content?.Trim() ?? "(no reply)";
+        private class Message
+        {
+            [JsonPropertyName("content")]
+            public string? Content { get; set; }
         }
     }
 }

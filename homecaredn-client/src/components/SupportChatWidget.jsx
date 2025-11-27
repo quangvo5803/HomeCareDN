@@ -6,6 +6,8 @@ import {
   useContext,
   useCallback,
 } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
@@ -108,6 +110,39 @@ const MessageShape = PropTypes.exact({
 
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
+  const renderers = {
+    a: ({ href, children }) => {
+      const isInternal = href && href.startsWith('/');
+      const linkClass = cn(
+        'font-bold underline transition-colors duration-200',
+        isUser
+          ? 'text-blue-100 hover:text-white'
+          : 'text-blue-600 hover:text-blue-800'
+      );
+
+      if (isInternal) {
+        return (
+          <Link to={href} className={linkClass}>
+            {children}
+          </Link>
+        );
+      }
+      return (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClass}
+        >
+          {children}
+        </a>
+      );
+    },
+    p: ({ children }) => (
+      <p className="mb-1 last:mb-0 inline-block">{children}</p>
+    ),
+  };
+
   return (
     <div
       className={cn(
@@ -118,19 +153,20 @@ function MessageBubble({ message }) {
       {!isUser && <BotAvatar />}
       <div
         className={cn(
-          'max-w-[75%] md:max-w-[65%]',
+          'max-w-[85%] md:max-w-[75%]',
           isUser ? 'items-end' : 'items-start'
         )}
       >
         <div
           className={cn(
-            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border',
+            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border overflow-hidden',
             isUser
               ? 'bg-orange-600 text-white border-indigo-500/30'
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
-          {message.text}
+          {/* Sử dụng ReactMarkdown để render nội dung */}
+          <ReactMarkdown components={renderers}>{message.text}</ReactMarkdown>
         </div>
         <div
           className={cn(
@@ -268,13 +304,22 @@ TabButton.propTypes = {
 function ChatInput({ onSend, disabled, isLoading, countdown }) {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
+
   const submit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const v = value.trim();
     if (!v) return;
     onSend(v);
     setValue('');
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submit();
+    }
+  };
+
   const buttonText = useMemo(() => {
     if (isLoading) {
       return <i className="fa-solid fa-spinner animate-spin w-4" />;
@@ -284,25 +329,29 @@ function ChatInput({ onSend, disabled, isLoading, countdown }) {
     }
     return t('supportChat.send');
   }, [isLoading, countdown, t]);
+
   return (
-    <form onSubmit={submit} className="flex w-full items-center gap-2">
-      <input
+    <form onSubmit={submit} className="flex w-full items-end gap-2">
+      <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={t('supportChat.inputPlaceholder')}
-        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-10 leading-snug overflow-y-auto"
         disabled={disabled}
+        rows={1}
       />
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150"
+        className="h-10 rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150 grid place-items-center font-medium"
       >
         {buttonText}
       </button>
     </form>
   );
 }
+
 ChatInput.propTypes = {
   onSend: PropTypes.func.isRequired,
   disabled: PropTypes.bool,

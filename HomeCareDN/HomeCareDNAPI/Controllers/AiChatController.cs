@@ -21,7 +21,7 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> Send([FromBody] AiChatRequestDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Prompt))
-                return BadRequest("PROMPT_REQUIRED");
+                return BadRequest(new { message = "Prompt is required" });
             var result = await _facade.AiChatService.SendAsync(dto);
             return Ok(result);
         }

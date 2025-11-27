@@ -2,10 +2,10 @@ import api from '../services/public/api';
 
 export const aiChatService = {
   send: async (input) => {
-    const body =
-      typeof input === 'string' ? { prompt: input } : { prompt: input?.prompt };
-
-    const res = await api.post('/AiChat/send', body, { withCredentials: true });
+    const payload = typeof input === 'string' ? { prompt: input } : input;
+    const res = await api.post('/AiChat/send', payload, {
+      withCredentials: true,
+    });
     return res.data;
   },
 
@@ -15,7 +15,7 @@ export const aiChatService = {
   },
 
   clear: async () => {
-    const res = await api.delete('/AiChat/history', { withCredentials: true });
-    return res.data;
+    await api.delete('/AiChat/history', { withCredentials: true });
+    return true;
   },
 };
