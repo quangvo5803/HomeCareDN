@@ -1008,12 +1008,12 @@ export default function MaterialRequestDetail() {
 
       <div className="overflow-x-auto">
         {/* Header */}
-        <div className="hidden lg:grid lg:grid-cols-19 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
+        <div className="hidden lg:grid lg:grid-cols-24 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
           <div className="col-span-1">#</div>
-          <div className="col-span-2">
+          <div className="col-span-3">
             {t('userPage.materialRequestDetail.image')}
           </div>
-          <div className="col-span-4">
+          <div className="col-span-5">
             {t('userPage.materialRequestDetail.infor')}
           </div>
           <div className="col-span-3">
@@ -1022,10 +1022,10 @@ export default function MaterialRequestDetail() {
           <div className="col-span-3">
             {t('userPage.materialRequestDetail.unit')}
           </div>
-          <div className="col-span-3">
+          <div className="col-span-4">
             {t('distributorMaterialRequestDetail.price')}
           </div>
-          <div className="col-span-3">
+          <div className="col-span-4">
             {t('distributorMaterialRequestDetail.totalPrice')}
           </div>
         </div>
@@ -1056,7 +1056,7 @@ export default function MaterialRequestDetail() {
                 key={item.materialID}
                 className="border-2 border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
               >
-                <div className="hidden lg:grid lg:grid-cols-19 gap-4 items-center text-center">
+                <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
                   {/* STT */}
                   <div className="col-span-1 flex justify-center">
                     <div className="w-5 h-5 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -1067,7 +1067,7 @@ export default function MaterialRequestDetail() {
                   </div>
 
                   {/* Image */}
-                  <div className="col-span-2 flex justify-center">
+                  <div className="col-span-3 flex justify-center">
                     <div className="aspect-square w-20 bg-slate-100 rounded-xl overflow-hidden relative border-2 border-slate-200 group-hover:border-orange-300 transition-all">
                       <img
                         src={
@@ -1081,7 +1081,7 @@ export default function MaterialRequestDetail() {
                   </div>
 
                   {/* Info */}
-                  <div className="col-span-4 text-center">
+                  <div className="col-span-5 text-center">
                     <h3 className="font-bold text-slate-900 mb-3 line-clamp-2 text-sm">
                       {displayName}
                     </h3>
@@ -1126,13 +1126,13 @@ export default function MaterialRequestDetail() {
                   </div>
 
                   {/* Price */}
-                  <div className="col-span-3 flex justify-center">
+                  <div className="col-span-4 flex justify-center">
                     <div className="w-28 px-3 py-2 border-2 border-slate-200 rounded-lg text-center focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all font-bold text-slate-900 text-sm">
                       {formatVND(item.price)}
                     </div>
                   </div>
                   {/* Total Price */}
-                  <div className="col-span-3 flex justify-center">
+                  <div className="col-span-4 flex justify-center">
                     <div className="w-full px-3 py-2 text-center font-bold text-slate-900 text-sm ">
                       {formatVND(item.price * item.quantity)}
                     </div>
@@ -1427,7 +1427,62 @@ export default function MaterialRequestDetail() {
 
           {/* Apply Form OR Application Details */}
           {ApplyView}
+          <div className="mb-6 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 shadow-sm">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-slate-900 text-base ml-3">
+                {t('distributorMaterialRequestDetail.customerInfo')}
+              </h3>
+            </div>
 
+            <div className="space-y-3">
+              {materialRequest.customerEmail && (
+                <div className="flex items-start">
+                  <span className="font-semibold text-slate-600 w-40">
+                    Email
+                  </span>
+                  <a
+                    href={`mailto:${materialRequest.customerEmail}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline break-all"
+                  >
+                    {materialRequest.customerEmail}
+                  </a>
+                </div>
+              )}
+              {materialRequest.customerName && (
+                <div className="flex items-start">
+                  <span className="font-semibold text-slate-600 w-40">
+                    {t('distributorMaterialRequestDetail.customerName')}
+                  </span>
+                  <span className="text-slate-900 font-medium">
+                    {materialRequest.customerName}
+                  </span>
+                </div>
+              )}
+
+              {materialRequest.customerPhone && (
+                <div className="flex items-start">
+                  <span className="font-semibold text-slate-600 w-40">
+                    {t('distributorMaterialRequestDetail.customerPhone')}
+                  </span>
+                  <a
+                    href={`tel:${materialRequest.customerPhone}`}
+                    className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                  >
+                    {materialRequest.customerPhone}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
           {/* Chat Section */}
           <ChatSection
             conversationID={materialRequest.conversation?.conversationID}

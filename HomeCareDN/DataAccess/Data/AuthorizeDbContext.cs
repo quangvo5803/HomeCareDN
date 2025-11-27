@@ -1,5 +1,4 @@
-﻿using System.Reflection.Emit;
-using DataAccess.Entities.Application;
+﻿using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -19,6 +18,10 @@ namespace DataAccess.Data
         {
             builder.HasDefaultSchema("auth");
             base.OnModelCreating(builder);
+
+            // =========================
+            // Seed Roles
+            // =========================
             builder
                 .Entity<IdentityRole>()
                 .HasData(
@@ -48,10 +51,81 @@ namespace DataAccess.Data
                     }
                 );
 
+            // =========================
+            // Seed Admin User (NEW)
+            // =========================
+            var hasher = new PasswordHasher<ApplicationUser>();
+
+            var adminUser = new ApplicationUser
+            {
+                Id = "9570d410-e3ea-46e0-aac1-bb17dff7457f",
+                FullName = "Admin",
+                UserName = "homecaredn43@gmail.com",
+                NormalizedUserName = "HOMECAREDN43@GMAIL.COM",
+                Email = "homecaredn43@gmail.com",
+                NormalizedEmail = "HOMECAREDN43@GMAIL.COM",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            var contractorUser = new ApplicationUser
+            {
+                Id = "cba463ec-27a1-4882-8515-afd8109ae7fa",
+                FullName = "Contractor",
+                UserName = "homecaredncontractor@gmail.com",
+                NormalizedUserName = "HOMECAREDNCONTRACTOR@GMAIL.COM",
+                Email = "homecaredncontractor@gmail.com",
+                NormalizedEmail = "HOMECAREDNCONTRACTOR@GMAIL.COM",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            var distributorUser = new ApplicationUser
+            {
+                Id = "4e4386ec-e25d-464b-b2a3-ee57ecff614b",
+                FullName = "Distributor",
+                UserName = "homecaredndistributor@gmail.com",
+                NormalizedUserName = "HOMECAREDNDISTRIBUTOR@GMAIL.COM",
+                Email = "homecaredndistributor@gmail.com",
+                NormalizedEmail = "HOMECAREDNDISTRIBUTOR@GMAIL.COM",
+                EmailConfirmed = true,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+            adminUser.PasswordHash = hasher.HashPassword(adminUser, "Abc123@");
+            contractorUser.PasswordHash = hasher.HashPassword(contractorUser, "Abc123@");
+            distributorUser.PasswordHash = hasher.HashPassword(distributorUser, "Abc123@");
+
+            builder.Entity<ApplicationUser>().HasData(adminUser);
+            builder.Entity<ApplicationUser>().HasData(contractorUser);
+            builder.Entity<ApplicationUser>().HasData(distributorUser);
+
+            // Assign Admin Role
+            builder
+                .Entity<IdentityUserRole<string>>()
+                .HasData(
+                    new IdentityUserRole<string>
+                    {
+                        UserId = adminUser.Id,
+                        RoleId = "b8d2f939-6450-41c6-b5f2-d9bc0f1c9f94",
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = contractorUser.Id,
+                        RoleId = "b0e6799f-ea1b-4df1-a0c0-0dc77c4f54cc",
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        UserId = distributorUser.Id,
+                        RoleId = "d1aa179c-780e-4938-a169-1d18e87f4b2d",
+                    }
+                );
+
+            // =========================
+            // Address & Others
+            // =========================
             builder.Entity<ApplicationUser>(entity =>
             {
                 entity.Property(mr => mr.Gender).HasConversion<string>();
             });
+
             builder.Entity<Address>(e =>
             {
                 e.HasKey(a => a.AddressID);
