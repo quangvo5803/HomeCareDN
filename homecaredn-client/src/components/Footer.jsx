@@ -121,18 +121,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Dòng dưới cùng
-      <div className="border-t border-gray-700 mt-8 py-4 text-center text-gray-500 text-sm">
-        <div className="container mx-auto max-w-screen-xl px-4 lg:px-6 flex flex-col md:flex-row justify-between items-center">
-          <p>{t("footer.bottom.copyright")}</p>
-          <p>
-            {t("footer.bottom.designed")} <a href="https://htmlcodex.com" className="text-orange-500 hover:underline">HTML Codex</a>
-            <br className="md:hidden" />
-            {t("footer.bottom.distributed")} <a href="https://themewagon.com" className="text-orange-500 hover:underline">ThemeWagon</a>
-          </p>
-        </div>
-      </div> */}
     </footer>
   );
 }

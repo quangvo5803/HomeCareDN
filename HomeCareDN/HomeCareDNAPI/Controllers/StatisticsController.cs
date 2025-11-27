@@ -43,14 +43,14 @@ namespace HomeCareDNAPI.Controllers
             [FromQuery] int year,
             [FromQuery] string role,
             [FromQuery] Guid? contractorId = null,
-            [FromQuery] Guid? ditributorId = null
+            [FromQuery] Guid? distributorId = null
         )
         {
             var statistics = await _facadeService.StatisticService.GetLineChartAsync(
                 year,
                 role,
                 contractorId,
-                ditributorId
+                distributorId
             );
             return Ok(statistics);
         }

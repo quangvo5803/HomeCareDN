@@ -96,14 +96,7 @@ export default function Contact() {
               </div>
 
               <p className="text-gray-600 mb-6 text-sm">
-                {t('contact.note_prefix')}{' '}
-                <a
-                  href="https://htmlcodex.com/contact-form"
-                  className="text-orange-500 underline hover:text-orange-600"
-                >
-                  {t('contact.note_link')}
-                </a>{' '}
-                <span aria-hidden="true">.</span>
+                {t('contact.note_prefix')}
               </p>
 
               <form

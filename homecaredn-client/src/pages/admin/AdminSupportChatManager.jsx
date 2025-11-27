@@ -41,7 +41,8 @@ export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
-  const { fetchUnreadCount, decreaseUnreadCount } = useOutletContext();
+  const { fetchUnreadCount, decreaseUnreadCount, setActiveConversationId } =
+    useOutletContext();
 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -173,6 +174,15 @@ export default function AdminSupportChatManager() {
     },
     'chat'
   );
+
+  useEffect(() => {
+    if (setActiveConversationId) {
+      setActiveConversationId(selectedConversation?.conversationID);
+    }
+    return () => {
+      if (setActiveConversationId) setActiveConversationId(null);
+    };
+  }, [selectedConversation, setActiveConversationId]);
 
   //Load conversations
   const loadConversations = useCallback(
