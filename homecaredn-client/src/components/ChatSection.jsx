@@ -108,7 +108,8 @@ export default function ChatSection({
       try {
         setLoading(true);
         const conversation = await conversationService.getConversationByID(
-          conversationID
+          conversationID,
+          user.id
         );
         setConversation(conversation);
 

@@ -31,15 +31,19 @@ namespace BusinessLogic.Services
             _userManager = userManager;
         }
 
-        public async Task<ConversationDto?> GetConversationByIDAsync(Guid id)
+        public async Task<ConversationDto?> GetConversationByIDAsync(ConversationGetByIdDto dto)
         {
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(
-                c => c.ConversationID == id,
+                c => c.ConversationID == dto.ConversationID,
                 asNoTracking: false
             );
             if (conversation == null)
             {
                 return null;
+            }
+            if (!IsUserInConversation(conversation, dto.CurrentUserId.ToString()))
+            {
+                return null; // Hoặc throw lỗi Unauthorized tuỳ vào thiết kế của bạn
             }
             var result = _mapper.Map<ConversationDto>(conversation);
             return result;
@@ -59,7 +63,7 @@ namespace BusinessLogic.Services
         }
 
         public async Task<PagedResultDto<ConversationDto>> GetAllConversationByAdminIDAsync(
-            ConversationGetByIdDto dto
+            ConversationGetByAdminIdDto dto
         )
         {
             var query = _unitOfWork
@@ -171,6 +175,13 @@ namespace BusinessLogic.Services
                     conversationDto.UserRole = roles.FirstOrDefault();
                 }
             }
+        }
+
+        private static bool IsUserInConversation(Conversation conversation, string userId)
+        {
+            return conversation.CustomerID == userId
+                || conversation.ContractorID == userId
+                || conversation.DistributorID == userId;
         }
     }
 }

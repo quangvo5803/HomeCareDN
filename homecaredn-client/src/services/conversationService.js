@@ -1,8 +1,8 @@
 import api from './public/api';
 
 export const conversationService = {
-  getConversationByID: async (id) => {
-    const res = await api.get(`/conversations/${id}`);
+  getConversationByID: async (dto) => {
+    const res = await api.get(`/conversations`, { dto });
     return res.data;
   },
   getConversationByUserID: async (id) => {
