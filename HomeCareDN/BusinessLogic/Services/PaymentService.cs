@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Globalization;
+using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.Payment;
@@ -14,7 +15,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using Net.payOS;
 using Net.payOS.Types;
-using System.Globalization;
 using Ultitity.Exceptions;
 using Ultitity.Options;
 
@@ -69,19 +69,26 @@ namespace BusinessLogic.Services
             switch (requestDto.Role)
             {
                 case "Contractor":
-                    cancelUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=cancelled";
-                    returnUrl = $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=paid";
+                    cancelUrl =
+                        $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=cancelled";
+                    returnUrl =
+                        $"{baseUrl}/Contractor/ServiceRequestManager/{requestDto.ServiceRequestID}?status=paid";
                     break;
 
                 case "Distributor":
-                    cancelUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=cancelled";
-                    returnUrl = $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=paid";
+                    cancelUrl =
+                        $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=cancelled";
+                    returnUrl =
+                        $"{baseUrl}/Distributor/MaterialRequestManager/{requestDto.MaterialRequestID}?status=paid";
                     break;
 
                 default:
                     var errors = new Dictionary<string, string[]>
                     {
-                        { "Role", new[] { "Role must be 'Contractor' or 'Distributor' not found" } },
+                        {
+                            "Role",
+                            new[] { "Role must be 'Contractor' or 'Distributor' not found" }
+                        },
                     };
                     throw new CustomValidationException(errors);
             }
@@ -99,15 +106,15 @@ namespace BusinessLogic.Services
 
             var payment = new PaymentTransaction
             {
-                ContractorApplicationID = requestDto.Role == "Contractor" 
-                    ? requestDto.ContractorApplicationID : null,
-                ServiceRequestID = requestDto.Role == "Contractor" 
-                    ? requestDto.ServiceRequestID : null,
+                ContractorApplicationID =
+                    requestDto.Role == "Contractor" ? requestDto.ContractorApplicationID : null,
+                ServiceRequestID =
+                    requestDto.Role == "Contractor" ? requestDto.ServiceRequestID : null,
 
-                DistributorApplicationID = requestDto.Role == "Distributor" 
-                    ? requestDto.DistributorApplicationID : null,
-                MaterialRequestID = requestDto.Role == "Distributor" 
-                    ? requestDto.MaterialRequestID : null,
+                DistributorApplicationID =
+                    requestDto.Role == "Distributor" ? requestDto.DistributorApplicationID : null,
+                MaterialRequestID =
+                    requestDto.Role == "Distributor" ? requestDto.MaterialRequestID : null,
 
                 Amount = requestDto.Amount,
                 Description = requestDto.Description ?? "Thanh toán hoa hồng",
@@ -161,9 +168,7 @@ namespace BusinessLogic.Services
                     )
                 )
                 {
-                    payment.PaidAt = DateTime
-                        .SpecifyKind(paidAt, DateTimeKind.Local)
-                        .ToUniversalTime();
+                    payment.PaidAt = DateTime.SpecifyKind(paidAt.AddHours(-7), DateTimeKind.Local);
                 }
                 else
                 {
@@ -177,7 +182,6 @@ namespace BusinessLogic.Services
                     tasks.Add(HandleDistributorPaymentAsync(payment));
 
                 await Task.WhenAll(tasks);
-
             }
             else
             {
@@ -187,10 +191,12 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        public async Task<PagedResultDto<PaymentTransactionDto>> GetAllCommissionAsync(QueryParameters parameters)
+        public async Task<PagedResultDto<PaymentTransactionDto>> GetAllCommissionAsync(
+            QueryParameters parameters
+        )
         {
             var query = _unitOfWork.PaymentTransactionsRepository.GetQueryable(
-                includeProperties:"ContractorApplication",
+                includeProperties: "ContractorApplication",
                 asNoTracking: true
             );
 
@@ -198,9 +204,9 @@ namespace BusinessLogic.Services
 
             if (!string.IsNullOrEmpty(parameters.Search))
             {
-                query = query.Where(u => 
-                    u.OrderCode.ToString().Contains(parameters.Search) ||
-                    u.Description.Contains(parameters.Search)
+                query = query.Where(u =>
+                    u.OrderCode.ToString().Contains(parameters.Search)
+                    || u.Description.Contains(parameters.Search)
                 );
             }
 
@@ -216,7 +222,7 @@ namespace BusinessLogic.Services
             query = query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
-                
+
             var payments = await query.ToListAsync();
             var dtos = _mapper.Map<IEnumerable<PaymentTransactionDto>>(payments);
 
@@ -236,7 +242,9 @@ namespace BusinessLogic.Services
             contractorApp!.Status = ApplicationStatus.Approved;
             contractorApp.DueCommisionTime = null;
 
-            var contractor = await _userManager.FindByIdAsync(contractorApp.ContractorID.ToString());
+            var contractor = await _userManager.FindByIdAsync(
+                contractorApp.ContractorID.ToString()
+            );
             if (contractor != null)
             {
                 contractor.ProjectCount += 1;
@@ -244,7 +252,8 @@ namespace BusinessLogic.Services
             }
 
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                s => s.ServiceRequestID == payment.ServiceRequestID, asNoTracking:false
+                s => s.ServiceRequestID == payment.ServiceRequestID,
+                asNoTracking: false
             );
 
             if (serviceRequest != null)
@@ -284,15 +293,17 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = serviceRequest!.CustomerID,
-                Title = "Yêu cầu của bạn đã được chấp thuận",
-                Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
-                DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
-                DataValue = serviceRequest.ServiceRequestID.ToString(),
-                Action = NotificationAction.Paid
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = serviceRequest!.CustomerID,
+                    Title = "Yêu cầu của bạn đã được chấp thuận",
+                    Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
+                    DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
+                    DataValue = serviceRequest.ServiceRequestID.ToString(),
+                    Action = NotificationAction.Paid,
+                }
+            );
         }
 
         private async Task HandleDistributorPaymentAsync(PaymentTransaction payment)
@@ -302,7 +313,9 @@ namespace BusinessLogic.Services
             distributorApp!.Status = ApplicationStatus.Approved;
             distributorApp.DueCommisionTime = null;
 
-            var distributor = await _userManager.FindByIdAsync(distributorApp.DistributorID.ToString());
+            var distributor = await _userManager.FindByIdAsync(
+                distributorApp.DistributorID.ToString()
+            );
             if (distributor != null)
             {
                 distributor.ProjectCount += 1;
@@ -352,15 +365,17 @@ namespace BusinessLogic.Services
                 PAYMENT,
                 new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
             );
-            await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
-            {
-                TargetUserId = materialRequest!.CustomerID,
-                Title = "Yêu cầu của bạn đã được chấp thuận",
-                Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
-                DataKey = $"DistributorApplication_{payment.DistributorApplicationID}_PAID",
-                DataValue = materialRequest.MaterialRequestID.ToString(),
-                Action = NotificationAction.Paid
-            });
+            await _notificationService.NotifyPersonalAsync(
+                new NotificationPersonalCreateOrUpdateDto
+                {
+                    TargetUserId = materialRequest!.CustomerID,
+                    Title = "Yêu cầu của bạn đã được chấp thuận",
+                    Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
+                    DataKey = $"DistributorApplication_{payment.DistributorApplicationID}_PAID",
+                    DataValue = materialRequest.MaterialRequestID.ToString(),
+                    Action = NotificationAction.Paid,
+                }
+            );
         }
     }
 }
