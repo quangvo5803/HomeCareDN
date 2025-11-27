@@ -1039,6 +1039,10 @@
     }
   },
   "adminServiceRequestManager": {
+    "customerInfo": "Customer Information",
+    "customerName": "Customer name",
+    "customerEmail": "Customer email",
+    "customerPhone": "Customer phone number",
     "no": "NO",
     "title": "Manage requested services",
     "subtitle": "Manage list of requested services",
@@ -1152,6 +1156,7 @@
       "distributorApplication": "participated order",
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
+      "historyDA":"Material order history",
       "history": "No history yet"
     }
   },
