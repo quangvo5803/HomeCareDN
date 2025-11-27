@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 
@@ -9,43 +8,50 @@ namespace Ultitity.Clients.Groqs
     {
         private readonly HttpClient _http;
         private readonly string _apiKey;
-        private readonly string _model;
 
-        public GroqClient(HttpClient http, IConfiguration cfg)
+        public GroqClient(HttpClient http, IConfiguration config)
         {
             _http = http;
-            _apiKey =
-                cfg["Groq:ApiKey"]?.Trim()
-                ?? throw new InvalidOperationException("Missing Groq:ApiKey");
+            _apiKey = ValidateAndGetApiKey(config);
 
-            if (!_apiKey.StartsWith("gsk_"))
-                throw new InvalidOperationException("Invalid Groq:ApiKey format.");
-
-            var baseUrl = cfg["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
-            _http.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : baseUrl + "/");
+            var baseUrl = config["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
+            _http.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : $"{baseUrl}/");
             _http.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
-
-            _model = "llama-3.3-70b-versatile";
         }
 
         public async Task<string> ChatAsync(object payload)
         {
-            // Tự động serialize payload sang JSON
             using var response = await _http.PostAsJsonAsync("chat/completions", payload);
 
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync();
                 throw new HttpRequestException(
-                    $"Groq API Error {(int)response.StatusCode}: {error}"
+                    $"Groq API Error ({(int)response.StatusCode}): {error}"
                 );
             }
 
             var result = await response.Content.ReadFromJsonAsync<GroqResponse>();
-            return result?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? "";
+            return result?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
         }
 
+        private static string ValidateAndGetApiKey(IConfiguration config)
+        {
+            var apiKey = config["Groq:ApiKey"]?.Trim();
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+                throw new InvalidOperationException("Groq:ApiKey is missing in configuration");
+
+            if (!apiKey.StartsWith("gsk_"))
+                throw new InvalidOperationException(
+                    "Invalid Groq:ApiKey format (must start with 'gsk_')"
+                );
+
+            return apiKey;
+        }
+
+        // ===== RESPONSE MODELS =====
         private class GroqResponse
         {
             [JsonPropertyName("choices")]
