@@ -146,12 +146,6 @@ export default function About() {
             <p className="text-gray-300 max-w-2xl mx-auto mb-6">
               {t('about.hero_description')}
             </p>
-            <a
-              href=""
-              className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-full font-semibold transition"
-            >
-              {t('about.hero_button')}
-            </a>
           </div>
         </div>
       </Reveal>
