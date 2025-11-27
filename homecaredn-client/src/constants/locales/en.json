@@ -646,6 +646,7 @@
     "customerPhone":"Customer phone:"
   },
   "partnerDashboard": {
+    "material": "Material",
     "no": "No",
     "service_type": "Service Type",
     "title": "Contractor Dashboard",

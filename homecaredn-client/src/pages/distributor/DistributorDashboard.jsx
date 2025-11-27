@@ -55,8 +55,7 @@ export default function DistributorDashboard() {
     labels.map((_, i) => getMonthlyValue(data, i + 1, key));
 
   const processBarChartData = (data, labels) => ({
-    repair: getMonthlyDataset(data, labels, 'repairCount'),
-    construction: getMonthlyDataset(data, labels, 'constructionCount'),
+    material: getMonthlyDataset(data, labels, 'materialCount'),
   });
 
   const processLineChartData = (data, labels) => ({
@@ -91,6 +90,7 @@ export default function DistributorDashboard() {
             const res = await StatisticService.getBarChart(
               barYear,
               user.role,
+              null,
               user.id
             );
             const data = res.data;
@@ -110,20 +110,16 @@ export default function DistributorDashboard() {
               t('adminDashboard.months.dec'),
             ];
 
-            const { repair, construction } = processBarChartData(data, labels);
+            const { material } = processBarChartData(data, labels);
 
             setBarChartData({
               labels,
               datasets: [
                 {
-                  label: t('partnerDashboard.repair'),
-                  data: repair,
+                  label: t('partnerDashboard.material'),
+                  data: material,
                   backgroundColor: 'rgba(59,130,246,0.8)',
-                },
-                {
-                  label: t('partnerDashboard.construction'),
-                  data: construction,
-                  backgroundColor: 'rgba(249,115,22,0.8)',
+                  borderRadius: 4,
                 },
               ],
             });
@@ -147,6 +143,7 @@ export default function DistributorDashboard() {
             const res = await StatisticService.getLineChart(
               lineYear,
               user.role,
+              null,
               user.id
             );
             const data = res.data;

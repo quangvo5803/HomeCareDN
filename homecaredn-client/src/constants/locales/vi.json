@@ -641,6 +641,7 @@
     "customerPhone":"Số điện thoại"
   },
   "partnerDashboard": {
+    "material":"Vật Liệu",
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
