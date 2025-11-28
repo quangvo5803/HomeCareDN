@@ -36,6 +36,11 @@ export const notificationService = {
         return response.data;
     },
 
+    deleteForAdmin: async (id) => {
+        const response = await api.delete(`/Notifications/Admin/${id}/delete`);
+        return response.data;
+    },
+
     // ====================== ALL ======================
     readNotification: async (id) => {
         const response = await api.put(`/Notifications/${id}/read`);

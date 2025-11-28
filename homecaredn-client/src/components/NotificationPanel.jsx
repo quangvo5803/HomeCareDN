@@ -54,6 +54,9 @@ export default function NotificationPanel({ notifications = [], loading, user })
             REJECT: (value) => `/Distributor/MaterialRequestManager/${value}`,
             PAID: (value) => `/Customer/MaterialRequestDetail/${value}`,
         },
+        Admin: {
+            SEND: null
+        },
         ServiceRequest: (value) => `/Contractor/${value}`,
         MaterialRequest: (value) => `/Distributor/${value}`,
     };
@@ -71,11 +74,19 @@ export default function NotificationPanel({ notifications = [], loading, user })
     const handleClickNotification = async (n) => {
         try {
             await notificationService.readNotification(n.notificationID);
+
+            setUnreadCount(prev => Math.max(prev - 1, 0));
+            setNotify(prev =>
+                prev.map(item =>
+                    item.notificationID === n.notificationID
+                        ? { ...item, isRead: true }
+                        : item
+                )
+            );
+
             const route = resolveNotificationRoute(n);
             if (route) {
                 navigate(route);
-            } else {
-                toast.error("Không tìm thấy thông báo", n);
             }
         } catch (err) {
             toast.error(handleApiError(err));
@@ -168,7 +179,8 @@ export default function NotificationPanel({ notifications = [], loading, user })
                         </button>
                         <button
                             onClick={handleReadAllNotifications}
-                            className="p-2 mr-2 text-orange-500 hover:bg-orange-50 rounded-full transition-all duration-200 cursor-pointer"
+                            disabled={unreadCount === 0}
+                            className="p-2 mr-2 text-orange-500 hover:bg-orange-50 rounded-full disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
                             title="Đánh dấu tất cả đã đọc"
                         >
                             <CheckCheck size={18} />

@@ -36,31 +36,13 @@ namespace BusinessLogic.Services
         {
             bool isAdmin = role == ADMIN;
 
-            var query = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n =>
-                    (n.Type == NotificationType.Personal && n.TargetUserId == parameters.FilterID) ||
-                    (n.Type == NotificationType.System &&
-                     (isAdmin ? n.TargetUserId == parameters.FilterID : n.TargetRoles!.Contains(role)))
-                );
+            var query = BuildBaseQuery(parameters, role, isAdmin);
 
-            if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
-            {
-                query = query.Where(u =>
-                    u.Title.Contains(parameters.Search) ||
-                    u.Message.Contains(parameters.Search)
-                );
-            }
+            query = AdminSearchFilter(query, parameters, isAdmin);
 
             var totalCount = await query.CountAsync();
 
-            query = isAdmin
-                ? (parameters.SortBy?.ToLower() switch
-                {
-                    "updatedat" => query.OrderBy(u => u.UpdatedAt),
-                    "updatedatdesc" => query.OrderByDescending(u => u.UpdatedAt),
-                    _ => query.OrderBy(u => u.CreatedAt)
-                })
-                : query.OrderByDescending(n => n.UpdatedAt);
+            query = AdminSorting(query, parameters, isAdmin);
 
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
@@ -87,28 +69,8 @@ namespace BusinessLogic.Services
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize
             };
-        }
-
-        public async Task<NotificationDto> GetNotificationById(Guid id)
-        {
-            var notify = await _unitOfWork.NotificationRepository
-                .GetAsync(n => n.NotificationID == id);
-            if(notify == null)
-            {
-                var errors = new Dictionary<string, string[]>
-                {
-                    { "Notification", new[] { "NotificationID NOT FOUND" } },
-                };
-                throw new CustomValidationException(errors);
-            }
-            return _mapper.Map<NotificationDto>(notify);
-        }
-        public async Task<NotificationDto> AdminSendSystemAsync
-            (NotificationSystemCreateOrUpdateDto requestDto)
-        {
-            return await CreateOrUpdateSystemAsync(requestDto, ADMIN);
-        }
-
+        }    
+        
         public async Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto)
         {
             var existing = await _unitOfWork.NotificationRepository
@@ -131,8 +93,8 @@ namespace BusinessLogic.Services
 
                 existing.Title = dto.Title;
                 existing.Message = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Có {existing.PendingCount} {dto.Message.ToLower()}."
-                    : dto.Message;
+                    ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
+                    : dto.Title;
 
                 existing.Action = dto.Action;
                 existing.UpdatedAt = DateTime.UtcNow;
@@ -259,6 +221,44 @@ namespace BusinessLogic.Services
             return result;
         }
 
+        // ==================== ADMIN ====================
+        public async Task<NotificationDto> AdminSendSystemAsync
+            (NotificationSystemCreateOrUpdateDto requestDto)
+        {
+            return await CreateOrUpdateSystemAsync(requestDto, ADMIN);
+        }
+
+        public async Task<NotificationDto> GetNotificationById(Guid id)
+        {
+            var notify = await _unitOfWork.NotificationRepository
+                .GetAsync(n => n.NotificationID == id);
+            if (notify == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Notification", new[] { "NotificationID NOT FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<NotificationDto>(notify);
+        }
+
+        public async Task DeleteNotificationAsync(Guid id)
+        {
+            var noti = await _unitOfWork.NotificationRepository
+                .GetAsync(n => n.NotificationID == id, asNoTracking:false);
+            if (noti != null)
+            {
+                _unitOfWork.NotificationRepository.Remove(noti);
+                await _unitOfWork.SaveAsync();
+            }
+            await SendToRolesAsync
+            (
+                noti!.TargetRoles!,
+                "Notification.Deleted",
+                noti.NotificationID
+            );
+        }
         // ==================== Helper ====================
         private async Task<NotificationDto> CreateOrUpdateSystemAsync
             (NotificationSystemCreateOrUpdateDto requestDto, string? role)
@@ -287,7 +287,7 @@ namespace BusinessLogic.Services
                 if (role == ADMIN)
                 {
                     noti.Action = NotificationAction.Send;
-                    noti.DataKey = "Admin_" + Guid.NewGuid().ToString("N").Substring(0, 10);
+                    noti.DataKey = "Admin_" + Guid.NewGuid().ToString("N").Substring(0, 10) + "_SEND";
                 }
                 await _unitOfWork.NotificationRepository.AddAsync(noti);
             }
@@ -317,5 +317,47 @@ namespace BusinessLogic.Services
                 await _notifier.SendToApplicationGroupAsync(groupName, eventName, payload);
             }
         }
+
+        private IQueryable<Notification> BuildBaseQuery(QueryParameters parameters, string role, bool isAdmin)
+        {
+            return _unitOfWork.NotificationRepository.GetQueryable()
+                .Where(n =>
+                    (n.Type == NotificationType.Personal && n.TargetUserId == parameters.FilterID) ||
+                    (n.Type == NotificationType.System &&
+                     (isAdmin ? n.SenderUserId == parameters.FilterID : n.TargetRoles!.Contains(role)))
+                );
+        }
+
+        private IQueryable<Notification> AdminSearchFilter(
+            IQueryable<Notification> query,
+            QueryParameters parameters,
+            bool isAdmin)
+        {
+            if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(n =>
+                    n.Title.Contains(parameters.Search) ||
+                    n.Message.Contains(parameters.Search));
+            }
+
+            return query;
+        }
+
+        private IQueryable<Notification> AdminSorting(
+            IQueryable<Notification> query,
+            QueryParameters parameters,
+            bool isAdmin)
+        {
+            if (!isAdmin)
+                return query.OrderByDescending(n => n.UpdatedAt);
+
+            return parameters.SortBy?.ToLower() switch
+            {
+                "updatedat" => query.OrderBy(n => n.UpdatedAt),
+                "updatedatdesc" => query.OrderByDescending(n => n.UpdatedAt),
+                _ => query.OrderByDescending(n => n.CreatedAt)
+            };
+        }
+
     }
 }

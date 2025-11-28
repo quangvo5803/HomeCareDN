@@ -86,7 +86,7 @@ export default function Header() {
       toast.info(
         <div
           dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
+            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.title}`
           }}
         />,
         {
@@ -143,6 +143,11 @@ export default function Header() {
           position: "top-right",
           autoClose: 3000,
         }
+      );
+    },
+    [RealtimeEvents.NotificationDeleted]: (notificationId) => {
+      setNotifications(prev =>
+        prev.filter(n => n.notificationID !== notificationId)
       );
     },
   });

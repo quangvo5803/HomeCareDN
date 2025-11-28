@@ -11,6 +11,7 @@ namespace DataAccess.Entities.Application
         public string Message { get; set; } = string.Empty;
         public string? TargetRoles { get; set; }
         public Guid? TargetUserId { get; set; }
+        public Guid? SenderUserId { get; set; } // cho admin send notify
         public bool IsRead { get; set; } = false;
         public string? DataKey { get; set; }
         public string? DataValue { get; set; }

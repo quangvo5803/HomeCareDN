@@ -10,6 +10,7 @@ import { withMinLoading } from '../../utils/withMinLoading';
 import { formatDate } from '../../utils/formatters';
 import { useAuth } from '../../hook/useAuth';
 import NotificationModal from '../../components/modal/NotificationModal';
+import { showDeleteModal } from '../../components/modal/DeleteModal';
 
 export default function AdminNotificationManager() {
     const { t, i18n } = useTranslation();
@@ -65,7 +66,8 @@ export default function AdminNotificationManager() {
             Search: debouncedSearch || '',
             FilterID: user.id,
         });
-    }, [t, currentPage, sortOption, debouncedSearch, fetchNotifications, user]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [t, currentPage, sortOption, debouncedSearch, user]);
 
     const handleOpenCreateNotify = () => {
         setNotifyViewOnly(false);
@@ -79,7 +81,7 @@ export default function AdminNotificationManager() {
     const handleSaveNotify = async (notifyData) => {
         try {
             await notificationService.createForAdmin(notifyData);
-            toast.success(t('SUCCESS.CREATE_REVIEW'));
+            toast.success(t('SUCCESS.NOTIFY_ADD'));
             setIsNotifyModalOpen(false);
             fetchNotifications({
                 PageNumber: currentPage,
@@ -103,6 +105,31 @@ export default function AdminNotificationManager() {
             toast.error(handleApiError(err));
         }
     };
+
+    const handleDelete = async (id) => {
+        showDeleteModal({
+            t,
+            titleKey: 'ModalPopup.DeleteBrandModal.title',
+            textKey: 'ModalPopup.DeleteBrandModal.text',
+            onConfirm: async () => {
+                await notificationService.deleteForAdmin(id);
+
+                const newTotal = totalCount - 1;
+                const newPage = Math.min(currentPage, Math.ceil(newTotal / pageSize)) || 1;
+
+                setCurrentPage(newPage);
+                fetchNotifications({
+                    PageNumber: newPage,
+                    PageSize: pageSize,
+                    SortBy: sortOption,
+                    Search: debouncedSearch || '',
+                    FilterID: user.id,
+                });
+                toast.success(t('SUCCESS.DELETE'));
+            },
+        });
+    };
+
 
     let tableContent;
 
@@ -133,7 +160,11 @@ export default function AdminNotificationManager() {
                 </td>
                 <td className="px-4 py-4 text-gray-700">
                     <span className="px-3 py-1 text-sm font-medium bg-amber-50 text-amber-700 rounded-full">
-                        {item.targetRoles}
+                        {item.targetRoles
+                            .split(',')
+                            .map(role => t(`adminNotifyManager.roles.${role.trim()}`))
+                            .join(', ')
+                        }
                     </span>
                 </td>
                 <td className="px-4 py-4 text-gray-800">{formatDate(item.createdAt, i18n.language)}</td>
@@ -146,6 +177,13 @@ export default function AdminNotificationManager() {
                         <i className="fa-solid fa-eye" />
                         {t('BUTTON.View')}
                     </button>
+                    <button
+                        className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer ml-2"
+                        onClick={() => handleDelete(item.notificationID)}
+                    >
+                        <i className="fa-solid fa-trash mr-2" />
+                        {t('BUTTON.Delete')}
+                    </button>
                 </td>
             </tr>
         ));
@@ -155,14 +193,21 @@ export default function AdminNotificationManager() {
                 <td colSpan="9" className="px-6 py-16 text-center">
                     <div className="flex flex-col items-center justify-center text-center mt-5 mb-5">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <i className="fas fa-bell text-gray-400 text-3xl" />
+                            <i className="fa-regular fa-bell-slash text-gray-400 text-3xl" />
                         </div>
                         <h3 className="text-xl font-bold text-gray-900 mb-2">
                             {t('adminNotifyManager.empty')}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500 mb-4">
                             {t('adminNotifyManager.empty_description')}
                         </p>
+                        <button
+                            className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
+                            onClick={() => setIsNotifyModalOpen(true)}
+                        >
+                            <i className="mr-3 fa-solid fa-plus"></i>
+                            {t('adminNotifyManager.buttonCreate')}
+                        </button>
                     </div>
                 </td>
             </tr>

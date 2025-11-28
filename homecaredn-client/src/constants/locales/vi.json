@@ -1236,6 +1236,11 @@
     "type": "Loại",
     "System": "Hệ thống",
     "receiver": "Người nhận",
+    "roles": {
+      "Customer": "Khách hàng",
+      "Distributor": "Nhà phân phối",
+      "Contractor": "Nhà thầu"
+    },
     "createAt": "Ngày tạo",
     "action": "Thao tác",
     "buttonCreate": "Tạo thông báo",
@@ -1458,7 +1463,7 @@
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
     "CATEGORY_NAME_ALREADY_EXISTS": "Danh mục đã tồn tại",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
-    "MATERIAL_NAME_ALREADY_EXISTS":"Vật liệu đã tồn tại.",
+    "MATERIAL_NAME_ALREADY_EXISTS": "Vật liệu đã tồn tại.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
 
@@ -1536,7 +1541,8 @@
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
     "RECONNECTED": "Đã kết nối lại với server!",
     "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
-    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!"
+    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!",
+    "NOTIFY_ADD": "Tạo thông báo thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",

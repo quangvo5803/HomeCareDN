@@ -279,10 +279,21 @@ namespace BusinessLogic.Services
                     serviceRequest?.ConversationID,
                 }
             );
+            var payload = new
+            {
+                payment.ContractorApplicationID,
+                payment.ServiceRequestID,
+                payment.PaymentTransactionID,
+                payment.OrderCode,
+                payment.Amount,
+                payment.Description,
+                payment.PaidAt,
+                Status = payment.Status.ToString()
+            };
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 PAYMENT,
-                new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
+                payload
             );
             await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
             {
@@ -347,10 +358,21 @@ namespace BusinessLogic.Services
                     materialRequest.ConversationID,
                 }
             );
+            var payload = new
+            {
+                payment.DistributorApplicationID,
+                payment.MaterialRequestID,
+                payment.PaymentTransactionID,
+                payment.OrderCode,
+                payment.Amount,
+                payment.Description,
+                payment.PaidAt,
+                Status = payment.Status.ToString()
+            };
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 PAYMENT,
-                new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
+                payload
             );
             await _notificationService.NotifyPersonalAsync(new NotificationPersonalCreateOrUpdateDto
             {

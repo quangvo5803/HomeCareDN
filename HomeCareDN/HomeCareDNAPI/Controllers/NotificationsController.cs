@@ -30,7 +30,7 @@ namespace HomeCareDNAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
         [HttpPost("Admin/create")]
-        public async Task<IActionResult> CreateOrUpdateSystemForAdmin(
+        public async Task<IActionResult> CreateNotificationSystemForAdmin(
                 [FromBody] NotificationSystemCreateOrUpdateDto dto)
         {
             return Ok(await _facadeService.NotificationService
@@ -52,6 +52,14 @@ namespace HomeCareDNAPI.Controllers
         public async Task<IActionResult> GetByIdForAdmin(Guid id)
         {
             return Ok(await _facadeService.NotificationService.GetNotificationById(id));
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpDelete("Admin/{id:guid}/delete")]
+        public async Task<IActionResult> DeleteNoticationForAdmin(Guid id)
+        {
+            await _facadeService.NotificationService.DeleteNotificationAsync(id);
+            return NoContent();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Contractor")]

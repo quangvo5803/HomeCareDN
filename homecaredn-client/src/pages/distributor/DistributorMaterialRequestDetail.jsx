@@ -69,9 +69,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -576,7 +576,7 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => {}}
+            onExpired={() => { }}
           />
           {new Date(existingApplication.dueCommisionTime) > new Date() && (
             <button
@@ -720,7 +720,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1301,7 +1301,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1427,7 +1427,41 @@ export default function MaterialRequestDetail() {
 
           {/* Apply Form OR Application Details */}
           {ApplyView}
-
+          {/* Customer Contact Info - Show when Approved */}
+          {existingApplication?.status === 'Approved' && (
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
+                <i className="fas fa-user text-gray-500" />
+                {t('contractorServiceRequestDetail.customerInfo')}
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <i className="fas fa-user-circle text-gray-400 text-xl" />
+                  <span className="text-gray-900 font-medium">
+                    {materialRequest.customerName}
+                  </span>
+                </div>
+                <a
+                  href={`tel:${materialRequest.customerPhone}`}
+                  className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-100"
+                >
+                  <i className="fas fa-phone text-blue-600"></i>
+                  <span className="text-sm text-gray-700 font-medium">
+                    {materialRequest.customerPhone}
+                  </span>
+                </a>
+                <a
+                  href={`mailto:${materialRequest.customerEmail}`}
+                  className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition border border-purple-100"
+                >
+                  <i className="fas fa-envelope text-purple-600"></i>
+                  <span className="text-sm text-gray-700 font-medium">
+                    {materialRequest.customerEmail}
+                  </span>
+                </a>
+              </div>
+            </div>
+          )}
           {/* Chat Section */}
           <ChatSection
             conversationID={materialRequest.conversation?.conversationID}
@@ -1457,28 +1491,25 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${
-                      status.canDo
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-red-50 border-red-200'
-                    }`}
+                    className={`p-4 rounded-lg text-center border ${status.canDo
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                      }`}
                   >
                     <p
-                      className={`text-sm text-gray-800 mb-2 ${
-                        status.nowrap
-                          ? 'whitespace-nowrap'
-                          : 'whitespace-normal'
-                      }`}
+                      className={`text-sm text-gray-800 mb-2 ${status.nowrap
+                        ? 'whitespace-nowrap'
+                        : 'whitespace-normal'
+                        }`}
                     >
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${
-                          status.canDo
-                            ? 'fa-check text-green-600'
-                            : 'fa-xmark text-red-600'
-                        }`}
+                        className={`fa-solid text-xl ${status.canDo
+                          ? 'fa-check text-green-600'
+                          : 'fa-xmark text-red-600'
+                          }`}
                       />
                     </div>
                   </div>

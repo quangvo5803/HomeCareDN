@@ -19,10 +19,10 @@ export default function NotificationModal({
     const [targetRoles, setTargetRoles] = useState([]);
 
     const roles = [
-        { key: "All", label: "All" },
-        { key: "Customer", label: "Customer" },
-        { key: "Distributor", label: "Distributor" },
-        { key: "Contractor", label: "Contractor" },
+        { key: "All", label: i18n.language === 'vi' ? "Tất cả" : "All" },
+        { key: "Customer", label: i18n.language === 'vi' ? "Khách hàng" : "Customer" },
+        { key: "Distributor", label: i18n.language === 'vi' ? "Nhà phân phối" : "Distributor" },
+        { key: "Contractor", label: i18n.language === 'vi' ? "Nhà thầu" : "Contractor" },
     ];
 
     useEffect(() => {
@@ -64,7 +64,7 @@ export default function NotificationModal({
                 Title: title || '',
                 Message: message || '',
                 TargetRoles: targetRoles.join(',') || '',
-                TargetUserId: user.id
+                SenderUserId: user.id
             };
             await onSave(data);
         } catch (err) {
@@ -151,12 +151,15 @@ export default function NotificationModal({
                                         type="checkbox"
                                         checked={
                                             role.key === 'All'
-                                                ? targetRoles.length === 3
+                                                ? roles
+                                                    .filter(r => r.key !== 'All') // tất cả role ngoại trừ "All"
+                                                    .every(r => targetRoles.includes(r.key)) // check nếu tất cả đã chọn
                                                 : targetRoles.includes(role.key)
                                         }
                                         onChange={() => !viewOnly && handleRoleChange(role.key)}
                                         className={`accent-blue-500 cursor-${viewOnly ? 'not-allowed' : 'pointer'}`}
                                     />
+
                                     <span className={viewOnly ? 'text-gray-500' : ''}>{role.label}</span>
                                 </label>
                             ))}

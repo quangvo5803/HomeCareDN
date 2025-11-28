@@ -5,6 +5,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Notification;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
 using DataAccess.Entities.Application;
@@ -201,6 +202,16 @@ namespace BusinessLogic.Services
                     dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
                 }
             }
+            if(role == "Admin")
+            {
+                dto.DistributorName =
+                        distributor!.FullName ?? distributor.UserName ?? string.Empty;
+                dto.DistributorEmail = distributor.Email ?? string.Empty;
+                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
+                var payment = await _unitOfWork.PaymentTransactionsRepository
+                    .GetAsync(p => p.DistributorApplicationID == application.DistributorApplicationID);
+                dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
+            }
             return dto;
         }
 
@@ -248,9 +259,9 @@ namespace BusinessLogic.Services
             dto.Status = ApplicationStatus.Pending.ToString();
 
             var customerDto = _mapper.Map<DistributorApplicationDto>(application);
-            dto.DistributorName = string.Empty;
-            dto.DistributorEmail = string.Empty;
-            dto.DistributorPhone = string.Empty;
+            customerDto.DistributorName = string.Empty;
+            customerDto.DistributorEmail = string.Empty;
+            customerDto.DistributorPhone = string.Empty;
             customerDto.Status = ApplicationStatus.Pending.ToString();
 
             var notifyTasks = new List<Task>
@@ -448,8 +459,7 @@ namespace BusinessLogic.Services
 
             var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
                 x => x.DistributorApplicationID == application.DistributorApplicationID,
-                includeProperties: INCLUDE,
-                asNoTracking: true
+                includeProperties: INCLUDE
             );
 
             var resultDto = _mapper.Map<DistributorApplicationDto>(reloadedApp);
@@ -478,7 +488,7 @@ namespace BusinessLogic.Services
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
-                acceptPayload
+                resultDto
             );
 
             await _notificationService.NotifyPersonalAsync(

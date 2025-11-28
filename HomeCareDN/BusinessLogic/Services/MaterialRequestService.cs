@@ -3,6 +3,7 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
@@ -294,13 +295,18 @@ namespace BusinessLogic.Services
                 var distributor = await _userManager.FindByIdAsync(
                     selected.DistributorID.ToString()
                 );
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.MaterialRequestID == selected.MaterialRequestID
+                );
                 dto.SelectedDistributorApplication = new DistributorApplicationDto
                 {
                     DistributorID = distributor?.Id ?? string.Empty,
                     DistributorApplicationID = selected.DistributorApplicationID,
+                    MaterialRequestID = selected.MaterialRequestID,
                     DistributorName = distributor?.FullName ?? string.Empty,
                     DistributorEmail = distributor?.Email ?? string.Empty,
                     DistributorPhone = distributor?.PhoneNumber ?? string.Empty,
+                    TotalEstimatePrice = selected.TotalEstimatePrice,
                     Status = selected.Status.ToString(),
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
@@ -308,6 +314,7 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment)
                 };
             }
         }

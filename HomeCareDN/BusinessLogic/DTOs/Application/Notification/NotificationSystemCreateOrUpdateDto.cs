@@ -8,5 +8,6 @@
         public string? DataValue { get; set; }
         public required string TargetRoles { get; set; }
         public Guid? TargetUserId { get; set; }
+        public Guid? SenderUserId { get; set; }
     }
 }
