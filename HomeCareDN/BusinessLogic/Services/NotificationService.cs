@@ -328,7 +328,7 @@ namespace BusinessLogic.Services
                 );
         }
 
-        private IQueryable<Notification> AdminSearchFilter(
+        private static IQueryable<Notification> AdminSearchFilter(
             IQueryable<Notification> query,
             QueryParameters parameters,
             bool isAdmin)
@@ -343,7 +343,7 @@ namespace BusinessLogic.Services
             return query;
         }
 
-        private IQueryable<Notification> AdminSorting(
+        private static IQueryable<Notification> AdminSorting(
             IQueryable<Notification> query,
             QueryParameters parameters,
             bool isAdmin)
