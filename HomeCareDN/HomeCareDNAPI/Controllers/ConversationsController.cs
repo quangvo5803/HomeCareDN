@@ -19,11 +19,11 @@ namespace HomeCareDNAPI.Controllers
             _facadeService = facadeService;
         }
 
-        [HttpGet("{id:guid}")]
+        [HttpGet]
         [Authorize(Roles = "Customer,Contractor,Distributor")]
-        public async Task<IActionResult> GetConversationByID(Guid id)
+        public async Task<IActionResult> GetConversationByID([FromQuery] ConversationGetByIdDto dto)
         {
-            var result = await _facadeService.ConversationService.GetConversationByIDAsync(id);
+            var result = await _facadeService.ConversationService.GetConversationByIDAsync(dto);
             return Ok(result);
         }
 
@@ -38,7 +38,7 @@ namespace HomeCareDNAPI.Controllers
         [HttpGet("admin")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllConversationsByAdminID(
-            [FromQuery] ConversationGetByIdDto dto
+            [FromQuery] ConversationGetByAdminIdDto dto
         )
         {
             var result = await _facadeService.ConversationService.GetAllConversationByAdminIDAsync(

@@ -144,7 +144,7 @@
     "map_title": "Bản đồ Google",
     "section_tag": "Liên hệ",
     "section_title": "Nếu bạn có thắc mắc, hãy liên hệ với chúng tôi",
-    "note_prefix": "Biểu mẫu liên hệ hiện chưa kích hoạt. Bạn có thể dùng form hoạt động với Ajax & PHP chỉ trong vài phút.",
+    "note_prefix": "Vui lòng để lại thông tin liên hệ, chúng tôi sẽ tư vấn và phản hồi trong thời gian sớm nhất.",
     "note_link": "Tải ngay",
     "form_aria": "Biểu mẫu liên hệ",
     "form": {
@@ -635,9 +635,13 @@
     "requestClosedNote": "Yêu cầu này đã đóng. Đơn đăng ký của bạn sẽ không còn được xử lý nữa.",
     "notAppliedYet": "Chưa đăng ký",
     "deleteApplication": "Xóa đơn ứng tuyển",
-    "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới"
+    "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới",
+    "customerInfo": "Thông tin khách hàng",
+    "customerName":"Tên khách hàng",
+    "customerPhone":"Số điện thoại"
   },
   "partnerDashboard": {
+    "material":"Vật Liệu",
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",

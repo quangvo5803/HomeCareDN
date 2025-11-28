@@ -22,6 +22,10 @@ export default function AdminLayout() {
 
   // State lưu số lượng chưa đọc
   const [unreadCount, setUnreadCount] = useState(0);
+  const activeConversationIdRef = useRef(null);
+  const setActiveConversationId = useCallback((id) => {
+    activeConversationIdRef.current = id;
+  }, []);
 
   const adminGroupJoinedRef = useRef(false);
   const notificationNewConvesation = useRef(
@@ -197,7 +201,10 @@ export default function AdminLayout() {
       },
 
       [RealtimeEvents.NewAdminMessage]: (payload) => {
-        if (!payload.isAdminRead) {
+        const isViewing =
+          activeConversationIdRef.current === payload.conversationID;
+
+        if (!isViewing && !payload.isAdminRead) {
           fetchUnreadCount();
         }
 
@@ -249,7 +256,13 @@ export default function AdminLayout() {
         <Navbar />
         <div className="w-full px-6 py-6 mx-auto flex-1">
           {/* Nơi render các trang con của admin */}
-          <Outlet context={{ fetchUnreadCount, decreaseUnreadCount }} />
+          <Outlet
+            context={{
+              fetchUnreadCount,
+              decreaseUnreadCount,
+              setActiveConversationId,
+            }}
+          />
         </div>
         <Footer />
       </div>

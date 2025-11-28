@@ -193,13 +193,15 @@ namespace BusinessLogic.Services
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
                 dto.RatingCount = distributor.RatingCount;
+                dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
+                dto.DistributorEmail = distributor.Email ?? string.Empty;
+                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
 
-                if (role == "Customer" && application.Status == ApplicationStatus.Approved)
+                if (role == "Customer" && application.Status != ApplicationStatus.Approved)
                 {
-                    dto.DistributorName =
-                        distributor.FullName ?? distributor.UserName ?? string.Empty;
-                    dto.DistributorEmail = distributor.Email ?? string.Empty;
-                    dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
+                    dto.DistributorName = string.Empty;
+                    dto.DistributorEmail = string.Empty;
+                    dto.DistributorPhone = string.Empty;
                 }
             }
             if(role == "Admin")

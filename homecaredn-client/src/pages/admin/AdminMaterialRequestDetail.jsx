@@ -447,16 +447,18 @@ export default function AdminMaterialRequestDetail() {
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 font-medium">
                               {i18n.language === 'vi'
-                                ? item?.material.name
-                                : item?.material.nameEN || item?.material.name}
+                                ? item?.material?.name
+                                : item?.material?.nameEN ||
+                                item?.material?.name}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
                               {item.quantity}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center">
                               {i18n.language === 'vi'
-                                ? item?.material.unit
-                                : item?.material.unitEn || item?.material.unit}
+                                ? item?.material?.unit
+                                : item?.material?.unitEn ||
+                                item?.material?.unit}
                             </td>
                           </tr>
                         )
