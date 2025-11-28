@@ -310,7 +310,6 @@ namespace BusinessLogic.Services
                     Status = selected.Status.ToString(),
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
-                    TotalEstimatePrice = selected.TotalEstimatePrice,
                     Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
