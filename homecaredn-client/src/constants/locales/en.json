@@ -577,7 +577,8 @@
     "reviewComment": "Review Comment",
     "reviewImages": "Review Images",
     "reviewedAt": "Reviewed At",
-    "reviewImageTitle": "Review Image"
+    "reviewImageTitle": "Review Image",
+    "realTime": "Service request deleted"
   },
   "distributorMaterialRequest": {
     "title": "Material requests manager",
@@ -642,8 +643,8 @@
     "deleteApplication": "Delete Application",
     "canDeleteWhilePending": "You can delete your current application to submit a new one.",
     "customerInfo": "Customer Information",
-    "customerName":"Customer name:",
-    "customerPhone":"Customer phone:"
+    "customerName": "Customer name:",
+    "customerPhone": "Customer phone:"
   },
   "partnerDashboard": {
     "material": "Material",
@@ -1157,7 +1158,7 @@
       "distributorApplication": "participated order",
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
-      "historyDA":"Material order history",
+      "historyDA": "Material order history",
       "history": "No history yet"
     }
   },

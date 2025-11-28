@@ -572,7 +572,8 @@
     "reviewComment": "Nội dung đánh giá",
     "reviewImages": "Hình ảnh đánh giá",
     "reviewedAt": "Ngày đánh giá",
-    "reviewImageTitle": "Ảnh đánh giá"
+    "reviewImageTitle": "Ảnh đánh giá",
+    "realTime": "Yêu cầu dịch vụ đã bị xóa"
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
@@ -637,11 +638,11 @@
     "deleteApplication": "Xóa đơn ứng tuyển",
     "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới",
     "customerInfo": "Thông tin khách hàng",
-    "customerName":"Tên khách hàng",
-    "customerPhone":"Số điện thoại"
+    "customerName": "Tên khách hàng",
+    "customerPhone": "Số điện thoại"
   },
   "partnerDashboard": {
-    "material":"Vật Liệu",
+    "material": "Vật Liệu",
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",

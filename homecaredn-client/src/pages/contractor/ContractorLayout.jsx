@@ -20,63 +20,28 @@ export default function ContractorLayout() {
   const [loading, setLoading] = useState(true);
 
   //Real time
+  const handleNewNotification = (payload, titleKey) => {
+    console.log("payload", payload);
+    setNotifications(prev => {
+      const exists = prev.some(n => n.notificationID === payload.notificationID);
+      if (exists) return prev;
+      return [{ ...payload, isRead: false }, ...prev];
+    });
+    toast.info(
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload[titleKey]}`
+        }}
+      />,
+      { position: 'top-right', autoClose: 3000 }
+    );
+  };
+
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.title}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
+    [RealtimeEvents.NotificationCreated]: (payload) => handleNewNotification(payload, 'title'),
+    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => handleNewNotification(payload, 'title'),
     [RealtimeEvents.NotificationDeleted]: (notificationId) => {
-      setNotifications(prev =>
-        prev.filter(n => n.notificationID !== notificationId)
-      );
+      setNotifications(prev => prev.filter(n => n.notificationID !== notificationId));
     },
   });
 

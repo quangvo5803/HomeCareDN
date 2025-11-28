@@ -57,7 +57,7 @@ namespace BusinessLogic.Services
                 {
                     if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
                     {
-                        dto.Message = $"Có {dto.PendingCount} {dto.Title.ToLower()}.";
+                        dto.Message = $"Có {dto.PendingCount} {dto.Message.ToLower()}";
                     }
                 }
             }
@@ -191,7 +191,7 @@ namespace BusinessLogic.Services
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu dịch vụ mới",
-                Message = "Có 1 yêu cầu dịch vụ mới.",
+                Message = "Có yêu cầu dịch vụ mới cần xử lý.",
                 DataKey = dataKey,
                 DataValue = "ServiceRequestManager",
                 TargetRoles = "Contractor"
@@ -209,7 +209,7 @@ namespace BusinessLogic.Services
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu vật tư mới",
-                Message = "Có 1 yêu cầu vật tư mới.",
+                Message = "Có yêu cầu vật tư mới cần được xử lý.",
                 DataKey = dataKey,
                 DataValue = "MaterialRequestManager",
                 TargetRoles = "Distributor"
@@ -294,9 +294,9 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
 
             var dto = _mapper.Map<NotificationDto>(noti);
-            dto.Message = noti.PendingCount > 1
-               ? $"Có {noti.PendingCount} {noti.Title.ToLower()}."
-               : noti.Message;
+            dto.Title = noti.PendingCount > 1
+               ? $"Có {noti.PendingCount} {noti.Title.ToLower()}"
+               : noti.Title;
 
             await SendToRolesAsync
             (

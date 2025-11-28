@@ -19,65 +19,37 @@ export default function DistributorLayout() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   //Real time
+  const handleNotification = (payload, titleKey) => {
+    setNotifications(prev => {
+      const exists = prev.some(n => n.notificationID === payload.notificationID);
+      if (exists) return prev;
+
+      return [{ ...payload, isRead: false }, ...prev];
+    });
+
+    toast.info(
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload[titleKey]}`
+        }}
+      />,
+      {
+        position: "top-right",
+        autoClose: 3000,
+      }
+    );
+  };
+
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.title}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
+    [RealtimeEvents.NotificationCreated]: (payload) => handleNotification(payload, 'title'),
+    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => handleNotification(payload, 'title'),
     [RealtimeEvents.NotificationDeleted]: (notificationId) => {
       setNotifications(prev =>
         prev.filter(n => n.notificationID !== notificationId)
       );
     },
   });
+
 
   useEffect(() => {
     if (!user) return;
