@@ -1,385 +1,121 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+﻿using System.Text.Json;
 using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.Services.Interfaces;
-using DataAccess.UnitOfWork;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Distributed;
 using Ultitity.Clients.Groqs;
+using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {
     public class AiChatService : IAiChatService
     {
-        private const string COOKIE_NAME = "HC_SUPPORT_CHAT_V1";
-        private const string CATALOG_CACHE_KEY = "HC_AI_CATALOG_V1";
-        private const int HISTORY_DAYS = 3;
-        private const int CATALOG_CACHE_HOURS = 1;
-        private const int MAX_HISTORY_MESSAGES = 20;
-        private const int MAX_RELEVANT_ITEMS = 15;
-        private const int MAX_GENERAL_ITEMS = 10;
-        private const int MAX_KEYWORDS = 10;
-
-        private readonly IDistributedCache _cache;
         private readonly IGroqClient _groq;
-        private readonly IHttpContextAccessor _http;
-        private readonly IUnitOfWork _unitOfWork;
+        private const string MESSAGE = "Message";
+        private const string ERROR_EMPTY_MESSAGE = "EMPTY_MESSAGE";
 
-        private static readonly DistributedCacheEntryOptions HistoryCacheOptions = new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(HISTORY_DAYS),
-        };
+        private const string SYSTEM_PROMPT_CHAT =
+            @"Bạn là Trợ lý ảo HomeCareDN (Tiếng Việt). 
+              Nhiệm vụ: Hỗ trợ khách hàng tìm thợ, vật tư, giải đáp thắc mắc. 
+              Yêu cầu: Trả lời ngắn gọn, lịch sự, dùng Markdown để trình bày đẹp.";
 
-        private static readonly DistributedCacheEntryOptions CatalogCacheOptions = new()
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(CATALOG_CACHE_HOURS),
-        };
+        private const string SYSTEM_PROMPT_SUGGEST =
+            @"Bạn là API gợi ý từ khóa (Autocomplete). 
+              Nhiệm vụ: Dựa vào input của user, hãy đoán và trả về 5 từ khóa liên quan nhất trong lĩnh vực xây dựng/sửa chữa nhà.
+              BẮT BUỘC: Chỉ trả về mảng JSON thuần túy (Array String). Không Markdown, không giải thích.
+              Ví dụ: [""sửa điện"", ""thợ điện"", ""bóng đèn""]";
 
-        public AiChatService(
-            IDistributedCache cache,
-            IGroqClient groq,
-            IHttpContextAccessor http,
-            IUnitOfWork unitOfWork
-        )
+        private const string SYSTEM_PROMPT_ESTIMATE =
+            @"Bạn là Chuyên gia Dự toán Xây dựng HomeCareDN.
+              Context: {0}
+              Nhiệm vụ: Ước lượng chi phí sơ bộ dựa trên yêu cầu.
+              Yêu cầu: Trình bày bảng giá (Table Markdown), các hạng mục cần làm, và tổng chi phí ước tính (VNĐ).
+              Cảnh báo: Ghi rõ đây chỉ là tham khảo.";
+
+        public AiChatService(IGroqClient groq)
         {
-            _cache = cache;
             _groq = groq;
-            _http = http;
-            _unitOfWork = unitOfWork;
         }
 
-        // ===== PUBLIC API =====
-        public async Task<AiChatResponseDto> SendAsync(AiChatRequestDto request)
+        public async Task<AiChatResponseDto> ChatSupportAsync(string message)
         {
-            var sessionId = EnsureCookieId();
-            var history = (await GetHistoryAsync(sessionId)).ToList();
-            var context = await BuildDynamicContextAsync(request.Prompt);
-
-            var messages = BuildMessagePayload(history, request.Prompt, context);
-            var reply = await _groq.ChatAsync(
-                new
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                var error = new Dictionary<string, string[]>
                 {
-                    model = "llama-3.3-70b-versatile",
-                    messages,
-                    temperature = 0.3,
-                    max_tokens = 1024,
-                }
-            );
-
-            await SaveMessageToHistoryAsync(sessionId, history, request.Prompt, reply);
-
-            return new AiChatResponseDto
-            {
-                Reply = reply,
-                History = history.TakeLast(MAX_HISTORY_MESSAGES).ToList(),
-            };
-        }
-
-        public async Task<IEnumerable<AiChatMessageDto>> GetHistoryAsync()
-        {
-            var sessionId = ReadCookieId();
-            return sessionId == null
-                ? Enumerable.Empty<AiChatMessageDto>()
-                : await GetHistoryAsync(sessionId);
-        }
-
-        public async Task ClearHistoryAsync()
-        {
-            var sessionId = ReadCookieId();
-            if (sessionId != null)
-            {
-                await _cache.RemoveAsync(HistoryCacheKey(sessionId));
-            }
-            _http.HttpContext!.Response.Cookies.Delete(COOKIE_NAME);
-        }
-
-        // ===== PRIVATE: MESSAGE BUILDING =====
-        private List<object> BuildMessagePayload(
-            List<AiChatMessageDto> history,
-            string userPrompt,
-            string context
-        )
-        {
-            var messages = new List<object>
-            {
-                new { role = "system", content = BuildSystemPrompt(context) },
-            };
-
-            // Add last N messages from history
-            foreach (var msg in history.TakeLast(MAX_HISTORY_MESSAGES))
-            {
-                messages.Add(new { role = msg.Role, content = msg.Content });
+                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
+                };
+                throw new CustomValidationException(error);
             }
 
-            messages.Add(new { role = "user", content = userPrompt });
-            return messages;
-        }
+            var result = await _groq.ChatAsync(SYSTEM_PROMPT_CHAT, message);
 
-        private async Task SaveMessageToHistoryAsync(
-            string sessionId,
-            List<AiChatMessageDto> history,
-            string userPrompt,
-            string aiReply
-        )
-        {
-            history.Add(
+            var history = new List<AiChatMessageDto>
+            {
                 new AiChatMessageDto
                 {
                     Role = "user",
-                    Content = userPrompt,
+                    Content = message,
                     TimestampUtc = DateTime.UtcNow,
-                }
-            );
-
-            history.Add(
+                },
                 new AiChatMessageDto
                 {
                     Role = "assistant",
-                    Content = aiReply,
+                    Content = result,
                     TimestampUtc = DateTime.UtcNow,
-                }
-            );
-
-            await SaveHistoryAsync(sessionId, history);
-        }
-
-        // ===== PRIVATE: CONTEXT BUILDING =====
-        private async Task<string> BuildDynamicContextAsync(string userPrompt)
-        {
-            var keywords = ExtractKeywords(userPrompt);
-            var sb = new StringBuilder();
-
-            // Check if user asking for instructions
-            if (IsAskingForInstructions(keywords))
-            {
-                sb.AppendLine("=== QUY TRÌNH BẮT BUỘC TẠO YÊU CẦU ===");
-                sb.AppendLine("1. Vào Profile → Cập nhật Họ tên, SĐT, Địa chỉ");
-                sb.AppendLine("2. Không được tạo yêu cầu nếu thiếu thông tin");
-                sb.AppendLine("=======================================\n");
-            }
-
-            // Get and filter catalog items
-            var allItems = await GetCachedCatalogAsync();
-            var relevantItems = FilterRelevantItems(allItems, keywords);
-
-            if (!relevantItems.Any())
-            {
-                sb.AppendLine(
-                    "[NOTE] Không tìm thấy kết quả chính xác. Hiển thị danh sách chung.\n"
-                );
-                relevantItems = allItems.Take(MAX_GENERAL_ITEMS).ToList();
-            }
-
-            AppendCatalogToContext(sb, relevantItems);
-
-            return sb.Length == 0 ? "Không có dữ liệu." : sb.ToString();
-        }
-
-        private void AppendCatalogToContext(StringBuilder sb, List<CatalogItem> items)
-        {
-            var services = items.Where(x => x.Type == "Service").ToList();
-            if (services.Any())
-            {
-                sb.AppendLine("=== DỊCH VỤ KHẢ DỤNG (CHỈ SỬ DỤNG ID NÀY) ===");
-                foreach (var s in services)
-                    sb.AppendLine($"- {s.DisplayString}");
-                sb.AppendLine();
-            }
-
-            var materials = items.Where(x => x.Type == "Material").ToList();
-            if (materials.Any())
-            {
-                sb.AppendLine("=== VẬT LIỆU KHẢ DỤNG (CHỈ SỬ DỤNG ID NÀY) ===");
-                foreach (var m in materials)
-                    sb.AppendLine($"- {m.DisplayString}");
-                sb.AppendLine();
-            }
-        }
-
-        private List<CatalogItem> FilterRelevantItems(
-            List<CatalogItem> allItems,
-            List<string> keywords
-        )
-        {
-            return allItems
-                .Where(item =>
-                    keywords.Any(k => item.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
-                )
-                .Take(MAX_RELEVANT_ITEMS)
-                .ToList();
-        }
-
-        private bool IsAskingForInstructions(List<string> keywords)
-        {
-            var instructionKeywords = new[]
-            {
-                "tạo",
-                "đặt",
-                "mua",
-                "yêu",
-                "cầu",
-                "create",
-                "order",
-                "request",
-                "buy",
+                },
             };
-
-            return keywords.Any(k =>
-                instructionKeywords.Any(ik => k.Contains(ik, StringComparison.OrdinalIgnoreCase))
-            );
+            return new AiChatResponseDto { Reply = result, History = history };
         }
 
-        private List<string> ExtractKeywords(string prompt)
+        public async Task<List<string>> SuggestSearchAsync(string query)
         {
-            if (string.IsNullOrWhiteSpace(prompt))
-                return new List<string>();
-
-            var cleaned = Regex.Replace(
-                prompt,
-                @"[^\w\sđàáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]",
-                " "
-            );
-
-            return cleaned
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                .Where(w => w.Length > 1)
-                .Distinct()
-                .Take(MAX_KEYWORDS)
-                .ToList();
-        }
-
-        // ===== PRIVATE: CATALOG CACHING =====
-        private async Task<List<CatalogItem>> GetCachedCatalogAsync()
-        {
-            var cached = await _cache.GetStringAsync(CATALOG_CACHE_KEY);
-            if (!string.IsNullOrEmpty(cached))
+            if (string.IsNullOrWhiteSpace(query))
             {
-                return JsonSerializer.Deserialize<List<CatalogItem>>(cached) ?? new();
+                var error = new Dictionary<string, string[]>
+                {
+                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
+                };
+                throw new CustomValidationException(error);
             }
 
-            var items = await BuildCatalogFromDatabaseAsync();
-            await _cache.SetStringAsync(
-                CATALOG_CACHE_KEY,
-                JsonSerializer.Serialize(items),
-                CatalogCacheOptions
-            );
+            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SUGGEST, query);
 
-            return items;
+            return ExtractJsonList(result, query);
         }
 
-        private async Task<List<CatalogItem>> BuildCatalogFromDatabaseAsync()
+        public async Task<string> EstimatePriceAsync(AiEstimateRequestDto dto)
         {
-            var items = new List<CatalogItem>();
+            var context =
+                dto.Data != null
+                    ? JsonSerializer.Serialize(dto.Data)
+                    : "Không có thông số chi tiết";
+            var result = string.Format(SYSTEM_PROMPT_ESTIMATE, context);
 
-            var services = await _unitOfWork.ServiceRepository.GetAllAsync();
-            items.AddRange(
-                services.Select(s => new CatalogItem
-                {
-                    Id = s.ServiceID,
-                    Name = s.Name,
-                    Type = "Service",
-                    DisplayString = $"ID: {s.ServiceID} | Name: {s.Name}",
-                })
-            );
-
-            var materials = await _unitOfWork.MaterialRepository.GetAllAsync();
-            items.AddRange(
-                materials.Select(m => new CatalogItem
-                {
-                    Id = m.MaterialID,
-                    Name = m.Name,
-                    Type = "Material",
-                    DisplayString = $"ID: {m.MaterialID} | Name: {m.Name}",
-                })
-            );
-
-            return items;
+            return await _groq.ChatAsync(result, dto.Requirement);
         }
 
-        // ===== PRIVATE: SYSTEM PROMPT =====
-        private string BuildSystemPrompt(string catalogContext)
+        // -----------------------------
+        // PRIVATE HELPER
+        // -----------------------------
+        private static List<string> ExtractJsonList(string aiResponse, string originalQuery)
         {
-            return $@"
-                You are HomeCareDN Virtual Assistant.
-                Assist customers in Vietnamese (default) or English based on input.
+            try
+            {
+                int startIndex = aiResponse.IndexOf('[');
+                int endIndex = aiResponse.LastIndexOf(']');
 
-                [STRICT RULES]:
-                1. SECURITY: NEVER reveal personal user data
-                2. CONTEXT: Use [CATALOG DATA] below to answer
-                   - IF ITEM NOT IN LIST → DO NOT CREATE LINK
-                   - NO FAKE IDs (like '123', '1', 'example')
-                   - ONLY use real UUIDs from catalog
-
-                3. FORMATTING:
-                   - Use Markdown links: [Text](URL)
-                   - Service: [Name](/ServiceDetail/{{UUID}})
-                   - Material: [Name](/MaterialDetail/{{UUID}})
-
-                4. NO DATA CASE:
-                   - If no exact match → recommend similar items with REAL UUIDs
-                   - If absolutely no data → give text advice WITHOUT links
-
-                [CATALOG DATA]:
-                {catalogContext}
-                ";
-        }
-
-        // ===== PRIVATE: COOKIE & CACHE =====
-        private string EnsureCookieId()
-        {
-            var existing = ReadCookieId();
-            if (!string.IsNullOrWhiteSpace(existing))
-                return existing!;
-
-            var newId = Guid.NewGuid().ToString("N");
-            _http.HttpContext!.Response.Cookies.Append(
-                COOKIE_NAME,
-                newId,
-                new CookieOptions
+                if (startIndex != -1 && endIndex != -1 && endIndex > startIndex)
                 {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = DateTimeOffset.UtcNow.AddDays(HISTORY_DAYS),
-                    Path = "/",
+                    string jsonPart = aiResponse.Substring(startIndex, endIndex - startIndex + 1);
+                    var result = JsonSerializer.Deserialize<List<string>>(jsonPart);
+                    return result ?? new List<string> { originalQuery };
                 }
-            );
 
-            return newId;
-        }
-
-        private string? ReadCookieId()
-        {
-            return
-                _http.HttpContext?.Request.Cookies.TryGetValue(COOKIE_NAME, out var value) == true
-                ? value
-                : null;
-        }
-
-        private async Task<IEnumerable<AiChatMessageDto>> GetHistoryAsync(string sessionId)
-        {
-            var json = await _cache.GetStringAsync(HistoryCacheKey(sessionId));
-            return string.IsNullOrEmpty(json)
-                ? new List<AiChatMessageDto>()
-                : JsonSerializer.Deserialize<List<AiChatMessageDto>>(json) ?? new();
-        }
-
-        private Task SaveHistoryAsync(string sessionId, IEnumerable<AiChatMessageDto> messages)
-        {
-            var json = JsonSerializer.Serialize(messages);
-            return _cache.SetStringAsync(HistoryCacheKey(sessionId), json, HistoryCacheOptions);
-        }
-
-        private static string HistoryCacheKey(string id) => $"HC_ChatHistory:{id}";
-
-        // ===== PRIVATE: MODELS =====
-        private class CatalogItem
-        {
-            public Guid Id { get; set; }
-            public string Name { get; set; } = string.Empty;
-            public string Type { get; set; } = string.Empty;
-            public string DisplayString { get; set; } = string.Empty;
+                return new List<string> { originalQuery };
+            }
+            catch
+            {
+                return new List<string> { originalQuery };
+            }
         }
     }
 }

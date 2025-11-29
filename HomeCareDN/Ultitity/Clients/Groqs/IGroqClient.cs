@@ -2,6 +2,6 @@
 {
     public interface IGroqClient
     {
-        Task<string> ChatAsync(object payload);
+        Task<string> ChatAsync(string systemPrompt, string userPrompt);
     }
 }

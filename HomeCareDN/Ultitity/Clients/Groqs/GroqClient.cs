@@ -1,5 +1,5 @@
 ﻿using System.Net.Http.Json;
-using System.Text.Json.Serialization;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 
 namespace Ultitity.Clients.Groqs
@@ -8,66 +8,75 @@ namespace Ultitity.Clients.Groqs
     {
         private readonly HttpClient _http;
         private readonly string _apiKey;
+        private readonly string _model;
+        private readonly string _path;
 
         public GroqClient(HttpClient http, IConfiguration config)
         {
             _http = http;
-            _apiKey = ValidateAndGetApiKey(config);
+            _apiKey =
+                config["Groq:ApiKey"] ?? throw new ArgumentNullException("Groq:ApiKey is missing");
+            _model =
+                config["Groq:Model"] ?? throw new ArgumentNullException("Groq:Model is missing");
+            _path =
+                config["Groq:ChatPath"]
+                ?? throw new ArgumentNullException("Groq:ChatPath is missing");
+            var baseUrl =
+                config["Groq:BaseUrl"]
+                ?? throw new ArgumentNullException("Groq:BaseUrl is missing");
 
-            var baseUrl = config["Groq:BaseUrl"] ?? "https://api.groq.com/openai/v1/";
             _http.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : $"{baseUrl}/");
             _http.DefaultRequestHeaders.Authorization =
                 new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
         }
 
-        public async Task<string> ChatAsync(object payload)
+        public async Task<string> ChatAsync(string systemPrompt, string userPrompt)
         {
-            using var response = await _http.PostAsJsonAsync("chat/completions", payload);
-
-            if (!response.IsSuccessStatusCode)
+            var payload = new
             {
-                var error = await response.Content.ReadAsStringAsync();
-                throw new HttpRequestException(
-                    $"Groq API Error ({(int)response.StatusCode}): {error}"
-                );
+                model = _model,
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt },
+                },
+                temperature = 0.5,
+                max_tokens = 1024,
+                response_format = new { type = "json_object" },
+            };
+
+            try
+            {
+                using var response = await _http.PostAsJsonAsync(_path, payload);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
+
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+                if (
+                    json.TryGetProperty("choices", out JsonElement choices)
+                    && choices.GetArrayLength() > 0
+                )
+                {
+                    var firstChoice = choices[0];
+                    if (
+                        firstChoice.TryGetProperty("message", out JsonElement messageProp)
+                        && messageProp.TryGetProperty("content", out JsonElement contentProp)
+                    )
+                    {
+                        return contentProp.GetString() ?? string.Empty;
+                    }
+                }
+
+                return string.Empty;
             }
-
-            var result = await response.Content.ReadFromJsonAsync<GroqResponse>();
-            return result?.Choices?.FirstOrDefault()?.Message?.Content?.Trim() ?? string.Empty;
-        }
-
-        private static string ValidateAndGetApiKey(IConfiguration config)
-        {
-            var apiKey = config["Groq:ApiKey"]?.Trim();
-
-            if (string.IsNullOrWhiteSpace(apiKey))
-                throw new InvalidOperationException("Groq:ApiKey is missing in configuration");
-
-            if (!apiKey.StartsWith("gsk_"))
-                throw new InvalidOperationException(
-                    "Invalid Groq:ApiKey format (must start with 'gsk_')"
-                );
-
-            return apiKey;
-        }
-
-        // ===== RESPONSE MODELS =====
-        private class GroqResponse
-        {
-            [JsonPropertyName("choices")]
-            public List<Choice>? Choices { get; set; }
-        }
-
-        private class Choice
-        {
-            [JsonPropertyName("message")]
-            public Message? Message { get; set; }
-        }
-
-        private class Message
-        {
-            [JsonPropertyName("content")]
-            public string? Content { get; set; }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

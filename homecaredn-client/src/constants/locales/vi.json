@@ -711,7 +711,8 @@
     "tabAI": "Nhắn với AI",
     "tabAdmin": "Nhắn với Quản Trị Viên",
     "startAdminChat": "Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện",
-    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI"
+    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI",
+    "loadingAdminChat": "Đang tải cuộc trò chuyện với Quản Trị Viên..."
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",

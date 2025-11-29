@@ -4,8 +4,8 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IAiChatService
     {
-        Task<AiChatResponseDto> SendAsync(AiChatRequestDto request);
-        Task<IEnumerable<AiChatMessageDto>> GetHistoryAsync();
-        Task ClearHistoryAsync();
+        Task<AiChatResponseDto> ChatSupportAsync(string message);
+        Task<List<string>> SuggestSearchAsync(string query);
+        Task<string> EstimatePriceAsync(AiEstimateRequestDto dto);
     }
 }
