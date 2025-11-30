@@ -17,6 +17,8 @@ namespace BusinessLogic.Services
         private readonly IUnitOfWork _unitOfWork;
 
         private const string MESSAGE = "Message";
+        private const string SYSTEM = "system";
+
         private const string ERROR_EMPTY_MESSAGE = "EMPTY_MESSAGE";
 
         private const string SYSTEM_PROMPT_CHAT =
@@ -75,15 +77,12 @@ namespace BusinessLogic.Services
 
             var history = await GetHistoryFromCacheAsync(dto.SessionId);
 
-            history.RemoveAll(x => x.Role == "system");
+            history.RemoveAll(x => x.Role == SYSTEM);
 
             var dynamicSystemPrompt =
                 $"{SYSTEM_PROMPT_CHAT}\n\n[DỮ LIỆU HỆ THỐNG HIỆN TẠI]:\n{internalContext}";
 
-            history.Insert(
-                0,
-                new ChatHistoryItem { Role = "system", Content = dynamicSystemPrompt }
-            );
+            history.Insert(0, new ChatHistoryItem { Role = SYSTEM, Content = dynamicSystemPrompt });
 
             history.Add(new ChatHistoryItem { Role = "user", Content = dto.Prompt });
 
@@ -141,59 +140,52 @@ namespace BusinessLogic.Services
                 keywords.Add(userPrompt);
             }
 
-            try
+            var allMaterials = await _unitOfWork.MaterialRepository.GetAllAsync();
+
+            var foundMaterials = allMaterials
+                .Where(m =>
+                    keywords.Any(k => m.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
+                )
+                .Take(5)
+                .ToList();
+
+            if (!foundMaterials.Any())
             {
-                var allMaterials = await _unitOfWork.MaterialRepository.GetAllAsync();
+                foundMaterials = allMaterials.Take(5).ToList();
+            }
 
-                var foundMaterials = allMaterials
-                    .Where(m =>
-                        keywords.Any(k => m.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
-                    )
-                    .Take(5)
-                    .ToList();
-
-                if (!foundMaterials.Any())
+            if (foundMaterials.Any())
+            {
+                sb.AppendLine("--- DANH SÁCH VẬT LIỆU CÓ SẴN TRONG HỆ THỐNG ---");
+                foreach (var m in foundMaterials)
                 {
-                    foundMaterials = allMaterials.Take(5).ToList();
-                }
-
-                if (foundMaterials.Any())
-                {
-                    sb.AppendLine("--- DANH SÁCH VẬT LIỆU CÓ SẴN TRONG HỆ THỐNG ---");
-                    foreach (var m in foundMaterials)
-                    {
-                        sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
-                    }
+                    sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
                 }
             }
-            catch { }
 
-            try
+            var allServices = await _unitOfWork.ServiceRepository.GetAllAsync();
+
+            var foundServices = allServices
+                .Where(s =>
+                    keywords.Any(k => s.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
+                )
+                .Take(5)
+                .ToList();
+
+            if (!foundServices.Any())
             {
-                var allServices = await _unitOfWork.ServiceRepository.GetAllAsync();
+                foundServices = allServices.Take(5).ToList();
+            }
 
-                var foundServices = allServices
-                    .Where(s =>
-                        keywords.Any(k => s.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
-                    )
-                    .Take(5)
-                    .ToList();
-
-                if (!foundServices.Any())
+            if (foundServices.Any())
+            {
+                sb.AppendLine("--- DANH SÁCH DỊCH VỤ CÓ SẴN TRONG HỆ THỐNG ---");
+                foreach (var s in foundServices)
                 {
-                    foundServices = allServices.Take(5).ToList();
-                }
-
-                if (foundServices.Any())
-                {
-                    sb.AppendLine("--- DANH SÁCH DỊCH VỤ CÓ SẴN TRONG HỆ THỐNG ---");
-                    foreach (var s in foundServices)
-                    {
-                        sb.AppendLine($"LINK: [{s.Name}](/ServiceDetail/{s.ServiceID})");
-                    }
+                    sb.AppendLine($"LINK: [{s.Name}](/ServiceDetail/{s.ServiceID})");
                 }
             }
-            catch { }
+
             if (sb.Length == 0)
             {
                 sb.AppendLine(
@@ -215,7 +207,7 @@ namespace BusinessLogic.Services
                 {
                     return new List<ChatHistoryItem>
                     {
-                        new ChatHistoryItem { Role = "system", Content = SYSTEM_PROMPT_CHAT },
+                        new ChatHistoryItem { Role = SYSTEM, Content = SYSTEM_PROMPT_CHAT },
                     };
                 }
                 return JsonSerializer.Deserialize<List<ChatHistoryItem>>(json)
@@ -225,7 +217,7 @@ namespace BusinessLogic.Services
             {
                 return new List<ChatHistoryItem>
                 {
-                    new ChatHistoryItem { Role = "system", Content = SYSTEM_PROMPT_CHAT },
+                    new ChatHistoryItem { Role = SYSTEM, Content = SYSTEM_PROMPT_CHAT },
                 };
             }
         }
@@ -275,7 +267,7 @@ namespace BusinessLogic.Services
         // PRIVATE CLASS HELPER
         // -----------------------------
 
-        private class ChatHistoryItem
+        private sealed record ChatHistoryItem
         {
             [JsonPropertyName("role")]
             public string Role { get; set; } = "";
