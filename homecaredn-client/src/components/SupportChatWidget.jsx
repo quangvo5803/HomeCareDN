@@ -5,6 +5,7 @@ import {
   useState,
   useContext,
   useCallback,
+  createContext,
 } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -106,7 +107,7 @@ const MessageShape = PropTypes.exact({
     PropTypes.instanceOf(Date),
   ]),
 });
-
+const MessageContext = createContext({ isUser: false });
 const MarkdownP = ({ children }) => (
   <p className="mb-1 last:mb-0 inline-block">{children}</p>
 );
@@ -131,7 +132,9 @@ const MarkdownTd = ({ children }) => (
 );
 MarkdownTd.propTypes = { children: PropTypes.node };
 
-const MarkdownLink = ({ href, children, isUser }) => {
+const MarkdownLink = ({ href, children }) => {
+  const { isUser } = useContext(MessageContext);
+
   const isInternal = href?.startsWith('/');
   const linkClass = cn(
     'font-bold underline transition-colors duration-200',
@@ -158,26 +161,21 @@ const MarkdownLink = ({ href, children, isUser }) => {
     </a>
   );
 };
-
 MarkdownLink.propTypes = {
   href: PropTypes.string,
   children: PropTypes.node,
-  isUser: PropTypes.bool,
+};
+
+const markdownComponents = {
+  a: MarkdownLink,
+  p: MarkdownP,
+  table: MarkdownTable,
+  th: MarkdownTh,
+  td: MarkdownTd,
 };
 
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
-  const renderers = useMemo(
-    () => ({
-      a: (props) => <MarkdownLink {...props} isUser={isUser} />,
-      p: MarkdownP,
-      table: MarkdownTable,
-      th: MarkdownTh,
-      td: MarkdownTd,
-    }),
-    [isUser]
-  );
-
   return (
     <div
       className={cn(
@@ -200,8 +198,12 @@ function MessageBubble({ message }) {
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
-          {/* Sử dụng ReactMarkdown để render nội dung */}
-          <ReactMarkdown components={renderers}>{message.text}</ReactMarkdown>
+          {/* Bọc ReactMarkdown trong Provider */}
+          <MessageContext.Provider value={{ isUser }}>
+            <ReactMarkdown components={markdownComponents}>
+              {message.text}
+            </ReactMarkdown>
+          </MessageContext.Provider>
         </div>
         <div
           className={cn(
