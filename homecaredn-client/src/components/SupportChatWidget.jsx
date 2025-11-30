@@ -176,6 +176,8 @@ const markdownComponents = {
 
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
+  const contextValue = useMemo(() => ({ isUser }), [isUser]);
+
   return (
     <div
       className={cn(
@@ -198,8 +200,8 @@ function MessageBubble({ message }) {
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
-          {/* Bọc ReactMarkdown trong Provider */}
-          <MessageContext.Provider value={{ isUser }}>
+          {/* Truyền giá trị đã memo vào Provider */}
+          <MessageContext.Provider value={contextValue}>
             <ReactMarkdown components={markdownComponents}>
               {message.text}
             </ReactMarkdown>
