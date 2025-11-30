@@ -130,40 +130,46 @@ const MarkdownTd = ({ children }) => (
   <td className="px-2 py-1 border-t">{children}</td>
 );
 MarkdownTd.propTypes = { children: PropTypes.node };
-/* ------------------------------------------------------------- */
+
+const MarkdownLink = ({ href, children, isUser }) => {
+  const isInternal = href?.startsWith('/');
+  const linkClass = cn(
+    'font-bold underline transition-colors duration-200',
+    isUser
+      ? 'text-blue-100 hover:text-white'
+      : 'text-blue-600 hover:text-blue-800'
+  );
+
+  if (isInternal) {
+    return (
+      <Link to={href} className={linkClass}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={linkClass}
+    >
+      {children}
+    </a>
+  );
+};
+
+MarkdownLink.propTypes = {
+  href: PropTypes.string,
+  children: PropTypes.node,
+  isUser: PropTypes.bool,
+};
 
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
-
   const renderers = useMemo(
     () => ({
-      a: ({ href, children }) => {
-        const isInternal = href?.startsWith('/');
-        const linkClass = cn(
-          'font-bold underline transition-colors duration-200',
-          isUser
-            ? 'text-blue-100 hover:text-white'
-            : 'text-blue-600 hover:text-blue-800'
-        );
-
-        if (isInternal) {
-          return (
-            <Link to={href} className={linkClass}>
-              {children}
-            </Link>
-          );
-        }
-        return (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={linkClass}
-          >
-            {children}
-          </a>
-        );
-      },
+      a: (props) => <MarkdownLink {...props} isUser={isUser} />,
       p: MarkdownP,
       table: MarkdownTable,
       th: MarkdownTh,
@@ -213,7 +219,6 @@ function MessageBubble({ message }) {
 MessageBubble.propTypes = {
   message: MessageShape.isRequired,
 };
-
 function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
