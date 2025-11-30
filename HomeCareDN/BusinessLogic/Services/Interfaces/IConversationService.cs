@@ -5,10 +5,10 @@ namespace BusinessLogic.Services.Interfaces
 {
     public interface IConversationService
     {
-        Task<ConversationDto?> GetConversationByIDAsync(Guid id);
+        Task<ConversationDto?> GetConversationByIDAsync(ConversationGetByIdDto dto);
         Task<ConversationDto?> GetConversationByUserIDAsync(string id);
         Task<PagedResultDto<ConversationDto>> GetAllConversationByAdminIDAsync(
-            ConversationGetByIdDto dto
+            ConversationGetByAdminIdDto dto
         );
         Task MarkConversationAsReadAsync(Guid id);
         Task<int> CountUnreadConversationsByAdminIDAsync(string id);

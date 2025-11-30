@@ -144,7 +144,7 @@
     "map_title": "Google Map",
     "section_tag": "Contact Us",
     "section_title": "If You Have Any Query, Please Contact Us",
-    "note_prefix": "The contact form is currently inactive. Get a functional and working contact form with Ajax & PHP in a few minutes.",
+    "note_prefix": "Please leave your contact information, and we will provide consultation and respond as soon as possible.",
     "note_link": "Download Now",
     "form_aria": "Contact form",
     "form": {
@@ -651,6 +651,7 @@
     "customerPhone":"Customer phone:"
   },
   "partnerDashboard": {
+    "material": "Material",
     "no": "No",
     "service_type": "Service Type",
     "title": "Contractor Dashboard",
@@ -1043,6 +1044,10 @@
     }
   },
   "adminServiceRequestManager": {
+    "customerInfo": "Customer Information",
+    "customerName": "Customer name",
+    "customerEmail": "Customer email",
+    "customerPhone": "Customer phone number",
     "no": "NO",
     "title": "Manage requested services",
     "subtitle": "Manage list of requested services",
@@ -1156,6 +1161,7 @@
       "distributorApplication": "participated order",
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
+      "historyDA":"Material order history",
       "history": "No history yet"
     }
   },
