@@ -107,51 +107,70 @@ const MessageShape = PropTypes.exact({
   ]),
 });
 
+const MarkdownP = ({ children }) => (
+  <p className="mb-1 last:mb-0 inline-block">{children}</p>
+);
+MarkdownP.propTypes = { children: PropTypes.node };
+
+const MarkdownTable = ({ children }) => (
+  <div className="overflow-x-auto my-2 border rounded">
+    <table className="min-w-full divide-y divide-gray-300 text-xs">
+      {children}
+    </table>
+  </div>
+);
+MarkdownTable.propTypes = { children: PropTypes.node };
+
+const MarkdownTh = ({ children }) => (
+  <th className="px-2 py-1 bg-gray-100 font-bold text-left">{children}</th>
+);
+MarkdownTh.propTypes = { children: PropTypes.node };
+
+const MarkdownTd = ({ children }) => (
+  <td className="px-2 py-1 border-t">{children}</td>
+);
+MarkdownTd.propTypes = { children: PropTypes.node };
+/* ------------------------------------------------------------- */
+
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
-  const renderers = {
-    a: ({ href, children }) => {
-      const isInternal = href && href.startsWith('/');
-      const linkClass = cn(
-        'font-bold underline transition-colors duration-200',
-        isUser
-          ? 'text-blue-100 hover:text-white'
-          : 'text-blue-600 hover:text-blue-800'
-      );
 
-      if (isInternal) {
-        return (
-          <Link to={href} className={linkClass}>
-            {children}
-          </Link>
+  const renderers = useMemo(
+    () => ({
+      a: ({ href, children }) => {
+        const isInternal = href?.startsWith('/');
+        const linkClass = cn(
+          'font-bold underline transition-colors duration-200',
+          isUser
+            ? 'text-blue-100 hover:text-white'
+            : 'text-blue-600 hover:text-blue-800'
         );
-      }
-      return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={linkClass}
-        >
-          {children}
-        </a>
-      );
-    },
-    p: ({ children }) => (
-      <p className="mb-1 last:mb-0 inline-block">{children}</p>
-    ),
-    table: ({ children }) => (
-      <div className="overflow-x-auto my-2 border rounded">
-        <table className="min-w-full divide-y divide-gray-300 text-xs">
-          {children}
-        </table>
-      </div>
-    ),
-    th: ({ children }) => (
-      <th className="px-2 py-1 bg-gray-100 font-bold text-left">{children}</th>
-    ),
-    td: ({ children }) => <td className="px-2 py-1 border-t">{children}</td>,
-  };
+
+        if (isInternal) {
+          return (
+            <Link to={href} className={linkClass}>
+              {children}
+            </Link>
+          );
+        }
+        return (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={linkClass}
+          >
+            {children}
+          </a>
+        );
+      },
+      p: MarkdownP,
+      table: MarkdownTable,
+      th: MarkdownTh,
+      td: MarkdownTd,
+    }),
+    [isUser]
+  );
 
   return (
     <div
@@ -428,7 +447,7 @@ function ChatWindow({ open, onClose, brand }) {
 
       const data = await aiChatService.chat(dto);
 
-      if (data && data.reply) {
+      if (data?.reply) {
         const botMsg = toAiUiMessage(data.reply, ROLES.BOT);
         setAiMessages((prev) => [...prev, botMsg]);
       }
