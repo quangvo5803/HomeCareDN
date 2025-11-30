@@ -7,27 +7,33 @@ namespace Ultitity.Clients.Groqs
     public class GroqClient : IGroqClient
     {
         private readonly HttpClient _http;
-        private readonly string _apiKey;
         private readonly string _model;
         private readonly string _path;
 
         public GroqClient(HttpClient http, IConfiguration config)
         {
             _http = http;
-            _apiKey =
-                config["Groq:ApiKey"] ?? throw new ArgumentNullException("Groq:ApiKey is missing");
+
+            var apiKey =
+                config["Groq:ApiKey"]
+                ?? throw new InvalidOperationException("Groq:ApiKey is missing");
+
             _model =
-                config["Groq:Model"] ?? throw new ArgumentNullException("Groq:Model is missing");
+                config["Groq:Model"]
+                ?? throw new InvalidOperationException("Groq:Model is missing");
+
             _path =
                 config["Groq:ChatPath"]
-                ?? throw new ArgumentNullException("Groq:ChatPath is missing");
+                ?? throw new InvalidOperationException("Groq:ChatPath is missing");
+
             var baseUrl =
                 config["Groq:BaseUrl"]
-                ?? throw new ArgumentNullException("Groq:BaseUrl is missing");
+                ?? throw new InvalidOperationException("Groq:BaseUrl is missing");
 
-            _http.BaseAddress = new Uri(baseUrl.EndsWith("/") ? baseUrl : $"{baseUrl}/");
+            _http.BaseAddress = new Uri(baseUrl.EndsWith('/') ? baseUrl : $"{baseUrl}/");
+
             _http.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _apiKey);
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
         }
 
         public async Task<string> ChatAsync(string systemPrompt, string userPrompt)
