@@ -24,7 +24,7 @@ export default function MaterialRequestDetail() {
   const { materialRequestId } = useParams();
   const navigate = useNavigate();
   const { addresses } = useUser();
-
+  const [deliveryDate, setDeliveryDate] = useState('');
   const [description, setDescription] = useState('');
   const [canAddMaterial, setCanAddMaterial] = useState(false);
   const [items, setItems] = useState([]);
@@ -160,6 +160,7 @@ export default function MaterialRequestDetail() {
           setDescription(data.description || '');
           setCanAddMaterial(data.canAddMaterial || false);
           setAddressID(data.addressID || '');
+          setDeliveryDate(data.deliveryDate || '');
           setItems(data.materialRequestItems || []);
           setOriginalItems(data.materialRequestItems || []);
         }
@@ -211,11 +212,14 @@ export default function MaterialRequestDetail() {
   const hasAddressChanges = addressID !== (materialRequest?.addressID || '');
   const hasCanAddMaterialChanges =
     canAddMaterial !== materialRequest?.canAddMaterial;
+  const hasDeliveryDateChanges =
+    deliveryDate !== (materialRequest?.deliveryDate || '');
   const hasAnyChanges =
     hasItemChanges ||
     hasDescriptionChanges ||
     hasAddressChanges ||
-    hasCanAddMaterialChanges;
+    hasCanAddMaterialChanges ||
+    hasDeliveryDateChanges;
 
   const canShowSaveCancel = hasAnyChanges;
   const canShowSend = items.length > 0 && addressID;
@@ -289,6 +293,7 @@ export default function MaterialRequestDetail() {
     const dto = {
       materialRequestID: materialRequestId,
       description: description,
+      deliveryDate: deliveryDate,
       canAddMaterial: canAddMaterial,
       isSubmit: isSubmit,
       addItems: addItems.map((a) => ({
@@ -327,6 +332,7 @@ export default function MaterialRequestDetail() {
           setItems(originalItems);
           setDescription(materialRequest?.description || '');
           setAddressID(materialRequest?.addressID || '');
+          setDeliveryDate(materialRequest?.deliveryDate || '');
           setCanAddMaterial(materialRequest?.canAddMaterial || false);
           Swal.close();
         } catch {
@@ -488,7 +494,29 @@ export default function MaterialRequestDetail() {
       </div>
     );
   };
+  const renderDeliveryDate = () => {
+    if (!canEdit) {
+      return (
+        <div className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4">
+          <p className="text-slate-700">
+            {formatDate(materialRequest.deliveryDate, i18n.language)}
+          </p>
+        </div>
+      );
+    }
 
+    return (
+      <div className="relative">
+        <input
+          type="date"
+          min={new Date().toISOString().split('T')[0]}
+          value={deliveryDate ? deliveryDate.split('T')[0] : ''}
+          onChange={(e) => setDeliveryDate(e.target.value)}
+          className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+        />
+      </div>
+    );
+  };
   const renderAddMaterialIcon = () => {
     return canAddMaterial
       ? 'check-circle text-green-500'
@@ -1081,16 +1109,13 @@ export default function MaterialRequestDetail() {
         {/* Header with Status */}
         <div className="flex items-center gap-6 mb-6">
           <div className="w-[88px] h-[88px] rounded-full flex items-center justify-center bg-[#FB8C00] text-white text-[36px] font-bold shadow-md">
-            {selectedDistributor.distributorApplicationID
-              .substring(0, 8)
-              ?.charAt(0)
-              ?.toUpperCase()}
+            {t('roles.Distributor')}
           </div>
 
           <div className="flex flex-col flex-1">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900">
-                {selectedDistributor.distributorApplicationID.substring(0, 8)}
+                {t('roles.Distributor ')}
               </h2>
               <StatusBadge
                 status={selectedDistributor.status}
@@ -1324,7 +1349,7 @@ export default function MaterialRequestDetail() {
               </div>
             ) : (
               <>
-                {distributorApplications.map((app) => (
+                {distributorApplications.map((app, idx) => (
                   <button
                     key={app.distributorApplicationID}
                     onClick={() => handleDetailDistributor(app)}
@@ -1332,16 +1357,13 @@ export default function MaterialRequestDetail() {
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-                        {app.distributorApplicationID
-                          .substring(0, 8)
-                          ?.charAt(0)
-                          ?.toUpperCase()}
+                        {t('roles.Distributor')}
                       </div>
                       <div className="flex-1 min-w-0">
                         {/* Status Row */}
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-lg text-slate-900 group-hover:text-orange-600 transition truncate">
-                            {app.distributorApplicationID.substring(0, 8)}
+                            {t('roles.Distributor') + ' ' + { idx }}
                           </h4>
 
                           <StatusBadge status={app.status} type="Application" />
@@ -1412,7 +1434,7 @@ export default function MaterialRequestDetail() {
       {/* Header */}
       <div
         className={`bg-white shadow-lg ${
-          hasAnyChanges ? 'sticky top-24 z-50' : ''
+          hasAnyChanges ? 'sticky top-24 z-20' : ''
         }`}
       >
         <div className="px-6 lg:px-12 py-3">
@@ -1564,14 +1586,12 @@ export default function MaterialRequestDetail() {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                    {t('Enums.ServiceType.Material')}
+                    {t('Enums.ServiceType.Material')} #
+                    {materialRequestId.substring(0, 8)}
                   </h2>
                   <p className="text-sm text-slate-500 mb-1">
                     {formatDate(materialRequest.createdAt, i18n.language)}
                   </p>
-                  <span className="inline-block text-sm font-mono bg-slate-100 text-slate-700 px-3 py-1 rounded-lg">
-                    #{materialRequestId.substring(0, 8)}
-                  </span>
                   <div className="flex gap-3 mt-1">
                     <StatusBadge
                       status={materialRequest.status}
@@ -1589,7 +1609,13 @@ export default function MaterialRequestDetail() {
                 </label>
                 {renderAddress()}
               </div>
-
+              <div className="mb-8 pb-8 border-b border-slate-200">
+                <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
+                  <i className="fas fa-calendar text-orange-600 mr-2"></i>
+                  {t('userPage.materialRequestDetail.deliveryDate')}
+                </label>
+                {renderDeliveryDate()}
+              </div>
               {/* Description */}
               <div className="mb-8">
                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">

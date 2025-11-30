@@ -23,9 +23,13 @@
     "he": "^1.2.0",
     "i18next": "^25.3.6",
     "i18next-browser-languagedetector": "^8.2.0",
+    "jszip": "^3.10.1",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.544.0",
+    "mammoth": "^1.11.0",
     "number-to-words": "^1.2.4",
+    "pdf-parse": "^2.4.5",
+    "pdfjs-dist": "^5.4.394",
     "perfect-scrollbar": "^1.5.6",
     "prop-types": "^15.8.1",
     "react": "^19.1.0",
@@ -39,10 +43,12 @@
     "react-toastify": "^11.0.5",
     "sweetalert2": "^11.22.4",
     "tailwindcss": "^4.1.12",
+    "tesseract.js": "^6.0.1",
     "tinymce": "^8.1.2",
     "trim-canvas": "^0.1.2",
     "use-debounce": "^10.0.6",
-    "venobox": "^2.1.8"
+    "venobox": "^2.1.8",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

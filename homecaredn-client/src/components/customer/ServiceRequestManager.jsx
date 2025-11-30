@@ -14,10 +14,10 @@ import { useUser } from '../../hook/useUser';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
 import ReviewCountdown from '../customer/ReviewCountdown';
-import { formatVND } from '../../utils/formatters';
+import { formatDate, formatVND } from '../../utils/formatters';
 
 export default function ServiceRequestManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { profile, addresses } = useUser();
   const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
@@ -349,7 +349,15 @@ export default function ServiceRequestManager() {
                         </span>
                       </div>
                     )}
-
+                    <div className="mt-2 flex items-center gap-2 text-sm">
+                      <i className="fa-solid fa-clock text-orange-500"></i>
+                      {t('userPage.serviceRequest.label_timeLine')}
+                      <span className="font-semibold">
+                        {formatDate(req.startDate, i18n.language) +
+                          ' - ' +
+                          formatDate(req.endDate, i18n.language)}
+                      </span>
+                    </div>
                     <div className="mt-2 flex items-center gap-2 text-sm">
                       <i className="fa-solid fa-location-dot text-orange-500"></i>
                       {t('userPage.serviceRequest.label_address')}

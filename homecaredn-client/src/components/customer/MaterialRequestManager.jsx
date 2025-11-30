@@ -14,6 +14,7 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import ReviewCountdown from './ReviewCountdown';
 import { reviewService } from '../../services/reviewService';
 import ReviewModal from '../modal/ReviewModal';
+import { formatDate } from '../../utils/formatters';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
@@ -233,16 +234,23 @@ export default function MaterialRequestManager({ user }) {
                     <div>
                       <h3 className="font-semibold text-gray-800 text-lg leading-tight">
                         {t('Enums.ServiceType.Material')}
+                        {' #'}
+                        {req.materialRequestID.substring(0, 8)}
                       </h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                        <span className="flex items-center gap-1">
+                      <div className="text-sm text-gray-500 mt-1 space-y-1">
+                        <div className="flex items-center gap-1">
                           <i className="fas fa-calendar-alt"></i>
-                          {new Date(req.createdAt).toLocaleDateString('vi-VN')}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <i className="fas fa-hashtag"></i>
-                          {req.materialRequestID.substring(0, 8)}
-                        </span>
+                          {formatDate(req.createdAt, i18n.language)}
+                        </div>
+
+                        {req.deliveryDate && (
+                          <div className="flex items-center gap-1">
+                            <i className="fas fa-calendar-alt"></i>
+                            {t('userPage.materialRequestDetail.deliveryDate')}
+                            {': '}
+                            {formatDate(req.deliveryDate, i18n.language)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -339,6 +339,12 @@ export default function AdminMaterialRequestDetail() {
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="mb-6">
             <p className="text-xl font-semibold text-gray-800 mb-2">
+              {t('userPage.materialRequestDetail.deliveryDate')}
+            </p>
+            {formatDate(materialRequestDetail.deliveryDate, i18n.language)}
+          </div>
+          <div className="mb-6">
+            <p className="text-xl font-semibold text-gray-800 mb-2">
               {t('adminMaterialRequestManager.description')}
             </p>
             <div

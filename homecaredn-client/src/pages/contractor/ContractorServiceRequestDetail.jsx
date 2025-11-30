@@ -34,6 +34,8 @@ import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
+import { extractFileText } from '../../utils/extractFileText';
 //For TINY MCE
 
 const MAX_IMAGES = 5;
@@ -55,6 +57,7 @@ export default function ContractorServiceRequestDetail() {
   const [images, setImages] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState(null);
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [totalApplications, setTotalApplications] = useState(0);
@@ -378,17 +381,43 @@ export default function ContractorServiceRequestDetail() {
       toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
-
+  useEffect(() => {
+    if (description) {
+      const plainText =
+        new DOMParser().parseFromString(description, 'text/html').body
+          .textContent || '';
+      const errorMsg = detectSensitiveInfo(plainText);
+      setDescriptionError(errorMsg);
+    } else {
+      setDescriptionError(null);
+    }
+  }, [description]);
   // Image handlers
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
 
     if (files.length + images.length > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
+    const validFiles = [];
 
-    const mapped = files.map((file) => ({
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${file.name} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
@@ -403,15 +432,31 @@ export default function ContractorServiceRequestDetail() {
   const handleRemoveDocument = (doc) => {
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
   };
-  const handleDocumentChange = (e) => {
+  const handleDocumentChange = async (e) => {
     const files = Array.from(e.target.files);
 
     if (files.length + documents.length > 5) {
       toast.error(t('ERROR.MAXIMUM_DOCUMENTS'));
       return;
     }
+    const validFiles = [];
 
-    const mapped = files.map((file) => ({
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${file.name} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
@@ -556,6 +601,16 @@ export default function ContractorServiceRequestDetail() {
                   <p className="text-gray-900 font-medium">
                     {serviceRequest.floors}{' '}
                     {t('contractorServiceRequestDetail.floorsUnit')}
+                  </p>
+                </div>
+                <div className="col-span-full">
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                    <i className="fa-solid fa-calendar mr-2 text-gray-400" />
+                    {t('userPage.serviceRequest.label_timeLine')}
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {formatDate(serviceRequest.startDate, i18n.language)}
+                    {' - '} {formatDate(serviceRequest.endDate, i18n.language)}
                   </p>
                 </div>
               </div>
@@ -857,7 +912,12 @@ export default function ContractorServiceRequestDetail() {
                     onEditorChange={(content) => setDescription(content)}
                   />
                 </div>
-
+                {descriptionError && (
+                  <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    {t(descriptionError)}
+                  </p>
+                )}
                 {/* Images */}
                 <div>
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">

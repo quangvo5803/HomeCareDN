@@ -1251,6 +1251,16 @@ export default function MaterialRequestDetail() {
                 {addressText}
               </span>
             </div>
+            <div className="flex flex-wrap gap-2 text-lg text-gray-800">
+              <span className="flex items-center gap-2">
+                <i className="fas fa-clock text-orange-500"></i>
+                {t('userPage.materialRequestDetail.deliveryDate')}
+                {': '}
+                <span className="font-bold">
+                  {formatDate(materialRequest.deliveryDate, i18n.language)}
+                </span>
+              </span>
+            </div>
           </div>
 
           {/* Material List */}

@@ -343,6 +343,7 @@
       "label_estimatePrice": "Giá dự kiến: ",
       "label_notEstimated": "Chưa ước tính",
       "label_packageOption": "Gói xây dựng: ",
+      "label_timeLine": "Thời gian xây dựng: ",
       "label_address": "Địa chỉ: ",
       "label_contractorApplyCount": "đơn ứng tuyển",
       "label_open": "Đang mở",
@@ -369,12 +370,15 @@
       "form_lengthPlaceholder": "Nhập chiều dài (mét)",
       "form_floor": "Số tầng",
       "form_floorPlaceholder": "Nhập số tầng",
+      "form_startDate":"Ngày bắt đầu thi công (dự kiến)",
+      "form_endDate": "Ngày kết thúc thi công (dự kiến)",
       "form_estimatePrice": "Giá ước tính",
       "form_estimatePricePlaceholder": "Nhập giá ước tính",
       "form_address": "Địa chỉ",
       "form_selectAddress": "Chọn địa chỉ",
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
+      "form_descriptionNote":"Vui lòng không nhập lại thông tin phía trên",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
       "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
       "uploading": "Đang tải lên",
@@ -439,6 +443,7 @@
       "descriptionsPlaceholder": "Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
       "address": "Địa chỉ",
       "selectAddress": "Chọn địa chỉ",
+      "deliveryDate": "Ngày giao hàng mong muốn",
       "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
       "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
       "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
@@ -1488,7 +1493,11 @@
     "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại",
     "FORBIDDEN": "Bạn không có quyền truy cập trang này!",
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
-    "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!"
+    "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
+
+    "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
+    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
+    
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1623,7 +1632,9 @@
     "sortCreateDateOld": "Cũ nhất",
     "Grid": "Lưới",
     "Table": "Bảng",
-    "All": "Tất cả"
+    "All": "Tất cả",
+    "SelectedContractor": "Nhà thầu được chọn",
+    "SelectedDistributor": "Nhà phân phối được chọn"
   },
   "commission": {
     "partner": {
@@ -1648,13 +1659,13 @@
     },
     "customer": {
       "expiredTitle": "Đơn ứng tuyển của đối tác đã bị từ chối",
-      "expiredMessage": "Do đối tác chưa hoàn tất phí hoa hồng, dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
-      "urgent": "Đang chờ đối tác hoàn tất thanh toán hoa hồng",
-      "less24h": "Nếu đối tác không thanh toán trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
-      "deadline": "Theo dõi tiến trình thanh toán hoa hồng của đối tác",
-      "completeNow": "⏳ Vui lòng chờ hệ thống cập nhật lại danh sách nhà thầu.",
-      "under24h": "⚠️ Đối tác sắp hết thời gian thanh toán, dịch vụ có thể sẽ được mở lại.",
-      "payBeforeDeadline": "Dịch vụ của bạn sẽ được mở lại tự động nếu đối tác không hoàn tất thanh toán đúng hạn."
+      "expiredMessage": "Do đối tác chưa hoàn tấtthủ tục để nhận dự án nên dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
+      "urgent": "Đang chờ đối tác hoàn tất thủ tục đăng kí nhận dự án",
+      "less24h": "Nếu đối tác không hoàn tất trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
+      "deadline": "Vui lòng đợi nhà thầu/nhà phân phối hoàn tất thủ tục",
+      "completeNow": "⏳ Vui lòng chờ hệ thống cập nhật lại danh sách nhà thầu/nhà phân phối.",
+      "under24h": "⚠️ Đối tác sắp hết thời gian hoàn tất thủ tục, dịch vụ có thể sẽ được mở lại.",
+      "payBeforeDeadline": "Dịch vụ của bạn sẽ được mở lại tự động nếu đối tác không hoàn tất thủ tục đúng hạn."
     },
     "days": "Ngày",
     "hours": "Giờ",

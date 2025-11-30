@@ -13,7 +13,8 @@ import { formatVND } from '../../utils/formatters';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
-
+import { detectSensitiveInfo } from '../../utils/detectSensitiveInfo';
+import { extractFileText } from '../../utils/extractFileText';
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
 const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
@@ -52,8 +53,12 @@ export default function ServiceRequestCreateUpdate() {
   const [width, setWidth] = useState('');
   const [length, setLength] = useState('');
   const [floors, setFloors] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [dateError, setDateError] = useState(null);
   const [estimatePrice, setEstimatePrice] = useState('');
   const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState(null);
   const [images, setImages] = useState([]);
   const [documents, setDocuments] = useState([]);
 
@@ -80,6 +85,8 @@ export default function ServiceRequestCreateUpdate() {
           setWidth(res.width || '');
           setLength(res.length || '');
           setFloors(res.floors || '');
+          setStartDate(res.startDate || '');
+          setEndDate(res.endDate || '');
           setEstimatePrice(res.estimatePrice || '');
           setDescription(res.description || '');
           setImages(
@@ -103,33 +110,96 @@ export default function ServiceRequestCreateUpdate() {
       setDesignStyle(passedService.designStyle || '');
     }
   }, [serviceRequestId, passedService, getServiceRequestById, t]);
+  useEffect(() => {
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
 
-  const handleImageChange = (e) => {
+      if (diffDays < 7) {
+        setDateError(t('ERROR.END_DATE_MIN_7_DAYS'));
+      } else {
+        setDateError(null);
+      }
+    }
+  }, [startDate, endDate, t]);
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
-    const mapped = files.map((file) => ({
+    const validFiles = [];
+    toast.info('Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát');
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${files.length - validFiles.length} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
     }));
     setImages((prev) => [...prev, ...mapped]);
   };
-  const handleDocumentChange = (e) => {
+
+  // Detect infomation in description
+  useEffect(() => {
+    if (description) {
+      const errorMsg = detectSensitiveInfo(description);
+      setDescriptionError(errorMsg);
+    } else {
+      setDescriptionError(null);
+    }
+  }, [description]);
+  const handleDocumentChange = async (e) => {
     const files = Array.from(e.target.files);
+
     if (files.length + documents.length > 5) {
       toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+      e.target.value = '';
       return;
     }
-    const mapped = files.map((file) => ({
+
+    const validFiles = [];
+
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${file.name} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
       name: file.name,
     }));
+
     setDocuments((prev) => [...prev, ...mapped]);
+
+    e.target.value = '';
   };
 
   const getFileNameFromUrl = (url) => {
@@ -182,10 +252,6 @@ export default function ServiceRequestCreateUpdate() {
         toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
         return;
       }
-      if (!description) {
-        toast.error(t('ERROR.REQUIRED_SERVICE_REQUEST_DESCRIPTION'));
-        return;
-      }
       if (images.length > MAX_IMAGES) {
         toast.error(t('ERROR.MAXIMUM_IMAGE'));
         return;
@@ -212,7 +278,7 @@ export default function ServiceRequestCreateUpdate() {
         Length: length,
         Floors: floors,
         EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
-        Description: description,
+        Description: description ?? null,
       };
       try {
         setImageProgress({
@@ -274,6 +340,8 @@ export default function ServiceRequestCreateUpdate() {
           payload.ServiceRequestID = serviceRequestId;
           await updateServiceRequest(payload);
         } else {
+          payload.StartDate = startDate;
+          payload.EndDate = endDate;
           await createServiceRequest(payload);
         }
 
@@ -295,18 +363,14 @@ export default function ServiceRequestCreateUpdate() {
     }
   };
 
-  // Xoá ảnh khỏi state
   const removeImageFromState = (img) => {
     setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
-  // Xử lý xoá ảnh (phân biệt ảnh mới / ảnh cũ)
   const handleRemoveImage = (img) => {
     if (img.isNew) {
-      // Ảnh mới chỉ xoá trong state
       removeImageFromState(img);
     } else {
-      // Ảnh cũ: confirm + gọi API xoá
       showDeleteModal({
         t,
         titleKey: t('ModalPopup.DeleteImageModal.title'),
@@ -599,22 +663,77 @@ export default function ServiceRequestCreateUpdate() {
                     )}
                   />
                 </div>
-                {width && length && floors ? (
-                  <p className="text-sm text-gray-600 mt-1 mb-2">
-                    {t('userPage.createServiceRequest.calculatedArea')}:{' '}
-                    <span className="font-semibold text-orange-600">
-                      {(
-                        Number(width) *
-                        Number(length) *
-                        Number(floors)
-                      ).toFixed(1)}{' '}
-                      m²
-                    </span>
-                  </p>
-                ) : (
-                  <p></p>
+
+                {/* Calculated Area - spans 2 columns */}
+                <div className="lg:col-span-2">
+                  {width && length && floors ? (
+                    <p className="text-sm text-gray-600 mt-1 mb-2">
+                      {t('userPage.createServiceRequest.calculatedArea')}:{' '}
+                      <span className="font-semibold text-orange-600">
+                        {(
+                          Number(width) *
+                          Number(length) *
+                          Number(floors)
+                        ).toFixed(1)}{' '}
+                        m²
+                      </span>
+                    </p>
+                  ) : (
+                    <p></p>
+                  )}
+                </div>
+
+                {/* Start Date */}
+                {!serviceRequestId && (
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <i className="fas fa-calendar-alt text-orange-500 mr-2"></i>
+                      {t('userPage.createServiceRequest.form_startDate')}
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      min={new Date().toISOString().split('T')[0]}
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    />
+                  </div>
                 )}
 
+                {/* End Date */}
+                {!serviceRequestId && (
+                  <div className="space-y-2">
+                    <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                      <i className="fas fa-calendar-alt text-orange-500 mr-2"></i>
+                      {t('userPage.createServiceRequest.form_endDate')}
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      min={
+                        startDate
+                          ? new Date(
+                              new Date(startDate).setDate(
+                                new Date(startDate).getDate() + 7
+                              )
+                            )
+                              .toISOString()
+                              .split('T')[0]
+                          : undefined
+                      }
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    />
+                    {dateError && (
+                      <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                        <i className="fas fa-exclamation-circle mr-2"></i>
+                        {dateError}
+                      </p>
+                    )}
+                  </div>
+                )}
                 {/* Address */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -646,8 +765,11 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-comment-alt text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_description')}
-                    <span className="text-red-500 ml-1">*</span>
                   </label>
+                  <p className="text-blue-500 text-sm font-medium flex items-center mt-2">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    {t('userPage.createServiceRequest.form_descriptionNote')}
+                  </p>
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -657,6 +779,13 @@ export default function ServiceRequestCreateUpdate() {
                       'userPage.createServiceRequest.form_descriptionPlaceholder'
                     )}
                   />
+
+                  {descriptionError && (
+                    <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                      <i className="fas fa-exclamation-circle mr-2"></i>
+                      {t(descriptionError)}
+                    </p>
+                  )}
                 </div>
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
@@ -863,7 +992,18 @@ export default function ServiceRequestCreateUpdate() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-orange-700 focus:ring-4 focus:ring-orange-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="inline-flex items-center px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-4 focus:ring-orange-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:bg-gray-400"
+                  disabled={
+                    !serviceType ||
+                    !packageOption ||
+                    !buildingType ||
+                    !mainStructureType ||
+                    !length ||
+                    !width ||
+                    !floors ||
+                    !addressID ||
+                    descriptionError
+                  }
                 >
                   <i className="fas fa-paper-plane mr-2"></i>
                   {serviceRequestId
