@@ -24,8 +24,8 @@ const ROLES = { USER: 'user', BOT: 'assistant' };
 const cn = (...xs) => xs.filter(Boolean).join(' ');
 
 // Keys local
-const STORAGE_KEY_SESSION = 'homecare_ai_session_id_v1';
-const STORAGE_KEY_MESSAGES = 'homecare_ai_messages_v1';
+const STORAGE_KEY_SESSION = 'homecare_ai_session_id';
+const STORAGE_KEY_MESSAGES = 'homecare_ai_messages';
 
 //AdminID
 const ADMIN_ID = import.meta.env.VITE_ADMIN_ID;
@@ -433,8 +433,11 @@ function ChatWindow({ open, onClose, brand }) {
         setAiMessages((prev) => [...prev, botMsg]);
       }
     } catch (err) {
-      const errorMsg = toAiUiMessage(`${t('supportChat.error')}`, ROLES.BOT);
-      setAiMessages((prev) => [...prev, errorMsg]);
+      const errorMessage = toAiUiMessage(
+        `${t('supportChat.error')}`,
+        ROLES.BOT
+      );
+      setAiMessages((prev) => [...prev, errorMessage]);
       console.error(err);
     } finally {
       setAiTyping(false);

@@ -696,6 +696,7 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
     "aiWelcome": "Xin chào! Tôi là trợ lý AI của bạn. Tôi có thể giúp gì cho bạn hôm nay?",
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
     "headerStatusReady": "Sẵn sàng hỗ trợ",
