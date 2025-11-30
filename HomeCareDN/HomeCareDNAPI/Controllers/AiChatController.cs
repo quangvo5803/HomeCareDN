@@ -20,7 +20,7 @@ namespace HomeCareDNAPI.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Chat([FromBody] AiChatRequestDto dto)
         {
-            var result = await _facadeService.AiChatService.ChatSupportAsync(dto.Prompt);
+            var result = await _facadeService.AiChatService.ChatSupportAsync(dto);
             return Ok(result);
         }
 

@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.Services.Interfaces;
+using Microsoft.Extensions.Caching.Distributed;
 using Ultitity.Clients.Groqs;
 using Ultitity.Exceptions;
 
@@ -9,6 +11,8 @@ namespace BusinessLogic.Services
     public class AiChatService : IAiChatService
     {
         private readonly IGroqClient _groq;
+        private readonly IDistributedCache _cache;
+
         private const string MESSAGE = "Message";
         private const string ERROR_EMPTY_MESSAGE = "EMPTY_MESSAGE";
 
@@ -30,14 +34,15 @@ namespace BusinessLogic.Services
               Yêu cầu: Trình bày bảng giá (Table Markdown), các hạng mục cần làm, và tổng chi phí ước tính (VNĐ).
               Cảnh báo: Ghi rõ đây chỉ là tham khảo.";
 
-        public AiChatService(IGroqClient groq)
+        public AiChatService(IGroqClient groq, IDistributedCache cache)
         {
             _groq = groq;
+            _cache = cache;
         }
 
-        public async Task<AiChatResponseDto> ChatSupportAsync(string message)
+        public async Task<AiChatResponseDto> ChatSupportAsync(AiChatRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(message))
+            if (string.IsNullOrWhiteSpace(dto.Prompt))
             {
                 var error = new Dictionary<string, string[]>
                 {
@@ -46,24 +51,19 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(error);
             }
 
-            var result = await _groq.ChatAsync(SYSTEM_PROMPT_CHAT, message);
+            var history = await GetHistoryFromCacheAsync(dto.SessionId);
 
-            var history = new List<AiChatMessageDto>
+            history.Add(new ChatHistoryItem { Role = "user", Content = dto.Prompt });
+
+            var result = await _groq.ChatAsync(history);
+
+            if (!string.IsNullOrEmpty(result))
             {
-                new AiChatMessageDto
-                {
-                    Role = "user",
-                    Content = message,
-                    TimestampUtc = DateTime.UtcNow,
-                },
-                new AiChatMessageDto
-                {
-                    Role = "assistant",
-                    Content = result,
-                    TimestampUtc = DateTime.UtcNow,
-                },
-            };
-            return new AiChatResponseDto { Reply = result, History = history };
+                history.Add(new ChatHistoryItem { Role = "assistant", Content = result });
+                await SaveHistoryToCacheAsync(dto.SessionId, history);
+            }
+
+            return new AiChatResponseDto { Reply = result };
         }
 
         public async Task<List<string>> SuggestSearchAsync(string query)
@@ -77,7 +77,13 @@ namespace BusinessLogic.Services
                 throw new CustomValidationException(error);
             }
 
-            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SUGGEST, query);
+            var messages = new List<object>
+            {
+                new { role = "system", content = SYSTEM_PROMPT_SUGGEST },
+                new { role = "user", content = query },
+            };
+
+            var result = await _groq.ChatAsync(messages);
 
             return ExtractJsonList(result, query);
         }
@@ -88,14 +94,64 @@ namespace BusinessLogic.Services
                 dto.Data != null
                     ? JsonSerializer.Serialize(dto.Data)
                     : "Không có thông số chi tiết";
-            var result = string.Format(SYSTEM_PROMPT_ESTIMATE, context);
+            var systemPrompt = string.Format(SYSTEM_PROMPT_ESTIMATE, context);
+            var messages = new List<object>
+            {
+                new { role = "system", content = systemPrompt },
+                new { role = "user", content = dto.Requirement },
+            };
 
-            return await _groq.ChatAsync(result, dto.Requirement);
+            return await _groq.ChatAsync(messages);
         }
 
         // -----------------------------
         // PRIVATE HELPER
         // -----------------------------
+        private async Task<List<ChatHistoryItem>> GetHistoryFromCacheAsync(string sessionId)
+        {
+            var key = $"chat_history_{sessionId}";
+
+            try
+            {
+                var json = await _cache.GetStringAsync(key);
+                if (string.IsNullOrEmpty(json))
+                {
+                    return new List<ChatHistoryItem>
+                    {
+                        new ChatHistoryItem { Role = "system", Content = SYSTEM_PROMPT_CHAT },
+                    };
+                }
+                return JsonSerializer.Deserialize<List<ChatHistoryItem>>(json)
+                    ?? new List<ChatHistoryItem>();
+            }
+            catch
+            {
+                return new List<ChatHistoryItem>
+                {
+                    new ChatHistoryItem { Role = "system", Content = SYSTEM_PROMPT_CHAT },
+                };
+            }
+        }
+
+        private async Task SaveHistoryToCacheAsync(string sessionId, List<ChatHistoryItem> history)
+        {
+            try
+            {
+                var key = $"chat_history_{sessionId}";
+                var options = new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromDays(3),
+                };
+
+                var result = JsonSerializer.Serialize(history);
+                await _cache.SetStringAsync(key, result, options);
+            }
+            catch
+            {
+                // Ignore cache save errors
+            }
+        }
+
         private static List<string> ExtractJsonList(string aiResponse, string originalQuery)
         {
             try
@@ -116,6 +172,18 @@ namespace BusinessLogic.Services
             {
                 return new List<string> { originalQuery };
             }
+        }
+
+        // -----------------------------
+        // PRIVATE CLASS HELPER
+        // -----------------------------
+        private class ChatHistoryItem
+        {
+            [JsonPropertyName("role")]
+            public string Role { get; set; } = "";
+
+            [JsonPropertyName("content")]
+            public string Content { get; set; } = "";
         }
     }
 }

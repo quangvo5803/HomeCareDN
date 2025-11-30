@@ -40,9 +40,8 @@ namespace Ultitity.Clients.Groqs
                     new { role = "system", content = systemPrompt },
                     new { role = "user", content = userPrompt },
                 },
-                temperature = 0.5,
+                temperature = 0.3,
                 max_tokens = 1024,
-                response_format = new { type = "json_object" },
             };
 
             try
@@ -71,6 +70,47 @@ namespace Ultitity.Clients.Groqs
                     }
                 }
 
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        public async Task<string> ChatAsync(object messages)
+        {
+            var payload = new
+            {
+                model = _model,
+                messages,
+                temperature = 0.3,
+                max_tokens = 1024,
+            };
+
+            try
+            {
+                using var response = await _http.PostAsJsonAsync(_path, payload);
+
+                if (!response.IsSuccessStatusCode)
+                    return string.Empty;
+
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+                if (
+                    json.TryGetProperty("choices", out JsonElement choices)
+                    && choices.GetArrayLength() > 0
+                )
+                {
+                    var firstChoice = choices[0];
+                    if (
+                        firstChoice.TryGetProperty("message", out JsonElement messageProp)
+                        && messageProp.TryGetProperty("content", out JsonElement contentProp)
+                    )
+                    {
+                        return contentProp.GetString() ?? string.Empty;
+                    }
+                }
                 return string.Empty;
             }
             catch

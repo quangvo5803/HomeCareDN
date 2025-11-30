@@ -701,6 +701,7 @@
     "no_applications": "No data to display"
   },
   "supportChat": {
+    "aiWelcome": "Hello! I'm your AI assistant. How can I help you today?",
     "headerTitle": "Assistant — Support for {{brand}}",
     "headerStatusReady": "Ready to help",
     "action": {

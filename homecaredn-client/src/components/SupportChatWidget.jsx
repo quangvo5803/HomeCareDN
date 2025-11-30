@@ -11,7 +11,6 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
-import { getSupportPrompt } from '../prompts/supportPrompt';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -23,6 +22,10 @@ import { conversationService } from '../services/conversationService';
 
 const ROLES = { USER: 'user', BOT: 'assistant' };
 const cn = (...xs) => xs.filter(Boolean).join(' ');
+
+// Keys local
+const STORAGE_KEY_SESSION = 'homecare_ai_session_id_v1';
+const STORAGE_KEY_MESSAGES = 'homecare_ai_messages_v1';
 
 //AdminID
 const ADMIN_ID = import.meta.env.VITE_ADMIN_ID;
@@ -51,16 +54,12 @@ const uid = (() => {
   };
 })();
 
-// Helper for AI
-const toAiUiMessage = (m) => ({
+// Helper for AI UI Message
+const toAiUiMessage = (text, role) => ({
   id: uid(),
-  role: m.role === 'assistant' ? ROLES.BOT : ROLES.USER,
-  text: m.content ?? m.text ?? '',
-  time:
-    m.time ??
-    (m.timestamp
-      ? new Date(m.timestamp).toTimeString().slice(0, 5)
-      : new Date().toTimeString().slice(0, 5)),
+  role: role,
+  text: text,
+  time: new Date().toTimeString().slice(0, 5),
 });
 
 const toAdminUiMessage = (m, currentUserId) => ({
@@ -141,6 +140,17 @@ function MessageBubble({ message }) {
     p: ({ children }) => (
       <p className="mb-1 last:mb-0 inline-block">{children}</p>
     ),
+    table: ({ children }) => (
+      <div className="overflow-x-auto my-2 border rounded">
+        <table className="min-w-full divide-y divide-gray-300 text-xs">
+          {children}
+        </table>
+      </div>
+    ),
+    th: ({ children }) => (
+      <th className="px-2 py-1 bg-gray-100 font-bold text-left">{children}</th>
+    ),
+    td: ({ children }) => <td className="px-2 py-1 border-t">{children}</td>,
   };
 
   return (
@@ -243,11 +253,6 @@ function ChatHeader({
               ? t('supportChat.action.expand')
               : t('supportChat.action.minimize')
           }
-          aria-label={
-            isMinimized
-              ? t('supportChat.action.expand')
-              : t('supportChat.action.minimize')
-          }
         >
           {isMinimized ? (
             <i className="fa-regular fa-square" />
@@ -259,7 +264,6 @@ function ChatHeader({
           onClick={onClose}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
           title={t('supportChat.action.close')}
-          aria-label={t('supportChat.action.close')}
         >
           <i className="fa-solid fa-xmark" />
         </button>
@@ -327,8 +331,8 @@ function ChatInput({ onSend, disabled, isLoading, countdown }) {
     if (countdown > 0) {
       return <span className="w-4 font-bold">{countdown}s</span>;
     }
-    return t('supportChat.send');
-  }, [isLoading, countdown, t]);
+    return <i className="fa-solid fa-paper-plane" />;
+  }, [isLoading, countdown]);
 
   return (
     <form onSubmit={submit} className="flex w-full items-end gap-2">
@@ -344,7 +348,7 @@ function ChatInput({ onSend, disabled, isLoading, countdown }) {
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="h-10 rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150 grid place-items-center font-medium"
+        className="h-10 rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-12 text-center transition-all duration-150 grid place-items-center font-medium"
       >
         {buttonText}
       </button>
@@ -360,7 +364,7 @@ ChatInput.propTypes = {
 };
 
 function ChatWindow({ open, onClose, brand }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
 
@@ -372,6 +376,7 @@ function ChatWindow({ open, onClose, brand }) {
   // State for AI
   const [aiMessages, setAiMessages] = useState([]);
   const [aiTyping, setAiTyping] = useState(false);
+  const [sessionId, setSessionId] = useState('');
 
   // State for Chat Admin
   const [adminMessages, setAdminMessages] = useState([]);
@@ -380,47 +385,57 @@ function ChatWindow({ open, onClose, brand }) {
   const [adminSending, setAdminSending] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const countdownRef = useRef(null);
-  const parseErr = (err) =>
-    err?.response?.data ?? err?.message ?? 'Bad request';
 
-  // ----- Logic cho AI Chat -----
-  const loadAiHistory = async () => {
-    try {
-      const raw = await aiChatService.history();
-      const list = Array.isArray(raw) ? raw.map(toAiUiMessage) : [];
-      setAiMessages(list);
-    } catch (error) {
-      toast.error(t(handleApiError(error)));
+  useEffect(() => {
+    if (open) {
+      let sid = localStorage.getItem(STORAGE_KEY_SESSION);
+      if (!sid) {
+        sid = uid();
+        localStorage.setItem(STORAGE_KEY_SESSION, sid);
+      }
+      setSessionId(sid);
+
+      try {
+        const savedMessags = localStorage.getItem(STORAGE_KEY_MESSAGES);
+        if (savedMessags) {
+          setAiMessages(JSON.parse(savedMessags));
+        } else {
+          setAiMessages([toAiUiMessage(t('supportChat.aiWelcome'), ROLES.BOT)]);
+        }
+      } catch {
+        setAiMessages([]);
+      }
     }
-  };
+  }, [open, t]);
+
+  useEffect(() => {
+    if (aiMessages.length > 0) {
+      localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(aiMessages));
+    }
+  }, [aiMessages]);
 
   const sendAiMessage = async (text) => {
     try {
       setAiTyping(true);
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          role: ROLES.USER,
-          text,
-          time: new Date().toTimeString().slice(0, 5),
-        },
-      ]);
-      await aiChatService.send({
+
+      const userMsg = toAiUiMessage(text, ROLES.USER);
+      setAiMessages((prev) => [...prev, userMsg]);
+
+      const dto = {
+        sessionId: sessionId,
         prompt: text,
-        system: getSupportPrompt(i18n.language),
-      });
-      await loadAiHistory();
+      };
+
+      const data = await aiChatService.chat(dto);
+
+      if (data && data.reply) {
+        const botMsg = toAiUiMessage(data.reply, ROLES.BOT);
+        setAiMessages((prev) => [...prev, botMsg]);
+      }
     } catch (err) {
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          role: ROLES.BOT,
-          text: `⚠️ ${parseErr(err)}`,
-          time: new Date().toTimeString().slice(0, 5),
-        },
-      ]);
+      const errorMsg = toAiUiMessage(`${t('supportChat.error')}`, ROLES.BOT);
+      setAiMessages((prev) => [...prev, errorMsg]);
+      console.error(err);
     } finally {
       setAiTyping(false);
     }
@@ -428,9 +443,7 @@ function ChatWindow({ open, onClose, brand }) {
 
   const loadAdminChatHistory = async (id) => {
     try {
-      const params = {
-        conversationID: id,
-      };
+      const params = { conversationID: id };
       const history = await chatMessageService.getMessagesByConversationID(
         params
       );
@@ -496,7 +509,6 @@ function ChatWindow({ open, onClose, brand }) {
       const createdMessageDto = await chatMessageService.sendMessageToAdmin(
         dto
       );
-
       setAdminMessages((prev) =>
         prev.map((m) =>
           m.id === tempId ? toAdminUiMessage(createdMessageDto, user.id) : m
@@ -510,7 +522,6 @@ function ChatWindow({ open, onClose, brand }) {
           adminID: ADMIN_ID,
         };
         setConversation(newConversation);
-
         if (chatConnection) {
           chatConnection.invoke(
             'JoinConversation',
@@ -526,12 +537,8 @@ function ChatWindow({ open, onClose, brand }) {
     }
 
     setAdminSending(false);
-    setCountdown(3); //Prevent Spawm Message
-
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-    }
-
+    setCountdown(3);
+    if (countdownRef.current) clearInterval(countdownRef.current);
     countdownRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -568,19 +575,12 @@ function ChatWindow({ open, onClose, brand }) {
   );
 
   useEffect(() => {
-    if (open) {
-      loadAiHistory();
-    } else {
+    if (!open) {
       setConversation(null);
-      setAiMessages([]);
       setAdminMessages([]);
-      setCurrentTab('AI');
       setAdminChatState('idle');
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
+      if (countdownRef.current) clearInterval(countdownRef.current);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   useEffect(() => {
@@ -594,8 +594,7 @@ function ChatWindow({ open, onClose, brand }) {
           .catch(() => {});
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentTab, adminChatState]);
+  }, [open, currentTab, adminChatState]); // eslint-disable-line
 
   const send = async (text) => {
     if (currentTab === 'AI') {
@@ -722,6 +721,7 @@ function ChatWindow({ open, onClose, brand }) {
     </div>
   );
 }
+
 ChatWindow.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
