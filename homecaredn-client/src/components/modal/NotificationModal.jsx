@@ -262,6 +262,8 @@ NotificationModal.propTypes = {
     notification: PropTypes.shape({
         title: PropTypes.string,
         message: PropTypes.string,
+        titleEN: PropTypes.string,
+        messageEN: PropTypes.string,
         type: PropTypes.string,
         targetRoles: PropTypes.string,
         updatedAt: PropTypes.string,

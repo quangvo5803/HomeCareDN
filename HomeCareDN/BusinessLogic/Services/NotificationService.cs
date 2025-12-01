@@ -78,43 +78,9 @@ namespace BusinessLogic.Services
                 .GetAsync(n => n.Type == NotificationType.Personal
                                 && n.DataKey == dto.DataKey, asNoTracking: false);
 
-            Notification noti;
-
-            if (existing != null && !existing.IsRead)
-            {
-                if (dto.Action == NotificationAction.Apply)
-                {
-                    existing.PendingCount++;
-                }
-                else if (dto.Action == NotificationAction.Accept ||
-                    dto.Action == NotificationAction.Reject || dto.Action == NotificationAction.Paid)
-                {
-                    existing.PendingCount = 0;
-                }
-
-                existing.Title = dto.Title;
-                existing.Message = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
-                    : dto.Title;
-                existing.MessageEN = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Have {existing.PendingCount} {dto.TitleEN!.ToLower()}."
-                    : dto.TitleEN;
-
-                existing.Action = dto.Action;
-                existing.UpdatedAt = DateTime.UtcNow;
-
-                noti = existing;
-            }
-            else
-            {
-                noti = _mapper.Map<Notification>(dto);
-                noti.Type = NotificationType.Personal;
-                noti.IsRead = false;
-                noti.PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0;
-                noti.CreatedAt = DateTime.UtcNow;
-                noti.UpdatedAt = DateTime.UtcNow;
-                await _unitOfWork.NotificationRepository.AddAsync(noti);
-            }
+            Notification noti = existing != null && !existing.IsRead
+                ? ExistingNotificationPersonal(existing, dto)
+                : await CreateNewNotificationPersonal(dto);
 
             await _unitOfWork.SaveAsync();
 
@@ -368,6 +334,53 @@ namespace BusinessLogic.Services
                 "updatedatdesc" => query.OrderByDescending(n => n.UpdatedAt),
                 _ => query.OrderByDescending(n => n.CreatedAt)
             };
+        }
+
+        private Notification ExistingNotificationPersonal
+            (Notification existing, NotificationPersonalCreateOrUpdateDto dto)
+        {
+            if (dto.Action == NotificationAction.Apply)
+            {
+                existing.PendingCount++;
+            }
+            else if (dto.Action is NotificationAction.Accept
+                  or NotificationAction.Reject
+                  or NotificationAction.Paid)
+            {
+                existing.PendingCount = 0;
+            }
+
+            existing.Title = dto.Title;
+
+            bool isMultipleApply = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply;
+
+            existing.Message = isMultipleApply
+                ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
+                : dto.Title;
+
+            existing.MessageEN = isMultipleApply
+                ? $"Have {existing.PendingCount} {dto.TitleEN!.ToLower()}."
+                : dto.TitleEN;
+
+            existing.Action = dto.Action;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            return existing;
+        }
+
+        private async Task<Notification> CreateNewNotificationPersonal(NotificationPersonalCreateOrUpdateDto dto)
+        {
+            var noti = _mapper.Map<Notification>(dto);
+
+            noti.Type = NotificationType.Personal;
+            noti.IsRead = false;
+            noti.PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0;
+            noti.CreatedAt = DateTime.UtcNow;
+            noti.UpdatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.NotificationRepository.AddAsync(noti);
+
+            return noti;
         }
 
     }
