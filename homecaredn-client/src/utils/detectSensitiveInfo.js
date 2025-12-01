@@ -40,7 +40,7 @@ const vietnameseToDigit = {
 const convertWordsToDigits = (text) => {
   let t = normalizeText(text);
   for (const [word, digit] of Object.entries(vietnameseToDigit)) {
-    const re = new RegExp(`\\b${word}\\b`, 'gi');
+    const re = new RegExp(word, 'gi'); // bỏ \b
     t = t.replace(re, digit);
   }
   return t;
