@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import DOMPurify from 'dompurify';
 import { useService } from '../hook/useService';
-import Loading from '../components/Loading';
+import LoadingComponent from '../components/LoadingComponent';
 import { Pagination } from 'antd';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -59,10 +59,9 @@ export default function ServiceItem({ itemServiceType }) {
     return t('home.default');
   };
 
-  const start = totalServices > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const start =
+    totalServices > 0 && !loading ? (currentPage - 1) * pageSize + 1 : 0;
   const end = Math.min(currentPage * pageSize, totalServices);
-
-  if (loading) return <Loading />;
 
   return (
     <div className="bg-white min-h-screen">
@@ -133,10 +132,12 @@ export default function ServiceItem({ itemServiceType }) {
                 {showSortDropdown && (
                   <>
                     {/* Backdrop */}
-                    <div
+                    <button
+                      type="button"
                       className="fixed inset-0 z-10"
                       onClick={() => setShowSortDropdown(false)}
-                    ></div>
+                      aria-label="Close dropdown"
+                    ></button>
 
                     {/* Dropdown Menu */}
                     <div className="absolute top-full mt-2 right-0 bg-white border border-gray-200 rounded shadow-lg z-20 min-w-[200px] overflow-hidden">
@@ -246,95 +247,112 @@ export default function ServiceItem({ itemServiceType }) {
             </div>
 
             {/* Service Cards Grid - IKEA Clean Layout */}
-            {services && services.length > 0 ? (
-              <div className="space-y-6">
-                {services.map((item) => (
-                  <Link
-                    to={`/ServiceDetail/${item.serviceID}`}
-                    key={item.serviceID}
-                    className="group block bg-white border border-gray-200 rounded-sm overflow-hidden hover:shadow-lg transition-all duration-300"
-                  >
-                    <div className="flex flex-col md:flex-row">
-                      {/* Image Container - IKEA square aesthetic */}
-                      <div className="md:w-2/5 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        <img
-                          src={
-                            item.imageUrls?.[0] ||
-                            'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
-                          }
-                          alt={item.name || 'Service image'}
-                          className="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      </div>
-
-                      {/* Content - Clean Typography */}
-                      <div className="md:w-3/5 p-6 md:p-8 flex flex-col justify-between">
-                        <div>
-                          <div className="flex items-start justify-between gap-4 mb-4">
-                            <h2 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
-                              {i18n.language === 'vi'
-                                ? item.name
-                                : item.nameEN || item.name}
-                            </h2>
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-3 mb-4">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full">
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              {t('serviceViewAll.verifiedLicense')}
-                            </span>
-
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
-                              <svg
-                                className="w-3.5 h-3.5"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              {t(`Enums.ServiceType.${item.serviceType}`)}
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* CTA Area */}
-                        <div className="pt-4 mt-auto">
-                          <div className="flex items-center text-blue-600 font-medium text-sm group-hover:gap-2 transition-all">
-                            <span>Xem chi tiết</span>
-                            <svg
-                              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 5l7 7-7 7"
-                              />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+            {loading ? (
+              <div className="flex flex-col items-center justify-center w-full h-96">
+                <LoadingComponent />
               </div>
+            ) : services && services.length > 0 ? (
+              <>
+                <div className="space-y-6">
+                  {services.map((item) => (
+                    <Link
+                      to={`/ServiceDetail/${item.serviceID}`}
+                      key={item.serviceID}
+                      className="group block bg-white border border-gray-200 rounded-sm overflow-hidden hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="flex flex-col md:flex-row">
+                        {/* Image Container - IKEA square aesthetic */}
+                        <div className="md:w-2/5 bg-gray-50 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={
+                              item.imageUrls?.[0] ||
+                              'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                            }
+                            alt={item.name || 'Service image'}
+                            className="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+
+                        {/* Content - Clean Typography */}
+                        <div className="md:w-3/5 p-6 md:p-8 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-start justify-between gap-4 mb-4">
+                              <h2 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                {i18n.language === 'vi'
+                                  ? item.name
+                                  : item.nameEN || item.name}
+                              </h2>
+                            </div>
+
+                            <div className="flex flex-wrap items-center gap-3 mb-4">
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full">
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                {t('serviceViewAll.verifiedLicense')}
+                              </span>
+
+                              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="currentColor"
+                                  viewBox="0 0 20 20"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                                {t(`Enums.ServiceType.${item.serviceType}`)}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* CTA Area */}
+                          <div className="pt-4 mt-auto">
+                            <div className="flex items-center text-blue-600 font-medium text-sm group-hover:gap-2 transition-all">
+                              <span>Xem chi tiết</span>
+                              <svg
+                                className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M9 5l7 7-7 7"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Pagination - Clean Design */}
+                <div className="flex justify-center mt-12 pt-8 border-t border-gray-200">
+                  <Pagination
+                    current={currentPage}
+                    pageSize={pageSize}
+                    total={totalServices}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                  />
+                </div>
+              </>
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-20 h-20 mb-6 rounded-full bg-gray-100 flex items-center justify-center">
@@ -355,19 +373,6 @@ export default function ServiceItem({ itemServiceType }) {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
                   {t('serviceViewAll.noService')}
                 </h3>
-              </div>
-            )}
-
-            {/* Pagination - Clean Design */}
-            {services && services.length > 0 && (
-              <div className="flex justify-center mt-12 pt-8 border-t border-gray-200">
-                <Pagination
-                  current={currentPage}
-                  pageSize={pageSize}
-                  total={totalServices}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                />
               </div>
             )}
           </main>

@@ -1649,6 +1649,8 @@
     "All": "All",
     "SelectedContractor": "Selected contractor",
     "SelectedDistributor": "Selected distributor",
+    "YouWasSelected":"You were selected",
+    "WasSelected":"Contractor/Distributor selected",
     "category": "Category",
     "brand": "Brand",
     "resetFilter": "Reset filter",

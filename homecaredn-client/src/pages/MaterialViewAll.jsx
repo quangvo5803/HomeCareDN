@@ -223,7 +223,7 @@ export default function MaterialViewAll() {
                         setShowCategoryDropdown(false);
                       }}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                        !selectedCategoryId ? 'font-semibold' : ''
+                        selectedCategoryId ? '' : 'font-semibold'
                       }`}
                     >
                       {t('common.All')}
@@ -280,7 +280,7 @@ export default function MaterialViewAll() {
                         setShowBrandDropdown(false);
                       }}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
-                        !selectedBrandId ? 'font-semibold' : ''
+                        selectedBrandId ? '' : 'font-semibold'
                       }`}
                     >
                       {t('common.All')}
@@ -396,14 +396,16 @@ export default function MaterialViewAll() {
 
       {/* Click outside to close dropdowns */}
       {(showSortDropdown || showCategoryDropdown || showBrandDropdown) && (
-        <div
+        <button
+          type="button"
           className="fixed inset-0 z-0"
           onClick={() => {
             setShowSortDropdown(false);
             setShowCategoryDropdown(false);
             setShowBrandDropdown(false);
           }}
-        ></div>
+          aria-label="Close dropdowns"
+        ></button>
       )}
     </div>
   );

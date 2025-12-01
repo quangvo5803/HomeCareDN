@@ -1638,6 +1638,8 @@
     "All": "Tất cả",
     "SelectedContractor": "Nhà thầu được chọn",
     "SelectedDistributor": "Nhà phân phối được chọn",
+    "YouWasSelected":"Bạn là người được chọn",
+    "WasSelected":"Đã chọn nhà thầu",
     "category":"Danh Mục",
     "brand":"Thương Hiệu",
     "resetFilter": "Đặt lại bộ lọc",

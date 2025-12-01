@@ -139,14 +139,14 @@ export default function CardItem({ item }) {
         {item.type === 'material' && (
           <div className="space-y-2">
             <button
-              onClick={(e) => handleAddNewMaterialRequest(e, item.materialID)}
+              onClick={() => handleAddNewMaterialRequest(item.materialID)}
               className="w-full py-2.5 border-2 border-black text-black font-bold text-sm bg-white  hover:border-orange-500 hover:text-orange-500"
             >
               {t('BUTTON.AddNewRequest')}
             </button>
 
             <button
-              onClick={(e) => handleAddExistingMaterialRequest(e)}
+              onClick={() => handleAddExistingMaterialRequest()}
               className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition-colors duration-200"
             >
               {t('BUTTON.AddToExisting')}
@@ -156,7 +156,7 @@ export default function CardItem({ item }) {
 
         {item.type === 'service' && (
           <button
-            onClick={(e) => handleAddNewServiceRequest(e, item)}
+            onClick={() => handleAddNewServiceRequest(item)}
             className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-colors duration-200"
           >
             {t('BUTTON.AddNewRequest')}
@@ -181,5 +181,6 @@ CardItem.propTypes = {
     serviceType: PropTypes.string,
     buildingType: PropTypes.string,
     imageUrls: PropTypes.arrayOf(PropTypes.string),
+    createdAt: PropTypes.string,
   }).isRequired,
 };

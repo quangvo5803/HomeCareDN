@@ -243,12 +243,12 @@ export default function MaterialRequestManager() {
                           (req.selectedDistributorApplicationID === user.id ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
                               <i className="fa-solid fa-user-check"></i>
-                              Bạn là người được chọn
+                              {t('common.YouWasSelected')}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                               <i className="fa-solid fa-user-check"></i>
-                              Đã chọn nhà thầu
+                              {t('common.WasSelected')}
                             </span>
                           ))}
                       </div>

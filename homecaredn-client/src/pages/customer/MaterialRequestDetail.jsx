@@ -1379,7 +1379,7 @@ export default function MaterialRequestDetail() {
                         {/* Status Row */}
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-lg text-slate-900 group-hover:text-orange-600 transition truncate">
-                            {t('roles.Distributor') + ' ' + { idx }}
+                            {`${t('roles.Distributor')} ${idx}`}
                           </h4>
 
                           <StatusBadge status={app.status} type="Application" />

@@ -134,7 +134,7 @@ export default function ServiceRequestCreateUpdate() {
       value: base * factor,
       formatted: (base * factor)
         .toString()
-        .replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
+        .replaceAll(/\B(?=(\d{3})+(?!\d))/g, '.'),
     }));
   }, [estimatePrice]);
 
@@ -371,7 +371,47 @@ export default function ServiceRequestCreateUpdate() {
     },
     [removeDocumentFromState, deleteServiceRequestDocument, serviceRequestId, t]
   );
+  const validateForm = () => {
+    if (!addressID) return t('ERROR.REQUIRED_ADDRESS');
+    if (!serviceType) return t('ERROR.REQUIRED_SERVICE_TYPE');
+    if (!packageOption) return t('ERROR.REQUIRED_PACKAGE_OPTION');
+    if (!buildingType) return t('ERROR.REQUIRED_BUILDING_TYPE');
+    if (!mainStructureType) return t('ERROR.REQUIRED_STRUCTURE_TYPE');
+    if (images.length > MAX_IMAGES) return t('ERROR.MAXIMUM_IMAGE');
+    if (documents.length > MAX_DOCUMENTS) return t('ERROR.MAXIMUM_DOCUMENT');
+    return null;
+  };
 
+  // 2️⃣ Upload helper
+  const uploadFilesToCloudinary = async (files, folder, type = 'image') => {
+    if (!files.length) return null;
+    return uploadToCloudinary(
+      files,
+      import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+      (progress) =>
+        type === 'image'
+          ? setImageProgress(progress)
+          : setDocumentProgress(progress),
+      folder,
+      type === 'document' ? 'raw' : undefined
+    );
+  };
+
+  // 3️⃣ Build payload
+  const buildPayload = () => ({
+    CustomerID: user.id,
+    AddressID: addressID,
+    ServiceType: serviceType,
+    PackageOption: packageOption,
+    BuildingType: buildingType,
+    MainStructureType: mainStructureType,
+    DesignStyle: designStyle,
+    Width: width,
+    Length: length,
+    Floors: floors,
+    EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
+    Description: description ?? null,
+  });
   // Submit handler
   const handleSubmit = useCallback(
     async (e) => {
@@ -379,57 +419,19 @@ export default function ServiceRequestCreateUpdate() {
       if (isSubmitting) return;
       setIsSubmitting(true);
 
+      const errorMessage = validateForm();
+      if (errorMessage) {
+        toast.error(errorMessage);
+        setIsSubmitting(false);
+        return;
+      }
+
+      const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
+      const newDocumentFiles = documents
+        .filter((d) => d.isNew)
+        .map((d) => d.file);
+
       try {
-        // Validation
-        if (!addressID) {
-          toast.error(t('ERROR.REQUIRED_ADDRESS'));
-          return;
-        }
-        if (!serviceType) {
-          toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
-          return;
-        }
-        if (!packageOption) {
-          toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
-          return;
-        }
-        if (!buildingType) {
-          toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
-          return;
-        }
-        if (!mainStructureType) {
-          toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
-          return;
-        }
-        if (images.length > MAX_IMAGES) {
-          toast.error(t('ERROR.MAXIMUM_IMAGE'));
-          return;
-        }
-        if (documents.length > MAX_DOCUMENTS) {
-          toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
-          return;
-        }
-
-        const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
-        const newDocumentFiles = documents
-          .filter((d) => d.isNew)
-          .map((d) => d.file);
-
-        const payload = {
-          CustomerID: user.id,
-          AddressID: addressID,
-          ServiceType: serviceType,
-          PackageOption: packageOption,
-          BuildingType: buildingType,
-          MainStructureType: mainStructureType,
-          DesignStyle: designStyle,
-          Width: width,
-          Length: length,
-          Floors: floors,
-          EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
-          Description: description ?? null,
-        };
-
         setImageProgress({
           loaded: 0,
           total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
@@ -438,30 +440,19 @@ export default function ServiceRequestCreateUpdate() {
           loaded: 0,
           total: newDocumentFiles.reduce((sum, f) => sum + f.size, 0),
         });
-
-        if (newImageFiles.length > 0 || newDocumentFiles.length > 0) {
+        if (newImageFiles.length || newDocumentFiles.length)
           setUploadProgress(1);
-        }
 
         const [imageResults, documentResults] = await Promise.all([
-          newImageFiles.length > 0
-            ? uploadToCloudinary(
-                newImageFiles,
-                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-                (progress) => setImageProgress(progress),
-                'HomeCareDN/ServiceRequest'
-              )
-            : Promise.resolve(null),
-          newDocumentFiles.length > 0
-            ? uploadToCloudinary(
-                newDocumentFiles,
-                import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-                (progress) => setDocumentProgress(progress),
-                'HomeCareDN/ServiceRequest/Documents',
-                'raw'
-              )
-            : Promise.resolve(null),
+          uploadFilesToCloudinary(newImageFiles, 'HomeCareDN/ServiceRequest'),
+          uploadFilesToCloudinary(
+            newDocumentFiles,
+            'HomeCareDN/ServiceRequest/Documents',
+            'document'
+          ),
         ]);
+
+        const payload = buildPayload();
 
         if (imageResults) {
           const arr = Array.isArray(imageResults)
@@ -498,6 +489,7 @@ export default function ServiceRequestCreateUpdate() {
         setIsSubmitting(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       isSubmitting,
       addressID,
