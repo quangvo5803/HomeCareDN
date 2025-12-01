@@ -336,7 +336,7 @@ namespace BusinessLogic.Services
             };
         }
 
-        private Notification ExistingNotificationPersonal
+        private static Notification ExistingNotificationPersonal
             (Notification existing, NotificationPersonalCreateOrUpdateDto dto)
         {
             if (dto.Action == NotificationAction.Apply)
