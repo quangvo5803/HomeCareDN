@@ -47,8 +47,7 @@
     "tinymce": "^8.1.2",
     "trim-canvas": "^0.1.2",
     "use-debounce": "^10.0.6",
-    "venobox": "^2.1.8",
-    "xlsx": "^0.18.5"
+    "venobox": "^2.1.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
