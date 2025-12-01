@@ -52,7 +52,7 @@ namespace WebApi.Repositories
             if (string.IsNullOrEmpty(publicId))
                 return false;
 
-            var deletionParams = new DeletionParams(publicId) { ResourceType = ResourceType.Raw };
+            var deletionParams = new DeletionParams(publicId);
             var result = await _cloudinary.DestroyAsync(deletionParams);
 
             if (result.Error != null)
