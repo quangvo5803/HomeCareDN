@@ -153,7 +153,6 @@ const phonePatterns = [/(?:\+?84|0)[\s.\-/()]*(?:\d[\s.\-/()]*){7,12}\d/];
 =========================== */
 export const detectSensitiveInfo = (rawText) => {
   if (!rawText || typeof rawText !== 'string') return null;
-
   // Phone / digits
   if (hasSuspiciousDigits(rawText)) return 'ERROR.DETECT_UNCESS_INFO';
 

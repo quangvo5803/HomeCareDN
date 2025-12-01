@@ -3,25 +3,22 @@ import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
 import Tesseract from 'tesseract.js';
 import JSZip from 'jszip';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
-  import.meta.url
-).toString();
+// FIX: Sử dụng CDN cho worker thay vì import.meta.url
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let worker = null;
 
-// Khởi tạo Tesseract worker với ngôn ngữ tiếng Việt từ local
+// Khởi tạo Tesseract worker với ngôn ngữ tiếng Việt
 async function initWorker() {
   if (!worker) {
     try {
-      // Sử dụng tessdata từ thư mục public/tessdata
-      // Bạn cần tải các file .traineddata về thư mục này
+      // FIX: Sử dụng CDN cho tessdata thay vì local path
       worker = await Tesseract.createWorker('vie+eng', 1, {
-        langPath: new URL('/tessdata', import.meta.url).toString(), // Đường dẫn đến thư mục chứa .traineddata files
+        langPath: '/tessdata',
         logger: () => {},
       });
 
-      // Set parameters để tránh warnings và tối ưu cho tiếng Việt
       await worker.setParameters({
         tessedit_pageseg_mode: Tesseract.PSM.AUTO,
         preserve_interword_spaces: '1',
@@ -61,7 +58,6 @@ async function preprocessImage(source, method = 'adaptive') {
   const data = imageData.data;
 
   if (method === 'adaptive') {
-    // Tính ngưỡng trung bình của ảnh
     let sum = 0;
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
@@ -69,14 +65,12 @@ async function preprocessImage(source, method = 'adaptive') {
     }
     const avgThreshold = sum / (data.length / 4);
 
-    // Áp dụng adaptive threshold
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
       const val = gray < avgThreshold ? 0 : 255;
       data[i] = data[i + 1] = data[i + 2] = val;
     }
   } else if (method === 'otsu') {
-    // Phương pháp Otsu's binarization (đơn giản hóa)
     const histogram = new Array(256).fill(0);
     for (let i = 0; i < data.length; i += 4) {
       const gray = Math.round(
@@ -85,7 +79,6 @@ async function preprocessImage(source, method = 'adaptive') {
       histogram[gray]++;
     }
 
-    // Tìm ngưỡng tối ưu
     const total = canvas.width * canvas.height;
     let sum = 0;
     for (let i = 0; i < 256; i++) sum += i * histogram[i];
@@ -112,7 +105,6 @@ async function preprocessImage(source, method = 'adaptive') {
       }
     }
 
-    // Áp dụng threshold
     for (let i = 0; i < data.length; i += 4) {
       const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
       const val = gray < threshold ? 0 : 255;
@@ -150,7 +142,7 @@ async function enhanceContrast(source) {
 
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
-  const factor = 1.5; // Hệ số tăng contrast
+  const factor = 1.5;
 
   for (let i = 0; i < data.length; i += 4) {
     data[i] = Math.min(255, (data[i] - 128) * factor + 128);
@@ -180,7 +172,6 @@ async function performOCR(source, quick = false) {
   try {
     const w = await initWorker();
 
-    // Quick mode: chỉ dùng 2 phương pháp tốt nhất
     if (quick) {
       const enhanced = await enhanceContrast(source);
       const resEnhanced = await w.recognize(enhanced);
@@ -193,10 +184,8 @@ async function performOCR(source, quick = false) {
         : resAdaptive.data.text;
     }
 
-    // Full mode: thử nhiều phương pháp
     const results = [];
 
-    // 1. Raw image
     try {
       const resRaw = await w.recognize(source);
       results.push(resRaw.data.text);
@@ -204,7 +193,6 @@ async function performOCR(source, quick = false) {
       console.warn('Raw OCR failed:', e);
     }
 
-    // 2. Enhanced contrast (thường tốt nhất cho ảnh chụp)
     try {
       const enhanced = await enhanceContrast(source);
       const resEnhanced = await w.recognize(enhanced);
@@ -213,7 +201,6 @@ async function performOCR(source, quick = false) {
       console.warn('Enhanced OCR failed:', e);
     }
 
-    // 3. Adaptive threshold (tốt cho ảnh scan)
     try {
       const adaptive = await preprocessImage(source, 'adaptive');
       const resAdaptive = await w.recognize(adaptive);
@@ -222,7 +209,6 @@ async function performOCR(source, quick = false) {
       console.warn('Adaptive OCR failed:', e);
     }
 
-    // 4. Otsu threshold (tốt cho ảnh có độ tương phản thấp)
     try {
       const otsu = await preprocessImage(source, 'otsu');
       const resOtsu = await w.recognize(otsu);
@@ -231,7 +217,6 @@ async function performOCR(source, quick = false) {
       console.warn('Otsu OCR failed:', e);
     }
 
-    // Chọn kết quả dài nhất
     if (results.length === 0) return '';
     return results.reduce((best, current) => {
       return current.length > best.length ? current : best;
@@ -244,17 +229,14 @@ async function performOCR(source, quick = false) {
 
 // Làm sạch text tiếng Việt
 function cleanOCRText(text) {
-  return (
-    text
-      // Giữ lại ký tự tiếng Việt, chữ cái, số, và dấu câu cơ bản
-      .replace(/[^\w\sÀ-ỹà-ỹĂăÂâĐđÊêÔôƠơŨũƯư.,:;!?@()\-+/'"]/g, '')
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean)
-      .join('\n')
-      .replace(/\s+/g, ' ')
-      .trim()
-  );
+  return text
+    .replace(/[^\w\sÀ-ỹà-ỹĂăÂâĐđÊêÔôƠơŨũƯư.,:;!?@()\-+/'"]/g, '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join('\n')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 // Extract text từ file với tùy chọn quick mode
@@ -285,7 +267,6 @@ async function extractPdf(file, useOCR = false, quickMode = false) {
     if (pageText.trim()) {
       text += pageText + '\n';
     } else if (useOCR) {
-      // Tăng scale lên 3.0 cho chất lượng tốt hơn
       const viewport = page.getViewport({ scale: 3.0 });
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
