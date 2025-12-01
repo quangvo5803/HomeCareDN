@@ -244,15 +244,17 @@ export default function ServiceRequestCreateUpdate() {
       }
 
       const validFiles = [];
-      toast.info(t('common.scanDocument'));
+
+      const toastId = toast.loading(t('common.scanDocument'));
 
       for (const file of files) {
         const content = await extractFileText(file);
         const error = detectSensitiveInfo(content);
-        if (!error) {
-          validFiles.push(file);
-        }
+
+        if (!error) validFiles.push(file);
       }
+
+      toast.dismiss(toastId);
 
       if (validFiles.length === 0) {
         const invalidCount = files.length - validFiles.length;
@@ -284,6 +286,9 @@ export default function ServiceRequestCreateUpdate() {
       }
 
       const validFiles = [];
+
+      const toastId = toast.loading(t('common.scanDocument'));
+
       for (const file of files) {
         const content = await extractFileText(file);
         const error = detectSensitiveInfo(content);
@@ -299,6 +304,7 @@ export default function ServiceRequestCreateUpdate() {
         e.target.value = '';
         return;
       }
+      toast.dismiss(toastId);
 
       const mapped = validFiles.map((file) => ({
         file,

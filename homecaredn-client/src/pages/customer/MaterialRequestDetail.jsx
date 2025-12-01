@@ -223,8 +223,9 @@ export default function MaterialRequestDetail() {
     hasCanAddMaterialChanges ||
     hasDeliveryDateChanges;
 
-  const canShowSaveCancel = hasAnyChanges;
-  const canShowSend = items.length > 0 && addressID;
+  const canShowSaveCancel = hasAnyChanges && !descriptionError;
+  const canShowSend =
+    items.length > 0 && addressID && deliveryDate && !descriptionError;
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (description) {
@@ -1125,13 +1126,13 @@ export default function MaterialRequestDetail() {
         {/* Header with Status */}
         <div className="flex items-center gap-6 mb-6">
           <div className="w-[88px] h-[88px] rounded-full flex items-center justify-center bg-[#FB8C00] text-white text-[36px] font-bold shadow-md">
-            {t('roles.Distributor')}
+            D
           </div>
 
           <div className="flex flex-col flex-1">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-slate-900">
-                {t('roles.Distributor ')}
+                {t('roles.Distributor')}
               </h2>
               <StatusBadge
                 status={selectedDistributor.status}
@@ -1142,7 +1143,7 @@ export default function MaterialRequestDetail() {
             <div className="flex items-center gap-3 mt-2 text-slate-600 text-sm">
               <span className="flex items-center gap-1 text-orange-500 font-semibold">
                 <i className="fas fa-star" />
-                {selectedDistributor.averageRating ?? 0}
+                {selectedDistributor.averageRating.toFixed(1)}
               </span>
 
               <span className="text-slate-300">•</span>
@@ -1373,13 +1374,13 @@ export default function MaterialRequestDetail() {
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-                        {t('roles.Distributor')}
+                        D
                       </div>
                       <div className="flex-1 min-w-0">
                         {/* Status Row */}
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-lg text-slate-900 group-hover:text-orange-600 transition truncate">
-                            {`${t('roles.Distributor')} ${idx}`}
+                            {`${t('roles.Distributor')} ${idx + 1}`}
                           </h4>
 
                           <StatusBadge status={app.status} type="Application" />
@@ -1389,7 +1390,9 @@ export default function MaterialRequestDetail() {
                         <div className="flex items-center gap-3 text-sm text-slate-700">
                           <span className="flex items-center gap-1 text-yellow-500 font-bold">
                             <i className="fas fa-star text-base"></i>
-                            <span className="text-sm">{app.averageRating}</span>
+                            <span className="text-sm">
+                              {app.averageRating.toFixed(1)}
+                            </span>
                           </span>
 
                           <span className="text-slate-400">•</span>
@@ -1621,14 +1624,16 @@ export default function MaterialRequestDetail() {
               <div className="mb-8 pb-8 border-b border-slate-200">
                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
                   <i className="fas fa-map-marker-alt text-orange-600 mr-2"></i>
-                  {t('userPage.materialRequestDetail.address')}
+                  {t('userPage.materialRequestDetail.address')}{' '}
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 {renderAddress()}
               </div>
               <div className="mb-8 pb-8 border-b border-slate-200">
                 <label className="block text-sm font-bold text-slate-700 mb-3 uppercase tracking-wide">
                   <i className="fas fa-calendar text-orange-600 mr-2"></i>
-                  {t('userPage.materialRequestDetail.deliveryDate')}
+                  {t('userPage.materialRequestDetail.deliveryDate')}{' '}
+                  <span className="text-red-500 ml-1">*</span>
                 </label>
                 {renderDeliveryDate()}
               </div>
