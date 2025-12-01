@@ -52,7 +52,7 @@ const hasSuspiciousDigits = (rawText = '') => {
 
   const digitsOnly = converted.replace(/\D/g, '');
 
-  return /\d{9,11}/.test(digitsOnly);
+  return /\d{8,11}/.test(digitsOnly);
 };
 
 /* ===========================
