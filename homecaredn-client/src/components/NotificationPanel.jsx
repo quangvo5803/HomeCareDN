@@ -120,8 +120,12 @@ export default function NotificationPanel({ notifications = [], loading, user })
                             <div className="w-2 h-2 mt-2 rounded-full bg-orange-500 flex-shrink-0 shadow-sm shadow-orange-300" />
                         )}
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-gray-800 mb-1">{n.title}</h4>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-2">{n.message}</p>
+                            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+                                {i18n.language === 'vi' ? n.title : n.titleEN || n.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                                {i18n.language === 'vi' ? n.message : n.messageEN || n.message}
+                            </p>
                             <span className="text-xs text-orange-600 font-medium">
                                 {formatDate(n.updatedAt, i18n.language)}
                             </span>

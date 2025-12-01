@@ -13,9 +13,12 @@ export default function NotificationModal({
     user
 }) {
     const { t, i18n } = useTranslation();
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const [title, setTitle] = useState('');
     const [message, setMessage] = useState('');
+    const [titleEN, setTitleEN] = useState('');
+    const [messageEN, setMessageEN] = useState('');
     const [targetRoles, setTargetRoles] = useState([]);
 
     const roles = [
@@ -29,10 +32,14 @@ export default function NotificationModal({
         if (isOpen && notification) {
             setTitle(notification.title || '');
             setMessage(notification.message || '');
+            setTitleEN(notification.titleEN || '');
+            setMessageEN(notification.messageEN || '');
             setTargetRoles(notification.targetRoles || []);
         } else if (isOpen) {
             setTitle('');
             setMessage('');
+            setTitleEN('');
+            setMessageEN('');
             setTargetRoles([]);
         }
     }, [isOpen, notification]);
@@ -63,6 +70,8 @@ export default function NotificationModal({
             const data = {
                 Title: title || '',
                 Message: message || '',
+                TitleEN: titleEN || '',
+                MessageEN: messageEN || '',
                 TargetRoles: targetRoles.join(',') || '',
                 SenderUserId: user.id
             };
@@ -76,7 +85,7 @@ export default function NotificationModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-auto p-8 flex flex-col max-h-[90vh]">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-auto p-8 flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="flex items-center justify-between pb-4 border-b">
                     <h3 className="text-2xl font-semibold text-gray-900">{viewOnly ? t('adminNotifyManager.detail') : t('adminNotifyManager.buttonCreate')}</h3>
@@ -90,7 +99,7 @@ export default function NotificationModal({
                     {/* Title */}
                     <div>
                         <label className="block mb-2 text-sm font-medium text-gray-700">
-                            {t('adminNotifyManager.title')} <span className="text-red-500">*</span>
+                            {t('adminNotifyManager.titleVI')} <span className="text-red-500">*</span>
                         </label>
                         {viewOnly ? (
                             <p className="px-4 py-3 border rounded-xl bg-gray-50 text-gray-700">{title}</p>
@@ -108,7 +117,7 @@ export default function NotificationModal({
                     {/* Message */}
                     <div>
                         <label className="block mb-2 text-sm font-medium text-gray-700">
-                            {t('adminNotifyManager.message')} <span className="text-red-500">*</span>
+                            {t('adminNotifyManager.messageVI')} <span className="text-red-500">*</span>
                         </label>
                         {viewOnly ? (
                             <p className="px-4 py-3 border rounded-xl bg-gray-50 text-gray-700">{message}</p>
@@ -120,6 +129,61 @@ export default function NotificationModal({
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                             />
+                        )}
+                    </div>
+
+                    {/* Expand/Collapse */}
+                    <div>
+                        {/* Nút Expand/Collapse */}
+                        <button
+                            type="button"
+                            onClick={() => setIsExpanded(!isExpanded)}
+                            className="flex items-center gap-1 text-sm font-medium text-gray-700 cursor-pointer"
+                        >
+                            <i className="fas fa-globe"></i>
+                            {t('adminBrandManager.brandModal.multilanguage_for_data')}
+                            <span>{isExpanded ? '▲' : '▼'}</span>
+                        </button>
+
+                        {/* Nội dung expand */}
+                        {isExpanded && (
+                            <div className="p-3">
+                                {/* Title EN */}
+                                <div>
+                                    <label className="block mb-2 text-sm font-medium text-gray-700">
+                                        {t('adminNotifyManager.titleEN')}
+                                    </label>
+                                    {viewOnly ? (
+                                        <p className="px-4 py-3 border rounded-xl bg-gray-50 text-gray-700">{titleEN || '-'}</p>
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            placeholder={t('adminNotifyManager.enterTitleEN')}
+                                            value={titleEN}
+                                            onChange={(e) => setTitleEN(e.target.value)}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Message EN */}
+                                <div>
+                                    <label className="block mb-2 mt-2 text-sm font-medium text-gray-700">
+                                        {t('adminNotifyManager.messageEN')}
+                                    </label>
+                                    {viewOnly ? (
+                                        <p className="px-4 py-3 border rounded-xl bg-gray-50 text-gray-700">{messageEN || '-'}</p>
+                                    ) : (
+                                        <textarea
+                                            className="w-full px-4 py-3 border rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            rows="5"
+                                            placeholder={t('adminNotifyManager.enterMessEN')}
+                                            value={messageEN}
+                                            onChange={(e) => setMessageEN(e.target.value)}
+                                        />
+                                    )}
+                                </div>
+                            </div>
                         )}
                     </div>
 

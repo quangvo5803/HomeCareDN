@@ -176,7 +176,7 @@
   },
   "materialViewAll": {
     "listMaterial": "Danh sách vật liệu",
-    "filter":"Lọc vật liệu",
+    "filter": "Lọc vật liệu",
     "filterCategory": "Danh mục vật liệu",
     "filterBrand": "Thương hiệu vật liệu",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
@@ -371,7 +371,7 @@
       "form_lengthPlaceholder": "Nhập chiều dài (mét)",
       "form_floor": "Số tầng",
       "form_floorPlaceholder": "Nhập số tầng",
-      "form_startDate":"Ngày bắt đầu thi công (dự kiến)",
+      "form_startDate": "Ngày bắt đầu thi công (dự kiến)",
       "form_endDate": "Ngày kết thúc thi công (dự kiến)",
       "form_estimatePrice": "Giá ước tính",
       "form_estimatePricePlaceholder": "Nhập giá ước tính",
@@ -379,7 +379,7 @@
       "form_selectAddress": "Chọn địa chỉ",
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
-      "form_descriptionNote":"Vui lòng không nhập lại thông tin phía trên",
+      "form_descriptionNote": "Vui lòng không nhập lại thông tin phía trên",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
       "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
       "uploading": "Đang tải lên",
@@ -1242,8 +1242,8 @@
     "subtitle": "Danh sách thông báo cho người dùng trong hệ thống",
     "notifications": "thông báo",
     "no": "STT",
-    "title1": "Tiêu đề",
-    "message": "Nội dung",
+    "titleVI": "Tiêu đề",
+    "messageVI": "Nội dung",
     "type": "Loại",
     "System": "Hệ thống",
     "receiver": "Người nhận",
@@ -1259,7 +1259,11 @@
     "enterTitle": "Nhập tiêu đề ...",
     "enterMess": "Nhập nội dung ...",
     "empty": "Không tìm thấy thông báo nào",
-    "empty_description": "Hiện tại không có thông báo nào."
+    "empty_description": "Hiện tại không có thông báo nào.",
+    "titleEN": "Tiêu đề (Tiếng anh)",
+    "messageEN": "Nội dung (Tiếng anh)",
+    "enterTitleEN": "Nhập tiêu đề bằng tiếng anh ...",
+    "enterMessEN": "Nhập nội dung bằng tiếng anh ..."
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
@@ -1525,7 +1529,6 @@
 
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
     "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
-    
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1652,7 +1655,7 @@
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search": "Tìm kiếm...",
-    "sort":"Sắp xếp",
+    "sort": "Sắp xếp",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
@@ -1665,13 +1668,13 @@
     "All": "Tất cả",
     "SelectedContractor": "Nhà thầu được chọn",
     "SelectedDistributor": "Nhà phân phối được chọn",
-    "YouWasSelected":"Bạn là người được chọn",
-    "WasSelected":"Đã chọn nhà thầu",
-    "category":"Danh Mục",
-    "brand":"Thương Hiệu",
+    "YouWasSelected": "Bạn là người được chọn",
+    "WasSelected": "Đã chọn nhà thầu",
+    "category": "Danh Mục",
+    "brand": "Thương Hiệu",
     "resetFilter": "Đặt lại bộ lọc",
     "Download": "Tải xuống",
-    "scanDocument":"Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
+    "scanDocument": "Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
     "file_unnecessary": "{{count}} file chứa thông tin không cần thiết"
   },
   "commission": {

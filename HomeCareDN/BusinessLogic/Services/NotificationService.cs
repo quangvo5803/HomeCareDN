@@ -58,7 +58,7 @@ namespace BusinessLogic.Services
                     if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
                     {
                         dto.Message = $"Có {dto.PendingCount} {dto.Message.ToLower()}";
-                        dto.MessageEN = $"Have {dto.PendingCount} {dto.MessageEN.ToLower()}";
+                        dto.MessageEN = $"Have {dto.PendingCount} {dto.MessageEN!.ToLower()}";
                     }
                 }
             }
@@ -97,7 +97,7 @@ namespace BusinessLogic.Services
                     ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
                     : dto.Title;
                 existing.MessageEN = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Have {existing.PendingCount} {dto.TitleEN.ToLower()}."
+                    ? $"Have {existing.PendingCount} {dto.TitleEN!.ToLower()}."
                     : dto.TitleEN;
 
                 existing.Action = dto.Action;
@@ -306,7 +306,7 @@ namespace BusinessLogic.Services
                ? $"Có {noti.PendingCount} {noti.Title.ToLower()}"
                : noti.Title;
             dto.TitleEN = noti.PendingCount > 1
-               ? $"Have {noti.PendingCount} {noti.TitleEN.ToLower()}"
+               ? $"Have {noti.PendingCount} {noti.TitleEN!.ToLower()}"
                : noti.TitleEN;
 
             await SendToRolesAsync

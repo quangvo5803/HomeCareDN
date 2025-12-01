@@ -70,6 +70,10 @@ export default function Header() {
 
   // Use realtime
   const handleNotification = (payload) => {
+    const displayMessage =
+      i18n.language === 'vi'
+        ? payload.message
+        : payload.messageEN || payload.message;
     setNotifications(prev => {
       const exists = prev.some(n => n.notificationID === payload.notificationID);
       if (exists) return prev;
@@ -77,11 +81,10 @@ export default function Header() {
     });
 
     toast.info(
-      <div
-        dangerouslySetInnerHTML={{
-          __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-        }}
-      />,
+      <div>
+        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
+        {displayMessage}
+      </div>,
       {
         position: "top-right",
         autoClose: 3000,

@@ -9,8 +9,8 @@ namespace DataAccess.Entities.Application
         public NotificationType Type { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
-        public string TitleEN { get; set; } = string.Empty;
-        public string MessageEN { get; set; } = string.Empty;
+        public string? TitleEN { get; set; }
+        public string? MessageEN { get; set; }
         public string? TargetRoles { get; set; }
         public Guid? TargetUserId { get; set; }
         public Guid? SenderUserId { get; set; } // cho admin send notify

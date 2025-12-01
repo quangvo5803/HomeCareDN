@@ -152,7 +152,9 @@ export default function AdminNotificationManager() {
                         {(currentPage - 1) * pageSize + idx + 1}
                     </span>
                 </td>
-                <td className="px-4 py-4 font-bold text-gray-900">{item.title}</td>
+                <td className="px-4 py-4 font-bold text-gray-900">
+                    {i18n.language === 'vi' ? item.title : item.titleEN || item.title}
+                </td>
                 <td className="px-4 py-4 text-gray-700">
                     <span className="px-3 py-1 text-sm font-medium text-purple-800 bg-purple-100 rounded-full">
                         {t(`adminNotifyManager.${item.type}`)}
@@ -308,7 +310,7 @@ export default function AdminNotificationManager() {
                             <thead>
                                 <tr className="h-12 bg-gray-50 border-b">
                                     <th className="px-4 py-4">{t('adminNotifyManager.no')}</th>
-                                    <th className="px-4 py-4">{t('adminNotifyManager.title1')}</th>
+                                    <th className="px-4 py-4">{t('adminNotifyManager.titleVI')}</th>
                                     <th className="px-4 py-4">{t('adminNotifyManager.type')}</th>
                                     <th className="px-4 py-4">{t('adminNotifyManager.receiver')}</th>
                                     <th className="px-4 py-4">{t('adminNotifyManager.createAt')}</th>

@@ -13,13 +13,20 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import useRealtime from '../../realtime/useRealtime';
 
 export default function DistributorLayout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
 
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   //Real time
-  const handleNotification = (payload, titleKey) => {
+  const handleNotification = (payload) => {
+    const titleKey = i18n.language === 'vi' ? 'title' : 'titleEN';
+
+    const displayTitle =
+      titleKey === 'titleEN' && !payload.titleEN
+        ? payload.title
+        : payload[titleKey];
+
     setNotifications(prev => {
       const exists = prev.some(n => n.notificationID === payload.notificationID);
       if (exists) return prev;
@@ -28,11 +35,10 @@ export default function DistributorLayout() {
     });
 
     toast.info(
-      <div
-        dangerouslySetInnerHTML={{
-          __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload[titleKey]}`
-        }}
-      />,
+      <div>
+        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
+        {displayTitle}
+      </div>,
       {
         position: "top-right",
         autoClose: 3000,
@@ -41,15 +47,14 @@ export default function DistributorLayout() {
   };
 
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => handleNotification(payload, 'title'),
-    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => handleNotification(payload, 'title'),
+    [RealtimeEvents.NotificationCreated]: handleNotification,
+    [RealtimeEvents.NotificationApplicationUpdate]: handleNotification,
     [RealtimeEvents.NotificationDeleted]: (notificationId) => {
       setNotifications(prev =>
         prev.filter(n => n.notificationID !== notificationId)
       );
     },
   });
-
 
   useEffect(() => {
     if (!user) return;

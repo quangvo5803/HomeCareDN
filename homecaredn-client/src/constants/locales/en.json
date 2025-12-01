@@ -177,7 +177,7 @@
   },
   "materialViewAll": {
     "listMaterial": "List of materials",
-    "filter":"Filter Material",
+    "filter": "Filter Material",
     "filterCategory": "Material category",
     "filterBrand": "Material brand",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
@@ -371,7 +371,7 @@
       "form_lengthPlaceholder": "Enter length in meters",
       "form_floor": "Number of Floors",
       "form_floorPlaceholder": "Enter number of floors",
-      "form_startDate":"Construction start date (expected)",
+      "form_startDate": "Construction start date (expected)",
       "form_endDate": "Construction end date (expected)",
       "form_estimatePrice": "Estimate Price",
       "form_estimatePricePlaceholder": "Enter estimate price",
@@ -379,7 +379,7 @@
       "form_selectAddress": "Select address",
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
-      "form_descriptionNote":"Please do not re-enter the above information.",
+      "form_descriptionNote": "Please do not re-enter the above information.",
       "form_images": "Reference / Current State (Maximum 5 images)",
       "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
@@ -1248,8 +1248,8 @@
     "subtitle": "List of notifications for users in the system",
     "notifications": "notifications",
     "no": "No.",
-    "title1": "Title",
-    "message": "Message",
+    "titleVI": "Title",
+    "messageVI": "Message",
     "type": "Type",
     "System": "System",
     "receiver": "Receiver",
@@ -1265,7 +1265,11 @@
     "enterTitle": "Enter title ...",
     "enterMess": "Enter message ...",
     "empty": "No notifications found",
-    "empty_description": "There are currently no announcements."
+    "empty_description": "There are currently no announcements.",
+    "titleEN": "Title (English)",
+    "messageEN": "Message (English)",
+    "enterTitleEN": "Enter title with english ...",
+    "enterMessEN": "Enter message with english ..."
   },
   "chat": {
     "unlocked": "Chat has been unlocked!",
@@ -1536,8 +1540,6 @@
 
     "EMPTY_DESCRIPTION": "Please provide a detailed description!",
     "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
-
-
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1676,15 +1678,14 @@
     "All": "All",
     "SelectedContractor": "Selected contractor",
     "SelectedDistributor": "Selected distributor",
-    "YouWasSelected":"You were selected",
-    "WasSelected":"Contractor/Distributor selected",
+    "YouWasSelected": "You were selected",
+    "WasSelected": "Contractor/Distributor selected",
     "category": "Category",
     "brand": "Brand",
     "resetFilter": "Reset filter",
     "Download": "Download",
-    "scanDocument":"Analyzing image/document please wait a moment",
+    "scanDocument": "Analyzing image/document please wait a moment",
     "file_unnecessary": "{{count}} file contain unnecessary information"
-
   },
   "commission": {
     "partner": {
@@ -1716,7 +1717,7 @@
       "completeNow": "⏳ Please wait for the system to update the list of contractors/distributors.",
       "under24h": "⚠️ The partner is about to run out of time to complete the procedure, the service may be reopened.",
       "payBeforeDeadline": "Your service will be reopened automatically if the partner does not complete the procedure on time."
-      },
+    },
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",
