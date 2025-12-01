@@ -14,6 +14,7 @@ const normalizeText = (text = '') => {
   return t;
 };
 
+// Map chữ số Việt → số
 const vietnameseToDigit = {
   khong: '0',
   không: '0',
@@ -40,23 +41,22 @@ const vietnameseToDigit = {
 const convertWordsToDigits = (text) => {
   let t = normalizeText(text);
   for (const [word, digit] of Object.entries(vietnameseToDigit)) {
-    const re = new RegExp(word, 'gi'); // bỏ \b
+    const re = new RegExp(word, 'gi'); // bắt cả khi liền chữ
     t = t.replace(re, digit);
   }
   return t;
 };
 
+// Bắt tất cả số 8–13 chữ số (rải, liền, chữ + số)
 const hasSuspiciousDigits = (rawText = '') => {
-  const norm = normalizeText(rawText);
-  const converted = convertWordsToDigits(norm);
-
+  if (!rawText) return false;
+  const converted = convertWordsToDigits(rawText);
   const digitsOnly = converted.replace(/\D/g, '');
-
-  return /\d{8,11}/.test(digitsOnly);
+  return /\d{8,13}/.test(digitsOnly);
 };
 
 /* ===========================
-   Prepare geo names
+   Geo names
 =========================== */
 const removeAdminPrefix = (name = '') =>
   normalizeText(name).replace(
@@ -88,60 +88,90 @@ const geoNamesList = Array.from(geoNames)
   .sort((a, b) => b.length - a.length);
 
 /* ===========================
-   Patterns
+   Normalize email tricks
 =========================== */
-const phonePatterns = [
-  /(?:\+?84|0)[\s.\-/()]*(?:\d[\s.\-/()]*){8,12}\d/,
-  /(?:\b(?:khong|mot|hai|ba|bon|nam|sau|bay|tam|chin)\b(?:\s+(?:khong|mot|hai|ba|bon|nam|sau|bay|tam|chin)){7,12})/i,
-];
-
-const idPatterns = [/(?:cmnd|cccd|chung\s*minh|passport)\s*[:=]?\s*\d{6,12}/i];
-
-const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i;
+const emailCharMap = {
+  ',': '.',
+  '，': '.',
+  '｡': '.',
+  '﹒': '.',
+  '﹐': '.',
+  '．': '.',
+  '＠': '@',
+  ' ': '',
+  '　': '',
+};
+const normalizeEmail = (text = '') => {
+  let t = text.toLowerCase();
+  for (const [k, v] of Object.entries(emailCharMap)) {
+    const re = new RegExp(k.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g');
+    t = t.replace(re, v);
+  }
+  t = t.replace(/\s*@\s*/g, '@').replace(/\s*\.\s*/g, '.');
+  return t;
+};
+const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/;
 
 /* ===========================
    Detect address
 =========================== */
 const detectAddress = (rawText = '') => {
   if (!rawText) return false;
-
   const norm = normalizeText(rawText)
     .replace(/[.,;!?]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 
-  // Số nhà
   const housePattern =
     /(?:s?o|nha|nhà|so|nha\s+so|nha-so|số)[:.\s-]*\d+[a-zA-Z]?(?:\/\d+)?/i;
   if (housePattern.test(norm)) return true;
 
-  // Số + đường
   const streetPattern =
     /\d+[a-zA-Z]?(?:\/\d+)?\s*(?:duong|phố|pho|hem|đường|xa|xã|phuong|phường|quan|quận|tp|thanh\s+pho)/i;
   if (streetPattern.test(norm)) return true;
 
-  // Tên địa lý (ít nhất 2 yếu tố)
   let geoCount = 0;
   for (const name of geoNamesList) {
     const nameNorm = normalizeText(name).replace(/\s+/g, ' ');
     if (norm.includes(nameNorm)) geoCount++;
   }
-
   return geoCount >= 2;
 };
 
 /* ===========================
-   Main export
+   ID Patterns
+=========================== */
+const idPatterns = [/(?:cmnd|cccd|chung\s*minh|passport)\s*[:=]?\s*\d{6,12}/i];
+
+/* ===========================
+   Phone Patterns (optional extra)
+=========================== */
+const phonePatterns = [/(?:\+?84|0)[\s.\-/()]*(?:\d[\s.\-/()]*){7,12}\d/];
+
+/* ===========================
+   Main detection
 =========================== */
 export const detectSensitiveInfo = (rawText) => {
-  const text = (rawText || '').trim();
-  if (!text) return null;
-  if (hasSuspiciousDigits(text)) return 'ERROR.DETECT_UNCESS_INFO';
-  if (detectAddress(text)) return 'ERROR.DETECT_UNCESS_INFO';
-  if (emailPattern.test(text)) return 'ERROR.DETECT_UNCESS_INFO';
+  if (!rawText || typeof rawText !== 'string') return null;
 
-  for (const p of [...phonePatterns, ...idPatterns]) {
-    if (p.test(text)) return 'ERROR.DETECT_UNCESS_INFO';
+  // Phone / digits
+  if (hasSuspiciousDigits(rawText)) return 'ERROR.DETECT_UNCESS_INFO';
+
+  // Address
+  if (detectAddress(rawText)) return 'ERROR.DETECT_UNCESS_INFO';
+
+  // Email
+  const normalizedEmail = normalizeEmail(rawText);
+  if (emailPattern.test(normalizedEmail)) return 'ERROR.DETECT_UNCESS_INFO';
+
+  // ID
+  for (const p of idPatterns) {
+    if (p.test(rawText)) return 'ERROR.DETECT_UNCESS_INFO';
+  }
+
+  // Extra phone patterns (optional)
+  for (const p of phonePatterns) {
+    if (p.test(rawText)) return 'ERROR.DETECT_UNCESS_INFO';
   }
 
   return null;
