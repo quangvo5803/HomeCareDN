@@ -50,11 +50,9 @@ const hasSuspiciousDigits = (rawText = '') => {
   const norm = normalizeText(rawText);
   const converted = convertWordsToDigits(norm);
 
-  // Bắt chuỗi số 10–11 liên tiếp → số điện thoại thật
-  if (/\b\d{10,11}\b/.test(converted)) return true;
+  const digitsOnly = converted.replace(/\D/g, '');
 
-  // Không tính tổng chữ số rải rác
-  return false;
+  return /\d{10,11}/.test(digitsOnly);
 };
 
 /* ===========================
