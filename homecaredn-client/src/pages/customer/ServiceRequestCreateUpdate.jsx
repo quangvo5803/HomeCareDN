@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -15,6 +15,7 @@ import { showDeleteModal } from '../../components/modal/DeleteModal';
 import Loading from '../../components/Loading';
 import { detectSensitiveInfo } from '../../utils/detectSensitiveInfo';
 import { extractFileText } from '../../utils/extractFileText';
+
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
 const ACCEPTED_DOC_TYPES = '.pdf,.doc,.docx,.txt';
@@ -35,6 +36,8 @@ export default function ServiceRequestCreateUpdate() {
     deleteServiceRequestDocument,
   } = useServiceRequest();
   const enums = useEnums();
+
+  // State management
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [imageProgress, setImageProgress] = useState({ loaded: 0, total: 0 });
@@ -62,16 +65,111 @@ export default function ServiceRequestCreateUpdate() {
   const [images, setImages] = useState([]);
   const [documents, setDocuments] = useState([]);
 
-  // upload docs and imgs progress
+  // Memoized translated options - Tối ưu performance cho dropdown
+  const translatedServiceTypes = useMemo(
+    () =>
+      enums?.serviceTypes?.map((s) => ({
+        value: s.value,
+        label: t(`Enums.ServiceType.${s.value}`),
+      })) || [],
+    [enums?.serviceTypes, t]
+  );
+
+  const translatedPackageOptions = useMemo(
+    () =>
+      enums?.packageOptions?.map((p) => ({
+        value: p.value,
+        label: t(`Enums.PackageOption.${p.value}`),
+      })) || [],
+    [enums?.packageOptions, t]
+  );
+
+  const translatedBuildingTypes = useMemo(
+    () =>
+      enums?.buildingTypes?.map((b) => ({
+        value: b.value,
+        label: t(`Enums.BuildingType.${b.value}`),
+      })) || [],
+    [enums?.buildingTypes, t]
+  );
+
+  const translatedMainStructures = useMemo(
+    () =>
+      enums?.mainStructures?.map((s) => ({
+        value: s.value,
+        label: t(`Enums.MainStructure.${s.value}`),
+      })) || [],
+    [enums?.mainStructures, t]
+  );
+
+  const translatedDesignStyles = useMemo(
+    () =>
+      enums?.designStyles?.map((s) => ({
+        value: s.value,
+        label: t(`Enums.DesignStyle.${s.value}`),
+      })) || [],
+    [enums?.designStyles, t]
+  );
+
+  // Memoized calculated values
+  const calculatedArea = useMemo(() => {
+    if (width && length && floors) {
+      return (Number(width) * Number(length) * Number(floors)).toFixed(1);
+    }
+    return null;
+  }, [width, length, floors]);
+
+  const formattedPrice = useMemo(() => {
+    if (!estimatePrice) return null;
+    return {
+      formatted: formatVND(Number(estimatePrice)),
+      inWords: numberToWordsByLang(Number(estimatePrice), i18n.language),
+    };
+  }, [estimatePrice, i18n.language]);
+
+  const priceMultipliers = useMemo(() => {
+    const base = Number(estimatePrice) || 1;
+    return [10, 100, 1000, 10000, 100000].map((factor) => ({
+      factor,
+      value: base * factor,
+      formatted: (base * factor)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, '.'),
+    }));
+  }, [estimatePrice]);
+
+  // Utility functions
+  const getFileNameFromUrl = useCallback((url) => {
+    if (!url) return 'unknown_file';
+    const urlWithoutQuery = url.split('?')[0];
+    const segments = urlWithoutQuery.split('/');
+    const fileName = segments.pop();
+    return decodeURIComponent(fileName);
+  }, []);
+
+  const getDocumentIcon = useCallback((fileName) => {
+    if (!fileName) return 'fas fa-file text-gray-400';
+    if (fileName.endsWith('.pdf')) return 'fas fa-file-pdf text-red-500';
+    if (fileName.endsWith('.doc') || fileName.endsWith('.docx'))
+      return 'fas fa-file-word text-blue-500';
+    if (fileName.endsWith('.txt')) return 'fas fa-file-alt text-gray-500';
+    return 'fas fa-file text-gray-400';
+  }, []);
+
+  // Upload progress tracking
   useEffect(() => {
     const totalLoaded = imageProgress.loaded + documentProgress.loaded;
     const totalSize = imageProgress.total + documentProgress.total;
+    if (totalSize > 0) {
+      const percent = Math.min(
+        100,
+        Math.round((totalLoaded * 100) / totalSize)
+      );
+      setUploadProgress(percent);
+    }
+  }, [imageProgress, documentProgress]);
 
-    const percent = Math.min(100, Math.round((totalLoaded * 100) / totalSize));
-    setUploadProgress(percent);
-  }, [imageProgress, documentProgress, uploadProgress]);
-
-  // Load data khi edit
+  // Load data when editing
   useEffect(() => {
     if (serviceRequestId) {
       getServiceRequestById(serviceRequestId)
@@ -102,185 +200,236 @@ export default function ServiceRequestCreateUpdate() {
         })
         .catch((err) => handleApiError(err, t));
     } else if (passedService) {
-      // Nếu là tạo mới và có dữ liệu service truyền qua
       setServiceType(passedService.serviceType || '');
       setPackageOption(passedService.packageOption || '');
       setBuildingType(passedService.buildingType || '');
       setMainStructureType(passedService.mainStructureType || '');
       setDesignStyle(passedService.designStyle || '');
     }
-  }, [serviceRequestId, passedService, getServiceRequestById, t]);
+  }, [
+    serviceRequestId,
+    passedService,
+    getServiceRequestById,
+    t,
+    getFileNameFromUrl,
+  ]);
+
+  // Date validation
   useEffect(() => {
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       const diffDays = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-
-      if (diffDays < 7) {
-        setDateError(t('ERROR.END_DATE_MIN_7_DAYS'));
-      } else {
-        setDateError(null);
-      }
+      setDateError(diffDays < 7 ? t('ERROR.END_DATE_MIN_7_DAYS') : null);
     }
   }, [startDate, endDate, t]);
-  const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-    const validFiles = [];
-    toast.info('Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát');
-    for (const file of files) {
-      const content = await extractFileText(file);
-      const error = detectSensitiveInfo(content);
 
-      if (error) {
-        toast.error(`${files.length - validFiles.length} - ${t(error)}`);
-      } else {
-        validFiles.push(file);
-      }
-    }
-
-    if (validFiles.length === 0) {
-      e.target.value = ''; // reset input
-      return;
-    }
-    const mapped = validFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-    }));
-    setImages((prev) => [...prev, ...mapped]);
-  };
-
-  // Detect infomation in description
+  // Description validation with debounce
   useEffect(() => {
-    if (description) {
-      const errorMsg = detectSensitiveInfo(description);
-      setDescriptionError(errorMsg);
-    } else {
-      setDescriptionError(null);
-    }
+    const timeoutId = setTimeout(() => {
+      setDescriptionError(
+        description ? detectSensitiveInfo(description) : null
+      );
+    }, 500);
+    return () => clearTimeout(timeoutId);
   }, [description]);
-  const handleDocumentChange = async (e) => {
-    const files = Array.from(e.target.files);
 
-    if (files.length + documents.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
-      e.target.value = '';
-      return;
-    }
-
-    const validFiles = [];
-
-    for (const file of files) {
-      const content = await extractFileText(file);
-      const error = detectSensitiveInfo(content);
-
-      if (error) {
-        toast.error(`${file.name} - ${t(error)}`);
-      } else {
-        validFiles.push(file);
-      }
-    }
-
-    if (validFiles.length === 0) {
-      e.target.value = ''; // reset input
-      return;
-    }
-
-    const mapped = validFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-      name: file.name,
-    }));
-
-    setDocuments((prev) => [...prev, ...mapped]);
-
-    e.target.value = '';
-  };
-
-  const getFileNameFromUrl = (url) => {
-    if (!url) return 'unknown_file';
-
-    const urlWithoutQuery = url.split('?')[0];
-    const segments = urlWithoutQuery.split('/');
-    const fileName = segments.pop();
-
-    return decodeURIComponent(fileName);
-  };
-  const getDocumentIcon = (fileName) => {
-    if (!fileName) return 'fas fa-file text-gray-400';
-    if (fileName.endsWith('.pdf')) {
-      return 'fas fa-file-pdf text-red-500';
-    }
-    if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
-      return 'fas fa-file-word text-blue-500';
-    }
-    if (fileName.endsWith('.txt')) {
-      return 'fas fa-file-alt text-gray-500';
-    }
-    return 'fas fa-file text-gray-400';
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return;
-    setIsSubmitting(true);
-    if (images.some((i) => i.isNew) || documents.some((d) => d.isNew)) {
-      setUploadProgress(1);
-    }
-    try {
-      if (!addressID) {
-        toast.error(t('ERROR.REQUIRED_ADDRESS'));
-        return;
-      }
-      if (!serviceType) {
-        toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
-        return;
-      }
-      if (!packageOption) {
-        toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
-        return;
-      }
-      if (!buildingType) {
-        toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
-        return;
-      }
-      if (!mainStructureType) {
-        toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
-        return;
-      }
-      if (images.length > MAX_IMAGES) {
+  // Image upload handler
+  const handleImageChange = useCallback(
+    async (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length + images.length > MAX_IMAGES) {
         toast.error(t('ERROR.MAXIMUM_IMAGE'));
         return;
       }
-      if (documents.length > MAX_DOCUMENTS) {
-        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+
+      const validFiles = [];
+      toast.info(t('common.scanDocument'));
+
+      for (const file of files) {
+        const content = await extractFileText(file);
+        const error = detectSensitiveInfo(content);
+        if (!error) {
+          validFiles.push(file);
+        }
+      }
+
+      if (validFiles.length === 0) {
+        const invalidCount = files.length - validFiles.length;
+        toast.error(t('common.file_unnecessary', { count: invalidCount }));
+        e.target.value = '';
         return;
       }
 
-      const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
-      const newDocumentFiles = documents
-        .filter((d) => d.isNew)
-        .map((d) => d.file);
+      const mapped = validFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+      }));
+      setImages((prev) => [...prev, ...mapped]);
+      e.target.value = '';
+    },
+    [images.length, t]
+  );
 
-      const payload = {
-        CustomerID: user.id,
-        AddressID: addressID,
-        ServiceType: serviceType,
-        PackageOption: packageOption,
-        BuildingType: buildingType,
-        MainStructureType: mainStructureType,
-        DesignStyle: designStyle,
-        Width: width,
-        Length: length,
-        Floors: floors,
-        EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
-        Description: description ?? null,
-      };
+  // Document upload handler
+  const handleDocumentChange = useCallback(
+    async (e) => {
+      const files = Array.from(e.target.files);
+
+      if (files.length + documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        e.target.value = '';
+        return;
+      }
+
+      const validFiles = [];
+      for (const file of files) {
+        const content = await extractFileText(file);
+        const error = detectSensitiveInfo(content);
+        if (error) {
+          const invalidCount = files.length - validFiles.length;
+          toast.error(t('common.file_unnecessary', { count: invalidCount }));
+        } else {
+          validFiles.push(file);
+        }
+      }
+
+      if (validFiles.length === 0) {
+        e.target.value = '';
+        return;
+      }
+
+      const mapped = validFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+        name: file.name,
+      }));
+
+      setDocuments((prev) => [...prev, ...mapped]);
+      e.target.value = '';
+    },
+    [documents.length, t]
+  );
+
+  // Remove handlers
+  const removeImageFromState = useCallback((img) => {
+    setImages((prev) => prev.filter((i) => i.url !== img.url));
+  }, []);
+
+  const handleRemoveImage = useCallback(
+    (img) => {
+      if (img.isNew) {
+        removeImageFromState(img);
+      } else {
+        showDeleteModal({
+          t,
+          titleKey: t('ModalPopup.DeleteImageModal.title'),
+          textKey: t('ModalPopup.DeleteImageModal.text'),
+          onConfirm: async () => {
+            try {
+              await deleteServiceRequestImage(serviceRequestId, img.url);
+              Swal.close();
+              toast.success(t('SUCCESS.DELETE'));
+              removeImageFromState(img);
+            } catch (err) {
+              handleApiError(err, t);
+            }
+          },
+        });
+      }
+    },
+    [removeImageFromState, deleteServiceRequestImage, serviceRequestId, t]
+  );
+
+  const removeDocumentFromState = useCallback((doc) => {
+    setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
+  }, []);
+
+  const handleRemoveDocument = useCallback(
+    (doc) => {
+      if (doc.isNew) {
+        removeDocumentFromState(doc);
+      } else {
+        showDeleteModal({
+          t,
+          titleKey: t('ModalPopup.DeleteDocumentModal.title'),
+          textKey: t('ModalPopup.DeleteDocumentModal.text'),
+          onConfirm: async () => {
+            try {
+              await deleteServiceRequestDocument(serviceRequestId, doc.url);
+              Swal.close();
+              toast.success(t('SUCCESS.DELETE'));
+              removeDocumentFromState(doc);
+            } catch (err) {
+              handleApiError(err, t);
+            }
+          },
+        });
+      }
+    },
+    [removeDocumentFromState, deleteServiceRequestDocument, serviceRequestId, t]
+  );
+
+  // Submit handler
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+
       try {
+        // Validation
+        if (!addressID) {
+          toast.error(t('ERROR.REQUIRED_ADDRESS'));
+          return;
+        }
+        if (!serviceType) {
+          toast.error(t('ERROR.REQUIRED_SERVICE_TYPE'));
+          return;
+        }
+        if (!packageOption) {
+          toast.error(t('ERROR.REQUIRED_PACKAGE_OPTION'));
+          return;
+        }
+        if (!buildingType) {
+          toast.error(t('ERROR.REQUIRED_BUILDING_TYPE'));
+          return;
+        }
+        if (!mainStructureType) {
+          toast.error(t('ERROR.REQUIRED_STRUCTURE_TYPE'));
+          return;
+        }
+        if (images.length > MAX_IMAGES) {
+          toast.error(t('ERROR.MAXIMUM_IMAGE'));
+          return;
+        }
+        if (documents.length > MAX_DOCUMENTS) {
+          toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+          return;
+        }
+
+        const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
+        const newDocumentFiles = documents
+          .filter((d) => d.isNew)
+          .map((d) => d.file);
+
+        const payload = {
+          CustomerID: user.id,
+          AddressID: addressID,
+          ServiceType: serviceType,
+          PackageOption: packageOption,
+          BuildingType: buildingType,
+          MainStructureType: mainStructureType,
+          DesignStyle: designStyle,
+          Width: width,
+          Length: length,
+          Floors: floors,
+          EstimatePrice: estimatePrice ? Number(estimatePrice) : null,
+          Description: description ?? null,
+        };
+
         setImageProgress({
           loaded: 0,
           total: newImageFiles.reduce((sum, f) => sum + f.size, 0),
@@ -294,7 +443,7 @@ export default function ServiceRequestCreateUpdate() {
           setUploadProgress(1);
         }
 
-        const imageUploadPromise =
+        const [imageResults, documentResults] = await Promise.all([
           newImageFiles.length > 0
             ? uploadToCloudinary(
                 newImageFiles,
@@ -302,9 +451,7 @@ export default function ServiceRequestCreateUpdate() {
                 (progress) => setImageProgress(progress),
                 'HomeCareDN/ServiceRequest'
               )
-            : Promise.resolve(null);
-
-        const documentUploadPromise =
+            : Promise.resolve(null),
           newDocumentFiles.length > 0
             ? uploadToCloudinary(
                 newDocumentFiles,
@@ -313,11 +460,7 @@ export default function ServiceRequestCreateUpdate() {
                 'HomeCareDN/ServiceRequest/Documents',
                 'raw'
               )
-            : Promise.resolve(null);
-
-        const [imageResults, documentResults] = await Promise.all([
-          imageUploadPromise,
-          documentUploadPromise,
+            : Promise.resolve(null),
         ]);
 
         if (imageResults) {
@@ -345,81 +488,48 @@ export default function ServiceRequestCreateUpdate() {
           await createServiceRequest(payload);
         }
 
-        navigate('/Customer', {
-          state: { tab: 'service_requests' },
-        });
+        navigate('/Customer', { state: { tab: 'service_requests' } });
       } catch (error) {
         toast.error(t(handleApiError(error)));
       } finally {
         setUploadProgress(0);
         setImageProgress({ loaded: 0, total: 0 });
         setDocumentProgress({ loaded: 0, total: 0 });
+        setIsSubmitting(false);
       }
-    } catch {
-      /// Handle in context
-    } finally {
-      setUploadProgress(0);
-      setIsSubmitting(false);
-    }
-  };
+    },
+    [
+      isSubmitting,
+      addressID,
+      serviceType,
+      packageOption,
+      buildingType,
+      mainStructureType,
+      designStyle,
+      width,
+      length,
+      floors,
+      estimatePrice,
+      description,
+      images,
+      documents,
+      user.id,
+      serviceRequestId,
+      startDate,
+      endDate,
+      t,
+      navigate,
+      createServiceRequest,
+      updateServiceRequest,
+    ]
+  );
 
-  const removeImageFromState = (img) => {
-    setImages((prev) => prev.filter((i) => i.url !== img.url));
-  };
-
-  const handleRemoveImage = (img) => {
-    if (img.isNew) {
-      removeImageFromState(img);
-    } else {
-      showDeleteModal({
-        t,
-        titleKey: t('ModalPopup.DeleteImageModal.title'),
-        textKey: t('ModalPopup.DeleteImageModal.text'),
-        onConfirm: async () => {
-          try {
-            await deleteServiceRequestImage(serviceRequestId, img.url);
-            Swal.close();
-            toast.success(t('SUCCESS.DELETE'));
-            removeImageFromState(img);
-          } catch (err) {
-            handleApiError(err, t);
-          }
-        },
-      });
-    }
-  };
-
-  const removeDocumentFromState = (doc) => {
-    setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
-  };
-
-  const handleRemoveDocument = (doc) => {
-    if (doc.isNew) {
-      removeDocumentFromState(doc);
-    } else {
-      showDeleteModal({
-        t,
-        titleKey: t('ModalPopup.DeleteDocumentModal.title'),
-        textKey: t('ModalPopup.DeleteDocumentModal.text'),
-        onConfirm: async () => {
-          try {
-            await deleteServiceRequestDocument(serviceRequestId, doc.url);
-            Swal.close();
-            toast.success(t('SUCCESS.DELETE'));
-            removeDocumentFromState(doc);
-          } catch (err) {
-            handleApiError(err, t);
-          }
-        },
-      });
-    }
-  };
-  if (uploadProgress || isSubmitting || addressLoading)
+  if (uploadProgress || isSubmitting || addressLoading) {
     return <Loading progress={uploadProgress} />;
+  }
 
   return (
     <>
-      {/* FontAwesome CDN */}
       <link
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -432,9 +542,7 @@ export default function ServiceRequestCreateUpdate() {
             <button
               type="button"
               onClick={() =>
-                navigate('/Customer', {
-                  state: { tab: 'service_requests' },
-                })
+                navigate('/Customer', { state: { tab: 'service_requests' } })
               }
               className="inline-flex items-center px-5 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 transition-all duration-200"
             >
@@ -483,9 +591,9 @@ export default function ServiceRequestCreateUpdate() {
                           'userPage.createServiceRequest.form_selectServiceType'
                         )}
                       </option>
-                      {enums?.serviceTypes?.map((s) => (
+                      {translatedServiceTypes.map((s) => (
                         <option key={s.value} value={s.value}>
-                          {t(`Enums.ServiceType.${s.value}`)}
+                          {s.label}
                         </option>
                       ))}
                     </select>
@@ -511,9 +619,9 @@ export default function ServiceRequestCreateUpdate() {
                           'userPage.createServiceRequest.form_selectPackageOption'
                         )}
                       </option>
-                      {enums?.packageOptions?.map((p) => (
+                      {translatedPackageOptions.map((p) => (
                         <option key={p.value} value={p.value}>
-                          {t(`Enums.PackageOption.${p.value}`)}
+                          {p.label}
                         </option>
                       ))}
                     </select>
@@ -539,9 +647,9 @@ export default function ServiceRequestCreateUpdate() {
                           'userPage.createServiceRequest.form_selectBuildingType'
                         )}
                       </option>
-                      {enums?.buildingTypes?.map((b) => (
+                      {translatedBuildingTypes.map((b) => (
                         <option key={b.value} value={b.value}>
-                          {t(`Enums.BuildingType.${b.value}`)}
+                          {b.label}
                         </option>
                       ))}
                     </select>
@@ -567,9 +675,9 @@ export default function ServiceRequestCreateUpdate() {
                           'userPage.createServiceRequest.form_selectStructureType'
                         )}
                       </option>
-                      {enums?.mainStructures?.map((s) => (
+                      {translatedMainStructures.map((s) => (
                         <option key={s.value} value={s.value}>
-                          {t(`Enums.MainStructure.${s.value}`)}
+                          {s.label}
                         </option>
                       ))}
                     </select>
@@ -594,9 +702,9 @@ export default function ServiceRequestCreateUpdate() {
                           'userPage.createServiceRequest.form_selectDesignStyle'
                         )}
                       </option>
-                      {enums?.designStyles?.map((s) => (
+                      {translatedDesignStyles.map((s) => (
                         <option key={s.value} value={s.value}>
-                          {t(`Enums.DesignStyle.${s.value}`)}
+                          {s.label}
                         </option>
                       ))}
                     </select>
@@ -664,22 +772,15 @@ export default function ServiceRequestCreateUpdate() {
                   />
                 </div>
 
-                {/* Calculated Area - spans 2 columns */}
+                {/* Calculated Area */}
                 <div className="lg:col-span-2">
-                  {width && length && floors ? (
+                  {calculatedArea && (
                     <p className="text-sm text-gray-600 mt-1 mb-2">
                       {t('userPage.createServiceRequest.calculatedArea')}:{' '}
                       <span className="font-semibold text-orange-600">
-                        {(
-                          Number(width) *
-                          Number(length) *
-                          Number(floors)
-                        ).toFixed(1)}{' '}
-                        m²
+                        {calculatedArea} m²
                       </span>
                     </p>
-                  ) : (
-                    <p></p>
                   )}
                 </div>
 
@@ -734,6 +835,7 @@ export default function ServiceRequestCreateUpdate() {
                     )}
                   </div>
                 )}
+
                 {/* Address */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -779,7 +881,6 @@ export default function ServiceRequestCreateUpdate() {
                       'userPage.createServiceRequest.form_descriptionPlaceholder'
                     )}
                   />
-
                   {descriptionError && (
                     <p className="text-red-500 text-sm font-medium flex items-center mt-2">
                       <i className="fas fa-exclamation-circle mr-2"></i>
@@ -787,6 +888,7 @@ export default function ServiceRequestCreateUpdate() {
                     </p>
                   )}
                 </div>
+
                 {/* Estimate Price */}
                 <div className="space-y-2 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -805,43 +907,35 @@ export default function ServiceRequestCreateUpdate() {
                     )}
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {[10, 100, 1000, 10000, 100000].map((factor) => (
+                    {priceMultipliers.map((item) => (
                       <button
                         type="button"
-                        key={factor}
-                        onClick={() =>
-                          setEstimatePrice(
-                            ((Number(estimatePrice) || 1) * factor).toString()
-                          )
-                        }
+                        key={item.factor}
+                        onClick={() => setEstimatePrice(item.value.toString())}
                         className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md hover:bg-orange-50 hover:border-orange-300 text-sm font-medium text-gray-700 transition-colors"
                       >
-                        {((Number(estimatePrice) || 1) * factor)
-                          .toString()
-                          .replaceAll(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                        {item.formatted}
                       </button>
                     ))}
                   </div>
-                  {estimatePrice && (
+                  {formattedPrice && (
                     <>
                       <p className="text-sm text-gray-500">
                         {t('userPage.createServiceRequest.estimatePrice')}
                         <span className="font-semibold text-orange-600">
-                          {formatVND(Number(estimatePrice))}
+                          {formattedPrice.formatted}
                         </span>
                       </p>
                       <p className="text-sm text-gray-500">
                         {t('userPage.createServiceRequest.estimateInWord')}
                         <span className="font-semibold">
-                          {numberToWordsByLang(
-                            Number(estimatePrice),
-                            i18n.language
-                          )}
+                          {formattedPrice.inWords}
                         </span>
                       </p>
                     </>
                   )}
                 </div>
+
                 {/* Images Upload Section */}
                 <div className="space-y-4 lg:col-span-2">
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -850,34 +944,31 @@ export default function ServiceRequestCreateUpdate() {
                   </label>
 
                   {images.length < MAX_IMAGES && (
-                    <>
-                      {/* Upload Button */}
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleImageChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                            <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
-                          </div>
-                          <p className="text-gray-600 text-center mb-2">
-                            <span className="font-semibold text-orange-600">
-                              {t('upload.clickToUploadImage')}
-                            </span>{' '}
-                            {t('upload.orDragAndDrop')}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            {t('upload.fileTypesHint')}
-                          </p>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                          <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
                         </div>
+                        <p className="text-gray-600 text-center mb-2">
+                          <span className="font-semibold text-orange-600">
+                            {t('upload.clickToUploadImage')}
+                          </span>{' '}
+                          {t('upload.orDragAndDrop')}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {t('upload.fileTypesHint')}
+                        </p>
                       </div>
-                    </>
+                    </div>
                   )}
-                  {/* Image Preview Grid */}
+
                   {images.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                       {images.map((img, idx) => (
@@ -920,35 +1011,31 @@ export default function ServiceRequestCreateUpdate() {
                   </label>
 
                   {documents.length < MAX_DOCUMENTS && (
-                    <>
-                      {/* Document Upload Button */}
-                      <div className="relative">
-                        <input
-                          type="file"
-                          accept={ACCEPTED_DOC_TYPES} // Specify accepted types
-                          multiple
-                          onChange={handleDocumentChange}
-                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        />
-                        <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                          <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                            <i className="fas fa-file-upload  text-blue-500 text-xl"></i>
-                          </div>
-                          <p className="text-gray-600 text-center mb-2">
-                            <span className="font-semibold text-blue-600">
-                              {t('upload.clickToUploadDocument')}
-                            </span>{' '}
-                            {t('upload.orDragAndDrop')}
-                          </p>
-                          <p className="text-sm text-gray-400">
-                            PDF, DOC, DOCX, TXT {/* Hint for file types */}
-                          </p>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept={ACCEPTED_DOC_TYPES}
+                        multiple
+                        onChange={handleDocumentChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
+                          <i className="fas fa-file-upload text-blue-500 text-xl"></i>
                         </div>
+                        <p className="text-gray-600 text-center mb-2">
+                          <span className="font-semibold text-blue-600">
+                            {t('upload.clickToUploadDocument')}
+                          </span>{' '}
+                          {t('upload.orDragAndDrop')}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          PDF, DOC, DOCX, TXT
+                        </p>
                       </div>
-                    </>
+                    </div>
                   )}
 
-                  {/* Document Preview Grid */}
                   {documents.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                       {documents.map((doc) => (
@@ -992,7 +1079,7 @@ export default function ServiceRequestCreateUpdate() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="inline-flex items-center px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-4 focus:ring-orange-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:bg-gray-400"
+                  className="inline-flex items-center px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 focus:ring-4 focus:ring-orange-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:bg-gray-400 disabled:cursor-not-allowed"
                   disabled={
                     !serviceType ||
                     !packageOption ||
@@ -1002,7 +1089,7 @@ export default function ServiceRequestCreateUpdate() {
                     !width ||
                     !floors ||
                     !addressID ||
-                    descriptionError
+                    !!descriptionError
                   }
                 >
                   <i className="fas fa-paper-plane mr-2"></i>

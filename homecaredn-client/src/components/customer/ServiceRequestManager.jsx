@@ -249,8 +249,12 @@ export default function ServiceRequestManager() {
         readOnly={reviewReadOnly}
       />
 
-      {!serviceRequests || serviceRequests.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl">
+      {loading ? (
+        <div className="py-10 text-center bg-white rounded-xl">
+          <LoadingComponent />
+        </div>
+      ) : !serviceRequests || serviceRequests.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-xl">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-4">
             <i className="fas fa-tools text-3xl text-orange-600"></i>
           </div>

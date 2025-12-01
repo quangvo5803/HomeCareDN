@@ -177,7 +177,8 @@
   },
   "materialViewAll": {
     "listMaterial": "List of materials",
-    "filterCategory": "Material catalog",
+    "filter":"Filter Material",
+    "filterCategory": "Material category",
     "filterBrand": "Material brand",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
     "noMaterial": "No corresponding material"
@@ -1303,7 +1304,7 @@
     "UpdateMaterial": "Update Material",
     "AddNewService": "Add new Service",
     "UpdateService": "Update Service",
-    "AddNewRequest": "Create and add a new request",
+    "AddNewRequest": "Create a new request",
     "AddToExisting": "Add to an existing request",
     "View": "View",
     "Edit": "Edit",
@@ -1635,6 +1636,7 @@
     "noRequirement": "No requirements",
     "notLogin": "Please login before action",
     "search": "Search...",
+    "sort": "Sort",
     "sortDefault": "Default",
     "sortName": "Name: A-Z",
     "sortNameDesc": "Name: Z-A",
@@ -1645,7 +1647,15 @@
     "Grid": "Grid",
     "Table": "Table",
     "All": "All",
-    "Download": "Download"
+    "SelectedContractor": "Selected contractor",
+    "SelectedDistributor": "Selected distributor",
+    "category": "Category",
+    "brand": "Brand",
+    "resetFilter": "Reset filter",
+    "Download": "Download",
+    "scanDocument":"Analyzing image/document please wait a moment",
+    "file_unnecessary": "{{count}} file contain unnecessary information"
+
   },
   "commission": {
     "partner": {

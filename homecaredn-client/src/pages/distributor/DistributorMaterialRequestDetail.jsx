@@ -36,6 +36,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { paymentService } from '../../services/paymentService';
 import ChatSection from '../../components/ChatSection';
+import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
 
 export default function MaterialRequestDetail() {
   const navigate = useNavigate();
@@ -54,6 +55,8 @@ export default function MaterialRequestDetail() {
   const [newMaterials, setNewMaterials] = useState([]);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageError, setMessageError] = useState(null);
+
   const [totalEstimatePrice, setTotalEstimatePrice] = useState(0);
 
   const [searchParams] = useSearchParams();
@@ -295,7 +298,20 @@ export default function MaterialRequestDetail() {
       quantity: Number(i.quantity),
     })),
   });
-
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (message) {
+        const plainText =
+          new DOMParser().parseFromString(message, 'text/html').body
+            .textContent || '';
+        const errorMsg = detectSensitiveInfo(plainText);
+        setMessageError(errorMsg);
+      } else {
+        setMessageError(null);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [message]);
   //  Submit application
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -955,7 +971,12 @@ export default function MaterialRequestDetail() {
             onEditorChange={(content) => setMessage(content)}
           />
         </div>
-
+        {messageError && (
+          <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+            <i className="fas fa-exclamation-circle mr-2"></i>
+            {t(messageError)}
+          </p>
+        )}
         {/* Submit */}
         <div>
           <button

@@ -43,7 +43,7 @@
     "react-toastify": "^11.0.5",
     "sweetalert2": "^11.22.4",
     "tailwindcss": "^4.1.12",
-    "tesseract.js": "^6.0.1",
+    "tesseract.js": "^5.1.1",
     "tinymce": "^8.1.2",
     "trim-canvas": "^0.1.2",
     "use-debounce": "^10.0.6",

@@ -382,15 +382,18 @@ export default function ContractorServiceRequestDetail() {
     }
   };
   useEffect(() => {
-    if (description) {
-      const plainText =
-        new DOMParser().parseFromString(description, 'text/html').body
-          .textContent || '';
-      const errorMsg = detectSensitiveInfo(plainText);
-      setDescriptionError(errorMsg);
-    } else {
-      setDescriptionError(null);
-    }
+    const timeoutId = setTimeout(() => {
+      if (description) {
+        const plainText =
+          new DOMParser().parseFromString(description, 'text/html').body
+            .textContent || '';
+        const errorMsg = detectSensitiveInfo(plainText);
+        setDescriptionError(errorMsg);
+      } else {
+        setDescriptionError(null);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
   }, [description]);
   // Image handlers
   const handleImageChange = async (e) => {

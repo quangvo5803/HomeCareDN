@@ -505,7 +505,11 @@ export default function AdminServiceRequestDetail() {
                     {t('adminServiceRequestManager.estimatePrice')}
                   </p>
                   <p className="font-semibold text-emerald-600 text-lg">
-                    {formatVND(Number(serviceRequestDetail.estimatePrice))}
+                    {serviceRequestDetail.estimatePrice == 0
+                      ? t('contractorServiceRequestManager.negotiable')
+                      : formatVND(
+                          Number(serviceRequestDetail.estimatePrice)
+                        )}{' '}
                   </p>
                 </div>
               </div>
@@ -610,7 +614,11 @@ export default function AdminServiceRequestDetail() {
                         {t('adminServiceRequestManager.estimatePrice')}
                       </p>
                       <p className="font-bold text-lg text-emerald-700">
-                        {formatVND(selectedContractor.estimatePrice)}
+                        {serviceRequestDetail.estimatePrice == 0
+                          ? t('contractorServiceRequestManager.negotiable')
+                          : formatVND(
+                              Number(serviceRequestDetail.estimatePrice)
+                            )}{' '}
                       </p>
                     </div>
 

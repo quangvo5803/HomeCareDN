@@ -5,17 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { Pagination } from 'antd';
 import CardItem from '../components/CardItem';
-import Loading from '../components/Loading';
 import { handleApiError } from '../utils/handleApiError';
 import { toast } from 'react-toastify';
-import FilterItem from '../components/FilterItem';
+import LoadingComponent from '../components/LoadingComponent';
 
 export default function MaterialViewAll() {
   const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOption, setSortOption] = useState('random');
   const { materials, totalMaterials, fetchMaterials, loading } = useMaterial();
-  const pageSize = 9;
+  const pageSize = 12;
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
   const [selectedCategoryId, setSelectedCategoryId] = useState('');
@@ -23,6 +22,11 @@ export default function MaterialViewAll() {
 
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+
+  // Dropdown states
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showBrandDropdown, setShowBrandDropdown] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -55,111 +59,352 @@ export default function MaterialViewAll() {
     selectedBrandId,
   ]);
 
-  const start = totalMaterials > 0 ? (currentPage - 1) * pageSize + 1 : 0;
-  const end = Math.min(currentPage * pageSize, totalMaterials);
-  if (loading) return <Loading />;
+  const getSortLabel = () => {
+    if (sortOption === 'random') return t('home.default');
+    if (sortOption === 'materialname' || sortOption === 'materialnameen')
+      return 'A-Z';
+    if (
+      sortOption === 'materialname_desc' ||
+      sortOption === 'materialnameen_desc'
+    )
+      return 'Z-A';
+    return t('home.default');
+  };
+
+  const getCategoryLabel = () => {
+    if (!selectedCategoryId) return null;
+    const category = categories.find(
+      (c) => c.categoryID === selectedCategoryId
+    );
+    return category
+      ? i18n.language === 'vi'
+        ? category.categoryName
+        : category.categoryNameEN || category.categoryName
+      : null;
+  };
+
+  const getBrandLabel = () => {
+    if (!selectedBrandId) return null;
+    const brand = brands.find((b) => b.brandID === selectedBrandId);
+    return brand
+      ? i18n.language === 'vi'
+        ? brand.brandName
+        : brand.brandNameEN || brand.brandName
+      : null;
+  };
+
+  const resetAllFilters = () => {
+    setSelectedCategoryId('');
+    setSelectedBrandId('');
+    setSortOption('random');
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters =
+    selectedCategoryId || selectedBrandId || sortOption !== 'random';
 
   return (
-    <body className="font-sans text-black bg-white">
-      <div className="max-w-[1200px] mx-auto px-4 py-6">
-        <div className="flex flex-col mb-6 md:flex-row md:justify-between md:items-center">
-          <h1 className="text-lg font-bold text-orange-400 md:text-xl">
+    <div className="min-h-screen font-sans bg-white">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header with item count */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {t('materialViewAll.listMaterial')}
           </h1>
-          {/* Sort */}
-          <div className="flex items-center mt-4 space-x-4 md:mt-0">
-            <p className="text-sm md:text-base">
-              {t('materialViewAll.pagination', { start, end, totalMaterials })}
-            </p>
-            <select
-              aria-label="Sort options"
-              className="px-3 py-1 text-sm border border-gray-300 rounded md:text-base"
-              value={sortOption}
-              onChange={(e) => {
-                setSortOption(e.target.value);
-                setCurrentPage(1);
-              }}
-            >
-              <option value="random">{t('home.default')}</option>
-              <option
-                value={
-                  i18n.language === 'vi' ? 'materialname' : 'materialnameen'
-                }
-              >
-                A-Z
-              </option>
-              <option
-                value={
-                  i18n.language === 'vi'
-                    ? 'materialname_desc'
-                    : 'materialnameen_desc'
-                }
-              >
-                Z-A
-              </option>
-            </select>
-          </div>
+          <p className="text-sm text-gray-600">{totalMaterials} sản phẩm</p>
         </div>
-        <div className="flex flex-col gap-6 md:flex-row">
-          {/* Filter */}
-          <aside className="w-full md:w-1/5 space-y-6">
-            <div className="h-px bg-gray-300 w-16" />
 
-            {/* Category */}
-            <FilterItem
-              itemType={{ type: 'material' }}
-              label={t('materialViewAll.filterCategory')}
-              options={categories}
-              selectedValue={selectedCategoryId}
-              onChange={setSelectedCategoryId}
-              name="categoryName"
-              nameEN="categoryNameEN"
-              valueID="categoryID"
-            />
+        {/* Filter Bar - IKEA Style */}
+        <div className="mb-6 pb-4 border-b border-gray-200">
+          <div className="flex flex-wrap gap-3 mb-3">
+            {/* Sort By Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowSortDropdown(!showSortDropdown);
+                  setShowCategoryDropdown(false);
+                  setShowBrandDropdown(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+              >
+                <span>
+                  {t('common.sort')} {getSortLabel()}
+                </span>
+                <i
+                  className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${
+                    showSortDropdown ? 'rotate-180' : ''
+                  }`}
+                ></i>
+              </button>
 
-            {/* Brand */}
-            <FilterItem
-              itemType={{ type: 'material' }}
-              label={t('materialViewAll.filterBrand')}
-              options={brands}
-              selectedValue={selectedBrandId}
-              onChange={setSelectedBrandId}
-              name="brandName"
-              nameEN="brandNameEN"
-              valueID="brandID"
-            />
-          </aside>
-
-          {/* Products grid */}
-          <section className="grid grid-cols-1 gap-6 md:w-4/5 sm:grid-cols-2 lg:grid-cols-3 min-h-[500px]">
-            {materials && materials.length > 0 ? (
-              <>
-                {materials.map((item) => (
-                  <CardItem key={item.MaterialID} item={item} />
-                ))}
-
-                <div className="flex justify-center py-4 col-span-full">
-                  <Pagination
-                    current={currentPage}
-                    pageSize={pageSize}
-                    total={totalMaterials}
-                    onChange={(page) => setCurrentPage(page)}
-                    showSizeChanger={false}
-                    size="small"
-                  />
+              {showSortDropdown && (
+                <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px]">
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setSortOption('random');
+                        setCurrentPage(1);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        sortOption === 'random' ? 'font-semibold' : ''
+                      }`}
+                    >
+                      {t('home.default')}
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption(
+                          i18n.language === 'vi'
+                            ? 'materialname'
+                            : 'materialnameen'
+                        );
+                        setCurrentPage(1);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        sortOption === 'materialname' ||
+                        sortOption === 'materialnameen'
+                          ? 'font-semibold'
+                          : ''
+                      }`}
+                    >
+                      A-Z
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSortOption(
+                          i18n.language === 'vi'
+                            ? 'materialname_desc'
+                            : 'materialnameen_desc'
+                        );
+                        setCurrentPage(1);
+                        setShowSortDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        sortOption === 'materialname_desc' ||
+                        sortOption === 'materialnameen_desc'
+                          ? 'font-semibold'
+                          : ''
+                      }`}
+                    >
+                      Z-A
+                    </button>
+                  </div>
                 </div>
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">
-                <i className="fas fa-box-open text-4xl mb-3 text-gray-400"></i>
-                <p className="text-lg font-medium">
-                  {t('materialViewAll.noMaterial')}
-                </p>
-              </div>
-            )}
-          </section>
+              )}
+            </div>
+
+            {/* Category Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowCategoryDropdown(!showCategoryDropdown);
+                  setShowSortDropdown(false);
+                  setShowBrandDropdown(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+              >
+                <span>{t('common.category')}</span>
+                <i
+                  className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${
+                    showCategoryDropdown ? 'rotate-180' : ''
+                  }`}
+                ></i>
+              </button>
+
+              {showCategoryDropdown && (
+                <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px] max-h-[300px] overflow-y-auto">
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setSelectedCategoryId('');
+                        setCurrentPage(1);
+                        setShowCategoryDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        !selectedCategoryId ? 'font-semibold' : ''
+                      }`}
+                    >
+                      {t('common.All')}
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category.categoryID}
+                        onClick={() => {
+                          setSelectedCategoryId(category.categoryID);
+                          setCurrentPage(1);
+                          setShowCategoryDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                          selectedCategoryId === category.categoryID
+                            ? 'font-semibold'
+                            : ''
+                        }`}
+                      >
+                        {i18n.language === 'vi'
+                          ? category.categoryName
+                          : category.categoryNameEN || category.categoryName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Brand Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowBrandDropdown(!showBrandDropdown);
+                  setShowSortDropdown(false);
+                  setShowCategoryDropdown(false);
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+              >
+                <span>{t('common.brand')}</span>
+                <i
+                  className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${
+                    showBrandDropdown ? 'rotate-180' : ''
+                  }`}
+                ></i>
+              </button>
+
+              {showBrandDropdown && (
+                <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px] max-h-[300px] overflow-y-auto">
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        setSelectedBrandId('');
+                        setCurrentPage(1);
+                        setShowBrandDropdown(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                        !selectedBrandId ? 'font-semibold' : ''
+                      }`}
+                    >
+                      {t('common.All')}
+                    </button>
+                    {brands.map((brand) => (
+                      <button
+                        key={brand.brandID}
+                        onClick={() => {
+                          setSelectedBrandId(brand.brandID);
+                          setCurrentPage(1);
+                          setShowBrandDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
+                          selectedBrandId === brand.brandID
+                            ? 'font-semibold'
+                            : ''
+                        }`}
+                      >
+                        {i18n.language === 'vi'
+                          ? brand.brandName
+                          : brand.brandNameEN || brand.brandName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Active Filters Tags */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Category Tag */}
+              {selectedCategoryId && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-900 rounded-full text-sm">
+                  <span className="font-medium">
+                    {t('common.category')}: {getCategoryLabel()}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedCategoryId('');
+                      setCurrentPage(1);
+                    }}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    <i className="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              )}
+
+              {/* Brand Tag */}
+              {selectedBrandId && (
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-900 rounded-full text-sm">
+                  <span className="font-medium">
+                    {t('common.brand')}: {getBrandLabel()}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setSelectedBrandId('');
+                      setCurrentPage(1);
+                    }}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    <i className="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              )}
+
+              {/* Reset All Button */}
+              <button
+                onClick={resetAllFilters}
+                className="text-sm text-gray-900 hover:text-gray-600 underline font-medium"
+              >
+                {t('common.resetFilter')}
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Products Grid */}
+        {loading ? (
+          <div className="flex flex-col items-center justify-center w-full h-96">
+            <LoadingComponent />
+          </div>
+        ) : materials && materials.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
+              {materials.map((item) => (
+                <CardItem key={item.MaterialID} item={item} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="flex justify-center py-6 border-t border-gray-200">
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={totalMaterials}
+                onChange={(page) => setCurrentPage(page)}
+                showSizeChanger={false}
+              />
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-96 text-center">
+            <i className="fas fa-box-open text-6xl text-gray-300 mb-4"></i>
+            <p className="text-lg font-medium text-gray-700 mb-2">
+              {t('materialViewAll.noMaterial')}
+            </p>
+          </div>
+        )}
       </div>
-    </body>
+
+      {/* Click outside to close dropdowns */}
+      {(showSortDropdown || showCategoryDropdown || showBrandDropdown) && (
+        <div
+          className="fixed inset-0 z-0"
+          onClick={() => {
+            setShowSortDropdown(false);
+            setShowCategoryDropdown(false);
+            setShowBrandDropdown(false);
+          }}
+        ></div>
+      )}
+    </div>
   );
 }

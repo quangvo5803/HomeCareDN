@@ -18,6 +18,7 @@ import Swal from 'sweetalert2';
 import useRealtime from '../../realtime/useRealtime';
 import { withMinLoading } from '../../utils/withMinLoading';
 import ChatSection from '../../components/ChatSection';
+import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
 
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
@@ -26,6 +27,7 @@ export default function MaterialRequestDetail() {
   const { addresses } = useUser();
   const [deliveryDate, setDeliveryDate] = useState('');
   const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState(null);
   const [canAddMaterial, setCanAddMaterial] = useState(false);
   const [items, setItems] = useState([]);
   const [addressID, setAddressID] = useState('');
@@ -223,7 +225,21 @@ export default function MaterialRequestDetail() {
 
   const canShowSaveCancel = hasAnyChanges;
   const canShowSend = items.length > 0 && addressID;
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (description) {
+        const errorMsg = detectSensitiveInfo(description);
+        if (errorMsg !== descriptionError) {
+          setDescriptionError(errorMsg);
+        }
+      } else if (descriptionError !== null) {
+        setDescriptionError(null);
+      }
+    }, 300); // Debounce 300ms
 
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [description]);
   const handleQuantityChange = (id, value) => {
     setItems((prev) =>
       prev.map((item) =>
@@ -1631,6 +1647,12 @@ export default function MaterialRequestDetail() {
                     'userPage.materialRequestDetail.descriptionsPlaceholder'
                   )}
                 />
+                {descriptionError && (
+                  <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    {t(descriptionError)}
+                  </p>
+                )}
               </div>
 
               {/* Checkbox */}

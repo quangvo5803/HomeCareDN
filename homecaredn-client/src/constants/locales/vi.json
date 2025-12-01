@@ -176,6 +176,7 @@
   },
   "materialViewAll": {
     "listMaterial": "Danh sách vật liệu",
+    "filter":"Lọc vật liệu",
     "filterCategory": "Danh mục vật liệu",
     "filterBrand": "Thương hiệu vật liệu",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
@@ -1297,7 +1298,7 @@
     "UpdateMaterial": "Cập nhật vật liệu",
     "AddNewService": "Thêm dịch vụ",
     "UpdateService": "Cập nhật dịch vụ",
-    "AddNewRequest": "Tạo và thêm yêu cầu mới",
+    "AddNewRequest": "Tạo yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
     "Edit": "Sửa",
@@ -1624,6 +1625,7 @@
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search": "Tìm kiếm...",
+    "sort":"Sắp xếp",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
@@ -1635,7 +1637,13 @@
     "Table": "Bảng",
     "All": "Tất cả",
     "SelectedContractor": "Nhà thầu được chọn",
-    "SelectedDistributor": "Nhà phân phối được chọn"
+    "SelectedDistributor": "Nhà phân phối được chọn",
+    "category":"Danh Mục",
+    "brand":"Thương Hiệu",
+    "resetFilter": "Đặt lại bộ lọc",
+    "Download": "Tải xuống",
+    "scanDocument":"Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
+    "file_unnecessary": "{{count}} file chứa thông tin không cần thiết"
   },
   "commission": {
     "partner": {
