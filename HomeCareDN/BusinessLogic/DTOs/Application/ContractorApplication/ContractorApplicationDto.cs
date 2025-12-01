@@ -1,5 +1,4 @@
 ﻿using BusinessLogic.DTOs.Application.Payment;
-using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.ContractorApplication
 {

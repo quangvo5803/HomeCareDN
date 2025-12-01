@@ -12,7 +12,7 @@ export function formatDate(iso, lng) {
   const locale = lng?.startsWith('vi') ? 'vi-VN' : 'en-US';
   return d.toLocaleDateString(locale, {
     day: '2-digit',
-    month: 'short',
+    month: 'long',
     year: 'numeric',
   });
 }

@@ -177,7 +177,8 @@
   },
   "materialViewAll": {
     "listMaterial": "List of materials",
-    "filterCategory": "Material catalog",
+    "filter":"Filter Material",
+    "filterCategory": "Material category",
     "filterBrand": "Material brand",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
     "noMaterial": "No corresponding material"
@@ -344,6 +345,7 @@
       "label_notEstimated": "Not estimated",
       "label_packageOption": "Package option: ",
       "label_address": "Address: ",
+      "label_timeLine": "Contrucstion timeline: ",
       "label_contractorApplyCount": "application form(s)",
       "label_open": "Opening",
       "label_close": "Closed",
@@ -369,12 +371,15 @@
       "form_lengthPlaceholder": "Enter length in meters",
       "form_floor": "Number of Floors",
       "form_floorPlaceholder": "Enter number of floors",
+      "form_startDate":"Construction start date (expected)",
+      "form_endDate": "Construction end date (expected)",
       "form_estimatePrice": "Estimate Price",
       "form_estimatePricePlaceholder": "Enter estimate price",
       "form_address": "Address",
       "form_selectAddress": "Select address",
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
+      "form_descriptionNote":"Please do not re-enter the above information.",
       "form_images": "Reference / Current State (Maximum 5 images)",
       "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
@@ -440,6 +445,7 @@
       "descriptionsPlaceholder": "Enter a description to help the distributor provide better consultation...",
       "address": "Address",
       "selectAddress": "Select address",
+      "deliveryDate": "Desired delivery date",
       "allowEditQuantity": "Allow distributor to edit quantity",
       "allowEditQuantityDes": "Enable this option to allow the distributors to adjust material quantities when submitting an application",
       "allowAddMaterial": "Allow distributors to add required materials",
@@ -1324,7 +1330,7 @@
     "UpdateMaterial": "Update Material",
     "AddNewService": "Add new Service",
     "UpdateService": "Update Service",
-    "AddNewRequest": "Create and add a new request",
+    "AddNewRequest": "Create a new request",
     "AddToExisting": "Add to an existing request",
     "View": "View",
     "Edit": "Edit",
@@ -1526,7 +1532,12 @@
     "NOTFOUND_DESCRIPTION": "The requested resource could not be found",
     "FORBIDDEN": "You do not have permission to access this page!",
     "NOT_FOUND": "Requested page not found!",
-    "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!"
+    "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!",
+
+    "EMPTY_DESCRIPTION": "Please provide a detailed description!",
+    "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
+
+
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1652,6 +1663,7 @@
     "noRequirement": "No requirements",
     "notLogin": "Please login before action",
     "search": "Search...",
+    "sort": "Sort",
     "sortDefault": "Default",
     "sortName": "Name: A-Z",
     "sortNameDesc": "Name: Z-A",
@@ -1662,7 +1674,17 @@
     "Grid": "Grid",
     "Table": "Table",
     "All": "All",
-    "Download": "Download"
+    "SelectedContractor": "Selected contractor",
+    "SelectedDistributor": "Selected distributor",
+    "YouWasSelected":"You were selected",
+    "WasSelected":"Contractor/Distributor selected",
+    "category": "Category",
+    "brand": "Brand",
+    "resetFilter": "Reset filter",
+    "Download": "Download",
+    "scanDocument":"Analyzing image/document please wait a moment",
+    "file_unnecessary": "{{count}} file contain unnecessary information"
+
   },
   "commission": {
     "partner": {
@@ -1686,15 +1708,15 @@
       "payBeforeDeadline": "Monitor and handle pending payments promptly to avoid reopening services."
     },
     "customer": {
-      "expiredTitle": "The partner’s application has been rejected",
-      "expiredMessage": "Because the partner did not complete the commission payment, your service will be reopened for other contractors to apply.",
-      "urgent": "Waiting for the partner to complete the commission payment",
-      "less24h": "If the partner does not pay within 24 hours, the service will reopen for other contractors.",
-      "deadline": "Tracking the partner’s commission payment process",
-      "completeNow": "⏳ Please wait while the system updates the list of available contractors.",
-      "under24h": "⚠️ The partner is running out of time — the service may soon reopen.",
-      "payBeforeDeadline": "Your service will automatically reopen if the partner fails to complete payment on time."
-    },
+      "expiredTitle": "The partner's application has been rejected",
+      "expiredMessage": "Because the partner has not completed the procedures to receive the project, your service will be reopened for other contractors to apply.",
+      "urgent": "Waiting for the partner to complete the project registration procedure",
+      "less24h": "If the partner does not complete within 24 hours, the system will reopen the service for other contractors.",
+      "deadline": "Please wait for the contractor/distributor to complete the procedure",
+      "completeNow": "⏳ Please wait for the system to update the list of contractors/distributors.",
+      "under24h": "⚠️ The partner is about to run out of time to complete the procedure, the service may be reopened.",
+      "payBeforeDeadline": "Your service will be reopened automatically if the partner does not complete the procedure on time."
+      },
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",

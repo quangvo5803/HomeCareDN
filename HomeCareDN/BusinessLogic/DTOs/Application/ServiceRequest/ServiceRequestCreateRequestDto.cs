@@ -36,9 +36,9 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
 
         public double? EstimatePrice { get; set; }
 
-        [Required(ErrorMessage = "REQUIRED_SERVICE_REQUEST_DESCRIPTION")]
-        public string Description { get; set; } = null!;
-
+        public string? Description { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public List<string>? ImageUrls { get; set; }
         public List<string>? ImagePublicIds { get; set; }
         public List<string>? DocumentUrls { get; set; }

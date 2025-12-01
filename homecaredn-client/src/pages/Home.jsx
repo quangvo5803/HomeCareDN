@@ -461,19 +461,21 @@ export default function Home() {
             </div>
 
             {/* grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative min-h-[200px]">
               {loadingService ? (
-                <LoadingComponent />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <LoadingComponent />
+                </div>
               ) : (
-                <>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {randomServices.length === 0 ? (
                     <p></p>
                   ) : (
-                    randomServices?.map((item) => (
+                    randomServices.map((item) => (
                       <CardItem key={item.serviceID} item={item} />
                     ))
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -508,19 +510,21 @@ export default function Home() {
             </div>
 
             {/* Grid */}
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative min-h-[200px]">
               {loadingMaterial ? (
-                <LoadingComponent />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <LoadingComponent />
+                </div>
               ) : (
-                <>
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {randomMaterials.length === 0 ? (
                     <p></p>
                   ) : (
-                    randomMaterials?.map((item) => (
+                    randomMaterials.map((item) => (
                       <CardItem key={item.materialID} item={item} />
                     ))
                   )}
-                </>
+                </div>
               )}
             </div>
           </div>

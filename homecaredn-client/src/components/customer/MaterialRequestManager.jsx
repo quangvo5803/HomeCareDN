@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import Loading from '../Loading';
+import LoadingComponent from '../LoadingComponent';
 import Swal from 'sweetalert2';
 import PropTypes from 'prop-types';
 import StatusBadge from '../../components/StatusBadge';
@@ -14,6 +15,7 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import ReviewCountdown from './ReviewCountdown';
 import { reviewService } from '../../services/reviewService';
 import ReviewModal from '../modal/ReviewModal';
+import { formatDate } from '../../utils/formatters';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
@@ -120,6 +122,7 @@ export default function MaterialRequestManager({ user }) {
       },
     });
   };
+
   const handleCreateReview = (serviceRequest) => {
     setSelectedMaterialRequest(serviceRequest);
     setReviewReadOnly(false);
@@ -151,7 +154,8 @@ export default function MaterialRequestManager({ user }) {
       handleApiError(err, t);
     }
   };
-  if (loading || uploadProgress) return <Loading progress={uploadProgress} />;
+
+  if (uploadProgress) return <Loading progress={uploadProgress} />;
 
   return (
     <div>
@@ -178,6 +182,7 @@ export default function MaterialRequestManager({ user }) {
           {t('BUTTON.CreateMaterialRequest')}
         </button>
       </div>
+
       <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => {
@@ -195,9 +200,15 @@ export default function MaterialRequestManager({ user }) {
         setUploadProgress={setUploadProgress}
         readOnly={reviewReadOnly}
       />
-      {/* Empty state */}
-      {!materialRequests || materialRequests.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl">
+
+      {/* Loading State */}
+      {loading ? (
+        <div className="py-10 text-center bg-white rounded-xl">
+          <LoadingComponent />
+        </div>
+      ) : !materialRequests || materialRequests.length === 0 ? (
+        /* Empty state */
+        <div className="text-center py-16 bg-white rounded-xl">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-4">
             <i className="fas fa-boxes text-3xl text-orange-600"></i>
           </div>
@@ -217,6 +228,7 @@ export default function MaterialRequestManager({ user }) {
           </button>
         </div>
       ) : (
+        /* Material Requests List */
         <div className="grid gap-4">
           {materialRequests.map((req) => (
             <div
@@ -233,16 +245,23 @@ export default function MaterialRequestManager({ user }) {
                     <div>
                       <h3 className="font-semibold text-gray-800 text-lg leading-tight">
                         {t('Enums.ServiceType.Material')}
+                        {' #'}
+                        {req.materialRequestID.substring(0, 8)}
                       </h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mt-1">
-                        <span className="flex items-center gap-1">
+                      <div className="text-sm text-gray-500 mt-1 space-y-1">
+                        <div className="flex items-center gap-1">
                           <i className="fas fa-calendar-alt"></i>
-                          {new Date(req.createdAt).toLocaleDateString('vi-VN')}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <i className="fas fa-hashtag"></i>
-                          {req.materialRequestID.substring(0, 8)}
-                        </span>
+                          {formatDate(req.createdAt, i18n.language)}
+                        </div>
+
+                        {req.deliveryDate && (
+                          <div className="flex items-center gap-1">
+                            <i className="fas fa-calendar-alt"></i>
+                            {t('userPage.materialRequestDetail.deliveryDate')}
+                            {': '}
+                            {formatDate(req.deliveryDate, i18n.language)}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

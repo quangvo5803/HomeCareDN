@@ -306,7 +306,7 @@ export default function ServiceRequestDetail() {
                   {formatDate(serviceRequest.createdAt, i18n.language)}
                 </p>
                 <span className="text-sm text-gray-500">
-                  <i className="fas fa-hashtag mr-1"></i>#
+                  <i className="fas fa-hashtag mr-1"></i>
                   {serviceRequest.serviceRequestID.substring(0, 8)}
                 </span>
               </div>
@@ -316,15 +316,17 @@ export default function ServiceRequestDetail() {
             </div>
 
             {/* Description */}
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                <i className="fas fa-align-left text-gray-500 mr-1"></i>
-                {t('userPage.serviceRequestDetail.label_description')}
-              </h3>
-              <p className="text-gray-600 leading-relaxed">
-                {serviceRequest.description}
-              </p>
-            </div>
+            {serviceRequest.description && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  <i className="fas fa-align-left text-gray-500 mr-1"></i>
+                  {t('userPage.serviceRequestDetail.label_description')}
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {serviceRequest.description}
+                </p>
+              </div>
+            )}
 
             {/* Address */}
             <div className="mb-6">
@@ -336,7 +338,17 @@ export default function ServiceRequestDetail() {
                 {`${serviceRequest.address.detail}, ${serviceRequest.address.ward}, ${serviceRequest.address.district}, ${serviceRequest.address.city}`}
               </p>
             </div>
-
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <i className="fas fa-clock text-orange-500 mr-1"></i>
+                {t('userPage.serviceRequest.label_timeLine')}
+              </h3>
+              <p className="text-gray-600 flex items-start gap-2">
+                {formatDate(serviceRequest.startDate, i18n.language) +
+                  ' - ' +
+                  formatDate(serviceRequest.endDate, i18n.language)}{' '}
+              </p>
+            </div>
             {/* Images */}
             {serviceRequest.imageUrls.length > 0 && (
               <div>
@@ -594,11 +606,10 @@ export default function ServiceRequestDetail() {
               )}
               <div className="text-center mb-6 pb-6 border-b">
                 <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                  {selectedContractor.contractorName?.charAt(0) ||
-                    selectedContractor.contractorApplicationID.charAt(0)}
+                  Contractor
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
-                  {selectedContractor.contractorApplicationID.substring(0, 12)}
+                  {t('common.SelectedContractor')}
                 </h3>
                 <div className="flex items-center justify-center gap-4 text-sm mb-2">
                   <span className="flex items-center gap-1 text-yellow-600">
@@ -890,7 +901,7 @@ export default function ServiceRequestDetail() {
                 </div>
               ) : contractorApplications.length > 0 ? (
                 <>
-                  {contractorApplications.map((c) => (
+                  {contractorApplications.map((c, idx) => (
                     <button
                       key={c.contractorApplicationID}
                       onClick={() => handleSelectContractor(c)}
@@ -898,11 +909,11 @@ export default function ServiceRequestDetail() {
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                          {c.contractorApplicationID.charAt(0)}
+                          Contractor
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 truncate mb-1">
-                            {c.contractorApplicationID.substring(0, 12)}
+                            {t('roles.Contractor ') + { idx }}
                           </h4>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
                             <span className="flex items-center gap-1">

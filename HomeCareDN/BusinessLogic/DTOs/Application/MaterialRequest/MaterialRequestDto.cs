@@ -21,6 +21,7 @@ namespace BusinessLogic.DTOs.Application.MaterialRequest
         public bool CanAddMaterial { get; set; }
 
         public DateTime CreatedAt { get; set; }
+        public DateTime? DeliveryDate { get; set; }
         public required string Status { get; set; }
         public int DistributorApplyCount { get; set; }
 
