@@ -901,7 +901,7 @@ export default function MaterialRequestDetail() {
                             onClick={() =>
                               handleDeleteMaterial(item.materialRequestItemID)
                             }
-                            disabled={!canAddMaterial}
+                            disabled={!canAddMaterial || !!messageError}
                             className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <i className="fas fa-trash-alt"></i>

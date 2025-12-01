@@ -913,7 +913,7 @@ export default function ServiceRequestDetail() {
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 truncate mb-1">
-                            {t('roles.Contractor ') + { idx }}
+                            {t('roles.Contractor ') + idx}
                           </h4>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
                             <span className="flex items-center gap-1">
