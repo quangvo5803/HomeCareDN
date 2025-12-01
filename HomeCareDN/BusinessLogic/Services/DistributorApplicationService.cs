@@ -284,7 +284,7 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = materialRequest.CustomerID,
                     Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
-                    Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                    Message = "Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
                     DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
                     DataValue = dto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Apply,
@@ -498,7 +498,7 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = application.DistributorID,
                     Title = "Chúc mừng! Bạn đã được chọn",
-                    Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                    Message = "Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
                     DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
                     DataValue = resultDto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Accept,
@@ -564,7 +564,7 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = distributorApplication.DistributorID,
                     Title = "Yêu cầu vật tư chưa được chấp nhận",
-                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                     DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
                     DataValue = dto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Reject,

@@ -325,7 +325,7 @@ namespace BusinessLogic.Services
                     TargetUserId = serviceRequest.CustomerID,
                     Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
                     Message =
-                        $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
+                        "Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
                     DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Apply,
@@ -398,7 +398,7 @@ namespace BusinessLogic.Services
                                 TargetUserId = app.ContractorID,
                                 Title = "Yêu cầu dịch vụ chưa được chấp nhận",
                                 Message =
-                                    $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                    "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                                 DataKey =
                                     $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
                                 DataValue = app.ServiceRequestID.ToString(),
@@ -442,7 +442,7 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = contractorApplication.ContractorID,
                     Title = "Chúc mừng! Bạn đã được chọn",
-                    Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                    Message = "Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
                     DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Accept,
@@ -507,7 +507,7 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = contractorApplication.ContractorID,
                     Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                     DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Reject,
