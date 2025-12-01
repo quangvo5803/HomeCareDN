@@ -58,6 +58,7 @@ namespace BusinessLogic.Services
                     if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
                     {
                         dto.Message = $"Có {dto.PendingCount} {dto.Message.ToLower()}";
+                        dto.MessageEN = $"Have {dto.PendingCount} {dto.MessageEN.ToLower()}";
                     }
                 }
             }
@@ -95,6 +96,9 @@ namespace BusinessLogic.Services
                 existing.Message = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
                     ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
                     : dto.Title;
+                existing.MessageEN = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
+                    ? $"Have {existing.PendingCount} {dto.TitleEN.ToLower()}."
+                    : dto.TitleEN;
 
                 existing.Action = dto.Action;
                 existing.UpdatedAt = DateTime.UtcNow;
@@ -192,6 +196,8 @@ namespace BusinessLogic.Services
             {
                 Title = "Yêu cầu dịch vụ mới",
                 Message = "Có yêu cầu dịch vụ mới cần xử lý.",
+                TitleEN = "New Service Request",
+                MessageEN = "There is a new service request to be processed.",
                 DataKey = dataKey,
                 DataValue = "ServiceRequestManager",
                 TargetRoles = "Contractor"
@@ -210,6 +216,8 @@ namespace BusinessLogic.Services
             {
                 Title = "Yêu cầu vật tư mới",
                 Message = "Có yêu cầu vật tư mới cần được xử lý.",
+                TitleEN = "New Material Request",
+                MessageEN = "There is a new material request to be processed.",
                 DataKey = dataKey,
                 DataValue = "MaterialRequestManager",
                 TargetRoles = "Distributor"
@@ -297,6 +305,9 @@ namespace BusinessLogic.Services
             dto.Title = noti.PendingCount > 1
                ? $"Có {noti.PendingCount} {noti.Title.ToLower()}"
                : noti.Title;
+            dto.TitleEN = noti.PendingCount > 1
+               ? $"Have {noti.PendingCount} {noti.TitleEN.ToLower()}"
+               : noti.TitleEN;
 
             await SendToRolesAsync
             (
