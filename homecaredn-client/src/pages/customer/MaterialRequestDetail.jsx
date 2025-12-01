@@ -1374,13 +1374,13 @@ export default function MaterialRequestDetail() {
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
-                        {t('roles.Distributor')}
+                        D
                       </div>
                       <div className="flex-1 min-w-0">
                         {/* Status Row */}
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-semibold text-lg text-slate-900 group-hover:text-orange-600 transition truncate">
-                            {`${t('roles.Distributor')} ${idx}`}
+                            {`${t('roles.Distributor')} ${idx + 1}`}
                           </h4>
 
                           <StatusBadge status={app.status} type="Application" />
@@ -1390,7 +1390,9 @@ export default function MaterialRequestDetail() {
                         <div className="flex items-center gap-3 text-sm text-slate-700">
                           <span className="flex items-center gap-1 text-yellow-500 font-bold">
                             <i className="fas fa-star text-base"></i>
-                            <span className="text-sm">{app.averageRating}</span>
+                            <span className="text-sm">
+                              {app.averageRating.toFixed(1)}
+                            </span>
                           </span>
 
                           <span className="text-slate-400">•</span>

@@ -606,10 +606,10 @@ export default function ServiceRequestDetail() {
               )}
               <div className="text-center mb-6 pb-6 border-b">
                 <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">
-                  Contractor
+                  C
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
-                  {t('common.SelectedContractor')}
+                  {t('roles.Contractor')}
                 </h3>
                 <div className="flex items-center justify-center gap-4 text-sm mb-2">
                   <span className="flex items-center gap-1 text-yellow-600">
@@ -909,11 +909,11 @@ export default function ServiceRequestDetail() {
                     >
                       <div className="flex items-start gap-3 mb-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                          Contractor
+                          C
                         </div>
                         <div className="flex-1">
                           <h4 className="font-semibold text-gray-900 truncate mb-1">
-                            {t('roles.Contractor ') + idx}
+                            {`${t('roles.Distributor')} ${idx + 1}`}
                           </h4>
                           <div className="flex items-center gap-3 text-xs text-gray-500">
                             <span className="flex items-center gap-1">
