@@ -508,7 +508,9 @@ export default function ServiceRequest() {
                           </td>
 
                           <td className="px-4 py-4 text-sm font-bold text-orange-500">
-                            {formatVND(Number(item.estimatePrice))}
+                            {item.estimatePrice == 0
+                              ? t('contractorServiceRequestManager.negotiable')
+                              : formatVND(Number(item.estimatePrice))}{' '}
                           </td>
 
                           <td className="px-4 py-4">

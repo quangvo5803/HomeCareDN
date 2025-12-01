@@ -150,7 +150,7 @@ export default function ContractorServiceRequestManager() {
   return (
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
       <div className="w-full max-w-7xl mx-auto">
-        {/* Header - Improved */}
+        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-blue-500/25">
@@ -167,9 +167,9 @@ export default function ContractorServiceRequestManager() {
           </div>
         </div>
 
-        {/* Container - Enhanced Shadow & Border */}
+        {/* Main Container */}
         <div className="overflow-hidden bg-white shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100">
-          {/* Actions Bar - Refined */}
+          {/* Actions Bar */}
           <div className="flex flex-col sm:flex-row items-start justify-between gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
             <div className="flex items-center flex-wrap gap-3">
               <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm bg-white shadow-sm border border-gray-200">
@@ -196,8 +196,7 @@ export default function ContractorServiceRequestManager() {
                 />
                 <span className="text-sm font-medium text-gray-700 group-hover:text-orange-600 transition-colors flex items-center gap-2">
                   <i className="fa-solid fa-user-check text-orange-500"></i>
-                  {t('contractorServiceRequestManager.showAppliedOnly') ||
-                    'Đã ứng tuyển'}
+                  {t('contractorServiceRequestManager.showAppliedOnly')}
                 </span>
               </label>
               <select
@@ -208,7 +207,6 @@ export default function ContractorServiceRequestManager() {
                   setCurrentPage(1);
                 }}
                 className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
-                aria-label="Sort service requests"
               >
                 <option value="">
                   {t('contractorServiceRequestManager.sortDefault')}
@@ -223,9 +221,9 @@ export default function ContractorServiceRequestManager() {
             </div>
           </div>
 
-          {/* Content */}
+          {/* Content Area */}
           <div className="w-full">
-            {/* Desktop - Enhanced Cards */}
+            {/* Desktop View */}
             <div className="hidden lg:block">
               <div className="p-6 space-y-4">
                 {serviceRequests && serviceRequests.length > 0 ? (
@@ -242,17 +240,17 @@ export default function ContractorServiceRequestManager() {
                       request?.address?.city,
                     ].filter(Boolean);
                     const addressText = addressParts.join(', ') || '—';
+
                     return (
                       <div
                         key={request.serviceRequestID}
                         className="group relative bg-white border border-gray-200 rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 hover:border-orange-200"
                       >
-                        {/* Left gradient accent bar */}
                         <div
                           className={`absolute inset-y-0 left-0 w-1.5 rounded-l-2xl ${ui.accent} transition-all duration-300 group-hover:w-2`}
                         />
 
-                        {/* Header row */}
+                        {/* Header with title and status badges */}
                         <div className="flex justify-between items-start mb-5 pl-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
@@ -267,23 +265,35 @@ export default function ContractorServiceRequestManager() {
                                 {t(`Enums.ServiceType.${request.serviceType}`)}
                               </h3>
                             </div>
-
-                            {/* Location */}
                             <div className="flex items-center text-sm text-gray-600 gap-2 ml-0.5">
                               <i className="fa-solid fa-location-dot text-orange-500" />
-                              <span
-                                className="truncate max-w-[56rem] font-medium"
-                                title={addressText}
-                              >
+                              <span className="truncate max-w-[56rem] font-medium">
                                 {addressText}
                               </span>
                             </div>
                           </div>
-
-                          <StatusBadge status={request.status} type="Request" />
+                          <div className="flex flex-col items-end gap-2">
+                            <StatusBadge
+                              status={request.status}
+                              type="Request"
+                            />
+                            {request.selectedContractorApplicationID &&
+                              (request.selectedContractorApplicationID ===
+                              user.id ? (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                                  <i className="fa-solid fa-user-check"></i>
+                                  {t('common.YouWasSelected')}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                  <i className="fa-solid fa-user-check"></i>
+                                  {t('common.WasSelected')}
+                                </span>
+                              ))}
+                          </div>
                         </div>
 
-                        {/* Meta chips - Improved */}
+                        {/* Meta Information Chips */}
                         <div className="pl-4 mb-5 flex flex-wrap gap-2">
                           <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200">
                             <i className="fa-solid fa-box-open" />
@@ -317,12 +327,15 @@ export default function ContractorServiceRequestManager() {
                           </span>
                         </div>
 
-                        {/* Footer row - Enhanced */}
+                        {/* Footer */}
                         <div className="flex justify-between items-center pt-4 border-t border-gray-100 pl-4">
                           <div className="flex items-center gap-2 text-sm text-gray-500">
                             <i className="fa-regular fa-calendar text-gray-400"></i>
-                            <span className="font-medium">
-                              {formatDate(request.createdAt, i18n.language)}
+                            <span className="font-medium text-gray-700 ">
+                              {t('userPage.serviceRequest.label_timeLine')}
+                              {formatDate(request.startDate, i18n.language)}
+                              {' - '}{' '}
+                              {formatDate(request.endDate, i18n.language)}
                             </span>
                           </div>
                           <button
@@ -358,7 +371,7 @@ export default function ContractorServiceRequestManager() {
               </div>
             </div>
 
-            {/* Mobile - Enhanced */}
+            {/* Mobile View */}
             <div className="lg:hidden">
               <div className="p-4 space-y-4">
                 {serviceRequests && serviceRequests.length > 0 ? (
@@ -399,7 +412,6 @@ export default function ContractorServiceRequestManager() {
                                 {t(`Enums.ServiceType.${request.serviceType}`)}
                               </h3>
                             </div>
-
                             <div className="flex items-center text-xs text-gray-600 gap-1.5">
                               <i className="fa-solid fa-location-dot text-orange-500" />
                               <span
@@ -411,7 +423,20 @@ export default function ContractorServiceRequestManager() {
                             </div>
                           </div>
 
-                          <StatusBadge status={request.status} type="Request" />
+                          <div className="flex flex-col items-end gap-2">
+                            <StatusBadge
+                              status={request.status}
+                              type="Request"
+                            />
+                            {request.selectedContractorApplicationID && (
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                <i className="fa-solid fa-user-check"></i>
+                                <span className="hidden sm:inline">
+                                  Đã chọn
+                                </span>
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex flex-wrap gap-2 mb-3 text-xs">
@@ -431,6 +456,24 @@ export default function ContractorServiceRequestManager() {
                             {request.area || '—'} m²
                           </span>
                         </div>
+
+                        {/* Mobile Dates */}
+                        {(request.startDate || request.endDate) && (
+                          <div className="mb-3 space-y-1 text-xs">
+                            {request.startDate && (
+                              <div className="flex items-center gap-1.5 text-emerald-600 font-medium">
+                                <i className="fa-solid fa-calendar-check"></i>
+                                {formatDate(request.startDate, i18n.language)}
+                              </div>
+                            )}
+                            {request.endDate && (
+                              <div className="flex items-center gap-1.5 text-red-600 font-medium">
+                                <i className="fa-solid fa-calendar-xmark"></i>
+                                {formatDate(request.endDate, i18n.language)}
+                              </div>
+                            )}
+                          </div>
+                        )}
 
                         <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                           <div className="text-xs font-bold text-orange-600 inline-flex items-center gap-1.5">

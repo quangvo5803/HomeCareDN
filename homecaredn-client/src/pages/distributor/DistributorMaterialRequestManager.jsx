@@ -224,15 +224,39 @@ export default function MaterialRequestManager() {
 
                     {/* Header */}
                     <div className="flex justify-between items-start mb-4 pl-4">
-                      <div>
-                        <h3 className="text-xl text-gray-600 mt-1">
-                          <i className="fa-solid fa-location-dot text-orange-500 mr-2" />
-                          {addressText}
+                      {/* LEFT GROUP */}
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full">
+                          <i className="fas fa-boxes text-orange-600" />
+                        </div>
+
+                        <h3 className="text-xl font-bold text-gray-600 mt-1">
+                          {t('Enums.ServiceType.Material')} #
+                          {req.materialRequestID.substring(0, 8)}
                         </h3>
                       </div>
-                      <StatusBadge status={req.status} type="Request" />
-                    </div>
 
+                      {/* RIGHT BADGE */}
+                      <div className="flex items-center gap-3">
+                        <StatusBadge status={req.status} type="Request" />
+                        {req.selectedDistributorApplicationID &&
+                          (req.selectedDistributorApplicationID === user.id ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                              <i className="fa-solid fa-user-check"></i>
+                              {t('common.YouWasSelected')}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                              <i className="fa-solid fa-user-check"></i>
+                              {t('common.WasSelected')}
+                            </span>
+                          ))}
+                      </div>
+                    </div>
+                    <p className="text-gray-600 text-lg mb-4 pl-4">
+                      <i className="fa-solid fa-location-dot text-orange-500 mr-2" />
+                      {addressText}
+                    </p>
                     {/* Description */}
                     <p className="text-gray-600 text-lg mb-4 pl-4">
                       {req.description.length > 60
@@ -249,7 +273,9 @@ export default function MaterialRequestManager() {
                       </span>
                       <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-50 text-gray-700 border border-gray-200">
                         <i className="fa-regular fa-calendar" />
-                        {formatDate(req.createdAt, i18n.language)}
+                        {t('userPage.materialRequestDetail.deliveryDate')}
+                        {': '}
+                        {formatDate(req.deliveryDate, i18n.language)}
                       </span>
                     </div>
 

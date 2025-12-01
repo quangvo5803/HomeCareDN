@@ -173,7 +173,10 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();

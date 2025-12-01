@@ -25,11 +25,13 @@ namespace BusinessLogic.DTOs.Application.ServiceRequest
         public double Length { get; set; }
         public int Floors { get; set; }
         public double EstimatePrice { get; set; }
-        public required string Description { get; set; }
+        public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; } = string.Empty;
         public bool IsOpen { get; set; }
         public Guid? SelectedContractorApplicationID { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         public int ContractorApplyCount { get; set; }
         public ICollection<string>? ImageUrls { get; set; }

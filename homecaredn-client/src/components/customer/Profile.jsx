@@ -227,7 +227,7 @@ export default function Profile({ user }) {
     });
   };
 
-  const handleGeoChange = async (level, e) => {
+  const handleGeoChange = (level, e) => {
     const code = e.target.value;
 
     if (level === 'province') {
@@ -239,16 +239,10 @@ export default function Profile({ user }) {
       setAddrForm((s) => ({ ...s, city: '', district: '', ward: '' }));
 
       if (!code) return;
-      try {
-        const { data: province } = await geoService.getDistrictsByProvince(
-          Number(code)
-        );
-        const ds = province?.districts || [];
-        setDistricts(ds);
-        setAddrForm((s) => ({ ...s, city: province?.name || '' }));
-      } catch {
-        setDistricts([]);
-      }
+
+      const province = provinces.find((p) => String(p.code) === code);
+      setDistricts(province?.districts || []);
+      setAddrForm((s) => ({ ...s, city: province?.name || '' }));
     }
 
     if (level === 'district') {
@@ -258,16 +252,10 @@ export default function Profile({ user }) {
       setAddrForm((s) => ({ ...s, district: '', ward: '' }));
 
       if (!code) return;
-      try {
-        const { data: district } = await geoService.getWardsByDistrict(
-          Number(code)
-        );
-        const ws = district?.wards || [];
-        setWards(ws);
-        setAddrForm((s) => ({ ...s, district: district?.name || '' }));
-      } catch {
-        setWards([]);
-      }
+
+      const district = districts.find((d) => String(d.code) === code);
+      setWards(district?.wards || []);
+      setAddrForm((s) => ({ ...s, district: district?.name || '' }));
     }
 
     if (level === 'ward') {

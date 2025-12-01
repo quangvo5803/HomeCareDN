@@ -6,44 +6,45 @@ import ItemDetail from '../components/ItemDetail';
 
 export default function MaterialDetail() {
   const { materialID } = useParams();
-  const [material, setMaterial] = useState({});
-  const { getMaterialById, loading, fetchMaterials } = useMaterial();
+  const [material, setMaterial] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(true);
   const [randomMaterials, setRandomMaterials] = useState([]);
+  const { getMaterialById, fetchMaterials } = useMaterial();
   const location = useLocation();
 
   useEffect(() => {
     const fetchMaterial = async () => {
+      setLoadingDetail(true);
       const data = await getMaterialById(materialID);
-      if (data) {
-        data.type = 'material';
-      }
-      setMaterial(data || {});
+      if (data) data.type = 'material';
+      setMaterial(data);
+      setLoadingDetail(false);
     };
     fetchMaterial();
   }, [materialID, getMaterialById, location.key]);
 
   useEffect(() => {
-    if (!material.categoryID) return;
+    if (!material?.categoryID) return;
+
     const loadMaterials = async () => {
-      try {
-        const data = await fetchMaterials({
-          PageNumber: 1,
-          PageSize: 8,
-          SortBy: 'random',
-          FilterCategoryID: material.categoryID || null,
-          FilterBrandID: material.brandID || null,
-          ExcludedID: materialID,
-        });
-        setRandomMaterials(data || []);
-      } catch (err) {
-        console.error(err);
-        setRandomMaterials([]);
-      }
+      const data = await fetchMaterials({
+        PageNumber: 1,
+        PageSize: 8,
+        SortBy: 'random',
+        FilterCategoryID: material.categoryID,
+        FilterBrandID: material.brandID,
+        ExcludedID: materialID,
+      });
+
+      setRandomMaterials(data || []);
     };
 
     loadMaterials();
-  }, [fetchMaterials, material.categoryID, material.brandID, materialID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [material?.categoryID, material?.brandID, materialID]);
 
-  if (loading) return <Loading />;
+  // Không render khi detail chưa load xong
+  if (loadingDetail) return <Loading />;
+
   return <ItemDetail item={material} relatedItems={randomMaterials} />;
 }
