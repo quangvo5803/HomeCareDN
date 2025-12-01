@@ -7,49 +7,42 @@ import ItemDetail from '../components/ItemDetail';
 export default function ServiceDetail() {
   const { serviceID } = useParams();
   const location = useLocation();
-  const [service, setService] = useState({});
+  const [service, setService] = useState(null);
+  const [loadingDetail, setLoadingDetail] = useState(true);
   const [randomServices, setRandomServices] = useState([]);
-  const { getServiceById, fetchServices, loading } = useService();
+  const { getServiceById, fetchServices } = useService();
 
   useEffect(() => {
     const fetchService = async () => {
-      try {
-        const data = await getServiceById(serviceID);
-        if (data) {
-          data.type = 'service';
-        }
-        setService(data || {});
-      } catch (err) {
-        console.error('Error fetching service:', err);
-        setService({});
-      }
+      setLoadingDetail(true);
+      const data = await getServiceById(serviceID);
+      if (data) data.type = 'service';
+      setService(data);
+      setLoadingDetail(false);
     };
     fetchService();
   }, [serviceID, getServiceById, location.key]);
 
   useEffect(() => {
-    if (!service.serviceType) return;
+    if (!service?.serviceType) return;
 
     const loadServices = async () => {
-      try {
-        const data = await fetchServices({
-          PageNumber: 1,
-          PageSize: 8,
-          SortBy: 'random',
-          FilterServiceType: service.serviceType || null,
-          ExcludedID: serviceID,
-        });
-        setRandomServices(data || []);
-      } catch (err) {
-        console.error(err);
-        setRandomServices([]);
-      }
+      const data = await fetchServices({
+        PageNumber: 1,
+        PageSize: 8,
+        SortBy: 'random',
+        FilterServiceType: service.serviceType,
+        ExcludedID: serviceID,
+      });
+
+      setRandomServices(data || []);
     };
 
     loadServices();
-  }, [fetchServices, service.serviceType, serviceID]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [service?.serviceType, serviceID]);
 
-  if (loading) return <Loading />;
+  if (loadingDetail) return <Loading />;
 
   return <ItemDetail item={service} relatedItems={randomServices} />;
 }

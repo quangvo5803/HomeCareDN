@@ -448,6 +448,35 @@ export default function AdminServiceRequestDetail() {
                 </p>
               </div>
             </div>
+            {/* START DATE */}
+            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <i className="fa-regular fa-calendar-plus text-green-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">
+                  {t('userPage.createServiceRequest.form_startDate')}
+                </p>
+                <p className="font-semibold text-gray-800">
+                  {formatDate(serviceRequestDetail.startDate, i18n.language)}
+                </p>
+              </div>
+            </div>
+
+            {/* END DATE */}
+            <div className="flex items-center gap-3 p-3 bg-rose-50 rounded-xl">
+              <div className="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                <i className="fa-regular fa-calendar-check text-rose-600"></i>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">
+                  {t('userPage.createServiceRequest.form_endDate')}
+                </p>
+                <p className="font-semibold text-gray-800">
+                  {formatDate(serviceRequestDetail.endDate, i18n.language)}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div className="border-t pt-4">
@@ -476,7 +505,11 @@ export default function AdminServiceRequestDetail() {
                     {t('adminServiceRequestManager.estimatePrice')}
                   </p>
                   <p className="font-semibold text-emerald-600 text-lg">
-                    {formatVND(Number(serviceRequestDetail.estimatePrice))}
+                    {serviceRequestDetail.estimatePrice == 0
+                      ? t('contractorServiceRequestManager.negotiable')
+                      : formatVND(
+                          Number(serviceRequestDetail.estimatePrice)
+                        )}{' '}
                   </p>
                 </div>
               </div>
@@ -581,7 +614,11 @@ export default function AdminServiceRequestDetail() {
                         {t('adminServiceRequestManager.estimatePrice')}
                       </p>
                       <p className="font-bold text-lg text-emerald-700">
-                        {formatVND(selectedContractor.estimatePrice)}
+                        {serviceRequestDetail.estimatePrice == 0
+                          ? t('contractorServiceRequestManager.negotiable')
+                          : formatVND(
+                              Number(serviceRequestDetail.estimatePrice)
+                            )}{' '}
                       </p>
                     </div>
 

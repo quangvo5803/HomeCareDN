@@ -120,6 +120,8 @@ export default function ExsitingMaterialRequestModal({
                     <div className="flex items-center gap-2 mb-2">
                       <h4 className="font-semibold text-gray-900">
                         {t('Enums.ServiceType.Material')}
+                        {' #'}
+                        {req.materialRequestID.substring(0, 8)}
                       </h4>
                       {selectedRequest?.materialRequestID ===
                         req.materialRequestID && (
@@ -130,10 +132,6 @@ export default function ExsitingMaterialRequestModal({
                       <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
                         <i className="fas fa-calendar-alt"></i>
                         {new Date(req.createdAt).toLocaleDateString('vi-VN')}
-                      </span>
-                      <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded">
-                        <i className="fas fa-hashtag"></i>
-                        {req.materialRequestID.substring(0, 8)}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 text-xs text-gray-600 mb-2">
