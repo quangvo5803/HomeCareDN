@@ -17,7 +17,7 @@ async function initWorker() {
       // Sử dụng tessdata từ thư mục public/tessdata
       // Bạn cần tải các file .traineddata về thư mục này
       worker = await Tesseract.createWorker('vie+eng', 1, {
-        langPath: '/tessdata', // Đường dẫn đến thư mục chứa .traineddata files
+        langPath: new URL('/tessdata', import.meta.url).toString(), // Đường dẫn đến thư mục chứa .traineddata files
         logger: () => {},
       });
 
