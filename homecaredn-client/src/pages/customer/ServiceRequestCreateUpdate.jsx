@@ -286,6 +286,9 @@ export default function ServiceRequestCreateUpdate() {
       }
 
       const validFiles = [];
+
+      const toastId = toast.loading(t('common.scanDocument'));
+
       for (const file of files) {
         const content = await extractFileText(file);
         const error = detectSensitiveInfo(content);
@@ -301,6 +304,7 @@ export default function ServiceRequestCreateUpdate() {
         e.target.value = '';
         return;
       }
+      toast.dismiss(toastId);
 
       const mapped = validFiles.map((file) => ({
         file,

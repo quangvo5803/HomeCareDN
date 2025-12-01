@@ -404,6 +404,7 @@ export default function ContractorServiceRequestDetail() {
       return;
     }
     const validFiles = [];
+    const toastId = toast.loading(t('common.scanDocument'));
 
     for (const file of files) {
       const content = await extractFileText(file);
@@ -420,6 +421,8 @@ export default function ContractorServiceRequestDetail() {
       e.target.value = ''; // reset input
       return;
     }
+    toast.dismiss(toastId);
+
     const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
@@ -443,6 +446,7 @@ export default function ContractorServiceRequestDetail() {
       return;
     }
     const validFiles = [];
+    const toastId = toast.loading(t('common.scanDocument'));
 
     for (const file of files) {
       const content = await extractFileText(file);
@@ -459,6 +463,8 @@ export default function ContractorServiceRequestDetail() {
       e.target.value = ''; // reset input
       return;
     }
+    toast.dismiss(toastId);
+
     const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
