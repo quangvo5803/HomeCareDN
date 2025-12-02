@@ -1,21 +1,18 @@
 import api from '../services/public/api';
 
 export const aiChatService = {
-  send: async (input) => {
-    const body =
-      typeof input === 'string' ? { prompt: input } : { prompt: input?.prompt };
-
-    const res = await api.post('/AiChat/send', body, { withCredentials: true });
-    return res.data;
+  chat: async (dto) => {
+    const response = await api.post('/aiChat/chat', dto);
+    return response.data;
   },
 
-  history: async () => {
-    const res = await api.get('/AiChat/history', { withCredentials: true });
-    return res.data;
+  suggest: async (input) => {
+    const response = await api.post('/aiChat/suggest', { prompt: input });
+    return response.data;
   },
 
-  clear: async () => {
-    const res = await api.delete('/AiChat/history', { withCredentials: true });
-    return res.data;
+  estimate: async (dto) => {
+    const response = await api.post('/aiChat/estimate', dto);
+    return response.data;
   },
 };

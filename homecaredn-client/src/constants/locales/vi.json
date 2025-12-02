@@ -176,6 +176,7 @@
   },
   "materialViewAll": {
     "listMaterial": "Danh sách vật liệu",
+    "filter": "Lọc vật liệu",
     "filterCategory": "Danh mục vật liệu",
     "filterBrand": "Thương hiệu vật liệu",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
@@ -343,6 +344,7 @@
       "label_estimatePrice": "Giá dự kiến: ",
       "label_notEstimated": "Chưa ước tính",
       "label_packageOption": "Gói xây dựng: ",
+      "label_timeLine": "Thời gian xây dựng: ",
       "label_address": "Địa chỉ: ",
       "label_contractorApplyCount": "đơn ứng tuyển",
       "label_open": "Đang mở",
@@ -369,12 +371,15 @@
       "form_lengthPlaceholder": "Nhập chiều dài (mét)",
       "form_floor": "Số tầng",
       "form_floorPlaceholder": "Nhập số tầng",
+      "form_startDate": "Ngày bắt đầu thi công (dự kiến)",
+      "form_endDate": "Ngày kết thúc thi công (dự kiến)",
       "form_estimatePrice": "Giá ước tính",
       "form_estimatePricePlaceholder": "Nhập giá ước tính",
       "form_address": "Địa chỉ",
       "form_selectAddress": "Chọn địa chỉ",
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
+      "form_descriptionNote": "Vui lòng không nhập lại thông tin phía trên",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
       "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
       "uploading": "Đang tải lên",
@@ -439,6 +444,7 @@
       "descriptionsPlaceholder": "Nhập mô tả để nhà phân phối có thể tư vấn tốt hơn...",
       "address": "Địa chỉ",
       "selectAddress": "Chọn địa chỉ",
+      "deliveryDate": "Ngày giao hàng mong muốn",
       "allowEditQuantity": "Cho phép nhà phân phối chỉnh sửa số lượng",
       "allowEditQuantityDes": "Bật tùy chọn này để cho phép nhà phân phối điều chỉnh số lượng vật liệu khi nộp đơn ứng tuyển",
       "allowAddMaterial": "Cho phép nhà phân phối thêm những vật liệu cần thiết",
@@ -572,7 +578,8 @@
     "reviewComment": "Nội dung đánh giá",
     "reviewImages": "Hình ảnh đánh giá",
     "reviewedAt": "Ngày đánh giá",
-    "reviewImageTitle": "Ảnh đánh giá"
+    "reviewImageTitle": "Ảnh đánh giá",
+    "realTime": "Yêu cầu dịch vụ đã bị xóa"
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
@@ -637,11 +644,11 @@
     "deleteApplication": "Xóa đơn ứng tuyển",
     "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới",
     "customerInfo": "Thông tin khách hàng",
-    "customerName":"Tên khách hàng",
-    "customerPhone":"Số điện thoại"
+    "customerName": "Tên khách hàng",
+    "customerPhone": "Số điện thoại"
   },
   "partnerDashboard": {
-    "material":"Vật Liệu",
+    "material": "Vật Liệu",
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -696,6 +703,8 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
+    "aiWelcome": "Xin chào! Tôi là trợ lý AI của bạn. Tôi có thể giúp gì cho bạn hôm nay?",
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
     "headerStatusReady": "Sẵn sàng hỗ trợ",
     "action": {
@@ -711,7 +720,8 @@
     "tabAI": "Nhắn với AI",
     "tabAdmin": "Nhắn với Quản Trị Viên",
     "startAdminChat": "Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện",
-    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI"
+    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI",
+    "loadingAdminChat": "Đang tải cuộc trò chuyện với Quản Trị Viên..."
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",
@@ -797,7 +807,8 @@
       "supportChat": "Chat",
       "user": "Người dùng",
       "review": "Đánh giá",
-      "commission": "Tiền hoa hồng"
+      "commission": "Tiền hoa hồng",
+      "notification": "Thông báo"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -968,7 +979,7 @@
     "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi.",
     "noContractor": "Chưa có nhà thầu nào",
     "noContractorYet": "Chưa có nhà thầu nào đăng ký.",
-    "customerInfo":"Thông tin khách hàng",
+    "customerInfo": "Thông tin khách hàng",
     "customerName": "Tên khách hàng",
     "customerEmail": "Email khách hàng",
     "customerPhone": "Số điện thoại khách hàng",
@@ -1150,7 +1161,7 @@
       "historySR": "Lịch sử dịch vụ đã yêu cầu",
       "historyCA": "Lịch sử dịch vụ đã tham gia",
       "historyMR": "Lịch sử yêu cầu vật liệu",
-      "historyDA":"Lịch sử đơn hàng vật liệu",
+      "historyDA": "Lịch sử đơn hàng vật liệu",
       "history": "Chưa có lịch sử nào"
     }
   },
@@ -1229,6 +1240,34 @@
     "empty": "Không có đánh giá nào",
     "empty_description": "Hiện chưa có đánh giá nào được ghi nhận."
   },
+  "adminNotifyManager": {
+    "title": "Quản lý Thông báo",
+    "subtitle": "Danh sách thông báo cho người dùng trong hệ thống",
+    "notifications": "thông báo",
+    "no": "STT",
+    "titleVI": "Tiêu đề",
+    "messageVI": "Nội dung",
+    "type": "Loại",
+    "System": "Hệ thống",
+    "receiver": "Người nhận",
+    "roles": {
+      "Customer": "Khách hàng",
+      "Distributor": "Nhà phân phối",
+      "Contractor": "Nhà thầu"
+    },
+    "createAt": "Ngày tạo",
+    "action": "Thao tác",
+    "buttonCreate": "Tạo thông báo",
+    "detail": "Chi tiết thông báo",
+    "enterTitle": "Nhập tiêu đề ...",
+    "enterMess": "Nhập nội dung ...",
+    "empty": "Không tìm thấy thông báo nào",
+    "empty_description": "Hiện tại không có thông báo nào.",
+    "titleEN": "Tiêu đề (Tiếng anh)",
+    "messageEN": "Nội dung (Tiếng anh)",
+    "enterTitleEN": "Nhập tiêu đề bằng tiếng anh ...",
+    "enterMessEN": "Nhập nội dung bằng tiếng anh ..."
+  },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
     "title": "Trò chuyện",
@@ -1292,7 +1331,7 @@
     "UpdateMaterial": "Cập nhật vật liệu",
     "AddNewService": "Thêm dịch vụ",
     "UpdateService": "Cập nhật dịch vụ",
-    "AddNewRequest": "Tạo và thêm yêu cầu mới",
+    "AddNewRequest": "Tạo yêu cầu mới",
     "AddToExisting": "Thêm vào yêu cầu hiện có",
     "View": "Xem",
     "Edit": "Sửa",
@@ -1442,7 +1481,7 @@
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
     "CATEGORY_NAME_ALREADY_EXISTS": "Danh mục đã tồn tại",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
-    "MATERIAL_NAME_ALREADY_EXISTS":"Vật liệu đã tồn tại.",
+    "MATERIAL_NAME_ALREADY_EXISTS": "Vật liệu đã tồn tại.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
 
@@ -1489,7 +1528,10 @@
     "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại",
     "FORBIDDEN": "Bạn không có quyền truy cập trang này!",
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
-    "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!"
+    "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
+
+    "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
+    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1520,7 +1562,8 @@
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
     "RECONNECTED": "Đã kết nối lại với server!",
     "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
-    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!"
+    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!",
+    "NOTIFY_ADD": "Tạo thông báo thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1615,6 +1658,7 @@
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search": "Tìm kiếm...",
+    "sort": "Sắp xếp",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
@@ -1624,7 +1668,17 @@
     "sortCreateDateOld": "Cũ nhất",
     "Grid": "Lưới",
     "Table": "Bảng",
-    "All": "Tất cả"
+    "All": "Tất cả",
+    "SelectedContractor": "Nhà thầu được chọn",
+    "SelectedDistributor": "Nhà phân phối được chọn",
+    "YouWasSelected": "Bạn là người được chọn",
+    "WasSelected": "Đã chọn nhà thầu",
+    "category": "Danh Mục",
+    "brand": "Thương Hiệu",
+    "resetFilter": "Đặt lại bộ lọc",
+    "Download": "Tải xuống",
+    "scanDocument": "Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
+    "file_unnecessary": "{{count}} file chứa thông tin không cần thiết"
   },
   "commission": {
     "partner": {
@@ -1649,13 +1703,13 @@
     },
     "customer": {
       "expiredTitle": "Đơn ứng tuyển của đối tác đã bị từ chối",
-      "expiredMessage": "Do đối tác chưa hoàn tất phí hoa hồng, dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
-      "urgent": "Đang chờ đối tác hoàn tất thanh toán hoa hồng",
-      "less24h": "Nếu đối tác không thanh toán trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
-      "deadline": "Theo dõi tiến trình thanh toán hoa hồng của đối tác",
-      "completeNow": "⏳ Vui lòng chờ hệ thống cập nhật lại danh sách nhà thầu.",
-      "under24h": "⚠️ Đối tác sắp hết thời gian thanh toán, dịch vụ có thể sẽ được mở lại.",
-      "payBeforeDeadline": "Dịch vụ của bạn sẽ được mở lại tự động nếu đối tác không hoàn tất thanh toán đúng hạn."
+      "expiredMessage": "Do đối tác chưa hoàn tấtthủ tục để nhận dự án nên dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
+      "urgent": "Đang chờ đối tác hoàn tất thủ tục đăng kí nhận dự án",
+      "less24h": "Nếu đối tác không hoàn tất trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
+      "deadline": "Vui lòng đợi nhà thầu/nhà phân phối hoàn tất thủ tục",
+      "completeNow": "⏳ Vui lòng chờ hệ thống cập nhật lại danh sách nhà thầu/nhà phân phối.",
+      "under24h": "⚠️ Đối tác sắp hết thời gian hoàn tất thủ tục, dịch vụ có thể sẽ được mở lại.",
+      "payBeforeDeadline": "Dịch vụ của bạn sẽ được mở lại tự động nếu đối tác không hoàn tất thủ tục đúng hạn."
     },
     "days": "Ngày",
     "hours": "Giờ",

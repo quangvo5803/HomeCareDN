@@ -36,6 +36,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { paymentService } from '../../services/paymentService';
 import ChatSection from '../../components/ChatSection';
+import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
 
 export default function MaterialRequestDetail() {
   const navigate = useNavigate();
@@ -54,6 +55,8 @@ export default function MaterialRequestDetail() {
   const [newMaterials, setNewMaterials] = useState([]);
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
+  const [messageError, setMessageError] = useState(null);
+
   const [totalEstimatePrice, setTotalEstimatePrice] = useState(0);
 
   const [searchParams] = useSearchParams();
@@ -69,9 +72,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -295,7 +298,20 @@ export default function MaterialRequestDetail() {
       quantity: Number(i.quantity),
     })),
   });
-
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (message) {
+        const plainText =
+          new DOMParser().parseFromString(message, 'text/html').body
+            .textContent || '';
+        const errorMsg = detectSensitiveInfo(plainText);
+        setMessageError(errorMsg);
+      } else {
+        setMessageError(null);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [message]);
   //  Submit application
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -576,7 +592,7 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => {}}
+            onExpired={() => { }}
           />
           {new Date(existingApplication.dueCommisionTime) > new Date() && (
             <button
@@ -720,7 +736,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -885,7 +901,7 @@ export default function MaterialRequestDetail() {
                             onClick={() =>
                               handleDeleteMaterial(item.materialRequestItemID)
                             }
-                            disabled={!canAddMaterial}
+                            disabled={!canAddMaterial || !!messageError}
                             className="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-500 text-red-600 hover:text-white rounded-lg transition font-bold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <i className="fas fa-trash-alt"></i>
@@ -955,7 +971,12 @@ export default function MaterialRequestDetail() {
             onEditorChange={(content) => setMessage(content)}
           />
         </div>
-
+        {messageError && (
+          <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+            <i className="fas fa-exclamation-circle mr-2"></i>
+            {t(messageError)}
+          </p>
+        )}
         {/* Submit */}
         <div>
           <button
@@ -1251,6 +1272,16 @@ export default function MaterialRequestDetail() {
                 {addressText}
               </span>
             </div>
+            <div className="flex flex-wrap gap-2 text-lg text-gray-800">
+              <span className="flex items-center gap-2">
+                <i className="fas fa-clock text-orange-500"></i>
+                {t('userPage.materialRequestDetail.deliveryDate')}
+                {': '}
+                <span className="font-bold">
+                  {formatDate(materialRequest.deliveryDate, i18n.language)}
+                </span>
+              </span>
+            </div>
           </div>
 
           {/* Material List */}
@@ -1301,7 +1332,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1512,28 +1543,25 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${
-                      status.canDo
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-red-50 border-red-200'
-                    }`}
+                    className={`p-4 rounded-lg text-center border ${status.canDo
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                      }`}
                   >
                     <p
-                      className={`text-sm text-gray-800 mb-2 ${
-                        status.nowrap
-                          ? 'whitespace-nowrap'
-                          : 'whitespace-normal'
-                      }`}
+                      className={`text-sm text-gray-800 mb-2 ${status.nowrap
+                        ? 'whitespace-nowrap'
+                        : 'whitespace-normal'
+                        }`}
                     >
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${
-                          status.canDo
-                            ? 'fa-check text-green-600'
-                            : 'fa-xmark text-red-600'
-                        }`}
+                        className={`fa-solid text-xl ${status.canDo
+                          ? 'fa-check text-green-600'
+                          : 'fa-xmark text-red-600'
+                          }`}
                       />
                     </div>
                   </div>

@@ -9,8 +9,11 @@ namespace DataAccess.Entities.Application
         public NotificationType Type { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
+        public string? TitleEN { get; set; }
+        public string? MessageEN { get; set; }
         public string? TargetRoles { get; set; }
         public Guid? TargetUserId { get; set; }
+        public Guid? SenderUserId { get; set; } // cho admin send notify
         public bool IsRead { get; set; } = false;
         public string? DataKey { get; set; }
         public string? DataValue { get; set; }
@@ -40,6 +43,9 @@ namespace DataAccess.Entities.Application
         Reject,
 
         [Display(Name = "Paid")]
-        Paid
+        Paid,
+
+        [Display(Name = "Send")]
+        Send
     }
 }

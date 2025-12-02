@@ -286,7 +286,7 @@ namespace BusinessLogic.Services.Interfaces
         {
             var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
                 sr => sr.ServiceRequestID == id,
-                includeProperties: "ContractorApplications.Images",
+                includeProperties: "ContractorApplications.Images,ContractorApplications.Documents",
                 false
             );
 

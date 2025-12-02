@@ -360,7 +360,7 @@ namespace BusinessLogic.Services
         public async Task<bool> CheckMaterialExisiting(string materialName, Guid? materialId = null)
         {
             var existing = await _unitOfWork.MaterialRepository.GetAsync(m =>
-                (!materialId.HasValue || m.BrandID != materialId.Value)
+                (!materialId.HasValue || m.MaterialID != materialId.Value)
                 && (m.Name == materialName || m.NameEN == materialName)
             );
             return existing != null;

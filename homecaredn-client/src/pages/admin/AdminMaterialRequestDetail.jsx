@@ -75,14 +75,15 @@ export default function AdminMaterialRequestDetail() {
       }
     },
     [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      console.log("payload", payload);
       setMaterialRequests((prev) =>
-        prev.map((mr) =>
-          mr.materialRequestID === payload.materialRequestID
-            ? { ...mr, status: 'Closed' }
-            : mr
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? { ...sr, status: 'Closed' }
+            : sr
         )
       );
-      if (materialRequestId == payload.serviceRequestID) {
+      if (materialRequestId == payload.materialRequestID) {
         setMaterialRequestDetail(
           (prev) => prev && { ...prev, status: 'Closed' }
         );
@@ -90,10 +91,10 @@ export default function AdminMaterialRequestDetail() {
           const newList = prev.map((ca) =>
             ca.distributorApplicationID === payload.distributorApplicationID
               ? {
-                  ...ca,
-                  status: 'PendingCommission',
-                  dueCommisionTime: payload?.dueCommisionTime || null,
-                }
+                ...ca,
+                status: 'PendingCommission',
+                dueCommisionTime: payload?.dueCommisionTime || null,
+              }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -103,7 +104,18 @@ export default function AdminMaterialRequestDetail() {
           );
 
           if (selected) {
-            setSelectedDistributor(selected);
+            setSelectedDistributor((prev) => ({
+              ...prev,
+              totalEstimatePrice: payload.totalEstimatePrice ?? prev.totalEstimatePrice,
+              items: payload.items ?? prev.items,
+              message: payload.message ?? prev.message,
+              averageRating: prev.averageRating ?? 0,
+              completedProjectCount: prev.completedProjectCount ?? 0,
+              ratingCount: prev.ratingCount ?? 0,
+              distributorName: prev.distributorName ?? '',
+              distributorEmail: prev.distributorEmail ?? '',
+              distributorPhone: prev.distributorPhone ?? '',
+            }));
             setViewingDistributorDetail(true);
           }
 
@@ -111,9 +123,8 @@ export default function AdminMaterialRequestDetail() {
         });
       }
     },
-
     [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
-      if (materialRequestId == payload.serviceRequestID) {
+      if (materialRequestId == payload.materialRequestID) {
         // Update contractor list
         setDistributorApplicationList((prev) =>
           prev.map((ca) =>
@@ -134,8 +145,8 @@ export default function AdminMaterialRequestDetail() {
         }
       }
     },
-
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      console.log("payload", payload);
       if (
         payload.distributorApplicationID ===
         selectedDistributor?.distributorApplicationID
@@ -144,7 +155,14 @@ export default function AdminMaterialRequestDetail() {
           ...prev,
           status: 'Approved',
           dueCommisionTime: null,
+          payment: { ...prev.payment, ...payload }
         }));
+      }
+    },
+    [RealtimeEvents.MaterialRequestDelete]: (payload) => {
+      if (payload.materialRequestID === materialRequestId) {
+        navigate('/Admin/MaterialRequestManager');
+        toast.info(t('distributorMaterialRequestDetail.realTime'));
       }
     },
   });
@@ -339,6 +357,12 @@ export default function AdminMaterialRequestDetail() {
         <div className="bg-white rounded-2xl shadow-sm p-6">
           <div className="mb-6">
             <p className="text-xl font-semibold text-gray-800 mb-2">
+              {t('userPage.materialRequestDetail.deliveryDate')}
+            </p>
+            {formatDate(materialRequestDetail.deliveryDate, i18n.language)}
+          </div>
+          <div className="mb-6">
+            <p className="text-xl font-semibold text-gray-800 mb-2">
               {t('adminMaterialRequestManager.description')}
             </p>
             <div
@@ -431,7 +455,7 @@ export default function AdminMaterialRequestDetail() {
                               {i18n.language === 'vi'
                                 ? item?.material?.name
                                 : item?.material?.nameEN ||
-                                  item?.material?.name}
+                                item?.material?.name}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
                               {item.quantity}
@@ -440,7 +464,7 @@ export default function AdminMaterialRequestDetail() {
                               {i18n.language === 'vi'
                                 ? item?.material?.unit
                                 : item?.material?.unitEn ||
-                                  item?.material?.unit}
+                                item?.material?.unit}
                             </td>
                           </tr>
                         )
@@ -654,6 +678,84 @@ export default function AdminMaterialRequestDetail() {
                     )}
                 </div>
               </div>
+              {/*Payment Information */}
+              {selectedDistributor.status === 'Approved' && (
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100 mt-5">
+                  <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                    <i className="fa-solid fa-credit-card"></i>
+                    {t(
+                      'adminServiceRequestManager.contractorDetail.paymentInfo'
+                    )}
+                  </p>
+
+                  <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                    <table className="w-full">
+                      <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
+                        <tr>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.orderCode'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.amount'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t('adminServiceRequestManager.description')}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.createAt'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t('adminServiceRequestManager.status')}
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-gray-100">
+                        <tr className="hover:bg-indigo-50 transition-colors">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                            {selectedDistributor.payment?.orderCode || 'N/A'}
+                          </td>
+
+                          <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
+                            {formatVND(
+                              selectedDistributor.payment?.amount || 0
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                            {selectedDistributor.payment?.description?.replaceAll(
+                              '-',
+                              ''
+                            ) || 'No description'}
+                          </td>
+
+                          <td className="px-4 py-4 text-sm text-gray-700 text-center">
+                            {formatDate(
+                              selectedDistributor.payment?.paidAt,
+                              i18n.language
+                            )}
+                          </td>
+
+                          <td className="px-4 py-4 text-sm text-gray-900 text-center">
+                            <div className="flex justify-center">
+                              <StatusBadge
+                                status={selectedDistributor.payment?.status}
+                                type="Payment"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           ) : distributorApplicationList.length === 0 ? (
             <div className="flex flex-col items-center mt-5 mb-5">

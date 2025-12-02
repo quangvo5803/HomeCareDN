@@ -21,8 +21,10 @@ namespace DataAccess.Entities.Application
         public double Length { get; set; }
         public int Floors { get; set; } = 1;
         public double? EstimatePrice { get; set; }
-        public required string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public RequestStatus Status { get; set; } = RequestStatus.Opening;
         public Guid? SelectedContractorApplicationID { get; set; } //Nhà thầu khách hàng chọn
         public Guid? ConversationID { get; set; }

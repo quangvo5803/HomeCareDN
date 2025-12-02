@@ -371,7 +371,7 @@ namespace BusinessLogic.Services
                 .MaterialRequestRepository.GetQueryable()
                 .AsNoTracking()
                 .CountAsync(sr =>
-                    sr.Status != RequestStatus.Closed && sr.SelectedDistributorApplication == null
+                    sr.Status == RequestStatus.Opening && sr.SelectedDistributorApplication == null
                 );
 
             var statusCounts = await _unitOfWork

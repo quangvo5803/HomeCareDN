@@ -15,6 +15,7 @@ namespace BusinessLogic.DTOs.Application.Service
         public required string BuildingType { get; set; }
         public string? MainStructureType { get; set; }
         public string? DesignStyle { get; set; }
+        public DateTime CreatedAt { get; set; }
         public ICollection<string>? ImageUrls { get; set; }
         public ICollection<string>? ImagePublicIds { get; set; }
     }

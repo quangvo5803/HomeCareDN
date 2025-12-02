@@ -14,10 +14,10 @@ import { useUser } from '../../hook/useUser';
 import { useState } from 'react';
 import ReviewModal from '../modal/ReviewModal';
 import ReviewCountdown from '../customer/ReviewCountdown';
-import { formatVND } from '../../utils/formatters';
+import { formatDate, formatVND } from '../../utils/formatters';
 
 export default function ServiceRequestManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { profile, addresses } = useUser();
   const { loading, serviceRequests, setServiceRequests, deleteServiceRequest } =
@@ -249,8 +249,12 @@ export default function ServiceRequestManager() {
         readOnly={reviewReadOnly}
       />
 
-      {!serviceRequests || serviceRequests.length === 0 ? (
-        <div className="text-center py-16 bg-gray-50 rounded-xl">
+      {loading ? (
+        <div className="py-10 text-center bg-white rounded-xl">
+          <LoadingComponent />
+        </div>
+      ) : !serviceRequests || serviceRequests.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-xl">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-orange-100 rounded-full mb-4">
             <i className="fas fa-tools text-3xl text-orange-600"></i>
           </div>
@@ -349,7 +353,15 @@ export default function ServiceRequestManager() {
                         </span>
                       </div>
                     )}
-
+                    <div className="mt-2 flex items-center gap-2 text-sm">
+                      <i className="fa-solid fa-clock text-orange-500"></i>
+                      {t('userPage.serviceRequest.label_timeLine')}
+                      <span className="font-semibold">
+                        {formatDate(req.startDate, i18n.language) +
+                          ' - ' +
+                          formatDate(req.endDate, i18n.language)}
+                      </span>
+                    </div>
                     <div className="mt-2 flex items-center gap-2 text-sm">
                       <i className="fa-solid fa-location-dot text-orange-500"></i>
                       {t('userPage.serviceRequest.label_address')}

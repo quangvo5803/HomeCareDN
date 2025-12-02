@@ -124,6 +124,11 @@ namespace HomeCareDNAPI
 
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddMemoryCache();
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration.GetConnectionString("Redis");
+                options.InstanceName = "HomeCareDN_";
+            });
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddHostedService<ContractorApplicationMonitor>();
             builder.Services.AddHostedService<DistributorApplicationMonitor>();
@@ -168,7 +173,10 @@ namespace HomeCareDNAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
             app.UseMiddleware<ValidationExceptionMiddleware>();
 
             app.UseHttpsRedirection();

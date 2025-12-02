@@ -9,37 +9,35 @@ namespace HomeCareDNAPI.Controllers
     [ApiController]
     public class AiChatController : ControllerBase
     {
-        private readonly IFacadeService _facade;
+        private readonly IFacadeService _facadeService;
 
-        public AiChatController(IFacadeService facade)
+        public AiChatController(IFacadeService facadeService)
         {
-            _facade = facade;
+            _facadeService = facadeService;
         }
 
-        [HttpPost("send")]
+        [HttpPost("chat")]
         [AllowAnonymous]
-        public async Task<IActionResult> Send([FromBody] AiChatRequestDto dto)
+        public async Task<IActionResult> Chat([FromBody] AiChatRequestDto dto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Prompt))
-                return BadRequest("PROMPT_REQUIRED");
-            var result = await _facade.AiChatService.SendAsync(dto);
+            var result = await _facadeService.AiChatService.ChatSupportAsync(dto);
             return Ok(result);
         }
 
-        [HttpGet("history")]
+        [HttpPost("suggest")]
         [AllowAnonymous]
-        public async Task<IActionResult> History()
+        public async Task<IActionResult> Suggest([FromBody] AiChatRequestDto dto)
         {
-            var history = await _facade.AiChatService.GetHistoryAsync();
-            return Ok(history);
+            var result = await _facadeService.AiChatService.SuggestSearchAsync(dto.Prompt);
+            return Ok(result);
         }
 
-        [HttpDelete("history")]
+        [HttpPost("estimate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Clear()
+        public async Task<IActionResult> Estimate([FromBody] AiEstimateRequestDto dto)
         {
-            await _facade.AiChatService.ClearHistoryAsync();
-            return NoContent();
+            var result = await _facadeService.AiChatService.EstimatePriceAsync(dto);
+            return Ok(new { estimate = result });
         }
     }
 }

@@ -44,6 +44,7 @@ import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminReviewManager from './pages/admin/AdminReviewManager';
 import AdminPaymentManager from './pages/admin/AdminPaymentManager';
+import AdminNotificationManager from './pages/admin/AdminNotificationManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -102,11 +103,10 @@ function App() {
           aria-label="Back to top"
           className={`fixed bottom-6 right-22 z-50 w-14 h-14 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${
-                      showBackTop
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 translate-y-3 pointer-events-none'
-                    }`}
+                    ${showBackTop
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-3 pointer-events-none'
+            }`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -342,6 +342,7 @@ function Layout() {
           <Route path="UserManager/:userID" element={<AdminUserDetail />} />
           <Route path="ReviewManager" element={<AdminReviewManager />} />
           <Route path="PaymentManager" element={<AdminPaymentManager />} />
+          <Route path="NotificationManager" element={<AdminNotificationManager />} />
         </Route>
         {/* Contractor routes */}
         <Route

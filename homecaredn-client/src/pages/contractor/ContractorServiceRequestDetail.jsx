@@ -34,6 +34,8 @@ import 'tinymce/plugins/lists';
 import 'tinymce/plugins/link';
 import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
+import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
+import { extractFileText } from '../../utils/extractFileText';
 //For TINY MCE
 
 const MAX_IMAGES = 5;
@@ -55,6 +57,7 @@ export default function ContractorServiceRequestDetail() {
   const [images, setImages] = useState([]);
   const [documents, setDocuments] = useState([]);
   const [description, setDescription] = useState('');
+  const [descriptionError, setDescriptionError] = useState(null);
   const [estimatePrice, setEstimatePrice] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [totalApplications, setTotalApplications] = useState(0);
@@ -87,9 +90,9 @@ export default function ContractorServiceRequestDetail() {
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -111,10 +114,10 @@ export default function ContractorServiceRequestDetail() {
       }));
     },
     //Delete
-    [RealtimeEvents.MaterialRequestDelete]: (payload) => {
+    [RealtimeEvents.ServiceRequestDelete]: (payload) => {
       if (payload.serviceRequestID === serviceRequestId) {
         navigate('/Contractor/ServiceRequestManager');
-        toast.info(t('distributorMaterialRequestDetail.realTime'));
+        toast.info(t('contractorServiceRequestDetail.realTime'));
       }
     },
   });
@@ -267,22 +270,22 @@ export default function ContractorServiceRequestDetail() {
       const imageUploadPromise =
         newImageFiles.length > 0
           ? uploadToCloudinary(
-              newImageFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setImageProgress(progress),
-              'HomeCareDN/ContractorAppication'
-            )
+            newImageFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setImageProgress(progress),
+            'HomeCareDN/ContractorAppication'
+          )
           : Promise.resolve(null);
 
       const documentUploadPromise =
         newDocumentFiles.length > 0
           ? uploadToCloudinary(
-              newDocumentFiles,
-              import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-              (progress) => setDocumentProgress(progress),
-              'HomeCareDN/ContractorAppication/Documents',
-              'raw'
-            )
+            newDocumentFiles,
+            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+            (progress) => setDocumentProgress(progress),
+            'HomeCareDN/ContractorAppication/Documents',
+            'raw'
+          )
           : Promise.resolve(null);
 
       const [imageResults, documentResults] = await Promise.all([
@@ -378,17 +381,49 @@ export default function ContractorServiceRequestDetail() {
       toast.error(err?.message || 'Lỗi thanh toán');
     }
   };
-
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (description) {
+        const plainText =
+          new DOMParser().parseFromString(description, 'text/html').body
+            .textContent || '';
+        const errorMsg = detectSensitiveInfo(plainText);
+        setDescriptionError(errorMsg);
+      } else {
+        setDescriptionError(null);
+      }
+    }, 300);
+    return () => clearTimeout(timeoutId);
+  }, [description]);
   // Image handlers
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
 
     if (files.length + images.length > 5) {
       toast.error(t('ERROR.MAXIMUM_IMAGE'));
       return;
     }
+    const validFiles = [];
+    const toastId = toast.loading(t('common.scanDocument'));
 
-    const mapped = files.map((file) => ({
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${file.name} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+    toast.dismiss(toastId);
+
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
@@ -403,15 +438,34 @@ export default function ContractorServiceRequestDetail() {
   const handleRemoveDocument = (doc) => {
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
   };
-  const handleDocumentChange = (e) => {
+  const handleDocumentChange = async (e) => {
     const files = Array.from(e.target.files);
 
     if (files.length + documents.length > 5) {
       toast.error(t('ERROR.MAXIMUM_DOCUMENTS'));
       return;
     }
+    const validFiles = [];
+    const toastId = toast.loading(t('common.scanDocument'));
 
-    const mapped = files.map((file) => ({
+    for (const file of files) {
+      const content = await extractFileText(file);
+      const error = detectSensitiveInfo(content);
+
+      if (error) {
+        toast.error(`${file.name} - ${t(error)}`);
+      } else {
+        validFiles.push(file);
+      }
+    }
+
+    if (validFiles.length === 0) {
+      e.target.value = ''; // reset input
+      return;
+    }
+    toast.dismiss(toastId);
+
+    const mapped = validFiles.map((file) => ({
       file,
       url: URL.createObjectURL(file),
       isNew: true,
@@ -556,6 +610,16 @@ export default function ContractorServiceRequestDetail() {
                   <p className="text-gray-900 font-medium">
                     {serviceRequest.floors}{' '}
                     {t('contractorServiceRequestDetail.floorsUnit')}
+                  </p>
+                </div>
+                <div className="col-span-full">
+                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                    <i className="fa-solid fa-calendar mr-2 text-gray-400" />
+                    {t('userPage.serviceRequest.label_timeLine')}
+                  </label>
+                  <p className="text-gray-900 font-medium">
+                    {formatDate(serviceRequest.startDate, i18n.language)}
+                    {' - '} {formatDate(serviceRequest.endDate, i18n.language)}
                   </p>
                 </div>
               </div>
@@ -788,12 +852,12 @@ export default function ContractorServiceRequestDetail() {
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
-                            'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
-                            { est: formatVND(serviceRequest.estimatePrice) }
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholderWithEst',
+                          { est: formatVND(serviceRequest.estimatePrice) }
+                        )
                         : t(
-                            'contractorServiceRequestDetail.bidPricePlaceholder'
-                          )
+                          'contractorServiceRequestDetail.bidPricePlaceholder'
+                        )
                     }
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
@@ -857,7 +921,12 @@ export default function ContractorServiceRequestDetail() {
                     onEditorChange={(content) => setDescription(content)}
                   />
                 </div>
-
+                {descriptionError && (
+                  <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                    <i className="fas fa-exclamation-circle mr-2"></i>
+                    {t(descriptionError)}
+                  </p>
+                )}
                 {/* Images */}
                 <div>
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -993,7 +1062,11 @@ export default function ContractorServiceRequestDetail() {
                   <button
                     type="submit"
                     className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                    disabled={!estimatePrice.trim() || !description.trim()}
+                    disabled={
+                      !estimatePrice.trim() ||
+                      !description.trim() ||
+                      !!descriptionError
+                    }
                   >
                     <i className="fas fa-paper-plane" />
                     {t('contractorServiceRequestDetail.applyForProject')}
@@ -1327,18 +1400,18 @@ export default function ContractorServiceRequestDetail() {
                           dueCommisionTime={
                             existingApplication.dueCommisionTime
                           }
-                          onExpired={() => {}}
+                          onExpired={() => { }}
                         />
                         {new Date(existingApplication.dueCommisionTime) >
                           new Date() && (
-                          <button
-                            onClick={handlePayCommission}
-                            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
-                          >
-                            <i className="fas fa-hand-holding-usd" />
-                            {t('contractorServiceRequestDetail.payCommission')}
-                          </button>
-                        )}
+                            <button
+                              onClick={handlePayCommission}
+                              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+                            >
+                              <i className="fas fa-hand-holding-usd" />
+                              {t('contractorServiceRequestDetail.payCommission')}
+                            </button>
+                          )}
                       </>
                     )}
                   </>
@@ -1403,7 +1476,7 @@ export default function ContractorServiceRequestDetail() {
           {/* Review Section - Show when Approved and user is the selected contractor */}
           {existingApplication?.status === 'Approved' &&
             serviceRequest.selectedContractorApplication?.contractorID ===
-              user?.id &&
+            user?.id &&
             serviceRequest.review && (
               <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
@@ -1417,11 +1490,10 @@ export default function ContractorServiceRequestDetail() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <i
                         key={star}
-                        className={`fa-solid fa-star text-2xl ${
-                          star <= serviceRequest.review.rating
-                            ? 'text-amber-400'
-                            : 'text-gray-300'
-                        }`}
+                        className={`fa-solid fa-star text-2xl ${star <= serviceRequest.review.rating
+                          ? 'text-amber-400'
+                          : 'text-gray-300'
+                          }`}
                       ></i>
                     ))}
                   </div>

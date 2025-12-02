@@ -12,6 +12,7 @@ namespace DataAccess.Entities.Application
         public string? Description { get; set; }
         public bool CanAddMaterial { get; set; } = false;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? DeliveryDate { get; set; }
         public RequestStatus Status { get; set; } = RequestStatus.Draft;
         public Guid? ConversationID { get; set; }
         public ICollection<MaterialRequestItem>? MaterialRequestItems { get; set; }

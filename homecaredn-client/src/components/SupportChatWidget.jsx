@@ -5,11 +5,13 @@ import {
   useState,
   useContext,
   useCallback,
+  createContext,
 } from 'react';
+import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useTranslation } from 'react-i18next';
 import { aiChatService } from '../services/aiChatService';
-import { getSupportPrompt } from '../prompts/supportPrompt';
 import { useAuth } from '../hook/useAuth';
 import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
@@ -21,6 +23,10 @@ import { conversationService } from '../services/conversationService';
 
 const ROLES = { USER: 'user', BOT: 'assistant' };
 const cn = (...xs) => xs.filter(Boolean).join(' ');
+
+// Keys local
+const STORAGE_KEY_SESSION = 'homecare_ai_session_id';
+const STORAGE_KEY_MESSAGES = 'homecare_ai_messages';
 
 //AdminID
 const ADMIN_ID = import.meta.env.VITE_ADMIN_ID;
@@ -49,16 +55,12 @@ const uid = (() => {
   };
 })();
 
-// Helper for AI
-const toAiUiMessage = (m) => ({
+// Helper for AI UI Message
+const toAiUiMessage = (text, role) => ({
   id: uid(),
-  role: m.role === 'assistant' ? ROLES.BOT : ROLES.USER,
-  text: m.content ?? m.text ?? '',
-  time:
-    m.time ??
-    (m.timestamp
-      ? new Date(m.timestamp).toTimeString().slice(0, 5)
-      : new Date().toTimeString().slice(0, 5)),
+  role: role,
+  text: text,
+  time: new Date().toTimeString().slice(0, 5),
 });
 
 const toAdminUiMessage = (m, currentUserId) => ({
@@ -105,9 +107,77 @@ const MessageShape = PropTypes.exact({
     PropTypes.instanceOf(Date),
   ]),
 });
+const MessageContext = createContext({ isUser: false });
+const MarkdownP = ({ children }) => (
+  <p className="mb-1 last:mb-0 inline-block">{children}</p>
+);
+MarkdownP.propTypes = { children: PropTypes.node };
+
+const MarkdownTable = ({ children }) => (
+  <div className="overflow-x-auto my-2 border rounded">
+    <table className="min-w-full divide-y divide-gray-300 text-xs">
+      {children}
+    </table>
+  </div>
+);
+MarkdownTable.propTypes = { children: PropTypes.node };
+
+const MarkdownTh = ({ children }) => (
+  <th className="px-2 py-1 bg-gray-100 font-bold text-left">{children}</th>
+);
+MarkdownTh.propTypes = { children: PropTypes.node };
+
+const MarkdownTd = ({ children }) => (
+  <td className="px-2 py-1 border-t">{children}</td>
+);
+MarkdownTd.propTypes = { children: PropTypes.node };
+
+const MarkdownLink = ({ href, children }) => {
+  const { isUser } = useContext(MessageContext);
+
+  const isInternal = href?.startsWith('/');
+  const linkClass = cn(
+    'font-bold underline transition-colors duration-200',
+    isUser
+      ? 'text-blue-100 hover:text-white'
+      : 'text-blue-600 hover:text-blue-800'
+  );
+
+  if (isInternal) {
+    return (
+      <Link to={href} className={linkClass}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={linkClass}
+    >
+      {children}
+    </a>
+  );
+};
+MarkdownLink.propTypes = {
+  href: PropTypes.string,
+  children: PropTypes.node,
+};
+
+const markdownComponents = {
+  a: MarkdownLink,
+  p: MarkdownP,
+  table: MarkdownTable,
+  th: MarkdownTh,
+  td: MarkdownTd,
+};
 
 function MessageBubble({ message }) {
   const isUser = message.role === ROLES.USER;
+  const contextValue = useMemo(() => ({ isUser }), [isUser]);
+
   return (
     <div
       className={cn(
@@ -118,19 +188,24 @@ function MessageBubble({ message }) {
       {!isUser && <BotAvatar />}
       <div
         className={cn(
-          'max-w-[75%] md:max-w-[65%]',
+          'max-w-[85%] md:max-w-[75%]',
           isUser ? 'items-end' : 'items-start'
         )}
       >
         <div
           className={cn(
-            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border',
+            'rounded-2xl px-4 py-2 text-sm leading-relaxed shadow-sm border overflow-hidden',
             isUser
               ? 'bg-orange-600 text-white border-indigo-500/30'
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
-          {message.text}
+          {/* Truyền giá trị đã memo vào Provider */}
+          <MessageContext.Provider value={contextValue}>
+            <ReactMarkdown components={markdownComponents}>
+              {message.text}
+            </ReactMarkdown>
+          </MessageContext.Provider>
         </div>
         <div
           className={cn(
@@ -148,7 +223,6 @@ function MessageBubble({ message }) {
 MessageBubble.propTypes = {
   message: MessageShape.isRequired,
 };
-
 function MessageList({ messages, filter }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
@@ -207,11 +281,6 @@ function ChatHeader({
               ? t('supportChat.action.expand')
               : t('supportChat.action.minimize')
           }
-          aria-label={
-            isMinimized
-              ? t('supportChat.action.expand')
-              : t('supportChat.action.minimize')
-          }
         >
           {isMinimized ? (
             <i className="fa-regular fa-square" />
@@ -223,7 +292,6 @@ function ChatHeader({
           onClick={onClose}
           className="h-8 w-8 grid place-items-center rounded hover:bg-gray-100"
           title={t('supportChat.action.close')}
-          aria-label={t('supportChat.action.close')}
         >
           <i className="fa-solid fa-xmark" />
         </button>
@@ -268,13 +336,22 @@ TabButton.propTypes = {
 function ChatInput({ onSend, disabled, isLoading, countdown }) {
   const { t } = useTranslation();
   const [value, setValue] = useState('');
+
   const submit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     const v = value.trim();
     if (!v) return;
     onSend(v);
     setValue('');
   };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submit();
+    }
+  };
+
   const buttonText = useMemo(() => {
     if (isLoading) {
       return <i className="fa-solid fa-spinner animate-spin w-4" />;
@@ -282,27 +359,31 @@ function ChatInput({ onSend, disabled, isLoading, countdown }) {
     if (countdown > 0) {
       return <span className="w-4 font-bold">{countdown}s</span>;
     }
-    return t('supportChat.send');
-  }, [isLoading, countdown, t]);
+    return <i className="fa-solid fa-paper-plane" />;
+  }, [isLoading, countdown]);
+
   return (
-    <form onSubmit={submit} className="flex w-full items-center gap-2">
-      <input
+    <form onSubmit={submit} className="flex w-full items-end gap-2">
+      <textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={t('supportChat.inputPlaceholder')}
-        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="flex-1 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none h-10 leading-snug overflow-y-auto"
         disabled={disabled}
+        rows={1}
       />
       <button
         type="submit"
         disabled={disabled || !value.trim()}
-        className="rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-20 text-center transition-all duration-150"
+        className="h-10 rounded-md bg-orange-600 px-3 py-2 text-white disabled:opacity-50 w-12 text-center transition-all duration-150 grid place-items-center font-medium"
       >
         {buttonText}
       </button>
     </form>
   );
 }
+
 ChatInput.propTypes = {
   onSend: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
@@ -311,7 +392,7 @@ ChatInput.propTypes = {
 };
 
 function ChatWindow({ open, onClose, brand }) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
 
@@ -323,6 +404,7 @@ function ChatWindow({ open, onClose, brand }) {
   // State for AI
   const [aiMessages, setAiMessages] = useState([]);
   const [aiTyping, setAiTyping] = useState(false);
+  const [sessionId, setSessionId] = useState('');
 
   // State for Chat Admin
   const [adminMessages, setAdminMessages] = useState([]);
@@ -331,47 +413,60 @@ function ChatWindow({ open, onClose, brand }) {
   const [adminSending, setAdminSending] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const countdownRef = useRef(null);
-  const parseErr = (err) =>
-    err?.response?.data ?? err?.message ?? 'Bad request';
 
-  // ----- Logic cho AI Chat -----
-  const loadAiHistory = async () => {
-    try {
-      const raw = await aiChatService.history();
-      const list = Array.isArray(raw) ? raw.map(toAiUiMessage) : [];
-      setAiMessages(list);
-    } catch (error) {
-      toast.error(t(handleApiError(error)));
+  useEffect(() => {
+    if (open) {
+      let sid = localStorage.getItem(STORAGE_KEY_SESSION);
+      if (!sid) {
+        sid = uid();
+        localStorage.setItem(STORAGE_KEY_SESSION, sid);
+      }
+      setSessionId(sid);
+
+      try {
+        const savedMessags = localStorage.getItem(STORAGE_KEY_MESSAGES);
+        if (savedMessags) {
+          setAiMessages(JSON.parse(savedMessags));
+        } else {
+          setAiMessages([toAiUiMessage(t('supportChat.aiWelcome'), ROLES.BOT)]);
+        }
+      } catch {
+        setAiMessages([]);
+      }
     }
-  };
+  }, [open, t]);
+
+  useEffect(() => {
+    if (aiMessages.length > 0) {
+      localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(aiMessages));
+    }
+  }, [aiMessages]);
 
   const sendAiMessage = async (text) => {
     try {
       setAiTyping(true);
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          role: ROLES.USER,
-          text,
-          time: new Date().toTimeString().slice(0, 5),
-        },
-      ]);
-      await aiChatService.send({
+
+      const userMsg = toAiUiMessage(text, ROLES.USER);
+      setAiMessages((prev) => [...prev, userMsg]);
+
+      const dto = {
+        sessionId: sessionId,
         prompt: text,
-        system: getSupportPrompt(i18n.language),
-      });
-      await loadAiHistory();
+      };
+
+      const data = await aiChatService.chat(dto);
+
+      if (data?.reply) {
+        const botMsg = toAiUiMessage(data.reply, ROLES.BOT);
+        setAiMessages((prev) => [...prev, botMsg]);
+      }
     } catch (err) {
-      setAiMessages((prev) => [
-        ...prev,
-        {
-          id: uid(),
-          role: ROLES.BOT,
-          text: `⚠️ ${parseErr(err)}`,
-          time: new Date().toTimeString().slice(0, 5),
-        },
-      ]);
+      const errorMessage = toAiUiMessage(
+        `${t('supportChat.error')}`,
+        ROLES.BOT
+      );
+      setAiMessages((prev) => [...prev, errorMessage]);
+      console.error(err);
     } finally {
       setAiTyping(false);
     }
@@ -379,9 +474,7 @@ function ChatWindow({ open, onClose, brand }) {
 
   const loadAdminChatHistory = async (id) => {
     try {
-      const params = {
-        conversationID: id,
-      };
+      const params = { conversationID: id };
       const history = await chatMessageService.getMessagesByConversationID(
         params
       );
@@ -447,7 +540,6 @@ function ChatWindow({ open, onClose, brand }) {
       const createdMessageDto = await chatMessageService.sendMessageToAdmin(
         dto
       );
-
       setAdminMessages((prev) =>
         prev.map((m) =>
           m.id === tempId ? toAdminUiMessage(createdMessageDto, user.id) : m
@@ -461,7 +553,6 @@ function ChatWindow({ open, onClose, brand }) {
           adminID: ADMIN_ID,
         };
         setConversation(newConversation);
-
         if (chatConnection) {
           chatConnection.invoke(
             'JoinConversation',
@@ -477,12 +568,8 @@ function ChatWindow({ open, onClose, brand }) {
     }
 
     setAdminSending(false);
-    setCountdown(3); //Prevent Spawm Message
-
-    if (countdownRef.current) {
-      clearInterval(countdownRef.current);
-    }
-
+    setCountdown(3);
+    if (countdownRef.current) clearInterval(countdownRef.current);
     countdownRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -519,19 +606,12 @@ function ChatWindow({ open, onClose, brand }) {
   );
 
   useEffect(() => {
-    if (open) {
-      loadAiHistory();
-    } else {
+    if (!open) {
       setConversation(null);
-      setAiMessages([]);
       setAdminMessages([]);
-      setCurrentTab('AI');
       setAdminChatState('idle');
-      if (countdownRef.current) {
-        clearInterval(countdownRef.current);
-      }
+      if (countdownRef.current) clearInterval(countdownRef.current);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   useEffect(() => {
@@ -545,8 +625,7 @@ function ChatWindow({ open, onClose, brand }) {
           .catch(() => {});
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentTab, adminChatState]);
+  }, [open, currentTab, adminChatState]); // eslint-disable-line
 
   const send = async (text) => {
     if (currentTab === 'AI') {
@@ -673,6 +752,7 @@ function ChatWindow({ open, onClose, brand }) {
     </div>
   );
 }
+
 ChatWindow.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
