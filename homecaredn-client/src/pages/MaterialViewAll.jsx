@@ -4,6 +4,7 @@ import { useBrand } from '../hook/useBrand';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { Pagination } from 'antd';
+import { useSearchParams } from 'react-router-dom';
 import CardItem from '../components/CardItem';
 import { handleApiError } from '../utils/handleApiError';
 import { toast } from 'react-toastify';
@@ -11,14 +12,20 @@ import LoadingComponent from '../components/LoadingComponent';
 
 export default function MaterialViewAll() {
   const { t, i18n } = useTranslation();
+  const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOption, setSortOption] = useState('random');
   const { materials, totalMaterials, fetchMaterials, loading } = useMaterial();
   const pageSize = 12;
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
-  const [selectedCategoryId, setSelectedCategoryId] = useState('');
-  const [selectedBrandId, setSelectedBrandId] = useState('');
+
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    searchParams.get('categoryId') || ''
+  );
+  const [selectedBrandId, setSelectedBrandId] = useState(
+    searchParams.get('brandId') || ''
+  );
 
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -27,6 +34,13 @@ export default function MaterialViewAll() {
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+
+  useEffect(() => {
+    const catId = searchParams.get('categoryId');
+    const brandId = searchParams.get('brandId');
+    if (catId !== null) setSelectedCategoryId(catId);
+    if (brandId !== null) setSelectedBrandId(brandId);
+  }, [searchParams]);
 
   useEffect(() => {
     (async () => {

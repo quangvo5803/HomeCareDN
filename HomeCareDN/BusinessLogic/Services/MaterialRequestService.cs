@@ -63,6 +63,11 @@ namespace BusinessLogic.Services
                 s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed
             );
 
+            if (parameters.FilterID != null && role == ADMIN)
+            {
+                query = query.Where(s => s.CustomerID == parameters.FilterID);
+            }
+
             if (parameters.FilterID != null && role == DISTRIBUTOR)
             {
                 query = query.Where(s =>
@@ -314,7 +319,7 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
-                    Payment = _mapper.Map<PaymentTransactionDto>(payment)
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
         }

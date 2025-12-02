@@ -28,7 +28,7 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("user/{id}")]
-        [Authorize(Roles = "Customer,Contractor,Distributor")]
+        [Authorize(Roles = "Customer,Contractor,Distributor,Admin")]
         public async Task<IActionResult> GetConversationByUserID(string id)
         {
             var result = await _facadeService.ConversationService.GetConversationByUserIDAsync(id);
