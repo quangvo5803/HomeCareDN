@@ -1169,6 +1169,7 @@
       "distributorApplication": "participated order",
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
+      "historyMR": "Material request history",
       "historyDA":"Material order history",
       "history": "No history yet",
       "chatWithUser": "Chat with user"
