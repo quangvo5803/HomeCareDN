@@ -37,6 +37,14 @@ RoleBadgeColors.propTypes = {
 const MESSAGE_SIZE = 10;
 const CONVERSATION_SIZE = 7;
 
+// helper
+const mergeNewConversation = (prevConversations, newConversation) => {
+  const exists = prevConversations.some(
+    (c) => c.conversationID === newConversation.conversationID
+  );
+  return exists ? prevConversations : [newConversation, ...prevConversations];
+};
+
 export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -105,16 +113,7 @@ export default function AdminSupportChatManager() {
         newConversation.isAdminRead = false;
         newConversation.adminUnreadMessageCount = 1;
 
-        setConversations((prev) => {
-          if (
-            prev.some(
-              (c) => c.conversationID === newConversation.conversationID
-            )
-          ) {
-            return prev;
-          }
-          return [newConversation, ...prev];
-        });
+        setConversations((prev) => mergeNewConversation(prev, newConversation));
         toast.success(t('adminSupportChatManager.newConversation'));
         notificationNewConvesation.current.play().catch(() => {});
       },
@@ -179,18 +178,8 @@ export default function AdminSupportChatManager() {
     'chat'
   );
 
-  // Handle preselected user chat
   useEffect(() => {
     if (!preselectedUserID || !user?.id || !chatConnection) return;
-
-    const addConversationIfNotExists = (conversation) => {
-      setConversations((prev) => {
-        const exists = prev.some(
-          (c) => c.conversationID === conversation.conversationID
-        );
-        return exists ? prev : [conversation, ...prev];
-      });
-    };
 
     const createVirtualConversation = () => ({
       conversationID: null,
@@ -212,7 +201,7 @@ export default function AdminSupportChatManager() {
         );
 
         if (existingConv) {
-          addConversationIfNotExists(existingConv);
+          setConversations((prev) => mergeNewConversation(prev, existingConv));
           await handleSelectConversation(existingConv);
         } else {
           const virtualConv = createVirtualConversation();
