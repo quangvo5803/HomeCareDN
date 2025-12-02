@@ -60,14 +60,26 @@ const toAiUiMessage = (text, role) => ({
   id: uid(),
   role: role,
   text: text,
-  time: new Date().toTimeString().slice(0, 5),
+  time: formatTime(new Date().toISOString()),
 });
+
+// Helper to format time
+const formatTime = (dateString) => {
+  if (!dateString) return new Date().toTimeString().slice(0, 5);
+
+  const date = new Date(
+    dateString.endsWith('Z') ? dateString : dateString + 'Z'
+  );
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  return `${hours}:${minutes}`;
+};
 
 const toAdminUiMessage = (m, currentUserId) => ({
   id: m.id ?? m.chatMessageID ?? uid(),
   role: m.senderID === currentUserId ? ROLES.USER : ROLES.BOT,
   text: m.content ?? '',
-  time: new Date(m.sentAt).toTimeString().slice(0, 5),
+  time: formatTime(m.sentAt),
 });
 
 function useAutoScroll(dep) {
@@ -391,7 +403,7 @@ ChatInput.propTypes = {
   countdown: PropTypes.number,
 };
 
-function ChatWindow({ open, onClose, brand }) {
+function ChatWindow({ open, onClose, onOpen, brand }) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
@@ -600,8 +612,71 @@ function ChatWindow({ open, onClose, brand }) {
     [conversation, user]
   );
 
+  const handleNewConversationFromAdmin = useCallback(
+    (payload) => {
+      if (!payload?.conversation?.conversationID) return;
+
+      setConversation(payload.conversation);
+
+      if (payload.firstMessage) {
+        const uiMessage = toAdminUiMessage(payload.firstMessage, user.id);
+        setAdminMessages((prev) => [...prev, uiMessage]);
+      }
+
+      toast.info(t('supportChat.adminStartedChat'), {
+        position: 'top-right',
+        autoClose: 3000,
+      });
+
+      if (!open) {
+        onOpen();
+      }
+
+      setCurrentTab('ADMIN');
+
+      if (chatConnection) {
+        chatConnection.invoke(
+          'JoinConversation',
+          payload.conversation.conversationID
+        );
+      }
+
+      if (adminChatState === 'idle') {
+        setAdminChatState('loaded');
+      }
+    },
+    [user, chatConnection, adminChatState, t, open, onOpen]
+  );
+
+  const handleNewMessageFromAdmin = useCallback(
+    (payload) => {
+      if (!payload?.message) return;
+
+      const uiMessage = toAdminUiMessage(payload.message, user.id);
+
+      setAdminMessages((prev) => {
+        if (prev.some((m) => m.id === payload.message.chatMessageID)) {
+          return prev;
+        }
+        return [...prev, uiMessage];
+      });
+
+      if (!open || currentTab !== 'ADMIN') {
+        toast.info(t('supportChat.newMessageFromAdmin'), {
+          position: 'top-right',
+          autoClose: 3000,
+        });
+      }
+    },
+    [user, open, currentTab, t]
+  );
+
   useRealtime(
-    { [RealtimeEvents.ChatMessageCreated]: handleNewAdminMessage },
+    {
+      [RealtimeEvents.ChatMessageCreated]: handleNewAdminMessage,
+      [RealtimeEvents.NewConversationFromAdmin]: handleNewConversationFromAdmin,
+      [RealtimeEvents.NewMessageFromAdmin]: handleNewMessageFromAdmin,
+    },
     'chat'
   );
 
@@ -756,6 +831,7 @@ function ChatWindow({ open, onClose, brand }) {
 ChatWindow.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
+  onOpen: PropTypes.func.isRequired,
   brand: PropTypes.string,
 };
 
@@ -787,10 +863,41 @@ ChatLauncherButton.propTypes = {
 /* ===== Default export ===== */
 export default function SupportChatWidget({ brand = 'HomeCareDN' }) {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const { chatConnection, chatConnectionState } = useContext(RealtimeContext);
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (!user?.id || !chatConnection || chatConnectionState !== 'connected') {
+      return;
+    }
+
+    const joinUserGroup = async () => {
+      try {
+        await chatConnection.invoke('JoinUserGroup', user.id);
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      }
+    };
+
+    joinUserGroup();
+    return () => {
+      if (chatConnection && user?.id) {
+        chatConnection.invoke('LeaveUserGroup', user.id).catch(() => {});
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, chatConnection, chatConnectionState]);
+
   return (
     <>
       <ChatLauncherButton open={open} setOpen={setOpen} />
-      <ChatWindow open={open} onClose={() => setOpen(false)} brand={brand} />
+      <ChatWindow
+        open={open}
+        onClose={() => setOpen(false)}
+        onOpen={() => setOpen(true)}
+        brand={brand}
+      />
     </>
   );
 }

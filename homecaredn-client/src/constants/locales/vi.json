@@ -702,6 +702,8 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "adminStartedChat": "Quản Trị Viên đã bắt đầu cuộc trò chuyện!",
+    "newMessageFromAdmin": "Tin nhắn mới từ Quản Trị Viên!",
     "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
     "aiWelcome": "Xin chào! Tôi là trợ lý AI của bạn. Tôi có thể giúp gì cho bạn hôm nay?",
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
@@ -1160,7 +1162,8 @@
       "historyCA": "Lịch sử dịch vụ đã tham gia",
       "historyMR": "Lịch sử yêu cầu vật liệu",
       "historyDA":"Lịch sử đơn hàng vật liệu",
-      "history": "Chưa có lịch sử nào"
+      "history": "Chưa có lịch sử nào",
+      "chatWithUser": "Chat với người dùng"
     }
   },
   "adminSupportManager": {

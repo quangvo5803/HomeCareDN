@@ -47,6 +47,14 @@ namespace HomeCareDNAPI.Controllers
             return Ok(result);
         }
 
+        [HttpGet("admin/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminGetConversationByUserID(string id)
+        {
+            var result = await _facadeService.ConversationService.GetConversationByUserIDAsync(id);
+            return Ok(result);
+        }
+
         [HttpPost("admin/mark-as-read/{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> MarkAsRead(Guid id)

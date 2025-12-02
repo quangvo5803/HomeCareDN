@@ -137,7 +137,19 @@ export default function AdminUserDetail() {
       ),
     [executeFetchDistributors]
   );
+  //--- Navigate to chat with user ---
+  const handleChatWithUser = () => {
+    if (!userDetail) return;
 
+    navigate('/Admin/SupportChatManager', {
+      state: {
+        preselectedUserID: userID,
+        userName: userDetail.fullName,
+        userEmail: userDetail.email,
+        userRole: userDetail.role,
+      },
+    });
+  };
   useEffect(() => {
     if (!userDetail) return;
 
@@ -677,6 +689,18 @@ export default function AdminUserDetail() {
         <>
           {renderHeader()}
           {renderUserInfo()}
+
+          {/* CHAT WITH USER BUTTON */}
+          <div className="max-w-5xl mx-auto mb-6">
+            <button
+              onClick={handleChatWithUser}
+              className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 font-semibold hover:from-orange-600 hover:to-orange-700 active:scale-[0.98]"
+            >
+              <i className="fa-solid fa-message text-xl"></i>
+              <span>{t('adminUserManager.userDetail.chatWithUser')}</span>
+              <i className="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
 
           {/* Bottom Section */}
           <div className="bg-white rounded-2xl shadow-md p-6 max-w-5xl mx-auto">

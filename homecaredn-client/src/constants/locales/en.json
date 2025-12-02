@@ -707,6 +707,8 @@
     "no_applications": "No data to display"
   },
   "supportChat": {
+    "adminStartedChat": "Admin has started the chat!",
+    "newMessageFromAdmin": "New message from Admin!",
     "error": "An error occurred while loading the chat. Please try again later.",
     "aiWelcome": "Hello! I'm your AI assistant. How can I help you today?",
     "headerTitle": "Assistant — Support for {{brand}}",
@@ -1166,7 +1168,8 @@
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
       "historyDA":"Material order history",
-      "history": "No history yet"
+      "history": "No history yet",
+      "chatWithUser": "Chat with user"
     }
   },
   "adminSupportManager": {
