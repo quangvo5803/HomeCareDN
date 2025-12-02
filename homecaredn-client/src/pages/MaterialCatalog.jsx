@@ -201,7 +201,7 @@ export default function MaterialCatalog() {
                 // thêm delay cho từng card
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div
+                <button
                   onClick={() => handleCardClick(m)}
                   className="h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-lg cursor-pointer group rounded-2xl hover:shadow-xl hover:-translate-y-1"
                 >
@@ -250,7 +250,7 @@ export default function MaterialCatalog() {
                       </div>
                     </button>
                   </div>
-                </div>
+                </button>
               </Reveal>
             ))}
           </div>
