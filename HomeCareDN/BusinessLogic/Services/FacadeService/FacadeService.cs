@@ -58,9 +58,9 @@ namespace BusinessLogic.Services.FacadeService
             BrandService = new BrandService(coreDeps.UnitOfWork, coreDeps.Mapper);
 
             AiChatService = new AiChatService(
-                infraDeps.Cache,
                 infraDeps.GroqClient,
-                infraDeps.Http
+                infraDeps.Cache,
+                coreDeps.UnitOfWork
             );
             ConversationService = new ConversationService(
                 coreDeps.UnitOfWork,

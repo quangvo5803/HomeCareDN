@@ -703,6 +703,8 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
+    "aiWelcome": "Xin chào! Tôi là trợ lý AI của bạn. Tôi có thể giúp gì cho bạn hôm nay?",
     "headerTitle": "Trợ lý — Hỗ trợ cho {{brand}}",
     "headerStatusReady": "Sẵn sàng hỗ trợ",
     "action": {
@@ -718,7 +720,8 @@
     "tabAI": "Nhắn với AI",
     "tabAdmin": "Nhắn với Quản Trị Viên",
     "startAdminChat": "Gửi tin nhắn cho Quản Trị Viên để bắt đầu cuộc trò chuyện",
-    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI"
+    "sendAdminChatError": "Gửi tin nhắn cho Quản Trị Viên BỊ LỖI",
+    "loadingAdminChat": "Đang tải cuộc trò chuyện với Quản Trị Viên..."
   },
   "distributorMaterialManager": {
     "title": "Quản lý vật liệu",

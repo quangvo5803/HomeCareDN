@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 
@@ -8,73 +7,122 @@ namespace Ultitity.Clients.Groqs
     public class GroqClient : IGroqClient
     {
         private readonly HttpClient _http;
-        private readonly string _chatPath;
+        private readonly string _model;
+        private readonly string _path;
 
-        public GroqClient(HttpClient http, IConfiguration cfg)
+        public GroqClient(HttpClient http, IConfiguration config)
         {
             _http = http;
 
-            var _apiKey = (
-                cfg["Groq:ApiKey"] ?? throw new InvalidOperationException("Missing Groq:ApiKey")
-            ).Trim();
+            var apiKey =
+                config["Groq:ApiKey"]
+                ?? throw new InvalidOperationException("Groq:ApiKey is missing");
 
-            if (!_apiKey.StartsWith("gsk_"))
-                throw new InvalidOperationException(
-                    "Groq:ApiKey probably wrong (must start with 'gsk_')."
-                );
+            _model =
+                config["Groq:Model"]
+                ?? throw new InvalidOperationException("Groq:Model is missing");
+
+            _path =
+                config["Groq:ChatPath"]
+                ?? throw new InvalidOperationException("Groq:ChatPath is missing");
 
             var baseUrl =
-                cfg["Groq:BaseUrl"] ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
-            if (!baseUrl.EndsWith('/'))
-                baseUrl += '/';
+                config["Groq:BaseUrl"]
+                ?? throw new InvalidOperationException("Groq:BaseUrl is missing");
 
-            _http.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
+            _http.BaseAddress = new Uri(baseUrl.EndsWith('/') ? baseUrl : $"{baseUrl}/");
 
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                "Bearer",
-                _apiKey
-            );
-            _http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
-
-            _chatPath = cfg["Groq:ChatPath"] ?? "chat/completions";
+            _http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
         }
 
-        public async Task<string> ChatAsync(
-            IEnumerable<(string Role, string Content)> messages,
-            double temperature = 0.7,
-            string model = "llama-3.3-70b-versatile"
-        )
+        public async Task<string> ChatAsync(string systemPrompt, string userPrompt)
         {
             var payload = new
             {
-                model,
-                messages = messages
-                    .Select(m => new { role = m.Role, content = m.Content })
-                    .ToArray(),
-                temperature,
+                model = _model,
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt },
+                    new { role = "user", content = userPrompt },
+                },
+                temperature = 0.3,
+                max_tokens = 1024,
             };
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, _chatPath);
-            req.Content = new StringContent(
-                JsonSerializer.Serialize(payload),
-                Encoding.UTF8,
-                "application/json"
-            );
+            try
+            {
+                using var response = await _http.PostAsJsonAsync(_path, payload);
 
-            using var res = await _http.SendAsync(req);
-            var json = await res.Content.ReadAsStringAsync();
+                if (!response.IsSuccessStatusCode)
+                {
+                    return string.Empty;
+                }
 
-            if (!res.IsSuccessStatusCode)
-                throw new HttpRequestException($"Groq error {(int)res.StatusCode}: {json}");
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
 
-            using var doc = JsonDocument.Parse(json);
-            var content = doc
-                .RootElement.GetProperty("choices")[0]
-                .GetProperty("message")
-                .GetProperty("content")
-                .GetString();
+                if (
+                    json.TryGetProperty("choices", out JsonElement choices)
+                    && choices.GetArrayLength() > 0
+                )
+                {
+                    var firstChoice = choices[0];
+                    if (
+                        firstChoice.TryGetProperty("message", out JsonElement messageProp)
+                        && messageProp.TryGetProperty("content", out JsonElement contentProp)
+                    )
+                    {
+                        return contentProp.GetString() ?? string.Empty;
+                    }
+                }
 
-            return content?.Trim() ?? "(no reply)";
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        public async Task<string> ChatAsync(object messages)
+        {
+            var payload = new
+            {
+                model = _model,
+                messages,
+                temperature = 0.3,
+                max_tokens = 1024,
+            };
+
+            try
+            {
+                using var response = await _http.PostAsJsonAsync(_path, payload);
+
+                if (!response.IsSuccessStatusCode)
+                    return string.Empty;
+
+                var json = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+                if (
+                    json.TryGetProperty("choices", out JsonElement choices)
+                    && choices.GetArrayLength() > 0
+                )
+                {
+                    var firstChoice = choices[0];
+                    if (
+                        firstChoice.TryGetProperty("message", out JsonElement messageProp)
+                        && messageProp.TryGetProperty("content", out JsonElement contentProp)
+                    )
+                    {
+                        return contentProp.GetString() ?? string.Empty;
+                    }
+                }
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }
