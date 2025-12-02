@@ -13,10 +13,6 @@ export const conversationService = {
     const respone = await api.get(`/conversations/admin`, { params });
     return respone.data;
   },
-  adminGetConversationByUserID: async (id) => {
-    const respone = await api.get(`/conversations/admin/${id}`);
-    return respone.data;
-  },
   markAsRead: async (id) => {
     api.post(`/conversations/admin/mark-as-read/${id}`);
   },

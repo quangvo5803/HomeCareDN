@@ -240,7 +240,8 @@ export default function MaterialRequestManager() {
                       <div className="flex items-center gap-3">
                         <StatusBadge status={req.status} type="Request" />
                         {req.selectedDistributorApplicationID &&
-                          (req.selectedDistributorApplicationID === user.id ? (
+                          (req.selectedDistributorApplication.distributorID ===
+                          user.id ? (
                             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
                               <i className="fa-solid fa-user-check"></i>
                               {t('common.YouWasSelected')}

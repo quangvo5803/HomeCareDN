@@ -1,6 +1,7 @@
 // src/pages/MaterialCatalog.jsx
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useCategory } from '../hook/useCategory';
 import { useBrand } from '../hook/useBrand';
 import Loading from '../components/Loading';
@@ -8,6 +9,7 @@ import Reveal from '../components/Reveal';
 
 export default function MaterialCatalog() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const [q, setQ] = useState('');
   const [tag, setTag] = useState('all');
   const [sort, setSort] = useState('relevant');
@@ -86,6 +88,14 @@ export default function MaterialCatalog() {
     if (sort === 'desc') return b.title.localeCompare(a.title);
     return 0;
   });
+
+  const handleCardClick = (item) => {
+    if (item.type === 'category') {
+      navigate(`/MaterialViewAll?categoryId=${item.id}`);
+    } else if (item.type === 'brand') {
+      navigate(`/MaterialViewAll?brandId=${item.id}`);
+    }
+  };
 
   if (loadingCategories || loadingBrands) return <Loading />;
 
@@ -191,7 +201,10 @@ export default function MaterialCatalog() {
                 // thêm delay cho từng card
                 style={{ transitionDelay: `${i * 100}ms` }}
               >
-                <div className="h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-lg cursor-pointer group rounded-2xl hover:shadow-xl hover:-translate-y-1">
+                <div
+                  onClick={() => handleCardClick(m)}
+                  className="h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-lg cursor-pointer group rounded-2xl hover:shadow-xl hover:-translate-y-1"
+                >
                   {/* Image */}
                   <div className="relative h-52 bg-gradient-to-br from-gray-50 to-white">
                     <img

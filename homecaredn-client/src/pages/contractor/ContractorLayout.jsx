@@ -28,8 +28,10 @@ export default function ContractorLayout() {
         ? payload.title
         : payload[titleKey];
 
-    setNotifications(prev => {
-      const exists = prev.some(n => n.notificationID === payload.notificationID);
+    setNotifications((prev) => {
+      const exists = prev.some(
+        (n) => n.notificationID === payload.notificationID
+      );
       if (exists) return prev;
 
       return [{ ...payload, isRead: false }, ...prev];
@@ -42,7 +44,7 @@ export default function ContractorLayout() {
       </div>,
       {
         position: 'top-right',
-        autoClose: 3000
+        autoClose: 3000,
       }
     );
   };
@@ -51,8 +53,8 @@ export default function ContractorLayout() {
     [RealtimeEvents.NotificationCreated]: handleNewNotification,
     [RealtimeEvents.NotificationApplicationUpdate]: handleNewNotification,
     [RealtimeEvents.NotificationDeleted]: (notificationId) => {
-      setNotifications(prev =>
-        prev.filter(n => n.notificationID !== notificationId)
+      setNotifications((prev) =>
+        prev.filter((n) => n.notificationID !== notificationId)
       );
     },
   });
@@ -65,10 +67,9 @@ export default function ContractorLayout() {
         const result = await notificationService.getAllForContractor({
           FilterID: user.id,
           PageNumber: 1,
-          PageSize: 10
+          PageSize: 10,
         });
         setNotifications(result.items);
-
       } catch (err) {
         toast.error(t(handleApiError(err)));
       } finally {
@@ -94,14 +95,12 @@ export default function ContractorLayout() {
         {/* Header */}
         <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
           <div className="flex items-center gap-3 p-4">
-            <div className="flex-1 flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-gray-500">
-              <i className="fa-solid fa-magnifying-glass"></i>
-              <input
-                className="flex-1 bg-transparent outline-none text-sm text-gray-700"
-                placeholder={t('partnerDashboard.search_placeholder')}
-              />
-            </div>
-            <NotificationPanel notifications={notifications} loading={loading} user={user} />
+            <div className="flex-1 flex items-center gap-2 rounded-xl px-3 py-"></div>
+            <NotificationPanel
+              notifications={notifications}
+              loading={loading}
+              user={user}
+            />
             <LanguageSwitch />
             <AvatarMenu />
           </div>

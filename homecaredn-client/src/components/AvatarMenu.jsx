@@ -63,16 +63,6 @@ export default function AvatarMenu() {
           role="menu"
           className="absolute right-0 mt-2 w-48 bg-white border rounded-xl shadow-lg overflow-hidden z-20"
         >
-          <Link
-            to="/profile"
-            relative="path"
-            onClick={() => setOpen(false)}
-            className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-50"
-            role="menuitem"
-          >
-            👤 {t('header.profile')}
-          </Link>
-
           <button
             type="button"
             onClick={handleLogout}
