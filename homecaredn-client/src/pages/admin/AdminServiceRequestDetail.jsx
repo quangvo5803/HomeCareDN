@@ -94,10 +94,10 @@ export default function AdminServiceRequestDetail() {
           const newList = prev.map((ca) =>
             ca.contractorApplicationID === payload.contractorApplicationID
               ? {
-                  ...ca,
-                  status: 'PendingCommission',
-                  dueCommisionTime: payload?.dueCommisionTime || null,
-                }
+                ...ca,
+                status: 'PendingCommission',
+                dueCommisionTime: payload?.dueCommisionTime || null,
+              }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -148,6 +148,7 @@ export default function AdminServiceRequestDetail() {
           ...prev,
           status: 'Approved',
           dueCommisionTime: null,
+          payment: { ...prev.payment, ...payload }
         }));
       }
     },
@@ -250,11 +251,10 @@ export default function AdminServiceRequestDetail() {
 
             <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
               <i
-                className={`fas ${
-                  serviceRequestDetail?.serviceType === 'Construction'
+                className={`fas ${serviceRequestDetail?.serviceType === 'Construction'
                     ? 'fa-hammer'
                     : 'fa-screwdriver-wrench'
-                } text-2xl text-white`}
+                  } text-2xl text-white`}
               />
             </div>
 
@@ -366,8 +366,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.packageOption
                     ? t(
-                        `Enums.PackageOption.${serviceRequestDetail.packageOption}`
-                      )
+                      `Enums.PackageOption.${serviceRequestDetail.packageOption}`
+                    )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -398,8 +398,8 @@ export default function AdminServiceRequestDetail() {
                 <p className="font-semibold text-gray-800">
                   {serviceRequestDetail.mainStructureType
                     ? t(
-                        `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
-                      )
+                      `Enums.MainStructure.${serviceRequestDetail.mainStructureType}`
+                    )
                     : t(`sharedEnums.updating`)}
                 </p>
               </div>
@@ -706,9 +706,8 @@ export default function AdminServiceRequestDetail() {
                             href={url}
                             className="venobox w-28 h-28 rounded-2xl overflow-hidden bg-gray-100 group cursor-pointer block"
                             data-gall="contractor-gallery"
-                            title={`${
-                              i18n.language === 'vi' ? 'Ảnh' : 'Image'
-                            } ${i + 1}`}
+                            title={`${i18n.language === 'vi' ? 'Ảnh' : 'Image'
+                              } ${i + 1}`}
                           >
                             <img
                               src={url}
@@ -816,11 +815,10 @@ export default function AdminServiceRequestDetail() {
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <i
                                   key={star}
-                                  className={`fa-solid fa-star text-2xl ${
-                                    star <= serviceRequestDetail.review.rating
+                                  className={`fa-solid fa-star text-2xl ${star <= serviceRequestDetail.review.rating
                                       ? 'text-amber-400'
                                       : 'text-gray-300'
-                                  }`}
+                                    }`}
                                 ></i>
                               ))}
                             </div>
@@ -851,32 +849,32 @@ export default function AdminServiceRequestDetail() {
                           {/* Review Images */}
                           {serviceRequestDetail.review.imageUrls?.length >
                             0 && (
-                            <div>
-                              <p className="text-gray-500 text-sm font-medium mb-3">
-                                {t(
-                                  'adminServiceRequestManager.contractorDetail.reviewImages'
-                                )}
-                              </p>
-                              <div className="flex flex-wrap gap-3">
-                                {serviceRequestDetail.review.imageUrls.map(
-                                  (url, i) => (
-                                    <a
-                                      key={`review-${url}-${i}`}
-                                      href={url}
-                                      className="venobox w-24 h-24 rounded-xl overflow-hidden bg-gray-100 group cursor-pointer block"
-                                      data-gall="review-gallery"
-                                    >
-                                      <img
-                                        src={url}
-                                        alt={`review-${i}`}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                      />
-                                    </a>
-                                  )
-                                )}
+                              <div>
+                                <p className="text-gray-500 text-sm font-medium mb-3">
+                                  {t(
+                                    'adminServiceRequestManager.contractorDetail.reviewImages'
+                                  )}
+                                </p>
+                                <div className="flex flex-wrap gap-3">
+                                  {serviceRequestDetail.review.imageUrls.map(
+                                    (url, i) => (
+                                      <a
+                                        key={`review-${url}-${i}`}
+                                        href={url}
+                                        className="venobox w-24 h-24 rounded-xl overflow-hidden bg-gray-100 group cursor-pointer block"
+                                        data-gall="review-gallery"
+                                      >
+                                        <img
+                                          src={url}
+                                          alt={`review-${i}`}
+                                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                        />
+                                      </a>
+                                    )
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
 
                           {/* Review Date */}
                           <div className="mt-4 pt-4 border-t border-gray-100">

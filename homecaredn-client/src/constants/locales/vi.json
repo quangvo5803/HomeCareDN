@@ -176,7 +176,7 @@
   },
   "materialViewAll": {
     "listMaterial": "Danh sách vật liệu",
-    "filter":"Lọc vật liệu",
+    "filter": "Lọc vật liệu",
     "filterCategory": "Danh mục vật liệu",
     "filterBrand": "Thương hiệu vật liệu",
     "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
@@ -371,7 +371,7 @@
       "form_lengthPlaceholder": "Nhập chiều dài (mét)",
       "form_floor": "Số tầng",
       "form_floorPlaceholder": "Nhập số tầng",
-      "form_startDate":"Ngày bắt đầu thi công (dự kiến)",
+      "form_startDate": "Ngày bắt đầu thi công (dự kiến)",
       "form_endDate": "Ngày kết thúc thi công (dự kiến)",
       "form_estimatePrice": "Giá ước tính",
       "form_estimatePricePlaceholder": "Nhập giá ước tính",
@@ -379,7 +379,7 @@
       "form_selectAddress": "Chọn địa chỉ",
       "form_description": "Mô tả",
       "form_descriptionPlaceholder": "Cung cấp thêm chi tiết về yêu cầu dịch vụ của bạn...",
-      "form_descriptionNote":"Vui lòng không nhập lại thông tin phía trên",
+      "form_descriptionNote": "Vui lòng không nhập lại thông tin phía trên",
       "form_images": "Hình minh họa / Hiện trạng (Tối đa 5 ảnh)",
       "form_documents": "Tệp đính kèm / Tài liệu (Tối đa 5 tệp)",
       "uploading": "Đang tải lên",
@@ -578,7 +578,8 @@
     "reviewComment": "Nội dung đánh giá",
     "reviewImages": "Hình ảnh đánh giá",
     "reviewedAt": "Ngày đánh giá",
-    "reviewImageTitle": "Ảnh đánh giá"
+    "reviewImageTitle": "Ảnh đánh giá",
+    "realTime": "Yêu cầu dịch vụ đã bị xóa"
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
@@ -643,11 +644,11 @@
     "deleteApplication": "Xóa đơn ứng tuyển",
     "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới",
     "customerInfo": "Thông tin khách hàng",
-    "customerName":"Tên khách hàng",
-    "customerPhone":"Số điện thoại"
+    "customerName": "Tên khách hàng",
+    "customerPhone": "Số điện thoại"
   },
   "partnerDashboard": {
-    "material":"Vật Liệu",
+    "material": "Vật Liệu",
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
@@ -803,7 +804,8 @@
       "supportChat": "Chat",
       "user": "Người dùng",
       "review": "Đánh giá",
-      "commission": "Tiền hoa hồng"
+      "commission": "Tiền hoa hồng",
+      "notification": "Thông báo"
     },
     "account": {
       "title": "Trang cá nhân",
@@ -974,7 +976,7 @@
     "empty_description": "Chưa có yêu cầu dịch vụ nào được gửi.",
     "noContractor": "Chưa có nhà thầu nào",
     "noContractorYet": "Chưa có nhà thầu nào đăng ký.",
-    "customerInfo":"Thông tin khách hàng",
+    "customerInfo": "Thông tin khách hàng",
     "customerName": "Tên khách hàng",
     "customerEmail": "Email khách hàng",
     "customerPhone": "Số điện thoại khách hàng",
@@ -1156,7 +1158,7 @@
       "historySR": "Lịch sử dịch vụ đã yêu cầu",
       "historyCA": "Lịch sử dịch vụ đã tham gia",
       "historyMR": "Lịch sử yêu cầu vật liệu",
-      "historyDA":"Lịch sử đơn hàng vật liệu",
+      "historyDA": "Lịch sử đơn hàng vật liệu",
       "history": "Chưa có lịch sử nào"
     }
   },
@@ -1234,6 +1236,34 @@
     "all": "Tất cả",
     "empty": "Không có đánh giá nào",
     "empty_description": "Hiện chưa có đánh giá nào được ghi nhận."
+  },
+  "adminNotifyManager": {
+    "title": "Quản lý Thông báo",
+    "subtitle": "Danh sách thông báo cho người dùng trong hệ thống",
+    "notifications": "thông báo",
+    "no": "STT",
+    "titleVI": "Tiêu đề",
+    "messageVI": "Nội dung",
+    "type": "Loại",
+    "System": "Hệ thống",
+    "receiver": "Người nhận",
+    "roles": {
+      "Customer": "Khách hàng",
+      "Distributor": "Nhà phân phối",
+      "Contractor": "Nhà thầu"
+    },
+    "createAt": "Ngày tạo",
+    "action": "Thao tác",
+    "buttonCreate": "Tạo thông báo",
+    "detail": "Chi tiết thông báo",
+    "enterTitle": "Nhập tiêu đề ...",
+    "enterMess": "Nhập nội dung ...",
+    "empty": "Không tìm thấy thông báo nào",
+    "empty_description": "Hiện tại không có thông báo nào.",
+    "titleEN": "Tiêu đề (Tiếng anh)",
+    "messageEN": "Nội dung (Tiếng anh)",
+    "enterTitleEN": "Nhập tiêu đề bằng tiếng anh ...",
+    "enterMessEN": "Nhập nội dung bằng tiếng anh ..."
   },
   "chat": {
     "unlocked": "Chat đã được mở khóa!",
@@ -1448,7 +1478,7 @@
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
     "CATEGORY_NAME_ALREADY_EXISTS": "Danh mục đã tồn tại",
     "MATERIAL_NOT_FOUND": "Không tìm thấy vật liệu.",
-    "MATERIAL_NAME_ALREADY_EXISTS":"Vật liệu đã tồn tại.",
+    "MATERIAL_NAME_ALREADY_EXISTS": "Vật liệu đã tồn tại.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
 
@@ -1499,7 +1529,6 @@
 
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
     "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
-    
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1530,7 +1559,8 @@
     "APPLICATION_CREATE": "Đã tạo đơn ứng tuyển thành công!",
     "RECONNECTED": "Đã kết nối lại với server!",
     "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
-    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!"
+    "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!",
+    "NOTIFY_ADD": "Tạo thông báo thành công."
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1625,7 +1655,7 @@
     "noRequirement": "Không có yêu cầu nào",
     "notLogin": "Vui lòng đăng nhập trước khi thao tác",
     "search": "Tìm kiếm...",
-    "sort":"Sắp xếp",
+    "sort": "Sắp xếp",
     "sortDefault": "Mặc định",
     "sortName": "Tên: A-Z",
     "sortNameDesc": "Tên: Z-A",
@@ -1638,13 +1668,13 @@
     "All": "Tất cả",
     "SelectedContractor": "Nhà thầu được chọn",
     "SelectedDistributor": "Nhà phân phối được chọn",
-    "YouWasSelected":"Bạn là người được chọn",
-    "WasSelected":"Đã chọn nhà thầu",
-    "category":"Danh Mục",
-    "brand":"Thương Hiệu",
+    "YouWasSelected": "Bạn là người được chọn",
+    "WasSelected": "Đã chọn nhà thầu",
+    "category": "Danh Mục",
+    "brand": "Thương Hiệu",
     "resetFilter": "Đặt lại bộ lọc",
     "Download": "Tải xuống",
-    "scanDocument":"Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
+    "scanDocument": "Đang phân tích hình ảnh/tài liệu vui lòng chờ trong giây lát",
     "file_unnecessary": "{{count}} file chứa thông tin không cần thiết"
   },
   "commission": {

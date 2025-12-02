@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application.DistributorApplication.Items;
+using BusinessLogic.DTOs.Application.Payment;
 using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.DistributorApplication
@@ -24,5 +25,7 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         public string DistributorEmail { get; set; } = string.Empty;
         public string DistributorPhone { get; set; } = string.Empty;
         public List<DistributorApplicationItemDto>? Items { get; set; }
+        // Thông tin giao dịch thanh toán
+        public PaymentTransactionDto? Payment { get; set; }
     }
 }
