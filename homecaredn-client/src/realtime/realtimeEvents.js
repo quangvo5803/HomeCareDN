@@ -36,4 +36,5 @@ export const RealtimeEvents = Object.freeze({
   NotificationApplicationCreate: 'Notification.Application.Create',
   NotificationApplicationUpdate: 'Notification.Application.Update',
   NotificationApplicationPaid: 'Notification.Application.Paid',
+  NotificationDeleted: 'Notification.Deleted',
 });

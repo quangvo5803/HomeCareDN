@@ -72,9 +72,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -592,7 +592,7 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => {}}
+            onExpired={() => { }}
           />
           {new Date(existingApplication.dueCommisionTime) > new Date() && (
             <button
@@ -736,7 +736,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1332,7 +1332,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1543,28 +1543,25 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${
-                      status.canDo
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-red-50 border-red-200'
-                    }`}
+                    className={`p-4 rounded-lg text-center border ${status.canDo
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                      }`}
                   >
                     <p
-                      className={`text-sm text-gray-800 mb-2 ${
-                        status.nowrap
-                          ? 'whitespace-nowrap'
-                          : 'whitespace-normal'
-                      }`}
+                      className={`text-sm text-gray-800 mb-2 ${status.nowrap
+                        ? 'whitespace-nowrap'
+                        : 'whitespace-normal'
+                        }`}
                     >
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${
-                          status.canDo
-                            ? 'fa-check text-green-600'
-                            : 'fa-xmark text-red-600'
-                        }`}
+                        className={`fa-solid text-xl ${status.canDo
+                          ? 'fa-check text-green-600'
+                          : 'fa-xmark text-red-600'
+                          }`}
                       />
                     </div>
                   </div>

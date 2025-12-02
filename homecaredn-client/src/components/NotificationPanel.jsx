@@ -54,6 +54,9 @@ export default function NotificationPanel({ notifications = [], loading, user })
             REJECT: (value) => `/Distributor/MaterialRequestManager/${value}`,
             PAID: (value) => `/Customer/MaterialRequestDetail/${value}`,
         },
+        Admin: {
+            SEND: null
+        },
         ServiceRequest: (value) => `/Contractor/${value}`,
         MaterialRequest: (value) => `/Distributor/${value}`,
     };
@@ -71,11 +74,19 @@ export default function NotificationPanel({ notifications = [], loading, user })
     const handleClickNotification = async (n) => {
         try {
             await notificationService.readNotification(n.notificationID);
+
+            setUnreadCount(prev => Math.max(prev - 1, 0));
+            setNotify(prev =>
+                prev.map(item =>
+                    item.notificationID === n.notificationID
+                        ? { ...item, isRead: true }
+                        : item
+                )
+            );
+
             const route = resolveNotificationRoute(n);
             if (route) {
                 navigate(route);
-            } else {
-                toast.error("Không tìm thấy thông báo", n);
             }
         } catch (err) {
             toast.error(handleApiError(err));
@@ -102,16 +113,19 @@ export default function NotificationPanel({ notifications = [], loading, user })
                 <button
                     key={n.notificationID}
                     onClick={() => handleClickNotification(n)}
-                    className={`w-full text-left p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead ? "bg-orange-50/40" : ""
-                        }`}
+                    className={`w-full text-left p-4 border-b border-orange-50 hover:bg-gradient-to-r hover:from-orange-50 hover:to-transparent transition-all duration-200 cursor-pointer ${!n.isRead && "bg-orange-50/40"}`}
                 >
                     <div className="flex items-start gap-3">
                         {!n.isRead && (
                             <div className="w-2 h-2 mt-2 rounded-full bg-orange-500 flex-shrink-0 shadow-sm shadow-orange-300" />
                         )}
                         <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-semibold text-gray-800 mb-1">{n.title}</h4>
-                            <p className="text-sm text-gray-600 leading-relaxed mb-2">{n.message}</p>
+                            <h4 className="text-sm font-semibold text-gray-800 mb-1">
+                                {i18n.language === 'vi' ? n.title : n.titleEN || n.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 leading-relaxed mb-2">
+                                {i18n.language === 'vi' ? n.message : n.messageEN || n.message}
+                            </p>
                             <span className="text-xs text-orange-600 font-medium">
                                 {formatDate(n.updatedAt, i18n.language)}
                             </span>
@@ -169,7 +183,8 @@ export default function NotificationPanel({ notifications = [], loading, user })
                         </button>
                         <button
                             onClick={handleReadAllNotifications}
-                            className="p-2 mr-2 text-orange-500 hover:bg-orange-50 rounded-full transition-all duration-200 cursor-pointer"
+                            disabled={unreadCount === 0}
+                            className="p-2 mr-2 text-orange-500 hover:bg-orange-50 rounded-full disabled:text-gray-500 disabled:cursor-not-allowed transition-all duration-200 cursor-pointer"
                             title="Đánh dấu tất cả đã đọc"
                         >
                             <CheckCheck size={18} />

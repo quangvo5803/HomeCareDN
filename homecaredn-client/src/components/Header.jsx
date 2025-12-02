@@ -67,85 +67,40 @@ export default function Header() {
     closeMobileNav();
     navigate('/login', { replace: true });
   };
+
   // Use realtime
+  const handleNotification = (payload) => {
+    const displayMessage =
+      i18n.language === 'vi'
+        ? payload.message
+        : payload.messageEN || payload.message;
+    setNotifications(prev => {
+      const exists = prev.some(n => n.notificationID === payload.notificationID);
+      if (exists) return prev;
+      return [{ ...payload, isRead: false }, ...prev];
+    });
+
+    toast.info(
+      <div>
+        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
+        {displayMessage}
+      </div>,
+      {
+        position: "top-right",
+        autoClose: 3000,
+      }
+    );
+  };
+
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationCreate]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationPaid]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
+    [RealtimeEvents.NotificationCreated]: handleNotification,
+    [RealtimeEvents.NotificationApplicationCreate]: handleNotification,
+    [RealtimeEvents.NotificationApplicationPaid]: handleNotification,
+    [RealtimeEvents.NotificationDeleted]: (notificationId) => {
+      setNotifications(prev => prev.filter(n => n.notificationID !== notificationId));
     },
   });
+
 
   // Close popovers when clicking outside / pressing Esc
   useEffect(() => {

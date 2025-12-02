@@ -177,7 +177,7 @@
   },
   "materialViewAll": {
     "listMaterial": "List of materials",
-    "filter":"Filter Material",
+    "filter": "Filter Material",
     "filterCategory": "Material category",
     "filterBrand": "Material brand",
     "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
@@ -371,7 +371,7 @@
       "form_lengthPlaceholder": "Enter length in meters",
       "form_floor": "Number of Floors",
       "form_floorPlaceholder": "Enter number of floors",
-      "form_startDate":"Construction start date (expected)",
+      "form_startDate": "Construction start date (expected)",
       "form_endDate": "Construction end date (expected)",
       "form_estimatePrice": "Estimate Price",
       "form_estimatePricePlaceholder": "Enter estimate price",
@@ -379,7 +379,7 @@
       "form_selectAddress": "Select address",
       "form_description": "Description",
       "form_descriptionPlaceholder": "Provide additional details about your service request...",
-      "form_descriptionNote":"Please do not re-enter the above information.",
+      "form_descriptionNote": "Please do not re-enter the above information.",
       "form_images": "Reference / Current State (Maximum 5 images)",
       "form_documents": "Attachments / Documents (Maximum 5 files)",
       "uploading": "Uploading",
@@ -583,7 +583,8 @@
     "reviewComment": "Review Comment",
     "reviewImages": "Review Images",
     "reviewedAt": "Reviewed At",
-    "reviewImageTitle": "Review Image"
+    "reviewImageTitle": "Review Image",
+    "realTime": "Service request deleted"
   },
   "distributorMaterialRequest": {
     "title": "Material requests manager",
@@ -648,8 +649,8 @@
     "deleteApplication": "Delete Application",
     "canDeleteWhilePending": "You can delete your current application to submit a new one.",
     "customerInfo": "Customer Information",
-    "customerName":"Customer name:",
-    "customerPhone":"Customer phone:"
+    "customerName": "Customer name:",
+    "customerPhone": "Customer phone:"
   },
   "partnerDashboard": {
     "material": "Material",
@@ -814,7 +815,8 @@
       "supportChat": "Chat",
       "user": "User",
       "review": "Review",
-      "commission": "Commission"
+      "commission": "Commission",
+      "notification": "Notification"
     },
     "account": {
       "title": "Account pages",
@@ -1247,6 +1249,34 @@
     "empty": "No reviews found",
     "empty_description": "There are currently no reviews available."
   },
+  "adminNotifyManager": {
+    "title": "Notification Management",
+    "subtitle": "List of notifications for users in the system",
+    "notifications": "notifications",
+    "no": "No.",
+    "titleVI": "Title",
+    "messageVI": "Message",
+    "type": "Type",
+    "System": "System",
+    "receiver": "Receiver",
+    "roles": {
+      "Customer": "Customer",
+      "Distributor": "Distributor",
+      "Contractor": "Contractor"
+    },
+    "createAt": "Created At",
+    "action": "Action",
+    "buttonCreate": "Create a notification",
+    "detail": "Notification details",
+    "enterTitle": "Enter title ...",
+    "enterMess": "Enter message ...",
+    "empty": "No notifications found",
+    "empty_description": "There are currently no announcements.",
+    "titleEN": "Title (English)",
+    "messageEN": "Message (English)",
+    "enterTitleEN": "Enter title with english ...",
+    "enterMessEN": "Enter message with english ..."
+  },
   "chat": {
     "unlocked": "Chat has been unlocked!",
     "title": "Chat",
@@ -1516,8 +1546,6 @@
 
     "EMPTY_DESCRIPTION": "Please provide a detailed description!",
     "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
-
-
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1548,7 +1576,8 @@
     "APPLICATION_CREATE": "Create application successfully",
     "RECONNECTED": "Reconnected to the server!",
     "ACCEPT_APPLICATION": "Accept application successfully!",
-    "REJECT_APPLICATION": "Reject application successfully!"
+    "REJECT_APPLICATION": "Reject application successfully!",
+    "NOTIFY_ADD": "Add notification successfully."
   },
   "roles": {
     "Distributor": "Distributor",
@@ -1655,15 +1684,14 @@
     "All": "All",
     "SelectedContractor": "Selected contractor",
     "SelectedDistributor": "Selected distributor",
-    "YouWasSelected":"You were selected",
-    "WasSelected":"Contractor/Distributor selected",
+    "YouWasSelected": "You were selected",
+    "WasSelected": "Contractor/Distributor selected",
     "category": "Category",
     "brand": "Brand",
     "resetFilter": "Reset filter",
     "Download": "Download",
-    "scanDocument":"Analyzing image/document please wait a moment",
+    "scanDocument": "Analyzing image/document please wait a moment",
     "file_unnecessary": "{{count}} file contain unnecessary information"
-
   },
   "commission": {
     "partner": {
@@ -1695,7 +1723,7 @@
       "completeNow": "⏳ Please wait for the system to update the list of contractors/distributors.",
       "under24h": "⚠️ The partner is about to run out of time to complete the procedure, the service may be reopened.",
       "payBeforeDeadline": "Your service will be reopened automatically if the partner does not complete the procedure on time."
-      },
+    },
     "days": "Days",
     "hours": "Hours",
     "minutes": "Minutes",
