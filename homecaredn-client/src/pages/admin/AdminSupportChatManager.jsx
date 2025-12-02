@@ -183,53 +183,53 @@ export default function AdminSupportChatManager() {
   useEffect(() => {
     if (!preselectedUserID || !user?.id || !chatConnection) return;
 
+    const addConversationIfNotExists = (conversation) => {
+      setConversations((prev) => {
+        const exists = prev.some(
+          (c) => c.conversationID === conversation.conversationID
+        );
+        return exists ? prev : [conversation, ...prev];
+      });
+    };
+
+    const createVirtualConversation = () => ({
+      conversationID: null,
+      userID: preselectedUserID,
+      adminID: user.id,
+      userEmail: state?.userEmail,
+      userName: state?.userName,
+      userRole: state?.userRole,
+      isAdminRead: true,
+      adminUnreadMessageCount: 0,
+      createdAt: new Date().toISOString(),
+      isVirtual: true,
+    });
+
     const initializePreselectedChat = async () => {
       try {
-        const existingConv =
-          await conversationService.adminGetConversationByUserID(
-            preselectedUserID
-          );
+        const existingConv = await conversationService.getConversationByUserID(
+          preselectedUserID
+        );
 
         if (existingConv) {
-          setConversations((prev) => {
-            const exists = prev.some(
-              (c) => c.conversationID === existingConv.conversationID
-            );
-            if (exists) {
-              return prev;
-            }
-            return [existingConv, ...prev];
-          });
-
+          addConversationIfNotExists(existingConv);
           await handleSelectConversation(existingConv);
         } else {
-          const virtualConv = {
-            conversationID: null,
-            userID: preselectedUserID,
-            adminID: user.id,
-            userEmail: state?.userEmail || 'Unknown User',
-            userName: state?.userName || '',
-            userRole: state?.userRole || 'Customer',
-            isAdminRead: true,
-            adminUnreadMessageCount: 0,
-            createdAt: new Date().toISOString(),
-            isVirtual: true,
-          };
+          const virtualConv = createVirtualConversation();
 
           setConversations((prev) => [virtualConv, ...prev]);
-
           setSelectedConversation(virtualConv);
           setMessages([]);
         }
-
-        setPreselectedUserID(null);
       } catch (error) {
         toast.error(t(handleApiError(error)));
+      } finally {
         setPreselectedUserID(null);
       }
     };
 
     initializePreselectedChat();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselectedUserID, user?.id, chatConnection, state, t]);
 
@@ -386,23 +386,29 @@ export default function AdminSupportChatManager() {
       setHasMoreMessages(true);
       return;
     }
-    if (chatConnection && !selectedConversation.isVirtual) {
-      chatConnection.invoke(
-        'JoinConversation',
-        selectedConversation.conversationID
-      );
-    }
-    if (!selectedConversation.isVirtual) {
-      setLoadingMessage(true);
-      loadMessages(1, false);
-    } else {
-      // Virtual conversation
+
+    if (selectedConversation.isVirtual) {
       setMessages([]);
       setLoadingMessage(false);
       setHasMoreMessages(false);
+    } else {
+      if (chatConnection) {
+        chatConnection.invoke(
+          'JoinConversation',
+          selectedConversation.conversationID
+        );
+      }
+
+      setLoadingMessage(true);
+      loadMessages(1, false);
     }
+
     return () => {
-      if (chatConnection && selectedConversation) {
+      if (
+        chatConnection &&
+        selectedConversation &&
+        !selectedConversation.isVirtual
+      ) {
         chatConnection
           .invoke('LeaveConversation', selectedConversation.conversationID)
           .catch(() => {});
