@@ -1366,7 +1366,8 @@
     "Accept": "Chấp nhận",
     "Reject": "Từ chối",
     "Approve": "Phê duyệt",
-    "BackToList": "Quay lại danh sách"
+    "BackToList": "Quay lại danh sách",
+    "Chat": "Chat"
   },
   "ModalPopup": {
     "ReviewModal": {

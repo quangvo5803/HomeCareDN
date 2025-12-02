@@ -1371,7 +1371,8 @@
     "RegisterPartner": "Register as Partner",
     "Accept": "Accept",
     "Reject": "Reject",
-    "Approve": "Approve"
+    "Approve": "Approve",
+    "Chat": "Chat"
   },
   "ModalPopup": {
     "ReviewModal": {

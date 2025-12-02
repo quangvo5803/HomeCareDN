@@ -252,6 +252,28 @@ export default function AdminUserManager() {
                                     <i className="fa-solid fa-eye" />
                                     {t('BUTTON.View')}
                                   </button>
+
+                                  {/* CHAT */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigate('/Admin/SupportChatManager', {
+                                        state: {
+                                          preselectedUserID: user.userID,
+                                          userName: user.fullName,
+                                          userEmail: user.email,
+                                          userRole: user.role,
+                                        },
+                                      });
+                                    }}
+                                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                                    title={t(
+                                      'adminUserManager.userDetail.chatWithUser'
+                                    )}
+                                  >
+                                    <i className="fa-solid fa-message" />
+                                    {t('BUTTON.Chat')}
+                                  </button>
                                 </div>
                               </td>
                             </tr>
