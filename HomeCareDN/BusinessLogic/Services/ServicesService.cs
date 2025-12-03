@@ -111,10 +111,18 @@ namespace BusinessLogic.Services
 
             var sortedQuery = parameters.SortBy switch
             {
-                "servicename" => baseQuery.OrderBy(s => s.Name),
-                "servicename_desc" => baseQuery.OrderByDescending(s => s.Name),
-                "servicenameen" => baseQuery.OrderBy(s => s.NameEN ?? s.Name),
-                "servicenameen_desc" => baseQuery.OrderByDescending(s => s.NameEN ?? s.Name),
+                "servicename" => baseQuery.OrderBy(s =>
+                    EF.Functions.Collate(s.Name, "Vietnamese_CI_AS")
+                ),
+                "servicename_desc" => baseQuery.OrderByDescending(s =>
+                    EF.Functions.Collate(s.Name, "Vietnamese_CI_AS")
+                ),
+                "servicenameen" => baseQuery.OrderBy(s =>
+                    EF.Functions.Collate(s.NameEN ?? s.Name, "Latin1_General_CI_AS")
+                ),
+                "servicenameen_desc" => baseQuery.OrderByDescending(s =>
+                    EF.Functions.Collate(s.NameEN ?? s.Name, "Latin1_General_CI_AS")
+                ),
                 _ => baseQuery.OrderBy(s => s.CreatedAt),
             };
 
