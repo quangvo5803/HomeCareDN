@@ -68,6 +68,7 @@ export default function ContractorServiceRequestDetail() {
     loaded: 0,
     total: 0,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // upload docs and imgs progress
   useEffect(() => {
@@ -240,6 +241,7 @@ export default function ContractorServiceRequestDetail() {
       toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
       return;
     }
+    setIsSubmitting(true);
 
     const newImageFiles = images.filter((i) => i.isNew).map((i) => i.file);
     const newDocumentFiles = documents
@@ -312,6 +314,11 @@ export default function ContractorServiceRequestDetail() {
 
       setExistingApplication(appData);
       setTotalApplications(totalApplications + 1);
+
+      setDescription('');
+      setEstimatePrice('');
+      setImages([]);
+      setDocuments([]);
     } catch (error) {
       setUploadProgress(0);
       toast.error(t(handleApiError(error)));
@@ -319,6 +326,7 @@ export default function ContractorServiceRequestDetail() {
       setUploadProgress(0);
       setImageProgress({ loaded: 0, total: 0 });
       setDocumentProgress({ loaded: 0, total: 0 });
+      setIsSubmitting(false);
     }
   };
 
@@ -392,7 +400,7 @@ export default function ContractorServiceRequestDetail() {
       } else {
         setDescriptionError(null);
       }
-    }, 300);
+    }, 500);
     return () => clearTimeout(timeoutId);
   }, [description]);
   // Image handlers
@@ -499,8 +507,14 @@ export default function ContractorServiceRequestDetail() {
   };
   const DEFAULT_ICON = 'fa-file-alt text-gray-500';
 
-  if (loading || isChecking || !serviceRequest) return <Loading />;
-  if (uploadProgress) return <Loading progress={uploadProgress} />;
+  if (
+    loading ||
+    isChecking ||
+    !serviceRequest ||
+    isSubmitting ||
+    uploadProgress
+  )
+    return <Loading progress={uploadProgress} />;
 
   const baseArea = (serviceRequest?.width ?? 0) * (serviceRequest?.length ?? 0);
   const totalArea = (baseArea * (serviceRequest?.floors ?? 1)).toFixed(1);
@@ -1065,7 +1079,8 @@ export default function ContractorServiceRequestDetail() {
                     disabled={
                       !estimatePrice.trim() ||
                       !description.trim() ||
-                      !!descriptionError
+                      !!descriptionError ||
+                      isSubmitting
                     }
                   >
                     <i className="fas fa-paper-plane" />

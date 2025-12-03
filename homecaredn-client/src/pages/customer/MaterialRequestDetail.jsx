@@ -236,7 +236,7 @@ export default function MaterialRequestDetail() {
       } else if (descriptionError !== null) {
         setDescriptionError(null);
       }
-    }, 300); // Debounce 300ms
+    }, 500);
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps

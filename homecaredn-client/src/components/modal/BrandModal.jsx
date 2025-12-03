@@ -14,6 +14,7 @@ export default function BrandModal({
   onSave,
   brandID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [brandName, setBrandName] = useState('');
@@ -72,14 +73,24 @@ export default function BrandModal({
   };
 
   const handleSubmit = async () => {
-    if (!brandName.trim()) return toast.error(t('ERROR.REQUIRED_BRANDNAME'));
-    if (!brand && !logoFile) return toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
+    setSubmitting(true);
+    if (!brandName.trim()) {
+      toast.error(t('ERROR.REQUIRED_BRANDNAME'));
+      setSubmitting(false);
+      return;
+    }
+    if (!brand && !logoFile) {
+      toast.error(t('ERROR.REQUIRED_BRANDLOGO'));
+      setSubmitting(false);
+      return;
+    }
     const exists = await brandService.checkBrand({
       name: brandName,
       brandID: brand?.brandID,
     });
     if (exists) {
       toast.error(t('ERROR.BRAND_NAME_ALREADY_EXISTS'));
+      setSubmitting(false);
       onClose();
       return;
     }
@@ -110,6 +121,7 @@ export default function BrandModal({
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+      setSubmitting(false);
     } finally {
       setUploadProgress(0);
     }
@@ -275,7 +287,7 @@ export default function BrandModal({
           <button
             className={`px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer`}
             onClick={handleSubmit}
-            disabled={!brandName.trim() || (!brand && !logoFile)}
+            disabled={!brandName.trim() || (!brand && !logoFile) || loading}
           >
             {brand ? t('BUTTON.UpdateBrand') : t('BUTTON.AddNewBrand')}
           </button>
@@ -291,6 +303,7 @@ BrandModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   brandID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
+  setSubmitting: PropTypes.func.isRequired,
 };
 // Default props
 BrandModal.defaultProps = {

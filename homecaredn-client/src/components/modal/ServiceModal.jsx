@@ -31,6 +31,7 @@ export default function ServiceModal({
   onSave,
   serviceID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const enums = useEnums();
@@ -142,16 +143,20 @@ export default function ServiceModal({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_SERVICENAME'));
+      setSubmitting(false);
       return;
     }
     if (!serviceType) {
       toast.error(t('ERROR.REQUIRED_SERVICETYPE'));
+      setSubmitting(false);
       return;
     }
     if (!buildingType) {
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
+      setSubmitting(false);
       return;
     }
     try {
@@ -186,12 +191,13 @@ export default function ServiceModal({
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
         data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-        onClose();
-        setUploadProgress(0);
       }
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+      setSubmitting(false);
+    } finally {
+      setUploadProgress(0);
     }
   };
 
@@ -495,7 +501,8 @@ export default function ServiceModal({
               !name.trim() ||
               !serviceType ||
               !buildingType ||
-              images.length === 0
+              images.length === 0 ||
+              loading
             }
           >
             {service ? t('BUTTON.Update') : t('BUTTON.Add')}

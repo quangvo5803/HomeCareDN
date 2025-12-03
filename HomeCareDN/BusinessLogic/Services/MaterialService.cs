@@ -38,50 +38,86 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.MaterialRepository.GetQueryable(
-                includeProperties: MATERIAL_INCLUDE
-            );
+            var baseQuery = _unitOfWork.MaterialRepository.GetQueryable();
+
             if (parameters.ExcludedID != null)
-            {
-                query = query.Where(m => m.MaterialID != parameters.ExcludedID);
-            }
+                baseQuery = baseQuery.Where(m => m.MaterialID != parameters.ExcludedID);
+
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
-
-                query = query.Where(await SearchMaterialAsync(searchUpper));
+                baseQuery = baseQuery.Where(await SearchMaterialAsync(searchUpper));
             }
 
             if (parameters.FilterCategoryID.HasValue)
-            {
-                query = query.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
-            }
-            if (parameters.FilterBrandID.HasValue)
-            {
-                query = query.Where(m => m.BrandID == parameters.FilterBrandID.Value);
-            }
-            var totalCount = await query.CountAsync();
+                baseQuery = baseQuery.Where(m => m.CategoryID == parameters.FilterCategoryID.Value);
 
-            query = parameters.SortBy switch
+            if (parameters.FilterBrandID.HasValue)
+                baseQuery = baseQuery.Where(m => m.BrandID == parameters.FilterBrandID.Value);
+
+            var totalCount = await baseQuery.CountAsync();
+
+            if (parameters.SortBy == "random")
             {
-                "materialname" => query.OrderBy(m => m.Name),
-                "materialname_desc" => query.OrderByDescending(m => m.Name),
-                "materialnameen" => query.OrderBy(m => m.NameEN ?? m.Name),
-                "materialnameen_desc" => query.OrderByDescending(m => m.NameEN ?? m.Name),
-                "random" => query.OrderBy(b => b.MaterialID),
-                _ => query.OrderBy(m => m.CreatedAt),
+                var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+
+                var randomIds = await baseQuery
+                    .Select(m => m.MaterialID)
+                    .OrderBy(x => Guid.NewGuid())
+                    .Skip(skip)
+                    .Take(parameters.PageSize)
+                    .ToListAsync();
+
+                var randomItems = await _unitOfWork
+                    .MaterialRepository.GetQueryable(includeProperties: MATERIAL_INCLUDE)
+                    .Where(m => randomIds.Contains(m.MaterialID))
+                    .ToListAsync();
+
+                randomItems = randomItems.OrderBy(x => randomIds.IndexOf(x.MaterialID)).ToList();
+
+                var dtosRandom = _mapper.Map<IEnumerable<MaterialDto>>(randomItems);
+
+                foreach (var dto in dtosRandom)
+                {
+                    var user = await _userManager.FindByIdAsync(dto.UserID);
+                    dto.UserName = user?.FullName;
+                }
+
+                return new PagedResultDto<MaterialDto>
+                {
+                    Items = dtosRandom,
+                    TotalCount = totalCount,
+                    PageNumber = parameters.PageNumber,
+                    PageSize = parameters.PageSize,
+                };
+            }
+
+            var sortedQuery = parameters.SortBy switch
+            {
+                "materialname" => baseQuery.OrderBy(m => m.Name),
+                "materialname_desc" => baseQuery.OrderByDescending(m => m.Name),
+                "materialnameen" => baseQuery.OrderBy(m => m.NameEN ?? m.Name),
+                "materialnameen_desc" => baseQuery.OrderByDescending(m => m.NameEN ?? m.Name),
+                _ => baseQuery.OrderBy(m => m.CreatedAt),
             };
-            query = query
+
+            var pagedQuery = sortedQuery
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
                 .Take(parameters.PageSize);
 
-            var items = await query.ToListAsync();
+            var items = await _unitOfWork
+                .MaterialRepository.GetQueryable(includeProperties: MATERIAL_INCLUDE)
+                .Where(m => pagedQuery.Select(x => x.MaterialID).Contains(m.MaterialID))
+                .ToListAsync();
+
             var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+
             foreach (var dto in dtos)
             {
                 var user = await _userManager.FindByIdAsync(dto.UserID);
                 dto.UserName = user?.FullName;
             }
+
             return new PagedResultDto<MaterialDto>
             {
                 Items = dtos,

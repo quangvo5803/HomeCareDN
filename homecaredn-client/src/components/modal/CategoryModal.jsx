@@ -15,6 +15,7 @@ export default function CategoryModal({
   onSave,
   categoryID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const [categoryName, setCategoryName] = useState('');
@@ -66,17 +67,24 @@ export default function CategoryModal({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!categoryName.trim()) {
-      return toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
+      toast.error(t('ERROR.REQUIRED_CATEGORYNAME'));
+      setSubmitting(false);
+      return;
     }
-    if (!category && !logoFile)
-      return toast.error(t('ERROR.REQUIRED_CATEGORYLOGO'));
+    if (!category && !logoFile) {
+      toast.error(t('ERROR.REQUIRED_CATEGORYLOGO'));
+      setSubmitting(false);
+      return;
+    }
     const exists = await categoryService.checkCategory({
       name: categoryName,
       categoryID: category?.categoryID,
     });
     if (exists) {
       toast.error(t('ERROR.CATEGORY_NAME_ALREADY_EXISTS'));
+      setSubmitting(false);
       onClose();
       return;
     }
@@ -109,6 +117,7 @@ export default function CategoryModal({
       await onSave(data);
     } catch (err) {
       toast.error(t(handleApiError(err)));
+      setSubmitting(false);
     } finally {
       setUploadProgress(0);
     }
@@ -257,7 +266,9 @@ export default function CategoryModal({
             className="px-6 py-2.5 rounded-xl text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed cursor-pointer"
             onClick={handleSubmit}
             disabled={
-              !categoryName.trim() || (!logoFile && !logoPreview && !category)
+              !categoryName.trim() ||
+              (!logoFile && !logoPreview && !category) ||
+              loading
             } // Bắt buộc tên và logo (nếu tạo mới)
           >
             {category ? t('BUTTON.UpdateCategory') : t('BUTTON.AddNewCategory')}
@@ -274,6 +285,7 @@ CategoryModal.propTypes = {
   onSave: PropTypes.func.isRequired,
   categoryID: PropTypes.string,
   setUploadProgress: PropTypes.func.isRequired,
+  setSubmitting: PropTypes.func.isRequired,
 };
 
 // Default props
