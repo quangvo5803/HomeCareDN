@@ -60,7 +60,6 @@ namespace BusinessLogic.Services
             if (parameters.SortBy == "random")
             {
                 var skip = (parameters.PageNumber - 1) * parameters.PageSize;
-
                 var randomIds = await baseQuery
                     .Select(m => m.MaterialID)
                     .OrderBy(x => Guid.NewGuid())
@@ -74,8 +73,7 @@ namespace BusinessLogic.Services
                     .ToListAsync();
 
                 randomItems = randomItems.OrderBy(x => randomIds.IndexOf(x.MaterialID)).ToList();
-
-                var dtosRandom = _mapper.Map<IEnumerable<MaterialDto>>(randomItems);
+                var dtosRandom = _mapper.Map<List<MaterialDto>>(randomItems);
 
                 foreach (var dto in dtosRandom)
                 {
@@ -94,23 +92,35 @@ namespace BusinessLogic.Services
 
             var sortedQuery = parameters.SortBy switch
             {
-                "materialname" => baseQuery.OrderBy(m => m.Name),
-                "materialname_desc" => baseQuery.OrderByDescending(m => m.Name),
-                "materialnameen" => baseQuery.OrderBy(m => m.NameEN ?? m.Name),
-                "materialnameen_desc" => baseQuery.OrderByDescending(m => m.NameEN ?? m.Name),
+                "materialname" => baseQuery.OrderBy(m =>
+                    EF.Functions.Collate(m.Name, "Vietnamese_CI_AS")
+                ),
+                "materialname_desc" => baseQuery.OrderByDescending(m =>
+                    EF.Functions.Collate(m.Name, "Vietnamese_CI_AS")
+                ),
+                "materialnameen" => baseQuery.OrderBy(m =>
+                    EF.Functions.Collate(m.NameEN ?? m.Name, "Latin1_General_CI_AS")
+                ),
+                "materialnameen_desc" => baseQuery.OrderByDescending(m =>
+                    EF.Functions.Collate(m.NameEN ?? m.Name, "Latin1_General_CI_AS")
+                ),
                 _ => baseQuery.OrderBy(m => m.CreatedAt),
             };
 
-            var pagedQuery = sortedQuery
+            var orderedIds = await sortedQuery
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize);
+                .Take(parameters.PageSize)
+                .Select(m => m.MaterialID)
+                .ToListAsync();
 
             var items = await _unitOfWork
                 .MaterialRepository.GetQueryable(includeProperties: MATERIAL_INCLUDE)
-                .Where(m => pagedQuery.Select(x => x.MaterialID).Contains(m.MaterialID))
+                .Where(m => orderedIds.Contains(m.MaterialID))
                 .ToListAsync();
 
-            var dtos = _mapper.Map<IEnumerable<MaterialDto>>(items);
+            items = items.OrderBy(x => orderedIds.IndexOf(x.MaterialID)).ToList();
+
+            var dtos = _mapper.Map<List<MaterialDto>>(items);
 
             foreach (var dto in dtos)
             {
