@@ -248,6 +248,7 @@ export default function AdminMaterialManager() {
           brands={brands}
           categories={categories}
           setUploadProgress={setUploadProgress}
+          setSubmitting={setSubmitting}
           readOnly={modalReadOnly}
         />
 

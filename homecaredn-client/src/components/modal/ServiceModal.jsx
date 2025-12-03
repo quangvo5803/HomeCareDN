@@ -26,7 +26,14 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/code';
 //For TINY MCE
 
-export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
+export default function ServiceModal({
+  isOpen,
+  onClose,
+  onSave,
+  serviceID,
+  setUploadProgress,
+  setSubmitting,
+}) {
   const { t } = useTranslation();
   const enums = useEnums();
   const { loading, getServiceById, deleteServiceImage } = useService();
@@ -42,9 +49,6 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
   const [designStyle, setDesignStyle] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const [images, setImages] = useState([]);
-
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [service, setService] = useState();
   // Fill dữ liệu khi mở modal
@@ -90,7 +94,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
       }
     };
     fetchService();
-  }, [isOpen, serviceID, getServiceById]);
+  }, [isOpen, serviceID, getServiceById, setUploadProgress]);
 
   // Xử lý chọn file
   const handleFileChange = (e) => {
@@ -146,20 +150,24 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_SERVICENAME'));
+      setSubmitting(false);
       return;
     }
     if (!serviceType) {
       toast.error(t('ERROR.REQUIRED_SERVICETYPE'));
+      setSubmitting(false);
       return;
     }
     if (!buildingType) {
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
+      setSubmitting(false);
       return;
     }
     try {
-      setIsSubmitting(true);
+      setSubmitting(true);
       const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
       const data = {
         Name: name,
@@ -175,7 +183,7 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
 
       if (images.length > 5) {
         toast.error(t('ERROR.MAXIMUM_IMAGE'));
-        setIsSubmitting(false);
+        setSubmitting(false);
         return;
       }
       if (service?.serviceID) {
@@ -207,15 +215,11 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
       toast.error(t(handleApiError(err)));
     } finally {
       setUploadProgress(0);
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
-
-  if (uploadProgress > 0 || isSubmitting) {
-    return <Loading progress={uploadProgress} />;
-  }
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[1050] p-4 bg-black/40">
@@ -515,7 +519,8 @@ export default function ServiceModal({ isOpen, onClose, onSave, serviceID }) {
               !name.trim() ||
               !serviceType ||
               !buildingType ||
-              images.length === 0
+              images.length === 0 ||
+              loading
             }
           >
             {service ? t('BUTTON.Update') : t('BUTTON.Add')}

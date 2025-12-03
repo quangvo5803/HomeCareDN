@@ -58,6 +58,7 @@ export const CategoryProvider = ({ children }) => {
       const data = await categoryService.getAll({
         PageNumber: 1,
         PageSize: 9999,
+        SortBy: 'categoryname',
         FilterID,
         FilterBool,
       });
@@ -78,14 +79,17 @@ export const CategoryProvider = ({ children }) => {
   // 📌 Get category by id
   const getCategoryById = useCallback(
     async (id) => {
-      try {
-        const local = categories.find((c) => c.categoryID === id);
-        if (local) return local;
-        return await categoryService.getById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
+      return await withMinLoading(async () => {
+        try {
+          const local = categories.find((c) => c.categoryID === id);
+          if (local) return local;
+
+          return await categoryService.getById(id);
+        } catch (err) {
+          toast.error(handleApiError(err));
+          return null;
+        }
+      }, setLoading);
     },
     [categories]
   );

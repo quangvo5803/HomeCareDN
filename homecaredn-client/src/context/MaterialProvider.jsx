@@ -63,14 +63,17 @@ export const MaterialProvider = ({ children }) => {
   );
   // 📌 Public: get material by id
   const getMaterialById = useCallback(async (id) => {
-    try {
-      const result = await materialService.getById(id);
-      return result;
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
+    return await withMinLoading(async () => {
+      try {
+        const result = await materialService.getById(id);
+        return result;
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    }, setLoading);
   }, []);
+
   // 📌 Distributor-only: get all by user id
   const executeFetchById = useCallback(
     async ({ PageNumber = 1, PageSize = 10, FilterID } = {}) => {

@@ -206,6 +206,7 @@ export default function DistributorMaterialManager() {
         brands={brands}
         categories={categories}
         setUploadProgress={setUploadProgress}
+        setSubmitting={setSubmitting}
       />
 
       {/* Table */}

@@ -383,7 +383,7 @@ export default function MaterialViewAll() {
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
               {materials.map((item) => (
-                <CardItem key={item.MaterialID} item={item} />
+                <CardItem key={item.materialID} item={item} />
               ))}
             </div>
 
