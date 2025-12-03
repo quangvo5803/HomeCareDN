@@ -44,7 +44,11 @@ export const BrandProvider = ({ children }) => {
   // 📌 Fetch all brands (dropdown)
   const executeFetchAllBrands = async () => {
     try {
-      const data = await brandService.getAll({ PageNumber: 1, PageSize: 9999 });
+      const data = await brandService.getAll({
+        PageNumber: 1,
+        PageSize: 9999,
+        SortBy: 'brandname',
+      });
       return data.items || [];
     } catch (err) {
       toast.error(handleApiError(err));
@@ -59,14 +63,17 @@ export const BrandProvider = ({ children }) => {
   // 📌 Get brand by ID
   const getBrandById = useCallback(
     async (id) => {
-      try {
-        const local = brands.find((b) => b.brandID === id);
-        if (local) return local;
-        return await brandService.getById(id);
-      } catch (err) {
-        toast.error(handleApiError(err));
-        return null;
-      }
+      return await withMinLoading(async () => {
+        try {
+          const local = brands.find((b) => b.brandID === id);
+          if (local) return local;
+
+          return await brandService.getById(id);
+        } catch (err) {
+          toast.error(handleApiError(err));
+          return null;
+        }
+      }, setLoading);
     },
     [brands]
   );

@@ -4,7 +4,7 @@ import Tesseract from 'tesseract.js';
 import JSZip from 'jszip';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  '/pdfjs-dist/pdf.worker.min.mjs',
+  'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
   import.meta.url
 ).toString();
 
@@ -14,12 +14,12 @@ let worker = null;
 async function initWorker() {
   if (!worker) {
     try {
-      // Sử dụng tessdata từ thư mục public/tessdata
-      // Bạn cần tải các file .traineddata về thư mục này
-      worker = await Tesseract.createWorker('vie+eng', 1, {
-        langPath: new URL('/tessdata', import.meta.url).toString(),
-        logger: () => {},
-      });
+      worker = await Tesseract.createWorker();
+
+      // Load languages - v5.1.1 dùng load() thay vì createWorker('vie+eng')
+      await worker.loadLanguage('vie');
+      await worker.loadLanguage('eng');
+      await worker.initialize('vie+eng');
 
       // Set parameters để tránh warnings và tối ưu cho tiếng Việt
       await worker.setParameters({

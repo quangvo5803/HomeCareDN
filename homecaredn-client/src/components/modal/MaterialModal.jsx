@@ -34,6 +34,7 @@ export default function MaterialModal({
   brands,
   categories,
   setUploadProgress,
+  setSubmitting,
   readOnly,
 }) {
   const { user } = useAuth();
@@ -163,24 +164,30 @@ export default function MaterialModal({
 
   // Submit
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_NAME'));
+      setSubmitting(false);
       return;
     }
     if (!unit.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_UNIT'));
+      setSubmitting(false);
       return;
     }
     if (!brandID.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_BRAND'));
+      setSubmitting(false);
       return;
     }
     if (!categoryID.trim()) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_CATEGORY'));
+      setSubmitting(false);
       return;
     }
     if (!material && images.filter((i) => i.isNew).length === 0) {
       toast.error(t('ERROR.REQUIRED_MATERIAL_IMAGES'));
+      setSubmitting(false);
       return;
     }
     const exists = await materialService.checkMaterial({
@@ -189,6 +196,7 @@ export default function MaterialModal({
     });
     if (exists) {
       toast.error(t('ERROR.MATERIAL_NAME_ALREADY_EXISTS'));
+      setSubmitting(false);
       onClose();
       return;
     }
@@ -224,6 +232,7 @@ export default function MaterialModal({
       await onSave(data);
     } catch (err) {
       toast.error(handleApiError(err));
+      setSubmitting(false);
     } finally {
       setUploadProgress(0);
     }
@@ -505,7 +514,8 @@ export default function MaterialModal({
                 !unit.trim() ||
                 !brandID ||
                 !categoryID ||
-                images.length === 0
+                images.length === 0 ||
+                loading
               }
             >
               {material ? t('BUTTON.Update') : t('BUTTON.Add')}
@@ -525,5 +535,6 @@ MaterialModal.propTypes = {
   brands: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   setUploadProgress: PropTypes.func.isRequired,
+  setSubmitting: PropTypes.func.isRequired,
   readOnly: PropTypes.bool.isRequired,
 };

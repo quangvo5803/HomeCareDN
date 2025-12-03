@@ -63,6 +63,7 @@ export default function MaterialRequestDetail() {
   const statusShownRef = useRef(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //Realtime
   useRealtime({
@@ -184,7 +185,7 @@ export default function MaterialRequestDetail() {
     );
   };
 
-  const calculateTotalAll = (existingItems, newItems) => {
+  const calculateTotalAll = useCallback((existingItems, newItems) => {
     const totalExisting = existingItems.reduce(
       (sum, item) => sum + (item.quantity || 0) * (item.price || 0),
       0
@@ -194,7 +195,7 @@ export default function MaterialRequestDetail() {
       0
     );
     return totalExisting + totalNew;
-  };
+  }, []);
 
   //  Update quantity/price EXISTING MATERIAL
   const updateExistingItem = (id, changes) => {
@@ -309,13 +310,15 @@ export default function MaterialRequestDetail() {
       } else {
         setMessageError(null);
       }
-    }, 300);
+    }, 500);
     return () => clearTimeout(timeoutId);
   }, [message]);
   //  Submit application
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
 
+    setIsSubmitting(true);
     const items = buildItemsByCase(materialRequest, newMaterials);
     const dto = buildDto(
       materialRequest,
@@ -331,6 +334,8 @@ export default function MaterialRequestDetail() {
       await materialRequestDetail();
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -427,7 +432,7 @@ export default function MaterialRequestDetail() {
   }, [materialRequest, newMaterials]);
 
   // Helper function to check if we should show the loading state
-  if (loading || isChecking || !materialRequest) {
+  if (loading || isChecking || !materialRequest || isSubmitting) {
     return <Loading />;
   }
 
@@ -982,7 +987,7 @@ export default function MaterialRequestDetail() {
           <button
             type="submit"
             className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
-            disabled={!canSubmit}
+            disabled={!canSubmit || isSubmitting}
           >
             <i className="fas fa-paper-plane" />
             {t('distributorMaterialRequestDetail.applyForProject')}

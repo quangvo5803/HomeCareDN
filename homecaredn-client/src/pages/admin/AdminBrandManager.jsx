@@ -72,7 +72,6 @@ export default function AdminBrandManager() {
 
   const handleSave = async (brandData) => {
     try {
-      setSubmitting(true);
       if (brandData.BrandID) {
         await updateBrand(brandData);
       } else {
@@ -201,6 +200,7 @@ export default function AdminBrandManager() {
           onSave={handleSave}
           brandID={editingBrandID}
           setUploadProgress={setUploadProgress}
+          setSubmitting={setSubmitting}
         />
 
         {/* Table Container */}
