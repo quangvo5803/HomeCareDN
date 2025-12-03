@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef, useCallback } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hook/useAuth';
 import { handleApiError } from '../../utils/handleApiError';
 import PropTypes from 'prop-types';
@@ -37,10 +37,19 @@ RoleBadgeColors.propTypes = {
 const MESSAGE_SIZE = 10;
 const CONVERSATION_SIZE = 7;
 
+// helper
+const mergeNewConversation = (prevConversations, newConversation) => {
+  const exists = prevConversations.some(
+    (c) => c.conversationID === newConversation.conversationID
+  );
+  return exists ? prevConversations : [newConversation, ...prevConversations];
+};
+
 export default function AdminSupportChatManager() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
+  const { state } = useLocation();
   const { fetchUnreadCount, decreaseUnreadCount, setActiveConversationId } =
     useOutletContext();
 
@@ -62,6 +71,9 @@ export default function AdminSupportChatManager() {
   const [hasMoreConversations, setHasMoreConversations] = useState(true);
   const [loadingMoreConversations, setLoadingMoreConversations] =
     useState(false);
+  const [preselectedUserID, setPreselectedUserID] = useState(
+    state?.preselectedUserID
+  );
 
   const messagesContainerRef = useRef(null);
   const conversationListRef = useRef(null);
@@ -101,16 +113,7 @@ export default function AdminSupportChatManager() {
         newConversation.isAdminRead = false;
         newConversation.adminUnreadMessageCount = 1;
 
-        setConversations((prev) => {
-          if (
-            prev.some(
-              (c) => c.conversationID === newConversation.conversationID
-            )
-          ) {
-            return prev;
-          }
-          return [newConversation, ...prev];
-        });
+        setConversations((prev) => mergeNewConversation(prev, newConversation));
         toast.success(t('adminSupportChatManager.newConversation'));
         notificationNewConvesation.current.play().catch(() => {});
       },
@@ -176,6 +179,50 @@ export default function AdminSupportChatManager() {
   );
 
   useEffect(() => {
+    if (!preselectedUserID || !user?.id || !chatConnection) return;
+
+    const createVirtualConversation = () => ({
+      conversationID: null,
+      userID: preselectedUserID,
+      adminID: user.id,
+      userEmail: state?.userEmail,
+      userName: state?.userName,
+      userRole: state?.userRole,
+      isAdminRead: true,
+      adminUnreadMessageCount: 0,
+      createdAt: new Date().toISOString(),
+      isVirtual: true,
+    });
+
+    const initializePreselectedChat = async () => {
+      try {
+        const existingConv = await conversationService.getConversationByUserID(
+          preselectedUserID
+        );
+
+        if (existingConv) {
+          setConversations((prev) => mergeNewConversation(prev, existingConv));
+          await handleSelectConversation(existingConv);
+        } else {
+          const virtualConv = createVirtualConversation();
+
+          setConversations((prev) => [virtualConv, ...prev]);
+          setSelectedConversation(virtualConv);
+          setMessages([]);
+        }
+      } catch (error) {
+        toast.error(t(handleApiError(error)));
+      } finally {
+        setPreselectedUserID(null);
+      }
+    };
+
+    initializePreselectedChat();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preselectedUserID, user?.id, chatConnection, state, t]);
+
+  useEffect(() => {
     if (setActiveConversationId) {
       setActiveConversationId(selectedConversation?.conversationID);
     }
@@ -229,6 +276,30 @@ export default function AdminSupportChatManager() {
     setConversationPage(1);
     loadConversations(1, false);
   }, [user?.id, chatConnection, debouncedSearch, loadConversations]);
+
+  // Sync selected conversation with real conversation from list
+  useEffect(() => {
+    if (!selectedConversation || conversations.length === 0) return;
+    const realConversation = conversations.find((c) => {
+      if (
+        selectedConversation.conversationID &&
+        c.conversationID === selectedConversation.conversationID
+      ) {
+        return true;
+      }
+      if (
+        selectedConversation.isVirtual &&
+        c.userID === selectedConversation.userID
+      ) {
+        return true;
+      }
+      return false;
+    });
+
+    if (realConversation && realConversation !== selectedConversation) {
+      setSelectedConversation(realConversation);
+    }
+  }, [conversations, selectedConversation]);
 
   // Infinite scroll for conversations
   const handleScrollConversations = useCallback(() => {
@@ -304,16 +375,29 @@ export default function AdminSupportChatManager() {
       setHasMoreMessages(true);
       return;
     }
-    if (chatConnection) {
-      chatConnection.invoke(
-        'JoinConversation',
-        selectedConversation.conversationID
-      );
+
+    if (selectedConversation.isVirtual) {
+      setMessages([]);
+      setLoadingMessage(false);
+      setHasMoreMessages(false);
+    } else {
+      if (chatConnection) {
+        chatConnection.invoke(
+          'JoinConversation',
+          selectedConversation.conversationID
+        );
+      }
+
+      setLoadingMessage(true);
+      loadMessages(1, false);
     }
-    setLoadingMessage(true);
-    loadMessages(1, false);
+
     return () => {
-      if (chatConnection && selectedConversation) {
+      if (
+        chatConnection &&
+        selectedConversation &&
+        !selectedConversation.isVirtual
+      ) {
         chatConnection
           .invoke('LeaveConversation', selectedConversation.conversationID)
           .catch(() => {});
@@ -382,6 +466,64 @@ export default function AdminSupportChatManager() {
       setMessageInput('');
     } catch (error) {
       toast.error(t(handleApiError(error)));
+    }
+  };
+
+  // Send message for virtual conversations
+  const handleSendVirtual = async () => {
+    if (!messageInput.trim() || !selectedConversation || !user?.id) return;
+
+    try {
+      const result = await chatMessageService.sendMessageToUser({
+        conversationID: null,
+        content: messageInput,
+        senderID: user.id,
+        receiverID: selectedConversation.userID,
+      });
+
+      if (result.conversationID) {
+        const updatedConv = {
+          ...selectedConversation,
+          conversationID: result.conversationID,
+          isVirtual: false,
+        };
+
+        setSelectedConversation(updatedConv);
+
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.userID === selectedConversation.userID && c.isVirtual
+              ? updatedConv
+              : c
+          )
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        if (chatConnection) {
+          try {
+            await chatConnection.invoke(
+              'JoinConversation',
+              result.conversationID
+            );
+          } catch (error) {
+            toast.error(t(handleApiError(error)));
+          }
+        }
+      }
+
+      setMessageInput('');
+    } catch (error) {
+      toast.error(t(handleApiError(error)));
+    }
+  };
+
+  // Wrapper function send message
+  const handleSendMessage = () => {
+    if (selectedConversation?.isVirtual) {
+      handleSendVirtual();
+    } else {
+      handleSend();
     }
   };
 
@@ -491,7 +633,14 @@ export default function AdminSupportChatManager() {
       </div>
     );
   };
+  const formatTimestamp = (sentAt) => {
+    if (!sentAt) return '';
 
+    const date = new Date(sentAt.endsWith('Z') ? sentAt : sentAt + 'Z');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
   return (
     <div className="flex flex-col h-[calc(100vh-10rem)] animate-fadeIn">
       {/* Header */}
@@ -620,13 +769,7 @@ export default function AdminSupportChatManager() {
                                     isAdmin ? 'text-right' : 'text-left'
                                   }`}
                                 >
-                                  {new Date(msg.sentAt).toLocaleTimeString(
-                                    'vi-VN',
-                                    {
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                    }
-                                  )}
+                                  {formatTimestamp(msg.sentAt)}
                                 </p>
                               </div>
                             </div>
@@ -646,7 +789,7 @@ export default function AdminSupportChatManager() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSend();
+                  handleSendMessage();
                 }}
                 className="p-4 border-t bg-white flex gap-3"
               >

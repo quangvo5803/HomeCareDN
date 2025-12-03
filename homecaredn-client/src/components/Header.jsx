@@ -67,82 +67,40 @@ export default function Header() {
     closeMobileNav();
     navigate('/login', { replace: true });
   };
+
   // Use realtime
+  const handleNotification = (payload) => {
+    const displayMessage =
+      i18n.language === 'vi'
+        ? payload.message
+        : payload.messageEN || payload.message;
+    setNotifications((prev) => {
+      const exists = prev.some(
+        (n) => n.notificationID === payload.notificationID
+      );
+      if (exists) return prev;
+      return [{ ...payload, isRead: false }, ...prev];
+    });
+
+    toast.info(
+      <div>
+        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
+        {displayMessage}
+      </div>,
+      {
+        position: 'top-right',
+        autoClose: 3000,
+      }
+    );
+  };
+
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationCreate]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationPaid]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
+    [RealtimeEvents.NotificationCreated]: handleNotification,
+    [RealtimeEvents.NotificationApplicationCreate]: handleNotification,
+    [RealtimeEvents.NotificationApplicationPaid]: handleNotification,
+    [RealtimeEvents.NotificationDeleted]: (notificationId) => {
+      setNotifications((prev) =>
+        prev.filter((n) => n.notificationID !== notificationId)
       );
     },
   });
@@ -179,10 +137,9 @@ export default function Header() {
         const result = await notificationService.getAllForCustomer({
           FilterID: user.id,
           PageNumber: 1,
-          PageSize: 10
+          PageSize: 10,
         });
         setNotifications(result.items);
-
       } catch (err) {
         toast.error(t(handleApiError(err)));
       } finally {
@@ -212,7 +169,7 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div className="flex-1 hidden lg:flex">
+          {/* <div className="flex-1 hidden lg:flex">
             <div className="relative w-full">
               <input
                 type="text"
@@ -221,7 +178,7 @@ export default function Header() {
               />
               <i className="absolute text-gray-400 transform -translate-y-1/2 fas fa-search left-4 top-1/2" />
             </div>
-          </div>
+          </div> */}
 
           {/* Navigation Menu (Desktop) */}
           <div className="items-center hidden lg:flex">
@@ -267,7 +224,11 @@ export default function Header() {
             <div className="flex items-center gap-6">
               {user ? (
                 <>
-                  <NotificationPanel notifications={notifications} loading={loading} user={user} />
+                  <NotificationPanel
+                    notifications={notifications}
+                    loading={loading}
+                    user={user}
+                  />
                   {/* Avatar menu */}
                   <div className="relative" ref={avatarRef}>
                     <button
@@ -425,8 +386,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (

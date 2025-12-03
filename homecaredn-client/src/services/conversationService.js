@@ -2,24 +2,24 @@ import api from './public/api';
 
 export const conversationService = {
   getConversationByID: async (params) => {
-    const res = await api.get(`/conversations`, { params });
-    return res.data;
+    const respone = await api.get(`/conversations`, { params });
+    return respone.data;
   },
   getConversationByUserID: async (id) => {
-    const res = await api.get(`/conversations/user/${id}`);
-    return res.data;
+    const respone = await api.get(`/conversations/user/${id}`);
+    return respone.data;
   },
   getAllConversationsByAdminID: async (params) => {
-    const res = await api.get(`/conversations/admin`, { params });
-    return res.data;
+    const respone = await api.get(`/conversations/admin`, { params });
+    return respone.data;
   },
   markAsRead: async (id) => {
     api.post(`/conversations/admin/mark-as-read/${id}`);
   },
   getUnreadConversationCount: async (id) => {
-    const res = await api.get(
+    const respone = await api.get(
       `/conversations/admin/get-unread-conversation/${id}`
     );
-    return res.data;
+    return respone.data;
   },
 };

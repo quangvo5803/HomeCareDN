@@ -25,18 +25,6 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
         <div className="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto justify-end gap-4">
-          {/* 🔍 Search */}
-          <div className="relative hidden md:flex items-center w-64">
-            <span className="absolute left-3 text-gray-400">
-              <i className="fas fa-search"></i>
-            </span>
-            <input
-              type="text"
-              className="pl-9 pr-3 py-2 w-full text-sm rounded-lg border border-gray-300 dark:bg-slate-850 dark:text-white bg-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder={t('adminNavbar.searchPlaceholder')}
-            />
-          </div>
-
           {/* 🌐 Language Switcher */}
           <div className="relative z-500">
             <button
@@ -64,14 +52,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          {/* 🔔 Notifications */}
-          <button className="relative w-10 h-10 flex items-center justify-center text-gray-600 bg-white border border-gray-300 hover:border-blue-500 rounded-full shadow-sm hover:text-blue-600 transition-all duration-300">
-            <i className="fa fa-bell text-lg"></i>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-              3
-            </span>
-          </button>
 
           {/* 👤 Avatar */}
           {/* 👤 Avatar + Logout */}

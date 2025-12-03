@@ -90,6 +90,25 @@ namespace BusinessLogic.Services
             return result;
         }
 
+        public async Task<ChatMessageDto> SendMessageToUserAsync(SendMessageRequestDto dto)
+        {
+            ValidateMessageContent(dto.Content);
+
+            var conversation = await CreateOrUpdateUserConversationAsync(dto);
+
+            if (!IsUserInConversation(conversation, dto.SenderID))
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { USER, new[] { ERROR_PERMISSION_DENIED } },
+                };
+                throw new CustomValidationException(errors);
+            }
+
+            var result = await CreateMessageAsync(dto, conversation);
+            return result;
+        }
+
         public async Task<PagedResultDto<ChatMessageDto>> GetAllMessagesByConversationIDAsync(
             ChatMessageGetByIdDto dto
         )
@@ -159,27 +178,102 @@ namespace BusinessLogic.Services
                 result
             );
 
-            var notifiedNewConversation = await NotifyNewConversationForAdmin(conversation, result);
-
-            if (
-                !notifiedNewConversation
-                && conversation.ConversationType == ConversationType.AdminSupport
-                && conversation.AdminID != null
-            )
+            if (conversation.ConversationType == ConversationType.AdminSupport)
             {
-                await _signalRNotifier.SendToAdminAsync(
-                    conversation.AdminID,
-                    "Chat.NewAdminMessage",
-                    new
-                    {
-                        dto.ConversationID,
-                        Message = result,
-                        conversation.IsAdminRead,
-                    }
-                );
+                await HandleAdminSupportNotifications(conversation, result, dto);
             }
 
             return result;
+        }
+
+        private async Task HandleAdminSupportNotifications(
+            Conversation conversation,
+            ChatMessageDto messageDto,
+            SendMessageRequestDto dto
+        )
+        {
+            var messageCount = await _unitOfWork
+                .ChatMessageRepository.GetQueryable()
+                .CountAsync(m => m.ConversationID == conversation.ConversationID);
+
+            var isFirstMessage = messageCount == 1;
+            var isAdminSender = dto.SenderID == conversation.AdminID;
+
+            if (isFirstMessage)
+            {
+                // First message in conversation
+                var conversationDto = _mapper.Map<ConversationDto>(conversation);
+                await IncludeUserInfo(conversationDto);
+                //Admin Send
+                if (isAdminSender && (conversation.UserID != null))
+                {
+                    await _signalRNotifier.SendToUserAsync(
+                        conversation.UserID,
+                        "Chat.NewConversationFromAdmin",
+                        new
+                        {
+                            conversation.ConversationID,
+                            Conversation = conversationDto,
+                            FirstMessage = messageDto,
+                        }
+                    );
+                }
+                //User Send
+                else if (conversation.AdminID != null)
+                {
+                    await _signalRNotifier.SendToAdminAsync(
+                        conversation.AdminID,
+                        "Chat.NewConversationForAdmin",
+                        new
+                        {
+                            conversation.ConversationID,
+                            Conversation = conversationDto,
+                            FirstMessage = messageDto,
+                        }
+                    );
+                }
+            }
+            else
+            {
+                //Admin Send
+                if (isAdminSender && (conversation.UserID != null))
+                {
+                    await _signalRNotifier.SendToUserAsync(
+                        conversation.UserID,
+                        "Chat.NewMessageFromAdmin",
+                        new { dto.ConversationID, Message = messageDto }
+                    );
+                }
+                //User Send
+                else if (conversation.AdminID != null)
+                {
+                    await _signalRNotifier.SendToAdminAsync(
+                        conversation.AdminID,
+                        "Chat.NewAdminMessage",
+                        new
+                        {
+                            dto.ConversationID,
+                            Message = messageDto,
+                            conversation.IsAdminRead,
+                        }
+                    );
+                }
+            }
+        }
+
+        private async Task IncludeUserInfo(ConversationDto conversationDto)
+        {
+            if (!string.IsNullOrEmpty(conversationDto.UserID))
+            {
+                var user = await _userManager.FindByIdAsync(conversationDto.UserID);
+                if (user != null)
+                {
+                    conversationDto.UserEmail = user.Email;
+                    conversationDto.UserName = user.FullName;
+                    var roles = await _userManager.GetRolesAsync(user);
+                    conversationDto.UserRole = roles.FirstOrDefault();
+                }
+            }
         }
 
         private async Task<Conversation> CreateOrUpdateAdminConversationAsync(
@@ -225,6 +319,61 @@ namespace BusinessLogic.Services
             }
         }
 
+        private async Task<Conversation> CreateOrUpdateUserConversationAsync(
+            SendMessageRequestDto dto
+        )
+        {
+            var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
+                c.UserID == dto.ReceiverID
+                && c.ConversationType == ConversationType.AdminSupport
+                && c.AdminID == dto.SenderID
+            );
+
+            //Update
+            if (conversation != null)
+            {
+                dto.ConversationID = conversation.ConversationID;
+                conversation.IsAdminRead = true;
+                return conversation;
+            }
+
+            if (dto.ConversationID != null)
+            {
+                conversation = await _unitOfWork.ConversationRepository.GetAsync(
+                    c => c.ConversationID == dto.ConversationID,
+                    asNoTracking: false
+                );
+
+                if (conversation == null)
+                {
+                    var errors = new Dictionary<string, string[]>
+                    {
+                        { CONVERSATION, new[] { ERROR_CONVERSATION_NOT_FOUND } },
+                    };
+                    throw new CustomValidationException(errors);
+                }
+
+                conversation.IsAdminRead = true;
+                return conversation;
+            }
+
+            //Create
+            conversation = new Conversation
+            {
+                ConversationID = Guid.NewGuid(),
+                UserID = dto.ReceiverID,
+                AdminID = dto.SenderID,
+                ConversationType = ConversationType.AdminSupport,
+                CreatedAt = DateTime.UtcNow,
+                IsAdminRead = true,
+            };
+
+            await _unitOfWork.ConversationRepository.AddAsync(conversation);
+            dto.ConversationID = conversation.ConversationID;
+
+            return conversation;
+        }
+
         private static void ValidateMessageContent(string? content)
         {
             if (string.IsNullOrWhiteSpace(content))
@@ -260,52 +409,6 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(errors);
             }
-        }
-
-        private async Task<bool> NotifyNewConversationForAdmin(
-            Conversation conversation,
-            ChatMessageDto dto
-        )
-        {
-            if (
-                conversation.ConversationType != ConversationType.AdminSupport
-                || conversation.AdminID == null
-            )
-                return false;
-
-            var messageCount = await _unitOfWork
-                .ChatMessageRepository.GetQueryable()
-                .CountAsync(m => m.ConversationID == conversation.ConversationID);
-
-            if (messageCount == 1 && conversation.AdminID != null)
-            {
-                var conversationDto = _mapper.Map<ConversationDto>(conversation);
-                if (!string.IsNullOrEmpty(conversationDto.UserID))
-                {
-                    var user = await _userManager.FindByIdAsync(conversationDto.UserID);
-
-                    if (user != null)
-                    {
-                        conversationDto.UserEmail = user.Email;
-                        conversationDto.UserName = user.FullName;
-                        var roles = await _userManager.GetRolesAsync(user);
-                        conversationDto.UserRole = roles.FirstOrDefault();
-                    }
-                }
-                await _signalRNotifier.SendToAdminAsync(
-                    conversation.AdminID,
-                    "Chat.NewConversationForAdmin",
-                    new
-                    {
-                        conversation.ConversationID,
-                        Conversation = conversationDto,
-                        FirstMessage = dto,
-                    }
-                );
-                return true;
-            }
-
-            return false;
         }
     }
 }

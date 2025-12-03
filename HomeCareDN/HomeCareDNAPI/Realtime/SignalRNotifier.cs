@@ -50,9 +50,13 @@ namespace HomeCareDNAPI.Realtime
             await _chatHub.Clients.Group(groupName).SendAsync(eventName, payload);
         }
 
-        public async Task SendToAllChatAsync(string eventName, object? payload)
+        public async Task SendToUserAsync(string userId, string eventName, object data)
         {
-            await _chatHub.Clients.All.SendAsync(eventName, payload);
+            if (string.IsNullOrEmpty(userId))
+                return;
+
+            var groupName = $"user_{userId}";
+            await _chatHub.Clients.Group(groupName).SendAsync(eventName, data);
         }
     }
 }
