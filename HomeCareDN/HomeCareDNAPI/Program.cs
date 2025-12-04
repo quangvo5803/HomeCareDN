@@ -93,7 +93,6 @@ namespace HomeCareDNAPI
                                 "https://homecaredn.onrender.com",
                                 "https://home-care-dn.vercel.app"
                             ) // domain React
-                            .SetIsOriginAllowed(origin => true)
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials(); // nếu dùng cookie/session
