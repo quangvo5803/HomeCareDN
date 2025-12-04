@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import DOMPurify from 'dompurify';
 import { useService } from '../hook/useService';
 import LoadingComponent from '../components/LoadingComponent';
 import { Pagination } from 'antd';
@@ -113,9 +112,8 @@ export default function ServiceItem({ itemServiceType }) {
                     </span>
                   </div>
                   <svg
-                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
-                      showSortDropdown ? 'rotate-180' : ''
-                    }`}
+                    className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showSortDropdown ? 'rotate-180' : ''
+                      }`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -148,11 +146,10 @@ export default function ServiceItem({ itemServiceType }) {
                             setCurrentPage(1);
                             setShowSortDropdown(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
-                            sortOption === 'random'
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${sortOption === 'random'
                               ? 'bg-blue-50 text-blue-700 font-medium'
                               : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           <span>{t('home.default')}</span>
                           {sortOption === 'random' && (
@@ -182,28 +179,27 @@ export default function ServiceItem({ itemServiceType }) {
                             setCurrentPage(1);
                             setShowSortDropdown(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
-                            sortOption === 'servicename' ||
-                            sortOption === 'servicenameen'
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${sortOption === 'servicename' ||
+                              sortOption === 'servicenameen'
                               ? 'bg-blue-50 text-blue-700 font-medium'
                               : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           <span>A → Z</span>
                           {(sortOption === 'servicename' ||
                             sortOption === 'servicenameen') && (
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
+                              <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
                         </button>
 
                         <button
@@ -216,28 +212,27 @@ export default function ServiceItem({ itemServiceType }) {
                             setCurrentPage(1);
                             setShowSortDropdown(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
-                            sortOption === 'servicename_desc' ||
-                            sortOption === 'servicenameen_desc'
+                          className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${sortOption === 'servicename_desc' ||
+                              sortOption === 'servicenameen_desc'
                               ? 'bg-blue-50 text-blue-700 font-medium'
                               : 'text-gray-700 hover:bg-gray-50'
-                          }`}
+                            }`}
                         >
                           <span>Z → A</span>
                           {(sortOption === 'servicename_desc' ||
                             sortOption === 'servicenameen_desc') && (
-                            <svg
-                              className="w-4 h-4"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          )}
+                              <svg
+                                className="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            )}
                         </button>
                       </div>
                     </div>
