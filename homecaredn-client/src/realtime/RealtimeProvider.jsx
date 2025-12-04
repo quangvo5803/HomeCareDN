@@ -45,15 +45,12 @@ export const RealtimeProvider = ({ children }) => {
           user.id
         }&role=${user.role}`,
         {
-          transport:
-            HttpTransportType.WebSockets |
-            HttpTransportType.ServerSentEvents |
-            HttpTransportType.LongPolling,
-          skipNegotiation: false,
+          transport: HttpTransportType.WebSockets,
+          skipNegotiation: true,
         }
       )
       .configureLogging(LogLevel.None)
-      .withAutomaticReconnect([0, 2000, 10000, 30000])
+      .withAutomaticReconnect()
       .build();
 
     connectionRef.current = connection;
@@ -78,14 +75,11 @@ export const RealtimeProvider = ({ children }) => {
 
     const chatConnection = new HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
-        transport:
-          HttpTransportType.WebSockets |
-          HttpTransportType.ServerSentEvents |
-          HttpTransportType.LongPolling,
-        skipNegotiation: false,
+        transport: HttpTransportType.WebSockets,
+        skipNegotiation: true,
       })
       .configureLogging(LogLevel.None)
-      .withAutomaticReconnect([0, 2000, 10000, 30000])
+      .withAutomaticReconnect()
       .build();
 
     chatConnectionRef.current = chatConnection;

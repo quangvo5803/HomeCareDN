@@ -314,7 +314,7 @@ namespace BusinessLogic.Services
                     dto
                 ),
                 _notifier.SendToApplicationGroupAsync(
-                    $"user_{serviceRequest.CustomerID.ToString()}",
+                    $"user_{serviceRequest.CustomerID}",
                     "ContractorApplication.Created",
                     customerDto
                 ),
@@ -380,17 +380,44 @@ namespace BusinessLogic.Services
                 foreach (var app in serviceRequest.ContractorApplications)
                 {
                     if (app.ContractorApplicationID != contractorApplicationID)
+                    {
                         app.Status = ApplicationStatus.Rejected;
+                        var payload = new
+                        {
+                            contractorApplication.ContractorApplicationID,
+                            contractorApplication.ServiceRequestID,
+                            Status = ApplicationStatus.Rejected.ToString(),
+                        };
+                        await _notifier.SendToApplicationGroupAsync(
+                            $"user_{app.ContractorID}",
+                            CONTRACTOR_APPLICATION_REJECT,
+                            payload
+                        );
+                        await _notificationService.NotifyPersonalAsync(
+                            new NotificationPersonalCreateOrUpdateDto
+                            {
+                                TargetUserId = app.ContractorID,
+                                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
+                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                TitleEN = "Service request not accepted",
+                                MessageEN =
+                                    "The customer did not select your application this time.",
+                                DataKey =
+                                    $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
+                                DataValue = app.ServiceRequestID.ToString(),
+                                Action = NotificationAction.Reject,
+                            }
+                        );
+                    }
                 }
             }
-
-            await _unitOfWork.SaveAsync();
-            var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             await _notifier.SendToApplicationGroupAsync(
                 "role_Contractor",
                 "ServiceRequest.Closed",
                 new { serviceRequest.ServiceRequestID }
             );
+            await _unitOfWork.SaveAsync();
+            var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             var payloadAccept = new
             {
                 contractorApplication.ContractorApplicationID,
@@ -399,12 +426,12 @@ namespace BusinessLogic.Services
                 contractorApplication.DueCommisionTime,
             };
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{serviceRequest.CustomerID.ToString()}",
+                $"user_{serviceRequest.CustomerID}",
                 "ContractorApplication.Accept",
                 payloadAccept
             );
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.ContractorID.ToString()}",
+                $"user_{dto.ContractorID}",
                 "ContractorApplication.Accept",
                 payloadAccept
             );
@@ -427,42 +454,6 @@ namespace BusinessLogic.Services
                     Action = NotificationAction.Accept,
                 }
             );
-            if (serviceRequest.ContractorApplications != null)
-            {
-                foreach (var app in serviceRequest.ContractorApplications)
-                {
-                    if (app.ContractorApplicationID != contractorApplicationID)
-                    {
-                        var payload = new
-                        {
-                            app.ContractorApplicationID,
-                            app.ServiceRequestID,
-                            Status = ApplicationStatus.Rejected.ToString(),
-                        };
-                        Console.WriteLine(app.ContractorID);
-                        await _notifier.SendToApplicationGroupAsync(
-                            $"user_{app.ContractorID.ToString()}",
-                            CONTRACTOR_APPLICATION_REJECT,
-                            payload
-                        );
-                        await _notificationService.NotifyPersonalAsync(
-                            new NotificationPersonalCreateOrUpdateDto
-                            {
-                                TargetUserId = app.ContractorID,
-                                Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
-                                TitleEN = "Service request not accepted",
-                                MessageEN =
-                                    "The customer did not select your application this time.",
-                                DataKey =
-                                    $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
-                                DataValue = app.ServiceRequestID.ToString(),
-                                Action = NotificationAction.Reject,
-                            }
-                        );
-                    }
-                }
-            }
 
             return dto;
         }
@@ -498,7 +489,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.ContractorID.ToString()}",
+                $"user_{dto.ContractorID}",
                 CONTRACTOR_APPLICATION_REJECT,
                 new
                 {
@@ -581,7 +572,7 @@ namespace BusinessLogic.Services
             );
             _unitOfWork.ContractorApplicationRepository.Remove(application);
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{serviceRequest?.CustomerID.ToString()}",
+                $"user_{serviceRequest?.CustomerID}",
                 "ContractorApplication.Delete",
                 new { application.ServiceRequestID, application.ContractorApplicationID }
             );
