@@ -384,8 +384,8 @@ namespace BusinessLogic.Services
                         app.Status = ApplicationStatus.Rejected;
                         var payload = new
                         {
-                            contractorApplication.ContractorApplicationID,
-                            contractorApplication.ServiceRequestID,
+                            app.ContractorApplicationID,
+                            app.ServiceRequestID,
                             Status = ApplicationStatus.Rejected.ToString(),
                         };
                         await _notifier.SendToApplicationGroupAsync(
@@ -411,12 +411,12 @@ namespace BusinessLogic.Services
                     }
                 }
             }
+            await _unitOfWork.SaveAsync();
             await _notifier.SendToApplicationGroupAsync(
                 "role_Contractor",
                 "ServiceRequest.Closed",
                 new { serviceRequest.ServiceRequestID }
             );
-            await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<ContractorApplicationDto>(contractorApplication);
             var payloadAccept = new
             {
