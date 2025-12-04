@@ -304,7 +304,7 @@ export default function AdminNotificationManager() {
                     viewOnly={notifyViewOnly}
                     user={user}
                 />
-                <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
+                <div className="hidden md:block bg-white shadow-lg border border-gray-200 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-center">
                             <thead>
@@ -321,6 +321,79 @@ export default function AdminNotificationManager() {
                         </table>
                     </div>
                 </div>
+
+                {/* Mobile Notification Cards */}
+                <div className="block md:hidden p-4 space-y-3">
+                    {notifications?.map((item, idx) => (
+                        <div
+                            key={item.notificationID}
+                            className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                        >
+                            {/* Card Header */}
+                            <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                                <div className="flex items-center gap-2.5">
+                                    <div className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                                        {(currentPage - 1) * pageSize + idx + 1}
+                                    </div>
+
+                                </div>
+                                <span className="px-2.5 py-1 text-sm font-medium text-purple-800 bg-purple-100 rounded-full">
+                                    {t(`adminNotifyManager.${item.type}`)}
+                                </span>
+                            </div>
+
+                            {/* Card Body */}
+                            <div className="p-4 space-y-3">
+                                {/* Title */}
+                                <div>
+                                    <h3 className="font-bold text-gray-900 text-base mb-1">
+                                        {i18n.language === 'vi' ? item.title : item.titleEN || item.title}
+                                    </h3>
+                                </div>
+
+                                {/* Target Roles */}
+                                <div className="flex items-start gap-2">
+                                    <i className="fa-regular fa-circle-user"></i>
+                                    <div className="flex-1">
+                                        <span className="text-xs text-gray-800 block mb-1">{t('adminNotifyManager.receiver')}</span>
+                                        <div className="flex flex-wrap gap-1.5 text-sm font-medium bg-amber-50 text-amber-700 rounded-full">
+                                            {item.targetRoles
+                                                .split(',')
+                                                .map(role => t(`adminNotifyManager.roles.${role.trim()}`))
+                                                .join(', ')
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Created Date */}
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                    <i className="fa-regular fa-calendar"></i>
+                                    <span>{formatDate(item.createdAt, i18n.language)}</span>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex gap-2 pt-2">
+                                    <button
+                                        onClick={() => handleViewNotification(item.notificationID)}
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-lg hover:bg-orange-700 active:bg-orange-800 transition-colors shadow-sm"
+                                    >
+                                        <i className="fa-solid fa-eye" />
+                                        <span>{t('BUTTON.View')}</span>
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.notificationID)}
+                                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 active:bg-red-700 transition-colors shadow-sm"
+                                    >
+                                        <i className="fa-solid fa-trash" />
+                                        <span>{t('BUTTON.Delete')}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Pagination */}
                 {!loading && totalCount > 0 && (
                     <div className="flex flex-col sm:flex-row items-center justify-between py-4 px-6 border-t border-gray-200 bg-gray-50 gap-3">
