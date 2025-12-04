@@ -274,7 +274,7 @@ namespace BusinessLogic.Services
                     dto
                 ),
                 _notifier.SendToApplicationGroupAsync(
-                    $"user_{materialRequest.CustomerID}",
+                    $"user_{materialRequest.CustomerID.ToString()}",
                     "DistributorApplication.Created",
                     customerDto
                 ),
@@ -317,7 +317,7 @@ namespace BusinessLogic.Services
             _unitOfWork.DistributorApplicationRepository.Remove(application);
 
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{materialRequest?.CustomerID}",
+                $"user_{materialRequest?.CustomerID.ToString()}",
                 "DistributorApplication.Delete",
                 new { application.MaterialRequestID, application.DistributorApplicationID }
             );
@@ -438,7 +438,7 @@ namespace BusinessLogic.Services
                         };
 
                         await _notifier.SendToApplicationGroupAsync(
-                            $"user_{other.DistributorID}",
+                            $"user_{other.DistributorID.ToString()}",
                             DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
@@ -483,12 +483,12 @@ namespace BusinessLogic.Services
             };
 
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{request.CustomerID}",
+                $"user_{request.CustomerID.ToString()}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{application.DistributorID}",
+                $"user_{application.DistributorID.ToString()}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
@@ -548,7 +548,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.DistributorID}",
+                $"user_{dto.DistributorID.ToString()}",
                 DISTRIBUTOR_APPLICATION_REJECT,
                 new
                 {
