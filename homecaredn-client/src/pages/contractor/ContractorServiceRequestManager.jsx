@@ -9,6 +9,7 @@ import StatusBadge from '../../components/StatusBadge';
 import { useAuth } from '../../hook/useAuth';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+
 export default function ContractorServiceRequestManager() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -151,16 +152,16 @@ export default function ContractorServiceRequestManager() {
     <div className="min-h-screen p-4 lg:p-8 bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50">
       <div className="w-full max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 lg:mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-blue-500/25">
-              <i className="text-xl text-white fa-solid fa-list-alt" />
+            <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg shadow-blue-500/25">
+              <i className="text-lg lg:text-xl text-white fa-solid fa-list-alt" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold text-gray-900">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">
                 {t('contractorServiceRequestManager.title')}
               </h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="text-xs lg:text-sm text-gray-500 mt-0.5">
                 {t('contractorServiceRequestManager.subtitle')}
               </p>
             </div>
@@ -170,9 +171,9 @@ export default function ContractorServiceRequestManager() {
         {/* Main Container */}
         <div className="overflow-hidden bg-white shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100">
           {/* Actions Bar */}
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm bg-white shadow-sm border border-gray-200">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 px-4 lg:px-6 py-4 lg:py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center flex-wrap gap-3 w-full lg:w-auto">
+              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm bg-white shadow-sm border border-gray-200 w-full lg:w-auto justify-center lg:justify-start">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute inline-flex w-full h-full bg-blue-400 rounded-full opacity-75 animate-ping"></span>
                   <span className="relative inline-flex w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
@@ -186,8 +187,8 @@ export default function ContractorServiceRequestManager() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-orange-300 transition-all cursor-pointer group">
+            <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
+              <label className="inline-flex items-center justify-center lg:justify-start gap-2.5 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-orange-300 transition-all cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={showAppliedOnly}
@@ -206,7 +207,7 @@ export default function ContractorServiceRequestManager() {
                   setSortOption(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
+                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer w-full lg:w-auto"
               >
                 <option value="">
                   {t('contractorServiceRequestManager.sortDefault')}
@@ -223,7 +224,7 @@ export default function ContractorServiceRequestManager() {
 
           {/* Content Area */}
           <div className="w-full">
-            {/* Desktop View */}
+            {/* Desktop View (Hidden on Mobile) */}
             <div className="hidden lg:block">
               <div className="p-6 space-y-4">
                 {serviceRequests && serviceRequests.length > 0 ? (
@@ -334,7 +335,7 @@ export default function ContractorServiceRequestManager() {
                             <span className="font-medium text-gray-700 ">
                               {t('userPage.serviceRequest.label_timeLine')}
                               {formatDate(request.startDate, i18n.language)}
-                              {' - '}{' '}
+                              {' - '}
                               {formatDate(request.endDate, i18n.language)}
                             </span>
                           </div>
@@ -371,7 +372,7 @@ export default function ContractorServiceRequestManager() {
               </div>
             </div>
 
-            {/* Mobile View */}
+            {/* Mobile View (Hidden on Desktop) */}
             <div className="lg:hidden">
               <div className="p-4 space-y-4">
                 {serviceRequests && serviceRequests.length > 0 ? (
@@ -415,7 +416,7 @@ export default function ContractorServiceRequestManager() {
                             <div className="flex items-center text-xs text-gray-600 gap-1.5">
                               <i className="fa-solid fa-location-dot text-orange-500" />
                               <span
-                                className="truncate font-medium"
+                                className="truncate font-medium break-all"
                                 title={addressText}
                               >
                                 {addressText}
@@ -428,32 +429,39 @@ export default function ContractorServiceRequestManager() {
                               status={request.status}
                               type="Request"
                             />
-                            {request.selectedContractorApplicationID && (
-                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-                                <i className="fa-solid fa-user-check"></i>
-                                <span className="hidden sm:inline">
-                                  Đã chọn
+                            {request.selectedContractorApplicationID &&
+                              (request.selectedContractorApplication
+                                .contractorID === user.id ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">
+                                  <i className="fa-solid fa-user-check"></i>
+                                  <span>Đã chọn</span>
                                 </span>
-                              </span>
-                            )}
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                  <i className="fa-solid fa-user-check"></i>
+                                  <span>Đã chọn</span>
+                                </span>
+                              ))}
                           </div>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-3 text-xs">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 font-medium">
-                            <i className="fa-solid fa-building" />
+                        <div className="flex flex-wrap gap-2 mb-3 text-[10px] font-medium text-gray-600">
+                          <span className="bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded">
                             {t(`Enums.BuildingType.${request.buildingType}`)}
                           </span>
                           {(request?.floors ?? 0) > 0 && (
-                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 text-gray-700 border border-gray-200 font-medium">
-                              <i className="fa-solid fa-layer-group" />
+                            <span className="bg-gray-50 text-gray-700 border border-gray-200 px-2 py-0.5 rounded">
                               {request.floors}{' '}
                               {t('contractorServiceRequestDetail.floorsUnit')}
                             </span>
                           )}
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 font-medium">
-                            <i className="fa-solid fa-ruler-combined" />
-                            {request.area || '—'} m²
+                          <span className="bg-teal-50 text-teal-700 border border-teal-100 px-2 py-0.5 rounded">
+                            {(
+                              request.length *
+                              request.width *
+                              request.floors
+                            ).toFixed(1) || '—'}{' '}
+                            m²
                           </span>
                         </div>
 
@@ -498,16 +506,18 @@ export default function ContractorServiceRequestManager() {
                     );
                   })
                 ) : (
-                  <div className="py-12 text-center">
-                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-                      <i className="text-2xl text-gray-400 fa-solid fa-list-alt"></i>
+                  <div className="text-center py-12">
+                    <div className="flex flex-col items-center">
+                      <div className="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
+                        <i className="text-2xl text-gray-400 fa-solid fa-list-alt"></i>
+                      </div>
+                      <h3 className="mb-1 text-lg font-bold text-gray-900">
+                        {t('contractorServiceRequestManager.noRequest')}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {t('contractorServiceRequestManager.letStart')}
+                      </p>
                     </div>
-                    <h3 className="mb-1 text-lg font-bold text-gray-900">
-                      {t('contractorServiceRequestManager.noRequest')}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {t('contractorServiceRequestManager.letStart')}
-                    </p>
                   </div>
                 )}
               </div>
@@ -515,7 +525,7 @@ export default function ContractorServiceRequestManager() {
 
             {/* Pagination */}
             {totalServiceRequests > 0 && (
-              <div className="flex justify-center py-6 border-t border-gray-100 bg-gray-50/50">
+              <div className="flex justify-center py-4 lg:py-6 border-t border-gray-100 bg-gray-50/50">
                 <Pagination
                   current={currentPage}
                   pageSize={pageSize}
@@ -523,6 +533,7 @@ export default function ContractorServiceRequestManager() {
                   onChange={(page) => setCurrentPage(page)}
                   showSizeChanger={false}
                   size="small"
+                  className="scale-90 lg:scale-100 origin-center"
                 />
               </div>
             )}
