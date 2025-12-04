@@ -7,7 +7,7 @@ namespace HomeCareDNAPI.Hubs
         public override async Task OnConnectedAsync()
         {
             var httpContext = Context.GetHttpContext();
-            var userId = httpContext?.Request.Query["userId"];
+            var userId = httpContext?.Request.Query["userId"].ToString();
             var role = httpContext?.Request.Query["role"];
 
             if (!string.IsNullOrEmpty(userId))
