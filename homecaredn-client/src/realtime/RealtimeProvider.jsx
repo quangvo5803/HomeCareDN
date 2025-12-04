@@ -46,7 +46,6 @@ export const RealtimeProvider = ({ children }) => {
         }&role=${user.role}`,
         {
           transport: HttpTransportType.WebSockets,
-          skipNegotiation: true,
         }
       )
       .configureLogging(LogLevel.None)
@@ -76,7 +75,6 @@ export const RealtimeProvider = ({ children }) => {
     const chatConnection = new HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
         transport: HttpTransportType.WebSockets,
-        skipNegotiation: true,
       })
       .configureLogging(LogLevel.None)
       .withAutomaticReconnect()
