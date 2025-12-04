@@ -73,9 +73,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-              ...mr,
-              status: 'Closed',
-            }
+                ...mr,
+                status: 'Closed',
+              }
             : mr
         )
       );
@@ -471,19 +471,19 @@ export default function MaterialRequestDetail() {
   const CommissionSection = isPendingCommission ? (
     <>
       {/* Commission Calculation Info Box */}
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 md:p-4 ring-1 ring-blue-200 space-y-3 md:space-y-4">
         <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
           <i className="fas fa-calculator text-blue-600"></i>
           {t('distributorMaterialRequestDetail.commissionCalculation')}
         </h4>
 
         {/* Commission tiers */}
-        <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
+        <div className="bg-white/60 rounded-md p-2 md:p-3 ring-1 ring-blue-100 overflow-x-auto">
           <p className="text-xs font-semibold text-gray-700 mb-2">
             {t('distributorMaterialRequestDetail.publicCommissionTiers')}
           </p>
 
-          <table className="w-full text-xs text-gray-700">
+          <table className="w-full text-xs text-gray-700 min-w-[250px]">
             <thead>
               <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
                 <th className="py-1">
@@ -543,7 +543,7 @@ export default function MaterialRequestDetail() {
           return (
             <div className="space-y-2">
               {/* Estimate Price */}
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
                 <span className="text-gray-600">
                   {t('distributorMaterialRequestDetail.yourBid')}:
                 </span>
@@ -553,7 +553,7 @@ export default function MaterialRequestDetail() {
               </div>
 
               {/* Commission Rate */}
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
                 <span className="text-gray-600">
                   {t('distributorMaterialRequestDetail.commissionRate')}:
                 </span>
@@ -573,7 +573,7 @@ export default function MaterialRequestDetail() {
                   <p className="text-lg font-bold text-blue-700">
                     {formatVND(commission)}
                   </p>
-                  <p className="text-sm text-gray-900">
+                  <p className="text-xs md:text-sm text-gray-900 break-words">
                     {numberToWordsByLang(commission, i18n.language)}
                   </p>
                 </div>
@@ -597,7 +597,7 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => { }}
+            onExpired={() => {}}
           />
           {new Date(existingApplication.dueCommisionTime) > new Date() && (
             <button
@@ -650,8 +650,8 @@ export default function MaterialRequestDetail() {
   };
 
   const ApplyFormView = (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6 inline-flex items-center gap-2">
+    <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6 space-y-6">
+      <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6 inline-flex items-center gap-2">
         <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-orange-50 ring-4 ring-orange-100">
           <i className="fas fa-clipboard-list text-orange-600" />
         </span>
@@ -673,8 +673,8 @@ export default function MaterialRequestDetail() {
           {hasNewMaterials ? (
             <div className="text-center py-1">
               <div className="text-center py-1">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <i className="fas fa-inbox text-slate-400 text-4xl"></i>
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6">
+                  <i className="fas fa-inbox text-slate-400 text-3xl md:text-4xl"></i>
                 </div>
                 <h4 className="font-bold text-slate-700 mb-2 text-lg">
                   {t('userPage.materialRequestDetail.noMaterial')}
@@ -697,7 +697,7 @@ export default function MaterialRequestDetail() {
             <>
               {newMaterials.length > 0 && canAddMaterial && (
                 <>
-                  {/* Table Header */}
+                  {/* Table Header Desktop */}
                   <div className="hidden lg:grid lg:grid-cols-28 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700">
                     <div className="col-span-1 text-center">#</div>
                     <div className="col-span-3 text-center">
@@ -741,7 +741,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                      item.material.categoryName;
+                        item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -756,7 +756,7 @@ export default function MaterialRequestDetail() {
                   return (
                     <div
                       key={item.materialRequestItemID}
-                      className="border-2 border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
+                      className="border-2 border-slate-200 rounded-xl p-4 md:p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
                     >
                       {/* Desktop Layout */}
                       <div className="hidden lg:grid lg:grid-cols-28 gap-4 items-center">
@@ -913,6 +913,135 @@ export default function MaterialRequestDetail() {
                           </button>
                         </div>
                       </div>
+
+                      {/* Mobile Layout  */}
+                      <div className="flex flex-col lg:hidden gap-3">
+                        {/* Top: Image & Info */}
+                        <div className="flex items-start gap-3">
+                          <div className="aspect-square w-16 h-16 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                            <img
+                              src={
+                                imageUrl ??
+                                'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                              }
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">
+                              {displayName}
+                            </h4>
+                            <div className="text-xs text-gray-500 flex flex-wrap gap-2">
+                              {displayCategory && (
+                                <span className="bg-gray-100 px-2 py-0.5 rounded">
+                                  {displayCategory}
+                                </span>
+                              )}
+                              {displayBrand && (
+                                <span className="bg-gray-100 px-2 py-0.5 rounded">
+                                  {displayBrand}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {/* Delete Button Mobile */}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteMaterial(item.materialRequestItemID)
+                            }
+                            disabled={!canAddMaterial}
+                            className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 rounded hover:bg-red-100"
+                          >
+                            <i className="fas fa-trash-alt text-sm"></i>
+                          </button>
+                        </div>
+
+                        <div className="border-t border-gray-100 my-1"></div>
+
+                        {/* Middle: Quantity & Unit */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-gray-600">
+                            {t('userPage.materialRequestDetail.quantity')}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (item.quantity > 1)
+                                  handleQuantityChangeNew(
+                                    item.materialRequestItemID,
+                                    item.quantity - 1
+                                  );
+                              }}
+                              disabled={item.quantity <= 1 || !canAddMaterial}
+                              className="w-7 h-7 flex items-center justify-center bg-gray-100 rounded hover:bg-orange-100 text-gray-600"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              min={1}
+                              value={item.quantity}
+                              onChange={(e) =>
+                                handleQuantityChangeNew(
+                                  item.materialRequestItemID,
+                                  e.target.value
+                                )
+                              }
+                              disabled={!canAddMaterial}
+                              className="w-12 text-center text-sm font-bold border-none bg-transparent focus:ring-0 p-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleQuantityChangeNew(
+                                  item.materialRequestItemID,
+                                  item.quantity + 1
+                                )
+                              }
+                              disabled={!canAddMaterial}
+                              className="w-7 h-7 flex items-center justify-center bg-gray-100 rounded hover:bg-orange-100 text-gray-600"
+                            >
+                              +
+                            </button>
+                            <span className="text-xs text-gray-500 ml-1">
+                              ({displayUnit})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Bottom: Price Input */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-gray-600">
+                            {t('distributorMaterialRequestDetail.price')}
+                          </span>
+                          <input
+                            type="number"
+                            min={0}
+                            placeholder="0"
+                            value={item.price || ''}
+                            onChange={(e) =>
+                              handlePriceChangeNew(
+                                item.materialRequestItemID,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="w-32 px-2 py-1 text-right border border-gray-300 rounded-md text-sm font-bold text-orange-600 focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                          />
+                        </div>
+
+                        {/* Total Price */}
+                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                          <span className="text-xs font-bold text-gray-700">
+                            {t('distributorMaterialRequestDetail.totalPrice')}
+                          </span>
+                          <span className="text-sm font-bold text-gray-900">
+                            {formatVND(item.price * item.quantity)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -922,7 +1051,7 @@ export default function MaterialRequestDetail() {
               {canAddMaterial && (
                 <button
                   type="button"
-                  className="w-full mt-6 flex items-center mb-6 justify-center gap-2 py-4 px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer"
+                  className="w-full mt-6 flex items-center mb-6 justify-center gap-2 py-3 px-4 md:py-4 md:px-6 border-2 border-dashed border-orange-300 rounded-xl text-orange-600 font-bold hover:border-orange-500 hover:bg-orange-50 transition-all cursor-pointer text-sm md:text-base"
                   onClick={() => setOpen(true)}
                 >
                   <i className="fas fa-plus-circle text-lg"></i>
@@ -940,14 +1069,16 @@ export default function MaterialRequestDetail() {
           </label>
 
           {totalEstimatePrice !== null && totalEstimatePrice !== undefined && (
-            <div className="mt-2 space-y-1 text-sm text-gray-500">
-              <p>
-                {t('distributorMaterialRequestDetail.bidPriceLabel')}{' '}
-                <span className="font-semibold text-orange-600">
+            <div className="mt-2 space-y-1 text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+              <p className="flex justify-between">
+                <span>
+                  {t('distributorMaterialRequestDetail.bidPriceLabel')}
+                </span>
+                <span className="font-bold text-orange-600">
                   {formatVND(Number(totalEstimatePrice))}
                 </span>
               </p>
-              <p>
+              <p className="text-xs md:text-sm italic">
                 {t('distributorMaterialRequestDetail.bidPriceInWords')}{' '}
                 <span className="font-semibold">{bidPriceInWords()}</span>
               </p>
@@ -965,7 +1096,7 @@ export default function MaterialRequestDetail() {
             value={message}
             init={{
               license_key: 'gpl',
-              height: 500,
+              height: 300, // Reduced height for mobile friendliness
               menubar: false,
               plugins: 'lists link image code',
               toolbar:
@@ -986,13 +1117,13 @@ export default function MaterialRequestDetail() {
         <div>
           <button
             type="submit"
-            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed cursor-pointer shadow-sm text-sm md:text-base font-semibold"
             disabled={!canSubmit || isSubmitting}
           >
             <i className="fas fa-paper-plane" />
             {t('distributorMaterialRequestDetail.applyForProject')}
           </button>
-          <p className="mt-3 text-xs text-gray-500 text-center">
+          <p className="mt-3 text-[10px] md:text-xs text-gray-500 text-center">
             <i className="fas fa-shield-alt mr-1" />
             {t('distributorMaterialRequestDetail.privacyNotice')}
           </p>
@@ -1002,27 +1133,32 @@ export default function MaterialRequestDetail() {
   );
 
   const ApplicationDetailView = (
-    <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
+    <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h3 className="text-lg md:text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
           <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-50 ring-4 ring-blue-100">
             <i className="fas fa-clipboard-check text-blue-600" />
           </span>
           {t('distributorMaterialRequestDetail.yourApplication')}
         </h3>
-        <StatusBadge status={existingApplication?.status} type="Application" />
+        <div className="self-start sm:self-auto">
+          <StatusBadge
+            status={existingApplication?.status}
+            type="Application"
+          />
+        </div>
       </div>
 
       {/* Selected Badge for PendingCommission */}
       {isPendingCommission && (
-        <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-4 ring-2 ring-yellow-400">
+        <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-3 md:p-4 ring-2 ring-yellow-400">
           <div className="flex items-center gap-3">
-            <i className="fas fa-trophy text-yellow-500 text-3xl"></i>
+            <i className="fas fa-trophy text-yellow-500 text-2xl md:text-3xl"></i>
             <div>
-              <p className="font-bold text-green-700 text-lg">
+              <p className="font-bold text-green-700 text-base md:text-lg">
                 {t('distributorMaterialRequestDetail.youAreSelected')}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs md:text-sm text-gray-600 mt-1">
                 {t(
                   'distributorMaterialRequestDetail.selectedPendingCommissionNote'
                 )}
@@ -1033,7 +1169,7 @@ export default function MaterialRequestDetail() {
       )}
 
       <div className="overflow-x-auto">
-        {/* Header */}
+        {/* Header Desktop */}
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
           <div className="col-span-1">#</div>
           <div className="col-span-3">
@@ -1056,7 +1192,7 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
 
-        {/* Material */}
+        {/* Material List */}
         <div className="space-y-4">
           {existingApplication?.items?.map((item, index) => {
             const imageUrl = item.images?.[0]?.imageUrl || item.imageUrls?.[0];
@@ -1080,8 +1216,9 @@ export default function MaterialRequestDetail() {
             return (
               <div
                 key={item.materialID}
-                className="border-2 border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
+                className="border-2 border-slate-200 rounded-xl p-4 md:p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
               >
+                {/* Desktop View */}
                 <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
                   {/* STT */}
                   <div className="col-span-1 flex justify-center">
@@ -1145,7 +1282,7 @@ export default function MaterialRequestDetail() {
                   {/* Unit */}
                   <div className="col-span-3 flex justify-center">
                     <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-200">
-                      <p className="text-sm w-7 h-5 font-bold text-slate-900">
+                      <p className="text-sm font-bold text-slate-900">
                         {displayUnit}
                       </p>
                     </div>
@@ -1164,6 +1301,72 @@ export default function MaterialRequestDetail() {
                     </div>
                   </div>
                 </div>
+
+                {/* Mobile View */}
+                <div className="flex flex-col lg:hidden gap-3">
+                  {/* Top: Image & Name */}
+                  <div className="flex items-start gap-3">
+                    <div className="aspect-square w-16 h-16 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                      <img
+                        src={
+                          imageUrl ??
+                          'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                        }
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">
+                        {displayName}
+                      </h4>
+                      <div className="text-xs text-gray-500 flex flex-wrap gap-2">
+                        {displayCategory && (
+                          <span className="bg-gray-100 px-2 py-0.5 rounded">
+                            {displayCategory}
+                          </span>
+                        )}
+                        {displayBrand && (
+                          <span className="bg-gray-100 px-2 py-0.5 rounded">
+                            {displayBrand}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-gray-100 my-1"></div>
+
+                  {/* Grid Stats */}
+                  <div className="grid grid-cols-2 gap-y-2 text-xs">
+                    <div>
+                      <span className="text-gray-500 block">
+                        {t('userPage.materialRequestDetail.quantity')}
+                      </span>
+                      <span className="font-semibold text-gray-800">
+                        {item.quantity} {displayUnit}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-gray-500 block">
+                        {t('distributorMaterialRequestDetail.price')}
+                      </span>
+                      <span className="font-semibold text-gray-800">
+                        {formatVND(item.price)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Total Price Row */}
+                  <div className="flex justify-between items-center bg-gray-50 p-2 rounded mt-1">
+                    <span className="text-xs font-bold text-gray-700">
+                      {t('distributorMaterialRequestDetail.totalPrice')}
+                    </span>
+                    <span className="text-sm font-bold text-blue-600">
+                      {formatVND(item.price * item.quantity)}
+                    </span>
+                  </div>
+                </div>
               </div>
             );
           })}
@@ -1171,7 +1374,7 @@ export default function MaterialRequestDetail() {
       </div>
 
       {/* Bid Price */}
-      <div className="bg-orange-50 rounded-lg p-5 ring-1 ring-orange-200">
+      <div className="bg-orange-50 rounded-lg p-4 md:p-5 ring-1 ring-orange-200">
         <div className="flex items-center gap-3 mb-2">
           <i className="fas fa-coins text-orange-500 text-xl"></i>
           <p className="text-sm font-medium text-gray-700">
@@ -1181,7 +1384,7 @@ export default function MaterialRequestDetail() {
         <p className="text-2xl font-bold text-gray-900 mb-1">
           {formatVND(existingApplication?.totalEstimatePrice)}
         </p>
-        <p className="text-sm text-gray-600">
+        <p className="text-xs md:text-sm text-gray-600 break-words">
           {numberToWordsByLang(
             existingApplication?.estimatePrice,
             i18n.language
@@ -1191,13 +1394,13 @@ export default function MaterialRequestDetail() {
 
       {/* Description */}
       {existingApplication?.message && (
-        <div className="border-t pt-6">
+        <div className="border-t pt-4 md:pt-6">
           <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <i className="fas fa-comment-alt text-gray-700"></i>
             {t('distributorMaterialRequestDetail.noteToOwner')}
           </h4>
           <div
-            className="prose prose-sm max-w-none text-gray-900 bg-gray-50 rounded-lg p-4"
+            className="prose prose-sm max-w-none text-gray-900 bg-gray-50 rounded-lg p-4 text-xs md:text-sm overflow-x-auto"
             dangerouslySetInnerHTML={{
               __html: existingApplication?.message,
             }}
@@ -1208,7 +1411,7 @@ export default function MaterialRequestDetail() {
       {/* Applied Date */}
       {existingApplication?.createdAt && (
         <div className="border-t pt-4">
-          <p className="text-sm text-gray-900 flex items-center gap-2">
+          <p className="text-xs md:text-sm text-gray-900 flex items-center gap-2">
             <i className="fas fa-calendar text-gray-700"></i>
             {t('distributorMaterialRequestDetail.appliedDate')}:{' '}
             <span className="font-medium">
@@ -1219,7 +1422,7 @@ export default function MaterialRequestDetail() {
       )}
 
       {/* Action Buttons */}
-      <div className="border-t pt-6 space-y-3">
+      <div className="border-t pt-4 md:pt-6 space-y-3">
         {CommissionSection}
         {PendingSection}
       </div>
@@ -1234,63 +1437,64 @@ export default function MaterialRequestDetail() {
   const ApplyView = getApplyView();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-8 px-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-slate-50 py-4 px-3 md:py-8 md:px-6">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-2xl bg-orange-500 h-12 sm:h-32">
+      <div className="relative overflow-hidden rounded-xl md:rounded-2xl bg-orange-500 h-28 md:h-32 shadow-md">
         {/* Back Button */}
         <button
           onClick={() => navigate('/Distributor/MaterialRequestManager')}
-          className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex items-center px-4 py-2 text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors cursor-pointer"
+          className="absolute left-3 top-3 md:left-4 md:top-1/2 md:-translate-y-1/2 inline-flex items-center px-2 py-1 text-xs text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors cursor-pointer backdrop-blur-sm z-10 lg:px-4 lg:py-2 lg:text-sm"
         >
           <i className="fas fa-arrow-left mr-2" />
           {t('distributorMaterialRequestDetail.backToList')}
         </button>
 
-        <div className="px-6 py-6 sm:px-8 sm:py-8 text-white h-full flex items-center justify-center">
-          <div className="max-w-3xl text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold inline-flex items-center gap-3 justify-center">
-              <i className="fas fa-boxes opacity-90" />
+        <div className="px-4 py-4 md:px-8 md:py-8 text-white h-full flex items-center justify-center">
+          <div className="max-w-3xl text-center mt-6 md:mt-0">
+            <h1 className="text-xl md:text-3xl font-bold inline-flex items-center gap-2 md:gap-3 justify-center text-center leading-tight">
+              <i className="fas fa-boxes opacity-90 hidden sm:inline-block" />
               {t('distributorMaterialRequestDetail.title')}
             </h1>
           </div>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-4 md:mt-8">
         {/* LEFT CONTENT */}
-        <div className="lg:col-span-9 space-y-6">
+        <div className="lg:col-span-9 space-y-4 md:space-y-6">
           {/* Request Info */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-6 space-y-5">
-            <div className="flex justify-between items-center">
-              <h3 className="text-xl font-semibold text-gray-800">
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-4 md:p-6 space-y-3 md:space-y-5">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-800">
                 {t('distributorMaterialRequestDetail.info')}
               </h3>
-              <StatusBadge status={materialRequest.status} type="Request" />
+              <div className="self-start sm:self-auto">
+                <StatusBadge status={materialRequest.status} type="Request" />
+              </div>
             </div>
-            <p className="text-gray-700 text-lg">
+            <p className="text-gray-700 text-sm md:text-lg">
               {materialRequest.description.length > 60
                 ? materialRequest.description.substring(0, 60) + '...'
                 : materialRequest.description}
             </p>
-            <div className="flex flex-wrap gap-2 text-lg text-gray-800">
-              <span className="flex items-center gap-2">
-                <i className="fas fa-location-dot text-orange-500"></i>
-                {addressText}
+            <div className="flex flex-col gap-2 text-sm md:text-lg text-gray-800">
+              <span className="flex items-start gap-2">
+                <i className="fas fa-location-dot text-orange-500 mt-1 md:mt-1.5 flex-shrink-0"></i>
+                <span className="break-words">{addressText}</span>
               </span>
-            </div>
-            <div className="flex flex-wrap gap-2 text-lg text-gray-800">
               <span className="flex items-center gap-2">
-                <i className="fas fa-clock text-orange-500"></i>
-                {t('userPage.materialRequestDetail.deliveryDate')}
-                {': '}
-                <span className="font-bold">
-                  {formatDate(materialRequest.deliveryDate, i18n.language)}
+                <i className="fas fa-clock text-orange-500 flex-shrink-0"></i>
+                <span>
+                  {t('userPage.materialRequestDetail.deliveryDate')}:{' '}
+                  <span className="font-bold">
+                    {formatDate(materialRequest.deliveryDate, i18n.language)}
+                  </span>
                 </span>
               </span>
             </div>
           </div>
 
-          {/* Material List */}
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-6">
+          {/* Material List (Original Request) */}
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-4 md:p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
               <i className="fas fa-cubes text-blue-500"></i>
               {t('distributorMaterialRequestDetail.listMaterial')} (
@@ -1298,7 +1502,7 @@ export default function MaterialRequestDetail() {
             </h3>
 
             <div className="overflow-x-auto">
-              {/* Header */}
+              {/* Header Desktop */}
               <div className="hidden lg:grid lg:grid-cols-24 gap-3 px-6 py-4 bg-slate-50 rounded-xl border border-slate-200 mb-4 font-bold text-sm text-slate-700 text-center">
                 <div className="col-span-1">#</div>
                 <div className="col-span-3">
@@ -1321,7 +1525,7 @@ export default function MaterialRequestDetail() {
                 </div>
               </div>
 
-              {/* Material */}
+              {/* Material Items */}
               <div className="space-y-4">
                 {materialRequest.materialRequestItems.map((item, index) => {
                   const imageUrl =
@@ -1337,7 +1541,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                      item.material.categoryName;
+                        item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1352,8 +1556,9 @@ export default function MaterialRequestDetail() {
                   return (
                     <div
                       key={item.materialRequestItemID}
-                      className="border-2 border-slate-200 rounded-xl p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
+                      className="border-2 border-slate-200 rounded-xl p-4 md:p-5 hover:border-orange-300 hover:shadow-lg transition-all bg-white group"
                     >
+                      {/* Desktop Grid View */}
                       <div className="hidden lg:grid lg:grid-cols-24 gap-3 items-center text-center">
                         {/* STT */}
                         <div className="col-span-1 flex justify-center">
@@ -1454,6 +1659,83 @@ export default function MaterialRequestDetail() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Mobile Card View (Original Request Items) */}
+                      <div className="flex flex-col lg:hidden gap-3">
+                        {/* Top: Image & Info */}
+                        <div className="flex items-start gap-3">
+                          <div className="aspect-square w-16 h-16 flex-shrink-0 bg-slate-100 rounded-lg overflow-hidden border border-slate-200">
+                            <img
+                              src={
+                                imageUrl ??
+                                'https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg'
+                              }
+                              alt={displayName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-bold text-gray-900 text-sm mb-1 truncate">
+                              {displayName}
+                            </h4>
+                            <div className="text-xs text-gray-500 flex flex-wrap gap-2">
+                              {displayCategory && (
+                                <span className="bg-gray-100 px-2 py-0.5 rounded">
+                                  {displayCategory}
+                                </span>
+                              )}
+                              {displayBrand && (
+                                <span className="bg-gray-100 px-2 py-0.5 rounded">
+                                  {displayBrand}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="border-t border-gray-100 my-1"></div>
+
+                        {/* Middle: Quantity & Unit */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-gray-600">
+                            {t('userPage.materialRequestDetail.quantity')}
+                          </span>
+                          <span className="text-sm font-bold text-gray-900">
+                            {item.quantity} {displayUnit}
+                          </span>
+                        </div>
+
+                        {/* Bottom: Price Input */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-gray-600">
+                            {t('distributorMaterialRequestDetail.price')}
+                          </span>
+                          <input
+                            type="number"
+                            min={0}
+                            placeholder="0"
+                            disabled={!canEnterPrice}
+                            value={item.price || ''}
+                            onChange={(e) =>
+                              handlePriceChange(
+                                item.materialRequestItemID,
+                                Number(e.target.value)
+                              )
+                            }
+                            className="w-32 px-2 py-1 text-right border border-gray-300 rounded-md text-sm font-bold text-orange-600 focus:ring-1 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100"
+                          />
+                        </div>
+
+                        {/* Total Price */}
+                        <div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+                          <span className="text-xs font-bold text-gray-700">
+                            {t('distributorMaterialRequestDetail.totalPrice')}
+                          </span>
+                          <span className="text-sm font-bold text-gray-900">
+                            {formatVND(item.price * item.quantity)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -1463,7 +1745,7 @@ export default function MaterialRequestDetail() {
 
           {/* Apply Form OR Application Details */}
           {ApplyView}
-          <div className="mb-6 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 shadow-sm">
+          <div className="mb-6 p-4 md:p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 shadow-sm">
             <div className="flex items-center mb-4">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                 <svg
@@ -1479,9 +1761,9 @@ export default function MaterialRequestDetail() {
               </h3>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 text-sm md:text-base">
               {materialRequest.customerEmail && (
-                <div className="flex items-start">
+                <div className="flex flex-col sm:flex-row sm:items-start">
                   <span className="font-semibold text-slate-600 w-40">
                     Email
                   </span>
@@ -1494,7 +1776,7 @@ export default function MaterialRequestDetail() {
                 </div>
               )}
               {materialRequest.customerName && (
-                <div className="flex items-start">
+                <div className="flex flex-col sm:flex-row sm:items-start">
                   <span className="font-semibold text-slate-600 w-40">
                     {t('distributorMaterialRequestDetail.customerName')}
                   </span>
@@ -1505,7 +1787,7 @@ export default function MaterialRequestDetail() {
               )}
 
               {materialRequest.customerPhone && (
-                <div className="flex items-start">
+                <div className="flex flex-col sm:flex-row sm:items-start">
                   <span className="font-semibold text-slate-600 w-40">
                     {t('distributorMaterialRequestDetail.customerPhone')}
                   </span>
@@ -1529,14 +1811,16 @@ export default function MaterialRequestDetail() {
 
         {/* RIGHT SIDEBAR */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-6 lg:sticky lg:top-24 space-y-5">
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-300 p-4 md:p-6 lg:sticky lg:top-24 space-y-5">
             {/*Create Date */}
             <div className="pb-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2 mr-5">
                 <i className="fas fa-calendar text-gray-500" />
                 {t('distributorMaterialRequestDetail.createAt')}
               </h3>
-              {formatDate(materialRequest.createdAt, i18n.language)}
+              <p className="text-gray-700">
+                {formatDate(materialRequest.createdAt, i18n.language)}
+              </p>
             </div>
             <div className="pb-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
@@ -1548,25 +1832,28 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${status.canDo
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
-                      }`}
+                    className={`p-4 rounded-lg text-center border ${
+                      status.canDo
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-red-50 border-red-200'
+                    }`}
                   >
                     <p
-                      className={`text-sm text-gray-800 mb-2 ${status.nowrap
-                        ? 'whitespace-nowrap'
-                        : 'whitespace-normal'
-                        }`}
+                      className={`text-sm text-gray-800 mb-2 ${
+                        status.nowrap
+                          ? 'whitespace-normal'
+                          : 'whitespace-normal'
+                      }`}
                     >
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${status.canDo
-                          ? 'fa-check text-green-600'
-                          : 'fa-xmark text-red-600'
-                          }`}
+                        className={`fa-solid text-xl ${
+                          status.canDo
+                            ? 'fa-check text-green-600'
+                            : 'fa-xmark text-red-600'
+                        }`}
                       />
                     </div>
                   </div>
