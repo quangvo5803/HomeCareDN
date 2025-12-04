@@ -16,7 +16,7 @@ namespace HomeCareDNAPI.Hubs
         public async Task JoinConversation(Guid id)
         {
             var httpContext = Context.GetHttpContext();
-            string? userId = httpContext?.Request.Query["userId"].FirstOrDefault();
+            var userId = httpContext?.Request.Query["userId"].FirstOrDefault();
 
             // Validate membership
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
