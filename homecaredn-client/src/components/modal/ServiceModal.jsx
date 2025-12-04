@@ -461,6 +461,7 @@ export default function ServiceModal({
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">
                   {t('adminServiceManager.serviceModal.images')}
+                  <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-3">
                   {images.map((img) => (

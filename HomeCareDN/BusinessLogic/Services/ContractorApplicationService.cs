@@ -324,11 +324,9 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = serviceRequest.CustomerID,
                     Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
-                    Message =
-                        "Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
+                    Message = "Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
                     TitleEN = "New contractor applied for your service request",
-                    MessageEN =
-                        "A new contractor has applied to handle your service request",
+                    MessageEN = "A new contractor has applied to handle your service request",
                     DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Apply,
@@ -374,7 +372,7 @@ namespace BusinessLogic.Services
 
             serviceRequest.Status = RequestStatus.Closed;
             contractorApplication.Status = ApplicationStatus.PendingCommission;
-            contractorApplication.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+            contractorApplication.DueCommisionTime = DateTime.Now.AddMinutes(2);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)
@@ -400,8 +398,7 @@ namespace BusinessLogic.Services
                             {
                                 TargetUserId = app.ContractorID,
                                 Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                                Message =
-                                    "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                                 TitleEN = "Service request not accepted",
                                 MessageEN =
                                     "The customer did not select your application this time.",

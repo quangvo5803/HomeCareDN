@@ -48,7 +48,10 @@ namespace DataAccess.Data
             {
                 entity.Property(e => e.Status).HasConversion<string>();
             });
-
+            modelBuilder.Entity<DistributorApplication>(entity =>
+            {
+                entity.Property(e => e.Status).HasConversion<string>();
+            });
             modelBuilder.Entity<Service>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();

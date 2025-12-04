@@ -204,14 +204,14 @@ namespace BusinessLogic.Services
                     dto.DistributorPhone = string.Empty;
                 }
             }
-            if(role == "Admin")
+            if (role == "Admin")
             {
-                dto.DistributorName =
-                        distributor!.FullName ?? distributor.UserName ?? string.Empty;
+                dto.DistributorName = distributor!.FullName ?? distributor.UserName ?? string.Empty;
                 dto.DistributorEmail = distributor.Email ?? string.Empty;
                 dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
-                var payment = await _unitOfWork.PaymentTransactionsRepository
-                    .GetAsync(p => p.DistributorApplicationID == application.DistributorApplicationID);
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.DistributorApplicationID == application.DistributorApplicationID
+                );
                 dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
             }
             return dto;
@@ -417,7 +417,7 @@ namespace BusinessLogic.Services
             }
 
             application.Status = ApplicationStatus.PendingCommission;
-            application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+            application.DueCommisionTime = DateTime.Now.AddMinutes(2);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
@@ -450,7 +450,8 @@ namespace BusinessLogic.Services
                                 Title = "Yêu cầu vật tư chưa được chấp nhận",
                                 Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
                                 TitleEN = "Material request not accepted",
-                                MessageEN = "The customer did not choose your application this time.",
+                                MessageEN =
+                                    "The customer did not choose your application this time.",
                                 DataKey =
                                     $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
                                 DataValue = other.MaterialRequestID.ToString(),
@@ -504,7 +505,8 @@ namespace BusinessLogic.Services
                     Title = "Chúc mừng! Bạn đã được chọn",
                     Message = "Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
                     TitleEN = "Congratulations! You have been selected",
-                    MessageEN = "The customer has selected you as the distributor for the material request.",
+                    MessageEN =
+                        "The customer has selected you as the distributor for the material request.",
                     DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
                     DataValue = resultDto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Accept,
