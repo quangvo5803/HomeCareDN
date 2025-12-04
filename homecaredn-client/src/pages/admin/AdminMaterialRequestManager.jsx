@@ -8,9 +8,9 @@ import StatusBadge from '../../components/StatusBadge';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { useAuth } from '../../hook/useAuth';
-
+import { formatDate } from '../../utils/formatters';
 export default function AdminMaterialRequestManager() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
 
@@ -51,9 +51,9 @@ export default function AdminMaterialRequestManager() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                distributorApplyCount: (mr.distributorApplyCount || 0) + 1,
-              }
+              ...mr,
+              distributorApplyCount: (mr.distributorApplyCount || 0) + 1,
+            }
             : mr
         )
       );
@@ -65,9 +65,9 @@ export default function AdminMaterialRequestManager() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -77,12 +77,12 @@ export default function AdminMaterialRequestManager() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                distributorApplyCount: Math.max(
-                  0,
-                  (mr.distributorApplyCount || 1) - 1
-                ),
-              }
+              ...mr,
+              distributorApplyCount: Math.max(
+                0,
+                (mr.distributorApplyCount || 1) - 1
+              ),
+            }
             : mr
         )
       );
@@ -92,9 +92,9 @@ export default function AdminMaterialRequestManager() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -147,22 +147,20 @@ export default function AdminMaterialRequestManager() {
             <div className="flex items-center gap-2 bg-white rounded-xl shadow-sm border border-gray-200 p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${viewMode === 'table'
+                  ? 'bg-orange-500 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <i className="fa-solid fa-table mr-2" />
                 {t('common.Table')}
               </button>
               <button
                 onClick={() => setViewMode('grid')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${viewMode === 'grid'
+                  ? 'bg-orange-500 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-50'
+                  }`}
               >
                 <i className="fa-solid fa-grip mr-2" />
                 {t('common.Grid')}
@@ -248,9 +246,7 @@ export default function AdminMaterialRequestManager() {
                             <div className="flex items-center gap-1.5 text-xs text-gray-500">
                               <i className="fa-solid fa-calendar" />
                               <span>
-                                {new Date(item.createdAt).toLocaleDateString(
-                                  'vi-VN'
-                                )}
+                                {formatDate(item.createdAt, i18n.language)}
                               </span>
                             </div>
                           </div>
@@ -332,6 +328,7 @@ export default function AdminMaterialRequestManager() {
                   </div>
                 );
               })
+
             ) : (
               <div className="col-span-full">
                 <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-16">
@@ -353,129 +350,212 @@ export default function AdminMaterialRequestManager() {
             )}
           </div>
         ) : (
-          // Table View
-          <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="h-12 bg-gray-50 border-b-1">
-                    <th className="w-[60px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.no')}
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.address')}
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.materials')}
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.distributors')}
-                    </th>
-                    <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.status')}
-                    </th>
-                    <th className="w-[120px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
-                      {t('adminMaterialRequestManager.action')}
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y divide-gray-100">
-                  {loading ? (
-                    <tr>
-                      <td
-                        colSpan="8"
-                        className="py-10 text-center align-middle"
-                      >
-                        <LoadingComponent />
-                      </td>
+          <>
+            {/* Table View */}
+            <div className="hidden md:grid bg-white shadow-lg border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="h-12 bg-gray-50 border-b-1">
+                      <th className="w-[60px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.no')}
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.address')}
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.materials')}
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.distributors')}
+                      </th>
+                      <th className="px-4 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.status')}
+                      </th>
+                      <th className="w-[120px] px-4 py-4 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">
+                        {t('adminMaterialRequestManager.action')}
+                      </th>
                     </tr>
-                  ) : materialRequests && materialRequests.length > 0 ? (
-                    materialRequests.map((item, idx) => {
-                      const addressText = getAddressText(item?.address);
+                  </thead>
 
-                      return (
-                        <tr
-                          key={item.materialRequestID}
-                          className={`hover:bg-gray-50 transition-colors duration-150 ${
-                            idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                          }`}
+                  <tbody className="divide-y divide-gray-100">
+                    {loading ? (
+                      <tr>
+                        <td
+                          colSpan="8"
+                          className="py-10 text-center align-middle"
                         >
-                          <td className="px-4 py-4 text-center">
-                            <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
-                              {(currentPage - 1) * pageSize + idx + 1}
-                            </span>
-                          </td>
+                          <LoadingComponent />
+                        </td>
+                      </tr>
+                    ) : materialRequests && materialRequests.length > 0 ? (
+                      materialRequests.map((item, idx) => {
+                        const addressText = getAddressText(item?.address);
 
-                          <td
-                            className="px-4 py-4 text-sm text-gray-600 truncate max-w-xs"
-                            title={addressText}
+                        return (
+                          <tr
+                            key={item.materialRequestID}
+                            className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                              }`}
                           >
-                            {addressText}
-                          </td>
+                            <td className="px-4 py-4 text-center">
+                              <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                                {(currentPage - 1) * pageSize + idx + 1}
+                              </span>
+                            </td>
 
-                          <td className="px-4 py-4 text-sm text-gray-900">
-                            {item.materialRequestItems?.length > 0 ? (
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold">
-                                  {item.materialRequestItems.length}{' '}
-                                  {t('adminMaterialRequestManager.items')}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-500">0</span>
-                            )}
-                          </td>
-
-                          <td className="px-4 py-4 text-sm font-bold text-green-500">
-                            {item.distributorApplyCount || 0}
-                          </td>
-
-                          <td className="px-4 py-4">
-                            <StatusBadge status={item.status} type="Request" />
-                          </td>
-
-                          <td className="px-4 py-4 text-center">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                navigate(
-                                  `/Admin/MaterialRequestManager/${item.materialRequestID}`
-                                )
-                              }
-                              className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                            <td
+                              className="px-4 py-4 text-sm text-gray-600 truncate max-w-xs"
+                              title={addressText}
                             >
-                              <i className="fa-solid fa-eye" />
-                              {t('BUTTON.View')}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan="8" className="px-6 py-16 text-center">
-                        <div className="flex flex-col items-center text-center mt-5 mb-5">
-                          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <i className="fa-solid fa-boxes text-gray-400 text-3xl" />
+                              {addressText}
+                            </td>
+
+                            <td className="px-4 py-4 text-sm text-gray-900">
+                              {item.materialRequestItems?.length > 0 ? (
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="px-2 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold">
+                                    {item.materialRequestItems.length}{' '}
+                                    {t('adminMaterialRequestManager.items')}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-gray-500">0</span>
+                              )}
+                            </td>
+
+                            <td className="px-4 py-4 text-sm font-bold text-green-500">
+                              {item.distributorApplyCount || 0}
+                            </td>
+
+                            <td className="px-4 py-4">
+                              <StatusBadge status={item.status} type="Request" />
+                            </td>
+
+                            <td className="px-4 py-4 text-center">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  navigate(
+                                    `/Admin/MaterialRequestManager/${item.materialRequestID}`
+                                  )
+                                }
+                                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                              >
+                                <i className="fa-solid fa-eye" />
+                                {t('BUTTON.View')}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="8" className="px-6 py-16 text-center">
+                          <div className="flex flex-col items-center text-center mt-5 mb-5">
+                            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                              <i className="fa-solid fa-boxes text-gray-400 text-3xl" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">
+                              {t('adminMaterialRequestManager.empty') ||
+                                'No Material Requests'}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {t(
+                                'adminMaterialRequestManager.empty_description'
+                              ) || 'No material requests found'}
+                            </p>
                           </div>
-                          <h3 className="text-xl font-bold text-gray-900 mb-2">
-                            {t('adminMaterialRequestManager.empty') ||
-                              'No Material Requests'}
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            {t(
-                              'adminMaterialRequestManager.empty_description'
-                            ) || 'No material requests found'}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Material Request Cards */}
+            <div className="block md:hidden p-4 space-y-3">
+              {materialRequests.map((item, idx) => {
+                const addressText = getAddressText(item?.address);
+
+                return (
+                  <div
+                    key={item.materialRequestID}
+                    className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+                  >
+                    {/* Card Header */}
+                    <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                          {(currentPage - 1) * pageSize + idx + 1}
+                        </div>
+                        <span className="text-black"> {formatDate(item.createdAt, i18n.language)}</span>
+                      </div>
+                      <StatusBadge status={item.status} type="Request" />
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="p-4 space-y-3">
+                      {/* Address */}
+                      <div className="flex items-start gap-2">
+                        <i className="fa-solid fa-map-pin"></i>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs text-gray-500 block mb-1">{t('adminMaterialRequestManager.address')}</span>
+                          <p className="text-sm text-gray-900 break-words leading-relaxed">
+                            {addressText}
                           </p>
                         </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                      </div>
+
+                      {/* Materials & Distributors Row */}
+                      <div className="flex items-center gap-4">
+                        {/* Materials */}
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i className="fa-solid fa-box"></i>
+                          </div>
+                          <div>
+                            <span className="text-xs text-gray-500 block">{t('adminMaterialRequestManager.materials')}</span>
+                            <span className="text-sm font-bold text-amber-600">
+                              {item.materialRequestItems?.length || 0} mặt hàng
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Distributors */}
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i className="fa-regular fa-handshake"></i>
+                          </div>
+                          <div>
+                            <span className="text-xs text-gray-500 block">{t('adminMaterialRequestManager.distributors')}</span>
+                            <span className="text-sm font-bold text-green-600">
+                              {item.distributorApplyCount || 0}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* View Button */}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(
+                            `/Admin/MaterialRequestManager/${item.materialRequestID}`
+                          )
+                        }
+                        className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-lg hover:bg-orange-700 active:bg-orange-800 transition-colors shadow-sm"
+                      >
+                        <i className="fa-solid fa-eye" />
+                        {t('BUTTON.View')}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          </div>
+          </>
         )}
 
         {/* Pagination */}

@@ -136,18 +136,18 @@ export default function MaterialRequestManager() {
 
   if (loading) return <Loading />;
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-slate-50 via-orange-50/30 to-slate-50">
+    <div className="min-h-screen p-3 md:p-6 bg-gradient-to-br from-slate-50 via-orange-50/30 to-slate-50">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="flex items-center justify-center w-12 h-12 bg-orange-500 rounded-xl shadow-md">
-            <i className="fa-solid fa-box-open text-white text-xl" />
+        <div className="flex items-center gap-3 mb-6 md:mb-8">
+          <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-orange-500 rounded-xl shadow-md flex-shrink-0">
+            <i className="fa-solid fa-box-open text-white text-lg md:text-xl" />
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-xl md:text-3xl font-bold text-gray-900">
               {t('distributorMaterialRequest.title')}
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs md:text-sm text-gray-500">
               {t('distributorMaterialRequest.subtitle')}
             </p>
           </div>
@@ -156,9 +156,9 @@ export default function MaterialRequestManager() {
         {/* Container */}
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
           {/* Actions Bar - Refined */}
-          <div className="flex flex-col sm:flex-row items-start justify-between gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm bg-white shadow-sm border border-gray-200">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-4 py-4 md:px-6 md:py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex items-center flex-wrap gap-3 w-full md:w-auto">
+              <div className="inline-flex items-center gap-2.5 px-3 py-2 md:px-4 rounded-xl text-xs md:text-sm bg-white shadow-sm border border-gray-200 w-full md:w-auto justify-center md:justify-start">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="absolute inline-flex w-full h-full bg-blue-400 rounded-full opacity-75 animate-ping"></span>
                   <span className="relative inline-flex w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
@@ -172,8 +172,8 @@ export default function MaterialRequestManager() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2">
-              <label className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-orange-300 transition-all cursor-pointer group">
+            <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+              <label className="inline-flex items-center justify-center md:justify-start gap-2.5 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-white border border-gray-200 shadow-sm hover:border-orange-300 transition-all cursor-pointer group select-none">
                 <input
                   type="checkbox"
                   checked={showAppliedOnly}
@@ -193,7 +193,7 @@ export default function MaterialRequestManager() {
                   setSortOption(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer"
+                className="px-4 py-2.5 text-sm font-medium border border-gray-200 rounded-xl bg-white shadow-sm hover:border-orange-300 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all cursor-pointer w-full md:w-auto"
                 aria-label="Sort service requests"
               >
                 <option value="">{t('common.sortDefault')}</option>
@@ -206,7 +206,8 @@ export default function MaterialRequestManager() {
               </select>
             </div>
           </div>
-          <div className="p-6 space-y-5">
+
+          <div className="p-4 md:p-6 space-y-4 md:space-y-5">
             {materialRequests && materialRequests.length > 0 ? (
               materialRequests.map((req) => {
                 const addressParts = [
@@ -217,76 +218,80 @@ export default function MaterialRequestManager() {
                 return (
                   <div
                     key={req.materialRequestID}
-                    className="group relative bg-white border border-gray-200 rounded-2xl p-6 hover:border-orange-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1"
+                    className="group relative bg-white border border-gray-200 rounded-2xl p-4 md:p-6 hover:border-orange-200 transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1"
                   >
                     {/* Left Accent */}
-                    <div className="absolute inset-y-0 left-0 w-1.5 rounded-l-2xl bg-orange-500" />
+                    <div className="absolute inset-y-0 left-0 w-1 md:w-1.5 rounded-l-2xl bg-orange-500" />
 
                     {/* Header */}
-                    <div className="flex justify-between items-start mb-4 pl-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-3 md:mb-4 pl-2 md:pl-4 gap-3 md:gap-0">
                       {/* LEFT GROUP */}
                       <div className="flex items-center gap-3">
-                        <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-full">
-                          <i className="fas fa-boxes text-orange-600" />
+                        <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 bg-orange-100 rounded-full flex-shrink-0">
+                          <i className="fas fa-boxes text-orange-600 text-sm md:text-base" />
                         </div>
 
-                        <h3 className="text-xl font-bold text-gray-600 mt-1">
+                        <h3 className="text-base md:text-xl font-bold text-gray-600 mt-1 break-all md:break-normal">
                           {t('Enums.ServiceType.Material')} #
                           {req.materialRequestID.substring(0, 8)}
                         </h3>
                       </div>
 
                       {/* RIGHT BADGE */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-wrap items-center gap-2 md:gap-3 pl-11 md:pl-0">
                         <StatusBadge status={req.status} type="Request" />
                         {req.selectedDistributorApplicationID &&
                           (req.selectedDistributorApplication.distributorID ===
                           user.id ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
                               <i className="fa-solid fa-user-check"></i>
                               {t('common.YouWasSelected')}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-lg text-[10px] md:text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
                               <i className="fa-solid fa-user-check"></i>
                               {t('common.WasSelected')}
                             </span>
                           ))}
                       </div>
                     </div>
-                    <p className="text-gray-600 text-lg mb-4 pl-4">
-                      <i className="fa-solid fa-location-dot text-orange-500 mr-2" />
-                      {addressText}
-                    </p>
-                    {/* Description */}
-                    <p className="text-gray-600 text-lg mb-4 pl-4">
-                      {req.description.length > 60
-                        ? req.description.substring(0, 60) + '...'
-                        : req.description}
-                    </p>
 
-                    {/* Info chips */}
-                    <div className="flex flex-wrap gap-2 mb-5 pl-4 text-sm">
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
-                        <i className="fa-solid fa-cubes" />
-                        {req.materialRequestItems?.length || 0}{' '}
-                        {t('distributorMaterialRequest.materialType')}
-                      </span>
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-50 text-gray-700 border border-gray-200">
-                        <i className="fa-regular fa-calendar" />
-                        {t('userPage.materialRequestDetail.deliveryDate')}
-                        {': '}
-                        {formatDate(req.deliveryDate, i18n.language)}
-                      </span>
+                    {/* Content Section */}
+                    <div className="pl-2 md:pl-4">
+                      <p className="text-gray-600 text-sm md:text-lg mb-2 md:mb-4 flex items-start">
+                        <i className="fa-solid fa-location-dot text-orange-500 mr-2 mt-1 md:mt-1.5 flex-shrink-0" />
+                        <span className="break-words">{addressText}</span>
+                      </p>
+                      {/* Description */}
+                      <p className="text-gray-600 text-sm md:text-lg mb-3 md:mb-4 pl-6 md:pl-0">
+                        {req.description.length > 60
+                          ? req.description.substring(0, 60) + '...'
+                          : req.description}
+                      </p>
+
+                      {/* Info chips */}
+                      <div className="flex flex-wrap gap-2 mb-4 md:mb-5 text-xs md:text-sm pl-0 md:pl-0">
+                        <span className="inline-flex items-center gap-2 px-2 py-1 md:px-3 md:py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+                          <i className="fa-solid fa-cubes" />
+                          {req.materialRequestItems?.length || 0}{' '}
+                          {t('distributorMaterialRequest.materialType')}
+                        </span>
+                        <span className="inline-flex items-center gap-2 px-2 py-1 md:px-3 md:py-1 rounded-lg bg-gray-50 text-gray-700 border border-gray-200">
+                          <i className="fa-regular fa-calendar" />
+                          {t('userPage.materialRequestDetail.deliveryDate')}
+                          {': '}
+                          {formatDate(req.deliveryDate, i18n.language)}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center border-t border-gray-100 pt-4 px-4">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-t border-gray-100 pt-4 px-2 md:px-4 gap-3 md:gap-0">
                       {/* Left side */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 w-full md:w-auto">
                         {/* canAddMaterial */}
                         <span
-                          className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg border 
+                          className={`inline-flex items-center justify-center md:justify-start w-full md:w-auto gap-2 px-3 py-1.5 md:py-1 rounded-lg border text-xs md:text-sm
                                                         ${
                                                           req.canAddMaterial
                                                             ? 'bg-green-50 text-green-700 border-green-200'
@@ -311,7 +316,7 @@ export default function MaterialRequestManager() {
                             `/Distributor/MaterialRequestManager/${req.materialRequestID}`
                           )
                         }
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md hover:from-orange-600 hover:to-orange-700 transition-all duration-300 cursor-pointer"
+                        className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 md:py-2 text-sm font-semibold text-white bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md hover:from-orange-600 hover:to-orange-700 transition-all duration-300 cursor-pointer"
                       >
                         <i className="fa-solid fa-eye" />
                         {t('BUTTON.View')}
@@ -321,19 +326,21 @@ export default function MaterialRequestManager() {
                 );
               })
             ) : (
-              <div className="text-center py-16 text-gray-500">
-                <i className="fa-solid fa-box-open text-4xl text-gray-400 mb-4"></i>
-                <p className="text-lg font-semibold text-gray-800 mb-1">
+              <div className="text-center py-12 md:py-16 text-gray-500">
+                <i className="fa-solid fa-box-open text-3xl md:text-4xl text-gray-400 mb-4"></i>
+                <p className="text-base md:text-lg font-semibold text-gray-800 mb-1">
                   {t('distributorMaterialRequest.noRequest')}
                 </p>
-                <p>{t('distributorMaterialRequest.letStart')}</p>
+                <p className="text-sm">
+                  {t('distributorMaterialRequest.letStart')}
+                </p>
               </div>
             )}
           </div>
 
           {/* Pagination */}
           {totalMaterialRequests > 0 && (
-            <div className="flex justify-center py-6 border-t border-gray-100 bg-gray-50/50">
+            <div className="flex justify-center py-4 md:py-6 border-t border-gray-100 bg-gray-50/50 overflow-x-auto">
               <Pagination
                 current={currentPage}
                 pageSize={pageSize}
@@ -341,6 +348,7 @@ export default function MaterialRequestManager() {
                 onChange={(page) => setCurrentPage(page)}
                 showSizeChanger={false}
                 size="small"
+                className="scale-90 md:scale-100 origin-center"
               />
             </div>
           )}

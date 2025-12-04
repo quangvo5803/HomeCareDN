@@ -534,22 +534,22 @@ export default function ContractorServiceRequestDetail() {
   const isRequestClosed = serviceRequest.status === 'Closed';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-6 space-y-4 md:space-y-6">
       {/* HERO SUMMARY */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 h-12 sm:h-32">
+      <div className="relative overflow-hidden rounded-xl md:rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 h-28 md:h-32 shadow-md">
         {/* Back Button */}
         <button
           onClick={() => navigate('/Contractor/ServiceRequestManager')}
-          className="absolute left-4 top-1/2 -translate-y-1/2 inline-flex items-center px-4 py-2 text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors"
+          className="absolute left-3 top-3 md:left-4 md:top-1/2 md:-translate-y-1/2 inline-flex items-center px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm text-white bg-black/20 hover:bg-black/30 rounded-lg transition-colors cursor-pointer backdrop-blur-sm z-10"
         >
           <i className="fas fa-arrow-left mr-2" />
           {t('contractorServiceRequestDetail.backToList')}
         </button>
 
-        <div className="px-6 py-6 sm:px-8 sm:py-8 text-white h-full flex items-center justify-center">
-          <div className="max-w-3xl text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold inline-flex items-center gap-3 justify-center">
-              <i className="fas fa-clipboard-list opacity-90" />
+        <div className="px-4 py-4 md:px-8 md:py-8 text-white h-full flex items-center justify-center">
+          <div className="max-w-3xl text-center mt-6 md:mt-0">
+            <h1 className="text-xl md:text-3xl font-bold inline-flex items-center gap-2 md:gap-3 justify-center text-center leading-tight">
+              <i className="fas fa-clipboard-list opacity-90 hidden sm:inline-block" />
               {t('contractorServiceRequestDetail.title')}
             </h1>
           </div>
@@ -557,49 +557,49 @@ export default function ContractorServiceRequestDetail() {
       </div>
 
       {/* BODY */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
         {/* LEFT: Details + Apply Form/Application Info + Chat */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="lg:col-span-8 space-y-4 md:space-y-6">
           {/* Specs card */}
           <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-            <div className="px-6 py-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="px-4 py-4 md:px-6 md:py-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 <div>
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fas fa-screwdriver-wrench mr-2 text-gray-400" />
                     {t('contractorServiceRequestDetail.serviceType')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {t(`Enums.ServiceType.${serviceRequest.serviceType}`)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fas fa-box-open mr-2 text-gray-400" />
                     {t('contractorServiceRequestDetail.packageOption')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {t(`Enums.PackageOption.${serviceRequest.packageOption}`)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fas fa-building mr-2 text-gray-400" />
                     {t('contractorServiceRequestDetail.buildingType')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {t(`Enums.BuildingType.${serviceRequest.buildingType}`)}
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fas fa-cubes mr-2 text-gray-400" />
                     {t('contractorServiceRequestDetail.structureType')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {t(
                       `Enums.MainStructure.${serviceRequest.mainStructureType}`
                     )}
@@ -608,32 +608,32 @@ export default function ContractorServiceRequestDetail() {
 
                 {serviceRequest.designStyle && (
                   <div>
-                    <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                    <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                       <i className="fas fa-palette mr-2 text-gray-400" />
                       {t('contractorServiceRequestDetail.designStyle')}
                     </label>
-                    <p className="text-gray-900 font-medium">
+                    <p className="text-gray-900 font-medium text-sm md:text-base">
                       {t(`Enums.DesignStyle.${serviceRequest.designStyle}`)}
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fas fa-th-large mr-2 text-gray-400" />
                     {t('contractorServiceRequestDetail.floors')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {serviceRequest.floors}{' '}
                     {t('contractorServiceRequestDetail.floorsUnit')}
                   </p>
                 </div>
                 <div className="col-span-full">
-                  <label className="block text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  <label className="block text-[10px] md:text-xs uppercase tracking-wide text-gray-500 mb-1">
                     <i className="fa-solid fa-calendar mr-2 text-gray-400" />
                     {t('userPage.serviceRequest.label_timeLine')}
                   </label>
-                  <p className="text-gray-900 font-medium">
+                  <p className="text-gray-900 font-medium text-sm md:text-base">
                     {formatDate(serviceRequest.startDate, i18n.language)}
                     {' - '} {formatDate(serviceRequest.endDate, i18n.language)}
                   </p>
@@ -643,35 +643,36 @@ export default function ContractorServiceRequestDetail() {
           </div>
 
           {/* Dimensions & Estimate row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {/* Dimensions */}
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-              <div className="px-6 py-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+              <div className="px-4 py-4 md:px-6 md:py-5">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                   <i className="fas fa-ruler-combined text-gray-500" />
                   {t('contractorServiceRequestDetail.dimensions')}
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2 md:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      <i className="fas fa-arrows-alt-h mr-2 text-gray-400" />
+                    <label className="block text-xs font-medium text-gray-600 mb-1 truncate">
                       {t('contractorServiceRequestDetail.width')}
                     </label>
-                    <p className="text-gray-900">{serviceRequest.width} m</p>
+                    <p className="text-gray-900 text-sm md:text-base">
+                      {serviceRequest.width} m
+                    </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      <i className="fas fa-arrows-alt-v mr-2 text-gray-400" />
+                    <label className="block text-xs font-medium text-gray-600 mb-1 truncate">
                       {t('contractorServiceRequestDetail.length')}
                     </label>
-                    <p className="text-gray-900">{serviceRequest.length} m</p>
+                    <p className="text-gray-900 text-sm md:text-base">
+                      {serviceRequest.length} m
+                    </p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">
-                      <i className="fas fa-expand-arrows-alt mr-2 text-gray-400" />
+                    <label className="block text-xs font-medium text-gray-600 mb-1 truncate">
                       {t('contractorServiceRequestDetail.totalArea')}
                     </label>
-                    <p className="text-xl font-bold text-orange-600">
+                    <p className="text-base md:text-xl font-bold text-orange-600">
                       {totalArea} m²
                     </p>
                   </div>
@@ -681,21 +682,21 @@ export default function ContractorServiceRequestDetail() {
 
             {/* Estimate */}
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-orange-200">
-              <div className="px-6 py-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+              <div className="px-4 py-4 md:px-6 md:py-5">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                   <i className="fas fa-dollar-sign text-orange-500" />
                   {t('contractorServiceRequestDetail.estimatePrice')}
                 </h3>
                 {serviceRequest.estimatePrice === 0 ? (
-                  <p className="text-orange-600 font-bold text-lg">
+                  <p className="text-orange-600 font-bold text-lg md:text-xl">
                     {t('contractorServiceRequestManager.negotiable')}
                   </p>
                 ) : (
                   <>
-                    <p className="text-gray-900 font-semibold text-xl mb-1">
+                    <p className="text-gray-900 font-semibold text-lg md:text-xl mb-1">
                       {formatVND(serviceRequest.estimatePrice)}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-xs md:text-sm text-gray-600">
                       {numberToWordsByLang(
                         serviceRequest.estimatePrice,
                         i18n.language
@@ -708,15 +709,18 @@ export default function ContractorServiceRequestDetail() {
           </div>
 
           {/* Address & Description row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             {serviceRequest.address && (
               <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-                <div className="px-6 py-5">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+                <div className="px-4 py-4 md:px-6 md:py-5">
+                  <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                     <i className="fas fa-map-marker-alt text-gray-500" />
                     {t('contractorServiceRequestDetail.address')}
                   </h3>
-                  <p className="text-gray-900" title={addressText}>
+                  <p
+                    className="text-gray-900 text-sm md:text-base break-words"
+                    title={addressText}
+                  >
                     {addressText}
                   </p>
                 </div>
@@ -724,12 +728,12 @@ export default function ContractorServiceRequestDetail() {
             )}
 
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-              <div className="px-6 py-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+              <div className="px-4 py-4 md:px-6 md:py-5">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                   <i className="fas fa-align-left text-gray-500" />
                   {t('contractorServiceRequestDetail.description')}
                 </h3>
-                <p className="text-gray-700 whitespace-pre-wrap">
+                <p className="text-gray-700 whitespace-pre-wrap text-sm md:text-base">
                   {serviceRequest.description}
                 </p>
               </div>
@@ -739,12 +743,12 @@ export default function ContractorServiceRequestDetail() {
           {/* Images */}
           {serviceRequest.imageUrls && serviceRequest.imageUrls.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-              <div className="px-6 py-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+              <div className="px-4 py-4 md:px-6 md:py-5">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                   <i className="fas fa-images text-gray-500" />
                   {t('contractorServiceRequestDetail.images')}
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
                   {serviceRequest.imageUrls.map((imageUrl) => (
                     <a
                       key={imageUrl}
@@ -768,14 +772,13 @@ export default function ContractorServiceRequestDetail() {
           {/* Documents */}
           {serviceRequest.documentUrls?.length > 0 && (
             <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200">
-              <div className="px-6 py-5">
-                {/* Tiêu đề (giữ nguyên) */}
-                <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
+              <div className="px-4 py-4 md:px-6 md:py-5">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2">
                   <i className="fas fa-file-alt text-gray-500" />
                   {t('contractorServiceRequestDetail.documents')}
                 </h3>
 
-                <div className="space-y-3">
+                <div className="space-y-2 md:space-y-3">
                   {serviceRequest.documentUrls.map((docUrl) => {
                     const fileName = decodeURIComponent(
                       docUrl.split('/').pop()?.split('?')[0] ?? 'document'
@@ -789,23 +792,25 @@ export default function ContractorServiceRequestDetail() {
                     return (
                       <div
                         key={docUrl}
-                        className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                        className="group relative flex items-center gap-3 p-2 md:p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
                       >
                         {/* Icon */}
-                        <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
-                          <i className={`fas ${iconClass} text-2xl`} />
+                        <div className="w-8 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-md bg-gray-50 border flex-shrink-0">
+                          <i
+                            className={`fas ${iconClass} text-xl md:text-2xl`}
+                          />
                         </div>
 
                         {/* Name + meta */}
                         <div className="min-w-0 flex-1">
                           <p
-                            className="text-sm font-medium text-gray-800 truncate"
+                            className="text-xs md:text-sm font-medium text-gray-800 truncate"
                             title={fileName}
                           >
                             {fileName}
                           </p>
-                          <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                          <div className="mt-0.5 text-[10px] md:text-xs text-gray-500 flex items-center gap-2">
+                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 border text-gray-600">
                               {(ext || 'file').toUpperCase()}
                             </span>
                           </div>
@@ -816,7 +821,7 @@ export default function ContractorServiceRequestDetail() {
                           <a
                             href={docUrl}
                             download
-                            className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                            className="px-2 py-1 md:px-2.5 md:py-1.5 text-[10px] md:text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition flex-shrink-0"
                           >
                             {t('common.Download')}
                           </a>
@@ -831,26 +836,26 @@ export default function ContractorServiceRequestDetail() {
 
           {/* Apply Form OR Application Details */}
           {isRequestClosed && !existingApplication ? (
-            <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-8 text-center">
-              <i className="fas fa-lock text-gray-400 text-4xl mb-3"></i>
-              <p className="text-gray-700 font-semibold mb-1">
+            <div className="bg-gray-50 rounded-xl shadow-sm ring-1 ring-gray-200 p-6 md:p-8 text-center">
+              <i className="fas fa-lock text-gray-400 text-3xl md:text-4xl mb-3"></i>
+              <p className="text-gray-700 font-semibold mb-1 text-sm md:text-base">
                 {t('contractorServiceRequestDetail.closedApplication')}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs md:text-sm text-gray-500">
                 {t('contractorServiceRequestDetail.requestAlreadyClosed')}
               </p>
             </div>
           ) : !existingApplication && !isRequestClosed ? (
-            // Apply Form - Show when NOT applied yet and request is not closed
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
+            // Apply Form
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6 space-y-4 md:space-y-6">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
                 <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-green-50 ring-4 ring-green-100">
                   <i className="fas fa-clipboard-list text-green-600" />
                 </span>
                 {t('contractorServiceRequestDetail.applyFormTitle')}
               </h3>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                 {/* Bid Price */}
                 <div>
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
@@ -864,7 +869,7 @@ export default function ContractorServiceRequestDetail() {
                     step={1000}
                     value={estimatePrice}
                     onChange={(e) => setEstimatePrice(e.target.value)}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                    className="w-full pl-4 pr-4 py-2.5 md:py-3 text-sm md:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
                     placeholder={
                       serviceRequest.estimatePrice
                         ? t(
@@ -886,7 +891,7 @@ export default function ContractorServiceRequestDetail() {
                             ((Number(estimatePrice) || 1) * factor).toString()
                           )
                         }
-                        className="px-3 py-1 bg-gray-100 rounded-md hover:bg-gray-200 text-sm font-medium"
+                        className="px-2 py-1 md:px-3 md:py-1 bg-gray-100 rounded-md hover:bg-gray-200 text-xs md:text-sm font-medium"
                       >
                         {((Number(estimatePrice) || 1) * factor)
                           .toString()
@@ -895,14 +900,14 @@ export default function ContractorServiceRequestDetail() {
                     ))}
                   </div>
                   {estimatePrice && (
-                    <div className="mt-2 space-y-1 text-sm text-gray-500">
+                    <div className="mt-2 space-y-1 text-xs md:text-sm text-gray-500 bg-gray-50 p-2 rounded-lg">
                       <p>
                         {t('contractorServiceRequestDetail.bidPriceLabel')}{' '}
                         <span className="font-semibold text-orange-600">
                           {formatVND(Number(estimatePrice))}
                         </span>
                       </p>
-                      <p>
+                      <p className="italic">
                         {t('contractorServiceRequestDetail.bidPriceInWords')}{' '}
                         <span className="font-semibold">
                           {numberToWordsByLang(
@@ -915,7 +920,7 @@ export default function ContractorServiceRequestDetail() {
                   )}
                 </div>
 
-                {/* Note (TinyMCE Editor) */}
+                {/* Note */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-comment-alt mr-2 text-gray-500" />
@@ -926,7 +931,7 @@ export default function ContractorServiceRequestDetail() {
                     value={description}
                     init={{
                       license_key: 'gpl',
-                      height: 500,
+                      height: 300, // Adjusted for mobile
                       menubar: false,
                       plugins: 'lists link image code',
                       toolbar:
@@ -938,12 +943,12 @@ export default function ContractorServiceRequestDetail() {
                   />
                 </div>
                 {descriptionError && (
-                  <p className="text-red-500 text-sm font-medium flex items-center mt-2">
+                  <p className="text-red-500 text-xs md:text-sm font-medium flex items-center mt-2">
                     <i className="fas fa-exclamation-circle mr-2"></i>
                     {t(descriptionError)}
                   </p>
                 )}
-                {/* Images */}
+                {/* Images Upload */}
                 <div>
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-images text-orange-500 mr-2"></i>
@@ -961,17 +966,17 @@ export default function ContractorServiceRequestDetail() {
                         onChange={handleImageChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
-                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                          <i className="fas fa-cloud-upload-alt text-orange-500 text-xl"></i>
+                      <div className="flex flex-col items-center justify-center px-4 py-6 md:px-6 md:py-8 border-2 border-dashed border-orange-300 rounded-lg hover:border-orange-400 hover:bg-orange-50 transition-colors cursor-pointer text-center">
+                        <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-full mb-3">
+                          <i className="fas fa-cloud-upload-alt text-orange-500 text-lg md:text-xl"></i>
                         </div>
-                        <p className="text-gray-600 text-center mb-2">
+                        <p className="text-gray-600 text-xs md:text-sm mb-1">
                           <span className="font-semibold text-orange-600">
                             {t('upload.clickToUploadImage')}
                           </span>{' '}
                           {t('upload.orDragAndDrop')}
                         </p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-[10px] md:text-xs text-gray-400">
                           {t('upload.fileTypesHint')}
                         </p>
                       </div>
@@ -979,7 +984,7 @@ export default function ContractorServiceRequestDetail() {
                   )}
 
                   {images.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-3">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3 mt-3">
                       {images.map((img, idx) => (
                         <div
                           key={img.url}
@@ -994,9 +999,9 @@ export default function ContractorServiceRequestDetail() {
                             <button
                               type="button"
                               onClick={() => handleRemoveImage(img)}
-                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center transition-colors"
                             >
-                              <i className="fas fa-trash-alt text-sm"></i>
+                              <i className="fas fa-trash-alt text-xs"></i>
                             </button>
                           </div>
                         </div>
@@ -1004,7 +1009,7 @@ export default function ContractorServiceRequestDetail() {
                     </div>
                   )}
                 </div>
-                {/* Documents */}
+                {/* Documents Upload */}
                 <div className="space-y-3 lg:col-span-2">
                   <div className="flex items-center justify-between">
                     <label className="flex items-center text-sm font-medium text-gray-700">
@@ -1026,17 +1031,17 @@ export default function ContractorServiceRequestDetail() {
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                         aria-label={t('upload.uploadDocuments')}
                       />
-                      <div className="flex flex-col items-center justify-center px-6 py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full mb-4">
-                          <i className="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                      <div className="flex flex-col items-center justify-center px-4 py-6 md:px-6 md:py-8 border-2 border-dashed border-blue-300 rounded-lg hover:border-blue-400 hover:bg-orange-50 transition-colors cursor-pointer text-center">
+                        <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-orange-100 rounded-full mb-3">
+                          <i className="fas fa-cloud-upload-alt text-blue-500 text-lg md:text-xl"></i>
                         </div>
-                        <p className="text-gray-600 text-center mb-2">
+                        <p className="text-gray-600 text-xs md:text-sm mb-1">
                           <span className="font-semibold text-blue-600">
                             {t('upload.clickToUploadDocument')}
                           </span>{' '}
                           {t('upload.orDragAndDrop')}
                         </p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-[10px] md:text-xs text-gray-400">
                           {t('upload.fileTypesHint')}
                         </p>
                       </div>
@@ -1044,7 +1049,7 @@ export default function ContractorServiceRequestDetail() {
                   )}
 
                   {documents.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                       {documents.map((doc) => (
                         <div
                           key={doc.url}
@@ -1053,19 +1058,19 @@ export default function ContractorServiceRequestDetail() {
                           <i
                             className={`${getDocumentIcon(
                               doc.name
-                            )} text-4xl mb-2`}
+                            )} text-3xl md:text-4xl mb-2`}
                           ></i>
-                          <p className="text-xs text-gray-600 break-all truncate px-2">
+                          <p className="text-[10px] md:text-xs text-gray-600 break-all truncate px-2 w-full">
                             {doc.name}
                           </p>
                           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <button
                               type="button"
                               onClick={() => handleRemoveDocument(doc)}
-                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                              className="bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center transition-colors"
                               aria-label="Remove document"
                             >
-                              <i className="fas fa-trash-alt text-sm"></i>
+                              <i className="fas fa-trash-alt text-xs"></i>
                             </button>
                           </div>
                         </div>
@@ -1077,7 +1082,7 @@ export default function ContractorServiceRequestDetail() {
                 <div>
                   <button
                     type="submit"
-                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold text-sm md:text-base"
                     disabled={
                       !estimatePrice.trim() ||
                       !description.trim() ||
@@ -1088,7 +1093,7 @@ export default function ContractorServiceRequestDetail() {
                     <i className="fas fa-paper-plane" />
                     {t('contractorServiceRequestDetail.applyForProject')}
                   </button>
-                  <p className="mt-3 text-xs text-gray-500 text-center">
+                  <p className="mt-3 text-[10px] md:text-xs text-gray-500 text-center">
                     <i className="fas fa-shield-alt mr-1" />
                     {t('contractorServiceRequestDetail.privacyNotice')}
                   </p>
@@ -1097,30 +1102,32 @@ export default function ContractorServiceRequestDetail() {
             </div>
           ) : (
             // Application Details - Show when ALREADY applied
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 space-y-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6 space-y-4 md:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h3 className="text-lg md:text-xl font-semibold text-gray-800 inline-flex items-center gap-2">
                   <span className="inline-flex items-center justify-center h-7 w-7 rounded-full bg-blue-50 ring-4 ring-blue-100">
                     <i className="fas fa-clipboard-check text-blue-600" />
                   </span>
                   {t('contractorServiceRequestDetail.yourApplication')}
                 </h3>
-                <StatusBadge
-                  status={existingApplication.status}
-                  type="Application"
-                />
+                <div className="self-start sm:self-auto">
+                  <StatusBadge
+                    status={existingApplication.status}
+                    type="Application"
+                  />
+                </div>
               </div>
 
               {/* Selected Badge for PendingCommission */}
               {existingApplication.status === 'PendingCommission' && (
-                <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-4 ring-2 ring-yellow-400">
+                <div className="bg-gradient-to-r from-yellow-50 to-green-50 rounded-lg p-3 md:p-4 ring-2 ring-yellow-400">
                   <div className="flex items-center gap-3">
-                    <i className="fas fa-trophy text-yellow-500 text-3xl"></i>
+                    <i className="fas fa-trophy text-yellow-500 text-2xl md:text-3xl"></i>
                     <div>
-                      <p className="font-bold text-green-700 text-lg">
+                      <p className="font-bold text-green-700 text-sm md:text-lg">
                         {t('contractorServiceRequestDetail.youAreSelected')}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-xs md:text-sm text-gray-600 mt-1">
                         {t(
                           'contractorServiceRequestDetail.selectedPendingCommissionNote'
                         )}
@@ -1131,17 +1138,17 @@ export default function ContractorServiceRequestDetail() {
               )}
 
               {/* Bid Price */}
-              <div className="bg-orange-50 rounded-lg p-5 ring-1 ring-orange-200">
+              <div className="bg-orange-50 rounded-lg p-4 md:p-5 ring-1 ring-orange-200">
                 <div className="flex items-center gap-3 mb-2">
-                  <i className="fas fa-coins text-orange-500 text-xl"></i>
+                  <i className="fas fa-coins text-orange-500 text-lg md:text-xl"></i>
                   <p className="text-sm font-medium text-gray-700">
                     {t('contractorServiceRequestDetail.yourBid')}
                   </p>
                 </div>
-                <p className="text-2xl font-bold text-gray-900 mb-1">
+                <p className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
                   {formatVND(existingApplication.estimatePrice)}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs md:text-sm text-gray-600 break-words">
                   {numberToWordsByLang(
                     existingApplication.estimatePrice,
                     i18n.language
@@ -1151,13 +1158,13 @@ export default function ContractorServiceRequestDetail() {
 
               {/* Description */}
               {existingApplication.description && (
-                <div className="border-t pt-6">
+                <div className="border-t pt-4 md:pt-6">
                   <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <i className="fas fa-comment-alt text-gray-400"></i>
                     {t('contractorServiceRequestDetail.noteToOwner')}
                   </h4>
                   <div
-                    className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4"
+                    className="prose prose-sm max-w-none text-gray-700 bg-gray-50 rounded-lg p-4 text-xs md:text-sm overflow-x-auto"
                     dangerouslySetInnerHTML={{
                       __html: existingApplication.description,
                     }}
@@ -1167,13 +1174,13 @@ export default function ContractorServiceRequestDetail() {
 
               {/* Images */}
               {existingApplication.imageUrls?.length > 0 && (
-                <div className="border-t pt-6">
+                <div className="border-t pt-4 md:pt-6">
                   <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <i className="fas fa-images text-gray-400"></i>
                     {t('contractorServiceRequestDetail.images')} (
                     {existingApplication.imageUrls.length})
                   </h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
                     {existingApplication.imageUrls.map((imageUrl, idx) => (
                       <a
                         key={imageUrl}
@@ -1193,13 +1200,13 @@ export default function ContractorServiceRequestDetail() {
               )}
               {/* Documents */}
               {existingApplication.documentUrls?.length > 0 && (
-                <div className="border-t pt-6">
+                <div className="border-t pt-4 md:pt-6">
                   <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
                     <i className="fas fa-file-alt text-gray-400"></i>
                     {t('contractorServiceRequestDetail.documents')} (
                     {existingApplication.documentUrls.length})
                   </h4>
-                  <div className="space-y-3">
+                  <div className="space-y-2 md:space-y-3">
                     {existingApplication.documentUrls.map((docUrl) => {
                       const fileName = decodeURIComponent(
                         docUrl.split('/').pop()?.split('?')[0] ?? 'document'
@@ -1211,32 +1218,36 @@ export default function ContractorServiceRequestDetail() {
                       return (
                         <div
                           key={docUrl}
-                          className="group relative flex items-center gap-3 p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
+                          className="group relative flex items-center gap-3 p-2 md:p-3 rounded-lg border ring-1 ring-gray-200 hover:shadow-md transition"
                         >
                           {/* Icon */}
-                          <div className="w-10 h-12 flex items-center justify-center rounded-md bg-gray-50 border">
-                            <i className={`fas ${iconClass} text-2xl`} />
+                          <div className="w-8 h-10 md:w-10 md:h-12 flex items-center justify-center rounded-md bg-gray-50 border flex-shrink-0">
+                            <i
+                              className={`fas ${iconClass} text-xl md:text-2xl`}
+                            />
                           </div>
+
                           {/* Name + meta */}
                           <div className="min-w-0 flex-1">
                             <p
-                              className="text-sm font-medium text-gray-800 truncate"
+                              className="text-xs md:text-sm font-medium text-gray-800 truncate"
                               title={fileName}
                             >
                               {fileName}
                             </p>
-                            <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
+                            <div className="mt-0.5 text-[10px] md:text-xs text-gray-500 flex items-center gap-2">
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-gray-100 border text-gray-600">
                                 {(ext || 'file').toUpperCase()}
                               </span>
                             </div>
                           </div>
+
                           {/* Actions */}
                           <div className="flex items-center gap-2">
                             <a
                               href={docUrl}
                               download
-                              className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
+                              className="px-2 py-1 md:px-2.5 md:py-1.5 text-[10px] md:text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition flex-shrink-0"
                             >
                               {t('common.Download')}
                             </a>
@@ -1251,7 +1262,7 @@ export default function ContractorServiceRequestDetail() {
               {/* Applied Date */}
               {existingApplication.createdAt && (
                 <div className="border-t pt-4">
-                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <p className="text-xs md:text-sm text-gray-500 flex items-center gap-2">
                     <i className="fas fa-calendar text-gray-400"></i>
                     {t('contractorServiceRequestDetail.appliedDate')}:{' '}
                     <span className="font-medium">
@@ -1262,11 +1273,11 @@ export default function ContractorServiceRequestDetail() {
               )}
 
               {/* Action Buttons */}
-              <div className="border-t pt-6 space-y-3">
+              <div className="border-t pt-4 md:pt-6 space-y-3">
                 {existingApplication.status === 'PendingCommission' && (
                   <>
                     {/* Commission Calculation Info Box */}
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 ring-1 ring-blue-200 space-y-4">
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 md:p-4 ring-1 ring-blue-200 space-y-3 md:space-y-4">
                       <h4 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                         <i className="fas fa-calculator text-blue-600"></i>
                         {t(
@@ -1275,13 +1286,13 @@ export default function ContractorServiceRequestDetail() {
                       </h4>
 
                       {/* 🟢 Hiển thị bảng các mức commission tier */}
-                      <div className="bg-white/60 rounded-md p-3 ring-1 ring-blue-100">
+                      <div className="bg-white/60 rounded-md p-2 md:p-3 ring-1 ring-blue-100 overflow-x-auto">
                         <p className="text-xs font-semibold text-gray-700 mb-2">
                           {t(
                             'contractorServiceRequestDetail.publicCommissionTiers'
                           )}
                         </p>
-                        <table className="w-full text-xs text-gray-700">
+                        <table className="w-full text-xs text-gray-700 min-w-[250px]">
                           <thead>
                             <tr className="border-b border-blue-200 text-left text-[13px] font-semibold">
                               <th className="py-1">
@@ -1349,7 +1360,7 @@ export default function ContractorServiceRequestDetail() {
                         return (
                           <div className="space-y-2">
                             {/* Estimate Price */}
-                            <div className="flex items-center justify-between text-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
                               <span className="text-gray-600">
                                 {t('contractorServiceRequestDetail.yourBid')}:
                               </span>
@@ -1359,7 +1370,7 @@ export default function ContractorServiceRequestDetail() {
                             </div>
 
                             {/* Commission Rate */}
-                            <div className="flex items-center justify-between text-sm">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm">
                               <span className="text-gray-600">
                                 {t(
                                   'contractorServiceRequestDetail.commissionRate'
@@ -1385,7 +1396,7 @@ export default function ContractorServiceRequestDetail() {
                                 <p className="text-lg font-bold text-blue-700">
                                   {formatVND(commission)}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-[10px] md:text-xs text-gray-500 break-words">
                                   {numberToWordsByLang(
                                     commission,
                                     i18n.language
@@ -1423,7 +1434,7 @@ export default function ContractorServiceRequestDetail() {
                           new Date() && (
                           <button
                             onClick={handlePayCommission}
-                            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+                            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold text-sm md:text-base"
                           >
                             <i className="fas fa-hand-holding-usd" />
                             {t('contractorServiceRequestDetail.payCommission')}
@@ -1438,12 +1449,12 @@ export default function ContractorServiceRequestDetail() {
                   <>
                     <button
                       onClick={handleDeleteApplication}
-                      className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+                      className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold text-sm md:text-base"
                     >
                       <i className="fas fa-trash-alt" />
                       {t('contractorServiceRequestDetail.deleteApplication')}
                     </button>
-                    <p className="text-xs text-gray-500 text-center">
+                    <p className="text-[10px] md:text-xs text-gray-500 text-center">
                       <i className="fas fa-info-circle mr-1" />
                       {t(
                         'contractorServiceRequestDetail.canDeleteWhilePending'
@@ -1457,15 +1468,15 @@ export default function ContractorServiceRequestDetail() {
 
           {/* Customer Contact Info - Show when Approved */}
           {existingApplication?.status === 'Approved' && (
-            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
+            <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
                 <i className="fas fa-user text-gray-500" />
                 {t('contractorServiceRequestDetail.customerInfo')}
               </h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <i className="fas fa-user-circle text-gray-400 text-xl" />
-                  <span className="text-gray-900 font-medium">
+                  <i className="fas fa-user-circle text-gray-400 text-lg md:text-xl" />
+                  <span className="text-gray-900 font-medium text-sm md:text-base">
                     {serviceRequest.customerName}
                   </span>
                 </div>
@@ -1473,7 +1484,7 @@ export default function ContractorServiceRequestDetail() {
                   href={`tel:${serviceRequest.customerPhone}`}
                   className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition border border-blue-100"
                 >
-                  <i className="fas fa-phone text-blue-600"></i>
+                  <i className="fas fa-phone text-blue-600 text-sm md:text-base"></i>
                   <span className="text-sm text-gray-700 font-medium">
                     {serviceRequest.customerPhone}
                   </span>
@@ -1482,8 +1493,8 @@ export default function ContractorServiceRequestDetail() {
                   href={`mailto:${serviceRequest.customerEmail}`}
                   className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition border border-purple-100"
                 >
-                  <i className="fas fa-envelope text-purple-600"></i>
-                  <span className="text-sm text-gray-700 font-medium">
+                  <i className="fas fa-envelope text-purple-600 text-sm md:text-base"></i>
+                  <span className="text-sm text-gray-700 font-medium break-all">
                     {serviceRequest.customerEmail}
                   </span>
                 </a>
@@ -1495,8 +1506,8 @@ export default function ContractorServiceRequestDetail() {
             serviceRequest.selectedContractorApplication?.contractorID ===
               user?.id &&
             serviceRequest.review && (
-              <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
+              <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6">
+                <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 inline-flex items-center gap-2">
                   <i className="fas fa-star text-amber-500" />
                   {t('contractorServiceRequestDetail.customerReview')}
                 </h3>
@@ -1507,7 +1518,7 @@ export default function ContractorServiceRequestDetail() {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <i
                         key={star}
-                        className={`fa-solid fa-star text-2xl ${
+                        className={`fa-solid fa-star text-lg md:text-2xl ${
                           star <= serviceRequest.review.rating
                             ? 'text-amber-400'
                             : 'text-gray-300'
@@ -1515,7 +1526,7 @@ export default function ContractorServiceRequestDetail() {
                       ></i>
                     ))}
                   </div>
-                  <span className="text-2xl font-bold text-amber-600">
+                  <span className="text-xl md:text-2xl font-bold text-amber-600">
                     {serviceRequest.review.rating.toFixed(1)}
                   </span>
                 </div>
@@ -1527,7 +1538,7 @@ export default function ContractorServiceRequestDetail() {
                       {t('contractorServiceRequestDetail.reviewComment')}
                     </p>
                     <div
-                      className="text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-4"
+                      className="text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-3 md:p-4 text-sm md:text-base"
                       dangerouslySetInnerHTML={{
                         __html: serviceRequest.review.comment,
                       }}
@@ -1541,7 +1552,7 @@ export default function ContractorServiceRequestDetail() {
                     <p className="text-sm font-medium text-gray-700 mb-3">
                       {t('contractorServiceRequestDetail.reviewImages')}
                     </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
                       {serviceRequest.review.imageUrls.map((url, i) => (
                         <a
                           key={`review-${url}-${i}`}
@@ -1562,7 +1573,7 @@ export default function ContractorServiceRequestDetail() {
 
                 {/* Review Date */}
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                  <p className="text-xs md:text-sm text-gray-500 flex items-center gap-2">
                     <i className="fa-regular fa-calendar"></i>
                     {t('contractorServiceRequestDetail.reviewedAt')}:{' '}
                     <span className="font-medium text-gray-700">
@@ -1585,14 +1596,16 @@ export default function ContractorServiceRequestDetail() {
 
         {/* RIGHT: Summary Sidebar */}
         <div className="lg:col-span-4">
-          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-6 lg:sticky lg:top-24 space-y-5">
+          <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-200 p-4 md:p-6 lg:sticky lg:top-24 space-y-4 md:space-y-5">
             {/*Create Date */}
             <div className="pb-4 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-3 inline-flex items-center gap-2 mr-5">
                 <i className="fas fa-calendar text-gray-500" />
                 {t('contractorServiceRequestDetail.createAt')}
               </h3>
-              {formatDate(serviceRequest.createdAt, i18n.language)}
+              <p className="text-gray-700 text-sm md:text-base">
+                {formatDate(serviceRequest.createdAt, i18n.language)}
+              </p>
             </div>
             {/* Status Badge */}
             <div className="pb-4 border-b border-gray-200">
