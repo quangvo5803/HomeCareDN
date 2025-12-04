@@ -62,8 +62,8 @@ export default function PartnerProfile() {
         <div className="space-y-1">
           {userDetail.address.slice(0, 4).map((addr) => (
             <div key={addr.addressID} className="flex items-start">
-              <i className="fa-solid fa-location-dot text-orange-500 mr-2 mt-1"></i>
-              <span>
+              <i className="fa-solid fa-location-dot text-orange-500 mr-2 mt-1 flex-shrink-0"></i>
+              <span className="text-sm md:text-base break-words">
                 {addr.detail}, {addr.district}, {addr.city}
               </span>
             </div>
@@ -74,7 +74,9 @@ export default function PartnerProfile() {
     return (
       <div className="flex items-center">
         <i className="fa-solid fa-location-dot text-gray-500 mr-2"></i>
-        <span>{t('partnerProfile.noAddress') || 'No address'}</span>
+        <span className="text-sm md:text-base">
+          {t('partnerProfile.noAddress') || 'No address'}
+        </span>
       </div>
     );
   };
@@ -88,19 +90,19 @@ export default function PartnerProfile() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-3xl p-4 lg:p-6">
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen rounded-none md:rounded-3xl p-3 md:p-4 lg:p-6 pb-20 md:pb-6">
       <div className="max-w-5xl mx-auto">
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-6 rounded-t-3xl mb-5">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <i className="fas fa-user-circle text-2xl"></i>
+        <div className="bg-gradient-to-r from-orange-400 to-orange-500 text-white p-4 md:p-6 rounded-2xl md:rounded-t-3xl mb-4 md:mb-5 shadow-sm">
+          <div className="flex items-center gap-3 md:gap-4">
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <i className="fas fa-user-circle text-xl md:text-2xl"></i>
             </div>
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-xl md:text-2xl font-bold">
                 {t('partnerProfile.title') || 'My Profile'}
               </h1>
-              <p className="text-sm text-white/90">
+              <p className="text-xs md:text-sm text-white/90 font-medium">
                 {t(`roles.${userDetail?.role}`)}
               </p>
             </div>
@@ -108,47 +110,53 @@ export default function PartnerProfile() {
         </div>
 
         {/* Profile Information Card */}
-        <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row items-center gap-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm md:shadow-md p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6 mb-4 md:mb-6">
           <Avatar
             name={userDetail?.fullName}
-            size="100"
             round
             color="#FB8C00"
             fgColor="#FFF"
-            className="shadow-md"
+            className="shadow-md flex-shrink-0"
+            size={window.innerWidth < 768 ? '80' : '100'}
           />
 
-          <div className="flex-1 flex flex-col md:flex-row justify-between items-start md:items-center w-full">
-            <div className="space-y-2 flex-1">
-              <h2 className="text-xl font-bold text-gray-800">
+          <div className="flex-1 flex flex-col md:flex-row justify-between items-center md:items-center w-full text-center md:text-left gap-4 md:gap-0">
+            <div className="space-y-2 flex-1 w-full md:w-auto">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 break-words">
                 {userDetail?.fullName || t('partnerProfile.noName')}
               </h2>
-              <p className="text-gray-600">
-                <i className="fa-solid fa-envelope text-orange-500 mr-2"></i>
-                {userDetail?.email}
-              </p>
-              <p className="text-gray-600">
-                <i className="fa-solid fa-phone text-orange-500 mr-2"></i>
-                {userDetail?.phoneNumber || t('partnerProfile.noPhone')}
-              </p>
-              <div className="text-gray-600">{renderAddress()}</div>
+
+              <div className="flex flex-col items-center md:items-start space-y-1">
+                <p className="text-gray-600 text-sm md:text-base flex items-center">
+                  <i className="fa-solid fa-envelope text-orange-500 mr-2"></i>
+                  <span className="break-all">{userDetail?.email}</span>
+                </p>
+                <p className="text-gray-600 text-sm md:text-base flex items-center">
+                  <i className="fa-solid fa-phone text-orange-500 mr-2"></i>
+                  {userDetail?.phoneNumber || t('partnerProfile.noPhone')}
+                </p>
+                <div className="text-gray-600 w-full flex justify-center md:justify-start">
+                  {renderAddress()}
+                </div>
+              </div>
             </div>
 
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 text-center min-w-[110px]">
-                <p className="text-yellow-600 text-sm font-medium">
+            {/* Stats Boxes */}
+            <div className="flex gap-3 w-full md:w-auto justify-center md:justify-end">
+              <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-2 md:p-3 text-center flex-1 md:flex-none min-w-[100px] md:min-w-[110px]">
+                <p className="text-yellow-600 text-xs md:text-sm font-medium uppercase tracking-wide">
                   {t('partnerProfile.rating') || 'Rating'}
                 </p>
-                <p className="text-lg font-bold text-yellow-700 flex items-center justify-center gap-1">
-                  <i className="fa-solid fa-star"></i>
+                <p className="text-base md:text-lg font-bold text-yellow-700 flex items-center justify-center gap-1 mt-1">
+                  <i className="fa-solid fa-star text-sm md:text-base"></i>
                   {userDetail?.averageRating?.toFixed(1) || '0.0'}
                 </p>
               </div>
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center min-w-[110px]">
-                <p className="text-blue-600 text-sm font-medium">
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-2 md:p-3 text-center flex-1 md:flex-none min-w-[100px] md:min-w-[110px]">
+                <p className="text-blue-600 text-xs md:text-sm font-medium uppercase tracking-wide">
                   {t('partnerProfile.projects') || 'Projects'}
                 </p>
-                <p className="text-lg font-bold text-blue-700">
+                <p className="text-base md:text-lg font-bold text-blue-700 mt-1">
                   {userDetail?.projectCount || 0}
                 </p>
               </div>
@@ -157,16 +165,16 @@ export default function PartnerProfile() {
         </div>
 
         {/* Info Note */}
-        <div className="bg-white rounded-2xl shadow-md p-4 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm md:shadow-md p-4 mb-4 md:mb-6 border-l-4 border-blue-500">
           <div className="flex items-start gap-3">
-            <div className="flex-shrink-0 w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-              <i className="fa-solid fa-info-circle text-blue-500 text-lg" />
+            <div className="flex-shrink-0 w-8 h-8 md:w-10 md:h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+              <i className="fa-solid fa-info-circle text-blue-500 text-base md:text-lg" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-gray-900 mb-1">
+              <h3 className="font-semibold text-gray-900 mb-1 text-sm md:text-base">
                 {t('partnerProfile.infoTitle') || 'Profile Information'}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs md:text-sm text-gray-600 leading-relaxed">
                 {t('partnerProfile.infoNote') ||
                   'Profile information cannot be edited. Please contact support if you need to update your details.'}
               </p>
@@ -175,32 +183,36 @@ export default function PartnerProfile() {
         </div>
 
         {/* Reviews Section */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
+        <div className="bg-white rounded-2xl shadow-sm md:shadow-md p-4 md:p-6">
           {/* Reviews Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div className="flex items-center gap-3 mb-4 sm:mb-0">
-              <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6 gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i className="fa-solid fa-star text-yellow-500 text-lg" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800">
                   {t('partnerProfile.customerReviews') || 'Customer Reviews'}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs md:text-sm text-gray-500">
                   {totalReviews}{' '}
                   {t('partnerProfile.totalReviews') || 'total reviews'}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <div className="text-2xl font-bold text-gray-900">
+            <div className="flex items-center gap-3 bg-gray-50 p-2 rounded-lg md:bg-transparent md:p-0">
+              <div className="text-left md:text-right flex-1 md:flex-none">
+                <span className="text-sm text-gray-600 md:hidden mr-2">
+                  Overall:
+                </span>
+                <span className="text-xl md:text-2xl font-bold text-gray-900">
                   {userDetail?.averageRating?.toFixed(1) || '0.0'}
-                </div>
-                <div className="flex gap-0.5 justify-end mt-1">
-                  {renderStars(Math.round(userDetail?.averageRating || 0))}
-                </div>
+                </span>
+                <span className="text-gray-400 text-sm ml-1">/ 5.0</span>
+              </div>
+              <div className="flex gap-0.5">
+                {renderStars(Math.round(userDetail?.averageRating || 0))}
               </div>
             </div>
           </div>
@@ -211,42 +223,43 @@ export default function PartnerProfile() {
               <LoadingComponent />
             </div>
           ) : reviews.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {reviews.map((review) => (
                 <div
                   key={review.reviewID}
-                  className="group relative bg-gray-50 border border-gray-200 rounded-xl p-5 transition-all duration-300 hover:shadow-md hover:border-orange-200"
+                  className="group relative bg-gray-50 border border-gray-200 rounded-xl p-3 md:p-5 transition-all duration-300 hover:shadow-md hover:border-orange-200"
                 >
                   {/* Review Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-start justify-between mb-2 md:mb-3">
+                    <div className="flex items-center gap-2 md:gap-3">
                       <Avatar
                         name={review.userName}
-                        size="40"
+                        size="32"
                         round
                         color="#3B82F6"
                         fgColor="#FFF"
+                        className="md:w-[40px] md:h-[40px]"
                       />
                       <div>
-                        <h4 className="font-semibold text-gray-900">
+                        <h4 className="font-semibold text-gray-900 text-sm md:text-base">
                           {review.userName}
                         </h4>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-500">
                           <i className="fa-regular fa-calendar" />
                           {formatDate(review.createdAt, i18n.language)}
                         </div>
                       </div>
                     </div>
 
-                    {/* Star Rating */}
-                    <div className="flex gap-0.5">
+                    {/* Star Rating Mobile */}
+                    <div className="flex gap-0.5 transform scale-75 origin-top-right md:scale-100">
                       {renderStars(review.rating)}
                     </div>
                   </div>
 
                   {/* Review Comment */}
                   {review.comment && (
-                    <p className="text-gray-700 mb-3 leading-relaxed pl-1">
+                    <p className="text-gray-700 text-sm md:text-base mb-3 leading-relaxed pl-1">
                       {review.comment}
                     </p>
                   )}
@@ -259,7 +272,7 @@ export default function PartnerProfile() {
                           key={idx}
                           src={url}
                           alt={`Review ${idx + 1}`}
-                          className="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform cursor-pointer"
+                          className="w-16 h-16 md:w-20 md:h-20 object-cover rounded-lg border border-gray-200"
                         />
                       ))}
                     </div>
@@ -268,15 +281,15 @@ export default function PartnerProfile() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center py-8 md:py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
               <div className="flex flex-col items-center">
-                <div className="flex items-center justify-center w-16 h-16 mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200">
-                  <i className="text-2xl text-gray-400 fa-solid fa-star"></i>
+                <div className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 mb-3 md:mb-4 rounded-full bg-white shadow-sm">
+                  <i className="text-xl md:text-2xl text-gray-400 fa-solid fa-star"></i>
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-gray-900">
+                <h3 className="mb-1 md:mb-2 text-base md:text-lg font-bold text-gray-900">
                   {t('partnerProfile.noReviews') || 'No reviews yet'}
                 </h3>
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 text-xs md:text-sm px-4">
                   {t('partnerProfile.noReviewsDesc') ||
                     'Complete projects to receive customer reviews'}
                 </p>
@@ -286,13 +299,15 @@ export default function PartnerProfile() {
 
           {/* Pagination */}
           {totalReviews > 0 && !reviewsLoading && (
-            <div className="flex justify-center mt-6 pt-6 border-t border-gray-200">
+            <div className="flex justify-center mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200 overflow-x-auto">
               <Pagination
+                size="small"
                 current={currentPage}
                 pageSize={pageSize}
                 total={totalReviews}
                 onChange={(page) => setCurrentPage(page)}
                 showSizeChanger={false}
+                className="scale-90 md:scale-100 origin-center"
               />
             </div>
           )}

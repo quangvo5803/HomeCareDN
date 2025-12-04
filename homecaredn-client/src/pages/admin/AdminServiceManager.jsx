@@ -192,6 +192,7 @@ export default function AdminServiceManager() {
           onSave={handleSave}
           serviceID={editingServiceID}
           setUploadProgress={setUploadProgress}
+          setSubmitting={setSubmitting}
         />
 
         {/* Table Container */}
