@@ -1838,13 +1838,7 @@ export default function MaterialRequestDetail() {
                         : 'bg-red-50 border-red-200'
                     }`}
                   >
-                    <p
-                      className={`text-sm text-gray-800 mb-2 ${
-                        status.nowrap
-                          ? 'whitespace-normal'
-                          : 'whitespace-normal'
-                      }`}
-                    >
+                    <p className="text-sm text-gray-800 mb-2 whitespace-normal">
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
