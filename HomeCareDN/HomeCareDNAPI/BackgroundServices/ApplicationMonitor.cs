@@ -78,7 +78,8 @@ namespace HomeCareDNAPI.BackgroundServices
                 foreach (var req in contractorRequests)
                 {
                     req.Status = RequestStatus.Opening;
-
+                    req.SelectedContractorApplicationID = null;
+                    req.SelectedContractorApplication = null;
                     var apps = contractorAllApps.Where(a =>
                         a.ServiceRequestID == req.ServiceRequestID
                     );
@@ -132,7 +133,8 @@ namespace HomeCareDNAPI.BackgroundServices
                 foreach (var req in distributorRequests)
                 {
                     req.Status = RequestStatus.Opening;
-
+                    req.SelectedDistributorApplication = null;
+                    req.SelectedDistributorApplicationID = null;
                     var apps = distributorAllApps.Where(a =>
                         a.MaterialRequestID == req.MaterialRequestID
                     );

@@ -417,7 +417,7 @@ namespace BusinessLogic.Services
             }
 
             application.Status = ApplicationStatus.PendingCommission;
-            application.DueCommisionTime = DateTime.Now.AddMinutes(2);
+            application.DueCommisionTime = DateTime.Now.AddDays(7);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
