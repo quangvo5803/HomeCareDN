@@ -218,6 +218,7 @@ export default function DistributorCategoryManager() {
                     ) : (
                       <img
                         src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                        alt=""
                         className="object-cover border border-gray-200 rounded-lg w-14 h-14 flex-shrink-0"
                       />
                     )}
@@ -374,6 +375,7 @@ export default function DistributorCategoryManager() {
                         ) : (
                           <img
                             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
+                            alt=""
                             className="object-cover border border-gray-200 rounded-lg w-13 h-13"
                           />
                         )}

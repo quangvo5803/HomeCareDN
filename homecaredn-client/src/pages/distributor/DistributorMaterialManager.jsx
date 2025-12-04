@@ -235,7 +235,7 @@ export default function DistributorMaterialManager() {
                     ) : (
                       <img
                         src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                        alt="No image"
+                        alt=""
                         className="object-cover border border-gray-200 rounded-lg w-16 h-16 flex-shrink-0"
                       />
                     )}
@@ -391,7 +391,7 @@ export default function DistributorMaterialManager() {
                         ) : (
                           <img
                             src="https://res.cloudinary.com/dl4idg6ey/image/upload/v1758524975/no_img_nflf9h.jpg"
-                            alt="No image"
+                            alt=""
                             className="object-cover border border-gray-200 rounded-lg w-13 h-13"
                           />
                         )}
