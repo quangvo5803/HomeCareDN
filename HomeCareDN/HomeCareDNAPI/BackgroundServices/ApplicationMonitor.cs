@@ -15,111 +15,147 @@ namespace HomeCareDNAPI.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            Console.WriteLine("BackgroundService RUNNING...");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await ProcessContractorApplications(stoppingToken);
-                    await ProcessDistributorApplications(stoppingToken);
+                    await ProcessApplications();
                 }
                 catch (Exception ex)
                 {
-                    // TODO: add logging (file / database)
-                    Console.WriteLine($"[ApplicationMonitor] Error: {ex.Message}");
+                    Console.WriteLine($"[ApplicationMonitor] ERROR: {ex}");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
 
-        private async Task ProcessContractorApplications(CancellationToken token)
+        // =======================================================
+        // GỘP CONTRACTOR + DISTRIBUTOR CHUNG 1 HÀM
+        // =======================================================
+        private async Task ProcessApplications()
         {
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var now = DateTime.Now;
 
-            var now = DateTime.UtcNow;
-
-            var expiredApps = await db
-                .ContractorApplications.Where(ca =>
-                    ca.Status == ApplicationStatus.Pending && ca.DueCommisionTime < now
+            // =======================================================
+            // 1. CONTRACTOR APPLICATION
+            // =======================================================
+            var expiredContractors = await db
+                .ContractorApplications.AsTracking()
+                .Where(a =>
+                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now
                 )
-                .ToListAsync(token);
+                .ToListAsync();
 
-            if (expiredApps.Count == 0)
-                return;
-
-            var relatedIds = expiredApps.Select(x => x.ServiceRequestID).Distinct().ToList();
-
-            var relatedRequests = await db
-                .ServiceRequests.Where(sr => relatedIds.Contains(sr.ServiceRequestID))
-                .ToListAsync(token);
-
-            var allApps = await db
-                .ContractorApplications.Where(ca => relatedIds.Contains(ca.ServiceRequestID))
-                .ToListAsync(token);
-
-            foreach (var app in expiredApps)
-                app.Status = ApplicationStatus.Rejected;
-
-            foreach (var req in relatedRequests)
+            if (expiredContractors.Count > 0)
             {
-                req.Status = RequestStatus.Opening;
+                Console.WriteLine($"[Contractor] Expired = {expiredContractors.Count}");
 
-                var apps = allApps.Where(a => a.ServiceRequestID == req.ServiceRequestID);
+                var contractorRequestIds = expiredContractors
+                    .Select(e => e.ServiceRequestID)
+                    .Distinct()
+                    .ToList();
 
-                foreach (var app in apps)
+                var contractorRequests = await db
+                    .ServiceRequests.AsTracking()
+                    .Where(r => contractorRequestIds.Contains(r.ServiceRequestID))
+                    .ToListAsync();
+
+                var contractorAllApps = await db
+                    .ContractorApplications.AsTracking()
+                    .Where(a => contractorRequestIds.Contains(a.ServiceRequestID))
+                    .ToListAsync();
+
+                // 1.1 Mark expired → Rejected
+                foreach (var app in expiredContractors)
+                    app.Status = ApplicationStatus.Rejected;
+
+                // 1.2 Re-open request + restore các ứng dụng khác → Pending
+                foreach (var req in contractorRequests)
                 {
-                    if (app.Status == ApplicationStatus.Rejected && !expiredApps.Contains(app))
-                        app.Status = ApplicationStatus.Pending;
+                    req.Status = RequestStatus.Opening;
+                    req.SelectedContractorApplicationID = null;
+                    req.SelectedContractorApplication = null;
+                    var apps = contractorAllApps.Where(a =>
+                        a.ServiceRequestID == req.ServiceRequestID
+                    );
+
+                    foreach (var app in apps)
+                    {
+                        bool isExpired = expiredContractors.Any(e =>
+                            e.ContractorApplicationID == app.ContractorApplicationID
+                        );
+
+                        if (!isExpired && app.Status == ApplicationStatus.Rejected)
+                            app.Status = ApplicationStatus.Pending;
+                    }
                 }
             }
 
-            await db.SaveChangesAsync(token);
-        }
-
-        private async Task ProcessDistributorApplications(CancellationToken token)
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-            var now = DateTime.UtcNow;
-
-            var expiredApps = await db
-                .DistributorApplications.Where(ca =>
-                    ca.Status == ApplicationStatus.Pending && ca.DueCommisionTime < now
+            // =======================================================
+            // 2. DISTRIBUTOR APPLICATION
+            // =======================================================
+            var expiredDistributors = await db
+                .DistributorApplications.AsTracking()
+                .Where(a =>
+                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now
                 )
-                .ToListAsync(token);
+                .ToListAsync();
 
-            if (expiredApps.Count == 0)
-                return;
-
-            var relatedIds = expiredApps.Select(x => x.MaterialRequestID).Distinct().ToList();
-
-            var relatedRequests = await db
-                .MaterialRequests.Where(sr => relatedIds.Contains(sr.MaterialRequestID))
-                .ToListAsync(token);
-
-            var allApps = await db
-                .DistributorApplications.Where(ca => relatedIds.Contains(ca.MaterialRequestID))
-                .ToListAsync(token);
-
-            foreach (var app in expiredApps)
-                app.Status = ApplicationStatus.Rejected;
-
-            foreach (var req in relatedRequests)
+            if (expiredDistributors.Count > 0)
             {
-                req.Status = RequestStatus.Opening;
+                Console.WriteLine($"[Distributor] Expired = {expiredDistributors.Count}");
 
-                var apps = allApps.Where(a => a.MaterialRequestID == req.MaterialRequestID);
+                var distributorRequestIds = expiredDistributors
+                    .Select(e => e.MaterialRequestID)
+                    .Distinct()
+                    .ToList();
 
-                foreach (var app in apps)
+                var distributorRequests = await db
+                    .MaterialRequests.AsTracking()
+                    .Where(r => distributorRequestIds.Contains(r.MaterialRequestID))
+                    .ToListAsync();
+
+                var distributorAllApps = await db
+                    .DistributorApplications.AsTracking()
+                    .Where(a => distributorRequestIds.Contains(a.MaterialRequestID))
+                    .ToListAsync();
+
+                // 2.1 Mark expired → Rejected
+                foreach (var app in expiredDistributors)
+                    app.Status = ApplicationStatus.Rejected;
+
+                // 2.2 Re-open + restore Pending
+                foreach (var req in distributorRequests)
                 {
-                    if (app.Status == ApplicationStatus.Rejected && !expiredApps.Contains(app))
-                        app.Status = ApplicationStatus.Pending;
+                    req.Status = RequestStatus.Opening;
+                    req.SelectedDistributorApplication = null;
+                    req.SelectedDistributorApplicationID = null;
+                    var apps = distributorAllApps.Where(a =>
+                        a.MaterialRequestID == req.MaterialRequestID
+                    );
+
+                    foreach (var app in apps)
+                    {
+                        bool isExpired = expiredDistributors.Any(e =>
+                            e.DistributorApplicationID == app.DistributorApplicationID
+                        );
+
+                        if (!isExpired && app.Status == ApplicationStatus.Rejected)
+                            app.Status = ApplicationStatus.Pending;
+                    }
                 }
             }
 
-            await db.SaveChangesAsync(token);
+            // =======================================================
+            // SAVE ALL
+            // =======================================================
+            await db.SaveChangesAsync();
+            Console.WriteLine("[ApplicationMonitor] All updates DONE");
         }
     }
 }

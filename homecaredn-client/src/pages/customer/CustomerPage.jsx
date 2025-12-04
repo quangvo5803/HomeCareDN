@@ -30,57 +30,71 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
   const title = titleMap[active] || t('userPage.profile.title');
   const subtitle = subtitleMap[active] || t('userPage.profile.subtitle');
 
+  const menuItems = [
+    {
+      key: 'profile',
+      label: t('userPage.profile.title'),
+      icon: 'fa-user',
+    },
+    {
+      key: 'service_requests',
+      label: t('userPage.serviceRequest.title'),
+      icon: 'fa-clipboard-list',
+    },
+    {
+      key: 'material_requests',
+      label: t('userPage.materialRequest.title'),
+      icon: 'fa-boxes',
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto p-3">
-        <div className="text-center mb-8 mt-5">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">{title}</h1>
-          <p className="text-gray-600">{subtitle}</p>
+    <div className="min-h-screen bg-gray-50 pb-10">
+      <div className="max-w-6xl mx-auto p-3 md:p-6">
+        {/* Page Header */}
+        <div className="text-center mb-6 md:mb-8 mt-4 md:mt-5">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
+            {title}
+          </h1>
+          <p className="text-sm md:text-base text-gray-600 px-4">{subtitle}</p>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-3">
-            <div className="bg-white rounded-lg shadow-md p-4 sticky top-28">
-              <nav className="space-y-2">
-                <button
-                  onClick={() => setActive('profile')}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center gap-3 ${
-                    active === 'profile'
-                      ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                      : 'hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <i className="fas fa-user mr-2"></i>
-                  {t('userPage.profile.title')}
-                </button>
-                <button
-                  onClick={() => setActive('service_requests')}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center gap-3 ${
-                    active === 'service_requests'
-                      ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                      : 'hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <i className="fas fa-clipboard-list mr-2"></i>
-                  {t('userPage.serviceRequest.title')}
-                </button>
-                <button
-                  onClick={() => setActive('material_requests')}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors duration-200 flex items-center gap-3 ${
-                    active === 'material_requests'
-                      ? 'bg-orange-50 text-orange-700 border border-orange-200'
-                      : 'hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <i className="fas fa-boxes"></i>
-                  {t('userPage.materialRequest.title')}
-                </button>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+          {/* Sidebar / Mobile Tabs */}
+          <div className="col-span-1 md:col-span-3">
+            <div className="bg-white rounded-xl shadow-sm md:shadow-md p-2 md:p-4 sticky top-16 md:top-24 z-10">
+              {/* Sử dụng Grid 3 cột cho mobile để chia đều */}
+              <nav className="grid grid-cols-3 md:flex md:flex-col gap-2">
+                {menuItems.map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={() => setActive(item.key)}
+                    className={`
+                      flex flex-col md:flex-row items-center justify-center md:justify-start 
+                      gap-1 md:gap-3 p-2 md:px-4 md:py-3 rounded-lg transition-all duration-200 
+                      text-[11px] sm:text-xs md:text-base font-medium
+                      ${
+                        active === item.key
+                          ? 'bg-orange-50 text-orange-700 border border-orange-200 shadow-sm'
+                          : 'hover:bg-gray-50 text-gray-700 border border-transparent'
+                      }
+                    `}
+                  >
+                    <i
+                      className={`fas ${item.icon} w-5 text-center text-sm md:text-lg mb-0.5 md:mb-0`}
+                    ></i>
+                    <span className="text-center md:text-left leading-tight md:leading-normal line-clamp-2 md:line-clamp-1">
+                      {item.label}
+                    </span>
+                  </button>
+                ))}
               </nav>
             </div>
           </div>
 
-          <div className="col-span-9">
-            <div className="bg-white rounded-lg shadow-md p-6">
+          {/* Main Content Area */}
+          <div className="col-span-1 md:col-span-9">
+            <div className="bg-white rounded-xl shadow-sm md:shadow-md p-4 md:p-6 min-h-[300px]">
               {active === 'profile' && <Profile user={user} />}
               {active === 'service_requests' && <ServiceRequestManager />}
               {active === 'material_requests' && (
@@ -93,6 +107,7 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
     </div>
   );
 }
+
 CustomerPage.propTypes = {
   defaultTab: PropTypes.string,
 };

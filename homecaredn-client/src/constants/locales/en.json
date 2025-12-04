@@ -1170,7 +1170,7 @@
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
       "historyMR": "Material request history",
-      "historyDA":"Material order history",
+      "historyDA": "Material order history",
       "history": "No history yet",
       "chatWithUser": "Chat with user"
     }
@@ -1488,6 +1488,8 @@
 
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+    "MAXIMUM_DOCUMENT": "You can only upload up to 5 documents.",
+    "MAXIMUM_DOCUMENT_SIZE": "Each document must be less than 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
@@ -1681,6 +1683,8 @@
     "sortMaterialCountDesc": "Product Quantity: High -> Low",
     "sortCreateDateNew": "Newest",
     "sortCreateDateOld": "Oldest",
+    "sortRatingAsc": "Low - High",
+    "sortRatingDesc": "High - Low",
     "Grid": "Grid",
     "Table": "Table",
     "All": "All",
