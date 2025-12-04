@@ -1477,6 +1477,8 @@
 
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
+    "MAXIMUM_DOCUMENT": "Bạn chỉ có thể tải lên tối đa 5 tài liệu.",
+    "MAXIMUM_DOCUMENT_SIZE": "Mỗi tài liệu dung lượng phải < 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu dịch vụ!",
     "MAXIMUM_MATERIAL_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu vật liệu!",
 

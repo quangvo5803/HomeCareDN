@@ -1488,6 +1488,8 @@
 
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
+    "MAXIMUM_DOCUMENT": "You can only upload up to 5 documents.",
+    "MAXIMUM_DOCUMENT_SIZE": "Each document must be less than 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
 
