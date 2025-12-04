@@ -1163,7 +1163,7 @@
       "historySR": "Lịch sử dịch vụ đã yêu cầu",
       "historyCA": "Lịch sử dịch vụ đã tham gia",
       "historyMR": "Lịch sử yêu cầu vật liệu",
-      "historyDA":"Lịch sử đơn hàng vật liệu",
+      "historyDA": "Lịch sử đơn hàng vật liệu",
       "history": "Chưa có lịch sử nào",
       "chatWithUser": "Chat với người dùng"
     }
@@ -1670,6 +1670,8 @@
     "sortMaterialCountDesc": "Số lượng sản phẩm: Nhiều -> Ít",
     "sortCreateDateNew": "Mới nhất",
     "sortCreateDateOld": "Cũ nhất",
+    "sortRatingAsc": "Thấp - Cao",
+    "sortRatingDesc": "Cao - Thấp",
     "Grid": "Lưới",
     "Table": "Bảng",
     "All": "Tất cả",

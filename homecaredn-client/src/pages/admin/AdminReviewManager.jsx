@@ -43,9 +43,8 @@ export default function AdminReviewManager() {
         {[1, 2, 3, 4, 5].map((star) => (
           <i
             key={star}
-            className={`fa-solid fa-star text-sm ${
-              star <= rating ? 'text-yellow-400' : 'text-gray-300'
-            }`}
+            className={`fa-solid fa-star text-sm ${star <= rating ? 'text-yellow-400' : 'text-gray-300'
+              }`}
           />
         ))}
       </div>
@@ -104,9 +103,9 @@ export default function AdminReviewManager() {
                 onChange={(e) => setSortBy(e.target.value)}
               >
                 <option value="">{t('common.sortDefault')}</option>
-                <option value="createat">{t('common.sortDateAsc')}</option>
+                <option value="createat">{t('common.sortCreateDateOld')}</option>
                 <option value="createat_desc">
-                  {t('common.sortDateDesc')}
+                  {t('common.sortCreateDateNew')}
                 </option>
                 <option value="rating">{t('common.sortRatingAsc')}</option>
                 <option value="rating_desc">
@@ -120,11 +119,10 @@ export default function AdminReviewManager() {
                     setRatingFilter('all');
                     navigate('?rating=all');
                   }}
-                  className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${
-                    ratingFilter === 'all'
-                      ? 'bg-orange-500 text-white'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                  }`}
+                  className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${ratingFilter === 'all'
+                    ? 'bg-orange-500 text-white'
+                    : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                    }`}
                 >
                   <i className="fa-solid fa-star mr-2" />
                   {t('adminReviewManager.all')}
@@ -136,11 +134,10 @@ export default function AdminReviewManager() {
                       setRatingFilter(star.toString());
                       navigate(`?rating=${star}`);
                     }}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${
-                      ratingFilter === star.toString()
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${ratingFilter === star.toString()
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     {star}
                     <i className="fa-solid fa-star ml-1 text-yellow-400" />
@@ -203,15 +200,14 @@ export default function AdminReviewManager() {
                           const reviewType = review.serviceRequestID
                             ? t('roles.Contractor')
                             : review.materialRequestID
-                            ? t('roles.Distributor')
-                            : '—';
+                              ? t('roles.Distributor')
+                              : '—';
 
                           return (
                             <tr
                               key={review.reviewID}
-                              className={`hover:bg-gray-50 transition-colors duration-150 ${
-                                index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                              }`}
+                              className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                                }`}
                             >
                               <td className="px-4 py-4 text-center align-middle">
                                 <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -233,13 +229,12 @@ export default function AdminReviewManager() {
                               </td>
                               <td className="px-6 py-4 text-center align-middle">
                                 <span
-                                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                                    reviewType === t('roles.Contractor')
-                                      ? 'bg-blue-100 text-blue-800'
-                                      : reviewType === t('roles.Distributor')
+                                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${reviewType === t('roles.Contractor')
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : reviewType === t('roles.Distributor')
                                       ? 'bg-green-100 text-green-800'
                                       : 'bg-gray-100 text-gray-800'
-                                  }`}
+                                    }`}
                                 >
                                   {reviewType}
                                 </span>
@@ -310,8 +305,8 @@ export default function AdminReviewManager() {
                       const reviewType = review.serviceRequestID
                         ? t('roles.Contractor')
                         : review.materialRequestID
-                        ? t('roles.Distributor')
-                        : '—';
+                          ? t('roles.Distributor')
+                          : '—';
 
                       return (
                         <div
@@ -328,13 +323,12 @@ export default function AdminReviewManager() {
                               </div>
                             </div>
                             <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                                reviewType === t('roles.Contractor')
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : reviewType === t('roles.Distributor')
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${reviewType === t('roles.Contractor')
+                                ? 'bg-blue-100 text-blue-800'
+                                : reviewType === t('roles.Distributor')
                                   ? 'bg-green-100 text-green-800'
                                   : 'bg-gray-100 text-gray-800'
-                              }`}
+                                }`}
                             >
                               {reviewType}
                             </span>

@@ -1170,7 +1170,7 @@
       "historySR": "Service requests history",
       "historyCA": "Participated service history",
       "historyMR": "Material request history",
-      "historyDA":"Material order history",
+      "historyDA": "Material order history",
       "history": "No history yet",
       "chatWithUser": "Chat with user"
     }
@@ -1681,6 +1681,8 @@
     "sortMaterialCountDesc": "Product Quantity: High -> Low",
     "sortCreateDateNew": "Newest",
     "sortCreateDateOld": "Oldest",
+    "sortRatingAsc": "Low - High",
+    "sortRatingDesc": "High - Low",
     "Grid": "Grid",
     "Table": "Table",
     "All": "All",
