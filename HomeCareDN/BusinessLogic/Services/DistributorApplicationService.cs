@@ -315,7 +315,27 @@ namespace BusinessLogic.Services
                 asNoTracking: false
             );
             _unitOfWork.DistributorApplicationRepository.Remove(application);
-
+            
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
+                n.DataValue == materialRequest!.MaterialRequestID.ToString() && !n.IsRead,
+                asNoTracking: false
+            );
+            if(noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var count = noti.PendingCount;
+                if (count <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"user_{materialRequest?.CustomerID}",
+                    "NotificationDistributorApplication.Delete",
+                    new { NotificationID = notiId, PendingCount = count }
+                );
+            }
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{materialRequest?.CustomerID.ToString()}",
                 "DistributorApplication.Delete",

@@ -94,6 +94,14 @@ export default function Header() {
     );
   };
 
+  const handleDeleteNotification = (payload) => {
+    if (!payload?.notificationID || payload.pendingCount !== 0) return;
+
+    setNotifications(prev =>
+      prev.filter(n => n.notificationID !== payload.notificationID)
+    );
+  };
+
   useRealtime({
     [RealtimeEvents.NotificationCreated]: handleNotification,
     [RealtimeEvents.NotificationApplicationCreate]: handleNotification,
@@ -103,6 +111,8 @@ export default function Header() {
         prev.filter((n) => n.notificationID !== notificationId)
       );
     },
+    [RealtimeEvents.NotificationDistributorApplicationDelete]: handleDeleteNotification,
+    [RealtimeEvents.NotificationContractorApplicationDelete]: handleDeleteNotification
   });
 
   // Close popovers when clicking outside / pressing Esc
@@ -386,9 +396,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (

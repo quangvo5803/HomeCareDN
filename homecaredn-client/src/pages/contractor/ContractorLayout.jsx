@@ -58,6 +58,20 @@ export default function ContractorLayout() {
         prev.filter((n) => n.notificationID !== notificationId)
       );
     },
+    [RealtimeEvents.NotificationServiceRequestDelete]: (payload) => {
+      setNotifications(prev => {
+        if (!payload?.notificationID) {
+          return prev;
+        }
+
+        if (payload.pendingCount === 0) {
+          return prev.filter(
+            n => n.notificationID !== payload.notificationID
+          );
+        }
+        return prev;
+      });
+    }
   });
 
   useEffect(() => {
