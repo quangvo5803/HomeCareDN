@@ -140,7 +140,7 @@ namespace HomeCareDNAPI
                 options.InstanceName = "HomeCareDN_";
             });
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddHostedService<ApplicationMonitor>();
+            //builder.Services.AddHostedService<ApplicationMonitor>();
 
             // LLM client
             builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>
