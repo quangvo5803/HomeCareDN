@@ -206,7 +206,7 @@ export default function MaterialCatalog() {
                   className="h-full overflow-hidden transition-all duration-300 bg-white border border-gray-100 shadow-lg cursor-pointer group rounded-2xl hover:shadow-xl hover:-translate-y-1"
                 >
                   {/* Image */}
-                  <div className="relative h-52 bg-gradient-to-br from-gray-50 to-white">
+                  <div className="relative w-full bg-gray-50 aspect-[4/3]">
                     <img
                       src={
                         m.img ||
