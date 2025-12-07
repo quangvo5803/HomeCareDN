@@ -87,6 +87,7 @@ export default function ContractorServiceRequestDetail() {
   useRealtime({
     //Accept
     [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
+      console.log(payload);
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -108,7 +109,8 @@ export default function ContractorServiceRequestDetail() {
       }));
     },
     //Reject
-    [RealtimeEvents.ContractorApplicationRejected]: () => {
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      console.log(payload);
       setExistingApplication((prev) => ({
         ...prev,
         status: 'Rejected',

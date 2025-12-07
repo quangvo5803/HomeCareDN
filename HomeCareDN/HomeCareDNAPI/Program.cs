@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using BusinessLogic.Mapping;
 using BusinessLogic.Services;
@@ -101,7 +102,16 @@ namespace HomeCareDNAPI
 
             builder.Services.AddHttpContextAccessor();
 
-            builder.Services.AddSignalR();
+            builder
+                .Services.AddSignalR()
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.PropertyNamingPolicy =
+                        JsonNamingPolicy.CamelCase;
+                    options.PayloadSerializerOptions.DictionaryKeyPolicy =
+                        JsonNamingPolicy.CamelCase;
+                });
+            ;
 
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -130,7 +140,7 @@ namespace HomeCareDNAPI
                 options.InstanceName = "HomeCareDN_";
             });
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddHostedService<ApplicationMonitor>();
+            //builder.Services.AddHostedService<ApplicationMonitor>();
 
             // LLM client
             builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>
