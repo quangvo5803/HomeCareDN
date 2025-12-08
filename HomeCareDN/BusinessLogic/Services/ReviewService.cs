@@ -108,7 +108,7 @@ namespace BusinessLogic.Services
                 await _unitOfWork.ImageRepository.AddRangeAsync(images);
             }
             await _unitOfWork.ReviewRepository.AddAsync(review);
-            await _unitOfWork.SaveAsync();
+
             var partner = await _userManager.FindByIdAsync(request.PartnerID);
             if (partner != null)
             {
@@ -116,6 +116,46 @@ namespace BusinessLogic.Services
                     (partner.AverageRating * partner.RatingCount + request.Rating)
                     / (partner.RatingCount + 1);
                 partner.RatingCount += 1;
+
+                double projectValue = 0;
+                // Case 1: Review for Service Request (Contractor)
+                if (request.ServiceRequestID.HasValue)
+                {
+                    var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                        filter: sr => sr.ServiceRequestID == request.ServiceRequestID.Value,
+                        includeProperties: "SelectedContractorApplication"
+                    );
+
+                    if (
+                        serviceRequest != null
+                        && serviceRequest.SelectedContractorApplication != null
+                    )
+                    {
+                        projectValue = serviceRequest.SelectedContractorApplication.EstimatePrice;
+                    }
+                }
+                // Case 2: Review for Material Request (Distributor)
+                else if (request.MaterialRequestID.HasValue)
+                {
+                    var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                        filter: mr => mr.MaterialRequestID == request.MaterialRequestID.Value,
+                        includeProperties: "SelectedDistributorApplication"
+                    );
+
+                    if (
+                        materialRequest != null
+                        && materialRequest.SelectedDistributorApplication != null
+                    )
+                    {
+                        projectValue = materialRequest
+                            .SelectedDistributorApplication
+                            .TotalEstimatePrice;
+                    }
+                }
+
+                int reputationChange = CalculateReputationPoints(projectValue, request.Rating);
+
+                partner.ReputationPoints += reputationChange;
                 await _userManager.UpdateAsync(partner);
             }
             return _mapper.Map<ReviewDto>(review);
@@ -142,6 +182,45 @@ namespace BusinessLogic.Services
             }
             _unitOfWork.ReviewRepository.Remove(review);
             await _unitOfWork.SaveAsync();
+        }
+
+        private int CalculateReputationPoints(double projectValue, int rating)
+        {
+            if (projectValue < 10_000_000)
+                return 0;
+
+            double logValue = Math.Log10(projectValue);
+            int basePoints = (int)Math.Max(1, (logValue - 7) * 3);
+
+            basePoints = Math.Min(basePoints, 50);
+
+            double multiplier;
+
+            switch (rating)
+            {
+                case 5:
+                    multiplier = 1.5;
+                    break;
+                case 4:
+                    multiplier = 1.0;
+                    break;
+                case 3:
+                    multiplier = 0.0;
+                    break;
+                case 2:
+                    multiplier = -1.0;
+                    break;
+                case 1:
+                    multiplier = -2.0;
+                    break;
+                default:
+                    multiplier = 0;
+                    break;
+            }
+
+            int finalPoints = (int)Math.Round(basePoints * multiplier);
+
+            return finalPoints;
         }
     }
 }

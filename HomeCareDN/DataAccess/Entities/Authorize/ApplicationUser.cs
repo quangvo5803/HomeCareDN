@@ -13,6 +13,7 @@ namespace DataAccess.Entities.Authorize
         public double AverageRating { get; set; }
         public int RatingCount { get; set; }
         public int ProjectCount { get; set; }
+        public int ReputationPoints { get; set; } = 0;
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }
