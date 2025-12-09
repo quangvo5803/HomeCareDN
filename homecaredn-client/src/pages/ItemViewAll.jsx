@@ -234,19 +234,19 @@ export default function ItemViewAll() {
         {/* Header with item count */}
         <div className="flex items-center justify-between mb-1">
           {/* Title */}
-          <h2 className="text-xl font-semibold text-gray-800">
+          <h1 className="text-xl font-semibold text-gray-800">
             {selectedType === "Material"
               ? t("itemViewAll.listMaterial")
               : selectedServiceType === "Repair"
                 ? t("itemViewAll.listRepair")
                 : t("itemViewAll.listConstruction")}
-          </h2>
+          </h1>
 
           {/* Dropdown */}
           <select
             value={selectedType}
             onChange={(e) => handleSelectType(e.target.value)}
-            className="border px-3 py-2 rounded-lg shadow-sm text-gray-700"
+            className="border px-3 py-2 rounded-lg shadow-sm text-gray-700 cursor-pointer"
           >
             <option value="Material">{t("itemViewAll.dropMaterial")}</option>
             <option value="Repair">{t("itemViewAll.dropRepair")}</option>

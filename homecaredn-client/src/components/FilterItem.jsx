@@ -34,7 +34,7 @@ function FilterService({
             <button
                 onClick={() => setOpen(!open)}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 
-                           bg-white border border-gray-300 hover:bg-gray-50 rounded-full w-full"
+                           bg-white border border-gray-300 hover:bg-gray-50 rounded-full w-full cursor-pointer"
             >
                 <span className="truncate">
                     {title}:{" "}
@@ -75,7 +75,7 @@ function FilterService({
                                         onSortChange(opt.value);
                                         setOpen(false);
                                     }}
-                                    className={`w-full px-4 py-2 text-left flex justify-between ${sortValue === opt.value ? "font-bold" : ""}`}
+                                    className={`w-full px-4 py-2 text-left flex justify-between cursor-pointer${sortValue === opt.value ? "font-bold" : ""}`}
                                 >
                                     {opt.label}
                                     {sortValue === opt.value && <i className="fas fa-check"></i>}
@@ -89,7 +89,7 @@ function FilterService({
                                         onChange(null);
                                         setOpen(false);
                                     }}
-                                    className={`w-full px-4 py-2 text-left hover:bg-gray-100 ${!selectedValue ? "font-semibold" : ""}`}
+                                    className={`w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer ${!selectedValue ? "font-semibold" : ""}`}
                                 >
                                     {t("common.All")}
                                 </button>
@@ -101,7 +101,7 @@ function FilterService({
                                             onChange(opt.value);
                                             setOpen(false);
                                         }}
-                                        className={`w-full px-4 py-2 text-left hover:bg-gray-100 ${selectedValue === opt.value ? "font-semibold" : ""}`}
+                                        className={`w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer ${selectedValue === opt.value ? "font-semibold" : ""}`}
                                     >
                                         {t(`Enums.${name}.${opt.value}`)}
                                     </button>
@@ -249,7 +249,7 @@ export default function FilterItem({
                     <div className="flex flex-wrap items-center gap-2">
                         <button
                             onClick={resetAllFilters}
-                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium"
+                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium cursor-pointer"
                         >
                             {t("common.resetFilter")}
                         </button>
@@ -272,7 +272,7 @@ export default function FilterItem({
                                 setShowCategoryDropdown(false);
                                 setShowBrandDropdown(false);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
                         >
                             <span>
                                 {t("common.sort")} {getSortLabel()}
@@ -292,7 +292,7 @@ export default function FilterItem({
                                             setCurrentPage(1);
                                             setShowSortDropdown(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${sortOption === "random" ? "font-semibold" : ""
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "random" ? "font-semibold" : ""
                                             }`}
                                     >
                                         {t("home.default")}
@@ -308,7 +308,7 @@ export default function FilterItem({
                                             setCurrentPage(1);
                                             setShowSortDropdown(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${sortOption === "materialname" ||
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "materialname" ||
                                             sortOption === "materialnameen"
                                             ? "font-semibold"
                                             : ""
@@ -327,7 +327,7 @@ export default function FilterItem({
                                             setCurrentPage(1);
                                             setShowSortDropdown(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${sortOption === "materialname_desc" ||
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "materialname_desc" ||
                                             sortOption === "materialnameen_desc"
                                             ? "font-semibold"
                                             : ""
@@ -348,7 +348,7 @@ export default function FilterItem({
                                 setShowSortDropdown(false);
                                 setShowBrandDropdown(false);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
                         >
                             <span>{t("common.category")}</span>
                             <i
@@ -366,7 +366,7 @@ export default function FilterItem({
                                             setCurrentPage(1);
                                             setShowCategoryDropdown(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedCategoryId ? "" : "font-semibold"
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedCategoryId ? "" : "font-semibold"
                                             }`}
                                     >
                                         {t("common.All")}
@@ -380,7 +380,7 @@ export default function FilterItem({
                                                 setCurrentPage(1);
                                                 setShowCategoryDropdown(false);
                                             }}
-                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedCategoryId === category.categoryID
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedCategoryId === category.categoryID
                                                 ? "font-semibold"
                                                 : ""
                                                 }`}
@@ -403,7 +403,7 @@ export default function FilterItem({
                                 setShowSortDropdown(false);
                                 setShowCategoryDropdown(false);
                             }}
-                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full"
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
                         >
                             <span>{t("common.brand")}</span>
                             <i
@@ -421,7 +421,7 @@ export default function FilterItem({
                                             setCurrentPage(1);
                                             setShowBrandDropdown(false);
                                         }}
-                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedBrandId ? "" : "font-semibold"
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedBrandId ? "" : "font-semibold"
                                             }`}
                                     >
                                         {t("common.All")}
@@ -435,7 +435,7 @@ export default function FilterItem({
                                                 setCurrentPage(1);
                                                 setShowBrandDropdown(false);
                                             }}
-                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${selectedBrandId === brand.brandID
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedBrandId === brand.brandID
                                                 ? "font-semibold"
                                                 : ""
                                                 }`}
@@ -490,7 +490,7 @@ export default function FilterItem({
 
                         <button
                             onClick={resetAllFilters}
-                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium"
+                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium cursor-pointer"
                         >
                             {t("common.resetFilter")}
                         </button>

@@ -177,8 +177,8 @@
   },
   "itemViewAll": {
     "listMaterial": "List of materials",
-    "listRepair": "List of repairs",
-    "listConstruction": "List of constructions",
+    "listRepair": "List of repair services",
+    "listConstruction": "List of construction services",
     "materials": "materials",
     "services": "services",
     "dropMaterial": "Material",
