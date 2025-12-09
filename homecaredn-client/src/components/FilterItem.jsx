@@ -121,8 +121,12 @@ FilterService.propTypes = {
     title: PropTypes.string.isRequired,
     options: PropTypes.array.isRequired,
     name: PropTypes.string.isRequired,
-    selectedValue: PropTypes.string,
+    selectedValue: PropTypes.any.isRequired,
     onChange: PropTypes.func.isRequired,
+    isSort: PropTypes.bool.isRequired,
+    sortValue: PropTypes.any.isRequired,
+    sortOptions: PropTypes.array.isRequired,
+    onSortChange: PropTypes.func.isRequired
 };
 
 export default function FilterItem({
@@ -507,7 +511,26 @@ FilterItem.propTypes = {
     onDesignStyleChange: PropTypes.func.isRequired,
     //material
     itemType: PropTypes.object.isRequired,
-
+    showSortDropdown: PropTypes.bool,
+    showCategoryDropdown: PropTypes.bool,
+    showBrandDropdown: PropTypes.bool,
+    setShowSortDropdown: PropTypes.func,
+    setShowCategoryDropdown: PropTypes.func,
+    setShowBrandDropdown: PropTypes.func,
+    sortOption: PropTypes.any,
+    setSortOption: PropTypes.func,
+    categories: PropTypes.array,
+    selectedCategoryId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    setSelectedCategoryId: PropTypes.func,
+    brands: PropTypes.array,
+    selectedBrandId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    setSelectedBrandId: PropTypes.func,
+    getSortLabel: PropTypes.func,
+    getCategoryLabel: PropTypes.func,
+    getBrandLabel: PropTypes.func,
+    hasActiveFilters: PropTypes.bool,
+    resetAllFilters: PropTypes.func,
+    setCurrentPage: PropTypes.func
 };
 
 
