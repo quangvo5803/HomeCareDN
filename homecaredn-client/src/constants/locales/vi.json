@@ -174,13 +174,16 @@
     "description": "Mô tả",
     "relatedMaterial": "Các vật liệu liên quan"
   },
-  "materialViewAll": {
+  "itemViewAll": {
     "listMaterial": "Danh sách vật liệu",
-    "filter": "Lọc vật liệu",
-    "filterCategory": "Danh mục vật liệu",
-    "filterBrand": "Thương hiệu vật liệu",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
-    "noMaterial": "Không có vật liệu tương ứng"
+    "listRepair": "Danh sách sửa chữa",
+    "listConstruction": "Danh sách xây dựng",
+    "materials": "vật liệu",
+    "services": "dịch vụ",
+    "dropMaterial": "Vật liệu",
+    "dropRepair": "Sửa chữa",
+    "dropConstruction": "Xây dựng",
+    "noItem": "Không có kết quả nào khớp"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",

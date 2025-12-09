@@ -20,9 +20,9 @@ const navItems = [
     href: '#',
     type: 'dropdown',
     submenu: [
-      { label: 'header.construction', href: '/ConstructionViewAll' },
-      { label: 'header.repair', href: '/RepairViewAll' },
-      { label: 'header.material', href: '/MaterialViewAll', type: 'link' },
+      { label: 'header.construction', href: '/ItemViewAll?type=Construction' },
+      { label: 'header.repair', href: '/ItemViewAll?type=Repair' },
+      { label: 'header.material', href: '/ItemViewAll?type=Material', type: 'link' },
       {
         label: 'header.materialCatalog',
         href: '/MaterialCatalog',
@@ -179,16 +179,37 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          {/* <div className="flex-1 hidden lg:flex">
+          <div className="flex-1 hidden lg:flex items-center gap-3">
+            {/* DROPDOWN TYPE SELECTOR */}
+            <div className="relative">
+              <select
+                //value={selectedType}
+                //onChange={(e) => handleSelectType(e.target.value)}
+                className="appearance-none py-3 pl-4 pr-10 rounded-full border border-gray-200 bg-white 
+                 text-gray-700 text-sm cursor-pointer focus:outline-none focus:ring-2 
+                 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+              >
+                <option value="Material">Material</option>
+                <option value="Repair">Repair</option>
+                <option value="Construction">Construction</option>
+              </select>
+
+              <i className="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none"></i>
+            </div>
+
+            {/* SEARCH INPUT */}
             <div className="relative w-full">
               <input
                 type="text"
                 placeholder={t('header.search')}
-                className="w-full py-3 pl-12 pr-4 transition-all duration-300 border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full py-3 pl-12 pr-4 transition-all duration-300 border border-gray-200 
+                 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 
+                 focus:border-blue-500"
               />
               <i className="absolute text-gray-400 transform -translate-y-1/2 fas fa-search left-4 top-1/2" />
             </div>
-          </div> */}
+
+          </div>
 
           {/* Navigation Menu (Desktop) */}
           <div className="items-center hidden lg:flex">
