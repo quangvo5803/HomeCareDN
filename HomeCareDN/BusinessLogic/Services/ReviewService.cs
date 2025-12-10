@@ -108,6 +108,7 @@ namespace BusinessLogic.Services
                 await _unitOfWork.ImageRepository.AddRangeAsync(images);
             }
             await _unitOfWork.ReviewRepository.AddAsync(review);
+            await _unitOfWork.SaveAsync();
 
             var partner = await _userManager.FindByIdAsync(request.PartnerID);
             if (partner != null)
@@ -152,7 +153,18 @@ namespace BusinessLogic.Services
                             .TotalEstimatePrice;
                     }
                 }
-
+                if (projectValue <= 1_000_000_000)
+                {
+                    partner.SmallScaleProjectCount += 1;
+                }
+                else if (projectValue <= 10_000_000_000)
+                {
+                    partner.MediumScaleProjectCount += 1;
+                }
+                else
+                {
+                    partner.LargeScaleProjectCount += 1;
+                }
                 int reputationChange = CalculateReputationPoints(projectValue, request.Rating);
 
                 partner.ReputationPoints += reputationChange;
@@ -186,41 +198,43 @@ namespace BusinessLogic.Services
 
         private int CalculateReputationPoints(double projectValue, int rating)
         {
-            if (projectValue < 10_000_000)
-                return 0;
-
-            double logValue = Math.Log10(projectValue);
-            int basePoints = (int)Math.Max(1, (logValue - 7) * 3);
-
-            basePoints = Math.Min(basePoints, 50);
-
-            double multiplier;
+            int point = 0;
+            if (projectValue <= 1_000_000_000)
+            {
+                point += 1;
+            }
+            else if (projectValue <= 10_000_000_000)
+            {
+                point += 5;
+            }
+            else
+            {
+                point += 10;
+            }
 
             switch (rating)
             {
                 case 5:
-                    multiplier = 1.5;
+                    point += 5;
                     break;
                 case 4:
-                    multiplier = 1.0;
+                    point += 3;
                     break;
                 case 3:
-                    multiplier = 0.0;
+                    point += 0;
                     break;
                 case 2:
-                    multiplier = -1.0;
+                    point -= 5;
                     break;
                 case 1:
-                    multiplier = -2.0;
+                    point -= 10;
                     break;
                 default:
-                    multiplier = 0;
+                    point += 0;
                     break;
             }
 
-            int finalPoints = (int)Math.Round(basePoints * multiplier);
-
-            return finalPoints;
+            return point;
         }
     }
 }

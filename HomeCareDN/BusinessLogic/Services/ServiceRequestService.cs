@@ -477,6 +477,10 @@ namespace BusinessLogic.Services.Interfaces
                     CompletedProjectCount = contractor?.ProjectCount ?? 0,
                     AverageRating = contractor?.AverageRating ?? 0,
                     RatingCount = contractor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = contractor?.ReputationPoints ?? 0,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -505,6 +509,10 @@ namespace BusinessLogic.Services.Interfaces
                     CompletedProjectCount = contractor?.ProjectCount ?? 0,
                     AverageRating = contractor?.AverageRating ?? 0,
                     RatingCount = contractor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = contractor?.ReputationPoints ?? 0,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved
