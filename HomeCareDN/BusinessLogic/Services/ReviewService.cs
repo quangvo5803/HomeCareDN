@@ -88,88 +88,26 @@ namespace BusinessLogic.Services
         {
             var review = _mapper.Map<Review>(request);
             review.ReviewID = Guid.NewGuid();
+
             if (request.ImageUrls != null && request.ImagePublicIds != null)
             {
-                var ids = request.ImagePublicIds?.ToList() ?? new List<string>();
-
-                var images = request
-                    .ImageUrls.Select(
-                        (url, i) =>
-                            new Image
-                            {
-                                ImageID = Guid.NewGuid(),
-                                ReviewID = review.ReviewID,
-                                ImageUrl = url,
-                                PublicId = i < ids.Count ? ids[i] : string.Empty,
-                            }
-                    )
-                    .ToList();
-
-                await _unitOfWork.ImageRepository.AddRangeAsync(images);
+                await AddReviewImagesAsync(
+                    review.ReviewID,
+                    request.ImageUrls,
+                    request.ImagePublicIds
+                );
             }
+
             await _unitOfWork.ReviewRepository.AddAsync(review);
             await _unitOfWork.SaveAsync();
 
-            var partner = await _userManager.FindByIdAsync(request.PartnerID);
-            if (partner != null)
-            {
-                partner.AverageRating =
-                    (partner.AverageRating * partner.RatingCount + request.Rating)
-                    / (partner.RatingCount + 1);
-                partner.RatingCount += 1;
+            await UpdatePartnerStatsAsync(
+                request.PartnerID,
+                request.Rating,
+                request.ServiceRequestID,
+                request.MaterialRequestID
+            );
 
-                double projectValue = 0;
-                // Case 1: Review for Service Request (Contractor)
-                if (request.ServiceRequestID.HasValue)
-                {
-                    var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                        filter: sr => sr.ServiceRequestID == request.ServiceRequestID.Value,
-                        includeProperties: "SelectedContractorApplication"
-                    );
-
-                    if (
-                        serviceRequest != null
-                        && serviceRequest.SelectedContractorApplication != null
-                    )
-                    {
-                        projectValue = serviceRequest.SelectedContractorApplication.EstimatePrice;
-                    }
-                }
-                // Case 2: Review for Material Request (Distributor)
-                else if (request.MaterialRequestID.HasValue)
-                {
-                    var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
-                        filter: mr => mr.MaterialRequestID == request.MaterialRequestID.Value,
-                        includeProperties: "SelectedDistributorApplication"
-                    );
-
-                    if (
-                        materialRequest != null
-                        && materialRequest.SelectedDistributorApplication != null
-                    )
-                    {
-                        projectValue = materialRequest
-                            .SelectedDistributorApplication
-                            .TotalEstimatePrice;
-                    }
-                }
-                if (projectValue <= 1_000_000_000)
-                {
-                    partner.SmallScaleProjectCount += 1;
-                }
-                else if (projectValue <= 10_000_000_000)
-                {
-                    partner.MediumScaleProjectCount += 1;
-                }
-                else
-                {
-                    partner.LargeScaleProjectCount += 1;
-                }
-                int reputationChange = CalculateReputationPoints(projectValue, request.Rating);
-
-                partner.ReputationPoints += reputationChange;
-                await _userManager.UpdateAsync(partner);
-            }
             return _mapper.Map<ReviewDto>(review);
         }
 
@@ -196,7 +134,109 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
         }
 
-        private int CalculateReputationPoints(double projectValue, int rating)
+        private async Task AddReviewImagesAsync(
+            Guid reviewId,
+            IEnumerable<string> imageUrls,
+            IEnumerable<string> imagePublicIds
+        )
+        {
+            var ids = imagePublicIds.ToList();
+            var images = imageUrls
+                .Select(
+                    (url, i) =>
+                        new Image
+                        {
+                            ImageID = Guid.NewGuid(),
+                            ReviewID = reviewId,
+                            ImageUrl = url,
+                            PublicId = i < ids.Count ? ids[i] : string.Empty,
+                        }
+                )
+                .ToList();
+
+            await _unitOfWork.ImageRepository.AddRangeAsync(images);
+        }
+
+        private async Task UpdatePartnerStatsAsync(
+            string partnerId,
+            int rating,
+            Guid? serviceRequestId,
+            Guid? materialRequestId
+        )
+        {
+            var partner = await _userManager.FindByIdAsync(partnerId);
+            if (partner == null)
+                return;
+
+            UpdateAverageRating(partner, rating);
+
+            double projectValue = await GetProjectValueAsync(serviceRequestId, materialRequestId);
+
+            UpdateProjectScaleCounts(partner, projectValue);
+
+            int reputationChange = CalculateReputationPoints(projectValue, rating);
+            partner.ReputationPoints += reputationChange;
+
+            await _userManager.UpdateAsync(partner);
+        }
+
+        private void UpdateAverageRating(ApplicationUser partner, int newRating)
+        {
+            partner.AverageRating =
+                (partner.AverageRating * partner.RatingCount + newRating)
+                / (partner.RatingCount + 1);
+            partner.RatingCount += 1;
+        }
+
+        private async Task<double> GetProjectValueAsync(
+            Guid? serviceRequestId,
+            Guid? materialRequestId
+        )
+        {
+            if (serviceRequestId.HasValue)
+            {
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    filter: sr => sr.ServiceRequestID == serviceRequestId.Value,
+                    includeProperties: "SelectedContractorApplication"
+                );
+
+                if (serviceRequest?.SelectedContractorApplication != null)
+                {
+                    return serviceRequest.SelectedContractorApplication.EstimatePrice;
+                }
+            }
+            else if (materialRequestId.HasValue)
+            {
+                var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                    filter: mr => mr.MaterialRequestID == materialRequestId.Value,
+                    includeProperties: "SelectedDistributorApplication"
+                );
+
+                if (materialRequest?.SelectedDistributorApplication != null)
+                {
+                    return materialRequest.SelectedDistributorApplication.TotalEstimatePrice;
+                }
+            }
+            return 0;
+        }
+
+        private void UpdateProjectScaleCounts(ApplicationUser partner, double projectValue)
+        {
+            if (projectValue <= 1_000_000_000)
+            {
+                partner.SmallScaleProjectCount += 1;
+            }
+            else if (projectValue <= 10_000_000_000)
+            {
+                partner.MediumScaleProjectCount += 1;
+            }
+            else
+            {
+                partner.LargeScaleProjectCount += 1;
+            }
+        }
+
+        private static int CalculateReputationPoints(double projectValue, int rating)
         {
             int point = 0;
             if (projectValue <= 1_000_000_000)
