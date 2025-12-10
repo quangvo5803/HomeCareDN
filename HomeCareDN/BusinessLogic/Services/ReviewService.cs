@@ -180,7 +180,7 @@ namespace BusinessLogic.Services
             await _userManager.UpdateAsync(partner);
         }
 
-        private void UpdateAverageRating(ApplicationUser partner, int newRating)
+        private static void UpdateAverageRating(ApplicationUser partner, int newRating)
         {
             partner.AverageRating =
                 (partner.AverageRating * partner.RatingCount + newRating)
@@ -220,7 +220,7 @@ namespace BusinessLogic.Services
             return 0;
         }
 
-        private void UpdateProjectScaleCounts(ApplicationUser partner, double projectValue)
+        private static void UpdateProjectScaleCounts(ApplicationUser partner, double projectValue)
         {
             if (projectValue <= 1_000_000_000)
             {
