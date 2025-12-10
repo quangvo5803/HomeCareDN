@@ -1,4 +1,6 @@
-﻿using BusinessLogic.DTOs.Application.Chat.Ai;
+﻿using System.Threading.Tasks;
+using BusinessLogic.DTOs.Application.Chat.Ai;
+using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.FacadeService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +36,31 @@ namespace HomeCareDNAPI.Controllers
 
         [HttpPost("estimate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Estimate([FromBody] AiEstimateRequestDto dto)
+        public async Task<IActionResult> Estimate(
+            [FromBody] AIServiceRequestPredictionRequestDto dto
+        )
         {
-            var result = await _facadeService.AiChatService.EstimatePriceAsync(dto);
-            return Ok(new { estimate = result });
+            const int maxRetry = 3;
+            AiServiceRequestPredictionResponseDto result =
+                new AiServiceRequestPredictionResponseDto();
+
+            for (int attempt = 1; attempt <= maxRetry; attempt++)
+            {
+                result = await _facadeService.AiChatService.EstimatePriceAsync(dto);
+
+                // Nếu AI trả về kết quả hợp lệ thì thoát vòng lặp
+                if (
+                    result?.SuggestedDescription != "AI did not return any result."
+                    && result?.SuggestedDescription != "Invalid JSON returned by AI"
+                )
+                    break;
+
+                // Nếu chưa phải lần cuối → chờ 0.3s rồi thử lại
+                if (attempt < maxRetry)
+                    await Task.Delay(300);
+            }
+
+            return Ok(result);
         }
     }
 }
