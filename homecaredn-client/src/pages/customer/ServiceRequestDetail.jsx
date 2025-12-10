@@ -611,19 +611,51 @@ export default function ServiceRequestDetail() {
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
                   {t('roles.Contractor')}
                 </h3>
-                <div className="flex items-center justify-center gap-4 text-sm mb-2">
-                  <span className="flex items-center gap-1 text-yellow-600">
-                    <i className="fas fa-star"></i>
-                    <span className="font-semibold">
-                      {selectedContractor.averageRating.toFixed(1)}
+                <div className="flex items-center justify-center gap-8 text-sm mb-2">
+                  {/* Cột trái - Số sao và điểm uy tín */}
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="flex items-center gap-1 text-yellow-600">
+                      <i className="fas fa-star"></i>
+                      <span className="font-semibold">
+                        {selectedContractor.averageRating.toFixed(1)}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-gray-300">•</span>
-                  <span className="text-gray-600">
-                    <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                    {selectedContractor.completedProjectCount}{' '}
-                    {t('userPage.serviceRequestDetail.label_project')}
-                  </span>
+                    {/* Điểm uy tín với tooltip */}
+                    <span className="flex items-center gap-1 group relative">
+                      <i className="fas fa-shield-alt text-blue-500"></i>
+                      <span className="font-semibold text-blue-600">{selectedContractor.reputationPoints ?? 0}</span>
+                      <span className="w-4 h-4 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs cursor-help font-bold">
+                        ?
+                      </span>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('userPage.serviceRequestDetail.reputationTooltip') || 
+                          'Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </span>
+                  </div>
+
+                  <span className="text-gray-300">|</span>
+
+                  {/* Cột phải - Số dự án theo quy mô */}
+                  <div className="flex flex-col gap-1 text-gray-600">
+                    <div className="flex items-center gap-2" title={t('userPage.serviceRequestDetail.smallScaleProjects') || 'Dự án quy mô nhỏ'}>
+                      <i className="fas fa-home text-green-400 w-4 text-center"></i>
+                      <span className="text-xs">{t('userPage.serviceRequestDetail.smallScaleProjects') || 'Nhỏ'}:</span>
+                      <span className="font-semibold">{selectedContractor.smallScaleProjectCount ?? 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2" title={t('userPage.serviceRequestDetail.mediumScaleProjects') || 'Dự án quy mô vừa'}>
+                      <i className="fas fa-building text-yellow-500 w-4 text-center"></i>
+                      <span className="text-xs">{t('userPage.serviceRequestDetail.mediumScaleProjects') || 'Vừa'}:</span>
+                      <span className="font-semibold">{selectedContractor.mediumScaleProjectCount ?? 0}</span>
+                    </div>
+                    <div className="flex items-center gap-2" title={t('userPage.serviceRequestDetail.largeScaleProjects') || 'Dự án quy mô lớn'}>
+                      <i className="fas fa-city text-red-500 w-4 text-center"></i>
+                      <span className="text-xs">{t('userPage.serviceRequestDetail.largeScaleProjects') || 'Lớn'}:</span>
+                      <span className="font-semibold">{selectedContractor.largeScaleProjectCount ?? 0}</span>
+                    </div>
+                  </div>
                 </div>
                 <StatusBadge
                   status={selectedContractor.status}
@@ -908,23 +940,33 @@ export default function ServiceRequestDetail() {
                       className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
                     >
                       <div className="flex items-start gap-3 mb-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                        {/* Cột trái - Avatar và thông tin cơ bản */}
+                        <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                           C
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-gray-900 truncate mb-1">
-                            {`${t('roles.Distributor')} ${idx + 1}`}
+                            {`${t('roles.Contractor')} ${idx + 1}`}
                           </h4>
-                          <div className="flex items-center gap-3 text-xs text-gray-500">
+                          <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
                             <span className="flex items-center gap-1">
                               <i className="fas fa-star text-yellow-500"></i>
                               <span>{c.averageRating.toFixed(1)}</span>
                             </span>
                             <span>•</span>
-                            <span>
-                              <i className="fas fa-check-circle text-green-500 mr-1"></i>
-                              {c.completedProjectCount}{' '}
-                              {t('userPage.serviceRequestDetail.label_project')}
+                            {/* Điểm uy tín với tooltip */}
+                            <span className="flex items-center gap-1 group relative">
+                              <i className="fas fa-shield-alt text-blue-500"></i>
+                              <span>{c.reputationPoints ?? 0}</span>
+                              <span className="w-4 h-4 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs cursor-help font-bold">
+                                ?
+                              </span>
+                              {/* Tooltip */}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                                {t('userPage.serviceRequestDetail.reputationTooltip') || 
+                                  'Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành'}
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                              </div>
                             </span>
                           </div>
                         </div>

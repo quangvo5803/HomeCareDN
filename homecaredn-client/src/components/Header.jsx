@@ -294,15 +294,25 @@ export default function Header() {
 
               {/* 🌐 Language Switcher (Desktop) */}
               <div className="relative" ref={langRef}>
-                <button
-                  type="button"
-                  onClick={() => setOpenLang((v) => !v)}
-                  className="flex items-center justify-center w-10 h-10 text-gray-600 transition-all duration-300 border border-gray-300 rounded-full hover:text-blue-600 hover:bg-gray-50 hover:border-blue-500"
-                  aria-haspopup="menu"
-                  aria-expanded={openLang}
-                >
-                  <i className="fas fa-globe" />
-                </button>
+                {(() => {
+                  const current = (i18n.language || 'en').startsWith('vi') ? 'vi' : 'en';
+                  const flagCode = current === 'vi' ? 'VN' : 'US';
+                  const label = current.toUpperCase();
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setOpenLang((v) => !v)}
+                      className="flex items-center gap-2 h-9 px-3 rounded-full border border-gray-300 hover:border-blue-500 hover:bg-gray-50 transition-all"
+                      aria-haspopup="menu"
+                      aria-expanded={openLang}
+                      title={t('partnerDashboard.change_language')}
+                    >
+                      <ReactCountryFlag countryCode={flagCode} svg className="text-lg" />
+                      <span className="text-sm font-medium">{label}</span>
+                      <i className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''}`} />
+                    </button>
+                  );
+                })()}
                 {openLang && (
                   <div
                     role="menu"

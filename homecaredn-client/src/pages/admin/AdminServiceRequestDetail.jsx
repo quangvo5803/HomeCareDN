@@ -609,7 +609,7 @@ export default function AdminServiceRequestDetail() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
                       <p className="text-emerald-600 text-sm font-medium mb-1">
                         {t('adminServiceRequestManager.estimatePrice')}
@@ -641,8 +641,49 @@ export default function AdminServiceRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedContractor.averageRating.toFixed(1)}
+                        {selectedContractor.averageRating?.toFixed(1) || '0.0'}
                       </p>
+                    </div>
+
+                    {/* Reputation Points với Tooltip */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100 group relative">
+                      <p className="text-indigo-600 text-sm font-medium mb-1 flex items-center gap-1">
+                        {t('adminServiceRequestManager.contractorDetail.reputation') || 'Uy tín'}
+                        <span className="w-3.5 h-3.5 rounded-full bg-indigo-200 text-indigo-600 flex items-center justify-center text-[10px] cursor-help font-bold">
+                          ?
+                        </span>
+                      </p>
+                      <p className="font-bold text-lg text-indigo-700 flex items-center gap-1">
+                        <i className="fa-solid fa-shield-alt"></i>
+                        {selectedContractor.reputationPoints ?? 0}
+                      </p>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminServiceRequestManager.contractorDetail.reputationTooltip') || 
+                          'Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+
+                    {/* Project Scale Counts */}
+                    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-2xl border border-teal-100">
+                      <p className="text-teal-600 text-sm font-medium mb-2">
+                        {t('adminServiceRequestManager.contractorDetail.projectsByScale') || 'Dự án theo quy mô'}
+                      </p>
+                      <div className="flex items-center gap-3 text-sm">
+                        <span className="flex items-center gap-1" title={t('adminServiceRequestManager.contractorDetail.smallScale') || 'Quy mô nhỏ'}>
+                          <i className="fas fa-home text-green-400"></i>
+                          <span className="font-bold text-green-700">{selectedContractor.smallScaleProjectCount ?? 0}</span>
+                        </span>
+                        <span className="flex items-center gap-1" title={t('adminServiceRequestManager.contractorDetail.mediumScale') || 'Quy mô vừa'}>
+                          <i className="fas fa-building text-yellow-500"></i>
+                          <span className="font-bold text-yellow-600">{selectedContractor.mediumScaleProjectCount ?? 0}</span>
+                        </span>
+                        <span className="flex items-center gap-1" title={t('adminServiceRequestManager.contractorDetail.largeScale') || 'Quy mô lớn'}>
+                          <i className="fas fa-city text-red-500"></i>
+                          <span className="font-bold text-red-600">{selectedContractor.largeScaleProjectCount ?? 0}</span>
+                        </span>
+                      </div>
                     </div>
 
                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
