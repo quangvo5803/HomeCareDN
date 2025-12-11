@@ -61,13 +61,6 @@ namespace BusinessLogic.Services
         private const string SYSTEM_PROMPT_SEARCH =
             @"Bạn là trợ lý tìm kiếm thông minh. Nhiệm vụ của bạn là dựa trên lịch sử tìm kiếm của người dùng để gợi ý các từ khóa liên quan, có thể dùng cho tìm kiếm sản phẩm (Material) hoặc dịch vụ (Repair/Construction). Trả về kết quả dưới dạng JSON danh sách từ khóa.";
 
-        private const string SYSTEM_PROMPT_ESTIMATE =
-            @"Bạn là Chuyên gia Dự toán Xây dựng HomeCareDN.
-              Context: {0}
-              Nhiệm vụ: Ước lượng chi phí sơ bộ dựa trên yêu cầu.
-              Yêu cầu: Trình bày bảng giá (Table Markdown), các hạng mục cần làm, và tổng chi phí ước tính (VNĐ).
-              Cảnh báo: Ghi rõ đây chỉ là tham khảo.";
-
         public AiChatService(
             IGroqClient groq,
             IDistributedCache cache,
@@ -123,36 +116,144 @@ namespace BusinessLogic.Services
 
         public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSearchDto)
         {
-            if (string.IsNullOrWhiteSpace(aiSearchDto.UserID))
+            // 1. Validate input
+            if (aiSearchDto == null || string.IsNullOrWhiteSpace(aiSearchDto.SearchType))
+                return new List<string>();
+
+            if (string.IsNullOrWhiteSpace(aiSearchDto.Language))
+                aiSearchDto.Language = "en";
+
+            var userHistory = aiSearchDto.History ?? new List<string>();
+
+            // 2. Build system + user prompt
+            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSearchDto, userHistory);
+
+            // 3. Call AI (Groq)
+            string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
+
+            if (string.IsNullOrWhiteSpace(raw))
+                return new List<string>();
+
+            // 4. Extract JSON from AI response
+            string json = TryExtractJsonArray(raw);
+
+            // 5. Deserialize
+            try
             {
-                var error = new Dictionary<string, string[]>
-                {
-                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
-                };
-                throw new CustomValidationException(error);
+                var result = JsonSerializer.Deserialize<List<string>>(
+                    json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                return result ?? new List<string>();
             }
-            var history = aiSearchDto.History ?? new List<string>();
-            string prompt = $@"
-Người dùng có UserID '{aiSearchDto.UserID}' đã tìm kiếm: {string.Join(", ", history)}.
-Loại tìm kiếm: {aiSearchDto.SearchType}.
-            
-Chỉ gợi ý 5-10 từ khóa liên quan cho loại tìm kiếm {aiSearchDto.SearchType}.
-Chỉ trả về danh sách JSON các từ khóa, ví dụ: [""từ khóa 1"", ""từ khóa 2""], không thêm mô tả khác.
-";
-            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SEARCH, prompt);
-            return ExtractJsonList(result, aiSearchDto.UserID);
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
+        // ==================== Build Suggest Prompt ====================
+        private (string systemPrompt, string userPrompt) BuildSuggestPrompt(
+            AiSearchRequestDto aiSearchDto,
+            List<string> userHistory
+        )
+        {
+            string systemPrompt =
+                @"You are a search keyword suggestion system for a construction and home repair marketplace.
+
+CRITICAL RULES:
+1. Response must be ONLY a valid JSON array of strings
+2. NO markdown, NO ```json wrapper, NO explanation
+3. NO extra text before or after JSON
+4. Output format EXACTLY: [""keyword1"", ""keyword2"", ""keyword3""]
+5. Each keyword must be relevant to the search category
+6. Keywords should be practical and commonly searched";
+
+            string userPrompt;
+
+            if (userHistory.Any())
+            {
+                string historyText = string.Join(", ", userHistory.Take(5));
+
+                userPrompt =
+                    $@"Generate search suggestions based on user history.
+
+USER PROFILE:
+- Search Category: {aiSearchDto.SearchType}
+- Recent Searches: {historyText}
+- Language: {aiSearchDto.Language}
+
+TASK:
+Generate 8-10 relevant search keywords for ""{aiSearchDto.SearchType}"" category.
+
+STRATEGY:
+- 60% related to user's search history
+- 40% popular items in this category
+
+EXAMPLES FOR CATEGORIES:
+- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+
+OUTPUT (start with [ immediately):
+[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+            }
+            else
+            {
+                userPrompt =
+                    $@"Generate popular search suggestions for first-time visitor.
+
+USER PROFILE:
+- Search Category: {aiSearchDto.SearchType}
+- Search History: None
+- Language: {aiSearchDto.Language}
+
+TASK:
+Suggest 8-10 MOST POPULAR keywords for ""{aiSearchDto.SearchType}"" category.
+
+FOCUS ON:
+- Best-selling products/services
+- Most frequently searched items
+- Essential items people often look for
+
+EXAMPLES FOR CATEGORIES:
+- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+
+OUTPUT (start with [ immediately):
+[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+            }
+
+            return (systemPrompt, userPrompt);
+        }
+
+        // ==================== Extract JSON Array ====================
+        private string TryExtractJsonArray(string raw)
+        {
+            raw = raw.Trim();
+
+            if (raw.StartsWith("```json"))
+                raw = raw.Substring(7);
+            if (raw.StartsWith("```"))
+                raw = raw.Substring(3);
+            if (raw.EndsWith("```"))
+                raw = raw.Substring(0, raw.Length - 3);
+
+            raw = raw.Trim();
+
+            int start = raw.IndexOf('[');
+            int end = raw.LastIndexOf(']');
+
+            if (start == -1 || end == -1 || end <= start)
+                return "[]";
+
+            return raw.Substring(start, end - start + 1);
         }
 
         public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSearchDto)
         {
-            if (string.IsNullOrWhiteSpace(aiSearchDto.UserID))
-            {
-                var error = new Dictionary<string, string[]>
-                {
-                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
-                };
-                throw new CustomValidationException(error);
-            }
             var aiKeywords = await SuggestSearchAsync(aiSearchDto);
             var results = new List<object>();
 
@@ -161,29 +262,27 @@ Chỉ trả về danh sách JSON các từ khóa, ví dụ: [""từ khóa 1"", "
                 var parameter = new QueryParameters
                 {
                     Search = keyword,
-                    SearchType = aiSearchDto.SearchType
+                    SearchType = aiSearchDto.SearchType,
                 };
 
                 switch (aiSearchDto.SearchType)
                 {
                     case "Material":
                         var materialResult = await _materialService.GetAllMaterialAsync(parameter);
-                        results.AddRange(materialResult.Items);
+                        if (materialResult?.Items != null)
+                            results.AddRange(materialResult.Items);
                         break;
 
                     case "Repair":
                     case "Construction":
                         var serviceResult = await _servicesService.GetAllServicesAsync(parameter);
-                        results.AddRange(serviceResult.Items);
-                        break;
-
-                    default:
+                        if (serviceResult?.Items != null)
+                            results.AddRange(serviceResult.Items);
                         break;
                 }
             }
-            results = results.Distinct().ToList();
 
-            return results;
+            return results.Distinct().ToList();
         }
 
         public async Task<AiServiceRequestPredictionResponseDto> EstimatePriceAsync(

@@ -11,8 +11,8 @@ import { handleApiError } from '../utils/handleApiError';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
 import useRealtime from '../realtime/useRealtime';
 import { useSearch } from '../hook/useSearch';
-import { aiChatService } from '../services/aiChatService';
 import LoadingComponent from './LoadingComponent';
+
 // Navigation data
 const navItems = [
   { label: 'header.home', href: '/', type: 'link' },
@@ -24,7 +24,11 @@ const navItems = [
     submenu: [
       { label: 'header.construction', href: '/ItemViewAll?type=Construction' },
       { label: 'header.repair', href: '/ItemViewAll?type=Repair' },
-      { label: 'header.material', href: '/ItemViewAll?type=Material', type: 'link' },
+      {
+        label: 'header.material',
+        href: '/ItemViewAll?type=Material',
+        type: 'link',
+      },
       {
         label: 'header.materialCatalog',
         href: '/MaterialCatalog',
@@ -50,15 +54,22 @@ export default function Header() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const { fetchSearchHistory, fetchSearchMaterial, fetchSearchService, loading: searchLoading } = useSearch();
+  const {
+    fetchSearchMaterial,
+    fetchSearchService,
+    loading: searchLoading,
+    getCombinedSuggestions,
+    saveSearchTerm,
+  } = useSearch();
 
-  const [type, setType] = useState("Material");
-  const [searchText, setSearchText] = useState("");
+  const [type, setType] = useState('Material');
+  const [searchText, setSearchText] = useState('');
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
   const [results, setResults] = useState([]);
   const wrapperRef = useRef(null);
   const [aiSuggestions, setAiSuggestions] = useState([]);
+
   const toggleServices = () => setIsServicesOpen((v) => !v);
 
   const closeMobileNav = () => {
@@ -108,8 +119,8 @@ export default function Header() {
   const handleDeleteNotification = (payload) => {
     if (!payload?.notificationID || payload.pendingCount !== 0) return;
 
-    setNotifications(prev =>
-      prev.filter(n => n.notificationID !== payload.notificationID)
+    setNotifications((prev) =>
+      prev.filter((n) => n.notificationID !== payload.notificationID)
     );
   };
 
@@ -122,8 +133,10 @@ export default function Header() {
         prev.filter((n) => n.notificationID !== notificationId)
       );
     },
-    [RealtimeEvents.NotificationDistributorApplicationDelete]: handleDeleteNotification,
-    [RealtimeEvents.NotificationContractorApplicationDelete]: handleDeleteNotification
+    [RealtimeEvents.NotificationDistributorApplicationDelete]:
+      handleDeleteNotification,
+    [RealtimeEvents.NotificationContractorApplicationDelete]:
+      handleDeleteNotification,
   });
 
   // Close popovers when clicking outside / pressing Esc
@@ -176,39 +189,29 @@ export default function Header() {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
         setShowHistory(false);
         setSearchText('');
-        setAiSuggestions([])
+        setAiSuggestions([]);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleFocusSearch = async () => {
-    if (user) {
-      const res = await fetchSearchHistory({
-        FilterID: user.id,
-        PageNumber: 1,
-        PageSize: 5,
-      });
-      setHistory(res || []);
-    } else {
-      const local = JSON.parse(localStorage.getItem("guest_history") || "[]");
-      setHistory(local.slice(0, 5));
-    }
-    setResults([]);
-    setShowHistory(true);
-  };
-
-  //AI
-  const fetchAiSuggest = async (userId, history = [], searchType) => {
-    if (!history) return [];
     try {
-      const dto = { UserID: userId, History: history, SearchType: searchType };
-      const res = await aiChatService.searchWithAi(dto);
-      return res || [];
+      // Get combined suggestions (history + AI)
+      const { history, aiSuggestions } = await getCombinedSuggestions(
+        user?.id,
+        type,
+        i18n.language
+      );
+
+      setHistory(history);
+      setAiSuggestions(aiSuggestions);
+      setResults([]);
+      setShowHistory(true);
     } catch (err) {
-      toast.error(handleApiError(err));
-      return [];
+      console.error('[handleFocusSearch]', err);
+      setShowHistory(true);
     }
   };
 
@@ -218,36 +221,45 @@ export default function Header() {
     setSearchText(text);
 
     if (!text.trim()) {
+      // Show suggestions again khi clear input
+      const { history, aiSuggestions } = await getCombinedSuggestions(
+        user?.id,
+        type,
+        i18n.language
+      );
+      setHistory(history);
+      setAiSuggestions(aiSuggestions);
       setResults([]);
       return;
     }
 
+    // Search for real results
     const params = {
       search: text,
       FinalSearch: true,
       SearchType: type,
       ...(user && { FilterID: user.id }),
     };
-    const res =
-      type === "Material"
-        ? await fetchSearchMaterial(params)
-        : await fetchSearchService(params);
-    setResults((res || []).slice(0, 5));
 
-    const historyList = user
-      ? (await fetchSearchHistory({ FilterID: user.id, PageNumber: 1, PageSize: 5 })) || []
-      : JSON.parse(localStorage.getItem("guest_history") || "[]").slice(0, 5);
+    try {
+      const res =
+        type === 'Material'
+          ? await fetchSearchMaterial(params)
+          : await fetchSearchService(params);
 
-    const formattedHistory = historyList.map(item => item.searchTerm);
-    const aiRes = await fetchAiSuggest(user.id, formattedHistory, type);
-    setAiSuggestions(aiRes.slice(0, 5));
-
-    setShowHistory(true);
+      setResults((res || []).slice(0, 5));
+      setShowHistory(true);
+    } catch (err) {
+      console.error('Search error:', err);
+    }
   };
 
   const handleSearch = async () => {
     const query = searchText.trim();
     if (!query) return;
+
+    // Save search term
+    await saveSearchTerm(user?.id, query, type);
 
     const params = {
       search: query,
@@ -256,25 +268,25 @@ export default function Header() {
       ...(user && { FilterID: user.id }),
     };
 
-    if (!user) {
-      const old = JSON.parse(localStorage.getItem("guest_history") || "[]");
-      const updated = [query, ...old.filter((x) => x !== query)].slice(0, 5);
-      localStorage.setItem("guest_history", JSON.stringify(updated));
+    try {
+      if (type === 'Material') {
+        await fetchSearchMaterial(params);
+      } else {
+        await fetchSearchService(params);
+      }
+      setShowHistory(false);
+      navigate(`/ItemViewAll?type=${type}&search=${query}`);
+    } catch (err) {
+      console.error('Search error:', err);
     }
-
-    if (type === "Material") {
-      await fetchSearchMaterial(params);
-    }
-    else {
-      await fetchSearchService(params);
-    }
-    setShowHistory(false);
-    navigate(`/ItemViewAll?type=${type}&search=${query}`);
   };
 
   const handleSelectItem = async (item) => {
     const name = item.searchTerm || item.name || item.nameEN || item;
     if (!name) return;
+
+    // Save search term
+    await saveSearchTerm(user?.id, name, type);
 
     setSearchText(name);
 
@@ -285,25 +297,28 @@ export default function Header() {
       ...(user && { FilterID: user.id }),
     };
 
-    if (type === "Material") {
-      await fetchSearchMaterial(params);
+    try {
+      if (type === 'Material') {
+        await fetchSearchMaterial(params);
+      } else {
+        await fetchSearchService(params);
+      }
+      setShowHistory(false);
+      navigate(`/ItemViewAll?type=${type}&search=${name}`);
+    } catch (err) {
+      console.error('Search error:', err);
     }
-    else {
-      await fetchSearchService(params);
-    }
-    if (!user) {
-      const old = JSON.parse(localStorage.getItem("guest_history") || "[]");
-      const updated = [name, ...old.filter((x) => x !== name)].slice(0, 5);
-      localStorage.setItem("guest_history", JSON.stringify(updated));
-    }
-
-    setShowHistory(false);
-    navigate(`/ItemViewAll?type=${type}&search=${name}`);
   };
 
-  const hasResults = results.length === 0 && !history.some(item =>
-    (item.searchTerm || item.name || item.nameEN || item).toLowerCase().includes(searchText.toLowerCase())
-  );
+  const hasResults =
+    results.length === 0 &&
+    !history.some((item) =>
+      (item.searchTerm || item.name || item.nameEN || item)
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    ) &&
+    aiSuggestions.length === 0 &&
+    searchText.trim().length > 0;
 
   return (
     <header
@@ -336,7 +351,9 @@ export default function Header() {
                 >
                   <option value="Material">{t('header.material')}</option>
                   <option value="Repair">{t('header.repair')}</option>
-                  <option value="Construction">{t('header.construction')}</option>
+                  <option value="Construction">
+                    {t('header.construction')}
+                  </option>
                 </select>
                 <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none" />
               </div>
@@ -349,7 +366,7 @@ export default function Header() {
                   value={searchText}
                   onChange={handleInputChange}
                   onFocus={handleFocusSearch}
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                   placeholder={t('header.placeholder')}
                   className="w-full py-4 pl-14 pr-5 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
                 />
@@ -376,7 +393,9 @@ export default function Header() {
                   ) : hasResults ? (
                     <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
                       <i className="fas fa-search text-6xl" />
-                      <span className="text-sm font-medium">{t('header.noResult')}</span>
+                      <span className="text-sm font-medium">
+                        {t('header.noResult')}
+                      </span>
                     </div>
                   ) : (
                     <>
@@ -402,7 +421,9 @@ export default function Header() {
                                   className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
                                 />
                               )}
-                              <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">{item.name}</span>
+                              <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
+                                {item.name}
+                              </span>
                             </div>
                           ))}
                         </div>
@@ -419,19 +440,25 @@ export default function Header() {
                           </div>
                           {aiSuggestions.map((item, i) => (
                             <div
-                              key={i}
+                              key={`ai-${i}`}
                               onMouseDown={() => handleSelectItem(item)}
                               className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150 group"
                             >
-                              {item.imageUrls?.[0] && (
+                              {item.imageUrls?.[0] ? (
                                 <img
                                   src={item.imageUrls[0]}
                                   alt={item.name}
                                   className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
                                 />
+                              ) : (
+                                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                  <i className="fas fa-lightbulb text-blue-600 text-lg" />
+                                </div>
                               )}
                               <span className="text-blue-600 font-medium group-hover:text-blue-700">
-                                {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                                {i18n.language === 'vi'
+                                  ? item.name
+                                  : item.nameEN || item.name}
                               </span>
                             </div>
                           ))}
@@ -449,7 +476,7 @@ export default function Header() {
                           </div>
                           {history.map((item, i) => (
                             <div
-                              key={i}
+                              key={`history-${i}`}
                               onMouseDown={() => handleSelectItem(item)}
                               className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors duration-150 group"
                             >
@@ -583,7 +610,9 @@ export default function Header() {
               {/* 🌐 Language Switcher (Desktop) */}
               <div className="relative" ref={langRef}>
                 {(() => {
-                  const current = (i18n.language || 'en').startsWith('vi') ? 'vi' : 'en';
+                  const current = (i18n.language || 'en').startsWith('vi')
+                    ? 'vi'
+                    : 'en';
                   const flagCode = current === 'vi' ? 'VN' : 'US';
                   const label = current.toUpperCase();
                   return (
@@ -595,9 +624,17 @@ export default function Header() {
                       aria-expanded={openLang}
                       title={t('partnerDashboard.change_language')}
                     >
-                      <ReactCountryFlag countryCode={flagCode} svg className="text-lg" />
+                      <ReactCountryFlag
+                        countryCode={flagCode}
+                        svg
+                        className="text-lg"
+                      />
                       <span className="text-sm font-medium">{label}</span>
-                      <i className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''}`} />
+                      <i
+                        className={`fas fa-chevron-down text-xs transition-transform ${
+                          openLang ? 'rotate-180' : ''
+                        }`}
+                      />
                     </button>
                   );
                 })()}
@@ -684,8 +721,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (
@@ -749,7 +787,6 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Compact Language Selector */}
                 <div className="flex gap-2 mt-3">
                   <button
                     type="button"
