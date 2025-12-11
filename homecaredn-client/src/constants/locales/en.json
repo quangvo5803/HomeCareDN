@@ -1458,6 +1458,7 @@
       "create": "Tell us about your experience with this contractor.",
       "rating": "Rating",
       "ratingStar": "Star",
+      "reputationPoints": "reputation points",
       "comment": "Comment",
       "commentPlaceholder": "Write your comment here...",
       "images": "Images",
