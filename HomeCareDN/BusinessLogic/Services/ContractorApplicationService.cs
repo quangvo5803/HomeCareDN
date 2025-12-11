@@ -81,6 +81,10 @@ namespace BusinessLogic.Services
                 dto.RatingCount = contractor.RatingCount;
                 dto.AverageRating = contractor.AverageRating;
                 dto.CompletedProjectCount = contractor.ProjectCount;
+                dto.SmallScaleProjectCount = contractor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = contractor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = contractor.LargeScaleProjectCount;
+                dto.ReputationPoints = contractor.ReputationPoints;
 
                 if (role == "Admin")
                 {
@@ -149,6 +153,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
             dto.AverageRating = contractor?.AverageRating ?? 0;
             dto.RatingCount = contractor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = contractor?.ReputationPoints ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -182,6 +190,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
             dto.AverageRating = contractor?.AverageRating ?? 0;
             dto.RatingCount = contractor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = contractor?.ReputationPoints ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";

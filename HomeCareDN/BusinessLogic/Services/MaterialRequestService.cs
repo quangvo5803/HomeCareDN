@@ -319,6 +319,10 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -347,6 +351,10 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
                     DistributorName =
                         selected.Status == ApplicationStatus.Approved
                             ? distributor?.FullName ?? string.Empty

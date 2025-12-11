@@ -83,6 +83,10 @@ namespace BusinessLogic.Services
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
                 dto.RatingCount = distributor.RatingCount;
+                dto.SmallScaleProjectCount = distributor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = distributor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = distributor.LargeScaleProjectCount;
+                dto.ReputationPoints = distributor.ReputationPoints;
                 if (role == "Admin")
                 {
                     dto.DistributorName =
@@ -156,6 +160,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = distributor?.ProjectCount ?? 0;
             dto.AverageRating = distributor?.AverageRating ?? 0;
             dto.RatingCount = distributor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = distributor?.ReputationPoints ?? 0;
             if (distributor is not null)
             {
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
@@ -193,6 +201,10 @@ namespace BusinessLogic.Services
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
                 dto.RatingCount = distributor.RatingCount;
+                dto.SmallScaleProjectCount = distributor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = distributor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = distributor.LargeScaleProjectCount;
+                dto.ReputationPoints = distributor.ReputationPoints;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
                 dto.DistributorEmail = distributor.Email ?? string.Empty;
                 dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;

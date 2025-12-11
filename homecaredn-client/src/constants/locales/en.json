@@ -33,7 +33,6 @@
     "about_feature3": "Thorough and professional",
     "about_experience": "Years",
     "about_experience1": "Experience",
-
     "facts_aria": "Workflow",
     "fact_step1_title": "Find suitable contractors/distributors",
     "fact_step1_desc": "Provide requirements, scope and budget for the system to suggest suitable partners.",
@@ -43,7 +42,6 @@
     "fact_step3_desc": "Compare profiles, negotiate terms and choose the most suitable option.",
     "fact_step4_title": "Connect & work",
     "fact_step4_desc": "Sign agreements, monitor progress, acceptance and post-construction support.",
-
     "features_subtitle": "Why Choose Us!",
     "features_title": "Our Specialization And Company Features",
     "features_intro": "We provide a comprehensive solution for finding and managing construction contractors. From partner selection, progress monitoring to quality assurance, the system helps you save time and costs in every project.",
@@ -53,21 +51,16 @@
     "features_item3_title": "A large number of grateful customers",
     "features_item4_title": "Always reliable and affordable prices",
     "features_item_desc": "Optimal, transparent and fast solutions in every stage of construction and repair projects.",
-
     "services_subtitle": "Our Services",
     "services_title": "Construction And Renovation Solutions",
     "services_more": "More Services",
-
     "material_subtitle": "Our Materials",
     "material_title": "Materials for Construction and Renovation",
     "material_more": "More Materials",
-
     "service_construction_more": "More Constructions",
     "service_repair_more": "More Repairs",
-
     "default": "Default",
     "noDescription": "Description not available",
-
     "testimonial_subtitle": "Testimonial",
     "testimonial_title": "What Our Happy Clients Say!",
     "testimonial_intro": "The construction and repair service management system is really impressive. The interface is friendly, easy to use, helping me save time and manage my work more effectively.",
@@ -430,7 +423,18 @@
       "higherThanEstimate": "Higher than the estimate by {{value}} million",
       "section_chat": "Chat with Contractor",
       "noMessages": "No messages yet",
-      "noChatFunction": "This feature is only available after you’ve selected a contractor"
+      "noChatFunction": "This feature is only available after you’ve selected a contractor",
+      "reputationTooltip": "Reputation score is calculated based on reviews and completed project values",
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "smallScaleProjects": "Small",
+      "mediumScaleProjects": "Medium",
+      "largeScaleProjects": "Large",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     },
     "materialRequest": {
       "title": "Material Requests",
@@ -482,7 +486,18 @@
       "confirmAccept": "Are you sure you accept this application?",
       "confirmReject": "Are you sure you reject this application?",
       "waiting": "Application has been accepted please wait for distributor confirmation.",
-      "alreadyRejected": "The application was rejected."
+      "alreadyRejected": "The application was rejected.",
+      "reputationTooltip": "Reputation score is calculated based on reviews and completed order values",
+      "reputationTooltipTitle": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "smallScaleProjects": "Small",
+      "mediumScaleProjects": "Medium",
+      "largeScaleProjects": "Large",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "contractorServiceRequestManager": {
@@ -672,7 +687,8 @@
     },
     "description": "Description",
     "estimate": "Estimate",
-    "commission_due": "Commission Due",
+    "commission_amount": "Commission Amount",
+    "commission_due": "Commission Due Time",
     "apply_at": "Applied At",
     "last_update": "Last Update",
     "notifications": "Notifications",
@@ -687,6 +703,7 @@
     "latest_applications": "Latest Applications",
     "view_all": "View All",
     "contractor_portal": "Portal",
+    "distributor_portal": "Portal",
     "id": "ID",
     "view": "View",
     "search_placeholder": "Search applications",
@@ -700,7 +717,6 @@
     "my_projects": "My Projects",
     "applications": "Applications",
     "profile": "Profile",
-
     "retry": "Retry",
     "no_requests": "No requests",
     "access_denied": "Access denied. Contractor role required.",
@@ -748,7 +764,6 @@
     "noCategory": "No category yet",
     "letStart": "Start by adding your first category."
   },
-
   "distributorMaterialManager": {
     "title": "Material Manager",
     "material": "materials",
@@ -796,7 +811,22 @@
     "customerReviews": "Customer Reviews",
     "totalReviews": "total reviews",
     "noReviews": "No reviews yet",
-    "noReviewsDesc": "Complete projects to receive customer reviews"
+    "noReviewsDesc": "Complete projects to receive customer reviews",
+    "reputation": "Reputation",
+    "reputationTooltip": "Reputation score is calculated based on reviews and completed work value",
+    "reputationTooltipTitle": "Reputation points by project value:",
+    "reputationTooltipTitleOrder": "Reputation points by order value:",
+    "reputationSmall": "• Under 1 billion: +1 point",
+    "reputationMedium": "• 1-10 billion: +5 points",
+    "reputationLarge": "• Over 10 billion: +10 points",
+    "projectsByScale": "Projects",
+    "ordersByScale": "Projects by Scale",
+    "smallScale": "Small scale",
+    "mediumScale": "Medium scale",
+    "largeScale": "Large scale",
+    "smallScaleTooltip": "Under 1 billion VND",
+    "mediumScaleTooltip": "From 1 - 10 billion VND",
+    "largeScaleTooltip": "Over 10 billion VND"
   },
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
@@ -1013,7 +1043,20 @@
       "rating": "Rating",
       "createAt": "Created At",
       "quotedItems": "Quoted Items List",
-      "price": "Price"
+      "price": "Price",
+      "reputation": "Reputation",
+      "reputationTooltip": "Reputation score is calculated based on reviews and completed order value",
+      "reputationTooltipTitle": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "ordersByScale": "Projects by Scale",
+      "smallScale": "Small scale",
+      "mediumScale": "Medium scale",
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminServiceManager": {
@@ -1092,7 +1135,20 @@
       "reviewInfo": "Review Information",
       "reviewComment": "Comment",
       "reviewImages": "Review Images",
-      "reviewedAt": "Reviewed At"
+      "reviewedAt": "Reviewed At",
+      "reputation": "Reputation",
+      "reputationTooltip": "Reputation score is calculated based on reviews and completed project value",
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "projectsByScale": "Projects by scale",
+      "smallScale": "Small scale",
+      "mediumScale": "Medium scale",
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminPartnerManager": {
@@ -1177,7 +1233,22 @@
       "historyMR": "Material request history",
       "historyDA": "Material order history",
       "history": "No history yet",
-      "chatWithUser": "Chat with user"
+      "chatWithUser": "Chat with user",
+      "reputation": "Reputation",
+      "reputationTooltip": "Reputation score is calculated based on reviews and completed work value",
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationTooltipTitleOrder": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "projectsByScale": "Projects",
+      "ordersByScale": "Projects by Scale",
+      "smallScale": "Small scale",
+      "mediumScale": "Medium scale",
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminSupportManager": {
@@ -1401,7 +1472,6 @@
       "title": "Are you sure?",
       "text": "This category will be deleted and cannot be restored!"
     },
-
     "DeleteSupportModal": {
       "title": "Delete this support request?",
       "text": "This action cannot be undone."
@@ -1500,7 +1570,6 @@
     "LOGIN_TOKEN_EXPIRED": "Session has expired, please log in again.",
     "LOGIN_GOOGLE": "Google login failed.",
     "REGISTER_ALREADY_EXISTS": "Email is already registered.",
-
     "NULL_NAME": "Please enter your full name.",
     "NULL_PHONE": "Please enter your phone number.",
     "NULL_EMAIL": "Please enter your email.",
@@ -1509,23 +1578,19 @@
     "NULL_PARTNERTYPE": "Please select a role.",
     "NULL_IMAGES": "Please upload company images.",
     "NULL_PASSWORD": "Please enter password",
-
     "INVALID_FULLNAME": "Full name must be between 2 and 50 characters.",
     "INVALID_PHONE": "Invalid phone number.",
     "INVALID_EMAIL": "Invalid email.",
-
     "ADDRESS_NOT_FOUND": "Address not found.",
     "ADDRESS_ID_MISMATCH": "Address ID does not match.",
     "ADDRESS_MAX": "You can only add up to 5 addresses.",
     "NETWORK_ERROR": "Cannot connect to the server, please try again later!",
-
     "MAXIMUM_IMAGE": "You can only upload up to 5 images.",
     "MAXIMUM_IMAGE_SIZE": "Each image must be less than 5 MB.",
     "MAXIMUM_DOCUMENT": "You can only upload up to 5 documents.",
     "MAXIMUM_DOCUMENT_SIZE": "Each document must be less than 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "You can only have 3 service requests at the same time!",
     "MAXIMUM_MATERIAL_REQUEST": "You can only have 3 material requests at the same time!",
-
     "BRAND_NOT_FOUND": "Brand not found.",
     "BRAND_NAME_ALREADY_EXISTS": "Brand name already exists.",
     "CATEGORY_NOT_FOUND": "Category not found.",
@@ -1534,7 +1599,6 @@
     "MATERIAL_NAME_ALREADY_EXISTS": "Material name already exists.",
     "IMAGE_NOT_FOUND": "Image not found.",
     "NOT_FOUND_EMAIL": "Email for verification not found.",
-
     "REQUIRED_BRANDNAME": "Please enter the brand name.",
     "REQUIRED_BRANDLOGO": "Please upload the brand logo.",
     "REQUIRED_CATEGORYNAME": "Please enter the category name.",
@@ -1549,38 +1613,30 @@
     "REQUIRED_ADDRESS": "Please provide address information before creating a request!",
     "REQUIRED_PHONE_NUMBER": "Please provide phone number before creating a request!",
     "IN_USE_ADDRESS": "This address is in use and cannot be deleted!",
-
     "REQUIRD_REJECT_REASON": "Please enter reject reason",
-
     "PARTNER_REQUEST_NOT_FOUND": "Request not found.",
     "PARTNER_REQUEST_REJECTED": "Your most recent application was rejected please try again in 3 days",
     "PARTNER_REQUEST_PENDING": "This email has created a request and is under review!",
-
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Please select an address!",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Please provide more description for better search results!",
     "REQUIRED_SERVICE_TYPE": "Please select a service type!",
     "REQUIRED_PACKAGE_OPTION": "Please select a package option!",
     "REQUIRED_BUILDING_TYPE": "Please select a building type!",
     "REQUIRED_STRUCTURE_TYPE": "Please select the main structure type!",
-
     "COOKIE_NOT_FOUND": "Cookie not found, please log in again.",
     "LOAD_ERROR": "An error occurred while loading data. Please try again later.",
     "SUBMIT_ERROR": "An error occurred while submitting data. Please try again later.",
     "DELETE_ERROR": "An error occurred while deleting. Please try again later.",
     "UPDATE_ERROR": "An error occurred while updating. Please try again later.",
-
     "REQUIRED_ESTIMATE_PRICE": "Required estimate price",
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Required contractor apply description",
-
     "UNAUTHORIZED_ACCESS": "Unauthorized access",
     "UNAUTHORIZED_ACCESS_DESCRIPTION": "You do not have permission to access this resource",
-
     "NOTFOUND": "Resource not found",
     "NOTFOUND_DESCRIPTION": "The requested resource could not be found",
     "FORBIDDEN": "You do not have permission to access this page!",
     "NOT_FOUND": "Requested page not found!",
     "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!",
-
     "EMPTY_DESCRIPTION": "Please provide a detailed description!",
     "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
   },
