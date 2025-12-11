@@ -179,7 +179,7 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div className="relative lg:w-[48%] flex items-center border-2 border-orange-200 rounded-full  transition-all">
+          <div className="relative w-full max-w-[600px] mx-auto flex items-center border-2 border-orange-200 rounded-full  transition-all">
             <div className="relative flex items-center border-r-2 border-orange-200 bg-white rounded-l-full">
               <select className="appearance-none py-3 pl-4 pr-10 bg-transparent text-gray-700 text-sm font-bold cursor-pointer focus:outline-none">
                 <option>Material</option>
