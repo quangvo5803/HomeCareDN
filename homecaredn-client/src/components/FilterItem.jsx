@@ -1,85 +1,132 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useEnums } from "../hook/useEnums";
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 
-function FilterService({ title, options, name, selectedValue, onChange }) {
-    const [isExpanded, setIsExpanded] = useState(true);
+function FilterService({
+    title,
+    options = [],
+    name,
+    selectedValue,
+    onChange,
+    isSort = false,
+    sortValue,
+    sortOptions = [],
+    onSortChange
+}) {
+    const [open, setOpen] = useState(false);
+    const wrapperRef = useRef(null);
     const { t } = useTranslation();
 
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
     return (
-        <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-white hover:border-gray-300 transition-colors">
+        <div ref={wrapperRef} className="relative inline-block">
+
+            {/* BUTTON */}
             <button
-                type="button"
-                className="w-full flex items-center justify-between group"
-                onClick={() => setIsExpanded(!isExpanded)}
+                onClick={() => setOpen(!open)}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 
+                           bg-white border border-gray-300 hover:bg-gray-50 rounded-full w-full cursor-pointer"
             >
-                <h2 className="font-semibold text-base md:text-lg text-gray-800">{title}</h2>
+                <span className="truncate">
+                    {title}:{" "}
+                    {!isSort
+                        ? selectedValue
+                            ? t(`Enums.${name}.${selectedValue}`)
+                            : t("common.All")
+                        : sortOptions.find(s => s.value === sortValue)?.label
+                    }
+                </span>
 
-                <div className="flex items-center gap-2">
-                    {/* Clear button */}
-                    {selectedValue && (
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onChange(null);
-                            }}
-                            className="text-red-500 hover:text-red-700 transition-colors p-1"
-                            aria-label="Clear selection"
-                        >
-                            <i className="fa-solid fa-xmark text-sm"></i>
-                        </button>
-                    )}
-
-                    {/* Toggle button */}
+                {!isSort && selectedValue && (
                     <i
-                        className={`fas fa-chevron-down text-gray-500 group-hover:text-gray-700 transition-all duration-300 text-sm ${isExpanded ? "rotate-180" : ""
-                            }`}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onChange(null);
+                        }}
+                        className="fas fa-times text-xs text-gray-600 hover:text-gray-900"
                     ></i>
-                </div>
+                )}
+
+                <i
+                    className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${open ? "rotate-180" : ""
+                        }`}
+                ></i>
             </button>
 
+            {open && (
+                <div className="absolute top-full mt-2 left-0 bg-white border shadow-lg z-20 min-w-[200px]">
+                    <div className="py-2">
 
-            <div
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-60 mt-4 opacity-100" : "max-h-0 opacity-0"
-                    }`}
-            >
-                <div className="max-h-52 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                    <ul className="space-y-3">
-                        {options.map((item) => (
-                            <li key={item.value}>
-                                <label
-                                    htmlFor={`${title}-${item.value}`}
-                                    className="flex items-center cursor-pointer group/item hover:bg-gray-50 -mx-2 px-2 py-1.5 rounded transition-colors"
+                        {isSort ? (
+                            // SORT LIST
+                            sortOptions.map(opt => (
+                                <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                        onSortChange(opt.value);
+                                        setOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2 text-left flex justify-between cursor-pointer${sortValue === opt.value ? "font-bold" : ""}`}
                                 >
-                                    <input
-                                        id={`${title}-${item.value}`}
-                                        type="radio"
-                                        name={name}
-                                        value={item.value}
-                                        checked={selectedValue === item.value}
-                                        onChange={(e) => onChange(e.target.value)}
-                                        className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer"
-                                    />
-                                    <span className="ml-3 text-sm text-gray-700 group-item/hover:text-gray-900">
-                                        {t(`Enums.${name}.${item.value}`)}
-                                    </span>
-                                </label>
-                            </li>
-                        ))}
-                    </ul>
+                                    {opt.label}
+                                    {sortValue === opt.value && <i className="fas fa-check"></i>}
+                                </button>
+                            ))
+                        ) : (
+                            // FILTER LIST
+                            <>
+                                <button
+                                    onClick={() => {
+                                        onChange(null);
+                                        setOpen(false);
+                                    }}
+                                    className={`w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer ${!selectedValue ? "font-semibold" : ""}`}
+                                >
+                                    {t("common.All")}
+                                </button>
+
+                                {options.map(opt => (
+                                    <button
+                                        key={opt.value}
+                                        onClick={() => {
+                                            onChange(opt.value);
+                                            setOpen(false);
+                                        }}
+                                        className={`w-full px-4 py-2 text-left hover:bg-gray-100 cursor-pointer ${selectedValue === opt.value ? "font-semibold" : ""}`}
+                                    >
+                                        {t(`Enums.${name}.${opt.value}`)}
+                                    </button>
+                                ))}
+                            </>
+                        )}
+
+                    </div>
                 </div>
-            </div>
+            )}
+
         </div>
     );
 }
+
 FilterService.propTypes = {
     title: PropTypes.string.isRequired,
     options: PropTypes.array.isRequired,
     name: PropTypes.string.isRequired,
-    selectedValue: PropTypes.string,
+    selectedValue: PropTypes.any.isRequired,
     onChange: PropTypes.func.isRequired,
+    isSort: PropTypes.bool.isRequired,
+    sortValue: PropTypes.any.isRequired,
+    sortOptions: PropTypes.array.isRequired,
+    onSortChange: PropTypes.func.isRequired
 };
 
 export default function FilterItem({
@@ -93,21 +140,57 @@ export default function FilterItem({
     onDesignStyleChange,
     //Material
     itemType,
-    label,
-    options,
-    selectedValue,
-    onChange,
-    name,
-    nameEN,
-    valueID,
+    showSortDropdown,
+    showCategoryDropdown,
+    showBrandDropdown,
+    setShowSortDropdown,
+    setShowCategoryDropdown,
+    setShowBrandDropdown,
+    sortOption,
+    setSortOption,
+    categories,
+    selectedCategoryId,
+    setSelectedCategoryId,
+    brands,
+    selectedBrandId,
+    setSelectedBrandId,
+    getSortLabel,
+    getCategoryLabel,
+    getBrandLabel,
+    hasActiveFilters,
+    resetAllFilters,
+    setCurrentPage,
 
 }) {
     const enums = useEnums();
     const { t, i18n } = useTranslation();
-    const [isOpen, setIsOpen] = useState(false);
 
     if (itemType.type === 'service') {
         const filterService = [
+            {
+                key: "sort",
+                title: t("common.sort"),
+                isSort: true,
+                sortValue: sortOption,
+                sortOptions: [
+                    { value: "random", label: t("home.default") },
+                    {
+                        value: i18n.language === "vi" ? "servicename" : "servicenameen",
+                        label: "A → Z"
+                    },
+                    {
+                        value:
+                            i18n.language === "vi"
+                                ? "servicename_desc"
+                                : "servicenameen_desc",
+                        label: "Z → A"
+                    }
+                ],
+                onSortChange: (v) => {
+                    setSortOption(v);
+                    setCurrentPage(1);
+                }
+            },
             {
                 key: "packageOption",
                 title: t("sharedEnums.packageOption"),
@@ -143,17 +226,35 @@ export default function FilterItem({
         ];
 
         return (
-            <div className="lg:col-span-1 w-75 mt-20">
-                {filterService.map((fs) => (
-                    <FilterService
-                        key={fs.key}
-                        title={fs.title}
-                        name={fs.name}
-                        options={fs.options}
-                        selectedValue={fs.selectedValue}
-                        onChange={fs.onChange}
-                    />
-                ))}
+            <div className="mb-6 pb-4 border-b border-gray-200">
+                <div className="mb-3 flex flex-wrap gap-3">
+                    {filterService.map((fs) => (
+                        <FilterService
+                            key={fs.key}
+                            title={fs.title}
+                            name={fs.name}
+                            options={fs.options}
+                            selectedValue={fs.selectedValue}
+                            onChange={fs.onChange}
+                            isSort={fs.isSort}
+                            sortValue={fs.sortValue}
+                            sortOptions={fs.sortOptions}
+                            onSortChange={fs.onSortChange}
+                        />
+                    ))}
+
+                </div>
+                {/* Active Tags */}
+                {hasActiveFilters && (
+                    <div className="flex flex-wrap items-center gap-2">
+                        <button
+                            onClick={resetAllFilters}
+                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium cursor-pointer"
+                        >
+                            {t("common.resetFilter")}
+                        </button>
+                    </div>
+                )}
             </div>
         );
     }
@@ -161,83 +262,241 @@ export default function FilterItem({
     //Filter Material
     if (itemType.type === 'material') {
         return (
-            <div className="relative w-full">
-                {/* Trigger Button */}
-                <button
-                    type="button"
-                    onClick={() => setIsOpen(!isOpen)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 pr-10 border rounded-lg text-left transition-all ${selectedValue
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-300 bg-white hover:border-gray-400'
-                        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                >
-                    <span className="text-sm md:text-base font-medium truncate">
-                        {selectedValue
-                            ? (() => {
-                                const op = options?.find(op => op[valueID] === selectedValue);
-                                return op?.[i18n.language === 'vi' ? name : nameEN || name];
-                            })()
-                            : label}
-                    </span>
-                </button>
+            <div className="mb-6 pb-4 border-b border-gray-200">
+                <div className="flex flex-wrap gap-3 mb-3">
+                    {/* Sort Filter */}
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                setShowSortDropdown(!showSortDropdown);
+                                setShowCategoryDropdown(false);
+                                setShowBrandDropdown(false);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
+                        >
+                            <span>
+                                {t("common.sort")} {getSortLabel()}
+                            </span>
+                            <i
+                                className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${showSortDropdown ? "rotate-180" : ""
+                                    }`}
+                            ></i>
+                        </button>
 
-                {selectedValue && (
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onChange('');
-                        }}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors z-20"
-                        aria-label="Clear selection"
-                    >
-                        <i className="fa-solid fa-xmark text-base"></i>
-                    </button>
-                )}
+                        {showSortDropdown && (
+                            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px]">
+                                <div className="py-2">
+                                    <button
+                                        onClick={() => {
+                                            setSortOption("random");
+                                            setCurrentPage(1);
+                                            setShowSortDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "random" ? "font-semibold" : ""
+                                            }`}
+                                    >
+                                        {t("home.default")}
+                                    </button>
 
-                {/* Icon dropdown */}
-                {!selectedValue && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <i
-                            className={`fa-solid fa-chevron-down text-xs transition-transform duration-200 ${isOpen ? 'rotate-180' : ''
-                                }`}
-                        />
+                                    <button
+                                        onClick={() => {
+                                            setSortOption(
+                                                i18n.language === "vi"
+                                                    ? "materialname"
+                                                    : "materialnameen"
+                                            );
+                                            setCurrentPage(1);
+                                            setShowSortDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "materialname" ||
+                                            sortOption === "materialnameen"
+                                            ? "font-semibold"
+                                            : ""
+                                            }`}
+                                    >
+                                        A-Z
+                                    </button>
+
+                                    <button
+                                        onClick={() => {
+                                            setSortOption(
+                                                i18n.language === "vi"
+                                                    ? "materialname_desc"
+                                                    : "materialnameen_desc"
+                                            );
+                                            setCurrentPage(1);
+                                            setShowSortDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${sortOption === "materialname_desc" ||
+                                            sortOption === "materialnameen_desc"
+                                            ? "font-semibold"
+                                            : ""
+                                            }`}
+                                    >
+                                        Z-A
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                setShowCategoryDropdown(!showCategoryDropdown);
+                                setShowSortDropdown(false);
+                                setShowBrandDropdown(false);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
+                        >
+                            <span>{t("common.category")}</span>
+                            <i
+                                className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${showCategoryDropdown ? "rotate-180" : ""
+                                    }`}
+                            ></i>
+                        </button>
+
+                        {showCategoryDropdown && (
+                            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px] max-h-[300px] overflow-y-auto">
+                                <div className="py-2">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedCategoryId("");
+                                            setCurrentPage(1);
+                                            setShowCategoryDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedCategoryId ? "" : "font-semibold"
+                                            }`}
+                                    >
+                                        {t("common.All")}
+                                    </button>
+
+                                    {categories.map((category) => (
+                                        <button
+                                            key={category.categoryID}
+                                            onClick={() => {
+                                                setSelectedCategoryId(category.categoryID);
+                                                setCurrentPage(1);
+                                                setShowCategoryDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedCategoryId === category.categoryID
+                                                ? "font-semibold"
+                                                : ""
+                                                }`}
+                                        >
+                                            {i18n.language === "vi"
+                                                ? category.categoryName
+                                                : category.categoryNameEN || category.categoryName}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Brand Filter */}
+                    <div className="relative">
+                        <button
+                            onClick={() => {
+                                setShowBrandDropdown(!showBrandDropdown);
+                                setShowSortDropdown(false);
+                                setShowCategoryDropdown(false);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 hover:bg-gray-50 rounded-full cursor-pointer"
+                        >
+                            <span>{t("common.brand")}</span>
+                            <i
+                                className={`fas fa-chevron-down text-xs text-gray-600 transition-transform ${showBrandDropdown ? "rotate-180" : ""
+                                    }`}
+                            ></i>
+                        </button>
+
+                        {showBrandDropdown && (
+                            <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 min-w-[200px] max-h-[300px] overflow-y-auto">
+                                <div className="py-2">
+                                    <button
+                                        onClick={() => {
+                                            setSelectedBrandId("");
+                                            setCurrentPage(1);
+                                            setShowBrandDropdown(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedBrandId ? "" : "font-semibold"
+                                            }`}
+                                    >
+                                        {t("common.All")}
+                                    </button>
+
+                                    {brands.map((brand) => (
+                                        <button
+                                            key={brand.brandID}
+                                            onClick={() => {
+                                                setSelectedBrandId(brand.brandID);
+                                                setCurrentPage(1);
+                                                setShowBrandDropdown(false);
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer ${selectedBrandId === brand.brandID
+                                                ? "font-semibold"
+                                                : ""
+                                                }`}
+                                        >
+                                            {i18n.language === "vi"
+                                                ? brand.brandName
+                                                : brand.brandNameEN || brand.brandName}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Active Tags */}
+                {hasActiveFilters && (
+                    <div className="flex flex-wrap items-center gap-2">
+                        {selectedCategoryId && (
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-900 rounded-full text-sm">
+                                <span className="font-medium">
+                                    {t("common.category")}: {getCategoryLabel()}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        setSelectedCategoryId("");
+                                        setCurrentPage(1);
+                                    }}
+                                    className="text-gray-600 hover:text-gray-900"
+                                >
+                                    <i className="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                        )}
+
+                        {selectedBrandId && (
+                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-900 rounded-full text-sm">
+                                <span className="font-medium">
+                                    {t("common.brand")}: {getBrandLabel()}
+                                </span>
+                                <button
+                                    onClick={() => {
+                                        setSelectedBrandId("");
+                                        setCurrentPage(1);
+                                    }}
+                                    className="text-gray-600 hover:text-gray-900"
+                                >
+                                    <i className="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={resetAllFilters}
+                            className="text-sm text-gray-900 hover:text-gray-600 underline font-medium cursor-pointer"
+                        >
+                            {t("common.resetFilter")}
+                        </button>
                     </div>
                 )}
-
-                {/* Dropdown Menu */}
-                {isOpen && (
-                    <>
-                        <button
-                            type="button"
-                            className="fixed inset-0 z-10 bg-transparent cursor-default"
-                            onClick={() => setIsOpen(false)}
-                            aria-label="Close modal"
-                        ></button>
-
-                        {/* Options */}
-                        <div className="absolute z-20 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                            {options?.map((op) => (
-                                <button
-                                    key={op[valueID]}
-                                    type="button"
-                                    onClick={() => {
-                                        onChange(op[valueID]);
-                                        setIsOpen(false);
-                                    }}
-                                    className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg ${selectedValue === op[valueID]
-                                        ? 'bg-blue-50 text-blue-700 font-medium'
-                                        : 'text-gray-700'
-                                        }`}
-                                >
-                                    {i18n.language === 'vi' ? op[name] : op[nameEN] || op[name]}
-                                </button>
-                            ))}
-                        </div>
-                    </>
-                )}
             </div>
-
         );
     }
 }
@@ -252,13 +511,26 @@ FilterItem.propTypes = {
     onDesignStyleChange: PropTypes.func.isRequired,
     //material
     itemType: PropTypes.object.isRequired,
-    label: PropTypes.string,
-    options: PropTypes.array,
-    selectedValue: PropTypes.string,
-    onChange: PropTypes.func,
-    name: PropTypes.string,
-    valueID: PropTypes.string,
-    nameEN: PropTypes.string,
+    showSortDropdown: PropTypes.bool,
+    showCategoryDropdown: PropTypes.bool,
+    showBrandDropdown: PropTypes.bool,
+    setShowSortDropdown: PropTypes.func,
+    setShowCategoryDropdown: PropTypes.func,
+    setShowBrandDropdown: PropTypes.func,
+    sortOption: PropTypes.any,
+    setSortOption: PropTypes.func,
+    categories: PropTypes.array,
+    selectedCategoryId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    setSelectedCategoryId: PropTypes.func,
+    brands: PropTypes.array,
+    selectedBrandId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    setSelectedBrandId: PropTypes.func,
+    getSortLabel: PropTypes.func,
+    getCategoryLabel: PropTypes.func,
+    getBrandLabel: PropTypes.func,
+    hasActiveFilters: PropTypes.bool,
+    resetAllFilters: PropTypes.func,
+    setCurrentPage: PropTypes.func
 };
 
 
