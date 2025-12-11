@@ -62,6 +62,24 @@ export default function DistributorDashboard() {
     revenue: getMonthlyDataset(data, labels, 'totalValue'),
   });
 
+  // Calculate commission based on estimate price
+  const calculateCommission = (estimatePrice) => {
+    if (!estimatePrice) return 0;
+    const price = Number(estimatePrice);
+    let commission = 0;
+    
+    if (price <= 500_000_000) {
+      commission = price * 0.02; // 2%
+    } else if (price <= 2_000_000_000) {
+      commission = price * 0.015; // 1.5%
+    } else {
+      commission = price * 0.01; // 1%
+      if (commission > 100_000_000) commission = 100_000_000; // Max 100M
+    }
+    
+    return commission;
+  };
+
   const fetchLatestApplications = useCallback(async () => {
     if (!user?.id) return;
     try {
@@ -495,6 +513,9 @@ export default function DistributorDashboard() {
                       {t('partnerDashboard.estimate')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.commission_amount')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       {t('partnerDashboard.commission_due')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -511,7 +532,7 @@ export default function DistributorDashboard() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {!latestApplications || latestApplications.length === 0 ? (
                     <tr>
-                      <td colSpan="6" className="px-6 py-12 text-center">
+                      <td colSpan="7" className="px-6 py-12 text-center">
                         <div className="flex flex-col items-center">
                           <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
                           <p className="text-gray-500 font-medium">
@@ -532,6 +553,12 @@ export default function DistributorDashboard() {
                         <td className="px-6 py-4 text-sm font-semibold text-gray-900">
                           {app.totalEstimatePrice
                             ? formatVND(app.totalEstimatePrice)
+                            : '-'}
+                        </td>
+                        {/* Commission Amount */}
+                        <td className="px-6 py-4 text-sm font-semibold text-orange-600">
+                          {app.totalEstimatePrice
+                            ? formatVND(calculateCommission(app.totalEstimatePrice))
                             : '-'}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
@@ -599,6 +626,17 @@ export default function DistributorDashboard() {
                           <span className="font-bold text-gray-900">
                             {app.totalEstimatePrice
                               ? formatVND(app.totalEstimatePrice)
+                              : '-'}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            {t('partnerDashboard.commission_amount')}:
+                          </span>
+                          <span className="font-bold text-orange-600">
+                            {app.totalEstimatePrice
+                              ? formatVND(calculateCommission(app.totalEstimatePrice))
                               : '-'}
                           </span>
                         </div>

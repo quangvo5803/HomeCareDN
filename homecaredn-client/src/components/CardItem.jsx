@@ -57,7 +57,7 @@ export default function CardItem({ item }) {
   };
 
   return (
-    <div className="group flex flex-col h-full bg-white border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden">
+    <div className="group flex flex-col h-full bg-white border-2 border-gray-300 hover:border-orange-400 rounded-lg transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
       {/* Badge */}
       <div className="relative">
         {/* Image Container */}
@@ -140,14 +140,14 @@ export default function CardItem({ item }) {
           <div className="space-y-2">
             <button
               onClick={() => handleAddNewMaterialRequest(item.materialID)}
-              className="w-full py-2.5 border-2 border-black text-black font-bold text-sm bg-white  hover:border-orange-500 hover:text-orange-500"
+              className="w-full py-2.5 border-2 border-black text-black font-bold text-sm bg-white hover:border-orange-500 hover:text-orange-500 rounded-lg transition-colors duration-200"
             >
               {t('BUTTON.AddNewRequest')}
             </button>
 
             <button
               onClick={() => handleAddExistingMaterialRequest()}
-              className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition-colors duration-200"
+              className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition-colors duration-200 border-2 border-orange-500 hover:border-orange-600 rounded-lg"
             >
               {t('BUTTON.AddToExisting')}
             </button>
@@ -157,7 +157,7 @@ export default function CardItem({ item }) {
         {item.type === 'service' && (
           <button
             onClick={() => handleAddNewServiceRequest(item)}
-            className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-colors duration-200"
+            className="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm transition-colors duration-200 border-2 border-orange-500 hover:border-orange-600 rounded-lg"
           >
             {t('BUTTON.AddNewRequest')}
           </button>

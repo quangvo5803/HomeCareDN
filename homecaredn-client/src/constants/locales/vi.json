@@ -37,7 +37,6 @@
     "about_feature3": "Đầy đủ và chuyên nghiệp",
     "about_experience": "Năm",
     "about_experience1": "Kinh nghiệm",
-
     "facts_aria": "Quy trình làm việc",
     "fact_step1_title": "Tìm nhà thầu/nhà phân phối phù hợp",
     "fact_step1_desc": "Cung cấp yêu cầu, phạm vi và ngân sách để hệ thống đề xuất đối tác phù hợp.",
@@ -47,7 +46,6 @@
     "fact_step3_desc": "So sánh hồ sơ, thương lượng điều khoản và chọn phương án phù hợp nhất.",
     "fact_step4_title": "Kết nối & làm việc",
     "fact_step4_desc": "Ký thoả thuận, theo dõi tiến độ, nghiệm thu và hỗ trợ sau thi công.",
-
     "features_subtitle": "Tại sao chọn chúng tôi!",
     "features_title": "Chuyên môn của chúng tôi và các tính năng của công ty",
     "features_intro": "Chúng tôi mang đến giải pháp toàn diện cho việc tìm kiếm và quản lý nhà thầu xây dựng. Từ khâu lựa chọn đối tác, giám sát tiến độ cho đến đảm bảo chất lượng, hệ thống giúp bạn tiết kiệm thời gian và chi phí trong mỗi dự án.",
@@ -57,21 +55,16 @@
     "features_item3_title": "Một lượng lớn khách hàng tri ân",
     "features_item4_title": "Luôn đáng tin cậy và giá cả phải chăng",
     "features_item_desc": "Giải pháp tối ưu, minh bạch và nhanh chóng trong mọi giai đoạn của dự án xây dựng và sửa chữa.",
-
     "services_subtitle": "Dịch vụ của chúng tôi",
     "services_title": "Giải pháp xây dựng và cải tạo",
     "services_more": "Thêm dịch vụ",
-
     "material_subtitle": "Vật liệu của chúng tôi",
     "material_title": "Vật liệu xây dựng và cải tạo",
     "material_more": "Xem thêm",
-
     "service_construction_more": "Xem thêm",
     "service_repair_more": "Xem thêm",
-
     "default": "Mặc định",
     "noDescription": "Mô tả không có sẵn",
-
     "testimonial_subtitle": "Lời chứng thực",
     "testimonial_title": "Những khách hàng hài lòng của chúng tôi nói gì!",
     "testimonial_intro": "Hệ thống quản lý dịch vụ xây dựng và sửa chữa thực sự ấn tượng. Giao diện thân thiện, dễ sử dụng, giúp tôi tiết kiệm thời gian và quản lý công việc hiệu quả hơn.",
@@ -307,7 +300,6 @@
       }
     }
   },
-
   "userPage": {
     "profile": {
       "title": "Hồ Sơ Của Tôi",
@@ -433,7 +425,18 @@
       "higherThanEstimate": "Cao hơn dự toán {{value}} triệu",
       "section_chat": "Trò chuyện với nhà thầu",
       "noMessages": "Chưa có tin nhắn nào",
-      "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu"
+      "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu",
+      "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "smallScaleProjects": "Nhỏ",
+      "mediumScaleProjects": "Vừa",
+      "largeScaleProjects": "Lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     },
     "materialRequest": {
       "title": "Yêu cầu vật liệu",
@@ -485,7 +488,18 @@
       "confirmAccept": "Bạn có chắc chắn muốn chấp nhận đơn này không?",
       "confirmReject": "Bạn có chắc chắn muốn từ chối đơn này không?",
       "waiting": "Đơn ứng tuyển đã được chấp nhận vui lòng chờ nhà phân phối xác nhận.",
-      "alreadyRejected": "Đơn ứng tuyển đã bị từ chối."
+      "alreadyRejected": "Đơn ứng tuyển đã bị từ chối.",
+      "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "smallScaleProjects": "Nhỏ",
+      "mediumScaleProjects": "Vừa",
+      "largeScaleProjects": "Lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "contractorServiceRequestManager": {
@@ -661,6 +675,7 @@
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
+    "title_dis": "Bảng Điều Khiển Nhà Phân Phối",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
       "open_requests": "Yêu cầu Mở",
@@ -670,7 +685,8 @@
     },
     "description": "Mô tả",
     "estimate": "Ước tính",
-    "commission_due": "Khoản hoa hồng phải trả",
+    "commission_amount": "Khoản hoa hồng phải trả",
+    "commission_due": "Thời gian trả hoa hồng",
     "apply_at": "Ngày ứng tuyển",
     "last_update": "Cập nhật lần cuối",
     "notifications": "Thông báo",
@@ -685,6 +701,7 @@
     "latest_applications": "Các Đơn Mới Nhất",
     "view_all": "Xem Tất Cả",
     "contractor_portal": "Cổng Thông Tin",
+    "distributor_portal": "Cổng Thông Tin ",
     "id": "Mã",
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
@@ -794,7 +811,22 @@
     "customerReviews": "Đánh giá từ khách hàng",
     "totalReviews": "lượt đánh giá",
     "noReviews": "Chưa có đánh giá",
-    "noReviewsDesc": "Hãy hoàn thành các dự án để nhận đánh giá từ khách hàng"
+    "noReviewsDesc": "Hãy hoàn thành các dự án để nhận đánh giá từ khách hàng",
+    "reputation": "Uy tín",
+    "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công việc đã hoàn thành",
+    "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+    "reputationTooltipTitleOrder": "Điểm uy tín theo giá trị đơn hàng:",
+    "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+    "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+    "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+    "projectsByScale": "Dự án theo quy mô",
+    "ordersByScale": "Dự án theo quy mô",
+    "smallScale": "Quy mô nhỏ",
+    "mediumScale": "Quy mô vừa",
+    "largeScale": "Quy mô lớn",
+    "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+    "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+    "largeScaleTooltip": "Trên 10 tỷ VNĐ"
   },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
@@ -1007,7 +1039,20 @@
       "reviewInfo": "Thông tin đánh giá",
       "reviewComment": "Bình luận",
       "reviewImages": "Hình ảnh đánh giá",
-      "reviewedAt": "Đánh giá lúc"
+      "reviewedAt": "Đánh giá lúc",
+      "reputation": "Uy tín",
+      "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "projectsByScale": "Dự án theo quy mô",
+      "smallScale": "Quy mô nhỏ",
+      "mediumScale": "Quy mô vừa",
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminMaterialManager": {
@@ -1087,7 +1132,20 @@
       "rating": "Đánh Giá",
       "createAt": "Ngày Tạo",
       "quotedItems": "Danh Sách Báo Giá",
-      "price": "Giá"
+      "price": "Giá",
+      "reputation": "Uy tín",
+      "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "ordersByScale": "Dự án theo quy mô",
+      "smallScale": "Quy mô nhỏ",
+      "mediumScale": "Quy mô vừa",
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminPartnerManager": {
@@ -1174,7 +1232,22 @@
       "historyMR": "Lịch sử yêu cầu vật liệu",
       "historyDA": "Lịch sử đơn hàng vật liệu",
       "history": "Chưa có lịch sử nào",
-      "chatWithUser": "Chat với người dùng"
+      "chatWithUser": "Chat với người dùng",
+      "reputation": "Uy tín",
+      "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công việc đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationTooltipTitleOrder": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "projectsByScale": "Dự án theo quy mô",
+      "ordersByScale": "Dự án theo quy mô",
+      "smallScale": "Quy mô nhỏ",
+      "mediumScale": "Quy mô vừa",
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminSupportManager": {
@@ -1385,6 +1458,7 @@
       "create": "Hãy cho chúng tôi biết trải nghiệm của bạn với nhà thầu này.",
       "rating": "Đánh giá",
       "ratingStar": "Sao",
+      "reputationPoints": "điểm uy tín",
       "comment": "Nhận xét",
       "commentPlaceholder": "Viết nhận xét của bạn ở đây...",
       "images": "Hình ảnh",
@@ -1407,7 +1481,6 @@
       "title": "Bạn có chắc chắn?",
       "text": "Vật liệu này sẽ bị xóa và không thể khôi phục!"
     },
-
     "DeleteServiceModal": {
       "title": "Bạn có chắc chắn?",
       "text": "Dịch vụ này sẽ bị xóa và không thể khôi phục!"
@@ -1494,7 +1567,6 @@
     "LOGIN_TOKEN_EXPIRED": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
     "LOGIN_GOOGLE": "Đăng nhập Google không thành công",
     "REGISTER_ALREADY_EXISTS": "Email đã được đăng ký.",
-
     "NULL_NAME": "Vui lòng nhập họ và tên.",
     "NULL_PHONE": "Vui lòng nhập số điện thoại.",
     "NULL_EMAIL": "Vui lòng nhập email.",
@@ -1506,19 +1578,16 @@
     "INVALID_FULLNAME": "Họ tên phải từ 2 đến 50 ký tự.",
     "INVALID_PHONE": "Số điện thoại không hợp lệ.",
     "INVALID_EMAIL": "Email không hợp lệ.",
-
     "ADDRESS_NOT_FOUND": "Không tìm thấy địa chỉ.",
     "ADDRESS_ID_MISMATCH": "ID địa chỉ không khớp.",
     "ADDRESS_MAX": "Bạn chỉ có thể thêm tối đa 5 địa chỉ.",
     "NETWORK_ERROR": "Không thể kết nối tới máy chủ, vui lòng thử lại sau!",
-
     "MAXIMUM_IMAGE": "Bạn chỉ có thể tải lên tối đa 5 ảnh.",
     "MAXIMUM_IMAGE_SIZE": "Mỗi ảnh dung lượng phải < 5 MB.",
     "MAXIMUM_DOCUMENT": "Bạn chỉ có thể tải lên tối đa 5 tài liệu.",
     "MAXIMUM_DOCUMENT_SIZE": "Mỗi tài liệu dung lượng phải < 5 MB.",
     "MAXIMUM_SERVICE_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu dịch vụ!",
     "MAXIMUM_MATERIAL_REQUEST": "Bạn chỉ có thể có cùng lúc 3 yêu cầu vật liệu!",
-
     "BRAND_NOT_FOUND": "Không tìm thấy thương hiệu.",
     "BRAND_NAME_ALREADY_EXISTS": "Thương hiệu đã tồn tại",
     "CATEGORY_NOT_FOUND": "Không tìm thấy danh mục.",
@@ -1527,7 +1596,6 @@
     "MATERIAL_NAME_ALREADY_EXISTS": "Vật liệu đã tồn tại.",
     "IMAGE_NOT_FOUND": "Không tìm thấy ảnh.",
     "NOT_FOUND_EMAIL": "Không tìm thấy Email để xác thực.",
-
     "REQUIRED_BRANDNAME": "Vui lòng nhập tên thương hiệu.",
     "REQUIRED_BRANDLOGO": "Vui lòng tải lên logo thương hiệu.",
     "REQUIRED_CATEGORYNAME": "Vui lòng nhập tên danh mục.",
@@ -1541,38 +1609,30 @@
     "REQUIRED_ADDRESS": "Vui lòng cung cấp thông tin địa chỉ trước khi tạo yêu cầu",
     "REQUIRED_PHONE_NUMBER": "Vui lòng cung cấp số điện thoại liên lạc trước khi tạo yêu cầu",
     "IN_USE_ADDRESS": "Địa chỉ này đang được sử dụng không thể xóa được!",
-
     "REQUIRD_REJECT_REASON": "Vui lòng nhập lí do từ chối",
-
     "PARTNER_REQUEST_NOT_FOUND": "Không tìm thấy yêu cầu",
     "PARTNER_REQUEST_REJECTED": "Đơn đăng kí của bạn gần nhất đã bị từ chối vui lòng thử lại sau 3 ngày",
     "PARTNER_REQUEST_PENDING": "Email này đã tạo đơn yêu cầu và đang trong thời gian xét duyệt!",
-
     "REQUIRED_SERVICE_REQUEST_ADDRESS": "Vui lòng chọn địa chỉ!",
     "REQUIRED_SERVICE_REQUEST_DESCRIPTION": "Vui lòng điền thêm mô tả để có kết quả tìm kiếm tốt nhấ!",
     "REQUIRED_SERVICE_TYPE": "Vui lòng chọn loại dịch vụ!",
     "REQUIRED_PACKAGE_OPTION": "Vui lòng chọn gọi dịch vụ!",
     "REQUIRED_BUILDING_TYPE": "Vui lòng chọn loại công trình!",
     "REQUIRED_STRUCTURE_TYPE": "Vui lòng chọn kết cấu chính!",
-
     "COOKIE_NOT_FOUND": "Không tìm thấy cookie, vui lòng đăng nhập lại.",
     "LOAD_ERROR": "Đã có lỗi xảy ra khi tải dữ liệu. Vui lòng thử lại sau.",
     "SUBMIT_ERROR": "Đã có lỗi xảy ra khi gửi dữ liệu. Vui lòng thử lại sau.",
     "DELETE_ERROR": "Đã có lỗi xảy ra khi xóa. Vui lòng thử lại sau.",
     "UPDATE_ERROR": "Đã có lỗi xảy ra khi cập nhật. Vui lòng thử lại sau.",
-
     "REQUIRED_ESTIMATE_PRICE": "Yêu cầu giá ước tính",
     "REQUIRED_CONTRACTOR_APPLY_DESCRIPTION": "Yêu cầu mô tả",
-
     "UNAUTHORIZED_ACCESS": "Không được phép truy cập",
     "UNAUTHORIZED_ACCESS_DESCRIPTION": "Bạn không có quyền truy cập tài nguyên này",
-
     "NOTFOUND": "Không tìm thấy tài nguyên",
     "NOTFOUND_DESCRIPTION": "Tài nguyên bạn đang tìm kiếm không tồn tại",
     "FORBIDDEN": "Bạn không có quyền truy cập trang này!",
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
     "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
-
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
     "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
   },
@@ -1656,7 +1716,6 @@
       "Rustic": "Mộc mạc",
       "Other": "Khác"
     },
-
     "PartnerType": {
       "Distributor": "Nhà phân phối",
       "DistributorDescription": "Cung cấp vật liệu xây dựng",
