@@ -10,7 +10,9 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
 import useRealtime from '../realtime/useRealtime';
-
+import { useSearch } from '../hook/useSearch';
+import { aiChatService } from '../services/aiChatService';
+import LoadingComponent from './LoadingComponent';
 // Navigation data
 const navItems = [
   { label: 'header.home', href: '/', type: 'link' },
@@ -48,6 +50,15 @@ export default function Header() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const { fetchSearchHistory, fetchSearchMaterial, fetchSearchService, loading: searchLoading } = useSearch();
+
+  const [type, setType] = useState("Material");
+  const [searchText, setSearchText] = useState("");
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [results, setResults] = useState([]);
+  const wrapperRef = useRef(null);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
   const toggleServices = () => setIsServicesOpen((v) => !v);
 
   const closeMobileNav = () => {
@@ -160,6 +171,140 @@ export default function Header() {
     fetchNotifications();
   }, [t, user]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowHistory(false);
+        setSearchText('');
+        setAiSuggestions([])
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleFocusSearch = async () => {
+    if (user) {
+      const res = await fetchSearchHistory({
+        FilterID: user.id,
+        PageNumber: 1,
+        PageSize: 5,
+      });
+      setHistory(res || []);
+    } else {
+      const local = JSON.parse(localStorage.getItem("guest_history") || "[]");
+      setHistory(local.slice(0, 5));
+    }
+    setResults([]);
+    setShowHistory(true);
+  };
+
+  //AI
+  const fetchAiSuggest = async (userId, history = [], searchType) => {
+    if (!history) return [];
+    try {
+      const dto = { UserID: userId, History: history, SearchType: searchType };
+      const res = await aiChatService.searchWithAi(dto);
+      return res || [];
+    } catch (err) {
+      toast.error(handleApiError(err));
+      return [];
+    }
+  };
+
+  // Realtime search
+  const handleInputChange = async (e) => {
+    const text = e.target.value;
+    setSearchText(text);
+
+    if (!text.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const params = {
+      search: text,
+      FinalSearch: true,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+    const res =
+      type === "Material"
+        ? await fetchSearchMaterial(params)
+        : await fetchSearchService(params);
+    setResults((res || []).slice(0, 5));
+
+    const historyList = user
+      ? (await fetchSearchHistory({ FilterID: user.id, PageNumber: 1, PageSize: 5 })) || []
+      : JSON.parse(localStorage.getItem("guest_history") || "[]").slice(0, 5);
+
+    const formattedHistory = historyList.map(item => item.searchTerm);
+    const aiRes = await fetchAiSuggest(user.id, formattedHistory, type);
+    setAiSuggestions(aiRes.slice(0, 5));
+
+    setShowHistory(true);
+  };
+
+  const handleSearch = async () => {
+    const query = searchText.trim();
+    if (!query) return;
+
+    const params = {
+      search: query,
+      FinalSearch: false,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+
+    if (!user) {
+      const old = JSON.parse(localStorage.getItem("guest_history") || "[]");
+      const updated = [query, ...old.filter((x) => x !== query)].slice(0, 5);
+      localStorage.setItem("guest_history", JSON.stringify(updated));
+    }
+
+    if (type === "Material") {
+      await fetchSearchMaterial(params);
+    }
+    else {
+      await fetchSearchService(params);
+    }
+    setShowHistory(false);
+    navigate(`/ItemViewAll?type=${type}&search=${query}`);
+  };
+
+  const handleSelectItem = async (item) => {
+    const name = item.searchTerm || item.name || item.nameEN || item;
+    if (!name) return;
+
+    setSearchText(name);
+
+    const params = {
+      search: name,
+      FinalSearch: false,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+
+    if (type === "Material") {
+      await fetchSearchMaterial(params);
+    }
+    else {
+      await fetchSearchService(params);
+    }
+    if (!user) {
+      const old = JSON.parse(localStorage.getItem("guest_history") || "[]");
+      const updated = [name, ...old.filter((x) => x !== name)].slice(0, 5);
+      localStorage.setItem("guest_history", JSON.stringify(updated));
+    }
+
+    setShowHistory(false);
+    navigate(`/ItemViewAll?type=${type}&search=${name}`);
+  };
+
+  const hasResults = results.length === 0 && !history.some(item =>
+    (item.searchTerm || item.name || item.nameEN || item).toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <header
       id="top"
@@ -179,23 +324,148 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div className="relative w-full max-w-[600px] mx-auto flex items-center border-2 border-orange-200 rounded-full  transition-all">
-            <div className="relative flex items-center border-r-2 border-orange-200 bg-white rounded-l-full">
-              <select className="appearance-none py-3 pl-4 pr-10 bg-transparent text-gray-700 text-sm font-bold cursor-pointer focus:outline-none">
-                <option>Material</option>
-                <option>Repair</option>
-                <option>Construction</option>
-              </select>
-              <i className="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+          <div ref={wrapperRef} className="relative w-full max-w-xl">
+            {/* INPUT WRAPPER */}
+            <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
+              {/* SELECT TYPE */}
+              <div className="relative flex items-center bg-gradient-to-br from-blue-50 to-indigo-50 border-r border-gray-200">
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  className="appearance-none py-4 pl-5 pr-12 bg-transparent text-gray-700 font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset rounded-l-2xl transition-all"
+                >
+                  <option value="Material">{t('header.material')}</option>
+                  <option value="Repair">{t('header.repair')}</option>
+                  <option value="Construction">{t('header.construction')}</option>
+                </select>
+                <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none" />
+              </div>
+
+              {/* INPUT */}
+              <div className="relative flex-1 flex items-center">
+                <i className="fas fa-search absolute left-5 text-gray-400 text-lg" />
+                <input
+                  type="text"
+                  value={searchText}
+                  onChange={handleInputChange}
+                  onFocus={handleFocusSearch}
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                  placeholder={t('header.placeholder')}
+                  className="w-full py-4 pl-14 pr-5 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
+                />
+              </div>
+
+              {/* SEARCH BUTTON */}
+              <button
+                onClick={handleSearch}
+                className="px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200 flex items-center justify-center"
+              >
+                <i className="fas fa-arrow-right text-lg" />
+              </button>
             </div>
-            <div className="relative flex-1 bg-white rounded-r-full">
-              <input
-                type="text"
-                placeholder={t('header.search')}
-                className="w-full py-3 pl-12 pr-4 bg-transparent focus:outline-none text-gray-700"
-              />
-              <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
-            </div>
+
+            {/* DROPDOWN HISTORY / RESULTS */}
+            {showHistory && (
+              <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
+                <div className="max-h-96 overflow-y-auto">
+                  {searchLoading ? (
+                    // SHOW LOADING
+                    <div className="flex justify-center items-center py-12">
+                      <LoadingComponent />
+                    </div>
+                  ) : hasResults ? (
+                    <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
+                      <i className="fas fa-search text-6xl" />
+                      <span className="text-sm font-medium">{t('header.noResult')}</span>
+                    </div>
+                  ) : (
+                    <>
+                      {/* SEARCH RESULTS */}
+                      {results.length > 0 && (
+                        <div className="border-b border-gray-100">
+                          <div className="px-4 py-2 bg-gray-50">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              <i className="fas fa-box-open mr-2" />
+                              {t('header.searchResult')}
+                            </span>
+                          </div>
+                          {results.map((item, i) => (
+                            <div
+                              key={i}
+                              onMouseDown={() => handleSelectItem(item)}
+                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group"
+                            >
+                              {item.imageUrls?.[0] && (
+                                <img
+                                  src={item.imageUrls[0]}
+                                  alt={item.name}
+                                  className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                                />
+                              )}
+                              <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">{item.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* AI SUGGESTIONS */}
+                      {aiSuggestions.length > 0 && (
+                        <div className="border-b border-gray-100">
+                          <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
+                              <i className="fas fa-robot mr-2" />
+                              {t('header.ai')}
+                            </span>
+                          </div>
+                          {aiSuggestions.map((item, i) => (
+                            <div
+                              key={i}
+                              onMouseDown={() => handleSelectItem(item)}
+                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150 group"
+                            >
+                              {item.imageUrls?.[0] && (
+                                <img
+                                  src={item.imageUrls[0]}
+                                  alt={item.name}
+                                  className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                                />
+                              )}
+                              <span className="text-blue-600 font-medium group-hover:text-blue-700">
+                                {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* SEARCH HISTORY */}
+                      {history.length > 0 && (
+                        <div>
+                          <div className="px-4 py-2 bg-gray-50">
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              <i className="fas fa-clock-rotate-left mr-2" />
+                              {t('header.searchHistory')}
+                            </span>
+                          </div>
+                          {history.map((item, i) => (
+                            <div
+                              key={i}
+                              onMouseDown={() => handleSelectItem(item)}
+                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors duration-150 group"
+                            >
+                              <i className="fas fa-history text-gray-400 group-hover:text-gray-600 transition-colors text-lg" />
+                              <span className="text-gray-600 group-hover:text-gray-800 transition-colors">
+                                {item.searchTerm || item}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Navigation Menu (Desktop) */}

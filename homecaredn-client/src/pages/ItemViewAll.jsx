@@ -80,9 +80,6 @@ export default function ItemViewAll() {
         FilterBrandID: selectedBrandId || null,
       });
     } else {
-      console.log("currentPage:", currentPage);
-      console.log("pageSize:", pageSize);
-      console.log("sortOption:", sortOption);
       fetchServices({
         PageNumber: currentPage,
         PageSize: pageSize,

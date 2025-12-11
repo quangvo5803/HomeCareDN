@@ -44,6 +44,7 @@ namespace DataAccess.UnitOfWork
         public IPaymentTransactionsRepository PaymentTransactionsRepository { get; private set; }
         public IReviewRepository ReviewRepository { get; private set; }
         public INotificationRepository NotificationRepository { get; private set; }
+        public ISearchHistoryRepository SearchHistoryRepository { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db, IOptions<CloudinaryOptions> cloudinaryOptions)
         {
@@ -67,6 +68,7 @@ namespace DataAccess.UnitOfWork
             PaymentTransactionsRepository = new PaymentTransactionsRepository(_db);
             ReviewRepository = new ReviewRepository(_db);
             NotificationRepository = new NotificationRepository(_db);
+            SearchHistoryRepository = new SearchHistoryRepository(_db);
         }
 
         public async Task SaveAsync()

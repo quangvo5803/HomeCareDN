@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.Interfaces;
@@ -8,6 +9,7 @@ using DataAccess.UnitOfWork;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Org.BouncyCastle.Utilities.Collections;
 using Ultitity.Clients.Groqs;
 using Ultitity.Exceptions;
 
@@ -20,6 +22,8 @@ namespace BusinessLogic.Services
         private readonly IDistributedCache _cache;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHostEnvironment _env;
+        private readonly IMaterialService _materialService;
+        private readonly IServicesService _servicesService;
 
         private const string MESSAGE = "Message";
         private const string SYSTEM = "system";
@@ -54,6 +58,9 @@ namespace BusinessLogic.Services
               BẮT BUỘC: Chỉ trả về mảng JSON thuần túy (Array String). Không Markdown, không giải thích.
               Ví dụ: [""sửa điện"", ""thợ điện"", ""bóng đèn""]";
 
+        private const string SYSTEM_PROMPT_SEARCH =
+            @"Bạn là trợ lý tìm kiếm thông minh. Nhiệm vụ của bạn là dựa trên lịch sử tìm kiếm của người dùng để gợi ý các từ khóa liên quan, có thể dùng cho tìm kiếm sản phẩm (Material) hoặc dịch vụ (Repair/Construction). Trả về kết quả dưới dạng JSON danh sách từ khóa.";
+
         private const string SYSTEM_PROMPT_ESTIMATE =
             @"Bạn là Chuyên gia Dự toán Xây dựng HomeCareDN.
               Context: {0}
@@ -66,7 +73,9 @@ namespace BusinessLogic.Services
             IDistributedCache cache,
             IUnitOfWork unitOfWork,
             IConfiguration config,
-            IHostEnvironment env
+            IHostEnvironment env,
+            IMaterialService materialService,
+            IServicesService servicesService
         )
         {
             _groq = groq;
@@ -74,6 +83,8 @@ namespace BusinessLogic.Services
             _unitOfWork = unitOfWork;
             _config = config;
             _env = env;
+            _materialService = materialService;
+            _servicesService = servicesService;
         }
 
         public async Task<AiChatResponseDto> ChatSupportAsync(AiChatRequestDto dto)
@@ -110,9 +121,9 @@ namespace BusinessLogic.Services
             return new AiChatResponseDto { Reply = result };
         }
 
-        public async Task<List<string>> SuggestSearchAsync(string query)
+        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSearchDto)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            if (string.IsNullOrWhiteSpace(aiSearchDto.UserID))
             {
                 var error = new Dictionary<string, string[]>
                 {
@@ -120,8 +131,59 @@ namespace BusinessLogic.Services
                 };
                 throw new CustomValidationException(error);
             }
-            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SUGGEST, query);
-            return ExtractJsonList(result, query);
+            var history = aiSearchDto.History ?? new List<string>();
+            string prompt = $@"
+Người dùng có UserID '{aiSearchDto.UserID}' đã tìm kiếm: {string.Join(", ", history)}.
+Loại tìm kiếm: {aiSearchDto.SearchType}.
+            
+Chỉ gợi ý 5-10 từ khóa liên quan cho loại tìm kiếm {aiSearchDto.SearchType}.
+Chỉ trả về danh sách JSON các từ khóa, ví dụ: [""từ khóa 1"", ""từ khóa 2""], không thêm mô tả khác.
+";
+            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SEARCH, prompt);
+            return ExtractJsonList(result, aiSearchDto.UserID);
+        }
+
+        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSearchDto)
+        {
+            if (string.IsNullOrWhiteSpace(aiSearchDto.UserID))
+            {
+                var error = new Dictionary<string, string[]>
+                {
+                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
+                };
+                throw new CustomValidationException(error);
+            }
+            var aiKeywords = await SuggestSearchAsync(aiSearchDto);
+            var results = new List<object>();
+
+            foreach (var keyword in aiKeywords)
+            {
+                var parameter = new QueryParameters
+                {
+                    Search = keyword,
+                    SearchType = aiSearchDto.SearchType
+                };
+
+                switch (aiSearchDto.SearchType)
+                {
+                    case "Material":
+                        var materialResult = await _materialService.GetAllMaterialAsync(parameter);
+                        results.AddRange(materialResult.Items);
+                        break;
+
+                    case "Repair":
+                    case "Construction":
+                        var serviceResult = await _servicesService.GetAllServicesAsync(parameter);
+                        results.AddRange(serviceResult.Items);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            results = results.Distinct().ToList();
+
+            return results;
         }
 
         public async Task<AiServiceRequestPredictionResponseDto> EstimatePriceAsync(
