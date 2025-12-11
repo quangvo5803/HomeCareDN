@@ -7,6 +7,7 @@ import i18n from '../../configs/i18n';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL + '/api',
+  timeout: 300000,
   withCredentials: true,
 });
 
