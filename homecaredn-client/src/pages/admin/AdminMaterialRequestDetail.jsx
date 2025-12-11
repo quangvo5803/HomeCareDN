@@ -588,9 +588,13 @@ export default function AdminMaterialRequestDetail() {
                         {selectedDistributor.reputationPoints ?? 0}
                       </p>
                       {/* Tooltip */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t('adminMaterialRequestManager.distributorDetail.reputationTooltip') || 
-                          'Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành'}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg min-w-max">
+                        <div className="font-semibold mb-1">
+                          {t('adminMaterialRequestManager.distributorDetail.reputationTooltipTitle') || 'Điểm uy tín theo giá trị đơn hàng:'}
+                        </div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -601,18 +605,30 @@ export default function AdminMaterialRequestDetail() {
                         {t('adminMaterialRequestManager.distributorDetail.ordersByScale') || 'Đơn hàng theo quy mô'}
                       </p>
                       <div className="flex items-center gap-3 text-sm">
-                        <span className="flex items-center gap-1" title={t('adminMaterialRequestManager.distributorDetail.smallScale') || 'Quy mô nhỏ'}>
+                        <div className="group/small relative flex items-center gap-1 cursor-help">
                           <i className="fas fa-box text-green-400"></i>
                           <span className="font-bold text-green-700">{selectedDistributor.smallScaleProjectCount ?? 0}</span>
-                        </span>
-                        <span className="flex items-center gap-1" title={t('adminMaterialRequestManager.distributorDetail.mediumScale') || 'Quy mô vừa'}>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/medium relative flex items-center gap-1 cursor-help">
                           <i className="fas fa-boxes text-yellow-500"></i>
                           <span className="font-bold text-yellow-600">{selectedDistributor.mediumScaleProjectCount ?? 0}</span>
-                        </span>
-                        <span className="flex items-center gap-1" title={t('adminMaterialRequestManager.distributorDetail.largeScale') || 'Quy mô lớn'}>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/large relative flex items-center gap-1 cursor-help">
                           <i className="fas fa-warehouse text-red-500"></i>
                           <span className="font-bold text-red-600">{selectedDistributor.largeScaleProjectCount ?? 0}</span>
-                        </span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 

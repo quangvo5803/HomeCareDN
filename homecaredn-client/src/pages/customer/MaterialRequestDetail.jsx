@@ -1157,9 +1157,16 @@ export default function MaterialRequestDetail() {
                     ?
                   </span>
                   {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                    {t('userPage.materialRequestDetail.reputationTooltip') ||
-                      'Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành'}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
+                    <div className="font-semibold mb-1">
+                      {t('userPage.materialRequestDetail.reputationTooltipTitle') ||
+                        'Điểm uy tín theo giá trị đơn hàng:'}
+                    </div>
+                    <div className="space-y-0.5">
+                      <div>{t('userPage.materialRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                      <div>{t('userPage.materialRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                      <div>{t('userPage.materialRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                    </div>
                     <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                   </div>
                 </span>
@@ -1169,14 +1176,8 @@ export default function MaterialRequestDetail() {
 
               {/* Cột phải - Số đơn hàng theo quy mô */}
               <div className="flex flex-col gap-1 text-slate-600">
-                <div
-                  className="flex items-center gap-2"
-                  title={
-                    t('userPage.materialRequestDetail.smallScaleProjects') ||
-                    'Đơn hàng quy mô nhỏ'
-                  }
-                >
-                  <i className="fas fa-box text-green-400 w-4 text-center"></i>
+                <div className="flex items-center gap-2 group/small relative">
+                  <i className="fas fa-box text-green-400 w-4 text-center cursor-help"></i>
                   <span className="text-xs">
                     {t('userPage.materialRequestDetail.smallScaleProjects') ||
                       'Nhỏ'}
@@ -1185,15 +1186,14 @@ export default function MaterialRequestDetail() {
                   <span className="font-semibold">
                     {selectedDistributor.smallScaleProjectCount ?? 0}
                   </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
                 </div>
-                <div
-                  className="flex items-center gap-2"
-                  title={
-                    t('userPage.materialRequestDetail.mediumScaleProjects') ||
-                    'Đơn hàng quy mô vừa'
-                  }
-                >
-                  <i className="fas fa-boxes text-yellow-500 w-4 text-center"></i>
+                <div className="flex items-center gap-2 group/medium relative">
+                  <i className="fas fa-boxes text-yellow-500 w-4 text-center cursor-help"></i>
                   <span className="text-xs">
                     {t('userPage.materialRequestDetail.mediumScaleProjects') ||
                       'Vừa'}
@@ -1202,15 +1202,14 @@ export default function MaterialRequestDetail() {
                   <span className="font-semibold">
                     {selectedDistributor.mediumScaleProjectCount ?? 0}
                   </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
                 </div>
-                <div
-                  className="flex items-center gap-2"
-                  title={
-                    t('userPage.materialRequestDetail.largeScaleProjects') ||
-                    'Đơn hàng quy mô lớn'
-                  }
-                >
-                  <i className="fas fa-warehouse text-red-500 w-4 text-center"></i>
+                <div className="flex items-center gap-2 group/large relative">
+                  <i className="fas fa-warehouse text-red-500 w-4 text-center cursor-help"></i>
                   <span className="text-xs">
                     {t('userPage.materialRequestDetail.largeScaleProjects') ||
                       'Lớn'}
@@ -1219,6 +1218,11 @@ export default function MaterialRequestDetail() {
                   <span className="font-semibold">
                     {selectedDistributor.largeScaleProjectCount ?? 0}
                   </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1475,11 +1479,16 @@ export default function MaterialRequestDetail() {
                               ?
                             </span>
                             {/* Tooltip */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                              {t(
-                                'userPage.materialRequestDetail.reputationTooltip'
-                              ) ||
-                                'Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành'}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
+                              <div className="font-semibold mb-1">
+                                {t('userPage.materialRequestDetail.reputationTooltipTitle') ||
+                                  'Điểm uy tín theo giá trị đơn hàng:'}
+                              </div>
+                              <div className="space-y-0.5">
+                                <div>{t('userPage.materialRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                                <div>{t('userPage.materialRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                                <div>{t('userPage.materialRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                              </div>
                               <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                             </div>
                           </span>

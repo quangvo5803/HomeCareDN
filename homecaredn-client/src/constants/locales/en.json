@@ -425,9 +425,16 @@
       "noMessages": "No messages yet",
       "noChatFunction": "This feature is only available after you’ve selected a contractor",
       "reputationTooltip": "Reputation score is calculated based on reviews and completed project values",
-      "smallScaleProjects": "Small-scale projects",
-      "mediumScaleProjects": "Medium-scale projects",
-      "largeScaleProjects": "Large-scale projects"
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "smallScaleProjects": "Small",
+      "mediumScaleProjects": "Medium",
+      "largeScaleProjects": "Large",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     },
     "materialRequest": {
       "title": "Material Requests",
@@ -481,9 +488,16 @@
       "waiting": "Application has been accepted please wait for distributor confirmation.",
       "alreadyRejected": "The application was rejected.",
       "reputationTooltip": "Reputation score is calculated based on reviews and completed order values",
-      "smallScaleProjects": "Small-scale orders",
-      "mediumScaleProjects": "Medium-scale orders",
-      "largeScaleProjects": "Large-scale orders"
+      "reputationTooltipTitle": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "smallScaleProjects": "Small",
+      "mediumScaleProjects": "Medium",
+      "largeScaleProjects": "Large",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "contractorServiceRequestManager": {
@@ -800,11 +814,19 @@
     "noReviewsDesc": "Complete projects to receive customer reviews",
     "reputation": "Reputation",
     "reputationTooltip": "Reputation score is calculated based on reviews and completed work value",
+    "reputationTooltipTitle": "Reputation points by project value:",
+    "reputationTooltipTitleOrder": "Reputation points by order value:",
+    "reputationSmall": "• Under 1 billion: +1 point",
+    "reputationMedium": "• 1-10 billion: +5 points",
+    "reputationLarge": "• Over 10 billion: +10 points",
     "projectsByScale": "Projects",
-    "ordersByScale": "Orders",
+    "ordersByScale": "Projects by Scale",
     "smallScale": "Small scale",
     "mediumScale": "Medium scale",
-    "largeScale": "Large scale"
+    "largeScale": "Large scale",
+    "smallScaleTooltip": "Under 1 billion VND",
+    "mediumScaleTooltip": "From 1 - 10 billion VND",
+    "largeScaleTooltip": "Over 10 billion VND"
   },
   "adminNavbar": {
     "searchPlaceholder": "Type here...",
@@ -1024,10 +1046,17 @@
       "price": "Price",
       "reputation": "Reputation",
       "reputationTooltip": "Reputation score is calculated based on reviews and completed order value",
-      "ordersByScale": "Orders by scale",
+      "reputationTooltipTitle": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
+      "ordersByScale": "Projects by Scale",
       "smallScale": "Small scale",
       "mediumScale": "Medium scale",
-      "largeScale": "Large scale"
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminServiceManager": {
@@ -1109,10 +1138,17 @@
       "reviewedAt": "Reviewed At",
       "reputation": "Reputation",
       "reputationTooltip": "Reputation score is calculated based on reviews and completed project value",
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
       "projectsByScale": "Projects by scale",
       "smallScale": "Small scale",
       "mediumScale": "Medium scale",
-      "largeScale": "Large scale"
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminPartnerManager": {
@@ -1200,11 +1236,19 @@
       "chatWithUser": "Chat with user",
       "reputation": "Reputation",
       "reputationTooltip": "Reputation score is calculated based on reviews and completed work value",
+      "reputationTooltipTitle": "Reputation points by project value:",
+      "reputationTooltipTitleOrder": "Reputation points by order value:",
+      "reputationSmall": "• Under 1 billion: +1 point",
+      "reputationMedium": "• 1-10 billion: +5 points",
+      "reputationLarge": "• Over 10 billion: +10 points",
       "projectsByScale": "Projects",
-      "ordersByScale": "Orders",
+      "ordersByScale": "Projects by Scale",
       "smallScale": "Small scale",
       "mediumScale": "Medium scale",
-      "largeScale": "Large scale"
+      "largeScale": "Large scale",
+      "smallScaleTooltip": "Under 1 billion VND",
+      "mediumScaleTooltip": "1 - 10 billion VND",
+      "largeScaleTooltip": "Over 10 billion VND"
     }
   },
   "adminSupportManager": {

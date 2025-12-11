@@ -423,9 +423,16 @@
       "noMessages": "Chưa có tin nhắn nào",
       "noChatFunction": "Tính năng này chỉ có khi bạn đã chọn được nhà thầu",
       "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành",
-      "smallScaleProjects": "Dự án quy mô nhỏ",
-      "mediumScaleProjects": "Dự án quy mô vừa",
-      "largeScaleProjects": "Dự án quy mô lớn"
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "smallScaleProjects": "Nhỏ",
+      "mediumScaleProjects": "Vừa",
+      "largeScaleProjects": "Lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     },
     "materialRequest": {
       "title": "Yêu cầu vật liệu",
@@ -479,9 +486,16 @@
       "waiting": "Đơn ứng tuyển đã được chấp nhận vui lòng chờ nhà phân phối xác nhận.",
       "alreadyRejected": "Đơn ứng tuyển đã bị từ chối.",
       "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành",
-      "smallScaleProjects": "Đơn hàng quy mô nhỏ",
-      "mediumScaleProjects": "Đơn hàng quy mô vừa",
-      "largeScaleProjects": "Đơn hàng quy mô lớn"
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "smallScaleProjects": "Nhỏ",
+      "mediumScaleProjects": "Vừa",
+      "largeScaleProjects": "Lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "contractorServiceRequestManager": {
@@ -657,6 +671,7 @@
     "no": "STT",
     "service_type": "Loại dịch vụ",
     "title": "Bảng Điều Khiển Nhà Thầu",
+    "title_dis": "Bảng Điều Khiển Nhà Phân Phối",
     "subtitle": "Quản lý dự án và theo dõi tiến độ",
     "kpi": {
       "open_requests": "Yêu cầu Mở",
@@ -682,6 +697,7 @@
     "latest_applications": "Các Đơn Mới Nhất",
     "view_all": "Xem Tất Cả",
     "contractor_portal": "Cổng Thông Tin",
+    "distributor_portal": "Cổng Thông Tin ",
     "id": "Mã",
     "view": "Xem",
     "search_placeholder": "Tìm kiếm đơn",
@@ -794,11 +810,19 @@
     "noReviewsDesc": "Hãy hoàn thành các dự án để nhận đánh giá từ khách hàng",
     "reputation": "Uy tín",
     "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công việc đã hoàn thành",
-    "projectsByScale": "Dự án",
-    "ordersByScale": "Đơn hàng",
+    "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+    "reputationTooltipTitleOrder": "Điểm uy tín theo giá trị đơn hàng:",
+    "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+    "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+    "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+    "projectsByScale": "Dự án theo quy mô",
+    "ordersByScale": "Dự án theo quy mô",
     "smallScale": "Quy mô nhỏ",
     "mediumScale": "Quy mô vừa",
-    "largeScale": "Quy mô lớn"
+    "largeScale": "Quy mô lớn",
+    "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+    "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+    "largeScaleTooltip": "Trên 10 tỷ VNĐ"
   },
   "adminNavbar": {
     "searchPlaceholder": "Nhập vào đây...",
@@ -1014,10 +1038,17 @@
       "reviewedAt": "Đánh giá lúc",
       "reputation": "Uy tín",
       "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công trình đã hoàn thành",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
       "projectsByScale": "Dự án theo quy mô",
       "smallScale": "Quy mô nhỏ",
       "mediumScale": "Quy mô vừa",
-      "largeScale": "Quy mô lớn"
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminMaterialManager": {
@@ -1100,10 +1131,17 @@
       "price": "Giá",
       "reputation": "Uy tín",
       "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị đơn hàng đã hoàn thành",
-      "ordersByScale": "Đơn hàng theo quy mô",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "ordersByScale": "Dự án theo quy mô",
       "smallScale": "Quy mô nhỏ",
       "mediumScale": "Quy mô vừa",
-      "largeScale": "Quy mô lớn"
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminPartnerManager": {
@@ -1193,11 +1231,19 @@
       "chatWithUser": "Chat với người dùng",
       "reputation": "Uy tín",
       "reputationTooltip": "Điểm uy tín được tính dựa trên đánh giá và giá trị công việc đã hoàn thành",
-      "projectsByScale": "Dự án",
-      "ordersByScale": "Đơn hàng",
+      "reputationTooltipTitle": "Điểm uy tín theo giá trị công trình:",
+      "reputationTooltipTitleOrder": "Điểm uy tín theo giá trị đơn hàng:",
+      "reputationSmall": "• Dưới 1 tỷ: +1 điểm",
+      "reputationMedium": "• Từ 1-10 tỷ: +5 điểm",
+      "reputationLarge": "• Trên 10 tỷ: +10 điểm",
+      "projectsByScale": "Dự án theo quy mô",
+      "ordersByScale": "Dự án theo quy mô",
       "smallScale": "Quy mô nhỏ",
       "mediumScale": "Quy mô vừa",
-      "largeScale": "Quy mô lớn"
+      "largeScale": "Quy mô lớn",
+      "smallScaleTooltip": "Dưới 1 tỷ VNĐ",
+      "mediumScaleTooltip": "Từ 1 - 10 tỷ VNĐ",
+      "largeScaleTooltip": "Trên 10 tỷ VNĐ"
     }
   },
   "adminSupportManager": {
