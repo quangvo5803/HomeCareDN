@@ -12,9 +12,11 @@ import { numberToWordsByLang } from '../../utils/numberToWords';
 import { formatVND } from '../../utils/formatters';
 import Swal from 'sweetalert2';
 import { showDeleteModal } from '../../components/modal/DeleteModal';
+import EstimatePriceAiModal from '../../components/modal/EstimatePriceAiModal';
 import Loading from '../../components/Loading';
 import { detectSensitiveInfo } from '../../utils/detectSensitiveInfo';
 import { extractFileText } from '../../utils/extractFileText';
+import { aiChatService } from '../../services/aiChatService';
 
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
@@ -64,6 +66,11 @@ export default function ServiceRequestCreateUpdate() {
   const [descriptionError, setDescriptionError] = useState(null);
   const [images, setImages] = useState([]);
   const [documents, setDocuments] = useState([]);
+  //AI State
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [aiStage, setAiStage] = useState(1);
+  const [aiProgress, setAiProgress] = useState(0);
+  const [aiResult, setAiResult] = useState(null);
 
   // Memoized translated options - Tối ưu performance cho dropdown
   const translatedServiceTypes = useMemo(
@@ -110,7 +117,16 @@ export default function ServiceRequestCreateUpdate() {
       })) || [],
     [enums?.designStyles, t]
   );
-
+  const isFormValidForAI = useMemo(() => {
+    return !!(
+      serviceType &&
+      buildingType &&
+      width &&
+      length &&
+      floors &&
+      mainStructureType
+    );
+  }, [serviceType, buildingType, width, length, floors, mainStructureType]);
   // Memoized calculated values
   const calculatedArea = useMemo(() => {
     if (width && length && floors) {
@@ -238,27 +254,42 @@ export default function ServiceRequestCreateUpdate() {
   const handleImageChange = useCallback(
     async (e) => {
       const files = Array.from(e.target.files);
+
       if (files.length + images.length > MAX_IMAGES) {
         toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        e.target.value = '';
         return;
       }
 
       const validFiles = [];
+      let invalidCount = 0;
 
       const toastId = toast.loading(t('common.scanDocument'));
 
-      for (const file of files) {
-        const content = await extractFileText(file);
-        const error = detectSensitiveInfo(content);
+      try {
+        for (const file of files) {
+          try {
+            const content = await extractFileText(file);
+            const error = detectSensitiveInfo(content);
 
-        if (!error) validFiles.push(file);
+            if (error) {
+              invalidCount++;
+            } else {
+              validFiles.push(file);
+            }
+          } catch {
+            invalidCount++;
+          }
+        }
+      } finally {
+        toast.dismiss(toastId);
       }
 
-      toast.dismiss(toastId);
+      if (invalidCount > 0) {
+        toast.error(t('common.file_unnecessary', { count: invalidCount }));
+      }
 
       if (validFiles.length === 0) {
-        const invalidCount = files.length - validFiles.length;
-        toast.error(t('common.file_unnecessary', { count: invalidCount }));
         e.target.value = '';
         return;
       }
@@ -268,6 +299,7 @@ export default function ServiceRequestCreateUpdate() {
         url: URL.createObjectURL(file),
         isNew: true,
       }));
+
       setImages((prev) => [...prev, ...mapped]);
       e.target.value = '';
     },
@@ -286,25 +318,39 @@ export default function ServiceRequestCreateUpdate() {
       }
 
       const validFiles = [];
+      let invalidCount = 0;
 
       const toastId = toast.loading(t('common.scanDocument'));
 
-      for (const file of files) {
-        const content = await extractFileText(file);
-        const error = detectSensitiveInfo(content);
-        if (error) {
-          const invalidCount = files.length - validFiles.length;
-          toast.error(t('common.file_unnecessary', { count: invalidCount }));
-        } else {
-          validFiles.push(file);
+      try {
+        for (const file of files) {
+          try {
+            const content = await extractFileText(file);
+            const error = detectSensitiveInfo(content);
+
+            if (error) {
+              invalidCount++;
+            } else {
+              validFiles.push(file);
+            }
+          } catch {
+            invalidCount++;
+          }
         }
+      } finally {
+        toast.dismiss(toastId);
       }
 
+      // Thông báo lỗi cho file không hợp lệ
+      if (invalidCount > 0) {
+        toast.error(t('common.file_unnecessary', { count: invalidCount }));
+      }
+
+      // Không có file hợp lệ → return
       if (validFiles.length === 0) {
         e.target.value = '';
         return;
       }
-      toast.dismiss(toastId);
 
       const mapped = validFiles.map((file) => ({
         file,
@@ -521,7 +567,93 @@ export default function ServiceRequestCreateUpdate() {
       updateServiceRequest,
     ]
   );
+  const handleAIEstimate = useCallback(
+    async () => {
+      if (!isFormValidForAI || isAIProcessing) return;
 
+      setIsAIProcessing(true);
+      setAiProgress(0);
+      setAiStage(1);
+      setAiResult(null);
+
+      try {
+        const dto = {
+          serviceType,
+          packageOption,
+          buildingType,
+          mainStructureType,
+          designStyle,
+          width: Number(width),
+          length: Number(length),
+          floors: Number(floors),
+          description,
+          language: i18n.language,
+        };
+
+        const apiPromise = aiChatService.estimate(dto);
+
+        const animationPromise = (async () => {
+          const stages = [
+            { stage: 1, duration: 3000, progress: 20 },
+            { stage: 2, duration: 3000, progress: 40 },
+            { stage: 3, duration: 3000, progress: 60 },
+            { stage: 4, duration: 3000, progress: 80 },
+          ];
+
+          for (const { stage, duration, progress } of stages) {
+            setAiStage(stage);
+
+            const startProgress = stage === 1 ? 0 : stages[stage - 2].progress;
+            const steps = 30;
+            const stepDuration = duration / steps;
+            const increment = (progress - startProgress) / steps;
+
+            for (let j = 0; j <= steps; j++) {
+              await new Promise((resolve) => setTimeout(resolve, stepDuration));
+              setAiProgress((prev) => Math.min(prev + increment, progress));
+            }
+          }
+        })();
+
+        const [result] = await Promise.all([apiPromise, animationPromise]);
+
+        setAiStage(5);
+        setAiProgress(100);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
+        setAiResult(result);
+      } catch (error) {
+        console.error(error);
+        setIsAIProcessing(false);
+        toast.error(t('ai.error') || 'Có lỗi xảy ra');
+      }
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      isFormValidForAI,
+      isAIProcessing,
+      serviceType,
+      packageOption,
+      buildingType,
+      mainStructureType,
+      designStyle,
+      width,
+      length,
+      floors,
+      description,
+    ]
+  );
+
+  const handleSelectPrice = (price) => {
+    setEstimatePrice(price);
+    setIsAIProcessing(false);
+    setAiResult(null);
+    toast.success(t('userPage.createServiceRequest.priceSelected'));
+  };
+
+  const handleCloseModal = () => {
+    setIsAIProcessing(false);
+    setAiResult(null);
+  };
   if (uploadProgress || isSubmitting || addressLoading) {
     return <Loading progress={uploadProgress} />;
   }
@@ -688,6 +820,7 @@ export default function ServiceRequestCreateUpdate() {
                   <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                     <i className="fas fa-paint-brush text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_designStyle')}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <select
@@ -893,16 +1026,45 @@ export default function ServiceRequestCreateUpdate() {
                     <i className="fas fa-dollar-sign text-orange-500 mr-2"></i>
                     {t('userPage.createServiceRequest.form_estimatePrice')}
                   </label>
-                  <input
-                    type="number"
-                    min={0}
-                    step={1000}
-                    value={estimatePrice}
-                    onChange={(e) => setEstimatePrice(e.target.value)}
-                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
-                    placeholder={t(
-                      'userPage.createServiceRequest.form_estimatePricePlaceholder'
-                    )}
+
+                  <div className="flex gap-3">
+                    <input
+                      type="number"
+                      min={0}
+                      step={1000}
+                      value={estimatePrice}
+                      onChange={(e) => setEstimatePrice(e.target.value)}
+                      className="flex-1 pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-colors"
+                      placeholder={t(
+                        'userPage.createServiceRequest.form_estimatePricePlaceholder'
+                      )}
+                    />
+
+                    {/* AI Button */}
+                    <button
+                      type="button"
+                      onClick={handleAIEstimate}
+                      disabled={!isFormValidForAI}
+                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:from-purple-600 hover:to-pink-600 focus:ring-4 focus:ring-purple-200 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed disabled:transform-none flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <i className="fas fa-brain"></i>
+                      <span>{t('BUTTON.Estimate')}</span>
+                    </button>
+                  </div>
+
+                  {!isFormValidForAI && (
+                    <p className="text-sm text-blue-600 flex items-center mt-2">
+                      <i className="fas fa-info-circle mr-2"></i>
+                      {t('userPage.createServiceRequest.AIrequirementHint')}
+                    </p>
+                  )}
+                  <EstimatePriceAiModal
+                    isOpen={isAIProcessing}
+                    stage={aiStage}
+                    progress={aiProgress}
+                    result={aiResult}
+                    onClose={handleCloseModal}
+                    onSelectPrice={handleSelectPrice}
                   />
                   <div className="flex flex-wrap gap-2 mt-2">
                     {priceMultipliers.map((item) => (
@@ -916,6 +1078,7 @@ export default function ServiceRequestCreateUpdate() {
                       </button>
                     ))}
                   </div>
+
                   {formattedPrice && (
                     <>
                       <p className="text-sm text-gray-500">
@@ -1083,6 +1246,7 @@ export default function ServiceRequestCreateUpdate() {
                     !packageOption ||
                     !buildingType ||
                     !mainStructureType ||
+                    !designStyle ||
                     !length ||
                     !width ||
                     !floors ||
