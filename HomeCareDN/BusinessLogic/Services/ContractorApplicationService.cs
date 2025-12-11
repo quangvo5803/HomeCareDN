@@ -583,6 +583,27 @@ namespace BusinessLogic.Services
                 s.ServiceRequestID == application.ServiceRequestID
             );
             _unitOfWork.ContractorApplicationRepository.Remove(application);
+
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
+                n.DataValue == serviceRequest!.ServiceRequestID.ToString() && !n.IsRead,
+                asNoTracking: false
+            );
+            if (noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var count = noti.PendingCount;
+                if (count <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"user_{serviceRequest?.CustomerID}",
+                    "NotificationContractorApplication.Delete",
+                    new { NotificationID = notiId, PendingCount = count }
+                );
+            }
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{serviceRequest?.CustomerID}",
                 "ContractorApplication.Delete",

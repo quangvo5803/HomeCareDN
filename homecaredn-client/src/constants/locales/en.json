@@ -168,13 +168,16 @@
     "description": "Descriptions",
     "relatedMaterial": "Related Materials"
   },
-  "materialViewAll": {
+  "itemViewAll": {
     "listMaterial": "List of materials",
-    "filter": "Filter Material",
-    "filterCategory": "Material category",
-    "filterBrand": "Material brand",
-    "pagination": "Showing {{start}} – {{end}} of {{totalMaterials}} product(s)",
-    "noMaterial": "No corresponding material"
+    "listRepair": "List of repair services",
+    "listConstruction": "List of construction services",
+    "materials": "materials",
+    "services": "services",
+    "dropMaterial": "Material",
+    "dropRepair": "Repair",
+    "dropConstruction": "Construction",
+    "noItem": "No matching results"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Construction",
@@ -379,7 +382,9 @@
       "calculatedArea": "Construction floor area: ",
       "estimatePrice": "Estimate price: ",
       "estimateInWord": "By word: ",
-      "footer": "You will receive notification as soon as a contractor/distributor applies."
+      "footer": "You will receive notification as soon as a contractor/distributor applies.",
+      "AIrequirementHint": "Please fill in all the information to be able to use AI to refer to bid prices",
+      "priceSelected": "Reference price selected"
     },
     "serviceRequestDetail": {
       "title": "Service Request Details",
@@ -1400,7 +1405,8 @@
     "Accept": "Accept",
     "Reject": "Reject",
     "Approve": "Approve",
-    "Chat": "Chat"
+    "Chat": "Chat",
+    "Estimate": "Reference bid price"
   },
   "ModalPopup": {
     "ReviewModal": {
@@ -1482,6 +1488,33 @@
       "selectedCount": "{{count}} materials selected",
       "searchPlaceholder": "Search by name, category, or brand...",
       "clearSearch": "Clear search"
+    },
+    "EstimatePriceAIModal": {
+      "stage1Title": "Analyzing Project Information",
+      "stage1Desc": "The system is collecting and processing technical parameters...",
+      "stage2Title": "Calculating Material Costs",
+      "stage2Desc": "Estimating material costs based on the total area...",
+      "stage3Title": "Evaluating Labor Costs",
+      "stage3Desc": "Calculating workforce requirements and construction time...",
+      "stage4Title": "Market Analysis",
+      "stage4Desc": "Comparing with similar projects in the area...",
+      "stage5Title": "Finalizing Price Proposal",
+      "stage5Desc": "Compiling and providing the best reference price...",
+      "resultTitle": "Construction Cost Estimate Completed",
+      "resultSubtitle": "AI has analyzed and generated a reference price",
+      "lowEstimate": "Economy Option",
+      "midEstimate": "Recommended",
+      "highEstimate": "Premium Option",
+      "suggestedDescription": "Project Suggestions",
+      "importantNotes": "Construction Notes",
+      "note1": "The below prices are for reference only and may vary depending on location and time of construction.",
+      "note2": "Actual costs depend on material quality, contractors, and market factors.",
+      "note3": "You should contact a contractor directly for an accurate quote for your project.",
+      "closeReference": "Close of Reference",
+      "processing": "Processing Project",
+      "pleaseWait": "Please wait a moment...",
+      "progress": "Progress",
+      "processingData": "Processing construction data..."
     }
   },
   "ERROR": {

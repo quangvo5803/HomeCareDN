@@ -642,22 +642,26 @@ export default function AdminSupportChatManager() {
     return `${hours}:${minutes}`;
   };
   return (
-    <div className="flex flex-col h-[calc(100vh-10rem)] animate-fadeIn">
+    <div className="flex flex-col h-[calc(100vh-8rem)] md:h-[calc(100vh-10rem)] animate-fadeIn">
       {/* Header */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-5 mb-5 text-white">
-        <h2 className="text-2xl font-semibold flex items-center gap-2">
+      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-md p-4 md:p-5 mb-4 md:mb-5 text-white">
+        <h2 className="text-xl md:text-2xl font-semibold flex items-center gap-2">
           <i className="fa-solid fa-headset"></i>
           {t('adminSupportChatManager.title')}
         </h2>
-        <p className="text-sm opacity-90 mt-1">
+        <p className="text-xs md:text-sm opacity-90 mt-1">
           {t('adminSupportChatManager.subtitle')}
         </p>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 gap-5 overflow-hidden">
-        {/* Sidebar */}
-        <div className="w-80 bg-white rounded-xl shadow-md border flex flex-col overflow-hidden">
+      <div className="flex flex-1 gap-0 md:gap-5 overflow-hidden relative">
+        {/* Sidebar (Conversation List) */}
+        <div
+          className={`${
+            selectedConversation ? 'hidden md:flex' : 'flex'
+          } w-full md:w-80 bg-white rounded-xl shadow-md border flex-col overflow-hidden transition-all duration-300`}
+        >
           <div className="p-3 border-b bg-gray-50">
             <h4 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
               <i className="fa-solid fa-list text-orange-500"></i>
@@ -684,27 +688,40 @@ export default function AdminSupportChatManager() {
           </div>
         </div>
 
-        {/* Right */}
-        {/* Chat Area */}
-        <div className="flex-1 bg-white rounded-xl shadow-md border flex flex-col overflow-hidden">
+        {/* Right (Chat Area) */}
+        <div
+          className={`${
+            selectedConversation ? 'flex' : 'hidden md:flex'
+          } flex-1 bg-white rounded-xl shadow-md border flex-col overflow-hidden transition-all duration-300`}
+        >
           {selectedConversation ? (
             <>
               {/* Header */}
               <div className="p-4 border-b flex items-center gap-3 bg-gray-50 ">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold text-lg">
+                {/* Mobile Back Button */}
+                <button
+                  onClick={() => setSelectedConversation(null)}
+                  className="md:hidden p-2 -ml-2 text-gray-600 hover:text-orange-600 transition-colors"
+                >
+                  <i className="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white font-bold text-base md:text-lg flex-shrink-0">
                   {selectedConversation?.userEmail?.charAt(0).toUpperCase()}
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-700">
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-gray-700 truncate">
                     {selectedConversation?.userEmail}
                   </h3>
                   {selectedConversation?.userName && (
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 truncate">
                       {selectedConversation?.userName}
                     </p>
                   )}
                   {selectedConversation?.userRole && (
-                    <RoleBadgeColors role={selectedConversation.userRole} />
+                    <div className="mt-0.5">
+                      <RoleBadgeColors role={selectedConversation.userRole} />
+                    </div>
                   )}
                 </div>
               </div>
@@ -752,15 +769,15 @@ export default function AdminSupportChatManager() {
                                 isAdmin ? 'justify-end' : 'justify-start'
                               }`}
                             >
-                              <div className="flex flex-col max-w-[70%]">
+                              <div className="flex flex-col max-w-[85%] md:max-w-[70%]">
                                 <div
-                                  className={`px-4 py-2 rounded-2xl ${
+                                  className={`px-4 py-2 rounded-2xl text-sm md:text-base ${
                                     isAdmin
                                       ? 'bg-orange-600 text-white rounded-br-sm'
-                                      : 'bg-white border text-gray-800 rounded-bl-sm'
+                                      : 'bg-white border text-gray-800 rounded-bl-sm shadow-sm'
                                   }`}
                                 >
-                                  <p className="text-sm leading-relaxed">
+                                  <p className="leading-relaxed break-words whitespace-pre-wrap">
                                     {msg.content}
                                   </p>
                                 </div>
@@ -791,30 +808,35 @@ export default function AdminSupportChatManager() {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="p-4 border-t bg-white flex gap-3"
+                className="p-3 md:p-4 border-t bg-white flex gap-2 md:gap-3 items-center"
               >
                 <input
                   type="text"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   placeholder={t('adminSupportChatManager.inputPlaceholder')}
-                  className="flex-1 border rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                  className="flex-1 border rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none bg-gray-50 focus:bg-white transition-colors"
                 />
                 <button
                   type="submit"
                   disabled={!messageInput.trim()}
-                  className="px-5 py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 disabled:opacity-50 transition flex items-center gap-2"
+                  className="w-10 h-10 md:w-auto md:px-5 md:py-2 bg-orange-600 text-white rounded-full hover:bg-orange-700 disabled:opacity-50 transition flex items-center justify-center gap-2 shadow-sm"
                 >
                   <i className="fa-solid fa-paper-plane"></i>
-                  {t('adminSupportChatManager.send')}
+                  <span className="hidden md:inline">
+                    {t('adminSupportChatManager.send')}
+                  </span>
                 </button>
               </form>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center flex-1 text-gray-400">
-              <i className="fa-solid fa-comments text-6xl mb-4"></i>
-              <p className="text-lg">
+            <div className="flex flex-col items-center justify-center flex-1 text-gray-400 p-4 text-center">
+              <i className="fa-solid fa-comments text-5xl md:text-6xl mb-4 text-orange-100"></i>
+              <p className="text-base md:text-lg text-gray-500 font-medium">
                 {t('adminSupportChatManager.selectConversation')}
+              </p>
+              <p className="text-sm mt-2 max-w-xs">
+                Chọn một cuộc hội thoại từ danh sách để bắt đầu chat
               </p>
             </div>
           )}

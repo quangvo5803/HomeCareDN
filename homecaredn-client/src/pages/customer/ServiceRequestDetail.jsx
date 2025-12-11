@@ -182,7 +182,7 @@ export default function ServiceRequestDetail() {
       if (!serviceRequest && !loading) {
         navigate('/Customer', { state: { tab: 'service_requests' } });
       }
-    }, 3000);
+    }, 10000);
     return () => clearTimeout(timeout);
   }, [serviceRequest, loading, navigate]);
 

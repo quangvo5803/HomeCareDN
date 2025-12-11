@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useServiceRequest } from '../../hook/useServiceRequest';
@@ -69,7 +69,14 @@ export default function ContractorServiceRequestDetail() {
     total: 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (!serviceRequest && !loading) {
+        navigate('/Contractor/ServiceRequestManager');
+      }
+    }, 10000);
+    return () => clearTimeout(timeout);
+  }, [serviceRequest, loading, navigate]);
   // upload docs and imgs progress
   useEffect(() => {
     const totalLoaded = imageProgress.loaded + documentProgress.loaded;
@@ -406,41 +413,63 @@ export default function ContractorServiceRequestDetail() {
     return () => clearTimeout(timeoutId);
   }, [description]);
   // Image handlers
-  const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
+  const handleImageChange = useCallback(
+    async (e) => {
+      const files = Array.from(e.target.files);
 
-    if (files.length + images.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_IMAGE'));
-      return;
-    }
-    const validFiles = [];
-    const toastId = toast.loading(t('common.scanDocument'));
-
-    for (const file of files) {
-      const content = await extractFileText(file);
-      const error = detectSensitiveInfo(content);
-
-      if (error) {
-        toast.error(`${file.name} - ${t(error)}`);
-      } else {
-        validFiles.push(file);
+      if (files.length + images.length > MAX_IMAGES) {
+        toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        e.target.value = '';
+        return;
       }
-    }
 
-    if (validFiles.length === 0) {
-      e.target.value = ''; // reset input
-      return;
-    }
-    toast.dismiss(toastId);
+      const validFiles = [];
+      let invalidCount = 0;
 
-    const mapped = validFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-    }));
+      const toastId = toast.loading(t('common.scanDocument'));
 
-    setImages((prev) => [...prev, ...mapped]);
-  };
+      try {
+        for (const file of files) {
+          try {
+            const content = await extractFileText(file);
+            const error = detectSensitiveInfo(content);
+
+            if (error) {
+              invalidCount++;
+            } else {
+              validFiles.push(file);
+            }
+          } catch {
+            invalidCount++;
+          }
+        }
+      } finally {
+        toast.dismiss(toastId);
+      }
+
+      // Thông báo lỗi nhưng vẫn cho giữ file hợp lệ
+      if (invalidCount > 0) {
+        toast.error(t('common.file_unnecessary', { count: invalidCount }));
+      }
+
+      // Nếu không có file hợp lệ → return
+      if (validFiles.length === 0) {
+        e.target.value = '';
+        return;
+      }
+
+      const mapped = validFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+      }));
+
+      setImages((prev) => [...prev, ...mapped]);
+      e.target.value = '';
+    },
+    [images.length, t]
+  );
+
   const handleRemoveImage = (img) => {
     setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
@@ -448,42 +477,64 @@ export default function ContractorServiceRequestDetail() {
   const handleRemoveDocument = (doc) => {
     setDocuments((prev) => prev.filter((d) => d.url !== doc.url));
   };
-  const handleDocumentChange = async (e) => {
-    const files = Array.from(e.target.files);
+  const handleDocumentChange = useCallback(
+    async (e) => {
+      const files = Array.from(e.target.files);
 
-    if (files.length + documents.length > 5) {
-      toast.error(t('ERROR.MAXIMUM_DOCUMENTS'));
-      return;
-    }
-    const validFiles = [];
-    const toastId = toast.loading(t('common.scanDocument'));
-
-    for (const file of files) {
-      const content = await extractFileText(file);
-      const error = detectSensitiveInfo(content);
-
-      if (error) {
-        toast.error(`${file.name} - ${t(error)}`);
-      } else {
-        validFiles.push(file);
+      if (files.length + documents.length > MAX_DOCUMENTS) {
+        toast.error(t('ERROR.MAXIMUM_DOCUMENT'));
+        e.target.value = '';
+        return;
       }
-    }
 
-    if (validFiles.length === 0) {
-      e.target.value = ''; // reset input
-      return;
-    }
-    toast.dismiss(toastId);
+      const validFiles = [];
+      let invalidCount = 0;
 
-    const mapped = validFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      isNew: true,
-      name: file.name,
-    }));
+      const toastId = toast.loading(t('common.scanDocument'));
 
-    setDocuments((prev) => [...prev, ...mapped]);
-  };
+      try {
+        for (const file of files) {
+          try {
+            const content = await extractFileText(file);
+            const error = detectSensitiveInfo(content);
+
+            if (error) {
+              invalidCount++;
+            } else {
+              validFiles.push(file);
+            }
+          } catch {
+            invalidCount++;
+          }
+        }
+      } finally {
+        toast.dismiss(toastId);
+      }
+
+      // Thông báo lỗi cho file không hợp lệ
+      if (invalidCount > 0) {
+        toast.error(t('common.file_unnecessary', { count: invalidCount }));
+      }
+
+      // Không có file hợp lệ → return
+      if (validFiles.length === 0) {
+        e.target.value = '';
+        return;
+      }
+
+      const mapped = validFiles.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+        name: file.name,
+      }));
+
+      setDocuments((prev) => [...prev, ...mapped]);
+      e.target.value = '';
+    },
+    [documents.length, t]
+  );
+
   const getDocumentIcon = (fileName) => {
     if (!fileName) return 'fas fa-file text-gray-400';
     if (fileName.endsWith('.pdf')) {

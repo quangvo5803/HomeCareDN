@@ -20,9 +20,9 @@ const navItems = [
     href: '#',
     type: 'dropdown',
     submenu: [
-      { label: 'header.construction', href: '/ConstructionViewAll' },
-      { label: 'header.repair', href: '/RepairViewAll' },
-      { label: 'header.material', href: '/MaterialViewAll', type: 'link' },
+      { label: 'header.construction', href: '/ItemViewAll?type=Construction' },
+      { label: 'header.repair', href: '/ItemViewAll?type=Repair' },
+      { label: 'header.material', href: '/ItemViewAll?type=Material', type: 'link' },
       {
         label: 'header.materialCatalog',
         href: '/MaterialCatalog',
@@ -94,6 +94,14 @@ export default function Header() {
     );
   };
 
+  const handleDeleteNotification = (payload) => {
+    if (!payload?.notificationID || payload.pendingCount !== 0) return;
+
+    setNotifications(prev =>
+      prev.filter(n => n.notificationID !== payload.notificationID)
+    );
+  };
+
   useRealtime({
     [RealtimeEvents.NotificationCreated]: handleNotification,
     [RealtimeEvents.NotificationApplicationCreate]: handleNotification,
@@ -103,6 +111,8 @@ export default function Header() {
         prev.filter((n) => n.notificationID !== notificationId)
       );
     },
+    [RealtimeEvents.NotificationDistributorApplicationDelete]: handleDeleteNotification,
+    [RealtimeEvents.NotificationContractorApplicationDelete]: handleDeleteNotification
   });
 
   // Close popovers when clicking outside / pressing Esc
@@ -169,16 +179,24 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          {/* <div className="flex-1 hidden lg:flex">
-            <div className="relative w-full">
+          <div className="relative lg:w-[48%] flex items-center border-2 border-orange-200 rounded-full  transition-all">
+            <div className="relative flex items-center border-r-2 border-orange-200 bg-white rounded-l-full">
+              <select className="appearance-none py-3 pl-4 pr-10 bg-transparent text-gray-700 text-sm font-bold cursor-pointer focus:outline-none">
+                <option>Material</option>
+                <option>Repair</option>
+                <option>Construction</option>
+              </select>
+              <i className="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs pointer-events-none"></i>
+            </div>
+            <div className="relative flex-1 bg-white rounded-r-full">
               <input
                 type="text"
                 placeholder={t('header.search')}
-                className="w-full py-3 pl-12 pr-4 transition-all duration-300 border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                className="w-full py-3 pl-12 pr-4 bg-transparent focus:outline-none text-gray-700"
               />
-              <i className="absolute text-gray-400 transform -translate-y-1/2 fas fa-search left-4 top-1/2" />
+              <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
             </div>
-          </div> */}
+          </div>
 
           {/* Navigation Menu (Desktop) */}
           <div className="items-center hidden lg:flex">
@@ -396,9 +414,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (

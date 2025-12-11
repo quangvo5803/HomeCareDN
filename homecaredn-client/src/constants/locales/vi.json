@@ -167,13 +167,16 @@
     "description": "Mô tả",
     "relatedMaterial": "Các vật liệu liên quan"
   },
-  "materialViewAll": {
+  "itemViewAll": {
     "listMaterial": "Danh sách vật liệu",
-    "filter": "Lọc vật liệu",
-    "filterCategory": "Danh mục vật liệu",
-    "filterBrand": "Thương hiệu vật liệu",
-    "pagination": "Hiển thị {{start}} – {{end}} của tổng {{totalMaterials}} sản phẩm",
-    "noMaterial": "Không có vật liệu tương ứng"
+    "listRepair": "Danh sách dịch vụ sửa chữa",
+    "listConstruction": "Danh sách dịch vụ xây dựng",
+    "materials": "vật liệu",
+    "services": "dịch vụ",
+    "dropMaterial": "Vật liệu",
+    "dropRepair": "Sửa chữa",
+    "dropConstruction": "Xây dựng",
+    "noItem": "Không có kết quả nào khớp"
   },
   "serviceDetail": {
     "breadcrumb_construction": "Xây dựng",
@@ -378,7 +381,9 @@
       "calculatedArea": "Diện tích sàn xây dựng: ",
       "estimatePrice": "Giá tiền ước tính: ",
       "estimateInWord": "Bằng chữ: ",
-      "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển."
+      "footer": "Bạn sẽ nhận được thông báo ngay khi có nhà thầu/nhà phân phối ứng tuyển.",
+      "AIrequirementHint": "Điền đầy đủ thông tin để có thể sử dụng AI tham khảo giá thầu",
+      "priceSelected": "Đã chọn mức giá tham khảo"
     },
     "serviceRequestDetail": {
       "title": "Chi tiết yêu cầu dịch vụ",
@@ -1394,7 +1399,8 @@
     "Reject": "Từ chối",
     "Approve": "Phê duyệt",
     "BackToList": "Quay lại danh sách",
-    "Chat": "Chat"
+    "Chat": "Chat",
+    "Estimate": "Tham khảo giá thầu"
   },
   "ModalPopup": {
     "ReviewModal": {
@@ -1472,6 +1478,33 @@
       "selectedCount": "{{count}} vật liệu được chọn",
       "searchPlaceholder": "Tìm kiếm theo tên, danh mục, thương hiệu...",
       "clearSearch": "Xóa tìm kiếm"
+    },
+    "EstimatePriceAIModal": {
+      "stage1Title": "Đang phân tích thông tin dự án",
+      "stage1Desc": "Hệ thống đang thu thập và xử lý các thông số kỹ thuật...",
+      "stage2Title": "Tính toán chi phí vật liệu",
+      "stage2Desc": "Đang ước tính chi phí nguyên vật liệu dựa trên diện tích...",
+      "stage3Title": "Đánh giá chi phí nhân công",
+      "stage3Desc": "Tính toán số lượng công nhân và thời gian thi công...",
+      "stage4Title": "Phân tích thị trường",
+      "stage4Desc": "So sánh với các dự án tương tự trong khu vực...",
+      "stage5Title": "Hoàn tất đề xuất giá",
+      "stage5Desc": "Tổng hợp và đưa ra mức giá tham khảo tốt nhất...",
+      "resultTitle": "Dự Toán Xây Dựng Hoàn Tất",
+      "resultSubtitle": "AI đã phân tích và đưa ra mức giá tham khảo",
+      "lowEstimate": "Mức Tiết Kiệm",
+      "midEstimate": "Khuyến Nghị",
+      "highEstimate": "Mức Cao Cấp",
+      "suggestedDescription": "Gợi Ý Cho Dự Án",
+      "importantNotes": "Lưu Ý Xây Dựng",
+      "note1": "Giá dưới chỉ mang tính chất tham khảo, có thể thay đổi tùy theo khu vực và thời điểm thi công.",
+      "note2": "Chi phí thực tế phụ thuộc vào chất lượng vật liệu, nhà thầu và các yếu tố thị trường.",
+      "note3": "Nên liên hệ trực tiếp với nhà thầu để được báo giá chính xác cho dự án của bạn.",
+      "closeReference": "Kết Thúc Tham Khảo",
+      "processing": "Đang Tính Toán Dự Án",
+      "pleaseWait": "Vui lòng đợi trong giây lát...",
+      "progress": "Tiến độ",
+      "processingData": "Đang xử lý dữ liệu xây dựng..."
     }
   },
   "ERROR": {

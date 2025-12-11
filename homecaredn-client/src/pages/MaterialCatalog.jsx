@@ -161,16 +161,14 @@ export default function MaterialCatalog() {
                 <button
                   key={tg.id}
                   onClick={() => setTag(tg.id)}
-                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${
-                    active
+                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all transform hover:scale-105 shadow-md hover:shadow-lg ${active
                       ? 'bg-blue-600 text-white'
                       : 'bg-white border-2 border-gray-200 text-gray-700 hover:border-blue-600'
-                  }`}
+                    }`}
                 >
                   <i
-                    className={`fas ${tg.icon} mr-2 ${
-                      active ? 'text-white' : 'text-blue-600'
-                    }`}
+                    className={`fas ${tg.icon} mr-2 ${active ? 'text-white' : 'text-blue-600'
+                      }`}
                   ></i>
                   {t(tg.i18n)}
                 </button>
@@ -219,16 +217,14 @@ export default function MaterialCatalog() {
                     {/* Badge */}
                     <div className="absolute top-3 left-3">
                       <span
-                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${
-                          m.type === 'category'
+                        className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-lg ${m.type === 'category'
                             ? 'bg-blue-600'
                             : 'bg-orange-600'
-                        }`}
+                          }`}
                       >
                         <i
-                          className={`fas ${
-                            m.type === 'category' ? 'fa-tags' : 'fa-star'
-                          }`}
+                          className={`fas ${m.type === 'category' ? 'fa-tags' : 'fa-star'
+                            }`}
                         ></i>
                         {m.type === 'category'
                           ? t('materialsCatalog.tag_category')
