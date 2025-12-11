@@ -11,7 +11,6 @@ using DataAccess.Entities.Authorize;
 using DataAccess.Repositories;
 using DataAccess.Repositories.Interfaces;
 using DataAccess.UnitOfWork;
-using HomeCareDNAPI.BackgroundServices;
 using HomeCareDNAPI.Hubs;
 using HomeCareDNAPI.Realtime;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -60,7 +59,12 @@ namespace HomeCareDNAPI
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
                 )
             );
-
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(10);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(2);
+                options.Limits.MaxRequestBodySize = 10 * 1024 * 1024;
+            });
             var key = builder.Configuration["Jwt:Key"];
             if (string.IsNullOrEmpty(key))
             {
@@ -103,7 +107,10 @@ namespace HomeCareDNAPI
             builder.Services.AddHttpContextAccessor();
 
             builder
-                .Services.AddSignalR()
+                .Services.AddSignalR(options =>
+                {
+                    options.MaximumReceiveMessageSize = 20 * 1024 * 1024;
+                })
                 .AddJsonProtocol(options =>
                 {
                     options.PayloadSerializerOptions.PropertyNamingPolicy =
