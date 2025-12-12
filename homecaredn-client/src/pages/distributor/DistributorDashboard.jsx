@@ -62,6 +62,24 @@ export default function DistributorDashboard() {
     revenue: getMonthlyDataset(data, labels, 'totalValue'),
   });
 
+  // Calculate commission based on estimate price
+  const calculateCommission = (estimatePrice) => {
+    if (!estimatePrice) return 0;
+    const price = Number(estimatePrice);
+    let commission = 0;
+    
+    if (price <= 500_000_000) {
+      commission = price * 0.02; // 2%
+    } else if (price <= 2_000_000_000) {
+      commission = price * 0.015; // 1.5%
+    } else {
+      commission = price * 0.01; // 1%
+      if (commission > 100_000_000) commission = 100_000_000; // Max 100M
+    }
+    
+    return commission;
+  };
+
   const fetchLatestApplications = useCallback(async () => {
     if (!user?.id) return;
     try {
@@ -309,13 +327,15 @@ export default function DistributorDashboard() {
     );
   }
   return (
-    <div className="w-full px-6 py-6 mx-auto bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 min-h-screen">
+    <div className="w-full px-4 py-4 md:px-6 md:py-6 mx-auto bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-50 min-h-screen">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">
           {t('partnerDashboard.title_dis')}
         </h1>
-        <p className="text-gray-600">{t('partnerDashboard.subtitle')}</p>
+        <p className="text-sm md:text-base text-gray-600">
+          {t('partnerDashboard.subtitle')}
+        </p>
       </div>
 
       {/* KPI Error */}
@@ -352,71 +372,71 @@ export default function DistributorDashboard() {
           <LoadingComponent />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           {/* Open Material Requests */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+          <div className="bg-white rounded-xl shadow-md p-5 md:p-6 border-l-4 border-blue-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   {t('partnerDashboard.kpi.open_requests')}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">
                   {kpiData.totalRequests}
                 </p>
               </div>
-              <div className="p-4 bg-blue-100 rounded-full">
-                <i className="fas fa-box-open text-blue-600 text-2xl"></i>
+              <div className="p-3 md:p-4 bg-blue-100 rounded-full">
+                <i className="fas fa-box-open text-blue-600 text-xl md:text-2xl"></i>
               </div>
             </div>
           </div>
 
           {/* Applied */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-yellow-500">
+          <div className="bg-white rounded-xl shadow-md p-5 md:p-6 border-l-4 border-yellow-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   {t('partnerDashboard.kpi.applied')}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">
                   {kpiData.pendingApplications}
                 </p>
               </div>
-              <div className="p-4 bg-yellow-100 rounded-full">
-                <i className="fas fa-file-signature text-yellow-600 text-2xl"></i>
+              <div className="p-3 md:p-4 bg-yellow-100 rounded-full">
+                <i className="fas fa-file-signature text-yellow-600 text-xl md:text-2xl"></i>
               </div>
             </div>
           </div>
 
           {/* Pending Payments */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+          <div className="bg-white rounded-xl shadow-md p-5 md:p-6 border-l-4 border-orange-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   {t('partnerDashboard.kpi.pending_payments')}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">
                   {kpiData.pendingCommissions}
                 </p>
               </div>
-              <div className="p-4 bg-orange-100 rounded-full">
-                <i className="fas fa-credit-card text-orange-600 text-2xl"></i>
+              <div className="p-3 md:p-4 bg-orange-100 rounded-full">
+                <i className="fas fa-credit-card text-orange-600 text-xl md:text-2xl"></i>
               </div>
             </div>
           </div>
 
           {/* Won (Approved) */}
-          <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+          <div className="bg-white rounded-xl shadow-md p-5 md:p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
                   {t('partnerDashboard.kpi.won')}
                 </p>
-                <p className="text-3xl font-bold text-gray-900">
+                <p className="text-2xl md:text-3xl font-bold text-gray-900">
                   {kpiData.approvedApplications}
                 </p>
               </div>
-              <div className="p-4 bg-green-100 rounded-full">
-                <i className="fas fa-handshake text-green-600 text-2xl"></i>
+              <div className="p-3 md:p-4 bg-green-100 rounded-full">
+                <i className="fas fa-handshake text-green-600 text-xl md:text-2xl"></i>
               </div>
             </div>
           </div>
@@ -424,15 +444,15 @@ export default function DistributorDashboard() {
       )}
 
       {/* Chart Container */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 md:mt-10">
         {/* Bar Chart - 50% */}
-        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[400px]">
+        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[350px] md:min-h-[400px]">
           {loadingBarChart && (
             <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
               <LoadingComponent />
             </div>
           )}
-          <div className="h-full w-full">
+          <div className="h-full w-full p-2 md:p-0">
             <BarChart
               type="Distributor"
               title={t('adminDashboard.barChart.salesOverview')}
@@ -444,13 +464,13 @@ export default function DistributorDashboard() {
           </div>
         </div>
         {/* Line Chart - 50% */}
-        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[400px]">
+        <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[350px] md:min-h-[400px]">
           {loadingLineChart && (
             <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
               <LoadingComponent />
             </div>
           )}
-          <div className="h-full w-full">
+          <div className="h-full w-full p-2 md:p-0">
             <LineChart
               type="Distributor"
               title={t('adminDashboard.lineChart.commissionRevenue')}
@@ -464,108 +484,188 @@ export default function DistributorDashboard() {
       </div>
 
       {/* Table: Latest Applications */}
-      <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mt-10">
-        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+      <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 mt-6 md:mt-10">
+        <div className="px-4 py-4 md:px-6 md:py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-1">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-1">
                 {t('partnerDashboard.latest_applications')}
               </h2>
             </div>
           </div>
         </div>
+
         {loadingApplications ? (
           <div className="flex justify-center py-12">
             <LoadingComponent />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.no')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.estimate')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.commission_due')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.apply_at')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.status')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    {t('partnerDashboard.action')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {!latestApplications || latestApplications.length === 0 ? (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <td colSpan="7" className="px-6 py-12 text-center">
-                      <div className="flex flex-col items-center">
-                        <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
-                        <p className="text-gray-500 font-medium">
-                          {t('partnerDashboard.no_applications')}
-                        </p>
-                      </div>
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.no')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.estimate')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.commission_amount')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.commission_due')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.apply_at')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.status')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                      {t('partnerDashboard.action')}
+                    </th>
                   </tr>
-                ) : (
-                  latestApplications.map((app, index) => (
-                    <tr
-                      key={app.distributorApplicationID}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      {/* NO. */}
-                      <td className="px-6 py-4 text-sm text-gray-900 font-mono">
-                        {index + 1}
-                      </td>
-
-                      {/* Total Estimate Price  */}
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                        {app.totalEstimatePrice
-                          ? formatVND(app.totalEstimatePrice)
-                          : '-'}
-                      </td>
-
-                      {/* DueCommissionTime */}
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {app.dueCommisionTime
-                          ? formatDate(app.dueCommisionTime, i18n.language)
-                          : '-'}
-                      </td>
-
-                      {/* Apply At (CreatedAt) */}
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {formatDate(app.createdAt, i18n.language)}
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-6 py-4">
-                        <StatusBadge status={app.status} type="Application" />
-                      </td>
-
-                      {/* Action */}
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => handleView(app.materialRequestID)}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
-                        >
-                          <i className="fas fa-eye"></i>
-                          {t('partnerDashboard.view')}
-                        </button>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {!latestApplications || latestApplications.length === 0 ? (
+                    <tr>
+                      <td colSpan="7" className="px-6 py-12 text-center">
+                        <div className="flex flex-col items-center">
+                          <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                          <p className="text-gray-500 font-medium">
+                            {t('partnerDashboard.no_applications')}
+                          </p>
+                        </div>
                       </td>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ) : (
+                    latestApplications.map((app, index) => (
+                      <tr
+                        key={app.distributorApplicationID}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-semibold text-gray-900">
+                          {app.totalEstimatePrice
+                            ? formatVND(app.totalEstimatePrice)
+                            : '-'}
+                        </td>
+                        {/* Commission Amount */}
+                        <td className="px-6 py-4 text-sm font-semibold text-orange-600">
+                          {app.totalEstimatePrice
+                            ? formatVND(calculateCommission(app.totalEstimatePrice))
+                            : '-'}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {app.dueCommisionTime
+                            ? formatDate(app.dueCommisionTime, i18n.language)
+                            : '-'}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {formatDate(app.createdAt, i18n.language)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadge status={app.status} type="Application" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <button
+                            onClick={() => handleView(app.materialRequestID)}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-orange-600 rounded-lg hover:bg-orange-700 transition-colors shadow-sm"
+                          >
+                            <i className="fas fa-eye"></i>
+                            {t('partnerDashboard.view')}
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile List View */}
+            <div className="md:hidden">
+              {!latestApplications || latestApplications.length === 0 ? (
+                <div className="px-6 py-12 text-center">
+                  <div className="flex flex-col items-center">
+                    <i className="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                    <p className="text-gray-500 font-medium">
+                      {t('partnerDashboard.no_applications')}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col p-4 gap-4">
+                  {latestApplications.map((app, index) => (
+                    <div
+                      key={app.distributorApplicationID}
+                      className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:border-orange-300 transition-colors"
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="flex items-center justify-center w-6 h-6 bg-gray-100 rounded-full text-xs font-mono font-bold text-gray-600">
+                            {index + 1}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {formatDate(app.createdAt, i18n.language)}
+                          </span>
+                        </div>
+                        <StatusBadge status={app.status} type="Application" />
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            {t('partnerDashboard.estimate')}:
+                          </span>
+                          <span className="font-bold text-gray-900">
+                            {app.totalEstimatePrice
+                              ? formatVND(app.totalEstimatePrice)
+                              : '-'}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            {t('partnerDashboard.commission_amount')}:
+                          </span>
+                          <span className="font-bold text-orange-600">
+                            {app.totalEstimatePrice
+                              ? formatVND(calculateCommission(app.totalEstimatePrice))
+                              : '-'}
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-gray-600">
+                            {t('partnerDashboard.commission_due')}:
+                          </span>
+                          <span className="text-gray-900">
+                            {app.dueCommisionTime
+                              ? formatDate(app.dueCommisionTime, i18n.language)
+                              : '-'}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleView(app.materialRequestID)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-orange-600 rounded-lg active:bg-orange-700 transition-colors shadow-sm"
+                      >
+                        <i className="fas fa-eye"></i>
+                        {t('partnerDashboard.view')}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

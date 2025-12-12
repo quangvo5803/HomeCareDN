@@ -1,0 +1,41 @@
+{
+  "serviceTypeMultiplier": {
+    "Construction": 1.00,
+    "Repair": 0.65
+  },
+
+  "buildingTypeBasePrice": {
+    "SingleStoryHouse": 5500000,
+    "Townhouse": 6000000,
+    "RentalHouse": 5200000,
+    "Apartment": 6500000,
+    "Villa": 9500000,
+    "Hotel": 12000000,
+    "Showroom": 9000000,
+    "School": 8000000,
+    "Hospital": 14000000,
+    "Warehouse": 4500000,
+    "Other": 5500000
+  },
+
+  "packageMultiplier": {
+    "StructureOnly": 0.68,
+    "BasicFinish": 0.95,
+    "FullFinish": 1.15,
+    "Other": 0.85
+  },
+
+  "mainStructureMultiplier": {
+    "ReinforcedConcrete": 1.0,
+    "PreEngineeredSteel": 1.10,
+    "NaturalWood": 1.25,
+    "Prefabricated": 0.90,
+    "Other": 1.0
+  },
+
+  "adjustment": {
+    "low": 0.92,
+    "mid": 1.00,
+    "high": 1.15
+  }
+}

@@ -30,16 +30,24 @@ namespace BusinessLogic.Services
             QueryParameters parameters
         )
         {
-            var query = _unitOfWork.ServiceRepository.GetQueryable(SERVICE_INCLUDE);
+            var baseQuery = _unitOfWork.ServiceRepository.GetQueryable();
+
             if (parameters.ExcludedID != null)
+                baseQuery = baseQuery.Where(s => s.ServiceID != parameters.ExcludedID);
+
+            if (!string.IsNullOrEmpty(parameters.SearchType) &&
+                Enum.TryParse<ServiceType>(parameters.SearchType, true, out var serviceType)
+            )
             {
-                query = query.Where(s => s.ServiceID != parameters.ExcludedID);
+                baseQuery = baseQuery.Where(s => s.ServiceType == serviceType);
             }
+
+
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
-
-                query = query.Where(s =>
+                
+                baseQuery = baseQuery.Where(s =>
                     (!string.IsNullOrEmpty(s.Name) && s.Name.ToUpper().Contains(searchUpper))
                     || (!string.IsNullOrEmpty(s.NameEN) && s.NameEN.ToUpper().Contains(searchUpper))
                     || (
@@ -52,46 +60,102 @@ namespace BusinessLogic.Services
                     )
                 );
             }
+
             if (parameters.FilterServiceType.HasValue)
-                query = query.Where(s => s.ServiceType == parameters.FilterServiceType.Value);
+                baseQuery = baseQuery.Where(s =>
+                    s.ServiceType == parameters.FilterServiceType.Value
+                );
 
             if (parameters.FilterPackageOption.HasValue)
-                query = query.Where(s => s.PackageOption == parameters.FilterPackageOption.Value);
+                baseQuery = baseQuery.Where(s =>
+                    s.PackageOption == parameters.FilterPackageOption.Value
+                );
 
             if (parameters.FilterBuildingType.HasValue)
-                query = query.Where(s => s.BuildingType == parameters.FilterBuildingType.Value);
+                baseQuery = baseQuery.Where(s =>
+                    s.BuildingType == parameters.FilterBuildingType.Value
+                );
 
             if (parameters.FilterMainStructureType.HasValue)
-                query = query.Where(s =>
+                baseQuery = baseQuery.Where(s =>
                     s.MainStructureType == parameters.FilterMainStructureType.Value
                 );
 
             if (parameters.FilterDesignStyle.HasValue)
-                query = query.Where(s => s.DesignStyle == parameters.FilterDesignStyle.Value);
+                baseQuery = baseQuery.Where(s =>
+                    s.DesignStyle == parameters.FilterDesignStyle.Value
+                );
 
-            var totalCount = await query.CountAsync();
-            query = parameters.SortBy switch
+            var totalCount = await baseQuery.CountAsync();
+
+            if (parameters.SortBy == "random")
             {
-                "servicename" => query.OrderBy(s => s.Name),
-                "servicename_desc" => query.OrderByDescending(s => s.Name),
-                "servicenameen" => query.OrderBy(s => s.NameEN ?? s.Name),
-                "servicenameen_desc" => query.OrderByDescending(s => s.NameEN ?? s.Name),
-                "random" => query.OrderBy(s => s.ServiceID),
-                _ => query.OrderBy(b => b.CreatedAt),
+                var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+
+                var randomIds = await baseQuery
+                    .Select(s => s.ServiceID)
+                    .OrderBy(x => Guid.NewGuid())
+                    .Skip(skip)
+                    .Take(parameters.PageSize)
+                    .ToListAsync();
+
+                var randomItems = await _unitOfWork
+                    .ServiceRepository.GetQueryable(SERVICE_INCLUDE)
+                    .Where(s => randomIds.Contains(s.ServiceID))
+                    .ToListAsync();
+
+                randomItems = randomItems.OrderBy(x => randomIds.IndexOf(x.ServiceID)).ToList();
+
+                var randomDtos = _mapper.Map<IEnumerable<ServiceDto>>(randomItems);
+
+                return new PagedResultDto<ServiceDto>
+                {
+                    Items = randomDtos,
+                    TotalCount = totalCount,
+                    PageNumber = parameters.PageNumber,
+                    PageSize = parameters.PageSize,
+                };
+            }
+
+            var sortedQuery = parameters.SortBy switch
+            {
+                "servicename" => baseQuery.OrderBy(s =>
+                    EF.Functions.Collate(s.Name, "Vietnamese_CI_AS")
+                ),
+                "servicename_desc" => baseQuery.OrderByDescending(s =>
+                    EF.Functions.Collate(s.Name, "Vietnamese_CI_AS")
+                ),
+                "servicenameen" => baseQuery.OrderBy(s =>
+                    EF.Functions.Collate(s.NameEN ?? s.Name, "Latin1_General_CI_AS")
+                ),
+                "servicenameen_desc" => baseQuery.OrderByDescending(s =>
+                    EF.Functions.Collate(s.NameEN ?? s.Name, "Latin1_General_CI_AS")
+                ),
+                _ => baseQuery.OrderBy(s => s.CreatedAt),
             };
-            query = query
+
+            var pagedIds = await sortedQuery
+                .Select(s => s.ServiceID)
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
-                .Take(parameters.PageSize);
+                .Take(parameters.PageSize)
+                .ToListAsync();
 
-            var items = await query.ToListAsync();
+            var items = await _unitOfWork
+                .ServiceRepository.GetQueryable(SERVICE_INCLUDE)
+                .Where(s => pagedIds.Contains(s.ServiceID))
+                .ToListAsync();
 
-            var serviceDtos = _mapper.Map<IEnumerable<ServiceDto>>(items);
+            items = items.OrderBy(x => pagedIds.IndexOf(x.ServiceID)).ToList();
+
+            var dtos = _mapper.Map<IEnumerable<ServiceDto>>(items);
+
             return new PagedResultDto<ServiceDto>
             {
-                Items = serviceDtos,
+                Items = dtos,
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
+                Search = parameters.Search,
             };
         }
 

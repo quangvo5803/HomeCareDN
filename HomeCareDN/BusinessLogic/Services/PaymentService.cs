@@ -284,21 +284,30 @@ namespace BusinessLogic.Services
                 {
                     payment.ContractorApplicationID,
                     Status = payment.Status.ToString(),
-                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(2),
                     serviceRequest?.ConversationID,
                 }
             );
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                PAYMENT,
-                new { payment.ContractorApplicationID, Status = payment.Status.ToString() }
-            );
+            var payload = new
+            {
+                payment.ContractorApplicationID,
+                payment.ServiceRequestID,
+                payment.PaymentTransactionID,
+                payment.OrderCode,
+                payment.Amount,
+                payment.Description,
+                payment.PaidAt,
+                Status = payment.Status.ToString(),
+            };
+            await _notifier.SendToApplicationGroupAsync($"role_Admin", PAYMENT, payload);
             await _notificationService.NotifyPersonalAsync(
                 new NotificationPersonalCreateOrUpdateDto
                 {
                     TargetUserId = serviceRequest!.CustomerID,
                     Title = "Yêu cầu của bạn đã được chấp thuận",
-                    Message = $"Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
+                    Message = "Bạn và nhà thầu đã sẵn sàng để bắt đầu công việc.",
+                    TitleEN = "Your request has been approved",
+                    MessageEN = "You and your contractor are ready to begin work.",
                     DataKey = $"ContractorApplication_{payment.ContractorApplicationID}_PAID",
                     DataValue = serviceRequest.ServiceRequestID.ToString(),
                     Action = NotificationAction.Paid,
@@ -356,21 +365,30 @@ namespace BusinessLogic.Services
                 {
                     payment.DistributorApplicationID,
                     Status = payment.Status.ToString(),
-                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(2),
                     materialRequest.ConversationID,
                 }
             );
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                PAYMENT,
-                new { payment.DistributorApplicationID, Status = payment.Status.ToString() }
-            );
+            var payload = new
+            {
+                payment.DistributorApplicationID,
+                payment.MaterialRequestID,
+                payment.PaymentTransactionID,
+                payment.OrderCode,
+                payment.Amount,
+                payment.Description,
+                payment.PaidAt,
+                Status = payment.Status.ToString(),
+            };
+            await _notifier.SendToApplicationGroupAsync($"role_Admin", PAYMENT, payload);
             await _notificationService.NotifyPersonalAsync(
                 new NotificationPersonalCreateOrUpdateDto
                 {
                     TargetUserId = materialRequest!.CustomerID,
                     Title = "Yêu cầu của bạn đã được chấp thuận",
                     Message = $"Bạn và nhà phân phối đã sẵn sàng để bắt đầu công việc.",
+                    TitleEN = "Your request has been approved",
+                    MessageEN = "You and your distributor are ready to begin work.",
                     DataKey = $"DistributorApplication_{payment.DistributorApplicationID}_PAID",
                     DataValue = materialRequest.MaterialRequestID.ToString(),
                     Action = NotificationAction.Paid,

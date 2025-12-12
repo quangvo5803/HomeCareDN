@@ -67,12 +67,14 @@ export const ServiceProvider = ({ children }) => {
 
   // ==================== GET BY ID ====================
   const getServiceById = useCallback(async (id) => {
-    try {
-      return await serviceService.getById(id);
-    } catch (err) {
-      toast.error(handleApiError(err));
-      return null;
-    }
+    return await withMinLoading(async () => {
+      try {
+        return await serviceService.getById(id);
+      } catch (err) {
+        toast.error(handleApiError(err));
+        return null;
+      }
+    }, setLoading);
   }, []);
 
   // ==================== CREATE ====================

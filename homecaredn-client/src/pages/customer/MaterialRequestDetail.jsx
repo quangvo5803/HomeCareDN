@@ -236,7 +236,7 @@ export default function MaterialRequestDetail() {
       } else if (descriptionError !== null) {
         setDescriptionError(null);
       }
-    }, 300); // Debounce 300ms
+    }, 500);
 
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1140,19 +1140,91 @@ export default function MaterialRequestDetail() {
               />
             </div>
 
-            <div className="flex items-center gap-3 mt-2 text-slate-600 text-sm">
-              <span className="flex items-center gap-1 text-orange-500 font-semibold">
-                <i className="fas fa-star" />
-                {selectedDistributor.averageRating.toFixed(1)}
-              </span>
+            <div className="flex items-center justify-center gap-8 text-sm mt-2">
+              {/* Cột trái - Số sao và điểm uy tín */}
+              <div className="flex flex-col items-center gap-2">
+                <span className="flex items-center gap-1 text-orange-500 font-semibold">
+                  <i className="fas fa-star" />
+                  {selectedDistributor.averageRating.toFixed(1)}
+                </span>
+                {/* Điểm uy tín với tooltip */}
+                <span className="flex items-center gap-1 group relative">
+                  <i className="fas fa-shield-alt text-blue-500"></i>
+                  <span className="font-semibold text-blue-600">
+                    {selectedDistributor.reputationPoints ?? 0}
+                  </span>
+                  <span className="w-4 h-4 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs cursor-help font-bold">
+                    ?
+                  </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
+                    <div className="font-semibold mb-1">
+                      {t('userPage.materialRequestDetail.reputationTooltipTitle') ||
+                        'Điểm uy tín theo giá trị đơn hàng:'}
+                    </div>
+                    <div className="space-y-0.5">
+                      <div>{t('userPage.materialRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                      <div>{t('userPage.materialRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                      <div>{t('userPage.materialRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                    </div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </span>
+              </div>
 
-              <span className="text-slate-300">•</span>
+              <span className="text-slate-300">|</span>
 
-              <span className="flex items-center gap-1 text-green-600 font-semibold">
-                <i className="fas fa-check-circle" />
-                {selectedDistributor.completedProjectCount ?? 0}{' '}
-                {t('userPage.materialRequestDetail.order')}
-              </span>
+              {/* Cột phải - Số đơn hàng theo quy mô */}
+              <div className="flex flex-col gap-1 text-slate-600">
+                <div className="flex items-center gap-2 group/small relative">
+                  <i className="fas fa-box text-green-400 w-4 text-center cursor-help"></i>
+                  <span className="text-xs">
+                    {t('userPage.materialRequestDetail.smallScaleProjects') ||
+                      'Nhỏ'}
+                    :
+                  </span>
+                  <span className="font-semibold">
+                    {selectedDistributor.smallScaleProjectCount ?? 0}
+                  </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 group/medium relative">
+                  <i className="fas fa-boxes text-yellow-500 w-4 text-center cursor-help"></i>
+                  <span className="text-xs">
+                    {t('userPage.materialRequestDetail.mediumScaleProjects') ||
+                      'Vừa'}
+                    :
+                  </span>
+                  <span className="font-semibold">
+                    {selectedDistributor.mediumScaleProjectCount ?? 0}
+                  </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 group/large relative">
+                  <i className="fas fa-warehouse text-red-500 w-4 text-center cursor-help"></i>
+                  <span className="text-xs">
+                    {t('userPage.materialRequestDetail.largeScaleProjects') ||
+                      'Lớn'}
+                    :
+                  </span>
+                  <span className="font-semibold">
+                    {selectedDistributor.largeScaleProjectCount ?? 0}
+                  </span>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                    {t('userPage.materialRequestDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                    <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1370,7 +1442,7 @@ export default function MaterialRequestDetail() {
                   <button
                     key={app.distributorApplicationID}
                     onClick={() => handleDetailDistributor(app)}
-                    className="w-full text-left p-5 border-2 border-slate-200 rounded-xl hover:border-orange-400 hover:shadow-lg transition-all group bg-gradient-to-br hover:from-orange-50 hover:to-transparent cursor-pointer"
+                    className="w-full text-left p-4 border rounded-lg hover:border-orange-500 hover:shadow-md bg-white transition-all"
                   >
                     <div className="flex items-start gap-4 mb-4">
                       <div className="w-14 h-14 rounded-full bg-orange-500 text-white flex items-center justify-center text-xl font-bold shadow-md">
@@ -1387,7 +1459,7 @@ export default function MaterialRequestDetail() {
                         </div>
 
                         {/* Stats */}
-                        <div className="flex items-center gap-3 text-sm text-slate-700">
+                        <div className="flex items-center gap-3 text-sm text-slate-700 flex-wrap">
                           <span className="flex items-center gap-1 text-yellow-500 font-bold">
                             <i className="fas fa-star text-base"></i>
                             <span className="text-sm">
@@ -1397,12 +1469,28 @@ export default function MaterialRequestDetail() {
 
                           <span className="text-slate-400">•</span>
 
-                          <span className="font-semibold flex items-center">
-                            <i className="fas fa-check-circle text-green-500 mr-1 text-base"></i>
-                            <span className="text-sm">
-                              {app.completedProjectCount}{' '}
-                              {t('userPage.materialRequestDetail.order')}
+                          {/* Điểm uy tín với tooltip */}
+                          <span className="flex items-center gap-1 group relative">
+                            <i className="fas fa-shield-alt text-blue-500"></i>
+                            <span className="font-semibold">
+                              {app.reputationPoints ?? 0}
                             </span>
+                            <span className="w-4 h-4 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs cursor-help font-bold">
+                              ?
+                            </span>
+                            {/* Tooltip */}
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
+                              <div className="font-semibold mb-1">
+                                {t('userPage.materialRequestDetail.reputationTooltipTitle') ||
+                                  'Điểm uy tín theo giá trị đơn hàng:'}
+                              </div>
+                              <div className="space-y-0.5">
+                                <div>{t('userPage.materialRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                                <div>{t('userPage.materialRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                                <div>{t('userPage.materialRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                              </div>
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                            </div>
                           </span>
                         </div>
                       </div>

@@ -77,9 +77,8 @@ export default function PaymentManager() {
     tableContent = payments.map((item, idx) => (
       <tr
         key={item.paymentTransactionID}
-        className={`hover:bg-gray-50 transition-colors duration-150 ${
-          idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-        }`}
+        className={`hover:bg-gray-50 transition-colors duration-150 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+          }`}
       >
         <td className="px-4 py-4">
           <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -109,11 +108,11 @@ export default function PaymentManager() {
             onClick={() =>
               item.serviceRequestID
                 ? navigate(
-                    `/Admin/ServiceRequestManager/${item.serviceRequestID}`
-                  )
+                  `/Admin/ServiceRequestManager/${item.serviceRequestID}`
+                )
                 : navigate(
-                    `/Admin/MaterialRequestManager/${item.materialRequestID}`
-                  )
+                  `/Admin/MaterialRequestManager/${item.materialRequestID}`
+                )
             }
             className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-orange-500 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all shadow-sm"
           >
@@ -219,7 +218,7 @@ export default function PaymentManager() {
         </div>
 
         {/* Content Area */}
-        <div className="bg-white shadow-lg border border-gray-200 overflow-hidden">
+        <div className="hidden md:block bg-white shadow-lg border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-center">
               <thead>
@@ -253,6 +252,83 @@ export default function PaymentManager() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile */}
+        <div className="block md:hidden p-4 space-y-3">
+          {payments?.map((item, idx) => (
+            <div
+              key={item.paymentTransactionID}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+            >
+              {/* Card Header */}
+              <div className="bg-gray-50 border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
+                    {(currentPage - 1) * pageSize + idx + 1}
+                  </div>
+                  <span className="text-gray-900 font-semibold text-sm">
+                    {item.orderCode}
+                  </span>
+                </div>
+                <StatusBadge status={item.status} type="Payment" />
+              </div>
+
+              {/* Card Body */}
+              <div className="p-4 space-y-3">
+                {/* Amount */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <i className="fa-regular fa-credit-card"></i>
+                    <span className="text-sm">{t('adminPaymentManager.amount')}</span>
+                  </div>
+                  <span className="text-lg font-bold text-gray-900 text-right">
+                    {formatVND(Number(item.amount))}
+                  </span>
+                </div>
+
+                {/* Date */}
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <i className="fa-regular fa-calendar"></i>
+                    <span className="text-sm">{t('adminPaymentManager.date')}</span>
+                  </div>
+                  <span className="text-sm text-gray-900 text-right">
+                    {formatDate(item.paidAt)}
+                  </span>
+                </div>
+
+                {/* Description */}
+                <div className="flex items-start gap-2">
+                  <i className="fa-regular fa-file-lines"></i>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs text-gray-500 block mb-1">{t('adminPaymentManager.description')}</span>
+                    <p className="text-sm text-gray-900 break-words">
+                      {item.description?.replaceAll('-', ' ') || 'Không có mô tả'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* View Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    item.serviceRequestID
+                      ? navigate(
+                        `/Admin/ServiceRequestManager/${item.serviceRequestID}`
+                      )
+                      : navigate(
+                        `/Admin/MaterialRequestManager/${item.materialRequestID}`
+                      )
+                  }
+                  className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-orange-600 rounded-lg hover:bg-orange-700 active:bg-orange-800 transition-colors shadow-sm"
+                >
+                  <i className="fa-solid fa-eye" />
+                  {t('BUTTON.View')}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Pagination */}

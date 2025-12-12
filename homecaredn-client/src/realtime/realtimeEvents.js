@@ -28,10 +28,17 @@ export const RealtimeEvents = Object.freeze({
   ConversationUnlocked: 'Chat.ConversationUnlocked',
   NewAdminMessage: 'Chat.NewAdminMessage',
   NewConversationForAdmin: 'Chat.NewConversationForAdmin',
+  NewConversationFromAdmin: 'Chat.NewConversationFromAdmin',
+  NewMessageFromAdmin: 'Chat.NewMessageFromAdmin',
 
   // Notification
   NotificationCreated: 'Notification.Created',
   NotificationApplicationCreate: 'Notification.Application.Create',
   NotificationApplicationUpdate: 'Notification.Application.Update',
   NotificationApplicationPaid: 'Notification.Application.Paid',
+  NotificationDeleted: 'Notification.Deleted',
+  NotificationServiceRequestDelete: 'NotificationServiceRequest.Delete',
+  NotificationMaterialRequestDelete: 'NotificationMaterialRequest.Delete',
+  NotificationDistributorApplicationDelete: 'NotificationDistributorApplication.Delete',
+  NotificationContractorApplicationDelete: 'NotificationContractorApplication.Delete'
 });

@@ -5,6 +5,7 @@ using BusinessLogic.DTOs.Application.ContractorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.MaterialRequest;
 using BusinessLogic.DTOs.Application.Notification;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.Services.Interfaces;
 using CloudinaryDotNet;
 using DataAccess.Entities.Application;
@@ -82,6 +83,10 @@ namespace BusinessLogic.Services
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
                 dto.RatingCount = distributor.RatingCount;
+                dto.SmallScaleProjectCount = distributor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = distributor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = distributor.LargeScaleProjectCount;
+                dto.ReputationPoints = distributor.ReputationPoints;
                 if (role == "Admin")
                 {
                     dto.DistributorName =
@@ -155,6 +160,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = distributor?.ProjectCount ?? 0;
             dto.AverageRating = distributor?.AverageRating ?? 0;
             dto.RatingCount = distributor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = distributor?.ReputationPoints ?? 0;
             if (distributor is not null)
             {
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? "";
@@ -192,6 +201,10 @@ namespace BusinessLogic.Services
                 dto.CompletedProjectCount = distributor.ProjectCount;
                 dto.AverageRating = distributor.AverageRating;
                 dto.RatingCount = distributor.RatingCount;
+                dto.SmallScaleProjectCount = distributor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = distributor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = distributor.LargeScaleProjectCount;
+                dto.ReputationPoints = distributor.ReputationPoints;
                 dto.DistributorName = distributor.FullName ?? distributor.UserName ?? string.Empty;
                 dto.DistributorEmail = distributor.Email ?? string.Empty;
                 dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
@@ -202,6 +215,16 @@ namespace BusinessLogic.Services
                     dto.DistributorEmail = string.Empty;
                     dto.DistributorPhone = string.Empty;
                 }
+            }
+            if (role == "Admin")
+            {
+                dto.DistributorName = distributor!.FullName ?? distributor.UserName ?? string.Empty;
+                dto.DistributorEmail = distributor.Email ?? string.Empty;
+                dto.DistributorPhone = distributor.PhoneNumber ?? string.Empty;
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.DistributorApplicationID == application.DistributorApplicationID
+                );
+                dto.Payment = _mapper.Map<PaymentTransactionDto>(payment);
             }
             return dto;
         }
@@ -250,9 +273,9 @@ namespace BusinessLogic.Services
             dto.Status = ApplicationStatus.Pending.ToString();
 
             var customerDto = _mapper.Map<DistributorApplicationDto>(application);
-            dto.DistributorName = string.Empty;
-            dto.DistributorEmail = string.Empty;
-            dto.DistributorPhone = string.Empty;
+            customerDto.DistributorName = string.Empty;
+            customerDto.DistributorEmail = string.Empty;
+            customerDto.DistributorPhone = string.Empty;
             customerDto.Status = ApplicationStatus.Pending.ToString();
 
             var notifyTasks = new List<Task>
@@ -263,7 +286,7 @@ namespace BusinessLogic.Services
                     dto
                 ),
                 _notifier.SendToApplicationGroupAsync(
-                    $"user_{materialRequest.CustomerID}",
+                    $"user_{materialRequest.CustomerID.ToString()}",
                     "DistributorApplication.Created",
                     customerDto
                 ),
@@ -273,7 +296,9 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = materialRequest.CustomerID,
                     Title = "Nhà phân phối mới đăng ký yêu cầu vật tư",
-                    Message = $"Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                    Message = "Nhà phân phối mới đã đăng ký xử lý yêu cầu vật tư của bạn",
+                    TitleEN = "New distributor applied for material request",
+                    MessageEN = "A new distributor has applied to handle your material request",
                     DataKey = $"DistributorApplication_{dto.MaterialRequestID}_APPLY",
                     DataValue = dto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Apply,
@@ -303,8 +328,28 @@ namespace BusinessLogic.Services
             );
             _unitOfWork.DistributorApplicationRepository.Remove(application);
 
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataValue == materialRequest!.MaterialRequestID.ToString() && !n.IsRead,
+                asNoTracking: false
+            );
+            if (noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var count = noti.PendingCount;
+                if (count <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"user_{materialRequest?.CustomerID}",
+                    "NotificationDistributorApplication.Delete",
+                    new { NotificationID = notiId, PendingCount = count }
+                );
+            }
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{materialRequest?.CustomerID}",
+                $"user_{materialRequest?.CustomerID.ToString()}",
                 "DistributorApplication.Delete",
                 new { application.MaterialRequestID, application.DistributorApplicationID }
             );
@@ -404,7 +449,7 @@ namespace BusinessLogic.Services
             }
 
             application.Status = ApplicationStatus.PendingCommission;
-            application.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+            application.DueCommisionTime = DateTime.Now.AddMinutes(2);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;
@@ -425,7 +470,7 @@ namespace BusinessLogic.Services
                         };
 
                         await _notifier.SendToApplicationGroupAsync(
-                            $"user_{other.DistributorID}",
+                            $"user_{other.DistributorID.ToString()}",
                             DISTRIBUTOR_APPLICATION_REJECT,
                             rejectPayload
                         );
@@ -436,6 +481,9 @@ namespace BusinessLogic.Services
                                 TargetUserId = other.DistributorID,
                                 Title = "Yêu cầu vật tư chưa được chấp nhận",
                                 Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                TitleEN = "Material request not accepted",
+                                MessageEN =
+                                    "The customer did not choose your application this time.",
                                 DataKey =
                                     $"DistributorApplication_{application.DistributorApplicationID}_REJECT",
                                 DataValue = other.MaterialRequestID.ToString(),
@@ -450,8 +498,7 @@ namespace BusinessLogic.Services
 
             var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
                 x => x.DistributorApplicationID == application.DistributorApplicationID,
-                includeProperties: INCLUDE,
-                asNoTracking: true
+                includeProperties: INCLUDE
             );
 
             var resultDto = _mapper.Map<DistributorApplicationDto>(reloadedApp);
@@ -468,19 +515,19 @@ namespace BusinessLogic.Services
             };
 
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{request.CustomerID}",
+                $"user_{request.CustomerID.ToString()}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{application.DistributorID}",
+                $"user_{application.DistributorID.ToString()}",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
                 acceptPayload
             );
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Admin",
                 DISTRIBUTOR_APPLICATION_ACCEPT,
-                acceptPayload
+                resultDto
             );
 
             await _notificationService.NotifyPersonalAsync(
@@ -488,7 +535,10 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = application.DistributorID,
                     Title = "Chúc mừng! Bạn đã được chọn",
-                    Message = $"Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                    Message = "Khách hàng đã chọn bạn làm nhà phân phối cho yêu cầu vật tư.",
+                    TitleEN = "Congratulations! You have been selected",
+                    MessageEN =
+                        "The customer has selected you as the distributor for the material request.",
                     DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_ACCEPT",
                     DataValue = resultDto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Accept,
@@ -530,7 +580,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             var dto = _mapper.Map<DistributorApplicationDto>(distributorApplication);
             await _notifier.SendToApplicationGroupAsync(
-                $"user_{dto.DistributorID}",
+                $"user_{dto.DistributorID.ToString()}",
                 DISTRIBUTOR_APPLICATION_REJECT,
                 new
                 {
@@ -554,7 +604,9 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = distributorApplication.DistributorID,
                     Title = "Yêu cầu vật tư chưa được chấp nhận",
-                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    TitleEN = "Material request not accepted",
+                    MessageEN = "The customer did not choose your application this time.",
                     DataKey = $"DistributorApplication_{dto.DistributorApplicationID}_REJECT",
                     DataValue = dto.MaterialRequestID.ToString(),
                     Action = NotificationAction.Reject,

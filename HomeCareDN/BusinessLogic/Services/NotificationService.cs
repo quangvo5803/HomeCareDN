@@ -18,6 +18,7 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly ISignalRNotifier _notifier;
         private readonly UserManager<ApplicationUser> _userManager;
+        private const string ADMIN = "Admin";
         public NotificationService
         (
             IUnitOfWork unitOfWork, IMapper mapper, 
@@ -33,18 +34,15 @@ namespace BusinessLogic.Services
         public async Task<PagedResultDto<NotificationDto>> GetAllNotificationsAsync
             (QueryParameters parameters, string role)
         {
-            var personalQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.Personal
-                            && n.TargetUserId == parameters.FilterID);
+            bool isAdmin = role == ADMIN;
 
-            var systemQuery = _unitOfWork.NotificationRepository.GetQueryable()
-                .Where(n => n.Type == NotificationType.System
-                            && (n.TargetRoles!.Contains(role) || n.TargetRoles.ToLower() == "all"));
+            var query = BuildBaseQuery(parameters, role, isAdmin);
 
-            var query = personalQuery.Union(systemQuery)
-                .OrderByDescending(n => n.UpdatedAt);
+            query = AdminSearchFilter(query, parameters, isAdmin);
 
             var totalCount = await query.CountAsync();
+
+            query = AdminSorting(query, parameters, isAdmin);
 
             var items = await query
                 .Skip((parameters.PageNumber - 1) * parameters.PageSize)
@@ -53,11 +51,15 @@ namespace BusinessLogic.Services
 
             var dtoItems = _mapper.Map<IEnumerable<NotificationDto>>(items);
 
-            foreach (var dto in dtoItems)
+            if (!isAdmin)
             {
-                if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
+                foreach (var dto in dtoItems)
                 {
-                    dto.Message = $"Có {dto.PendingCount} {dto.Title.ToLower()}.";
+                    if (dto.Type == NotificationType.System.ToString() && dto.PendingCount > 1)
+                    {
+                        dto.Message = $"Có {dto.PendingCount} {dto.Message.ToLower()}";
+                        dto.MessageEN = $"Have {dto.PendingCount} {dto.MessageEN!.ToLower()}";
+                    }
                 }
             }
 
@@ -68,54 +70,17 @@ namespace BusinessLogic.Services
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize
             };
-        }
-
-        public async Task<NotificationDto> AdminSendSystemAsync
-            (NotificationSystemCreateOrUpdateDto requestDto)
-        {
-            return await CreateOrUpdateSystemAsync(requestDto);
-        }
-
+        }    
+        
         public async Task<NotificationDto> NotifyPersonalAsync(NotificationPersonalCreateOrUpdateDto dto)
         {
             var existing = await _unitOfWork.NotificationRepository
                 .GetAsync(n => n.Type == NotificationType.Personal
                                 && n.DataKey == dto.DataKey, asNoTracking: false);
 
-            Notification noti;
-
-            if (existing != null && !existing.IsRead)
-            {
-                if (dto.Action == NotificationAction.Apply)
-                {
-                    existing.PendingCount++;
-                }
-                else if (dto.Action == NotificationAction.Accept ||
-                    dto.Action == NotificationAction.Reject || dto.Action == NotificationAction.Paid)
-                {
-                    existing.PendingCount = 0;
-                }
-
-                existing.Title = dto.Title;
-                existing.Message = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply
-                    ? $"Có {existing.PendingCount} {dto.Message.ToLower()}."
-                    : dto.Message;
-
-                existing.Action = dto.Action;
-                existing.UpdatedAt = DateTime.UtcNow;
-
-                noti = existing;
-            }
-            else
-            {
-                noti = _mapper.Map<Notification>(dto);
-                noti.Type = NotificationType.Personal;
-                noti.IsRead = false;
-                noti.PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0;
-                noti.CreatedAt = DateTime.UtcNow;
-                noti.UpdatedAt = DateTime.UtcNow;
-                await _unitOfWork.NotificationRepository.AddAsync(noti);
-            }
+            Notification noti = existing != null && !existing.IsRead
+                ? ExistingNotificationPersonal(existing, dto)
+                : await CreateNewNotificationPersonal(dto);
 
             await _unitOfWork.SaveAsync();
 
@@ -196,13 +161,15 @@ namespace BusinessLogic.Services
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu dịch vụ mới",
-                Message = "Có 1 yêu cầu dịch vụ mới.",
+                Message = "Có yêu cầu dịch vụ mới cần xử lý.",
+                TitleEN = "New Service Request",
+                MessageEN = "There is a new service request to be processed.",
                 DataKey = dataKey,
                 DataValue = "ServiceRequestManager",
                 TargetRoles = "Contractor"
             };
 
-            var result = await CreateOrUpdateSystemAsync(dto);
+            var result = await CreateOrUpdateSystemAsync(dto, null);
 
             return result;
         }
@@ -214,21 +181,61 @@ namespace BusinessLogic.Services
             var dto = new NotificationSystemCreateOrUpdateDto
             {
                 Title = "Yêu cầu vật tư mới",
-                Message = "Có 1 yêu cầu vật tư mới.",
+                Message = "Có yêu cầu vật tư mới cần được xử lý.",
+                TitleEN = "New Material Request",
+                MessageEN = "There is a new material request to be processed.",
                 DataKey = dataKey,
                 DataValue = "MaterialRequestManager",
                 TargetRoles = "Distributor"
             };
 
-            var result = await CreateOrUpdateSystemAsync(dto);
+            var result = await CreateOrUpdateSystemAsync(dto, null);
             
             await _unitOfWork.SaveAsync();
             return result;
         }
 
+        // ==================== ADMIN ====================
+        public async Task<NotificationDto> AdminSendSystemAsync
+            (NotificationSystemCreateOrUpdateDto requestDto)
+        {
+            return await CreateOrUpdateSystemAsync(requestDto, ADMIN);
+        }
+
+        public async Task<NotificationDto> GetNotificationById(Guid id)
+        {
+            var notify = await _unitOfWork.NotificationRepository
+                .GetAsync(n => n.NotificationID == id);
+            if (notify == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { "Notification", new[] { "NotificationID NOT FOUND" } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            return _mapper.Map<NotificationDto>(notify);
+        }
+
+        public async Task DeleteNotificationAsync(Guid id)
+        {
+            var noti = await _unitOfWork.NotificationRepository
+                .GetAsync(n => n.NotificationID == id, asNoTracking:false);
+            if (noti != null)
+            {
+                _unitOfWork.NotificationRepository.Remove(noti);
+                await _unitOfWork.SaveAsync();
+            }
+            await SendToRolesAsync
+            (
+                noti!.TargetRoles!,
+                "Notification.Deleted",
+                noti.NotificationID
+            );
+        }
         // ==================== Helper ====================
         private async Task<NotificationDto> CreateOrUpdateSystemAsync
-            (NotificationSystemCreateOrUpdateDto requestDto)
+            (NotificationSystemCreateOrUpdateDto requestDto, string? role)
         {
             var existing = await _unitOfWork.NotificationRepository
                 .GetAsync(n => n.Type == NotificationType.System
@@ -236,7 +243,7 @@ namespace BusinessLogic.Services
                 );
             Notification noti;
 
-            if (existing != null)
+            if (existing != null && !existing.IsRead)
             {
                 existing.PendingCount++;
                 existing.UpdatedAt = DateTime.UtcNow;
@@ -248,18 +255,25 @@ namespace BusinessLogic.Services
             {
                 noti = _mapper.Map<Notification>(requestDto);
                 noti.Type = NotificationType.System;
-                noti.PendingCount = 1;
                 noti.CreatedAt = DateTime.UtcNow;
                 noti.UpdatedAt = DateTime.UtcNow;
-
+                noti.PendingCount = 1;
+                if (role == ADMIN)
+                {
+                    noti.Action = NotificationAction.Send;
+                    noti.DataKey = "Admin_" + Guid.NewGuid().ToString("N").Substring(0, 10) + "_SEND";
+                }
                 await _unitOfWork.NotificationRepository.AddAsync(noti);
             }
             await _unitOfWork.SaveAsync();
 
             var dto = _mapper.Map<NotificationDto>(noti);
-            dto.Message = noti.PendingCount > 1
-               ? $"Có {noti.PendingCount} {noti.Title.ToLower()}."
-               : noti.Message;
+            dto.Title = noti.PendingCount > 1
+               ? $"Có {noti.PendingCount} {noti.Title.ToLower()}"
+               : noti.Title;
+            dto.TitleEN = noti.PendingCount > 1
+               ? $"Have {noti.PendingCount} {noti.TitleEN!.ToLower()}"
+               : noti.TitleEN;
 
             await SendToRolesAsync
             (
@@ -273,12 +287,6 @@ namespace BusinessLogic.Services
 
         private async Task SendToRolesAsync(string roles, string eventName, object payload)
         {
-            if (roles.ToLower() == "all")
-            {
-                await _notifier.SendToAllApplicationAsync(eventName, payload);
-                return;
-            }
-
             var roleList = roles.Split(",").Select(x => x.Trim());
             foreach (var role in roleList)
             {
@@ -286,5 +294,94 @@ namespace BusinessLogic.Services
                 await _notifier.SendToApplicationGroupAsync(groupName, eventName, payload);
             }
         }
+
+        private IQueryable<Notification> BuildBaseQuery(QueryParameters parameters, string role, bool isAdmin)
+        {
+            return _unitOfWork.NotificationRepository.GetQueryable()
+                .Where(n =>
+                    (n.Type == NotificationType.Personal && n.TargetUserId == parameters.FilterID) ||
+                    (n.Type == NotificationType.System &&
+                     (isAdmin ? n.SenderUserId == parameters.FilterID : n.TargetRoles!.Contains(role)))
+                );
+        }
+
+        private static IQueryable<Notification> AdminSearchFilter(
+            IQueryable<Notification> query,
+            QueryParameters parameters,
+            bool isAdmin)
+        {
+            if (isAdmin && !string.IsNullOrEmpty(parameters.Search))
+            {
+                query = query.Where(n =>
+                    n.Title.Contains(parameters.Search) ||
+                    n.Message.Contains(parameters.Search));
+            }
+
+            return query;
+        }
+
+        private static IQueryable<Notification> AdminSorting(
+            IQueryable<Notification> query,
+            QueryParameters parameters,
+            bool isAdmin)
+        {
+            if (!isAdmin)
+                return query.OrderByDescending(n => n.UpdatedAt);
+
+            return parameters.SortBy?.ToLower() switch
+            {
+                "updatedat" => query.OrderBy(n => n.UpdatedAt),
+                "updatedatdesc" => query.OrderByDescending(n => n.UpdatedAt),
+                _ => query.OrderByDescending(n => n.CreatedAt)
+            };
+        }
+
+        private static Notification ExistingNotificationPersonal
+            (Notification existing, NotificationPersonalCreateOrUpdateDto dto)
+        {
+            if (dto.Action == NotificationAction.Apply)
+            {
+                existing.PendingCount++;
+            }
+            else if (dto.Action is NotificationAction.Accept
+                  or NotificationAction.Reject
+                  or NotificationAction.Paid)
+            {
+                existing.PendingCount = 0;
+            }
+
+            existing.Title = dto.Title;
+
+            bool isMultipleApply = existing.PendingCount > 1 && dto.Action == NotificationAction.Apply;
+
+            existing.Message = isMultipleApply
+                ? $"Có {existing.PendingCount} {dto.Title.ToLower()}."
+                : dto.Title;
+
+            existing.MessageEN = isMultipleApply
+                ? $"Have {existing.PendingCount} {dto.TitleEN!.ToLower()}."
+                : dto.TitleEN;
+
+            existing.Action = dto.Action;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            return existing;
+        }
+
+        private async Task<Notification> CreateNewNotificationPersonal(NotificationPersonalCreateOrUpdateDto dto)
+        {
+            var noti = _mapper.Map<Notification>(dto);
+
+            noti.Type = NotificationType.Personal;
+            noti.IsRead = false;
+            noti.PendingCount = dto.Action == NotificationAction.Apply ? 1 : 0;
+            noti.CreatedAt = DateTime.UtcNow;
+            noti.UpdatedAt = DateTime.UtcNow;
+
+            await _unitOfWork.NotificationRepository.AddAsync(noti);
+
+            return noti;
+        }
+
     }
 }

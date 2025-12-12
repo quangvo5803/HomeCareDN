@@ -29,13 +29,37 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-        [HttpGet("Admin")]
-        public async Task<IActionResult> CreateOrUpdateSystemForAdmin(
-                [FromQuery] NotificationSystemCreateOrUpdateDto createDto)
+        [HttpPost("Admin/create")]
+        public async Task<IActionResult> CreateNotificationSystemForAdmin(
+                [FromBody] NotificationSystemCreateOrUpdateDto dto)
         {
             return Ok(await _facadeService.NotificationService
-                .AdminSendSystemAsync(createDto)
+                .AdminSendSystemAsync(dto)
             );
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpGet("Admin")]
+        public async Task<IActionResult> GetAllNotificationForAdmin([FromQuery] QueryParameters parameters)
+        {
+            return Ok(await _facadeService.NotificationService
+                .GetAllNotificationsAsync(parameters, "Admin")
+            );
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpGet("Admin/{id:guid}")]
+        public async Task<IActionResult> GetByIdForAdmin(Guid id)
+        {
+            return Ok(await _facadeService.NotificationService.GetNotificationById(id));
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+        [HttpDelete("Admin/{id:guid}/delete")]
+        public async Task<IActionResult> DeleteNoticationForAdmin(Guid id)
+        {
+            await _facadeService.NotificationService.DeleteNotificationAsync(id);
+            return NoContent();
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Contractor")]

@@ -44,6 +44,7 @@ import AdminUserManager from './pages/admin/AdminUserManager';
 import AdminUserDetail from './pages/admin/AdminUserDetail';
 import AdminReviewManager from './pages/admin/AdminReviewManager';
 import AdminPaymentManager from './pages/admin/AdminPaymentManager';
+import AdminNotificationManager from './pages/admin/AdminNotificationManager';
 //Contractor pages
 import ContractorLayout from './pages/contractor/ContractorLayout';
 import ContractorDashboard from './pages/contractor/ContractorDashboard';
@@ -57,14 +58,13 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 //Partner pages
 import PartnerProfile from './pages/partner/PartnerProfile';
 //Home Page
-import MaterialViewAll from './pages/MaterialViewAll';
+import ItemViewAll from './pages/ItemViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 import ServiceDetail from './pages/ServiceDetail';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerTypeSelection from './pages/PartnerTypeSelection';
-import RepairViewAll from './pages/RepairViewAll';
-import ConstructionViewAll from './pages/ConstructionViewAll';
+
 // Customer pages
 import CustomerPage from './pages/customer/CustomerPage';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
@@ -102,11 +102,10 @@ function App() {
           aria-label="Back to top"
           className={`fixed bottom-6 right-22 z-50 w-14 h-14 rounded-full bg-orange-500 text-white shadow-lg 
                     flex items-center justify-center transition-all duration-300 hover:bg-orange-600  
-                    ${
-                      showBackTop
-                        ? 'opacity-100 translate-y-0'
-                        : 'opacity-0 translate-y-3 pointer-events-none'
-                    }`}
+                    ${showBackTop
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-3 pointer-events-none'
+            }`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -342,6 +341,7 @@ function Layout() {
           <Route path="UserManager/:userID" element={<AdminUserDetail />} />
           <Route path="ReviewManager" element={<AdminReviewManager />} />
           <Route path="PaymentManager" element={<AdminPaymentManager />} />
+          <Route path="NotificationManager" element={<AdminNotificationManager />} />
         </Route>
         {/* Contractor routes */}
         <Route
@@ -399,9 +399,7 @@ function Layout() {
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
-        <Route path="MaterialViewAll" element={<MaterialViewAll />} />
-        <Route path="RepairViewAll" element={<RepairViewAll />} />
-        <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
+        <Route path="ItemViewAll" element={<ItemViewAll />} />
 
         {/* Trang thông báo lỗi */}
         <Route path="/Unauthorized" element={<Unauthorized />} />

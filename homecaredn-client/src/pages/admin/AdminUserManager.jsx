@@ -121,11 +121,10 @@ export default function AdminUserManager() {
                       setFilter(key);
                       navigate(`?filter=${key}`);
                     }}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${
-                      filter === key
-                        ? 'bg-orange-500 text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
-                    }`}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm cursor-pointer ${filter === key
+                      ? 'bg-orange-500 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:border-orange-300'
+                      }`}
                   >
                     {t(`adminUserManager.${key}`)}
                   </button>
@@ -190,16 +189,15 @@ export default function AdminUserManager() {
                           const firstAddress = user?.address?.[0];
                           const addressText = firstAddress
                             ? [firstAddress.district, firstAddress.city]
-                                .filter(Boolean)
-                                .join(', ')
+                              .filter(Boolean)
+                              .join(', ')
                             : '—';
 
                           return (
                             <tr
                               key={user.userID}
-                              className={`hover:bg-gray-50 transition-colors duration-150 ${
-                                index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
-                              }`}
+                              className={`hover:bg-gray-50 transition-colors duration-150 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'
+                                }`}
                             >
                               <td className="px-4 py-4 text-center align-middle">
                                 <span className="inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-orange-500 rounded-full shadow-sm">
@@ -252,6 +250,28 @@ export default function AdminUserManager() {
                                     <i className="fa-solid fa-eye" />
                                     {t('BUTTON.View')}
                                   </button>
+
+                                  {/* CHAT */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      navigate('/Admin/SupportChatManager', {
+                                        state: {
+                                          preselectedUserID: user.userID,
+                                          userName: user.fullName,
+                                          userEmail: user.email,
+                                          userRole: user.role,
+                                        },
+                                      });
+                                    }}
+                                    className="inline-flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                                    title={t(
+                                      'adminUserManager.userDetail.chatWithUser'
+                                    )}
+                                  >
+                                    <i className="fa-solid fa-message" />
+                                    {t('BUTTON.Chat')}
+                                  </button>
                                 </div>
                               </td>
                             </tr>
@@ -299,8 +319,8 @@ export default function AdminUserManager() {
                       const firstAddress = user?.address?.[0];
                       const addressText = firstAddress
                         ? [firstAddress.district, firstAddress.city]
-                            .filter(Boolean)
-                            .join(', ')
+                          .filter(Boolean)
+                          .join(', ')
                         : '—';
 
                       return (
@@ -352,6 +372,28 @@ export default function AdminUserManager() {
                             >
                               <i className="fa-solid fa-eye mr-1" />
                               {t('BUTTON.View')}
+                            </button>
+
+                            {/* CHAT */}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                navigate('/Admin/SupportChatManager', {
+                                  state: {
+                                    preselectedUserID: user.userID,
+                                    userName: user.fullName,
+                                    userEmail: user.email,
+                                    userRole: user.role,
+                                  },
+                                });
+                              }}
+                              className="flex-1 px-3 py-2 text-xs font-semibold text-white bg-teal-500 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-all shadow-sm cursor-pointer"
+                              title={t(
+                                'adminUserManager.userDetail.chatWithUser'
+                              )}
+                            >
+                              <i className="fa-solid fa-message mr-1" />
+                              {t('BUTTON.Chat')}
                             </button>
                           </div>
                         </div>

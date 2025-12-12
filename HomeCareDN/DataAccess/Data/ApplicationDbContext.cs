@@ -26,6 +26,7 @@ namespace DataAccess.Data
         public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SearchHistory> searchHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -48,7 +49,10 @@ namespace DataAccess.Data
             {
                 entity.Property(e => e.Status).HasConversion<string>();
             });
-
+            modelBuilder.Entity<DistributorApplication>(entity =>
+            {
+                entity.Property(e => e.Status).HasConversion<string>();
+            });
             modelBuilder.Entity<Service>(entity =>
             {
                 entity.Property(e => e.ServiceType).HasConversion<string>();

@@ -3,6 +3,7 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.DistributorApplication;
 using BusinessLogic.DTOs.Application.DistributorApplication.Items;
 using BusinessLogic.DTOs.Application.MaterialRequest;
+using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
@@ -61,6 +62,11 @@ namespace BusinessLogic.Services
             query = query.Where(s =>
                 s.Status == RequestStatus.Opening || s.Status == RequestStatus.Closed
             );
+
+            if (parameters.FilterID != null && role == ADMIN)
+            {
+                query = query.Where(s => s.CustomerID == parameters.FilterID);
+            }
 
             if (parameters.FilterID != null && role == DISTRIBUTOR)
             {
@@ -148,7 +154,7 @@ namespace BusinessLogic.Services
                 );
                 if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
                 {
-                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(2);
                 }
             }
         }
@@ -294,21 +300,30 @@ namespace BusinessLogic.Services
                 var distributor = await _userManager.FindByIdAsync(
                     selected.DistributorID.ToString()
                 );
+                var payment = await _unitOfWork.PaymentTransactionsRepository.GetAsync(p =>
+                    p.MaterialRequestID == selected.MaterialRequestID
+                );
                 dto.SelectedDistributorApplication = new DistributorApplicationDto
                 {
                     DistributorID = distributor?.Id ?? string.Empty,
                     DistributorApplicationID = selected.DistributorApplicationID,
+                    MaterialRequestID = selected.MaterialRequestID,
                     DistributorName = distributor?.FullName ?? string.Empty,
                     DistributorEmail = distributor?.Email ?? string.Empty,
                     DistributorPhone = distributor?.PhoneNumber ?? string.Empty,
+                    TotalEstimatePrice = selected.TotalEstimatePrice,
                     Status = selected.Status.ToString(),
                     Message = selected.Message,
                     CreatedAt = selected.CreatedAt,
-                    TotalEstimatePrice = selected.TotalEstimatePrice,
                     Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
+                    Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
         }
@@ -336,6 +351,10 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
                     DistributorName =
                         selected.Status == ApplicationStatus.Approved
                             ? distributor?.FullName ?? string.Empty
@@ -587,6 +606,26 @@ namespace BusinessLogic.Services
             await DeleteRelatedEntity(materialRequest);
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
 
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataKey == "MaterialRequest" && !n.IsRead,
+                asNoTracking: false
+            );
+            if (noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var newCount = noti.PendingCount;
+                if (newCount <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"role_Distributor",
+                    "NotificationMaterialRequest.Delete",
+                    new { NotificationID = notiId, PendingCount = newCount }
+                );
+            }
             await _unitOfWork.SaveAsync();
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Distributor",

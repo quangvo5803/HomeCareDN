@@ -81,6 +81,10 @@ namespace BusinessLogic.Services
                 dto.RatingCount = contractor.RatingCount;
                 dto.AverageRating = contractor.AverageRating;
                 dto.CompletedProjectCount = contractor.ProjectCount;
+                dto.SmallScaleProjectCount = contractor.SmallScaleProjectCount;
+                dto.MediumScaleProjectCount = contractor.MediumScaleProjectCount;
+                dto.LargeScaleProjectCount = contractor.LargeScaleProjectCount;
+                dto.ReputationPoints = contractor.ReputationPoints;
 
                 if (role == "Admin")
                 {
@@ -149,6 +153,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
             dto.AverageRating = contractor?.AverageRating ?? 0;
             dto.RatingCount = contractor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = contractor?.ReputationPoints ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -182,6 +190,10 @@ namespace BusinessLogic.Services
             dto.CompletedProjectCount = contractor?.ProjectCount ?? 0;
             dto.AverageRating = contractor?.AverageRating ?? 0;
             dto.RatingCount = contractor?.RatingCount ?? 0;
+            dto.SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0;
+            dto.MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0;
+            dto.LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0;
+            dto.ReputationPoints = contractor?.ReputationPoints ?? 0;
             if (contractor != null)
             {
                 dto.ContractorName = contractor.FullName ?? contractor.UserName ?? "";
@@ -324,8 +336,9 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = serviceRequest.CustomerID,
                     Title = "Nhà thầu mới đăng ký yêu cầu dịch vụ",
-                    Message =
-                        $"Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ {dto.ServiceType} của bạn",
+                    Message = "Nhà thầu mới đã đăng ký xử lý yêu cầu dịch vụ của bạn",
+                    TitleEN = "New contractor applied for your service request",
+                    MessageEN = "A new contractor has applied to handle your service request",
                     DataKey = $"ContractorApplication_{dto.ServiceRequestID}_APPLY",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Apply,
@@ -371,7 +384,7 @@ namespace BusinessLogic.Services
 
             serviceRequest.Status = RequestStatus.Closed;
             contractorApplication.Status = ApplicationStatus.PendingCommission;
-            contractorApplication.DueCommisionTime = DateTime.UtcNow.AddDays(7);
+            contractorApplication.DueCommisionTime = DateTime.Now.AddMinutes(2);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)
@@ -397,8 +410,10 @@ namespace BusinessLogic.Services
                             {
                                 TargetUserId = app.ContractorID,
                                 Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                                Message =
-                                    $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                                TitleEN = "Service request not accepted",
+                                MessageEN =
+                                    "The customer did not select your application this time.",
                                 DataKey =
                                     $"ContractorApplication_{contractorApplication.ContractorApplicationID}_REJECT",
                                 DataValue = app.ServiceRequestID.ToString(),
@@ -442,7 +457,10 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = contractorApplication.ContractorID,
                     Title = "Chúc mừng! Bạn đã được chọn",
-                    Message = $"Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                    Message = "Khách hàng đã chọn bạn làm nhà thầu cho yêu cầu dịch vụ.",
+                    TitleEN = "Congratulations! You have been selected",
+                    MessageEN =
+                        "The customer has selected you as the contractor for the service request.",
                     DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_ACCEPT",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Accept,
@@ -507,7 +525,9 @@ namespace BusinessLogic.Services
                 {
                     TargetUserId = contractorApplication.ContractorID,
                     Title = "Yêu cầu dịch vụ chưa được chấp nhận",
-                    Message = $"Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    Message = "Khách hàng đã không chọn yêu cầu của bạn trong lần này.",
+                    TitleEN = "Service request not accepted",
+                    MessageEN = "The customer did not select your application this time.",
                     DataKey = $"ContractorApplication_{dto.ContractorApplicationID}_REJECT",
                     DataValue = dto.ServiceRequestID.ToString(),
                     Action = NotificationAction.Reject,
@@ -563,6 +583,27 @@ namespace BusinessLogic.Services
                 s.ServiceRequestID == application.ServiceRequestID
             );
             _unitOfWork.ContractorApplicationRepository.Remove(application);
+
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataValue == serviceRequest!.ServiceRequestID.ToString() && !n.IsRead,
+                asNoTracking: false
+            );
+            if (noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var count = noti.PendingCount;
+                if (count <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"user_{serviceRequest?.CustomerID}",
+                    "NotificationContractorApplication.Delete",
+                    new { NotificationID = notiId, PendingCount = count }
+                );
+            }
             await _notifier.SendToApplicationGroupAsync(
                 $"user_{serviceRequest?.CustomerID}",
                 "ContractorApplication.Delete",

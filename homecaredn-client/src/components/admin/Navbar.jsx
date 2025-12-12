@@ -25,28 +25,26 @@ export default function Navbar() {
     >
       <div className="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
         <div className="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto justify-end gap-4">
-          {/* 🔍 Search */}
-          <div className="relative hidden md:flex items-center w-64">
-            <span className="absolute left-3 text-gray-400">
-              <i className="fas fa-search"></i>
-            </span>
-            <input
-              type="text"
-              className="pl-9 pr-3 py-2 w-full text-sm rounded-lg border border-gray-300 dark:bg-slate-850 dark:text-white bg-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              placeholder={t('adminNavbar.searchPlaceholder')}
-            />
-          </div>
-
           {/* 🌐 Language Switcher */}
           <div className="relative z-500">
-            <button
-              onClick={() => setOpenLang(!openLang)}
-              className="w-10 h-10 flex items-center justify-center text-gray-600 bg-white border border-gray-300 hover:border-blue-500 rounded-full shadow-sm hover:text-blue-600 transition-all duration-300"
-            >
-              <i className="fas fa-globe"></i>
-            </button>
+            {(() => {
+              const current = (i18n.language || 'en').startsWith('vi') ? 'vi' : 'en';
+              const flagCode = current === 'vi' ? 'VN' : 'US';
+              const label = current.toUpperCase();
+              return (
+                <button
+                  onClick={() => setOpenLang(!openLang)}
+                  className="flex items-center gap-2 h-9 px-3 rounded-full border border-gray-300 bg-white hover:border-orange-500 hover:bg-gray-50 transition-all focus:outline-none focus:ring-0"
+                  title={t('partnerDashboard.change_language')}
+                >
+                  <ReactCountryFlag countryCode={flagCode} svg className="text-lg" />
+                  <span className="text-sm font-medium hidden md:inline">{label}</span>
+                  <i className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''}`} />
+                </button>
+              );
+            })()}
             {openLang && (
-              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1">
+              <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border p-2 space-y-1 z-20">
                 <button
                   onClick={() => changeLanguage('en')}
                   className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 rounded-md"
@@ -64,14 +62,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-          {/* 🔔 Notifications */}
-          <button className="relative w-10 h-10 flex items-center justify-center text-gray-600 bg-white border border-gray-300 hover:border-blue-500 rounded-full shadow-sm hover:text-blue-600 transition-all duration-300">
-            <i className="fa fa-bell text-lg"></i>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">
-              3
-            </span>
-          </button>
 
           {/* 👤 Avatar */}
           {/* 👤 Avatar + Logout */}

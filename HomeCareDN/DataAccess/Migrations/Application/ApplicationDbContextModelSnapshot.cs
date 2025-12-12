@@ -261,8 +261,9 @@ namespace DataAccess.Migrations.Application
                     b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("TotalEstimatePrice")
                         .HasColumnType("float");
@@ -541,8 +542,14 @@ namespace DataAccess.Migrations.Application
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MessageEN")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PendingCount")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("SenderUserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("TargetRoles")
                         .HasColumnType("nvarchar(max)");
@@ -552,6 +559,9 @@ namespace DataAccess.Migrations.Application
 
                     b.Property<string>("Title")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TitleEN")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Type")
@@ -723,6 +733,27 @@ namespace DataAccess.Migrations.Application
                         .HasFilter("[ServiceRequestID] IS NOT NULL");
 
                     b.ToTable("Review", "app");
+                });
+
+            modelBuilder.Entity("DataAccess.Entities.Application.SearchHistory", b =>
+                {
+                    b.Property<Guid>("SearchHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SearchDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SearchTerm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SearchHistoryID");
+
+                    b.ToTable("searchHistories", "app");
                 });
 
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>

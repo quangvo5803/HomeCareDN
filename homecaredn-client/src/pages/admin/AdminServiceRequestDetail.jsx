@@ -148,6 +148,7 @@ export default function AdminServiceRequestDetail() {
           ...prev,
           status: 'Approved',
           dueCommisionTime: null,
+          payment: { ...prev.payment, ...payload },
         }));
       }
     },
@@ -608,17 +609,13 @@ export default function AdminServiceRequestDetail() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
                       <p className="text-emerald-600 text-sm font-medium mb-1">
                         {t('adminServiceRequestManager.estimatePrice')}
                       </p>
                       <p className="font-bold text-lg text-emerald-700">
-                        {serviceRequestDetail.estimatePrice == 0
-                          ? t('contractorServiceRequestManager.negotiable')
-                          : formatVND(
-                              Number(serviceRequestDetail.estimatePrice)
-                            )}{' '}
+                        {formatVND(Number(selectedContractor.estimatePrice))}
                       </p>
                     </div>
 
@@ -644,8 +641,65 @@ export default function AdminServiceRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedContractor.averageRating.toFixed(1)}
+                        {selectedContractor.averageRating?.toFixed(1) || '0.0'}
                       </p>
+                    </div>
+
+                    {/* Reputation Points với Tooltip */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100 group relative">
+                      <p className="text-indigo-600 text-sm font-medium mb-1 flex items-center gap-1">
+                        {t('adminServiceRequestManager.contractorDetail.reputation') || 'Uy tín'}
+                        <span className="w-3.5 h-3.5 rounded-full bg-indigo-200 text-indigo-600 flex items-center justify-center text-[10px] cursor-help font-bold">
+                          ?
+                        </span>
+                      </p>
+                      <p className="font-bold text-lg text-indigo-700 flex items-center gap-1">
+                        <i className="fa-solid fa-shield-alt"></i>
+                        {selectedContractor.reputationPoints ?? 0}
+                      </p>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg min-w-max">
+                        <div className="font-semibold mb-1">
+                          {t('adminServiceRequestManager.contractorDetail.reputationTooltipTitle') || 'Điểm uy tín theo giá trị công trình:'}
+                        </div>
+                        <div>{t('adminServiceRequestManager.contractorDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                        <div>{t('adminServiceRequestManager.contractorDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                        <div>{t('adminServiceRequestManager.contractorDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+
+                    {/* Project Scale Counts */}
+                    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-2xl border border-teal-100">
+                      <p className="text-teal-600 text-sm font-medium mb-2">
+                        {t('adminServiceRequestManager.contractorDetail.projectsByScale') || 'Dự án theo quy mô'}
+                      </p>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="group/small relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-home text-green-400"></i>
+                          <span className="font-bold text-green-700">{selectedContractor.smallScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminServiceRequestManager.contractorDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/medium relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-building text-yellow-500"></i>
+                          <span className="font-bold text-yellow-600">{selectedContractor.mediumScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminServiceRequestManager.contractorDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/large relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-city text-red-500"></i>
+                          <span className="font-bold text-red-600">{selectedContractor.largeScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminServiceRequestManager.contractorDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">

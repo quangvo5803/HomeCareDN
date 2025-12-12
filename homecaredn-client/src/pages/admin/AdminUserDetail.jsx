@@ -137,7 +137,19 @@ export default function AdminUserDetail() {
       ),
     [executeFetchDistributors]
   );
+  //--- Navigate to chat with user ---
+  const handleChatWithUser = () => {
+    if (!userDetail) return;
 
+    navigate('/Admin/SupportChatManager', {
+      state: {
+        preselectedUserID: userID,
+        userName: userDetail.fullName,
+        userEmail: userDetail.email,
+        userRole: userDetail.role,
+      },
+    });
+  };
   useEffect(() => {
     if (!userDetail) return;
 
@@ -256,24 +268,109 @@ export default function AdminUserDetail() {
           <div className="text-gray-600">{renderAddress()}</div>
         </div>
 
-        {userDetail?.role === 'Contractor' && (
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-3 text-center min-w-[110px]">
-              <p className="text-yellow-600 text-sm font-medium">
+        {(userDetail?.role === 'Contractor' || userDetail?.role === 'Distributor') && (
+          <div className="flex flex-wrap gap-3 mt-4 md:mt-0 justify-center md:justify-end">
+            {/* Rating Box */}
+            <div className="bg-yellow-50 border border-yellow-100 rounded-xl p-2 md:p-3 text-center min-w-[80px] md:min-w-[100px]">
+              <p className="text-yellow-600 text-xs md:text-sm font-medium">
                 {t('adminUserManager.userDetail.rating')}
               </p>
-              <p className="text-lg font-bold text-yellow-700 flex items-center justify-center gap-1">
+              <p className="text-base md:text-lg font-bold text-yellow-700 flex items-center justify-center gap-1 mt-1">
                 <i className="fa-solid fa-star"></i>
-                {userDetail.averageRating.toFixed(1)}
+                {userDetail.averageRating?.toFixed(1) || '0.0'}
               </p>
             </div>
-            <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 text-center min-w-[110px]">
-              <p className="text-orange-600 text-sm font-medium">
-                {t('adminUserManager.projectCount')}
+
+            {/* Reputation Points Box với Tooltip */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-2 md:p-3 text-center min-w-[80px] md:min-w-[100px] group relative">
+              <p className="text-blue-600 text-xs md:text-sm font-medium flex items-center justify-center gap-1">
+                {t('adminUserManager.userDetail.reputation') || 'Uy tín'}
+                <span className="w-3.5 h-3.5 rounded-full bg-blue-200 text-blue-600 flex items-center justify-center text-[10px] cursor-help font-bold">
+                  ?
+                </span>
               </p>
-              <p className="text-lg font-bold text-orange-700">
-                {userDetail.projectCount}
+              <p className="text-base md:text-lg font-bold text-blue-700 flex items-center justify-center gap-1 mt-1">
+                <i className="fa-solid fa-shield-alt"></i>
+                {userDetail.reputationPoints ?? 0}
               </p>
+              {/* Tooltip */}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg min-w-max">
+                <div className="font-semibold mb-1">
+                  {userDetail.role === 'Contractor'
+                    ? (t('adminUserManager.userDetail.reputationTooltipTitle') || 'Điểm uy tín theo giá trị công trình:')
+                    : (t('adminUserManager.userDetail.reputationTooltipTitleOrder') || 'Điểm uy tín theo giá trị đơn hàng:')}
+                </div>
+                <div>{t('adminUserManager.userDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                <div>{t('adminUserManager.userDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                <div>{t('adminUserManager.userDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+              </div>
+            </div>
+
+            {/* Project Scale Counts */}
+            <div className="bg-green-50 border border-green-100 rounded-xl p-2 md:p-3 text-center min-w-[120px] md:min-w-[140px]">
+              <p className="text-green-600 text-xs md:text-sm font-medium mb-1">
+                {userDetail.role === 'Contractor' 
+                  ? (t('adminUserManager.userDetail.projectsByScale') || 'Dự án') 
+                  : (t('adminUserManager.userDetail.ordersByScale') || 'Đơn hàng')}
+              </p>
+              <div className="flex items-center justify-center gap-2 text-sm">
+                {userDetail.role === 'Contractor' ? (
+                  <>
+                    <div className="group/small relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-home text-green-400"></i>
+                      <span className="font-bold text-green-700">{userDetail.smallScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                    <div className="group/medium relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-building text-yellow-500"></i>
+                      <span className="font-bold text-yellow-600">{userDetail.mediumScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                    <div className="group/large relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-city text-red-500"></i>
+                      <span className="font-bold text-red-600">{userDetail.largeScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="group/small relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-box text-green-400"></i>
+                      <span className="font-bold text-green-700">{userDetail.smallScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                    <div className="group/medium relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-boxes text-yellow-500"></i>
+                      <span className="font-bold text-yellow-600">{userDetail.mediumScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                    <div className="group/large relative flex items-center gap-1 cursor-help">
+                      <i className="fas fa-warehouse text-red-500"></i>
+                      <span className="font-bold text-red-600">{userDetail.largeScaleProjectCount ?? 0}</span>
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                        {t('adminUserManager.userDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -677,6 +774,18 @@ export default function AdminUserDetail() {
         <>
           {renderHeader()}
           {renderUserInfo()}
+
+          {/* CHAT WITH USER BUTTON */}
+          <div className="max-w-5xl mx-auto mb-6">
+            <button
+              onClick={handleChatWithUser}
+              className="w-full px-6 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-3 font-semibold hover:from-orange-600 hover:to-orange-700 active:scale-[0.98]"
+            >
+              <i className="fa-solid fa-message text-xl"></i>
+              <span>{t('adminUserManager.userDetail.chatWithUser')}</span>
+              <i className="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
 
           {/* Bottom Section */}
           <div className="bg-white rounded-2xl shadow-md p-6 max-w-5xl mx-auto">

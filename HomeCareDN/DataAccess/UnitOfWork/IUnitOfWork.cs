@@ -23,6 +23,7 @@ namespace DataAccess.UnitOfWork
         IPaymentTransactionsRepository PaymentTransactionsRepository { get; }
         IReviewRepository ReviewRepository { get; }
         INotificationRepository NotificationRepository { get; }
+        ISearchHistoryRepository SearchHistoryRepository { get; }
         Task SaveAsync();
     }
 }

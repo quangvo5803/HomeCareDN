@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Application.DistributorApplication.Items;
+using BusinessLogic.DTOs.Application.Payment;
 using DataAccess.Entities.Application;
 
 namespace BusinessLogic.DTOs.Application.DistributorApplication
@@ -17,6 +18,10 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         public int CompletedProjectCount { get; set; }
         public double AverageRating { get; set; }
         public int RatingCount { get; set; }
+        public int SmallScaleProjectCount { get; set; }
+        public int MediumScaleProjectCount { get; set; }
+        public int LargeScaleProjectCount { get; set; }
+        public int ReputationPoints { get; set; }
 
         // Thông tin liên lạc nhà phân phối (mới hiển thị khi đóng phí)
         public required string DistributorID { get; set; }
@@ -24,5 +29,7 @@ namespace BusinessLogic.DTOs.Application.DistributorApplication
         public string DistributorEmail { get; set; } = string.Empty;
         public string DistributorPhone { get; set; } = string.Empty;
         public List<DistributorApplicationItemDto>? Items { get; set; }
+        // Thông tin giao dịch thanh toán
+        public PaymentTransactionDto? Payment { get; set; }
     }
 }

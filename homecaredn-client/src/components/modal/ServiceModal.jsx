@@ -9,6 +9,7 @@ import { showDeleteModal } from './DeleteModal';
 import { handleApiError } from '../../utils/handleApiError';
 import { uploadToCloudinary } from '../../utils/uploadToCloudinary';
 import LoadingComponent from '../LoadingComponent';
+import Loading from '../Loading';
 
 //For TINY MCE
 import { Editor } from '@tinymce/tinymce-react';
@@ -31,6 +32,7 @@ export default function ServiceModal({
   onSave,
   serviceID,
   setUploadProgress,
+  setSubmitting,
 }) {
   const { t } = useTranslation();
   const enums = useEnums();
@@ -109,6 +111,14 @@ export default function ServiceModal({
       isNew: true,
     }));
     setImages((prev) => [...prev, ...mappedFiles]);
+    e.target.value = '';
+  };
+
+  const handleInputClick = (e) => {
+    if (images.length >= 5) {
+      e.preventDefault();
+      toast.error(t('ERROR.MAXIMUM_IMAGE'));
+    }
   };
 
   // Xoá ảnh khỏi state
@@ -116,13 +126,11 @@ export default function ServiceModal({
     setImages((prev) => prev.filter((i) => i.url !== img.url));
   };
 
-  // Hàm xoá ảnh (local hoặc DB)
+  // Hàm xoá ảnh
   const handleRemoveImage = (img) => {
     if (img.isNew) {
-      //  Ảnh mới chỉ xoá state
       removeImageFromState(img);
     } else {
-      //  Ảnh cũ confirm + gọi API
       showDeleteModal({
         t,
         titleKey: t('ModalPopup.DeleteImageModal.title'),
@@ -142,19 +150,24 @@ export default function ServiceModal({
   };
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     if (!name.trim()) {
       toast.error(t('ERROR.REQUIRED_SERVICENAME'));
+      setSubmitting(false);
       return;
     }
     if (!serviceType) {
       toast.error(t('ERROR.REQUIRED_SERVICETYPE'));
+      setSubmitting(false);
       return;
     }
     if (!buildingType) {
       toast.error(t('ERROR.REQUIRED_BUILDINGTYPE'));
+      setSubmitting(false);
       return;
     }
     try {
+      setSubmitting(true);
       const newFiles = images.filter((i) => i.isNew).map((i) => i.file);
       const data = {
         Name: name,
@@ -167,8 +180,10 @@ export default function ServiceModal({
         MainStructureType: mainStructureType || null,
         DesignStyle: designStyle || null,
       };
+
       if (images.length > 5) {
         toast.error(t('ERROR.MAXIMUM_IMAGE'));
+        setSubmitting(false);
         return;
       }
       if (service?.serviceID) {
@@ -180,18 +195,27 @@ export default function ServiceModal({
         const uploaded = await uploadToCloudinary(
           newFiles,
           import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-          (percent) => setUploadProgress(percent),
+          (progress) => {
+            const { loaded, total } = progress;
+            if (total > 0) {
+              const percent = Math.floor((loaded * 100) / total);
+              setUploadProgress(percent);
+            }
+          },
           'HomeCareDN/Service'
         );
         const uploadedArray = Array.isArray(uploaded) ? uploaded : [uploaded];
         data.ImageUrls = uploadedArray.map((u) => u.url);
         data.ImagePublicIds = uploadedArray.map((u) => u.publicId);
-        onClose();
-        setUploadProgress(0);
       }
+
       await onSave(data);
+      onClose();
     } catch (err) {
       toast.error(t(handleApiError(err)));
+    } finally {
+      setUploadProgress(0);
+      setSubmitting(false);
     }
   };
 
@@ -434,48 +458,49 @@ export default function ServiceModal({
               </div>
 
               {/* Upload Images */}
-              {images.length < 5 && (
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    {t('adminServiceManager.serviceModal.images')}
-                  </label>
-                  <div className="flex flex-wrap gap-3">
-                    {images.map((img) => (
-                      <div
-                        key={img.url}
-                        className="relative overflow-hidden border w-28 h-28 rounded-xl group"
-                      >
-                        <img
-                          src={img.url}
-                          alt="preview"
-                          className="object-cover w-full h-full"
-                        />
-                        <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
-                          {(images.length !== 1 || img.isNew) && (
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveImage(img)}
-                              className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
-                            >
-                              <i className="fa-solid fa-xmark"></i>
-                            </button>
-                          )}
-                        </div>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  {t('adminServiceManager.serviceModal.images')}
+                  <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {images.map((img) => (
+                    <div
+                      key={img.url}
+                      className="relative overflow-hidden border w-28 h-28 rounded-xl group"
+                    >
+                      <img
+                        src={img.url}
+                        alt="preview"
+                        className="object-cover w-full h-full"
+                      />
+                      <div className="absolute inset-0 transition opacity-0 bg-black/30 group-hover:opacity-100">
+                        {(images.length !== 1 || img.isNew) && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(img)}
+                            className="absolute flex items-center justify-center w-6 h-6 text-xs text-white bg-red-600 rounded-full shadow top-1 right-1 hover:bg-red-700 cursor-pointer"
+                          >
+                            <i className="fa-solid fa-xmark"></i>
+                          </button>
+                        )}
                       </div>
-                    ))}
-                  </div>
-                  <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
-                    {t('adminServiceManager.serviceModal.chooseFiles')}
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={handleFileChange}
-                    />
-                  </label>
+                    </div>
+                  ))}
                 </div>
-              )}
+                {/* Input */}
+                <label className="inline-block px-4 py-3 border-2 border-gray-300 border-dashed cursor-pointer rounded-xl hover:border-blue-400 hover:bg-blue-50">
+                  {t('adminServiceManager.serviceModal.chooseFiles')}
+                  <input
+                    type="file"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onClick={handleInputClick}
+                    onChange={handleFileChange}
+                  />
+                </label>
+              </div>
             </>
           )}
         </div>
@@ -495,7 +520,8 @@ export default function ServiceModal({
               !name.trim() ||
               !serviceType ||
               !buildingType ||
-              images.length === 0
+              images.length === 0 ||
+              loading
             }
           >
             {service ? t('BUTTON.Update') : t('BUTTON.Add')}
@@ -512,7 +538,6 @@ ServiceModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   serviceID: PropTypes.string,
-  setUploadProgress: PropTypes.func.isRequired,
 };
 
 // Default props

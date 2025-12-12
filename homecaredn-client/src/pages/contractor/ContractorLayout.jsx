@@ -13,66 +13,65 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import useRealtime from '../../realtime/useRealtime';
 
 export default function ContractorLayout() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuth();
 
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  //Real time
+  // Real time
+  const handleNewNotification = (payload) => {
+    const titleKey = i18n.language === 'vi' ? 'title' : 'titleEN';
+
+    const displayTitle =
+      titleKey === 'titleEN' && !payload.titleEN
+        ? payload.title
+        : payload[titleKey];
+
+    setNotifications((prev) => {
+      const exists = prev.some(
+        (n) => n.notificationID === payload.notificationID
+      );
+      if (exists) return prev;
+
+      return [{ ...payload, isRead: false }, ...prev];
+    });
+
+    toast.info(
+      <div>
+        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
+        {displayTitle}
+      </div>,
+      {
+        position: 'top-right',
+        autoClose: 3000,
+      }
+    );
+  };
+
   useRealtime({
-    [RealtimeEvents.NotificationCreated]: (payload) => {
+    [RealtimeEvents.NotificationCreated]: handleNewNotification,
+    [RealtimeEvents.NotificationApplicationUpdate]: handleNewNotification,
+    [RealtimeEvents.NotificationDeleted]: (notificationId) => {
+      setNotifications((prev) =>
+        prev.filter((n) => n.notificationID !== notificationId)
+      );
+    },
+    [RealtimeEvents.NotificationServiceRequestDelete]: (payload) => {
       setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
+        if (!payload?.notificationID) {
           return prev;
         }
 
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
+        if (payload.pendingCount === 0) {
+          return prev.filter(
+            n => n.notificationID !== payload.notificationID
+          );
+        }
+        return prev;
       });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
-    [RealtimeEvents.NotificationApplicationUpdate]: (payload) => {
-      setNotifications(prev => {
-        const exists = prev.some(n => n.notificationID === payload.notificationID);
-
-        if (exists) {
-          return prev;
-        }
-
-        return [
-          { ...payload, isRead: false },
-          ...prev
-        ];
-      });
-
-      toast.info(
-        <div
-          dangerouslySetInnerHTML={{
-            __html: `<i class="fa-solid fa-bell text-orange-500 mr-1"></i> ${payload.message}`
-          }}
-        />,
-        {
-          position: "top-right",
-          autoClose: 3000,
-        }
-      );
-    },
+    }
   });
 
   useEffect(() => {
@@ -83,10 +82,9 @@ export default function ContractorLayout() {
         const result = await notificationService.getAllForContractor({
           FilterID: user.id,
           PageNumber: 1,
-          PageSize: 10
+          PageSize: 10,
         });
         setNotifications(result.items);
-
       } catch (err) {
         toast.error(t(handleApiError(err)));
       } finally {
@@ -98,8 +96,10 @@ export default function ContractorLayout() {
   }, [t, user]);
 
   return (
-    <div className="min-h-screen grid grid-cols-[260px_1fr] bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50">
       <MenuList
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
         brand={{
           logoUrl:
             'https://res.cloudinary.com/dl4idg6ey/image/upload/v1749183824/logo_flxixf.png',
@@ -108,30 +108,39 @@ export default function ContractorLayout() {
         }}
       />
 
-      <div className="flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-3 p-4">
-            <div className="flex-1 flex items-center gap-2 bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-gray-500">
-              <i className="fa-solid fa-magnifying-glass"></i>
-              <input
-                className="flex-1 bg-transparent outline-none text-sm text-gray-700"
-                placeholder={t('partnerDashboard.search_placeholder')}
-              />
+            {/* Menu Mobile */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200"
+            >
+              <i className="fa-solid fa-bars text-xl"></i>
+            </button>
+
+            <div className="flex-1 flex items-center gap-2 rounded-xl px-3 py-"></div>
+
+            <NotificationPanel
+              notifications={notifications}
+              loading={loading}
+              user={user}
+            />
+            <div className="hidden sm:block">
+              <LanguageSwitch />
             </div>
-            <NotificationPanel notifications={notifications} loading={loading} user={user} />
-            <LanguageSwitch />
             <AvatarMenu />
           </div>
         </header>
 
         {/* Main content */}
-        <main className="p-6 space-y-6">
+        <main className="p-4 md:p-6 space-y-6 flex-1 overflow-x-hidden">
           {/* Nơi render các trang con của contractor */}
           <Outlet />
         </main>
 
-        <footer className="p-6 text-center text-gray-500 text-sm">
+        <footer className="p-6 text-center text-gray-500 text-xs md:text-sm">
           © {new Date().getFullYear()} HomeCareDN
         </footer>
       </div>

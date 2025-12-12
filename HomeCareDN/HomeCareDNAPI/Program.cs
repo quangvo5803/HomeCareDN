@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using BusinessLogic.Mapping;
 using BusinessLogic.Services;
@@ -15,6 +16,7 @@ using HomeCareDNAPI.Hubs;
 using HomeCareDNAPI.Realtime;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
@@ -31,19 +33,24 @@ namespace HomeCareDNAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
-
+            builder.WebHost.ConfigureKestrel(options =>
+            {
+                options.ConfigureEndpointDefaults(endpointOptions =>
+                {
+                    endpointOptions.Protocols = HttpProtocols.Http1;
+                });
+                options.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
+                options.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5);
+                options.Limits.MaxRequestBodySize = 50 * 1024 * 1024;
+            });
             builder
                 .Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -51,7 +58,6 @@ namespace HomeCareDNAPI
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
                 )
             );
-
             builder.Services.AddDbContext<AuthorizeDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -59,7 +65,6 @@ namespace HomeCareDNAPI
                         sqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)
                 )
             );
-
             var key = builder.Configuration["Jwt:Key"];
             if (string.IsNullOrEmpty(key))
             {
@@ -91,37 +96,42 @@ namespace HomeCareDNAPI
                                 "http://localhost:5173",
                                 "https://homecaredn.onrender.com",
                                 "https://home-care-dn.vercel.app"
-                            ) // domain React
+                            )
                             .AllowAnyHeader()
                             .AllowAnyMethod()
-                            .AllowCredentials(); // nếu dùng cookie/session
+                            .AllowCredentials();
                     }
                 );
             });
-
             builder.Services.AddHttpContextAccessor();
-
-            builder.Services.AddSignalR();
-
+            builder
+                .Services.AddSignalR(options =>
+                {
+                    options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);
+                    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+                    options.MaximumReceiveMessageSize = 512_000;
+                })
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.PropertyNamingPolicy =
+                        JsonNamingPolicy.CamelCase;
+                    options.PayloadSerializerOptions.DictionaryKeyPolicy =
+                        JsonNamingPolicy.CamelCase;
+                });
+            ;
             builder.Services.AddScoped<ISignalRNotifier, SignalRNotifier>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-            /// Register Options
-            ///
             builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
             builder.Services.Configure<CloudinaryOptions>(
                 builder.Configuration.GetSection("Cloudinary")
             );
             builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection("Google"));
             builder.Services.Configure<PayOsOptions>(builder.Configuration.GetSection("PayOS"));
-
-            /// Register services for Application
-
             builder.Services.AddScoped<CoreDependencies>();
             builder.Services.AddScoped<InfraDependencies>();
             builder.Services.AddScoped<IdentityDependencies>();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IFacadeService, FacadeService>();
-
             builder.Services.AddDistributedMemoryCache();
             builder.Services.AddMemoryCache();
             builder.Services.AddStackExchangeRedisCache(options =>
@@ -130,10 +140,7 @@ namespace HomeCareDNAPI
                 options.InstanceName = "HomeCareDN_";
             });
             builder.Services.AddHttpContextAccessor();
-            builder.Services.AddHostedService<ContractorApplicationMonitor>();
-            builder.Services.AddHostedService<DistributorApplicationMonitor>();
-
-            // LLM client
+            builder.Services.AddHostedService<ApplicationMonitor>();
             builder.Services.AddHttpClient<IGroqClient, GroqClient>(client =>
             {
                 var baseUrl =
@@ -142,17 +149,13 @@ namespace HomeCareDNAPI
                 client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             });
-            //PayOS
             builder.Services.AddSingleton(sp =>
             {
                 var clientId = builder.Configuration["PayOS:ClientId"];
                 var apiKey = builder.Configuration["PayOS:ApiKey"];
                 var checksumKey = builder.Configuration["PayOS:ChecksumKey"];
-
                 return new PayOS(clientId!, apiKey!, checksumKey!);
             });
-
-            /// Register services for Authorize
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IAuthorizeService, AuthorizeService>();
             builder.Services.AddSingleton<IEmailQueue, EmailQueue>();
@@ -162,12 +165,8 @@ namespace HomeCareDNAPI
                 .Services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AuthorizeDbContext>()
                 .AddDefaultTokenProviders();
-            /// Automapper
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
-
             var app = builder.Build();
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -177,23 +176,32 @@ namespace HomeCareDNAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseRouting();
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
+            app.Use(
+                async (context, next) =>
+                {
+                    try
+                    {
+                        await next();
+                    }
+                    catch (IOException ex)
+                    {
+                        Console.WriteLine("[Connection Closed] " + ex.Message);
+                    }
+                }
+            );
 
             app.UseHttpsRedirection();
             app.UseWebSockets();
-
-            app.UseRouting();
-
             app.UseCors("AllowReactApp");
-
             app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.MapControllers();
             app.MapHub<ApplicationHub>("/hubs/application");
             app.MapHub<ChatHub>("/hubs/chat");
-
             app.Run();
         }
     }

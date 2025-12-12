@@ -75,14 +75,15 @@ export default function AdminMaterialRequestDetail() {
       }
     },
     [RealtimeEvents.DistributorApplicationAccept]: (payload) => {
+      console.log("payload", payload);
       setMaterialRequests((prev) =>
-        prev.map((mr) =>
-          mr.materialRequestID === payload.materialRequestID
-            ? { ...mr, status: 'Closed' }
-            : mr
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? { ...sr, status: 'Closed' }
+            : sr
         )
       );
-      if (materialRequestId == payload.serviceRequestID) {
+      if (materialRequestId == payload.materialRequestID) {
         setMaterialRequestDetail(
           (prev) => prev && { ...prev, status: 'Closed' }
         );
@@ -90,10 +91,10 @@ export default function AdminMaterialRequestDetail() {
           const newList = prev.map((ca) =>
             ca.distributorApplicationID === payload.distributorApplicationID
               ? {
-                  ...ca,
-                  status: 'PendingCommission',
-                  dueCommisionTime: payload?.dueCommisionTime || null,
-                }
+                ...ca,
+                status: 'PendingCommission',
+                dueCommisionTime: payload?.dueCommisionTime || null,
+              }
               : { ...ca, status: 'Rejected' }
           );
 
@@ -103,7 +104,18 @@ export default function AdminMaterialRequestDetail() {
           );
 
           if (selected) {
-            setSelectedDistributor(selected);
+            setSelectedDistributor((prev) => ({
+              ...prev,
+              totalEstimatePrice: payload.totalEstimatePrice ?? prev.totalEstimatePrice,
+              items: payload.items ?? prev.items,
+              message: payload.message ?? prev.message,
+              averageRating: prev.averageRating ?? 0,
+              completedProjectCount: prev.completedProjectCount ?? 0,
+              ratingCount: prev.ratingCount ?? 0,
+              distributorName: prev.distributorName ?? '',
+              distributorEmail: prev.distributorEmail ?? '',
+              distributorPhone: prev.distributorPhone ?? '',
+            }));
             setViewingDistributorDetail(true);
           }
 
@@ -111,9 +123,8 @@ export default function AdminMaterialRequestDetail() {
         });
       }
     },
-
     [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
-      if (materialRequestId == payload.serviceRequestID) {
+      if (materialRequestId == payload.materialRequestID) {
         // Update contractor list
         setDistributorApplicationList((prev) =>
           prev.map((ca) =>
@@ -134,8 +145,8 @@ export default function AdminMaterialRequestDetail() {
         }
       }
     },
-
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
+      console.log("payload", payload);
       if (
         payload.distributorApplicationID ===
         selectedDistributor?.distributorApplicationID
@@ -144,7 +155,14 @@ export default function AdminMaterialRequestDetail() {
           ...prev,
           status: 'Approved',
           dueCommisionTime: null,
+          payment: { ...prev.payment, ...payload }
         }));
+      }
+    },
+    [RealtimeEvents.MaterialRequestDelete]: (payload) => {
+      if (payload.materialRequestID === materialRequestId) {
+        navigate('/Admin/MaterialRequestManager');
+        toast.info(t('distributorMaterialRequestDetail.realTime'));
       }
     },
   });
@@ -437,7 +455,7 @@ export default function AdminMaterialRequestDetail() {
                               {i18n.language === 'vi'
                                 ? item?.material?.name
                                 : item?.material?.nameEN ||
-                                  item?.material?.name}
+                                item?.material?.name}
                             </td>
                             <td className="px-4 py-3 text-sm text-gray-900 text-center font-semibold">
                               {item.quantity}
@@ -446,7 +464,7 @@ export default function AdminMaterialRequestDetail() {
                               {i18n.language === 'vi'
                                 ? item?.material?.unit
                                 : item?.material?.unitEn ||
-                                  item?.material?.unit}
+                                item?.material?.unit}
                             </td>
                           </tr>
                         )
@@ -519,7 +537,7 @@ export default function AdminMaterialRequestDetail() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                     <div className="bg-gradient-to-br from-emerald-50 to-green-50 p-4 rounded-2xl border border-emerald-100">
                       <p className="text-emerald-600 text-sm font-medium mb-1">
                         {t(
@@ -553,8 +571,65 @@ export default function AdminMaterialRequestDetail() {
                       </p>
                       <p className="font-bold text-lg text-amber-700 flex items-center gap-1">
                         <i className="fa-solid fa-star"></i>
-                        {selectedDistributor.averageRating.toFixed(1)}
+                        {selectedDistributor.averageRating?.toFixed(1) || '0.0'}
                       </p>
+                    </div>
+
+                    {/* Reputation Points với Tooltip */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-violet-50 p-4 rounded-2xl border border-indigo-100 group relative">
+                      <p className="text-indigo-600 text-sm font-medium mb-1 flex items-center gap-1">
+                        {t('adminMaterialRequestManager.distributorDetail.reputation') || 'Uy tín'}
+                        <span className="w-3.5 h-3.5 rounded-full bg-indigo-200 text-indigo-600 flex items-center justify-center text-[10px] cursor-help font-bold">
+                          ?
+                        </span>
+                      </p>
+                      <p className="font-bold text-lg text-indigo-700 flex items-center gap-1">
+                        <i className="fa-solid fa-shield-alt"></i>
+                        {selectedDistributor.reputationPoints ?? 0}
+                      </p>
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg min-w-max">
+                        <div className="font-semibold mb-1">
+                          {t('adminMaterialRequestManager.distributorDetail.reputationTooltipTitle') || 'Điểm uy tín theo giá trị đơn hàng:'}
+                        </div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
+                        <div>{t('adminMaterialRequestManager.distributorDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                      </div>
+                    </div>
+
+                    {/* Order Scale Counts */}
+                    <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-4 rounded-2xl border border-teal-100">
+                      <p className="text-teal-600 text-sm font-medium mb-2">
+                        {t('adminMaterialRequestManager.distributorDetail.ordersByScale') || 'Đơn hàng theo quy mô'}
+                      </p>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="group/small relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-box text-green-400"></i>
+                          <span className="font-bold text-green-700">{selectedDistributor.smallScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/medium relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-boxes text-yellow-500"></i>
+                          <span className="font-bold text-yellow-600">{selectedDistributor.mediumScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                        <div className="group/large relative flex items-center gap-1 cursor-help">
+                          <i className="fas fa-warehouse text-red-500"></i>
+                          <span className="font-bold text-red-600">{selectedDistributor.largeScaleProjectCount ?? 0}</span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
+                            {t('adminMaterialRequestManager.distributorDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-2xl border border-purple-100">
@@ -660,6 +735,84 @@ export default function AdminMaterialRequestDetail() {
                     )}
                 </div>
               </div>
+              {/*Payment Information */}
+              {selectedDistributor.status === 'Approved' && (
+                <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-5 rounded-2xl border border-indigo-100 mt-5">
+                  <p className="text-indigo-600 text-sm font-semibold mb-4 uppercase tracking-wide flex items-center gap-2">
+                    <i className="fa-solid fa-credit-card"></i>
+                    {t(
+                      'adminServiceRequestManager.contractorDetail.paymentInfo'
+                    )}
+                  </p>
+
+                  <div className="bg-white rounded-xl overflow-hidden shadow-sm">
+                    <table className="w-full">
+                      <thead className="bg-gradient-to-r from-indigo-100 to-blue-100">
+                        <tr>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.orderCode'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.amount'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t('adminServiceRequestManager.description')}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t(
+                              'adminServiceRequestManager.contractorDetail.createAt'
+                            )}
+                          </th>
+                          <th className="px-4 py-3 text-center text-xs font-semibold text-indigo-700 uppercase tracking-wider">
+                            {t('adminServiceRequestManager.status')}
+                          </th>
+                        </tr>
+                      </thead>
+
+                      <tbody className="divide-y divide-gray-100">
+                        <tr className="hover:bg-indigo-50 transition-colors">
+                          <td className="px-4 py-3 text-sm font-medium text-gray-900 text-center">
+                            {selectedDistributor.payment?.orderCode || 'N/A'}
+                          </td>
+
+                          <td className="px-4 py-3 text-sm font-bold text-emerald-600 text-center">
+                            {formatVND(
+                              selectedDistributor.payment?.amount || 0
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3 text-sm text-gray-700 text-center">
+                            {selectedDistributor.payment?.description?.replaceAll(
+                              '-',
+                              ''
+                            ) || 'No description'}
+                          </td>
+
+                          <td className="px-4 py-4 text-sm text-gray-700 text-center">
+                            {formatDate(
+                              selectedDistributor.payment?.paidAt,
+                              i18n.language
+                            )}
+                          </td>
+
+                          <td className="px-4 py-4 text-sm text-gray-900 text-center">
+                            <div className="flex justify-center">
+                              <StatusBadge
+                                status={selectedDistributor.payment?.status}
+                                type="Payment"
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </>
           ) : distributorApplicationList.length === 0 ? (
             <div className="flex flex-col items-center mt-5 mb-5">

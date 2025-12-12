@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email.Interface;
@@ -18,6 +19,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public IGroqClient GroqClient { get; }
         public IOptions<PayOsOptions> PayOsOptions { get; }
         public ISignalRNotifier Notifier { get; }
+        public IHostEnvironment HostEnvironment { get; }
 
         public InfraDependencies(
             IConfiguration configuration,
@@ -26,7 +28,8 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             IHttpContextAccessor http,
             IGroqClient groqClient,
             IOptions<PayOsOptions> payOsOptions,
-            ISignalRNotifier notifier
+            ISignalRNotifier notifier,
+            IHostEnvironment hostEnvironment
         )
         {
             Configuration = configuration;
@@ -36,6 +39,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             GroqClient = groqClient;
             PayOsOptions = payOsOptions;
             Notifier = notifier;
+            HostEnvironment = hostEnvironment;
         }
     }
 }
