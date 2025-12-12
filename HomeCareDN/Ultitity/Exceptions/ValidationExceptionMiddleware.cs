@@ -12,44 +12,45 @@ namespace Ultitity.Exceptions
             _next = next;
         }
 
-        public async Task InvokeAsync(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                await _next(httpContext);
+                await _next(context);
             }
             catch (CustomValidationException ex)
             {
-                await HandleValidationExceptionAsync(httpContext, ex);
+                await WriteJsonAsync(
+                    context,
+                    StatusCodes.Status400BadRequest,
+                    new { message = ex.Message, errors = ex.Errors }
+                );
             }
-            catch
+            catch (Exception ex)
             {
-                await HandleExceptionAsync(httpContext);
+                await WriteJsonAsync(
+                    context,
+                    StatusCodes.Status500InternalServerError,
+                    new { message = "An unexpected error occurred.", detail = ex.Message }
+                );
             }
         }
 
-        private static async Task HandleValidationExceptionAsync(
+        private static async Task WriteJsonAsync(
             HttpContext context,
-            CustomValidationException exception
+            int statusCode,
+            object payload
         )
         {
+            // Nếu response đã bắt đầu → không ghi tiếp nữa (tránh connection closed)
+            if (context.Response.HasStarted)
+                return;
+
+            context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-            var response = new { message = exception.Message, errors = exception.Errors };
+            var json = JsonSerializer.Serialize(payload);
 
-            var json = JsonSerializer.Serialize(response);
-            await context.Response.WriteAsync(json);
-        }
-
-        private static async Task HandleExceptionAsync(HttpContext context)
-        {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-            var response = new { message = "An unexpected error occurred." };
-
-            var json = JsonSerializer.Serialize(response);
             await context.Response.WriteAsync(json);
         }
     }
