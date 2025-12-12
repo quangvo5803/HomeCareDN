@@ -25,7 +25,7 @@ export default function ItemViewAll() {
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
   const [selectedType, setSelectedType] = useState("Material");
-  const [, setSelectedServiceType] = useState("Repair");
+  const [_, setSelectedServiceType] = useState("Repair");
   const urlType = searchParams.get("type");
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     searchParams.get('categoryId') || ''
@@ -230,6 +230,10 @@ export default function ItemViewAll() {
       </>
     );
   };
+  const totalCount =
+    selectedType === "Material"
+      ? `${loading ? 0 : totalMaterials} ${t("itemViewAll.materials")}`
+      : `${loading ? 0 : totalServices} ${t("itemViewAll.services")}`;
 
   return (
     <div className="min-h-screen font-sans bg-white">
@@ -267,10 +271,7 @@ export default function ItemViewAll() {
 
         {/* Counter phía dưới */}
         <div className="text-gray-600 text-sm mb-10">
-          {selectedType === "Material"
-            ? `${loading ? 0 : totalMaterials} ${t("itemViewAll.materials")}`
-            : `${loading ? 0 : totalServices} ${t("itemViewAll.services")}`
-          }
+          {totalCount}
         </div>
 
 

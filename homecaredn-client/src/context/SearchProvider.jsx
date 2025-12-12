@@ -195,7 +195,7 @@ export const SearchProvider = ({ children }) => {
   // ==================== Save Search Term ====================
   const saveSearchTerm = useCallback(async (userId, searchTerm, type) => {
     try {
-      if (!searchTerm || !searchTerm.trim()) return;
+      if (!searchTerm.trim()) return;
 
       if (userId) {
         // Logged in - Save to DB

@@ -114,17 +114,17 @@ namespace BusinessLogic.Services
             return new AiChatResponseDto { Reply = result };
         }
 
-        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSearchDto)
+        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSuggest)
         {
-            if (aiSearchDto == null || string.IsNullOrWhiteSpace(aiSearchDto.SearchType))
+            if (aiSuggest == null || string.IsNullOrWhiteSpace(aiSuggest.SearchType))
                 return new List<string>();
 
-            if (string.IsNullOrWhiteSpace(aiSearchDto.Language))
-                aiSearchDto.Language = "en";
+            if (string.IsNullOrWhiteSpace(aiSuggest.Language))
+                aiSuggest.Language = "en";
 
-            var userHistory = aiSearchDto.History ?? new List<string>();
+            var userHistory = aiSuggest.History ?? new List<string>();
 
-            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSearchDto, userHistory);
+            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSuggest, userHistory);
 
             string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
 
@@ -247,9 +247,9 @@ OUTPUT (start with [ immediately):
             return raw.Substring(start, end - start + 1);
         }
 
-        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSearchDto)
+        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSuggest)
         {
-            var aiKeywords = await SuggestSearchAsync(aiSearchDto);
+            var aiKeywords = await SuggestSearchAsync(aiSuggest);
             var results = new List<object>();
 
             foreach (var keyword in aiKeywords)
@@ -257,10 +257,10 @@ OUTPUT (start with [ immediately):
                 var parameter = new QueryParameters
                 {
                     Search = keyword,
-                    SearchType = aiSearchDto.SearchType,
+                    SearchType = aiSuggest.SearchType,
                 };
 
-                switch (aiSearchDto.SearchType)
+                switch (aiSuggest.SearchType)
                 {
                     case "Material":
                         var materialResult = await _materialService.GetAllMaterialAsync(parameter);

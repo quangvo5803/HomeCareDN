@@ -35,13 +35,13 @@ namespace BusinessLogic.Services
             if (parameters.ExcludedID != null)
                 baseQuery = baseQuery.Where(s => s.ServiceID != parameters.ExcludedID);
 
-            if (!string.IsNullOrEmpty(parameters.SearchType))
+            if (!string.IsNullOrEmpty(parameters.SearchType) &&
+                Enum.TryParse<ServiceType>(parameters.SearchType, true, out var serviceType)
+            )
             {
-                if (Enum.TryParse<ServiceType>(parameters.SearchType, true, out var serviceType))
-                {
-                    baseQuery = baseQuery.Where(s => s.ServiceType == serviceType);
-                }
+                baseQuery = baseQuery.Where(s => s.ServiceType == serviceType);
             }
+
 
             if (!string.IsNullOrEmpty(parameters.Search))
             {

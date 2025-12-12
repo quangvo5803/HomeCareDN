@@ -320,6 +320,101 @@ export default function Header() {
     aiSuggestions.length === 0 &&
     searchText.trim().length > 0;
 
+  let content;
+
+  if (searchLoading) {
+    content = (
+      <div className="flex justify-center items-center py-12">
+        <LoadingComponent />
+      </div>
+    );
+  } else if (hasResults) {
+    content = (
+      <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
+        <i className="fas fa-search text-6xl" />
+        <span className="text-sm font-medium">
+          {t('header.noResult')}
+        </span>
+      </div>
+    );
+  } else {
+    content = (
+      <>
+        {/* SEARCH RESULTS */}
+        {results.length > 0 && (
+          <div className="border-b border-gray-100">
+            {results.map((item) => (
+              <div
+                key={item.materialID || item.serviceID}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group"
+              >
+                {item.imageUrls?.[0] && (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt={item.name}
+                    className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                  />
+                )}
+                <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
+                  {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* AI SUGGESTIONS */}
+        {aiSuggestions.length > 0 && (
+          <div className="border-b border-gray-100">
+            {aiSuggestions.map((item) => (
+              <div
+                key={item}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150 group"
+              >
+                {item.imageUrls?.[0] ? (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt={item.name}
+                    className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i className="fas fa-fire text-red-500 text-lg" />
+                  </div>
+                )}
+                <span className="text-orange-600 font-medium group-hover:text-orange-700">
+                  {i18n.language === 'vi'
+                    ? item.name
+                    : item.nameEN || item.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* SEARCH HISTORY */}
+        {history.length > 0 && (
+          <div>
+            {history.map((item) => (
+              <div
+                key={item}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors duration-150 group"
+              >
+                <i className="fas fa-history text-gray-400 group-hover:text-gray-600 transition-colors text-lg" />
+                <span className="text-gray-600 group-hover:text-gray-800 transition-colors">
+                  {item.searchTerm || item}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <header
       id="top"
@@ -393,92 +488,7 @@ export default function Header() {
             {showHistory && (
               <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
                 <div className="max-h-96 overflow-y-auto">
-                  {searchLoading ? (
-                    <div className="flex justify-center items-center py-12">
-                      <LoadingComponent />
-                    </div>
-                  ) : hasResults ? (
-                    <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
-                      <i className="fas fa-search text-6xl" />
-                      <span className="text-sm font-medium">
-                        {t('header.noResult')}
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      {/* SEARCH RESULTS */}
-                      {results.length > 0 && (
-                        <div className="border-b border-gray-100">
-                          {results.map((item, i) => (
-                            <div
-                              key={i}
-                              onMouseDown={() => handleSelectItem(item)}
-                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group"
-                            >
-                              {item.imageUrls?.[0] && (
-                                <img
-                                  src={item.imageUrls[0]}
-                                  alt={item.name}
-                                  className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
-                                />
-                              )}
-                              <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
-                                {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* AI SUGGESTIONS */}
-                      {aiSuggestions.length > 0 && (
-                        <div className="border-b border-gray-100">
-                          {aiSuggestions.map((item, i) => (
-                            <div
-                              key={`ai-${i}`}
-                              onMouseDown={() => handleSelectItem(item)}
-                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150 group"
-                            >
-                              {item.imageUrls?.[0] ? (
-                                <img
-                                  src={item.imageUrls[0]}
-                                  alt={item.name}
-                                  className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
-                                />
-                              ) : (
-                                <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                                  <i className="fas fa-fire text-red-500 text-lg" />
-                                </div>
-                              )}
-                              <span className="text-orange-600 font-medium group-hover:text-orange-700">
-                                {i18n.language === 'vi'
-                                  ? item.name
-                                  : item.nameEN || item.name}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* SEARCH HISTORY */}
-                      {history.length > 0 && (
-                        <div>
-                          {history.map((item, i) => (
-                            <div
-                              key={`history-${i}`}
-                              onMouseDown={() => handleSelectItem(item)}
-                              className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors duration-150 group"
-                            >
-                              <i className="fas fa-history text-gray-400 group-hover:text-gray-600 transition-colors text-lg" />
-                              <span className="text-gray-600 group-hover:text-gray-800 transition-colors">
-                                {item.searchTerm || item}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
+                  {content}
                 </div>
               </div>
             )}
