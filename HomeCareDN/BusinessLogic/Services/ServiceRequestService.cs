@@ -316,8 +316,9 @@ namespace BusinessLogic.Services.Interfaces
             await DeleteRelatedEntity(serviceRequest!);
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
 
-            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
-                n.DataKey == "ServiceRequest" && !n.IsRead, asNoTracking: false
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataKey == "ServiceRequest" && !n.IsRead,
+                asNoTracking: false
             );
             if (noti != null)
             {
@@ -333,11 +334,7 @@ namespace BusinessLogic.Services.Interfaces
                 await _notifier.SendToApplicationGroupAsync(
                     $"role_Contractor",
                     "NotificationServiceRequest.Delete",
-                    new
-                    {
-                        NotificationID = notiId,
-                        PendingCount = newCount
-                    }
+                    new { NotificationID = notiId, PendingCount = newCount }
                 );
             }
             await _unitOfWork.SaveAsync();
@@ -397,7 +394,7 @@ namespace BusinessLogic.Services.Interfaces
                 );
                 if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
                 {
-                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(2);
                 }
             }
         }
