@@ -18,6 +18,8 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public UserManager<ApplicationUser> UserManager { get; }
         public PayOS PayOS { get; }
         public INotificationService NotificationService { get; }
+        public IMaterialService MaterialService { get; }
+        public IServicesService ServicesService { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
@@ -36,6 +38,12 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             UserManager = userManager;
             PayOS = payOS;
             NotificationService = notificationService;
+            MaterialService = new MaterialService(
+                unitOfWork,
+                mapper,
+                userManager
+            );
+            ServicesService = new ServicesService(unitOfWork, mapper);
         }
     }
 }

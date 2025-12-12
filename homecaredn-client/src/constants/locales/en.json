@@ -3,17 +3,18 @@
     "home": "Home",
     "about": "About Us",
     "services": "Our Services",
-    "construction": "Construction Home",
-    "repair": "Repair Home",
+    "construction": "Construction",
+    "repair": "Repair",
     "material": "Material",
     "materialCatalog": "Material Catalog",
     "contact": "Contact Us",
     "login": "Login",
     "register": "Register",
-    "search": "Search...",
     "profile": "Profile",
     "logout": "Logout",
-    "become_partner": "Become a Partner"
+    "become_partner": "Become a Partner",
+    "placeholder": "Search materials, repairs, or construction...",
+    "noResult": "No results found"
   },
   "home": {
     "slider_category1": "Commercial",
@@ -169,9 +170,7 @@
     "relatedMaterial": "Related Materials"
   },
   "itemViewAll": {
-    "listMaterial": "List of materials",
-    "listRepair": "List of repair services",
-    "listConstruction": "List of construction services",
+    "list": "List of",
     "materials": "materials",
     "services": "services",
     "dropMaterial": "Material",

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.Interfaces;
@@ -8,6 +9,7 @@ using DataAccess.UnitOfWork;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Org.BouncyCastle.Utilities.Collections;
 using Ultitity.Clients.Groqs;
 using Ultitity.Exceptions;
 
@@ -20,6 +22,8 @@ namespace BusinessLogic.Services
         private readonly IDistributedCache _cache;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHostEnvironment _env;
+        private readonly IMaterialService _materialService;
+        private readonly IServicesService _servicesService;
 
         private const string MESSAGE = "Message";
         private const string SYSTEM = "system";
@@ -54,19 +58,17 @@ namespace BusinessLogic.Services
               BẮT BUỘC: Chỉ trả về mảng JSON thuần túy (Array String). Không Markdown, không giải thích.
               Ví dụ: [""sửa điện"", ""thợ điện"", ""bóng đèn""]";
 
-        private const string SYSTEM_PROMPT_ESTIMATE =
-            @"Bạn là Chuyên gia Dự toán Xây dựng HomeCareDN.
-              Context: {0}
-              Nhiệm vụ: Ước lượng chi phí sơ bộ dựa trên yêu cầu.
-              Yêu cầu: Trình bày bảng giá (Table Markdown), các hạng mục cần làm, và tổng chi phí ước tính (VNĐ).
-              Cảnh báo: Ghi rõ đây chỉ là tham khảo.";
+        private const string SYSTEM_PROMPT_SEARCH =
+            @"Bạn là trợ lý tìm kiếm thông minh. Nhiệm vụ của bạn là dựa trên lịch sử tìm kiếm của người dùng để gợi ý các từ khóa liên quan, có thể dùng cho tìm kiếm sản phẩm (Material) hoặc dịch vụ (Repair/Construction). Trả về kết quả dưới dạng JSON danh sách từ khóa.";
 
         public AiChatService(
             IGroqClient groq,
             IDistributedCache cache,
             IUnitOfWork unitOfWork,
             IConfiguration config,
-            IHostEnvironment env
+            IHostEnvironment env,
+            IMaterialService materialService,
+            IServicesService servicesService
         )
         {
             _groq = groq;
@@ -74,6 +76,8 @@ namespace BusinessLogic.Services
             _unitOfWork = unitOfWork;
             _config = config;
             _env = env;
+            _materialService = materialService;
+            _servicesService = servicesService;
         }
 
         public async Task<AiChatResponseDto> ChatSupportAsync(AiChatRequestDto dto)
@@ -110,18 +114,170 @@ namespace BusinessLogic.Services
             return new AiChatResponseDto { Reply = result };
         }
 
-        public async Task<List<string>> SuggestSearchAsync(string query)
+        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSuggest)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            if (aiSuggest == null || string.IsNullOrWhiteSpace(aiSuggest.SearchType))
+                return new List<string>();
+
+            if (string.IsNullOrWhiteSpace(aiSuggest.Language))
+                aiSuggest.Language = "en";
+
+            var userHistory = aiSuggest.History ?? new List<string>();
+
+            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSuggest, userHistory);
+
+            string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
+
+            if (string.IsNullOrWhiteSpace(raw))
+                return new List<string>();
+
+            string json = TryExtractJsonArray(raw);
+
+            try
             {
-                var error = new Dictionary<string, string[]>
-                {
-                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
-                };
-                throw new CustomValidationException(error);
+                var result = JsonSerializer.Deserialize<List<string>>(
+                    json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                );
+
+                return result ?? new List<string>();
             }
-            var result = await _groq.ChatAsync(SYSTEM_PROMPT_SUGGEST, query);
-            return ExtractJsonList(result, query);
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
+        // ==================== Build Suggest Prompt ====================
+        private static (string systemPrompt, string userPrompt) BuildSuggestPrompt(
+            AiSearchRequestDto aiSearchDto,
+            List<string> userHistory
+        )
+        {
+            string systemPrompt =
+                @"You are a search keyword suggestion system for a construction and home repair marketplace.
+
+CRITICAL RULES:
+1. Response must be ONLY a valid JSON array of strings
+2. NO markdown, NO ```json wrapper, NO explanation
+3. NO extra text before or after JSON
+4. Output format EXACTLY: [""keyword1"", ""keyword2"", ""keyword3""]
+5. Each keyword must be relevant to the search category
+6. Keywords should be practical and commonly searched";
+
+            string userPrompt;
+
+            if (userHistory.Any())
+            {
+                string historyText = string.Join(", ", userHistory.Take(5));
+
+                userPrompt =
+                    $@"Generate search suggestions based on user history.
+
+USER PROFILE:
+- Search Category: {aiSearchDto.SearchType}
+- Recent Searches: {historyText}
+- Language: {aiSearchDto.Language}
+
+TASK:
+Generate 8-10 relevant search keywords for ""{aiSearchDto.SearchType}"" category.
+
+STRATEGY:
+- 60% related to user's search history
+- 40% popular items in this category
+
+EXAMPLES FOR CATEGORIES:
+- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+
+OUTPUT (start with [ immediately):
+[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+            }
+            else
+            {
+                userPrompt =
+                    $@"Generate popular search suggestions for first-time visitor.
+
+USER PROFILE:
+- Search Category: {aiSearchDto.SearchType}
+- Search History: None
+- Language: {aiSearchDto.Language}
+
+TASK:
+Suggest 8-10 MOST POPULAR keywords for ""{aiSearchDto.SearchType}"" category.
+
+FOCUS ON:
+- Best-selling products/services
+- Most frequently searched items
+- Essential items people often look for
+
+EXAMPLES FOR CATEGORIES:
+- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+
+OUTPUT (start with [ immediately):
+[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+            }
+
+            return (systemPrompt, userPrompt);
+        }
+
+        // ==================== Extract JSON Array ====================
+        private static string TryExtractJsonArray(string raw)
+        {
+            raw = raw.Trim();
+
+            if (raw.StartsWith("```json"))
+                raw = raw.Substring(7);
+            if (raw.StartsWith("```"))
+                raw = raw.Substring(3);
+            if (raw.EndsWith("```"))
+                raw = raw.Substring(0, raw.Length - 3);
+
+            raw = raw.Trim();
+
+            int start = raw.IndexOf('[');
+            int end = raw.LastIndexOf(']');
+
+            if (start == -1 || end == -1 || end <= start)
+                return "[]";
+
+            return raw.Substring(start, end - start + 1);
+        }
+
+        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSuggest)
+        {
+            var aiKeywords = await SuggestSearchAsync(aiSuggest);
+            var results = new List<object>();
+
+            foreach (var keyword in aiKeywords)
+            {
+                var parameter = new QueryParameters
+                {
+                    Search = keyword,
+                    SearchType = aiSuggest.SearchType,
+                };
+
+                switch (aiSuggest.SearchType)
+                {
+                    case "Material":
+                        var materialResult = await _materialService.GetAllMaterialAsync(parameter);
+                        if (materialResult?.Items != null)
+                            results.AddRange(materialResult.Items);
+                        break;
+
+                    case "Repair":
+                    case "Construction":
+                        var serviceResult = await _servicesService.GetAllServicesAsync(parameter);
+                        if (serviceResult?.Items != null)
+                            results.AddRange(serviceResult.Items);
+                        break;
+                }
+            }
+
+            return results.Distinct().ToList();
         }
 
         public async Task<AiServiceRequestPredictionResponseDto> EstimatePriceAsync(

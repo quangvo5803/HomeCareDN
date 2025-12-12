@@ -35,10 +35,18 @@ namespace BusinessLogic.Services
             if (parameters.ExcludedID != null)
                 baseQuery = baseQuery.Where(s => s.ServiceID != parameters.ExcludedID);
 
+            if (!string.IsNullOrEmpty(parameters.SearchType) &&
+                Enum.TryParse<ServiceType>(parameters.SearchType, true, out var serviceType)
+            )
+            {
+                baseQuery = baseQuery.Where(s => s.ServiceType == serviceType);
+            }
+
+
             if (!string.IsNullOrEmpty(parameters.Search))
             {
                 var searchUpper = parameters.Search.ToUpper();
-
+                
                 baseQuery = baseQuery.Where(s =>
                     (!string.IsNullOrEmpty(s.Name) && s.Name.ToUpper().Contains(searchUpper))
                     || (!string.IsNullOrEmpty(s.NameEN) && s.NameEN.ToUpper().Contains(searchUpper))
@@ -147,6 +155,7 @@ namespace BusinessLogic.Services
                 TotalCount = totalCount,
                 PageNumber = parameters.PageNumber,
                 PageSize = parameters.PageSize,
+                Search = parameters.Search,
             };
         }
 

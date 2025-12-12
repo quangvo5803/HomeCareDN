@@ -87,6 +87,7 @@ namespace BusinessLogic.Services
                     TotalCount = totalCount,
                     PageNumber = parameters.PageNumber,
                     PageSize = parameters.PageSize,
+                    Search = parameters.Search,
                 };
             }
 
