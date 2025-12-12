@@ -116,7 +116,6 @@ namespace BusinessLogic.Services
 
         public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSearchDto)
         {
-            // 1. Validate input
             if (aiSearchDto == null || string.IsNullOrWhiteSpace(aiSearchDto.SearchType))
                 return new List<string>();
 
@@ -125,19 +124,15 @@ namespace BusinessLogic.Services
 
             var userHistory = aiSearchDto.History ?? new List<string>();
 
-            // 2. Build system + user prompt
             var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSearchDto, userHistory);
 
-            // 3. Call AI (Groq)
             string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
 
             if (string.IsNullOrWhiteSpace(raw))
                 return new List<string>();
 
-            // 4. Extract JSON from AI response
             string json = TryExtractJsonArray(raw);
 
-            // 5. Deserialize
             try
             {
                 var result = JsonSerializer.Deserialize<List<string>>(

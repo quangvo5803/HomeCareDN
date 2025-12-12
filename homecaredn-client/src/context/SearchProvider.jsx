@@ -147,7 +147,7 @@ export const SearchProvider = ({ children }) => {
       toast.error(handleApiError(err));
       return [];
     }
-  });
+  }, []);
 
   // ================= SEARCH SERVICE (Repair/Construction) =================
   const fetchSearchService = useCallback(async (params = {}) => {
@@ -158,7 +158,7 @@ export const SearchProvider = ({ children }) => {
       toast.error(handleApiError(err));
       return [];
     }
-  });
+  }, []);
 
   // ==================== Get Combined Suggestions ====================
   // Returns history + AI keywords (NOT products/services)

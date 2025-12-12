@@ -25,7 +25,7 @@ export default function ItemViewAll() {
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
   const [selectedType, setSelectedType] = useState("Material");
-  const [selectedServiceType, setSelectedServiceType] = useState("Repair");
+  const [, setSelectedServiceType] = useState("Repair");
   const urlType = searchParams.get("type");
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     searchParams.get('categoryId') || ''
@@ -47,6 +47,9 @@ export default function ItemViewAll() {
   const [buildingType, setBuildingType] = useState(null);
   const [mainStructureType, setMainStructureType] = useState(null);
   const [designStyle, setDesignStyle] = useState(null);
+
+  const [isDropdown, setIsDropdown] = useState(false);
+  const searchValue = searchParams.get("search") || "";
 
   useEffect(() => {
     const catId = searchParams.get('categoryId');
@@ -78,6 +81,7 @@ export default function ItemViewAll() {
         SortBy: sortOption,
         FilterCategoryID: selectedCategoryId || null,
         FilterBrandID: selectedBrandId || null,
+        Search: searchValue || null,
       });
     } else {
       fetchServices({
@@ -89,6 +93,7 @@ export default function ItemViewAll() {
         FilterBuildingType: buildingType || undefined,
         FilterMainStructureType: mainStructureType || undefined,
         FilterDesignStyle: designStyle || undefined,
+        Search: searchValue || null,
       });
     }
 
@@ -105,6 +110,7 @@ export default function ItemViewAll() {
     designStyle,
     fetchMaterials,
     fetchServices,
+    searchValue,
   ]);
   useEffect(() => {
     if (urlType) {
@@ -229,33 +235,42 @@ export default function ItemViewAll() {
     <div className="min-h-screen font-sans bg-white">
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header with item count */}
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-3 mb-1">
           {/* Title */}
           <h1 className="text-xl font-semibold text-gray-800">
-            {selectedType === "Material"
-              ? t("itemViewAll.listMaterial")
-              : selectedServiceType === "Repair"
-                ? t("itemViewAll.listRepair")
-                : t("itemViewAll.listConstruction")}
+            {t("itemViewAll.list")}
           </h1>
 
-          {/* Dropdown */}
-          <select
-            value={selectedType}
-            onChange={(e) => handleSelectType(e.target.value)}
-            className="border px-3 py-2 rounded-lg shadow-sm text-gray-700 cursor-pointer"
-          >
-            <option value="Material">{t("itemViewAll.dropMaterial")}</option>
-            <option value="Repair">{t("itemViewAll.dropRepair")}</option>
-            <option value="Construction">{t("itemViewAll.dropConstruction")}</option>
-          </select>
+          {/* Wrapper select + icon */}
+          <div className="relative">
+            <select
+              value={selectedType}
+              onChange={(e) => handleSelectType(e.target.value)}
+              onClick={() => setIsDropdown(!isDropdown)}
+              onBlur={() => setIsDropdown(false)}
+              className="border px-3 py-2 pr-10 rounded-lg shadow-sm text-gray-800 cursor-pointer hover:border-blue-400 focus:border-blue-500 transition duration-200 appearance-none"
+            >
+              <option value="Material">{t("itemViewAll.dropMaterial")}</option>
+              <option value="Repair">{t("itemViewAll.dropRepair")}</option>
+              <option value="Construction">{t("itemViewAll.dropConstruction")}</option>
+            </select>
+            {/* Icon */}
+            <i
+              className={`
+                absolute right-3 top-1/2 -translate-y-1/2 
+                text-gray-600 pointer-events-none transition duration-200
+                ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+              `}
+            ></i>
+          </div>
         </div>
 
         {/* Counter phía dưới */}
         <div className="text-gray-600 text-sm mb-10">
           {selectedType === "Material"
-            ? `${totalMaterials} ${t("itemViewAll.materials")}`
-            : `${totalServices} ${t("itemViewAll.services")}`}
+            ? `${loading ? 0 : totalMaterials} ${t("itemViewAll.materials")}`
+            : `${loading ? 0 : totalServices} ${t("itemViewAll.services")}`
+          }
         </div>
 
 

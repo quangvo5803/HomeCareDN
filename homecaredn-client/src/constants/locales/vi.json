@@ -14,10 +14,7 @@
     "logout": "Đăng Xuất",
     "become_partner": "Đăng kí trở thành đối tác",
     "placeholder": "Tìm kiếm vật liệu, sửa chữa hoặc xây dựng...",
-    "noResult": "Không tìm thấy kết quả",
-    "searchResult": "Kết quả tìm kiếm",
-    "ai": "Đề xuất của AI",
-    "searchHistory": "Các tìm kiếm gần đây"
+    "noResult": "Không tìm thấy kết quả"
   },
   "home": {
     "slider_category1": "Thương mại",
@@ -172,9 +169,7 @@
     "relatedMaterial": "Các vật liệu liên quan"
   },
   "itemViewAll": {
-    "listMaterial": "Danh sách vật liệu",
-    "listRepair": "Danh sách dịch vụ sửa chữa",
-    "listConstruction": "Danh sách dịch vụ xây dựng",
+    "list": "Danh sách",
     "materials": "vật liệu",
     "services": "dịch vụ",
     "dropMaterial": "Vật liệu",

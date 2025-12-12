@@ -17,13 +17,13 @@ namespace HomeCareDNAPI.Controllers
         }
 
         [HttpGet("search-material")]
-        public async Task<IActionResult> SearchMaterialAsync([FromQuery] QueryParameters query)
+        public async Task<IActionResult> SearchMaterial([FromQuery] QueryParameters query)
         {
             var rs = await _facadeService.SearchHistoryService.SearchMaterialAsync(query);
             return Ok(rs);
         }
         [HttpGet("search-service")]
-        public async Task<IActionResult> SearchServiceAsync([FromQuery] QueryParameters query)
+        public async Task<IActionResult> SearchService([FromQuery] QueryParameters query)
         {
             var rs = await _facadeService.SearchHistoryService.SearchServiceAsync(query);
             return Ok(rs);

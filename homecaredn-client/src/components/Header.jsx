@@ -69,7 +69,7 @@ export default function Header() {
   const [results, setResults] = useState([]);
   const wrapperRef = useRef(null);
   const [aiSuggestions, setAiSuggestions] = useState([]);
-
+  const [isDropdown, setIsDropdown] = useState(false);
   const toggleServices = () => setIsServicesOpen((v) => !v);
 
   const closeMobileNav = () => {
@@ -339,7 +339,7 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div ref={wrapperRef} className="relative w-full max-w-xl">
+          <div ref={wrapperRef} className="relative w-full max-w-[500px] mx-auto">
             {/* INPUT WRAPPER */}
             <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
               {/* SELECT TYPE */}
@@ -347,6 +347,8 @@ export default function Header() {
                 <select
                   value={type}
                   onChange={(e) => setType(e.target.value)}
+                  onClick={() => setIsDropdown(!isDropdown)}
+                  onBlur={() => setIsDropdown(false)}
                   className="appearance-none py-4 pl-5 pr-12 bg-transparent text-gray-700 font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset rounded-l-2xl transition-all"
                 >
                   <option value="Material">{t('header.material')}</option>
@@ -355,7 +357,13 @@ export default function Header() {
                     {t('header.construction')}
                   </option>
                 </select>
-                <i className="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm pointer-events-none" />
+                <i
+                  className={`
+                    absolute right-3 top-1/2 -translate-y-1/2 
+                    text-gray-600 pointer-events-none transition duration-200
+                    ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+                  `}
+                ></i>
               </div>
 
               {/* INPUT */}
@@ -375,7 +383,7 @@ export default function Header() {
               {/* SEARCH BUTTON */}
               <button
                 onClick={handleSearch}
-                className="px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-200 flex items-center justify-center"
+                className="px-6 bg-orange-600 hover:bg-orange-700 cursor-pointer text-white font-semibold transition-colors duration-200 flex items-center justify-center"
               >
                 <i className="fas fa-arrow-right text-lg" />
               </button>
@@ -386,7 +394,6 @@ export default function Header() {
               <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
                 <div className="max-h-96 overflow-y-auto">
                   {searchLoading ? (
-                    // SHOW LOADING
                     <div className="flex justify-center items-center py-12">
                       <LoadingComponent />
                     </div>
@@ -402,12 +409,6 @@ export default function Header() {
                       {/* SEARCH RESULTS */}
                       {results.length > 0 && (
                         <div className="border-b border-gray-100">
-                          <div className="px-4 py-2 bg-gray-50">
-                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                              <i className="fas fa-box-open mr-2" />
-                              {t('header.searchResult')}
-                            </span>
-                          </div>
                           {results.map((item, i) => (
                             <div
                               key={i}
@@ -422,7 +423,7 @@ export default function Header() {
                                 />
                               )}
                               <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
-                                {item.name}
+                                {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
                               </span>
                             </div>
                           ))}
@@ -432,12 +433,6 @@ export default function Header() {
                       {/* AI SUGGESTIONS */}
                       {aiSuggestions.length > 0 && (
                         <div className="border-b border-gray-100">
-                          <div className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50">
-                            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
-                              <i className="fas fa-robot mr-2" />
-                              {t('header.ai')}
-                            </span>
-                          </div>
                           {aiSuggestions.map((item, i) => (
                             <div
                               key={`ai-${i}`}
@@ -451,11 +446,11 @@ export default function Header() {
                                   className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
                                 />
                               ) : (
-                                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                  <i className="fas fa-lightbulb text-blue-600 text-lg" />
+                                <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                                  <i className="fas fa-fire text-red-500 text-lg" />
                                 </div>
                               )}
-                              <span className="text-blue-600 font-medium group-hover:text-blue-700">
+                              <span className="text-orange-600 font-medium group-hover:text-orange-700">
                                 {i18n.language === 'vi'
                                   ? item.name
                                   : item.nameEN || item.name}
@@ -468,12 +463,6 @@ export default function Header() {
                       {/* SEARCH HISTORY */}
                       {history.length > 0 && (
                         <div>
-                          <div className="px-4 py-2 bg-gray-50">
-                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                              <i className="fas fa-clock-rotate-left mr-2" />
-                              {t('header.searchHistory')}
-                            </span>
-                          </div>
                           {history.map((item, i) => (
                             <div
                               key={`history-${i}`}
@@ -631,9 +620,8 @@ export default function Header() {
                       />
                       <span className="text-sm font-medium">{label}</span>
                       <i
-                        className={`fas fa-chevron-down text-xs transition-transform ${
-                          openLang ? 'rotate-180' : ''
-                        }`}
+                        className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
                   );
@@ -721,9 +709,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (

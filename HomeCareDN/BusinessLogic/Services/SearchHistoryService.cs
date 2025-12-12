@@ -19,21 +19,18 @@ namespace BusinessLogic.Services
         private readonly IMapper _mapper;
         private readonly IMaterialService _materialService;
         private readonly IServicesService _servicesService;
-        //private readonly IAiChatService _aiChatService;
 
         public SearchHistoryService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMaterialService materialService,
             IServicesService servicesService
-            //IAiChatService aiChatService
         )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _servicesService = servicesService;
             _materialService = materialService;
-            //_aiChatService = aiChatService;
         }
 
         public async Task<SearchHistoryDto?> AddSearchHistory(SearchHistoryCreateRequestDto dto)
