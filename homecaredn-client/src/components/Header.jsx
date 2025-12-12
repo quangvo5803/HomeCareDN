@@ -344,10 +344,10 @@ export default function Header() {
         {results.length > 0 && (
           <div className="border-b border-gray-100">
             {results.map((item) => (
-              <div
+              <button
                 key={item.materialID || item.serviceID}
                 onMouseDown={() => handleSelectItem(item)}
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group"
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group w-full text-left"
               >
                 {item.imageUrls?.[0] && (
                   <img
@@ -359,7 +359,7 @@ export default function Header() {
                 <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
                   {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -368,10 +368,12 @@ export default function Header() {
         {aiSuggestions.length > 0 && (
           <div className="border-b border-gray-100">
             {aiSuggestions.map((item) => (
-              <div
+              <button
                 key={item}
                 onMouseDown={() => handleSelectItem(item)}
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150 group"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer 
+                  hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 
+                transition-all duration-150 group bg-transparent border-0"
               >
                 {item.imageUrls?.[0] ? (
                   <img
@@ -389,7 +391,7 @@ export default function Header() {
                     ? item.name
                     : item.nameEN || item.name}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}
@@ -398,16 +400,18 @@ export default function Header() {
         {history.length > 0 && (
           <div>
             {history.map((item) => (
-              <div
+              <button
                 key={item}
                 onMouseDown={() => handleSelectItem(item)}
-                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors duration-150 group"
+                className="flex w-full items-center gap-3 px-4 py-3 text-left
+                  hover:bg-gray-50 transition-colors duration-150 group 
+                  bg-transparent border-0 cursor-pointer"
               >
                 <i className="fas fa-history text-gray-400 group-hover:text-gray-600 transition-colors text-lg" />
                 <span className="text-gray-600 group-hover:text-gray-800 transition-colors">
                   {item.searchTerm || item}
                 </span>
-              </div>
+              </button>
             ))}
           </div>
         )}

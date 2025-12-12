@@ -25,7 +25,7 @@ export default function ItemViewAll() {
   const { fetchAllCategories } = useCategory();
   const { fetchAllBrands } = useBrand();
   const [selectedType, setSelectedType] = useState("Material");
-  const [_, setSelectedServiceType] = useState("Repair");
+  const [_ignored, setSelectedServiceType] = useState("Repair");
   const urlType = searchParams.get("type");
   const [selectedCategoryId, setSelectedCategoryId] = useState(
     searchParams.get('categoryId') || ''
@@ -230,10 +230,18 @@ export default function ItemViewAll() {
       </>
     );
   };
-  const totalCount =
+  const count = loading
+    ? 0
+    : selectedType === "Material"
+      ? totalMaterials
+      : totalServices;
+
+  const label =
     selectedType === "Material"
-      ? `${loading ? 0 : totalMaterials} ${t("itemViewAll.materials")}`
-      : `${loading ? 0 : totalServices} ${t("itemViewAll.services")}`;
+      ? t("itemViewAll.materials")
+      : t("itemViewAll.services");
+
+  const totalCount = `${count} ${label}`;
 
   return (
     <div className="min-h-screen font-sans bg-white">

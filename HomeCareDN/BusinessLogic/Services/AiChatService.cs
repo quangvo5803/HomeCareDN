@@ -149,7 +149,7 @@ namespace BusinessLogic.Services
         }
 
         // ==================== Build Suggest Prompt ====================
-        private (string systemPrompt, string userPrompt) BuildSuggestPrompt(
+        private static (string systemPrompt, string userPrompt) BuildSuggestPrompt(
             AiSearchRequestDto aiSearchDto,
             List<string> userHistory
         )
@@ -225,7 +225,7 @@ OUTPUT (start with [ immediately):
         }
 
         // ==================== Extract JSON Array ====================
-        private string TryExtractJsonArray(string raw)
+        private static string TryExtractJsonArray(string raw)
         {
             raw = raw.Trim();
 
