@@ -13,6 +13,7 @@ using BusinessLogic.DTOs.Application.Notification;
 using BusinessLogic.DTOs.Application.PartnerRequest;
 using BusinessLogic.DTOs.Application.Payment;
 using BusinessLogic.DTOs.Application.Review;
+using BusinessLogic.DTOs.Application.SearchHistory;
 using BusinessLogic.DTOs.Application.Service;
 using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.DTOs.Authorize.User;
@@ -64,6 +65,7 @@ namespace BusinessLogic.Mapping
             CreateMap<DistributorCreateApplicationItemDto, DistributorApplicationItem>();
             CreateMap<NotificationPersonalCreateOrUpdateDto, Notification>();
             CreateMap<NotificationSystemCreateOrUpdateDto, Notification>();
+            CreateMap<SearchHistoryCreateRequestDto, SearchHistory>();
 
             // ------------------------
             // Update DTO -> Entity (Write)
@@ -399,6 +401,7 @@ namespace BusinessLogic.Mapping
                 );
 
             CreateMap<Notification, NotificationDto>();
+            CreateMap<SearchHistory, SearchHistoryDto>();
         }
 
         // ------------------------

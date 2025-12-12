@@ -26,6 +26,7 @@ namespace DataAccess.Data
         public DbSet<DistributorApplicationItem> DistributorApplicationItems { get; set; }
         public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<SearchHistory> searchHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

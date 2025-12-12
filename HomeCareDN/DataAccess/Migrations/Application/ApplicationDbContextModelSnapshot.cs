@@ -735,6 +735,27 @@ namespace DataAccess.Migrations.Application
                     b.ToTable("Review", "app");
                 });
 
+            modelBuilder.Entity("DataAccess.Entities.Application.SearchHistory", b =>
+                {
+                    b.Property<Guid>("SearchHistoryID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SearchDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SearchTerm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SearchHistoryID");
+
+                    b.ToTable("searchHistories", "app");
+                });
+
             modelBuilder.Entity("DataAccess.Entities.Application.Service", b =>
                 {
                     b.Property<Guid>("ServiceID")

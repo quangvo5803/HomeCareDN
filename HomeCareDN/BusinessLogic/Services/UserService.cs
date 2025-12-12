@@ -5,7 +5,6 @@ using BusinessLogic.DTOs.Authorize.User;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.Data;
 using DataAccess.Entities.Authorize;
-using DataAccess.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ultitity.Exceptions;
@@ -16,7 +15,6 @@ namespace BusinessLogic.Services
     {
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly AuthorizeDbContext _db;
 
         private const string ADDRESS_STR = "Address";
@@ -27,13 +25,11 @@ namespace BusinessLogic.Services
         public UserService(
             IMapper mapper,
             UserManager<ApplicationUser> userManager,
-            IUnitOfWork unitOfWork,
             AuthorizeDbContext db
         )
         {
             _mapper = mapper;
             _userManager = userManager;
-            _unitOfWork = unitOfWork;
             _db = db;
         }
 

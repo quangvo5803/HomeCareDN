@@ -315,6 +315,31 @@ namespace BusinessLogic.Services.Interfaces
             }
             await DeleteRelatedEntity(serviceRequest!);
             _unitOfWork.ServiceRequestRepository.Remove(serviceRequest!);
+
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
+                n.DataKey == "ServiceRequest" && !n.IsRead, asNoTracking: false
+            );
+            if (noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var newCount = noti.PendingCount;
+
+                if (newCount <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"role_Contractor",
+                    "NotificationServiceRequest.Delete",
+                    new
+                    {
+                        NotificationID = notiId,
+                        PendingCount = newCount
+                    }
+                );
+            }
             await _unitOfWork.SaveAsync();
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Contractor",
@@ -477,6 +502,10 @@ namespace BusinessLogic.Services.Interfaces
                     CompletedProjectCount = contractor?.ProjectCount ?? 0,
                     AverageRating = contractor?.AverageRating ?? 0,
                     RatingCount = contractor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = contractor?.ReputationPoints ?? 0,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -505,6 +534,10 @@ namespace BusinessLogic.Services.Interfaces
                     CompletedProjectCount = contractor?.ProjectCount ?? 0,
                     AverageRating = contractor?.AverageRating ?? 0,
                     RatingCount = contractor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = contractor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = contractor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = contractor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = contractor?.ReputationPoints ?? 0,
                     DueCommisionTime = selected.DueCommisionTime,
                     ContractorName =
                         selected.Status == ApplicationStatus.Approved

@@ -92,6 +92,9 @@ namespace DataAccess.Migrations.Authorize
                     b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("LargeScaleProjectCount")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("LastOTPSentAt")
                         .HasColumnType("datetime2");
 
@@ -100,6 +103,9 @@ namespace DataAccess.Migrations.Authorize
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("MediumScaleProjectCount")
+                        .HasColumnType("int");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -127,8 +133,14 @@ namespace DataAccess.Migrations.Authorize
                     b.Property<int>("RatingCount")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReputationPoints")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SmallScaleProjectCount")
+                        .HasColumnType("int");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -155,18 +167,22 @@ namespace DataAccess.Migrations.Authorize
                             Id = "9570d410-e3ea-46e0-aac1-bb17dff7457f",
                             AccessFailedCount = 0,
                             AverageRating = 0.0,
-                            ConcurrencyStamp = "47e299a4-1a69-4222-827d-6464cdfe431b",
+                            ConcurrencyStamp = "a86ac35d-a053-47a5-b02c-2df7eef12480",
                             Email = "homecaredn43@gmail.com",
                             EmailConfirmed = true,
                             FullName = "Admin",
+                            LargeScaleProjectCount = 0,
                             LockoutEnabled = false,
+                            MediumScaleProjectCount = 0,
                             NormalizedEmail = "HOMECAREDN43@GMAIL.COM",
                             NormalizedUserName = "HOMECAREDN43@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEHIVyRrM9T7MgQzaauFVnxO1UyTB2KnT/w1WlA8SSiHqssYtZMAeE3i4y6vlQ87NQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOAvcu5y5oEP/3/tiWWFJDPD0TnrbFV4oSnJ4JziXw6/Y2Fw3i8HIZJ0Uutv3aHQdA==",
                             PhoneNumberConfirmed = false,
                             ProjectCount = 0,
                             RatingCount = 0,
-                            SecurityStamp = "f7ba3742-65a3-45be-b1d6-44d1b5b7f76f",
+                            ReputationPoints = 0,
+                            SecurityStamp = "7a23463d-8964-452e-b0ad-3f0ab5f47d24",
+                            SmallScaleProjectCount = 0,
                             TwoFactorEnabled = false,
                             UserName = "homecaredn43@gmail.com"
                         },
@@ -175,18 +191,22 @@ namespace DataAccess.Migrations.Authorize
                             Id = "cba463ec-27a1-4882-8515-afd8109ae7fa",
                             AccessFailedCount = 0,
                             AverageRating = 0.0,
-                            ConcurrencyStamp = "5fee51d6-7b36-48e9-b8ef-650c214151f4",
+                            ConcurrencyStamp = "a999632f-17ef-4b45-9b57-3b892d4c5478",
                             Email = "homecaredncontractor@gmail.com",
                             EmailConfirmed = true,
                             FullName = "Contractor",
+                            LargeScaleProjectCount = 0,
                             LockoutEnabled = false,
+                            MediumScaleProjectCount = 0,
                             NormalizedEmail = "HOMECAREDNCONTRACTOR@GMAIL.COM",
                             NormalizedUserName = "HOMECAREDNCONTRACTOR@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAyrK2r8/L8TCdYGw/TutzQNiNUW6NrK4nNpwbsQ/8QAF4o77zXs4FCPvSyLnjUeIg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEK5rVxuAkI/1GxQ4g17P3dymmHjcV2kXnboTAi8ZIIzk73Kk7/2o0P4wRjV79EUFdA==",
                             PhoneNumberConfirmed = false,
                             ProjectCount = 0,
                             RatingCount = 0,
-                            SecurityStamp = "fbdc4468-e443-49c2-8d8c-114e5dedb4fb",
+                            ReputationPoints = 0,
+                            SecurityStamp = "efd6512c-5d9c-40af-ba80-66a1596ec6b6",
+                            SmallScaleProjectCount = 0,
                             TwoFactorEnabled = false,
                             UserName = "homecaredncontractor@gmail.com"
                         },
@@ -195,18 +215,22 @@ namespace DataAccess.Migrations.Authorize
                             Id = "4e4386ec-e25d-464b-b2a3-ee57ecff614b",
                             AccessFailedCount = 0,
                             AverageRating = 0.0,
-                            ConcurrencyStamp = "5155088c-e771-4e48-8839-9b4bde56e041",
+                            ConcurrencyStamp = "f606df6a-4657-4cb0-97e1-0259727cba8d",
                             Email = "homecaredndistributor@gmail.com",
                             EmailConfirmed = true,
                             FullName = "Distributor",
+                            LargeScaleProjectCount = 0,
                             LockoutEnabled = false,
+                            MediumScaleProjectCount = 0,
                             NormalizedEmail = "HOMECAREDNDISTRIBUTOR@GMAIL.COM",
                             NormalizedUserName = "HOMECAREDNDISTRIBUTOR@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKg9WTuw72i6n/4AVl3xuhfY1pvl0BhDOdoYY1VHwQZbkgpd3y+4NXLaeGbeaEEoxQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED+Ef6n6RND0b8AxqP1F61MG75W7WVOrjwQtZ1GA/5M+6H0KI/ehiI8KMSQ+eRo29g==",
                             PhoneNumberConfirmed = false,
                             ProjectCount = 0,
                             RatingCount = 0,
-                            SecurityStamp = "21a30e86-9725-48f9-960d-d08cd5071bef",
+                            ReputationPoints = 0,
+                            SecurityStamp = "8330bfa6-29db-4e7a-ae8c-028beba4536d",
+                            SmallScaleProjectCount = 0,
                             TwoFactorEnabled = false,
                             UserName = "homecaredndistributor@gmail.com"
                         });

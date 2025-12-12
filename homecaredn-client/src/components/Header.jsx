@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import { handleApiError } from '../utils/handleApiError';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
 import useRealtime from '../realtime/useRealtime';
+import { useSearch } from '../hook/useSearch';
+import LoadingComponent from './LoadingComponent';
 
 // Navigation data
 const navItems = [
@@ -20,9 +22,13 @@ const navItems = [
     href: '#',
     type: 'dropdown',
     submenu: [
-      { label: 'header.construction', href: '/ConstructionViewAll' },
-      { label: 'header.repair', href: '/RepairViewAll' },
-      { label: 'header.material', href: '/MaterialViewAll', type: 'link' },
+      { label: 'header.construction', href: '/ItemViewAll?type=Construction' },
+      { label: 'header.repair', href: '/ItemViewAll?type=Repair' },
+      {
+        label: 'header.material',
+        href: '/ItemViewAll?type=Material',
+        type: 'link',
+      },
       {
         label: 'header.materialCatalog',
         href: '/MaterialCatalog',
@@ -48,6 +54,22 @@ export default function Header() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const {
+    fetchSearchMaterial,
+    fetchSearchService,
+    loading: searchLoading,
+    getCombinedSuggestions,
+    saveSearchTerm,
+  } = useSearch();
+
+  const [type, setType] = useState('Material');
+  const [searchText, setSearchText] = useState('');
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [results, setResults] = useState([]);
+  const wrapperRef = useRef(null);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [isDropdown, setIsDropdown] = useState(false);
   const toggleServices = () => setIsServicesOpen((v) => !v);
 
   const closeMobileNav = () => {
@@ -94,6 +116,14 @@ export default function Header() {
     );
   };
 
+  const handleDeleteNotification = (payload) => {
+    if (!payload?.notificationID || payload.pendingCount !== 0) return;
+
+    setNotifications((prev) =>
+      prev.filter((n) => n.notificationID !== payload.notificationID)
+    );
+  };
+
   useRealtime({
     [RealtimeEvents.NotificationCreated]: handleNotification,
     [RealtimeEvents.NotificationApplicationCreate]: handleNotification,
@@ -103,6 +133,10 @@ export default function Header() {
         prev.filter((n) => n.notificationID !== notificationId)
       );
     },
+    [RealtimeEvents.NotificationDistributorApplicationDelete]:
+      handleDeleteNotification,
+    [RealtimeEvents.NotificationContractorApplicationDelete]:
+      handleDeleteNotification,
   });
 
   // Close popovers when clicking outside / pressing Esc
@@ -150,6 +184,241 @@ export default function Header() {
     fetchNotifications();
   }, [t, user]);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+        setShowHistory(false);
+        setSearchText('');
+        setAiSuggestions([]);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleFocusSearch = async () => {
+    try {
+      // Get combined suggestions (history + AI)
+      const { history, aiSuggestions } = await getCombinedSuggestions(
+        user?.id,
+        type,
+        i18n.language
+      );
+
+      setHistory(history);
+      setAiSuggestions(aiSuggestions);
+      setResults([]);
+      setShowHistory(true);
+    } catch (err) {
+      console.error('[handleFocusSearch]', err);
+      setShowHistory(true);
+    }
+  };
+
+  // Realtime search
+  const handleInputChange = async (e) => {
+    const text = e.target.value;
+    setSearchText(text);
+
+    if (!text.trim()) {
+      // Show suggestions again khi clear input
+      const { history, aiSuggestions } = await getCombinedSuggestions(
+        user?.id,
+        type,
+        i18n.language
+      );
+      setHistory(history);
+      setAiSuggestions(aiSuggestions);
+      setResults([]);
+      return;
+    }
+
+    // Search for real results
+    const params = {
+      search: text,
+      FinalSearch: true,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+
+    try {
+      const res =
+        type === 'Material'
+          ? await fetchSearchMaterial(params)
+          : await fetchSearchService(params);
+
+      setResults((res || []).slice(0, 5));
+      setShowHistory(true);
+    } catch (err) {
+      console.error('Search error:', err);
+    }
+  };
+
+  const handleSearch = async () => {
+    const query = searchText.trim();
+    if (!query) return;
+
+    // Save search term
+    await saveSearchTerm(user?.id, query, type);
+
+    const params = {
+      search: query,
+      FinalSearch: false,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+
+    try {
+      if (type === 'Material') {
+        await fetchSearchMaterial(params);
+      } else {
+        await fetchSearchService(params);
+      }
+      setShowHistory(false);
+      navigate(`/ItemViewAll?type=${type}&search=${query}`);
+    } catch (err) {
+      console.error('Search error:', err);
+    }
+  };
+
+  const handleSelectItem = async (item) => {
+    const name = item.searchTerm || item.name || item.nameEN || item;
+    if (!name) return;
+
+    // Save search term
+    await saveSearchTerm(user?.id, name, type);
+
+    setSearchText(name);
+
+    const params = {
+      search: name,
+      FinalSearch: false,
+      SearchType: type,
+      ...(user && { FilterID: user.id }),
+    };
+
+    try {
+      if (type === 'Material') {
+        await fetchSearchMaterial(params);
+      } else {
+        await fetchSearchService(params);
+      }
+      setShowHistory(false);
+      navigate(`/ItemViewAll?type=${type}&search=${name}`);
+    } catch (err) {
+      console.error('Search error:', err);
+    }
+  };
+
+  const hasResults =
+    results.length === 0 &&
+    !history.some((item) =>
+      (item.searchTerm || item.name || item.nameEN || item)
+        .toLowerCase()
+        .includes(searchText.toLowerCase())
+    ) &&
+    aiSuggestions.length === 0 &&
+    searchText.trim().length > 0;
+
+  let content;
+
+  if (searchLoading) {
+    content = (
+      <div className="flex justify-center items-center py-12">
+        <LoadingComponent />
+      </div>
+    );
+  } else if (hasResults) {
+    content = (
+      <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
+        <i className="fas fa-search text-6xl" />
+        <span className="text-sm font-medium">
+          {t('header.noResult')}
+        </span>
+      </div>
+    );
+  } else {
+    content = (
+      <>
+        {/* SEARCH RESULTS */}
+        {results.length > 0 && (
+          <div className="border-b border-gray-100">
+            {results.map((item) => (
+              <button
+                key={item.materialID || item.serviceID}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-blue-50 transition-colors duration-150 group w-full text-left"
+              >
+                {item.imageUrls?.[0] && (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt={item.name}
+                    className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                  />
+                )}
+                <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
+                  {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* AI SUGGESTIONS */}
+        {aiSuggestions.length > 0 && (
+          <div className="border-b border-gray-100">
+            {aiSuggestions.map((item) => (
+              <button
+                key={item}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer 
+                  hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 
+                transition-all duration-150 group bg-transparent border-0"
+              >
+                {item.imageUrls?.[0] ? (
+                  <img
+                    src={item.imageUrls[0]}
+                    alt={item.name}
+                    className="w-12 h-12 rounded-lg object-cover shadow-sm group-hover:shadow-md transition-shadow"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <i className="fas fa-fire text-red-500 text-lg" />
+                  </div>
+                )}
+                <span className="text-orange-600 font-medium group-hover:text-orange-700">
+                  {i18n.language === 'vi'
+                    ? item.name
+                    : item.nameEN || item.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* SEARCH HISTORY */}
+        {history.length > 0 && (
+          <div>
+            {history.map((item) => (
+              <button
+                key={item}
+                onMouseDown={() => handleSelectItem(item)}
+                className="flex w-full items-center gap-3 px-4 py-3 text-left
+                  hover:bg-gray-50 transition-colors duration-150 group 
+                  bg-transparent border-0 cursor-pointer"
+              >
+                <i className="fas fa-history text-gray-400 group-hover:text-gray-600 transition-colors text-lg" />
+                <span className="text-gray-600 group-hover:text-gray-800 transition-colors">
+                  {item.searchTerm || item}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <header
       id="top"
@@ -169,16 +438,65 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          {/* <div className="flex-1 hidden lg:flex">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder={t('header.search')}
-                className="w-full py-3 pl-12 pr-4 transition-all duration-300 border border-gray-200 rounded-full bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-              />
-              <i className="absolute text-gray-400 transform -translate-y-1/2 fas fa-search left-4 top-1/2" />
+          <div ref={wrapperRef} className="relative w-full max-w-[500px] mx-auto">
+            {/* INPUT WRAPPER */}
+            <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
+              {/* SELECT TYPE */}
+              <div className="relative flex items-center bg-gradient-to-br from-blue-50 to-indigo-50 border-r border-gray-200">
+                <select
+                  value={type}
+                  onChange={(e) => setType(e.target.value)}
+                  onClick={() => setIsDropdown(!isDropdown)}
+                  onBlur={() => setIsDropdown(false)}
+                  className="appearance-none py-4 pl-5 pr-12 bg-transparent text-gray-700 font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset rounded-l-2xl transition-all"
+                >
+                  <option value="Material">{t('header.material')}</option>
+                  <option value="Repair">{t('header.repair')}</option>
+                  <option value="Construction">
+                    {t('header.construction')}
+                  </option>
+                </select>
+                <i
+                  className={`
+                    absolute right-3 top-1/2 -translate-y-1/2 
+                    text-gray-600 pointer-events-none transition duration-200
+                    ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+                  `}
+                ></i>
+              </div>
+
+              {/* INPUT */}
+              <div className="relative flex-1 flex items-center">
+                <i className="fas fa-search absolute left-5 text-gray-400 text-lg" />
+                <input
+                  type="text"
+                  value={searchText}
+                  onChange={handleInputChange}
+                  onFocus={handleFocusSearch}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder={t('header.placeholder')}
+                  className="w-full py-4 pl-14 pr-5 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
+                />
+              </div>
+
+              {/* SEARCH BUTTON */}
+              <button
+                onClick={handleSearch}
+                className="px-6 bg-orange-600 hover:bg-orange-700 cursor-pointer text-white font-semibold transition-colors duration-200 flex items-center justify-center"
+              >
+                <i className="fas fa-arrow-right text-lg" />
+              </button>
             </div>
-          </div> */}
+
+            {/* DROPDOWN HISTORY / RESULTS */}
+            {showHistory && (
+              <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
+                <div className="max-h-96 overflow-y-auto">
+                  {content}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Navigation Menu (Desktop) */}
           <div className="items-center hidden lg:flex">
@@ -294,15 +612,34 @@ export default function Header() {
 
               {/* 🌐 Language Switcher (Desktop) */}
               <div className="relative" ref={langRef}>
-                <button
-                  type="button"
-                  onClick={() => setOpenLang((v) => !v)}
-                  className="flex items-center justify-center w-10 h-10 text-gray-600 transition-all duration-300 border border-gray-300 rounded-full hover:text-blue-600 hover:bg-gray-50 hover:border-blue-500"
-                  aria-haspopup="menu"
-                  aria-expanded={openLang}
-                >
-                  <i className="fas fa-globe" />
-                </button>
+                {(() => {
+                  const current = (i18n.language || 'en').startsWith('vi')
+                    ? 'vi'
+                    : 'en';
+                  const flagCode = current === 'vi' ? 'VN' : 'US';
+                  const label = current.toUpperCase();
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setOpenLang((v) => !v)}
+                      className="flex items-center gap-2 h-9 px-3 rounded-full border border-gray-300 hover:border-blue-500 hover:bg-gray-50 transition-all"
+                      aria-haspopup="menu"
+                      aria-expanded={openLang}
+                      title={t('partnerDashboard.change_language')}
+                    >
+                      <ReactCountryFlag
+                        countryCode={flagCode}
+                        svg
+                        className="text-lg"
+                      />
+                      <span className="text-sm font-medium">{label}</span>
+                      <i
+                        className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''
+                          }`}
+                      />
+                    </button>
+                  );
+                })()}
                 {openLang && (
                   <div
                     role="menu"
@@ -386,9 +723,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (
@@ -452,7 +788,6 @@ export default function Header() {
                   </div>
                 )}
 
-                {/* Compact Language Selector */}
                 <div className="flex gap-2 mt-3">
                   <button
                     type="button"

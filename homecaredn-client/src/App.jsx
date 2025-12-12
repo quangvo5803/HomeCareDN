@@ -58,14 +58,13 @@ import DistributorMaterialManager from './pages/distributor/DistributorMaterialM
 //Partner pages
 import PartnerProfile from './pages/partner/PartnerProfile';
 //Home Page
-import MaterialViewAll from './pages/MaterialViewAll';
+import ItemViewAll from './pages/ItemViewAll';
 import MaterialDetail from './pages/MaterialDetail';
 import DistributorCategoryManager from './pages/distributor/DistributorCategoryManager';
 import ServiceDetail from './pages/ServiceDetail';
 import PartnerRegistration from './pages/PartnerRegistration';
 import PartnerTypeSelection from './pages/PartnerTypeSelection';
-import RepairViewAll from './pages/RepairViewAll';
-import ConstructionViewAll from './pages/ConstructionViewAll';
+
 // Customer pages
 import CustomerPage from './pages/customer/CustomerPage';
 import ServiceRequestCreateUpdate from './pages/customer/ServiceRequestCreateUpdate';
@@ -400,9 +399,7 @@ function Layout() {
             <Navigate to={user ? getRedirectPath(user) : '/Home'} replace />
           }
         />
-        <Route path="MaterialViewAll" element={<MaterialViewAll />} />
-        <Route path="RepairViewAll" element={<RepairViewAll />} />
-        <Route path="ConstructionViewAll" element={<ConstructionViewAll />} />
+        <Route path="ItemViewAll" element={<ItemViewAll />} />
 
         {/* Trang thông báo lỗi */}
         <Route path="/Unauthorized" element={<Unauthorized />} />

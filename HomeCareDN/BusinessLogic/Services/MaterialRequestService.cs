@@ -319,6 +319,10 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
                     Payment = _mapper.Map<PaymentTransactionDto>(payment),
                 };
             }
@@ -347,6 +351,10 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
+                    MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
+                    LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
+                    ReputationPoints = distributor?.ReputationPoints ?? 0,
                     DistributorName =
                         selected.Status == ApplicationStatus.Approved
                             ? distributor?.FullName ?? string.Empty
@@ -598,6 +606,29 @@ namespace BusinessLogic.Services
             await DeleteRelatedEntity(materialRequest);
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
 
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataKey == "MaterialRequest" && !n.IsRead, asNoTracking: false
+            );
+            if(noti != null)
+            {
+                noti.PendingCount -= 1;
+                noti.UpdatedAt = DateTime.UtcNow;
+                var notiId = noti.NotificationID;
+                var newCount = noti.PendingCount;
+                if(newCount <= 0)
+                {
+                    _unitOfWork.NotificationRepository.Remove(noti);
+                }
+                await _notifier.SendToApplicationGroupAsync(
+                    $"role_Distributor",
+                    "NotificationMaterialRequest.Delete",
+                    new
+                    {
+                        NotificationID = notiId,
+                        PendingCount = newCount
+                    }
+                );
+            }
             await _unitOfWork.SaveAsync();
             await _notifier.SendToApplicationGroupAsync(
                 $"role_Distributor",

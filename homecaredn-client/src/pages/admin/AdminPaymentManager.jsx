@@ -258,7 +258,7 @@ export default function PaymentManager() {
         <div className="block md:hidden p-4 space-y-3">
           {payments?.map((item, idx) => (
             <div
-              key={idx}
+              key={item.paymentTransactionID}
               className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
             >
               {/* Card Header */}

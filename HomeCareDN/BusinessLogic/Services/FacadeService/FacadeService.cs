@@ -25,7 +25,7 @@ namespace BusinessLogic.Services.FacadeService
         public IUserService UserService { get; }
         public IDistributorApplicationService DistributorApplicationService { get; }
         public INotificationService NotificationService { get; }
-
+        public ISearchHistoryService SearchHistoryService { get; }
         public FacadeService(
             CoreDependencies coreDeps,
             InfraDependencies infraDeps,
@@ -60,7 +60,11 @@ namespace BusinessLogic.Services.FacadeService
             AiChatService = new AiChatService(
                 infraDeps.GroqClient,
                 infraDeps.Cache,
-                coreDeps.UnitOfWork
+                coreDeps.UnitOfWork,
+                infraDeps.Configuration,
+                infraDeps.HostEnvironment,
+                coreDeps.MaterialService,
+                coreDeps.ServicesService
             );
             ConversationService = new ConversationService(
                 coreDeps.UnitOfWork,
@@ -119,7 +123,6 @@ namespace BusinessLogic.Services.FacadeService
             UserService = new UserService(
                 coreDeps.Mapper,
                 identityDeps.UserManager,
-                coreDeps.UnitOfWork,
                 coreDeps.AuthorizeDbContext
             );
 
@@ -136,6 +139,13 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 infraDeps.Notifier,
                 identityDeps.UserManager
+            );
+
+            SearchHistoryService = new SearchHistoryService(
+                coreDeps.UnitOfWork,
+                coreDeps.Mapper,
+                coreDeps.MaterialService,
+                coreDeps.ServicesService
             );
         }
     }
