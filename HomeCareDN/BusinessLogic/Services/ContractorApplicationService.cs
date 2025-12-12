@@ -384,7 +384,7 @@ namespace BusinessLogic.Services
 
             serviceRequest.Status = RequestStatus.Closed;
             contractorApplication.Status = ApplicationStatus.PendingCommission;
-            contractorApplication.DueCommisionTime = DateTime.Now.AddDays(7);
+            contractorApplication.DueCommisionTime = DateTime.Now.AddMinutes(2);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)
@@ -584,8 +584,8 @@ namespace BusinessLogic.Services
             );
             _unitOfWork.ContractorApplicationRepository.Remove(application);
 
-            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
-                n.DataValue == serviceRequest!.ServiceRequestID.ToString() && !n.IsRead,
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataValue == serviceRequest!.ServiceRequestID.ToString() && !n.IsRead,
                 asNoTracking: false
             );
             if (noti != null)
