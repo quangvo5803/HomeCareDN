@@ -196,6 +196,17 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        closeMobileNav();
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleFocusSearch = async () => {
     try {
       // Get combined suggestions (history + AI)
@@ -308,6 +319,7 @@ export default function Header() {
     } catch (err) {
       console.error('Search error:', err);
     }
+    closeMobileNav();
   };
 
   const hasResults =
@@ -438,7 +450,7 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div ref={wrapperRef} className="relative w-full max-w-[500px] mx-auto">
+          <div ref={wrapperRef} className="relative w-full max-w-[550px] mx-auto hidden lg:block">
             {/* INPUT WRAPPER */}
             <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
               {/* SELECT TYPE */}
@@ -478,14 +490,6 @@ export default function Header() {
                   className="w-full py-4 pl-14 pr-5 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400"
                 />
               </div>
-
-              {/* SEARCH BUTTON */}
-              <button
-                onClick={handleSearch}
-                className="px-6 bg-orange-600 hover:bg-orange-700 cursor-pointer text-white font-semibold transition-colors duration-200 flex items-center justify-center"
-              >
-                <i className="fas fa-arrow-right text-lg" />
-              </button>
             </div>
 
             {/* DROPDOWN HISTORY / RESULTS */}
@@ -691,13 +695,58 @@ export default function Header() {
           <div className="absolute left-0 right-0 hidden border-t border-gray-100 shadow-xl peer-checked:block lg:hidden top-full bg-white/95 backdrop-blur-md">
             <div className="max-h-screen p-4 overflow-y-auto">
               {/* Compact Search */}
-              <div className="relative mb-4">
-                <input
-                  type="text"
-                  placeholder={t('header.search')}
-                  className="w-full py-3 pl-10 pr-4 transition-all duration-200 border border-gray-200 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-                />
-                <i className="absolute text-sm text-gray-400 transform -translate-y-1/2 fas fa-search left-3 top-1/2" />
+              <div className="mb-4">
+                <div className="relative w-full mx-auto">
+                  {/* INPUT WRAPPER */}
+                  <div className="flex flex-col bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    {/* SELECT TYPE */}
+                    <div className="relative flex items-center bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-gray-200">
+                      <select
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                        onClick={() => setIsDropdown(!isDropdown)}
+                        onBlur={() => setIsDropdown(false)}
+                        className="appearance-none w-full py-3 pl-4 pr-10 bg-transparent text-gray-700 font-semibold cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-inset rounded-t-2xl transition-all"
+                      >
+                        <option value="Material">{t('header.material')}</option>
+                        <option value="Repair">{t('header.repair')}</option>
+                        <option value="Construction">{t('header.construction')}</option>
+                      </select>
+                      <i
+                        className={`
+                          absolute right-3 top-1/2 -translate-y-1/2 
+                          text-gray-600 pointer-events-none transition duration-200
+                          ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+                        `}
+                      ></i>
+                    </div>
+
+                    {/* INPUT & SEARCH BUTTON */}
+                    <div className="relative flex items-stretch">
+                      <div className="relative flex-1 flex items-center">
+                        <i className="fas fa-search absolute left-4 text-gray-400 text-base" />
+                        <input
+                          type="text"
+                          value={searchText}
+                          onChange={handleInputChange}
+                          onFocus={handleFocusSearch}
+                          onKeyDown={(e) => e.key === "Enter" && (handleSearch(), closeMobileNav())}
+                          placeholder={t('header.placeholder')}
+                          className="w-full py-3 pl-11 pr-3 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* DROPDOWN HISTORY / RESULTS */}
+                  {showHistory && (
+                    <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-2 max-h-64 overflow-hidden border border-gray-100">
+                      <div className="max-h-64 overflow-y-auto">
+                        {content}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Compact Navigation */}
