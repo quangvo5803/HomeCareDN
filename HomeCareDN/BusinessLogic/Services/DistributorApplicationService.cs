@@ -327,12 +327,12 @@ namespace BusinessLogic.Services
                 asNoTracking: false
             );
             _unitOfWork.DistributorApplicationRepository.Remove(application);
-            
-            var noti = await _unitOfWork.NotificationRepository.GetAsync(n =>
-                n.DataValue == materialRequest!.MaterialRequestID.ToString() && !n.IsRead,
+
+            var noti = await _unitOfWork.NotificationRepository.GetAsync(
+                n => n.DataValue == materialRequest!.MaterialRequestID.ToString() && !n.IsRead,
                 asNoTracking: false
             );
-            if(noti != null)
+            if (noti != null)
             {
                 noti.PendingCount -= 1;
                 noti.UpdatedAt = DateTime.UtcNow;
@@ -449,7 +449,7 @@ namespace BusinessLogic.Services
             }
 
             application.Status = ApplicationStatus.PendingCommission;
-            application.DueCommisionTime = DateTime.Now.AddDays(7);
+            application.DueCommisionTime = DateTime.Now.AddMinutes(2);
 
             request.Status = RequestStatus.Closed;
             request.SelectedDistributorApplicationID = application.DistributorApplicationID;

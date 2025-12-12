@@ -284,7 +284,7 @@ namespace BusinessLogic.Services
                 {
                     payment.ContractorApplicationID,
                     Status = payment.Status.ToString(),
-                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(2),
                     serviceRequest?.ConversationID,
                 }
             );
@@ -297,13 +297,9 @@ namespace BusinessLogic.Services
                 payment.Amount,
                 payment.Description,
                 payment.PaidAt,
-                Status = payment.Status.ToString()
+                Status = payment.Status.ToString(),
             };
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                PAYMENT,
-                payload
-            );
+            await _notifier.SendToApplicationGroupAsync($"role_Admin", PAYMENT, payload);
             await _notificationService.NotifyPersonalAsync(
                 new NotificationPersonalCreateOrUpdateDto
                 {
@@ -369,7 +365,7 @@ namespace BusinessLogic.Services
                 {
                     payment.DistributorApplicationID,
                     Status = payment.Status.ToString(),
-                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(5),
+                    StartReviewDate = payment.PaidAt!.Value.AddMinutes(2),
                     materialRequest.ConversationID,
                 }
             );
@@ -382,13 +378,9 @@ namespace BusinessLogic.Services
                 payment.Amount,
                 payment.Description,
                 payment.PaidAt,
-                Status = payment.Status.ToString()
+                Status = payment.Status.ToString(),
             };
-            await _notifier.SendToApplicationGroupAsync(
-                $"role_Admin",
-                PAYMENT,
-                payload
-            );
+            await _notifier.SendToApplicationGroupAsync($"role_Admin", PAYMENT, payload);
             await _notificationService.NotifyPersonalAsync(
                 new NotificationPersonalCreateOrUpdateDto
                 {

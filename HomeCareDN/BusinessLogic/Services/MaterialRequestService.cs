@@ -154,7 +154,7 @@ namespace BusinessLogic.Services
                 );
                 if (contractorPayment != null && contractorPayment.PaidAt.HasValue)
                 {
-                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddDays(7);
+                    dto.StartReviewDate = contractorPayment.PaidAt.Value.AddMinutes(2);
                 }
             }
         }
@@ -607,26 +607,23 @@ namespace BusinessLogic.Services
             _unitOfWork.MaterialRequestRepository.Remove(materialRequest);
 
             var noti = await _unitOfWork.NotificationRepository.GetAsync(
-                n => n.DataKey == "MaterialRequest" && !n.IsRead, asNoTracking: false
+                n => n.DataKey == "MaterialRequest" && !n.IsRead,
+                asNoTracking: false
             );
-            if(noti != null)
+            if (noti != null)
             {
                 noti.PendingCount -= 1;
                 noti.UpdatedAt = DateTime.UtcNow;
                 var notiId = noti.NotificationID;
                 var newCount = noti.PendingCount;
-                if(newCount <= 0)
+                if (newCount <= 0)
                 {
                     _unitOfWork.NotificationRepository.Remove(noti);
                 }
                 await _notifier.SendToApplicationGroupAsync(
                     $"role_Distributor",
                     "NotificationMaterialRequest.Delete",
-                    new
-                    {
-                        NotificationID = notiId,
-                        PendingCount = newCount
-                    }
+                    new { NotificationID = notiId, PendingCount = newCount }
                 );
             }
             await _unitOfWork.SaveAsync();
