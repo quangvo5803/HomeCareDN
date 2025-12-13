@@ -730,7 +730,12 @@ export default function Header() {
                           value={searchText}
                           onChange={handleInputChange}
                           onFocus={handleFocusSearch}
-                          onKeyDown={(e) => e.key === "Enter" && (handleSearch(), closeMobileNav())}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSearch();
+                              closeMobileNav();
+                            }
+                          }}
                           placeholder={t('header.placeholder')}
                           className="w-full py-3 pl-11 pr-3 bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 text-sm"
                         />
