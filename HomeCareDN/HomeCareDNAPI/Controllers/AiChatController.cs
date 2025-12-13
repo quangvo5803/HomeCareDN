@@ -28,9 +28,17 @@ namespace HomeCareDNAPI.Controllers
 
         [HttpPost("suggest")]
         [AllowAnonymous]
-        public async Task<IActionResult> Suggest([FromBody] AiChatRequestDto dto)
+        public async Task<IActionResult> Suggest([FromBody] AiSearchRequestDto dto)
         {
-            var result = await _facadeService.AiChatService.SuggestSearchAsync(dto.Prompt);
+            var result = await _facadeService.AiChatService.SuggestSearchAsync(dto);
+            return Ok(result);
+        }
+
+        [HttpPost("search-ai")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchWithAI([FromBody] AiSearchRequestDto dto)
+        {
+            var result = await _facadeService.AiChatService.SearchWithAISuggestionsAsync(dto);
             return Ok(result);
         }
 
