@@ -35,11 +35,13 @@ export default function DistributorMaterialManager() {
   } = useMaterial();
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loadingInitialData, setLoadingInitialData] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMaterialID, setEditingMaterialID] = useState(null);
   useEffect(() => {
     (async () => {
+      setLoadingInitialData(true);
       try {
         const [brandList, categoryList] = await Promise.all([
           fetchAllBrands(),
@@ -49,6 +51,8 @@ export default function DistributorMaterialManager() {
         setCategories(categoryList);
       } catch (err) {
         toast.error(handleApiError(err));
+      } finally {
+        setLoadingInitialData(false);
       }
     })();
   }, [fetchAllBrands, fetchAllCategories]);
@@ -185,14 +189,28 @@ export default function DistributorMaterialManager() {
 
           {/* Add Button */}
           <button
-            className="px-4 py-2.5 text-sm font-medium text-white transition rounded-xl bg-emerald-500 hover:bg-emerald-600 shadow-sm flex items-center justify-center gap-2"
+            className={`px-4 py-2.5 text-sm font-medium text-white transition rounded-xl shadow-sm flex items-center justify-center gap-2 ${loadingInitialData ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'}`}
+            disabled={loadingInitialData}
             onClick={() => {
+              if (brands.length === 0 || categories.length === 0) {
+                toast.error(t('adminMaterialManager.noBrandAndService'));
+                return;
+              }
               setEditingMaterialID(null);
               setIsModalOpen(true);
             }}
           >
-            <i className="fa-solid fa-plus"></i>
-            {t('BUTTON.AddNewMaterial')}
+            {loadingInitialData ? (
+              <>
+                <i className="fa-solid fa-spinner fa-spin"></i>
+                {t('common.loadingData', { defaultValue: 'Đang tải dữ liệu...' })}
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-plus"></i>
+                {t('BUTTON.AddNewMaterial')}
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -481,11 +499,27 @@ export default function DistributorMaterialManager() {
                         {t('distributorMaterialManager.letStart')}
                       </p>
                       <button
-                        className="px-4 py-2 text-white rounded-lg bg-emerald-500 hover:bg-emerald-600"
-                        onClick={() => setIsModalOpen(true)}
+                        className={`px-4 py-2 text-white rounded-lg ${loadingInitialData ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-500 hover:bg-emerald-600'}`}
+                        disabled={loadingInitialData}
+                        onClick={() => {
+                          if (brands.length === 0 || categories.length === 0) {
+                            toast.error(t('adminMaterialManager.noBrandAndService'));
+                            return;
+                          }
+                          setIsModalOpen(true);
+                        }}
                       >
-                        <i className="mr-3 fa-solid fa-plus"></i>
-                        {t('BUTTON.AddNewMaterial')}
+                        {loadingInitialData ? (
+                          <>
+                            <i className="mr-3 fa-solid fa-spinner fa-spin"></i>
+                            {t('common.loadingData', { defaultValue: 'Đang tải dữ liệu...' })}
+                          </>
+                        ) : (
+                          <>
+                            <i className="mr-3 fa-solid fa-plus"></i>
+                            {t('BUTTON.AddNewMaterial')}
+                          </>
+                        )}
                       </button>
                     </div>
                   </td>
