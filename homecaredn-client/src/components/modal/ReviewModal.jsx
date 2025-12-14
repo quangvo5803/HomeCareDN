@@ -135,16 +135,59 @@ export default function ReviewModal({
                 // Define reputation point change for each star
                 const getReputationChange = (starValue) => {
                   switch (starValue) {
-                    case 1: return { points: -10, color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
-                    case 2: return { points: -5, color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' };
-                    case 3: return { points: 0, color: 'text-gray-600', bgColor: 'bg-gray-50', borderColor: 'border-gray-200' };
-                    case 4: return { points: 3, color: 'text-green-600', bgColor: 'bg-green-50', borderColor: 'border-green-200' };
-                    case 5: return { points: 5, color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' };
-                    default: return { points: 0, color: 'text-gray-600', bgColor: 'bg-gray-50', borderColor: 'border-gray-200' };
+                    case 1:
+                      return {
+                        points: -10,
+                        color: 'text-red-600',
+                        bgColor: 'bg-red-50',
+                        borderColor: 'border-red-200',
+                      };
+                    case 2:
+                      return {
+                        points: -5,
+                        color: 'text-orange-600',
+                        bgColor: 'bg-orange-50',
+                        borderColor: 'border-orange-200',
+                      };
+                    case 3:
+                      return {
+                        points: 0,
+                        color: 'text-gray-600',
+                        bgColor: 'bg-gray-50',
+                        borderColor: 'border-gray-200',
+                      };
+                    case 4:
+                      return {
+                        points: 3,
+                        color: 'text-green-600',
+                        bgColor: 'bg-green-50',
+                        borderColor: 'border-green-200',
+                      };
+                    case 5:
+                      return {
+                        points: 5,
+                        color: 'text-emerald-600',
+                        bgColor: 'bg-emerald-50',
+                        borderColor: 'border-emerald-200',
+                      };
+                    default:
+                      return {
+                        points: 0,
+                        color: 'text-gray-600',
+                        bgColor: 'bg-gray-50',
+                        borderColor: 'border-gray-200',
+                      };
                   }
                 };
                 const repChange = getReputationChange(star);
-                
+                const arrowColors = {
+                  'border-red-200': '#fecaca',
+                  'border-orange-200': '#fed7aa',
+                  'border-gray-200': '#e5e7eb',
+                  'border-green-200': '#bbf7d0',
+                };
+                const currentArrowColor =
+                  arrowColors[repChange.borderColor] || '#a7f3d0';
                 return (
                   <div key={star} className="group/star relative">
                     <button
@@ -174,11 +217,18 @@ export default function ReviewModal({
                     </button>
                     {/* Tooltip */}
                     {!readOnly && (
-                      <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 ${repChange.bgColor} ${repChange.borderColor} border text-sm rounded-lg opacity-0 invisible group-hover/star:opacity-100 group-hover/star:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg`}>
+                      <div
+                        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 ${repChange.bgColor} ${repChange.borderColor} border text-sm rounded-lg opacity-0 invisible group-hover/star:opacity-100 group-hover/star:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg`}
+                      >
                         <div className={`font-semibold ${repChange.color}`}>
-                          {repChange.points > 0 ? '+' : ''}{repChange.points} {t('ModalPopup.ReviewModal.reputationPoints')}
+                          {repChange.points > 0 ? '+' : ''}
+                          {repChange.points}{' '}
+                          {t('ModalPopup.ReviewModal.reputationPoints')}
                         </div>
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent" style={{ borderTopColor: repChange.borderColor === 'border-red-200' ? '#fecaca' : repChange.borderColor === 'border-orange-200' ? '#fed7aa' : repChange.borderColor === 'border-gray-200' ? '#e5e7eb' : repChange.borderColor === 'border-green-200' ? '#bbf7d0' : '#a7f3d0' }}></div>
+                        <div
+                          className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent"
+                          style={{ borderTopColor: currentArrowColor }}
+                        ></div>
                       </div>
                     )}
                   </div>
