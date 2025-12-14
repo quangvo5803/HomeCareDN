@@ -24,8 +24,9 @@ export default function AdminMaterialManager() {
   const [editingMaterialID, setEditingMaterialID] = useState(null);
   const [modalReadOnly, setModalReadOnly] = useState(false);
 
-  const { fetchAllBrands } = useBrand();
-  const { fetchAllCategories } = useCategory();
+  const { fetchAllBrands, loading: loadingBrand } = useBrand();
+  const { fetchAllCategories, loading: loadingCategory } = useCategory();
+  const loadingInitialData = loadingBrand || loadingCategory;
   const [uploadProgress, setUploadProgress] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -33,7 +34,6 @@ export default function AdminMaterialManager() {
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebounce(search, 1000);
   const [submitting, setSubmitting] = useState(false);
-  const [loadingInitialData, setLoadingInitialData] = useState(true);
 
   const {
     materials,
@@ -47,7 +47,6 @@ export default function AdminMaterialManager() {
 
   useEffect(() => {
     (async () => {
-      setLoadingInitialData(true);
       try {
         const [brandList, categoryList] = await Promise.all([
           fetchAllBrands(),
@@ -57,8 +56,6 @@ export default function AdminMaterialManager() {
         setCategories(categoryList);
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
-        setLoadingInitialData(false);
       }
     })();
   }, [fetchAllBrands, fetchAllCategories]);

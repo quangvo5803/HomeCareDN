@@ -17,8 +17,9 @@ export default function DistributorMaterialManager() {
   const { user } = useAuth();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { fetchAllBrands } = useBrand();
-  const { fetchAllCategories } = useCategory();
+  const { fetchAllBrands, loading: loadingBrand } = useBrand();
+  const { fetchAllCategories, loading: loadingCategory } = useCategory();
+  const loadingInitialData = loadingBrand || loadingCategory;
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [sortBy, setSortBy] = useState('');
@@ -35,13 +36,11 @@ export default function DistributorMaterialManager() {
   } = useMaterial();
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loadingInitialData, setLoadingInitialData] = useState(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMaterialID, setEditingMaterialID] = useState(null);
   useEffect(() => {
     (async () => {
-      setLoadingInitialData(true);
       try {
         const [brandList, categoryList] = await Promise.all([
           fetchAllBrands(),
@@ -51,8 +50,6 @@ export default function DistributorMaterialManager() {
         setCategories(categoryList);
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
-        setLoadingInitialData(false);
       }
     })();
   }, [fetchAllBrands, fetchAllCategories]);
