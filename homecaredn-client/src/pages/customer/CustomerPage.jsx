@@ -7,6 +7,9 @@ import MaterialRequestManager from '../../components/customer/MaterialRequestMan
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
 
 export default function CustomerPage({ defaultTab = 'profile' }) {
   const { user, loading: authLoading } = useAuth();
@@ -15,7 +18,22 @@ export default function CustomerPage({ defaultTab = 'profile' }) {
   const initialTab = location.state?.tab || defaultTab;
   const [active, setActive] = useState(initialTab);
 
+  useRealtime({
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      if (payload.reason === 'Commission payment expired') {
+        toast.warning(t('userPage.serviceRequest.serviceApplicationExpired'));
+      }
+    },
+
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      if (payload.reason === 'Commission payment expired') {
+        toast.warning(t('userPage.materialRequest.materialApplicationExpired'));
+      }
+    },
+  });
+
   if (authLoading) return <Loading />;
+
   const titleMap = {
     profile: t('userPage.profile.title'),
     service_requests: t('userPage.serviceRequest.title'),

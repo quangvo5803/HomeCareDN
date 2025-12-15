@@ -9,6 +9,7 @@ import StatusBadge from '../../components/StatusBadge';
 import { useAuth } from '../../hook/useAuth';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import { toast } from 'react-toastify';
 
 export default function ContractorServiceRequestManager() {
   const { t, i18n } = useTranslation();
@@ -97,7 +98,31 @@ export default function ContractorServiceRequestManager() {
         )
       );
     },
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) => {
+          if (sr.serviceRequestID === payload.serviceRequestID) {
+            const myApp = sr.selectedContractorApplication;
+            if (
+              myApp?.contractorID === user.id &&
+              payload.reason === 'Commission payment expired'
+            ) {
+              toast.error(t('contractorServiceRequest.paymentExpiredMessage'), {
+                toastId: `reject-${payload.contractorApplicationID}`,
+              });
+            }
 
+            return {
+              ...sr,
+              status: 'Opening',
+              selectedContractorApplicationID: null,
+              selectedContractorApplication: null,
+            };
+          }
+          return sr;
+        })
+      );
+    },
     // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setServiceRequests((prev) =>

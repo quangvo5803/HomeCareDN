@@ -20,6 +20,7 @@ namespace DataAccess.Entities.Application
 
         [ForeignKey("ServiceRequestID")]
         public ServiceRequest? ServiceRequest { get; set; }
+        public ICollection<PaymentTransaction>? PaymentTransactions { get; set; }
     }
 
     public enum ApplicationStatus
