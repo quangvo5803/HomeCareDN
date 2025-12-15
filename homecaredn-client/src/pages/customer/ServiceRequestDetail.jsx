@@ -131,6 +131,33 @@ export default function ServiceRequestDetail() {
         }
       }
     },
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      if (serviceRequestId == payload.serviceRequestID) {
+        setServiceRequest((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            status: 'Opening',
+            selectedContractorApplication: null,
+          };
+        });
+
+        if (
+          selectedContractor?.contractorApplicationID ===
+          payload.contractorApplicationID
+        ) {
+          setSelectedContractor(null);
+          toast.info(t('userPage.serviceRequest.serviceApplicationExpired'));
+        }
+        setContractorApplications((prev) =>
+          prev.map((c) =>
+            c.contractorApplicationID === payload.contractorApplicationID
+              ? { ...c, status: 'Rejected' }
+              : c
+          )
+        );
+      }
+    },
   });
 
   // ---- CONTRACTOR ACTIONS ----
@@ -632,13 +659,26 @@ export default function ServiceRequestDetail() {
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
                         <div className="font-semibold mb-1">
-                          {t('userPage.serviceRequestDetail.reputationTooltipTitle') ||
-                            'Điểm uy tín theo giá trị công trình:'}
+                          {t(
+                            'userPage.serviceRequestDetail.reputationTooltipTitle'
+                          ) || 'Điểm uy tín theo giá trị công trình:'}
                         </div>
                         <div className="space-y-0.5">
-                          <div>{t('userPage.serviceRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
-                          <div>{t('userPage.serviceRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
-                          <div>{t('userPage.serviceRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
+                          <div>
+                            {t(
+                              'userPage.serviceRequestDetail.reputationSmall'
+                            ) || '• Dưới 1 tỷ: +1 điểm'}
+                          </div>
+                          <div>
+                            {t(
+                              'userPage.serviceRequestDetail.reputationMedium'
+                            ) || '• Từ 1-10 tỷ: +5 điểm'}
+                          </div>
+                          <div>
+                            {t(
+                              'userPage.serviceRequestDetail.reputationLarge'
+                            ) || '• Trên 10 tỷ: +10 điểm'}
+                          </div>
                         </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                       </div>
@@ -662,7 +702,8 @@ export default function ServiceRequestDetail() {
                       </span>
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t('userPage.serviceRequestDetail.smallScaleTooltip') || 'Dưới 1 tỷ VNĐ'}
+                        {t('userPage.serviceRequestDetail.smallScaleTooltip') ||
+                          'Dưới 1 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -679,7 +720,9 @@ export default function ServiceRequestDetail() {
                       </span>
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t('userPage.serviceRequestDetail.mediumScaleTooltip') || 'Từ 1 - 10 tỷ VNĐ'}
+                        {t(
+                          'userPage.serviceRequestDetail.mediumScaleTooltip'
+                        ) || 'Từ 1 - 10 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -696,7 +739,8 @@ export default function ServiceRequestDetail() {
                       </span>
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t('userPage.serviceRequestDetail.largeScaleTooltip') || 'Trên 10 tỷ VNĐ'}
+                        {t('userPage.serviceRequestDetail.largeScaleTooltip') ||
+                          'Trên 10 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -1004,21 +1048,34 @@ export default function ServiceRequestDetail() {
                               <i className="fas fa-shield-alt text-blue-500"></i>
                               <span>{c.reputationPoints ?? 0}</span>
                               <span className="w-4 h-4 rounded-full bg-gray-300 text-gray-600 flex items-center justify-center text-xs cursor-help font-bold">
-                              ?
-                            </span>
-                            {/* Tooltip */}
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
-                              <div className="font-semibold mb-1">
-                                {t('userPage.serviceRequestDetail.reputationTooltipTitle') ||
-                                  'Điểm uy tín theo giá trị công trình:'}
+                                ?
+                              </span>
+                              {/* Tooltip */}
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
+                                <div className="font-semibold mb-1">
+                                  {t(
+                                    'userPage.serviceRequestDetail.reputationTooltipTitle'
+                                  ) || 'Điểm uy tín theo giá trị công trình:'}
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div>
+                                    {t(
+                                      'userPage.serviceRequestDetail.reputationSmall'
+                                    ) || '• Dưới 1 tỷ: +1 điểm'}
+                                  </div>
+                                  <div>
+                                    {t(
+                                      'userPage.serviceRequestDetail.reputationMedium'
+                                    ) || '• Từ 1-10 tỷ: +5 điểm'}
+                                  </div>
+                                  <div>
+                                    {t(
+                                      'userPage.serviceRequestDetail.reputationLarge'
+                                    ) || '• Trên 10 tỷ: +10 điểm'}
+                                  </div>
+                                </div>
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                               </div>
-                              <div className="space-y-0.5">
-                                <div>{t('userPage.serviceRequestDetail.reputationSmall') || '• Dưới 1 tỷ: +1 điểm'}</div>
-                                <div>{t('userPage.serviceRequestDetail.reputationMedium') || '• Từ 1-10 tỷ: +5 điểm'}</div>
-                                <div>{t('userPage.serviceRequestDetail.reputationLarge') || '• Trên 10 tỷ: +10 điểm'}</div>
-                              </div>
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-                            </div>
                             </span>
                           </div>
                         </div>

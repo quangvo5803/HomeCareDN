@@ -493,7 +493,11 @@ namespace BusinessLogic.Services
                     }
                 }
             }
-
+            await _notifier.SendToApplicationGroupAsync(
+                "role_Distributor",
+                "MaterialRequest.Closed",
+                new { request.MaterialRequestID }
+            );
             await _unitOfWork.SaveAsync();
 
             var reloadedApp = await _unitOfWork.DistributorApplicationRepository.GetAsync(
