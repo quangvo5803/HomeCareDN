@@ -176,6 +176,8 @@ namespace HomeCareDNAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseRouting();
+
             app.UseMiddleware<ValidationExceptionMiddleware>();
             app.Use(
                 async (context, next) =>
@@ -190,12 +192,13 @@ namespace HomeCareDNAPI
                     }
                 }
             );
+
             app.UseHttpsRedirection();
             app.UseWebSockets();
-            app.UseRouting();
             app.UseCors("AllowReactApp");
             app.UseAuthentication();
             app.UseAuthorization();
+
             app.MapControllers();
             app.MapHub<ApplicationHub>("/hubs/application");
             app.MapHub<ChatHub>("/hubs/chat");

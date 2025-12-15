@@ -1,4 +1,5 @@
-﻿using DataAccess.Data;
+﻿using BusinessLogic.Services.Interfaces;
+using DataAccess.Data;
 using DataAccess.Entities.Application;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +40,7 @@ namespace HomeCareDNAPI.BackgroundServices
         {
             using var scope = _serviceProvider.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var notifier = scope.ServiceProvider.GetRequiredService<ISignalRNotifier>();
             var now = DateTime.Now;
 
             // =======================================================
@@ -51,6 +53,8 @@ namespace HomeCareDNAPI.BackgroundServices
                 )
                 .ToListAsync();
 
+            List<ServiceRequest> contractorRequests = new List<ServiceRequest>();
+
             if (expiredContractors.Count > 0)
             {
                 Console.WriteLine($"[Contractor] Expired = {expiredContractors.Count}");
@@ -60,7 +64,7 @@ namespace HomeCareDNAPI.BackgroundServices
                     .Distinct()
                     .ToList();
 
-                var contractorRequests = await db
+                contractorRequests = await db
                     .ServiceRequests.AsTracking()
                     .Where(r => contractorRequestIds.Contains(r.ServiceRequestID))
                     .ToListAsync();
@@ -106,6 +110,8 @@ namespace HomeCareDNAPI.BackgroundServices
                 )
                 .ToListAsync();
 
+            List<MaterialRequest> distributorRequests = new List<MaterialRequest>();
+
             if (expiredDistributors.Count > 0)
             {
                 Console.WriteLine($"[Distributor] Expired = {expiredDistributors.Count}");
@@ -115,7 +121,7 @@ namespace HomeCareDNAPI.BackgroundServices
                     .Distinct()
                     .ToList();
 
-                var distributorRequests = await db
+                distributorRequests = await db
                     .MaterialRequests.AsTracking()
                     .Where(r => distributorRequestIds.Contains(r.MaterialRequestID))
                     .ToListAsync();
@@ -152,10 +158,94 @@ namespace HomeCareDNAPI.BackgroundServices
             }
 
             // =======================================================
-            // SAVE ALL
+            // SAVE ALL & NOTIFY
             // =======================================================
-            await db.SaveChangesAsync();
-            Console.WriteLine("[ApplicationMonitor] All updates DONE");
+            if (expiredContractors.Count > 0 || expiredDistributors.Count > 0)
+            {
+                await db.SaveChangesAsync();
+                Console.WriteLine("[ApplicationMonitor] All updates DONE");
+
+                // =======================================================
+                // 3. REALTIME NOTIFICATIONS
+                // =======================================================
+
+                // 3.1 Notify Contractor Events
+                foreach (var app in expiredContractors)
+                {
+                    var req = contractorRequests.FirstOrDefault(r =>
+                        r.ServiceRequestID == app.ServiceRequestID
+                    );
+                    if (req != null)
+                    {
+                        var payload = new
+                        {
+                            serviceRequestID = app.ServiceRequestID,
+                            contractorApplicationID = app.ContractorApplicationID,
+                            status = ApplicationStatus.Rejected.ToString(),
+                            reason = "Commission payment expired",
+                        };
+
+                        // Notify Customer
+                        await notifier.SendToApplicationGroupAsync(
+                            $"user_{req.CustomerID}",
+                            "ContractorApplication.Rejected",
+                            payload
+                        );
+
+                        // Notify Contractor
+                        await notifier.SendToApplicationGroupAsync(
+                            "role_Contractor",
+                            "ContractorApplication.Rejected",
+                            payload
+                        );
+
+                        // Notify Admin
+                        await notifier.SendToApplicationGroupAsync(
+                            "role_Admin",
+                            "ContractorApplication.Rejected",
+                            payload
+                        );
+                    }
+                }
+
+                // 3.2 Notify Distributor Events
+                foreach (var app in expiredDistributors)
+                {
+                    var req = distributorRequests.FirstOrDefault(r =>
+                        r.MaterialRequestID == app.MaterialRequestID
+                    );
+                    if (req != null)
+                    {
+                        var payload = new
+                        {
+                            materialRequestID = app.MaterialRequestID,
+                            distributorApplicationID = app.DistributorApplicationID,
+                            status = ApplicationStatus.Rejected.ToString(),
+                            reason = "Commission payment expired",
+                        };
+
+                        // Notify Customer
+                        await notifier.SendToApplicationGroupAsync(
+                            $"user_{req.CustomerID}",
+                            "DistributorApplication.Rejected",
+                            payload
+                        );
+
+                        // Notify Distributor
+                        await notifier.SendToApplicationGroupAsync(
+                            "role_Distributor",
+                            "DistributorApplication.Rejected",
+                            payload
+                        );
+                        // Notify Admin
+                        await notifier.SendToApplicationGroupAsync(
+                            "role_Admin",
+                            "DistributorApplication.Rejected",
+                            payload
+                        );
+                    }
+                }
+            }
         }
     }
 }

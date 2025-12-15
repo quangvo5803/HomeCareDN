@@ -86,6 +86,21 @@ export default function MaterialRequestManager({ user }) {
         )
       );
     },
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) => {
+          if (sr.materialRequestID === payload.materialRequestID) {
+            return {
+              ...sr,
+              status: 'Opening',
+              selectedDistributorApplicationID: null,
+              selectedDistributorApplication: null,
+            };
+          }
+          return sr;
+        })
+      );
+    },
   });
 
   const handleViewDetail = (materialRequestID) => {

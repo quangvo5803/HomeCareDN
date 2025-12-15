@@ -9,6 +9,7 @@ import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import Loading from '../../components/Loading';
+import { toast } from 'react-toastify';
 
 export default function MaterialRequestManager() {
   const { t, i18n } = useTranslation();
@@ -49,7 +50,7 @@ export default function MaterialRequestManager() {
       );
       setTotalMaterialRequests((prev) => Math.max(0, prev - 1));
     },
-    [RealtimeEvents.MaterialRequestClosedClosed]: (payload) => {
+    [RealtimeEvents.MaterialRequestClosed]: (payload) => {
       setMaterialRequests((prev) =>
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
@@ -101,7 +102,32 @@ export default function MaterialRequestManager() {
         )
       );
     },
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) => {
+          if (sr.materialRequestID === payload.materialRequestID) {
+            const myApp = sr.selectedDistributorApplication;
+            if (
+              myApp?.distributorID === user.id &&
+              payload.reason === 'Commission payment expired'
+            ) {
+              toast.error(
+                t('distributorMaterialRequest.paymentExpiredMessage'),
+                { toastId: `reject-${payload.distributorApplicationID}` }
+              );
+            }
 
+            return {
+              ...sr,
+              status: 'Opening',
+              selectedDistributorApplicationID: null,
+              selectedDistributorApplication: null,
+            };
+          }
+          return sr;
+        })
+      );
+    },
     // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setMaterialRequests((prev) =>

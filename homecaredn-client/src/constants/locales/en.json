@@ -344,7 +344,9 @@
       "label_contractorApplyCount": "application form(s)",
       "label_open": "Opening",
       "label_close": "Closed",
-      "label_contractorApplied": "contractor(s)"
+      "label_contractorApplied": "contractor(s)",
+      "serviceApplicationExpired":"The application period service request has ended.",
+      "otherPaymentExpiredMessage": "Your Application just reopen because some one not paid."
     },
     "createServiceRequest": {
       "title": "Create Service Request",
@@ -433,7 +435,8 @@
       "largeScaleProjects": "Large",
       "smallScaleTooltip": "Under 1 billion VND",
       "mediumScaleTooltip": "1 - 10 billion VND",
-      "largeScaleTooltip": "Over 10 billion VND"
+      "largeScaleTooltip": "Over 10 billion VND",
+      "applicationExpired": "The application period for this service request has ended."
     },
     "materialRequest": {
       "title": "Material Requests",
@@ -445,7 +448,8 @@
       "lbl_materialList": "Material List",
       "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
-      "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials."
+      "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials.",
+      "materialApplicationExpired":"The application period material request has ended."
     },
     "materialRequestDetail": {
       "title": "Material Request Details",
@@ -603,7 +607,8 @@
     "reviewImages": "Review Images",
     "reviewedAt": "Reviewed At",
     "reviewImageTitle": "Review Image",
-    "realTime": "Service request deleted"
+    "realTime": "Service request deleted",
+    "paymentExpiredMessage": "The commission payment window has expired. Please reapply for the project."
   },
   "distributorMaterialRequest": {
     "title": "Material requests manager",
@@ -669,7 +674,8 @@
     "canDeleteWhilePending": "You can delete your current application to submit a new one.",
     "customerInfo": "Customer Information",
     "customerName": "Customer name:",
-    "customerPhone": "Customer phone:"
+    "customerPhone": "Customer phone:",
+    "paymentExpiredMessage": "The commission payment window has expired. Please reapply for the project."
   },
   "partnerDashboard": {
     "material": "Material",
