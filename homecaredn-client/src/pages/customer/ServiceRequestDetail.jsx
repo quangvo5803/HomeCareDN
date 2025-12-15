@@ -913,13 +913,7 @@ export default function ServiceRequestDetail() {
                   <div className="mb-6">
                     <CommissionCountdown
                       dueCommisionTime={selectedContractor.dueCommisionTime}
-                      onExpired={() => {
-                        toast.warning(
-                          t(
-                            'contractorServiceRequestDetail.paymentDeadlineExpired'
-                          )
-                        );
-                      }}
+                      onExpired={() => {}}
                       role="customer"
                     />
                   </div>

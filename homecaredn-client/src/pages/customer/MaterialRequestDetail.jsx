@@ -1407,11 +1407,7 @@ export default function MaterialRequestDetail() {
             <div className="mb-6">
               <CommissionCountdown
                 dueCommisionTime={selectedDistributor.dueCommisionTime}
-                onExpired={() => {
-                  toast.warning(
-                    t('userPage.materialRequest.materialApplicationExpired')
-                  );
-                }}
+                onExpired={() => {}}
                 role="customer"
               />
             </div>
