@@ -18,8 +18,9 @@ export default function CommissionCountdown({
 
     isExpiredCalled.current = false;
 
+    const now = Date.now();
     const calculateTimeLeft = () => {
-      const total = new Date(dueCommisionTime).getTime() - new Date.now();
+      const total = new Date(dueCommisionTime).getTime() - now;
 
       if (total <= 0) {
         setTimeLeft(null);
