@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate } from '../../utils/formatters';
 import PropTypes from 'prop-types';
@@ -11,27 +11,49 @@ export default function CommissionCountdown({
   const { t, i18n } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
 
+  const isExpiredCalled = useRef(false);
+
   useEffect(() => {
     if (!dueCommisionTime) return;
 
+    isExpiredCalled.current = false;
+
     const calculateTimeLeft = () => {
-      const total = new Date(dueCommisionTime) - new Date().getTime();
+      const total = new Date(dueCommisionTime).getTime() - new Date().getTime();
+
       if (total <= 0) {
-        onExpired();
         setTimeLeft(null);
-        return;
+
+        if (!isExpiredCalled.current) {
+          isExpiredCalled.current = true;
+          if (onExpired) onExpired();
+        }
+        return true;
       }
+      const days = Math.floor(total / (1000 * 60 * 60 * 24));
       const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((total / 1000 / 60) % 60);
       const seconds = Math.floor((total / 1000) % 60);
-      const days = Math.floor(total / (1000 * 60 * 60 * 24));
+
       setTimeLeft({ total, days, hours, minutes, seconds });
+      return false;
     };
 
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
+    const initialExpired = calculateTimeLeft();
+
+    if (initialExpired) return;
+
+    const timer = setInterval(() => {
+      const shouldStop = calculateTimeLeft();
+      if (shouldStop) {
+        clearInterval(timer);
+      }
+    }, 1000);
+
     return () => clearInterval(timer);
-  }, [dueCommisionTime, onExpired]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dueCommisionTime]);
 
   const prefix = `commission.${role}`;
 

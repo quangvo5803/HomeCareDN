@@ -104,27 +104,38 @@ export default function MaterialRequestManager() {
     },
     [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
       setMaterialRequests((prev) =>
-        prev.map((sr) => {
-          if (sr.materialRequestID === payload.materialRequestID) {
-            const myApp = sr.selectedDistributorApplication;
+        prev.map((mr) => {
+          if (mr.materialRequestID === payload.materialRequestID) {
+            const isMyApplicationRejected =
+              mr.selectedDistributorApplication?.distributorID === user.id;
+
             if (
-              myApp?.distributorID === user.id &&
+              isMyApplicationRejected &&
               payload.reason === 'Commission payment expired'
             ) {
               toast.error(
-                t('distributorMaterialRequest.paymentExpiredMessage'),
-                { toastId: `reject-${payload.distributorApplicationID}` }
+                t('distributorMaterialRequestDetail.paymentExpiredMessage'),
+                {
+                  toastId: `reject-self-${payload.distributorApplicationID}`,
+                }
+              );
+            } else if (payload.reason === 'Commission payment expired') {
+              toast.info(
+                t('distributorMaterialRequest.otherPaymentExpiredMessage'),
+                {
+                  toastId: `reject-other-${payload.distributorApplicationID}`,
+                }
               );
             }
 
             return {
-              ...sr,
+              ...mr,
               status: 'Opening',
               selectedDistributorApplicationID: null,
               selectedDistributorApplication: null,
             };
           }
-          return sr;
+          return mr;
         })
       );
     },

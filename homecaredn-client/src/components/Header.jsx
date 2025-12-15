@@ -332,9 +332,7 @@ export default function Header() {
     content = (
       <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
         <i className="fas fa-search text-6xl" />
-        <span className="text-sm font-medium">
-          {t('header.noResult')}
-        </span>
+        <span className="text-sm font-medium">{t('header.noResult')}</span>
       </div>
     );
   } else {
@@ -357,7 +355,9 @@ export default function Header() {
                   />
                 )}
                 <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
-                  {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                  {i18n.language === 'vi'
+                    ? item.name
+                    : item.nameEN || item.name}
                 </span>
               </button>
             ))}
@@ -438,7 +438,10 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div ref={wrapperRef} className="relative w-full max-w-[500px] mx-auto">
+          <div
+            ref={wrapperRef}
+            className="relative w-full max-w-[500px] mx-auto"
+          >
             {/* INPUT WRAPPER */}
             <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
               {/* SELECT TYPE */}
@@ -460,7 +463,7 @@ export default function Header() {
                   className={`
                     absolute right-3 top-1/2 -translate-y-1/2 
                     text-gray-600 pointer-events-none transition duration-200
-                    ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+                    ${isDropdown ? 'fa fa-chevron-up' : 'fa fa-chevron-down'}
                   `}
                 ></i>
               </div>
@@ -491,9 +494,7 @@ export default function Header() {
             {/* DROPDOWN HISTORY / RESULTS */}
             {showHistory && (
               <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
-                <div className="max-h-96 overflow-y-auto">
-                  {content}
-                </div>
+                <div className="max-h-96 overflow-y-auto">{content}</div>
               </div>
             )}
           </div>
@@ -634,8 +635,9 @@ export default function Header() {
                       />
                       <span className="text-sm font-medium">{label}</span>
                       <i
-                        className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''
-                          }`}
+                        className={`fas fa-chevron-down text-xs transition-transform ${
+                          openLang ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
                   );
@@ -690,16 +692,6 @@ export default function Header() {
           {/* Mobile Menu */}
           <div className="absolute left-0 right-0 hidden border-t border-gray-100 shadow-xl peer-checked:block lg:hidden top-full bg-white/95 backdrop-blur-md">
             <div className="max-h-screen p-4 overflow-y-auto">
-              {/* Compact Search */}
-              <div className="relative mb-4">
-                <input
-                  type="text"
-                  placeholder={t('header.search')}
-                  className="w-full py-3 pl-10 pr-4 transition-all duration-200 border border-gray-200 bg-gray-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
-                />
-                <i className="absolute text-sm text-gray-400 transform -translate-y-1/2 fas fa-search left-3 top-1/2" />
-              </div>
-
               {/* Compact Navigation */}
               <ul className="mb-4 space-y-1">
                 {navItems.map((item) => (
@@ -723,8 +715,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (

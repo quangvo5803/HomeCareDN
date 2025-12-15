@@ -133,29 +133,14 @@ export default function ServiceRequestDetail() {
     },
     [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
       if (serviceRequestId == payload.serviceRequestID) {
-        setServiceRequest((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            status: 'Opening',
-            selectedContractorApplication: null,
-          };
-        });
+        setServiceRequest((prev) => ({
+          ...prev,
+          status: 'Opening',
+          selectedContractorApplication: null,
+          selectedContractorApplicationID: null,
+        }));
 
-        if (
-          selectedContractor?.contractorApplicationID ===
-          payload.contractorApplicationID
-        ) {
-          setSelectedContractor(null);
-          toast.info(t('userPage.serviceRequest.serviceApplicationExpired'));
-        }
-        setContractorApplications((prev) =>
-          prev.map((c) =>
-            c.contractorApplicationID === payload.contractorApplicationID
-              ? { ...c, status: 'Rejected' }
-              : c
-          )
-        );
+        toast.info(t('userPage.serviceRequest.serviceApplicationExpired'));
       }
     },
   });

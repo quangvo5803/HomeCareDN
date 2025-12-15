@@ -122,7 +122,12 @@ export default function MaterialRequestDetail() {
               t('distributorMaterialRequestDetail.paymentExpiredMessage')
             );
           }
+        } else if (existingApplication) {
+          toast.info(
+            t('distributorMaterialRequest.otherPaymentExpiredMessage')
+          );
         }
+
         setMaterialRequest((prev) => ({
           ...prev,
           status: 'Opening',
