@@ -1,7 +1,10 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '../../utils/formatters';
 import PropTypes from 'prop-types';
+import { formatDate } from '../../utils/formatters';
+
+const HOURS_6_IN_MS = 6 * 60 * 60 * 1000;
+const HOURS_24_IN_MS = 24 * 60 * 60 * 1000;
 
 export default function CommissionCountdown({
   dueCommisionTime,
@@ -11,37 +14,47 @@ export default function CommissionCountdown({
   const { t, i18n } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
 
+  // Dùng useRef để lưu onExpired mới nhất mà không gây re-render cho useEffect chính
+  const onExpiredRef = useRef(onExpired);
   const isExpiredCalled = useRef(false);
+
+  useEffect(() => {
+    onExpiredRef.current = onExpired;
+  }, [onExpired]);
 
   useEffect(() => {
     if (!dueCommisionTime) return;
 
     isExpiredCalled.current = false;
 
-    const now = Date.now();
     const calculateTimeLeft = () => {
-      const total = new Date(dueCommisionTime).getTime() - now;
+      // FIX: Sửa new Date.now() thành Date.now()
+      const now = Date.now();
+      const dueTime = new Date(dueCommisionTime).getTime();
+      const total = dueTime - now;
 
       if (total <= 0) {
         setTimeLeft(null);
 
         if (!isExpiredCalled.current) {
           isExpiredCalled.current = true;
-          if (onExpired) onExpired();
+          if (onExpiredRef.current) {
+            onExpiredRef.current();
+          }
         }
-        return true;
+        return true; // Should stop
       }
+
       const days = Math.floor(total / (1000 * 60 * 60 * 24));
       const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
       const minutes = Math.floor((total / 1000 / 60) % 60);
       const seconds = Math.floor((total / 1000) % 60);
 
       setTimeLeft({ total, days, hours, minutes, seconds });
-      return false;
+      return false; // Should not stop
     };
 
     const initialExpired = calculateTimeLeft();
-
     if (initialExpired) return;
 
     const timer = setInterval(() => {
@@ -52,16 +65,14 @@ export default function CommissionCountdown({
     }, 1000);
 
     return () => clearInterval(timer);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dueCommisionTime]);
 
   const prefix = `commission.${role}`;
 
   const status = useMemo(() => {
     if (!timeLeft) return 'expired';
-    if (timeLeft.total < 6 * 60 * 60 * 1000) return 'critical';
-    if (timeLeft.total < 24 * 60 * 60 * 1000) return 'urgent';
+    if (timeLeft.total < HOURS_6_IN_MS) return 'critical';
+    if (timeLeft.total < HOURS_24_IN_MS) return 'urgent';
     return 'normal';
   }, [timeLeft]);
 
@@ -98,6 +109,7 @@ export default function CommissionCountdown({
         <div className="flex items-center gap-3">
           <i
             className={`fas fa-exclamation-triangle ${styles.icon} text-2xl`}
+            aria-hidden="true"
           />
           <div>
             <p className={`font-bold ${styles.text}`}>
@@ -113,9 +125,9 @@ export default function CommissionCountdown({
   }
 
   const titleMap = {
-    critical: '🚨 ' + t(prefix + '.urgent'),
-    urgent: '⚠️ ' + t(prefix + '.less24h'),
-    normal: '⏰ ' + t(prefix + '.deadline'),
+    critical: `🚨 ${t(`${prefix}.urgent`)}`,
+    urgent: `⚠️ ${t(`${prefix}.less24h`)}`,
+    normal: `⏰ ${t(`${prefix}.deadline`)}`,
   };
 
   const noteMap = {
@@ -135,10 +147,14 @@ export default function CommissionCountdown({
   return (
     <div className={`${styles.bg} rounded-lg p-4 ring-2 ${styles.ring}`}>
       <div className="flex items-start gap-3">
-        <i className={`fas fa-clock ${styles.icon} text-2xl`} />
+        <i
+          className={`fas fa-clock ${styles.icon} text-2xl`}
+          aria-hidden="true"
+        />
         <div className="flex-1">
           <p className={`font-bold ${styles.text} mb-2`}>{titleMap[status]}</p>
-          {/* Countdown */}
+
+          {/* Countdown Grid */}
           <div className="grid grid-cols-4 gap-2 mb-3">
             {['days', 'hours', 'minutes', 'seconds'].map((unit) => (
               <div
@@ -154,9 +170,10 @@ export default function CommissionCountdown({
               </div>
             ))}
           </div>
+
           <p className="text-sm text-gray-600">{noteMap[status]}</p>
           <p className="text-xs text-gray-500 mt-2">
-            <i className="far fa-calendar mr-1" />
+            <i className="far fa-calendar mr-1" aria-hidden="true" />
             {t('commission.due')}: {formatDate(dueCommisionTime, i18n.language)}
           </p>
         </div>
@@ -164,6 +181,7 @@ export default function CommissionCountdown({
     </div>
   );
 }
+
 CommissionCountdown.propTypes = {
   dueCommisionTime: PropTypes.oneOfType([
     PropTypes.string,
