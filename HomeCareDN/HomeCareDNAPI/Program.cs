@@ -93,8 +93,6 @@ namespace HomeCareDNAPI
                     {
                         policy
                             .WithOrigins(
-                                "https://unarriving-unswaying-winifred.ngrok-free.dev",
-                                "http://localhost:5252",
                                 "http://localhost:5173",
                                 "https://homecaredn.onrender.com",
                                 "https://home-care-dn.vercel.app"
@@ -195,7 +193,7 @@ namespace HomeCareDNAPI
                 }
             );
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseWebSockets();
             app.UseCors("AllowReactApp");
             app.UseAuthentication();
