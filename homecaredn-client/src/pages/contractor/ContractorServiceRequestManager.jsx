@@ -102,14 +102,26 @@ export default function ContractorServiceRequestManager() {
       setServiceRequests((prev) =>
         prev.map((sr) => {
           if (sr.serviceRequestID === payload.serviceRequestID) {
-            const myApp = sr.selectedContractorApplication;
+            const isMyApplicationRejected =
+              sr.selectedContractorApplication?.contractorID === user.id;
+
             if (
-              myApp?.contractorID === user.id &&
+              isMyApplicationRejected &&
               payload.reason === 'Commission payment expired'
             ) {
-              toast.error(t('contractorServiceRequest.paymentExpiredMessage'), {
-                toastId: `reject-${payload.contractorApplicationID}`,
-              });
+              toast.error(
+                t('contractorServiceRequestDetail.paymentExpiredMessage'),
+                {
+                  toastId: `reject-self-${payload.contractorApplicationID}`,
+                }
+              );
+            } else if (payload.reason === 'Commission payment expired') {
+              toast.info(
+                t('contractorServiceRequestManager.otherPaymentExpiredMessage'),
+                {
+                  toastId: `reject-other-${payload.contractorApplicationID}`,
+                }
+              );
             }
 
             return {

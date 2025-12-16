@@ -618,7 +618,8 @@
     "applied": "nhà phân phối ứng tuyển",
     "canAddMaterial": "Có thể thêm vật tư",
     "noEditQuantity": "Không sửa số lượng",
-    "noAddMaterial": "Không thêm vật tư"
+    "noAddMaterial": "Không thêm vật tư",
+    "otherPaymentExpiredMessage": "Đơn ứng tuyển của bạn đã được mở lại vì một người khác chưa thanh toán."
   },
   "distributorMaterialRequestDetail": {
     "realTime": "Yêu cầu vật liệu đã bị xóa",

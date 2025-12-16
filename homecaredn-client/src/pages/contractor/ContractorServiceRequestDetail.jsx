@@ -133,6 +133,10 @@ export default function ContractorServiceRequestDetail() {
               t('contractorServiceRequestDetail.paymentExpiredMessage')
             );
           }
+        } else if (existingApplication) {
+          toast.info(
+            t('contractorServiceRequestManager.otherPaymentExpiredMessage')
+          );
         }
 
         setServiceRequest((prev) => ({

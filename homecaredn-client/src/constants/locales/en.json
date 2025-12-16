@@ -621,7 +621,8 @@
     "applied": "distributor application",
     "canAddMaterial": "Can add material",
     "noEditQuantity": "No edit quality",
-    "noAddMaterial": "No add material"
+    "noAddMaterial": "No add material",
+    "otherPaymentExpiredMessage": "Your Application just reopen because some one not paid."
   },
   "distributorMaterialRequestDetail": {
     "realTime": "Materials request deleted",

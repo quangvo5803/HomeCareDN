@@ -344,9 +344,7 @@ export default function Header() {
     content = (
       <div className="flex flex-col items-center justify-center gap-3 px-6 py-12 text-gray-400">
         <i className="fas fa-search text-6xl" />
-        <span className="text-sm font-medium">
-          {t('header.noResult')}
-        </span>
+        <span className="text-sm font-medium">{t('header.noResult')}</span>
       </div>
     );
   } else {
@@ -369,7 +367,9 @@ export default function Header() {
                   />
                 )}
                 <span className="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
-                  {i18n.language === 'vi' ? item.name : item.nameEN || item.name}
+                  {i18n.language === 'vi'
+                    ? item.name
+                    : item.nameEN || item.name}
                 </span>
               </button>
             ))}
@@ -472,7 +472,7 @@ export default function Header() {
                   className={`
                     absolute right-3 top-1/2 -translate-y-1/2 
                     text-gray-600 pointer-events-none transition duration-200
-                    ${isDropdown ? "fa fa-chevron-up" : "fa fa-chevron-down"}
+                    ${isDropdown ? 'fa fa-chevron-up' : 'fa fa-chevron-down'}
                   `}
                 ></i>
               </div>
@@ -495,9 +495,7 @@ export default function Header() {
             {/* DROPDOWN HISTORY / RESULTS */}
             {showHistory && (
               <div className="absolute w-full bg-white shadow-2xl rounded-2xl z-50 mt-3 max-h-96 overflow-hidden border border-gray-100">
-                <div className="max-h-96 overflow-y-auto">
-                  {content}
-                </div>
+                <div className="max-h-96 overflow-y-auto">{content}</div>
               </div>
             )}
           </div>
@@ -638,8 +636,9 @@ export default function Header() {
                       />
                       <span className="text-sm font-medium">{label}</span>
                       <i
-                        className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''
-                          }`}
+                        className={`fas fa-chevron-down text-xs transition-transform ${
+                          openLang ? 'rotate-180' : ''
+                        }`}
                       />
                     </button>
                   );
@@ -777,8 +776,9 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                              }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
+                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                            }`}
                           />
                         </button>
                         {isServicesOpen && (

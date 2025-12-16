@@ -19,6 +19,7 @@ import useRealtime from '../../realtime/useRealtime';
 import { withMinLoading } from '../../utils/withMinLoading';
 import ChatSection from '../../components/ChatSection';
 import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
+import CommissionCountdown from '../../components/partner/CommissionCountdown';
 
 export default function MaterialRequestDetail() {
   const { t, i18n } = useTranslation();
@@ -159,20 +160,22 @@ export default function MaterialRequestDetail() {
           };
         });
 
+        setDistributorApplications((prev) =>
+          prev.map((c) =>
+            c.distributorApplicationID === payload.distributorApplicationID
+              ? { ...c, status: 'Rejected' }
+              : { ...c, status: 'Pending' }
+          )
+        );
+
         if (
           selectedDistributor?.distributorApplicationID ===
           payload.distributorApplicationID
         ) {
           setSelectedDistributor(null);
-          toast.info(t('userPage.materialRequest.materialApplicationExpired'));
         }
-        setDistributorApplications((prev) =>
-          prev.map((c) =>
-            c.distributorApplicationID === payload.distributorApplicationID
-              ? { ...c, status: 'Rejected' }
-              : c
-          )
-        );
+
+        toast.info(t('userPage.materialRequest.materialApplicationExpired'));
       }
     },
   });
@@ -1399,7 +1402,16 @@ export default function MaterialRequestDetail() {
             </div>
           </div>
         )}
-
+        {selectedDistributor.status === 'PendingCommission' &&
+          selectedDistributor.dueCommisionTime && (
+            <div className="mb-6">
+              <CommissionCountdown
+                dueCommisionTime={selectedDistributor.dueCommisionTime}
+                onExpired={() => {}}
+                role="customer"
+              />
+            </div>
+          )}
         {/* Action Buttons */}
         {selectedDistributor.status == 'Pending' && (
           <div className="grid grid-cols-2 gap-3 mt-6">
@@ -1871,7 +1883,6 @@ export default function MaterialRequestDetail() {
           </div>
         </div>
       </div>
-
       {/* Chat Section */}
       <ChatSection
         conversationID={
