@@ -190,6 +190,11 @@ export default function AdminDashboard() {
   }, [lineYear, t]);
 
   //Pie
+  const buildLabels = (rawData, t) =>
+    rawData.map(item => t(`adminDashboard.${item.label.toLowerCase()}`));
+
+  const buildPercentages = rawData =>
+    rawData.map(item => item.percentage);
   useEffect(() => {
     const fetchPieChartChart = async () => {
       await withMinLoading(
@@ -199,17 +204,13 @@ export default function AdminDashboard() {
             const rawData = res.data;
 
             setRawPieData(rawData);
-            const labels = rawData.map(item => {
-              const key = `adminDashboard.${item.label.toLowerCase()}`;
-              return t(key);
-            });
-            const percentages = rawData.map(item => item.percentage);
+
             setPieChartData({
-              labels: labels,
+              labels: buildLabels(rawData, t),
               datasets: [
                 {
                   label: t('adminDashboard.pieChart.serviceRequests'),
-                  data: percentages,
+                  data: buildPercentages(rawData),
                   backgroundColor: [
                     'rgba(99, 102, 241, 0.7)',
                     'rgba(236, 72, 153, 0.7)',
