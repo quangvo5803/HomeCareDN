@@ -450,7 +450,7 @@ export default function Header() {
           </Link>
 
           {/* Search Bar (Desktop) */}
-          <div ref={wrapperRef} className="relative w-full max-w-[550px] mx-auto hidden lg:block">
+          <div ref={wrapperRef} className="relative w-full max-w-[500px] mx-auto hidden lg:block">
             {/* INPUT WRAPPER */}
             <div className="flex items-stretch bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
               {/* SELECT TYPE */}
@@ -636,9 +636,8 @@ export default function Header() {
                       />
                       <span className="text-sm font-medium">{label}</span>
                       <i
-                        className={`fas fa-chevron-down text-xs transition-transform ${
-                          openLang ? 'rotate-180' : ''
-                        }`}
+                        className={`fas fa-chevron-down text-xs transition-transform ${openLang ? 'rotate-180' : ''
+                          }`}
                       />
                     </button>
                   );
@@ -776,9 +775,8 @@ export default function Header() {
                         >
                           <span>{t(item.label)}</span>
                           <i
-                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${
-                              isServicesOpen ? 'rotate-180 text-blue-600' : ''
-                            }`}
+                            className={`fas fa-chevron-down text-xs transition-transform duration-200 ${isServicesOpen ? 'rotate-180 text-blue-600' : ''
+                              }`}
                           />
                         </button>
                         {isServicesOpen && (
