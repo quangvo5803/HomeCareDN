@@ -199,6 +199,7 @@ export default function AdminDashboard() {
             const rawData = res.data;
 
             setRawPieData(rawData);
+            const percentages = rawData.map(item => item.percentage);
             setPieChartData({
               labels: rawData.map(item =>
                 t(`adminDashboard.${item.label.toLowerCase()}`)
@@ -206,7 +207,7 @@ export default function AdminDashboard() {
               datasets: [
                 {
                   label: t('adminDashboard.pieChart.serviceRequests'),
-                  data: rawData.map(item => item.percentage),
+                  data: percentages,
                   backgroundColor: [
                     'rgba(99, 102, 241, 0.7)',
                     'rgba(236, 72, 153, 0.7)',

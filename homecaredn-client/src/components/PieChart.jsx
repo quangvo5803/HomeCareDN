@@ -174,4 +174,5 @@ PieChart.propTypes = {
   data: PropTypes.object.isRequired,
   type: PropTypes.string,
   loading: PropTypes.bool,
+  rawData: PropTypes.object.isRequired,
 };
