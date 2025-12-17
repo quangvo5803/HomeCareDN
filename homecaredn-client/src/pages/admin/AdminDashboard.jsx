@@ -199,11 +199,13 @@ export default function AdminDashboard() {
             const rawData = res.data;
 
             setRawPieData(rawData);
+            const labels = rawData.map(item => {
+              const key = `adminDashboard.${item.label.toLowerCase()}`;
+              return t(key);
+            });
             const percentages = rawData.map(item => item.percentage);
             setPieChartData({
-              labels: rawData.map(item =>
-                t(`adminDashboard.${item.label.toLowerCase()}`)
-              ),
+              labels: labels,
               datasets: [
                 {
                   label: t('adminDashboard.pieChart.serviceRequests'),
