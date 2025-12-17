@@ -157,8 +157,7 @@ namespace BusinessLogic.Services
             );
 
             var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
-                da => da.Status == ApplicationStatus.Approved && da.CreatedAt.Year == year,
-                includeProperties: "Items"
+                da => da.Status == ApplicationStatus.Approved && da.CreatedAt.Year == year
             );
 
             if (contractor == null || distributor == null)
@@ -174,12 +173,30 @@ namespace BusinessLogic.Services
             // === Repair & Construction ===
             var resultGrouped = contractor
                 .GroupBy(ca => ca.ServiceRequest!.ServiceType)
-                .Select(g => new AdminPieChartDto { Label = g.Key.ToString(), Count = g.Count() })
+                .Select(g => new AdminPieChartDto 
+                { 
+                    Label = g.Key.ToString(), 
+                    Count = g.Count(), 
+                    TotalAmount = g.Sum(x => x.EstimatePrice) 
+                })
                 .ToList();
 
             // === Material ===
             var materialCount = distributor.Count();
-            resultGrouped.Add(new AdminPieChartDto { Label = "Material", Count = materialCount });
+            resultGrouped.Add(new AdminPieChartDto 
+            { 
+                Label = "Material", 
+                Count = materialCount, 
+                TotalAmount = distributor.Sum(x => x.TotalEstimatePrice)
+            });
+
+            var totalPercentage = resultGrouped.Sum(r => r.Count);
+            foreach (var item in resultGrouped)
+            {
+                item.Percentage = totalPercentage == 0
+                    ? 0
+                    : Math.Round((item.Count / (double)totalPercentage) * 100, 2);
+            }
 
             return resultGrouped;
         }

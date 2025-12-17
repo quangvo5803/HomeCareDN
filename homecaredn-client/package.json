@@ -18,6 +18,7 @@
     "axios": "^1.11.0",
     "browser-image-compression": "^2.0.2",
     "chart.js": "^4.5.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "dompurify": "^3.2.6",
     "framer-motion": "^12.23.12",
     "he": "^1.2.0",
