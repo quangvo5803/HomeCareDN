@@ -445,23 +445,6 @@ export default function AdminDashboard() {
           />
         </div>
       </div>
-
-      {/* Bar Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
-        <div className="col-span-12 bg-white rounded-xl p-4 relative">
-          <div className="h-full w-full">
-            <BarChart
-              type="Admin"
-              title={t('adminDashboard.barChart.salesOverview')}
-              data={barChartData}
-              year={barYear}
-              onYearChange={setBarYear}
-              loading={loadingBarChart}
-            />
-          </div>
-        </div>
-      </div>
-
       {/* Top Contractors & Distributors */}
       {loadingTop ? (
         <div className="mt-6">
@@ -680,6 +663,22 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Bar Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
+        <div className="col-span-12 bg-white rounded-xl p-4 relative">
+          <div className="h-full w-full">
+            <BarChart
+              type="Admin"
+              title={t('adminDashboard.barChart.salesOverview')}
+              data={barChartData}
+              year={barYear}
+              onYearChange={setBarYear}
+              loading={loadingBarChart}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
