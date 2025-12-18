@@ -159,12 +159,7 @@ namespace BusinessLogic.Services
 
             if (payments == null || !payments.Any())
             {
-                throw new CustomValidationException(
-                    new Dictionary<string, string[]>
-                    {
-                        { "Pie Chart", new[] { "No payment data found" } }
-                    }
-                );
+                return new List<AdminPieChartDto>();
             }
 
             var result = new List<AdminPieChartDto>();
