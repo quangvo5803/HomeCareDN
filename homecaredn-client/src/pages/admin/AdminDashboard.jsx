@@ -27,6 +27,7 @@ export default function AdminDashboard() {
     labels: [],
     datasets: [],
   });
+  const [rawPieData, setRawPieData] = useState([]);
   const [barChartData, setBarChartData] = useState({
     labels: [],
     datasets: [],
@@ -189,6 +190,11 @@ export default function AdminDashboard() {
   }, [lineYear, t]);
 
   //Pie
+  const buildLabels = (rawData, t) =>
+    rawData.map(item => t(`adminDashboard.${item.label.toLowerCase()}`));
+
+  const buildPercentages = rawData =>
+    rawData.map(item => item.percentage);
   useEffect(() => {
     const fetchPieChartChart = async () => {
       await withMinLoading(
@@ -197,30 +203,14 @@ export default function AdminDashboard() {
             const res = await StatisticService.getPieChart(pieYear);
             const rawData = res.data;
 
-            let construction = 0,
-              repair = 0,
-              material = 0;
-
-            for (const item of rawData) {
-              if (item.label === 'Construction') construction = item.count;
-              if (item.label === 'Repair') repair = item.count;
-              if (item.label === 'Material') material = item.count;
-            }
-
-            const labels = [
-              t('adminDashboard.construction'),
-              t('adminDashboard.repair'),
-              t('adminDashboard.material'),
-            ];
-
-            const values = [construction, repair, material];
+            setRawPieData(rawData);
 
             setPieChartData({
-              labels,
+              labels: buildLabels(rawData, t),
               datasets: [
                 {
                   label: t('adminDashboard.pieChart.serviceRequests'),
-                  data: values,
+                  data: buildPercentages(rawData),
                   backgroundColor: [
                     'rgba(99, 102, 241, 0.7)',
                     'rgba(236, 72, 153, 0.7)',
@@ -432,11 +422,6 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
         {/* Line Chart */}
         <div className="lg:col-span-7 relative">
-          {loadingLineChart && (
-            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
-              <LoadingComponent />
-            </div>
-          )}
           <LineChart
             type="Admin"
             title={t('adminDashboard.lineChart.commissionRevenue')}
@@ -449,11 +434,6 @@ export default function AdminDashboard() {
 
         {/* Pie Chart */}
         <div className="lg:col-span-5 relative">
-          {loadingPieChart && (
-            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
-              <LoadingComponent />
-            </div>
-          )}
           <PieChart
             type="Admin"
             title={t('adminDashboard.pieChart.serviceRequests')}
@@ -461,6 +441,7 @@ export default function AdminDashboard() {
             year={pieYear}
             onYearChange={setPieYear}
             loading={loadingPieChart}
+            rawData={rawPieData}
           />
         </div>
       </div>
@@ -468,11 +449,6 @@ export default function AdminDashboard() {
       {/* Bar Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-10">
         <div className="col-span-12 bg-white rounded-xl p-4 relative">
-          {loadingBarChart && (
-            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
-              <LoadingComponent />
-            </div>
-          )}
           <div className="h-full w-full">
             <BarChart
               type="Admin"

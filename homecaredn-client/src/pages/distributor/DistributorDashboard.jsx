@@ -67,7 +67,7 @@ export default function DistributorDashboard() {
     if (!estimatePrice) return 0;
     const price = Number(estimatePrice);
     let commission = 0;
-    
+
     if (price <= 500_000_000) {
       commission = price * 0.02; // 2%
     } else if (price <= 2_000_000_000) {
@@ -76,7 +76,7 @@ export default function DistributorDashboard() {
       commission = price * 0.01; // 1%
       if (commission > 100_000_000) commission = 100_000_000; // Max 100M
     }
-    
+
     return commission;
   };
 
@@ -223,10 +223,10 @@ export default function DistributorDashboard() {
     } catch (error) {
       setKpiError(
         error?.response?.data?.title ||
-          error?.response?.data?.message ||
-          error?.response?.data ||
-          error?.message ||
-          t('partnerDashboard.errors.kpi_load_failed')
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error?.message ||
+        t('partnerDashboard.errors.kpi_load_failed')
       );
     } finally {
       setLoadingDashboardStats(false);
@@ -447,11 +447,6 @@ export default function DistributorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6 md:mt-10">
         {/* Bar Chart - 50% */}
         <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[350px] md:min-h-[400px]">
-          {loadingBarChart && (
-            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
-              <LoadingComponent />
-            </div>
-          )}
           <div className="h-full w-full p-2 md:p-0">
             <BarChart
               type="Distributor"
@@ -465,11 +460,6 @@ export default function DistributorDashboard() {
         </div>
         {/* Line Chart - 50% */}
         <div className="lg:col-span-6 bg-white rounded-xl relative shadow-md border border-gray-100 min-h-[350px] md:min-h-[400px]">
-          {loadingLineChart && (
-            <div className="absolute inset-0 bg-white backdrop-blur-sm flex items-center justify-center rounded-xl z-50">
-              <LoadingComponent />
-            </div>
-          )}
           <div className="h-full w-full p-2 md:p-0">
             <LineChart
               type="Distributor"

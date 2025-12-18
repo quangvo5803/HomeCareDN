@@ -344,7 +344,7 @@
       "label_open": "Đang mở",
       "label_close": "Đã đóng",
       "label_contractorApplied": "nhà thầu",
-      "serviceApplicationExpired":"Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại."
+      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại."
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -445,7 +445,7 @@
       "lbl_materialUnit": "vật liệu",
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
       "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu.",
-      "materialApplicationExpired":"Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu vật tư đã được mở lại."
+      "materialApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu vật tư đã được mở lại."
     },
     "materialRequestDetail": {
       "title": "Chi tiết yêu cầu vật liệu",
@@ -519,7 +519,6 @@
     "sortDefault": "Mặc định",
     "sortOldest": "Cũ nhất",
     "sortNewest": "Mới nhất"
-
   },
   "contractorServiceRequestDetail": {
     "privacyNotice": "Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
@@ -674,7 +673,6 @@
     "customerName": "Tên khách hàng",
     "customerPhone": "Số điện thoại",
     "paymentExpiredMessage": "Phí hoa hồng hết hạn thanh toán. Vui lòng thử lại."
-
   },
   "partnerDashboard": {
     "material": "Vật Liệu",
@@ -898,7 +896,8 @@
       "commission": "Tiền hoa hồng"
     },
     "pieChart": {
-      "serviceRequests": "Tổng dịch vụ đã yêu cầu"
+      "serviceRequests": "Tổng dịch vụ đã yêu cầu",
+      "amount": "Tiền đã thu"
     },
     "barChart": {
       "salesOverview": "Doanh số trong năm"
