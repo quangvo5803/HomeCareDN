@@ -345,7 +345,7 @@
       "label_open": "Opening",
       "label_close": "Closed",
       "label_contractorApplied": "contractor(s)",
-      "serviceApplicationExpired":"The application period service request has ended.",
+      "serviceApplicationExpired": "The application period service request has ended.",
       "otherPaymentExpiredMessage": "Your Application just reopen because some one not paid."
     },
     "createServiceRequest": {
@@ -449,7 +449,7 @@
       "lbl_materialUnit": "materials",
       "lbl_andMoreMaterial": "... and {{count}} more materials",
       "lbl_emptyMaterialList": "The material list is empty. Go to details to add requested materials.",
-      "materialApplicationExpired":"The application period material request has ended."
+      "materialApplicationExpired": "The application period material request has ended."
     },
     "materialRequestDetail": {
       "title": "Material Request Details",
@@ -898,7 +898,8 @@
       "commission": "Commission"
     },
     "pieChart": {
-      "serviceRequests": "Service Requested"
+      "serviceRequests": "Total service requested",
+      "amount": "Amount collected"
     },
     "barChart": {
       "salesOverview": "Sales for the year"
