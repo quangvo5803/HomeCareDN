@@ -43,7 +43,7 @@ export default function Header() {
   const { t, i18n } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-
+  const debounceRef = useRef(null);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [openLang, setOpenLang] = useState(false);
   const [openAvatarMenu, setOpenAvatarMenu] = useState(false);
@@ -252,17 +252,23 @@ export default function Header() {
       ...(user && { FilterID: user.id }),
     };
 
-    try {
-      const res =
-        type === 'Material'
-          ? await fetchSearchMaterial(params)
-          : await fetchSearchService(params);
-
-      setResults((res || []).slice(0, 5));
-      setShowHistory(true);
-    } catch (err) {
-      console.error('Search error:', err);
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res =
+          type === 'Material'
+            ? await fetchSearchMaterial(params)
+            : await fetchSearchService(params);
+
+        setResults((res || []).slice(0, 5));
+        setShowHistory(true);
+      } catch (err) {
+        console.error('Search error:', err);
+      }
+    }, 500);
   };
 
   const handleSearch = async () => {
@@ -332,6 +338,19 @@ export default function Header() {
     aiSuggestions.length === 0 &&
     searchText.trim().length > 0;
 
+  const getAISuggestionKey = (item) => {
+    if (item.id) return `ai-${item.id}`;
+    if (item.code) return `ai-${item.code}`;
+    if (item.name) return `ai-${item.name}`;
+    return `ai-${JSON.stringify(item)}`;
+  };
+
+  const getHistoryKey = (item) => {
+    if (item?.searchHistoryID) return `his-${item.searchHistoryID}`;
+    if (typeof item === 'string') return `his-${item}`;
+    return `his-${JSON.stringify(item)}`;
+  };
+
   let content;
 
   if (searchLoading) {
@@ -381,7 +400,7 @@ export default function Header() {
           <div className="border-b border-gray-100">
             {aiSuggestions.map((item) => (
               <button
-                key={item}
+                key={getAISuggestionKey(item)}
                 onMouseDown={() => handleSelectItem(item)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left cursor-pointer 
                   hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 
@@ -413,7 +432,7 @@ export default function Header() {
           <div>
             {history.map((item) => (
               <button
-                key={item}
+                key={getHistoryKey(item)}
                 onMouseDown={() => handleSelectItem(item)}
                 className="flex w-full items-center gap-3 px-4 py-3 text-left
                   hover:bg-gray-50 transition-colors duration-150 group 
