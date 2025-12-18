@@ -103,7 +103,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-xl">
               <LoadingComponent />
             </div>
           )}

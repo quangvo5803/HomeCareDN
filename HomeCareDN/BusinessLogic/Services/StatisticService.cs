@@ -151,54 +151,61 @@ namespace BusinessLogic.Services
 
         public async Task<IEnumerable<AdminPieChartDto>> GetPieChartStatisticsAsync(int year)
         {
-            var contractor = await _unitOfWork.ContractorApplicationRepository.GetRangeAsync(
-                ca => ca.Status == ApplicationStatus.Approved && ca.CreatedAt.Year == year,
-                includeProperties: SERVICE_REQUEST_INCLUDE
+            var payments = await _unitOfWork.PaymentTransactionsRepository.GetRangeAsync(
+                pt => pt.Status == PaymentStatus.Paid
+                      && pt.CreatedAt.Year == year,
+                includeProperties: "ContractorApplication.ServiceRequest,DistributorApplication"
             );
 
-            var distributor = await _unitOfWork.DistributorApplicationRepository.GetRangeAsync(
-                da => da.Status == ApplicationStatus.Approved && da.CreatedAt.Year == year
-            );
-
-            if (contractor == null || distributor == null)
+            if (payments == null || !payments.Any())
             {
                 throw new CustomValidationException(
                     new Dictionary<string, string[]>
                     {
-                        { "Pie Chart Null", new[] { "Pie Chart Not Found" } },
+                        { "Pie Chart", new[] { "No payment data found" } }
                     }
                 );
             }
 
-            // === Repair & Construction ===
-            var resultGrouped = contractor
-                .GroupBy(ca => ca.ServiceRequest!.ServiceType)
-                .Select(g => new AdminPieChartDto 
-                { 
-                    Label = g.Key.ToString(), 
-                    Count = g.Count(), 
-                    TotalAmount = g.Sum(x => x.EstimatePrice) 
+            var result = new List<AdminPieChartDto>();
+
+            var contractorGrouped = payments
+                .Where(pt => pt.ContractorApplication != null
+                          && pt.ContractorApplication.ServiceRequest != null)
+                .GroupBy(pt => pt.ContractorApplication!.ServiceRequest!.ServiceType)
+                .Select(g => new AdminPieChartDto
+                {
+                    Label = g.Key.ToString(),
+                    Count = g.Count(),
+                    TotalAmount = g.Sum(x => x.Amount)
                 })
                 .ToList();
 
-            // === Material ===
-            var materialCount = distributor.Count();
-            resultGrouped.Add(new AdminPieChartDto 
-            { 
-                Label = "Material", 
-                Count = materialCount, 
-                TotalAmount = distributor.Sum(x => x.TotalEstimatePrice)
-            });
+            result.AddRange(contractorGrouped);
 
-            var totalPercentage = resultGrouped.Sum(r => r.Count);
-            foreach (var item in resultGrouped)
+            var distributorGrouped = payments
+                .Where(pt => pt.DistributorApplication != null).ToList();
+
+            if (distributorGrouped.Any())
             {
-                item.Percentage = totalPercentage == 0
-                    ? 0
-                    : Math.Round((item.Count / (double)totalPercentage) * 100, 2);
+                result.Add(new AdminPieChartDto
+                {
+                    Label = "Material",
+                    Count = distributorGrouped.Count,
+                    TotalAmount = distributorGrouped.Sum(x => x.Amount)
+                });
             }
 
-            return resultGrouped;
+            var totalCommission = result.Sum(x => x.TotalAmount);
+
+            foreach (var item in result)
+            {
+                item.Percentage = totalCommission == 0
+                    ? 0
+                    : Math.Round((double)(item.TotalAmount / totalCommission * 100), 2);
+            }
+
+            return result;
         }
 
         public async Task<AdminTopDto> GetAdminTopAsync()
