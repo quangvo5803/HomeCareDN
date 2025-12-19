@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Diagnostics.Contracts;
+using System.Globalization;
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Notification;
@@ -157,7 +158,6 @@ namespace BusinessLogic.Services
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
-
                 if (
                     DateTime.TryParseExact(
                         data.TransactionDateTime,
@@ -248,6 +248,11 @@ namespace BusinessLogic.Services
             if (contractor != null)
             {
                 contractor.ProjectCount += 1;
+                double projectValue = await GetProjectValueAsync(
+                    contractorApp.ServiceRequestID,
+                    null
+                );
+                UpdateReputationPointAndProjectScaleCounts(contractor, projectValue);
                 await _userManager.UpdateAsync(contractor);
             }
 
@@ -328,6 +333,11 @@ namespace BusinessLogic.Services
             if (distributor != null)
             {
                 distributor.ProjectCount += 1;
+                double projectValue = await GetProjectValueAsync(
+                    null,
+                    distributorApp.MaterialRequestID
+                );
+                UpdateReputationPointAndProjectScaleCounts(distributor, projectValue);
                 await _userManager.UpdateAsync(distributor);
             }
 
@@ -394,6 +404,69 @@ namespace BusinessLogic.Services
                     Action = NotificationAction.Paid,
                 }
             );
+        }
+
+        private async Task<double> GetProjectValueAsync(
+            Guid? serviceRequestId,
+            Guid? materialRequestId
+        )
+        {
+            if (serviceRequestId.HasValue)
+            {
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    filter: sr => sr.ServiceRequestID == serviceRequestId.Value,
+                    includeProperties: "SelectedContractorApplication"
+                );
+
+                if (serviceRequest?.SelectedContractorApplication != null)
+                {
+                    return serviceRequest.SelectedContractorApplication.EstimatePrice;
+                }
+            }
+            else if (materialRequestId.HasValue)
+            {
+                var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                    filter: mr => mr.MaterialRequestID == materialRequestId.Value,
+                    includeProperties: "SelectedDistributorApplication"
+                );
+
+                if (materialRequest?.SelectedDistributorApplication != null)
+                {
+                    return materialRequest.SelectedDistributorApplication.TotalEstimatePrice;
+                }
+            }
+            return 0;
+        }
+
+        private static void UpdateReputationPointAndProjectScaleCounts(
+            ApplicationUser partner,
+            double projectValue
+        )
+        {
+            if (projectValue <= 1_000_000_000)
+            {
+                partner.SmallScaleProjectCount += 1;
+            }
+            else if (projectValue <= 10_000_000_000)
+            {
+                partner.MediumScaleProjectCount += 1;
+            }
+            else
+            {
+                partner.LargeScaleProjectCount += 1;
+            }
+            if (projectValue <= 1_000_000_000)
+            {
+                partner.ReputationPoints += 1;
+            }
+            else if (projectValue <= 10_000_000_000)
+            {
+                partner.ReputationPoints += 5;
+            }
+            else
+            {
+                partner.ReputationPoints += 10;
+            }
         }
     }
 }

@@ -172,8 +172,6 @@ namespace BusinessLogic.Services
 
             double projectValue = await GetProjectValueAsync(serviceRequestId, materialRequestId);
 
-            UpdateProjectScaleCounts(partner, projectValue);
-
             int reputationChange = CalculateReputationPoints(projectValue, rating);
             partner.ReputationPoints += reputationChange;
 
@@ -220,37 +218,9 @@ namespace BusinessLogic.Services
             return 0;
         }
 
-        private static void UpdateProjectScaleCounts(ApplicationUser partner, double projectValue)
-        {
-            if (projectValue <= 1_000_000_000)
-            {
-                partner.SmallScaleProjectCount += 1;
-            }
-            else if (projectValue <= 10_000_000_000)
-            {
-                partner.MediumScaleProjectCount += 1;
-            }
-            else
-            {
-                partner.LargeScaleProjectCount += 1;
-            }
-        }
-
         private static int CalculateReputationPoints(double projectValue, int rating)
         {
             int point = 0;
-            if (projectValue <= 1_000_000_000)
-            {
-                point += 1;
-            }
-            else if (projectValue <= 10_000_000_000)
-            {
-                point += 5;
-            }
-            else
-            {
-                point += 10;
-            }
 
             switch (rating)
             {
