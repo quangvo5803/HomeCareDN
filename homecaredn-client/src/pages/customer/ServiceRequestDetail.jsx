@@ -671,6 +671,41 @@ export default function ServiceRequestDetail() {
                             ) || '• Trên 10 tỷ: +10 điểm'}
                           </div>
                         </div>
+                        {/* Phần thưởng theo đánh giá */}
+                        <div className="border-t border-gray-600 mt-2 pt-2">
+                          <div className="font-semibold mb-1">
+                            {t(
+                              'userPage.serviceRequestDetail.reputationTooltipRatingTitle'
+                            ) || 'Điểm thưởng theo đánh giá:'}
+                          </div>
+                          <div className="space-y-0.5">
+                            <div className="text-emerald-400">
+                              {t(
+                                'userPage.serviceRequestDetail.reputationRating5'
+                              ) || '• 5 sao: +5 điểm'}
+                            </div>
+                            <div className="text-green-400">
+                              {t(
+                                'userPage.serviceRequestDetail.reputationRating4'
+                              ) || '• 4 sao: +3 điểm'}
+                            </div>
+                            <div className="text-gray-400">
+                              {t(
+                                'userPage.serviceRequestDetail.reputationRating3'
+                              ) || '• 3 sao: +0 điểm'}
+                            </div>
+                            <div className="text-orange-400">
+                              {t(
+                                'userPage.serviceRequestDetail.reputationRating2'
+                              ) || '• 2 sao: -5 điểm'}
+                            </div>
+                            <div className="text-red-400">
+                              {t(
+                                'userPage.serviceRequestDetail.reputationRating1'
+                              ) || '• 1 sao: -10 điểm'}
+                            </div>
+                          </div>
+                        </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </span>

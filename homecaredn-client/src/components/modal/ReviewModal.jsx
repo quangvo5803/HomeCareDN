@@ -188,6 +188,20 @@ export default function ReviewModal({
                 };
                 const currentArrowColor =
                   arrowColors[repChange.borderColor] || '#a7f3d0';
+                
+                // Tooltip position classes based on star position
+                const getTooltipPositionClasses = () => {
+                  if (star === 1) return 'left-0'; // Sang trái cho 1 sao
+                  if (star === 5) return 'right-0'; // Sang phải cho 5 sao
+                  return 'left-1/2 -translate-x-1/2'; // Trung tâm
+                };
+                
+                const getArrowPositionClasses = () => {
+                  if (star === 1) return 'left-3'; // Bên trái cho 1 sao
+                  if (star === 5) return 'right-3'; // Bên phải cho 5 sao 
+                  return 'left-1/2 -translate-x-1/2'; // Trung tâm
+                };
+
                 return (
                   <div key={star} className="group/star relative">
                     <button
@@ -218,15 +232,19 @@ export default function ReviewModal({
                     {/* Tooltip */}
                     {!readOnly && (
                       <div
-                        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 ${repChange.bgColor} ${repChange.borderColor} border text-sm rounded-lg opacity-0 invisible group-hover/star:opacity-100 group-hover/star:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg`}
+                        className={`absolute bottom-full ${getTooltipPositionClasses()} mb-1 px-2 py-1 ${repChange.bgColor} ${repChange.borderColor} border text-xs rounded-md opacity-0 invisible group-hover/star:opacity-100 group-hover/star:visible transition-all duration-200 whitespace-nowrap z-50 shadow-md`}
                       >
-                        <div className={`font-semibold ${repChange.color}`}>
-                          {repChange.points > 0 ? '+' : ''}
-                          {repChange.points}{' '}
-                          {t('ModalPopup.ReviewModal.reputationPoints')}
+                        <div className={`font-bold text-center ${repChange.color}`}>
+                          <span className="text-base">
+                            {repChange.points > 0 ? '+' : ''}
+                            {repChange.points}
+                          </span>
+                          <span className="ml-1 font-normal">
+                            {t('ModalPopup.ReviewModal.reputationPoints')}
+                          </span>
                         </div>
                         <div
-                          className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent"
+                          className={`absolute top-full ${getArrowPositionClasses()} border-4 border-transparent`}
                           style={{ borderTopColor: currentArrowColor }}
                         ></div>
                       </div>
