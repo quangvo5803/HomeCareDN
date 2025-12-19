@@ -247,7 +247,6 @@ namespace BusinessLogic.Services
             );
             if (contractor != null)
             {
-                contractor.ProjectCount += 1;
                 double projectValue = await GetProjectValueAsync(
                     contractorApp.ServiceRequestID,
                     null
@@ -332,7 +331,6 @@ namespace BusinessLogic.Services
             );
             if (distributor != null)
             {
-                distributor.ProjectCount += 1;
                 double projectValue = await GetProjectValueAsync(
                     null,
                     distributorApp.MaterialRequestID
