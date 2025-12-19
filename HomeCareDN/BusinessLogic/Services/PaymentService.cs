@@ -248,6 +248,7 @@ namespace BusinessLogic.Services
             if (contractor != null)
             {
                 contractor.ProjectCount += 1;
+                UpdateProjectScaleAndBaseReputation(contractor, contractorApp.EstimatePrice);
                 await _userManager.UpdateAsync(contractor);
             }
 
@@ -328,6 +329,7 @@ namespace BusinessLogic.Services
             if (distributor != null)
             {
                 distributor.ProjectCount += 1;
+                UpdateProjectScaleAndBaseReputation(distributor, distributorApp.TotalEstimatePrice);
                 await _userManager.UpdateAsync(distributor);
             }
 
@@ -394,6 +396,30 @@ namespace BusinessLogic.Services
                     Action = NotificationAction.Paid,
                 }
             );
+        }
+
+        private static void UpdateProjectScaleAndBaseReputation(ApplicationUser partner, double projectValue)
+        {
+            if (projectValue <= 1_000_000_000)
+            {
+                partner.SmallScaleProjectCount += 1;
+            }
+            else if (projectValue <= 10_000_000_000)
+            {
+                partner.MediumScaleProjectCount += 1;
+            }
+            else
+            {
+                partner.LargeScaleProjectCount += 1;
+            }
+
+            int basePoints = projectValue switch
+            {
+                <= 1_000_000_000 => 1,
+                <= 10_000_000_000 => 5,
+                _ => 10
+            };
+            partner.ReputationPoints += basePoints;
         }
     }
 }

@@ -170,12 +170,8 @@ namespace BusinessLogic.Services
 
             UpdateAverageRating(partner, rating);
 
-            double projectValue = await GetProjectValueAsync(serviceRequestId, materialRequestId);
-
-            UpdateProjectScaleCounts(partner, projectValue);
-
-            int reputationChange = CalculateReputationPoints(projectValue, rating);
-            partner.ReputationPoints += reputationChange;
+            int ratingBonus = CalculateRatingBonus(rating);
+            partner.ReputationPoints += ratingBonus;
 
             await _userManager.UpdateAsync(partner);
         }
@@ -188,93 +184,17 @@ namespace BusinessLogic.Services
             partner.RatingCount += 1;
         }
 
-        private async Task<double> GetProjectValueAsync(
-            Guid? serviceRequestId,
-            Guid? materialRequestId
-        )
+        private static int CalculateRatingBonus(int rating)
         {
-            if (serviceRequestId.HasValue)
+            return rating switch
             {
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                    filter: sr => sr.ServiceRequestID == serviceRequestId.Value,
-                    includeProperties: "SelectedContractorApplication"
-                );
-
-                if (serviceRequest?.SelectedContractorApplication != null)
-                {
-                    return serviceRequest.SelectedContractorApplication.EstimatePrice;
-                }
-            }
-            else if (materialRequestId.HasValue)
-            {
-                var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
-                    filter: mr => mr.MaterialRequestID == materialRequestId.Value,
-                    includeProperties: "SelectedDistributorApplication"
-                );
-
-                if (materialRequest?.SelectedDistributorApplication != null)
-                {
-                    return materialRequest.SelectedDistributorApplication.TotalEstimatePrice;
-                }
-            }
-            return 0;
-        }
-
-        private static void UpdateProjectScaleCounts(ApplicationUser partner, double projectValue)
-        {
-            if (projectValue <= 1_000_000_000)
-            {
-                partner.SmallScaleProjectCount += 1;
-            }
-            else if (projectValue <= 10_000_000_000)
-            {
-                partner.MediumScaleProjectCount += 1;
-            }
-            else
-            {
-                partner.LargeScaleProjectCount += 1;
-            }
-        }
-
-        private static int CalculateReputationPoints(double projectValue, int rating)
-        {
-            int point = 0;
-            if (projectValue <= 1_000_000_000)
-            {
-                point += 1;
-            }
-            else if (projectValue <= 10_000_000_000)
-            {
-                point += 5;
-            }
-            else
-            {
-                point += 10;
-            }
-
-            switch (rating)
-            {
-                case 5:
-                    point += 5;
-                    break;
-                case 4:
-                    point += 3;
-                    break;
-                case 3:
-                    point += 0;
-                    break;
-                case 2:
-                    point -= 5;
-                    break;
-                case 1:
-                    point -= 10;
-                    break;
-                default:
-                    point += 0;
-                    break;
-            }
-
-            return point;
+                5 => 5,
+                4 => 3,
+                3 => 0,
+                2 => -5,
+                1 => -10,
+                _ => 0
+            };
         }
     }
 }
