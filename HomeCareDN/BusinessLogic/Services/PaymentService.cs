@@ -247,16 +247,8 @@ namespace BusinessLogic.Services
             );
             if (contractor != null)
             {
-<<<<<<< HEAD
                 contractor.ProjectCount += 1;
                 UpdateProjectScaleAndBaseReputation(contractor, contractorApp.EstimatePrice);
-=======
-                double projectValue = await GetProjectValueAsync(
-                    contractorApp.ServiceRequestID,
-                    null
-                );
-                UpdateReputationPointAndProjectScaleCounts(contractor, projectValue);
->>>>>>> develop
                 await _userManager.UpdateAsync(contractor);
             }
 
@@ -336,16 +328,8 @@ namespace BusinessLogic.Services
             );
             if (distributor != null)
             {
-<<<<<<< HEAD
                 distributor.ProjectCount += 1;
                 UpdateProjectScaleAndBaseReputation(distributor, distributorApp.TotalEstimatePrice);
-=======
-                double projectValue = await GetProjectValueAsync(
-                    null,
-                    distributorApp.MaterialRequestID
-                );
-                UpdateReputationPointAndProjectScaleCounts(distributor, projectValue);
->>>>>>> develop
                 await _userManager.UpdateAsync(distributor);
             }
 
@@ -414,46 +398,7 @@ namespace BusinessLogic.Services
             );
         }
 
-<<<<<<< HEAD
         private static void UpdateProjectScaleAndBaseReputation(ApplicationUser partner, double projectValue)
-=======
-        private async Task<double> GetProjectValueAsync(
-            Guid? serviceRequestId,
-            Guid? materialRequestId
-        )
-        {
-            if (serviceRequestId.HasValue)
-            {
-                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
-                    filter: sr => sr.ServiceRequestID == serviceRequestId.Value,
-                    includeProperties: "SelectedContractorApplication"
-                );
-
-                if (serviceRequest?.SelectedContractorApplication != null)
-                {
-                    return serviceRequest.SelectedContractorApplication.EstimatePrice;
-                }
-            }
-            else if (materialRequestId.HasValue)
-            {
-                var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
-                    filter: mr => mr.MaterialRequestID == materialRequestId.Value,
-                    includeProperties: "SelectedDistributorApplication"
-                );
-
-                if (materialRequest?.SelectedDistributorApplication != null)
-                {
-                    return materialRequest.SelectedDistributorApplication.TotalEstimatePrice;
-                }
-            }
-            return 0;
-        }
-
-        private static void UpdateReputationPointAndProjectScaleCounts(
-            ApplicationUser partner,
-            double projectValue
-        )
->>>>>>> develop
         {
             if (projectValue <= 1_000_000_000)
             {
@@ -467,7 +412,6 @@ namespace BusinessLogic.Services
             {
                 partner.LargeScaleProjectCount += 1;
             }
-<<<<<<< HEAD
 
             int basePoints = projectValue switch
             {
@@ -476,20 +420,6 @@ namespace BusinessLogic.Services
                 _ => 10
             };
             partner.ReputationPoints += basePoints;
-=======
-            if (projectValue <= 1_000_000_000)
-            {
-                partner.ReputationPoints += 1;
-            }
-            else if (projectValue <= 10_000_000_000)
-            {
-                partner.ReputationPoints += 5;
-            }
-            else
-            {
-                partner.ReputationPoints += 10;
-            }
->>>>>>> develop
         }
     }
 }
