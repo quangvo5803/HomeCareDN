@@ -1,22 +1,22 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useServiceRequest } from "../../hook/useServiceRequest";
-import VenoBox from "venobox";
-import "venobox/dist/venobox.min.css";
-import Loading from "../../components/Loading";
-import LoadingComponent from "../../components/LoadingComponent";
-import { useTranslation } from "react-i18next";
-import { formatDate, formatVND } from "../../utils/formatters";
-import { handleApiError } from "../../utils/handleApiError";
-import { toast } from "react-toastify";
-import { contractorApplicationService } from "../../services/contractorApplicationService";
-import StatusBadge from "../../components/StatusBadge";
-import { Pagination } from "antd";
-import useRealtime from "../../realtime/useRealtime";
-import { RealtimeEvents } from "../../realtime/realtimeEvents";
-import he from "he";
-import CommissionCountdown from "../../components/partner/CommissionCountdown";
-import ChatSection from "../../components/ChatSection";
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useServiceRequest } from '../../hook/useServiceRequest';
+import VenoBox from 'venobox';
+import 'venobox/dist/venobox.min.css';
+import Loading from '../../components/Loading';
+import LoadingComponent from '../../components/LoadingComponent';
+import { useTranslation } from 'react-i18next';
+import { formatDate, formatVND } from '../../utils/formatters';
+import { handleApiError } from '../../utils/handleApiError';
+import { toast } from 'react-toastify';
+import { contractorApplicationService } from '../../services/contractorApplicationService';
+import StatusBadge from '../../components/StatusBadge';
+import { Pagination } from 'antd';
+import useRealtime from '../../realtime/useRealtime';
+import { RealtimeEvents } from '../../realtime/realtimeEvents';
+import he from 'he';
+import CommissionCountdown from '../../components/partner/CommissionCountdown';
+import ChatSection from '../../components/ChatSection';
 
 export default function ServiceRequestDetail() {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ export default function ServiceRequestDetail() {
           sr.serviceRequestID === payload.serviceRequestID
             ? {
                 ...sr,
-                status: "Closed",
+                status: 'Closed',
               }
             : sr
         )
@@ -102,7 +102,7 @@ export default function ServiceRequestDetail() {
           if (!prev) return prev;
           return {
             ...prev,
-            status: "Closed",
+            status: 'Closed',
           };
         }
       });
@@ -135,12 +135,12 @@ export default function ServiceRequestDetail() {
       if (serviceRequestId == payload.serviceRequestID) {
         setServiceRequest((prev) => ({
           ...prev,
-          status: "Opening",
+          status: 'Opening',
           selectedContractorApplication: null,
           selectedContractorApplicationID: null,
         }));
 
-        toast.info(t("userPage.serviceRequest.serviceApplicationExpired"));
+        toast.info(t('userPage.serviceRequest.serviceApplicationExpired'));
       }
     },
   });
@@ -187,7 +187,7 @@ export default function ServiceRequestDetail() {
           c.contractorApplicationID === contractorApplicationID ? rejected : c
         )
       );
-      toast.success(t("SUCCESS.REJECT_APPLICATION"));
+      toast.success(t('SUCCESS.REJECT_APPLICATION'));
     } catch (error) {
       toast.error(handleApiError(error));
     } finally {
@@ -198,7 +198,7 @@ export default function ServiceRequestDetail() {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (!serviceRequest && !loading) {
-        navigate("/Customer", { state: { tab: "service_requests" } });
+        navigate('/Customer', { state: { tab: 'service_requests' } });
       }
     }, 10000);
     return () => clearTimeout(timeout);
@@ -258,21 +258,21 @@ export default function ServiceRequestDetail() {
   }, [serviceRequest, fetchContractors]);
 
   useEffect(() => {
-    const vb = new VenoBox({ selector: ".venobox" });
+    const vb = new VenoBox({ selector: '.venobox' });
     return () => vb.close();
   });
 
   const ICON_MAP = {
-    pdf: "fa-file-pdf text-red-600",
-    doc: "fa-file-word text-blue-600",
-    docx: "fa-file-word text-blue-600",
-    xls: "fa-file-excel text-green-600",
-    xlsx: "fa-file-excel text-green-600",
-    ppt: "fa-file-powerpoint text-orange-600",
-    pptx: "fa-file-powerpoint text-orange-600",
-    txt: "fa-file-lines text-gray-600",
+    pdf: 'fa-file-pdf text-red-600',
+    doc: 'fa-file-word text-blue-600',
+    docx: 'fa-file-word text-blue-600',
+    xls: 'fa-file-excel text-green-600',
+    xlsx: 'fa-file-excel text-green-600',
+    ppt: 'fa-file-powerpoint text-orange-600',
+    pptx: 'fa-file-powerpoint text-orange-600',
+    txt: 'fa-file-lines text-gray-600',
   };
-  const DEFAULT_ICON = "fa-file-alt text-gray-500";
+  const DEFAULT_ICON = 'fa-file-alt text-gray-500';
 
   if (loading || !serviceRequest || isSubmiting) return <Loading />;
 
@@ -285,16 +285,16 @@ export default function ServiceRequestDetail() {
           <div className="relative flex items-center justify-between">
             <button
               onClick={() =>
-                navigate("/Customer", { state: { tab: "service_requests" } })
+                navigate('/Customer', { state: { tab: 'service_requests' } })
               }
               className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition-colors font-medium"
             >
               <i className="fas fa-arrow-left"></i>
-              <span>{t("BUTTON.Back")}</span>
+              <span>{t('BUTTON.Back')}</span>
             </button>
             <h1 className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold text-orange-500">
               <i className="fa-solid fa-clipboard-list mr-2"></i>
-              {t("userPage.serviceRequestDetail.title")}
+              {t('userPage.serviceRequestDetail.title')}
             </h1>
           </div>
         </div>
@@ -309,11 +309,11 @@ export default function ServiceRequestDetail() {
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <i
                   className={`text-orange-600 text-xl fas ${
-                    serviceRequest.serviceType === "Construction"
-                      ? "fa-hammer"
-                      : "fa-screwdriver-wrench"
+                    serviceRequest.serviceType === 'Construction'
+                      ? 'fa-hammer'
+                      : 'fa-screwdriver-wrench'
                   }`}
-                />{" "}
+                />{' '}
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">
@@ -338,7 +338,7 @@ export default function ServiceRequestDetail() {
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                   <i className="fas fa-align-left text-gray-500 mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_description")}
+                  {t('userPage.serviceRequestDetail.label_description')}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
                   {serviceRequest.description}
@@ -350,7 +350,7 @@ export default function ServiceRequestDetail() {
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                 <i className="fas fa-map-marker-alt text-orange-500 mr-1"></i>
-                {t("userPage.serviceRequestDetail.label_address")}
+                {t('userPage.serviceRequestDetail.label_address')}
               </h3>
               <p className="text-gray-600 flex items-start gap-2">
                 {`${serviceRequest.address.detail}, ${serviceRequest.address.ward}, ${serviceRequest.address.district}, ${serviceRequest.address.city}`}
@@ -359,12 +359,12 @@ export default function ServiceRequestDetail() {
             <div className="mb-6">
               <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">
                 <i className="fas fa-clock text-orange-500 mr-1"></i>
-                {t("userPage.serviceRequest.label_timeLine")}
+                {t('userPage.serviceRequest.label_timeLine')}
               </h3>
               <p className="text-gray-600 flex items-start gap-2">
                 {formatDate(serviceRequest.startDate, i18n.language) +
-                  " - " +
-                  formatDate(serviceRequest.endDate, i18n.language)}{" "}
+                  ' - ' +
+                  formatDate(serviceRequest.endDate, i18n.language)}{' '}
               </p>
             </div>
             {/* Images */}
@@ -372,7 +372,7 @@ export default function ServiceRequestDetail() {
               <div>
                 <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
                   <i className="fas fa-images text-orange-500 mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_images")}
+                  {t('userPage.serviceRequestDetail.label_images')}
                 </h3>
                 <div className="grid grid-cols-4 gap-3">
                   {serviceRequest.imageUrls.map((img, idx) => (
@@ -397,17 +397,17 @@ export default function ServiceRequestDetail() {
           {serviceRequest.documentUrls.length > 0 && (
             <div>
               <h3 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                <i className="fas fa-file-alt text-orange-500 mt-1"></i>{" "}
-                {t("userPage.serviceRequestDetail.label_documents")}
+                <i className="fas fa-file-alt text-orange-500 mt-1"></i>{' '}
+                {t('userPage.serviceRequestDetail.label_documents')}
               </h3>
 
               <div className="space-y-3">
                 {serviceRequest.documentUrls.map((docUrl) => {
                   const fileName = decodeURIComponent(
-                    docUrl.split("/").pop()?.split("?")[0] ?? "document"
+                    docUrl.split('/').pop()?.split('?')[0] ?? 'document'
                   );
                   const ext = (
-                    fileName.includes(".") ? fileName.split(".").pop() : ""
+                    fileName.includes('.') ? fileName.split('.').pop() : ''
                   ).toLowerCase();
 
                   const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
@@ -432,7 +432,7 @@ export default function ServiceRequestDetail() {
                         </p>
                         <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
-                            {(ext || "file").toUpperCase()}
+                            {(ext || 'file').toUpperCase()}
                           </span>
                         </div>
                       </div>
@@ -444,7 +444,7 @@ export default function ServiceRequestDetail() {
                           download
                           className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
                         >
-                          {t("common.Download")}
+                          {t('common.Download')}
                         </a>
                       </div>
                     </div>
@@ -458,7 +458,7 @@ export default function ServiceRequestDetail() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6">
               <i className="fas fa-tools text-orange-500 mr-2"></i>
-              {t("userPage.serviceRequestDetail.label_serviceInfor")}
+              {t('userPage.serviceRequestDetail.label_serviceInfor')}
             </h2>
 
             {/* Grid specifications */}
@@ -466,7 +466,7 @@ export default function ServiceRequestDetail() {
               <div className="border rounded-lg p-4 hover:border-orange-300 transition-colors">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-box-open mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_packageOption")}
+                  {t('userPage.serviceRequestDetail.label_packageOption')}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {t(`Enums.PackageOption.${serviceRequest.packageOption}`)}
@@ -476,7 +476,7 @@ export default function ServiceRequestDetail() {
               <div className="border rounded-lg p-4 hover:border-orange-300 transition-colors">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-building mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_buildingType")}
+                  {t('userPage.serviceRequestDetail.label_buildingType')}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {t(`Enums.BuildingType.${serviceRequest.buildingType}`)}
@@ -486,7 +486,7 @@ export default function ServiceRequestDetail() {
               <div className="border rounded-lg p-4 hover:border-orange-300 transition-colors">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-layer-group mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_mainStructureType")}
+                  {t('userPage.serviceRequestDetail.label_mainStructureType')}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {t(`Enums.MainStructure.${serviceRequest.mainStructureType}`)}
@@ -496,12 +496,12 @@ export default function ServiceRequestDetail() {
               <div className="border rounded-lg p-4 hover:border-orange-300 transition-colors">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-pencil-ruler mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_designType")}
+                  {t('userPage.serviceRequestDetail.label_designType')}
                 </p>
                 <p className="font-semibold text-gray-900">
                   {serviceRequest.designStyle
                     ? t(`Enums.DesignStyle.${serviceRequest.designStyle}`)
-                    : t("common.noRequirement")}
+                    : t('common.noRequirement')}
                 </p>
               </div>
             </div>
@@ -511,7 +511,7 @@ export default function ServiceRequestDetail() {
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-ruler-horizontal mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_width")}
+                  {t('userPage.serviceRequestDetail.label_width')}
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {serviceRequest.width}
@@ -522,7 +522,7 @@ export default function ServiceRequestDetail() {
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-ruler-vertical mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_length")}
+                  {t('userPage.serviceRequestDetail.label_length')}
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {serviceRequest.length}
@@ -533,7 +533,7 @@ export default function ServiceRequestDetail() {
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">
                   <i className="fas fa-layer-group mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_floors")}
+                  {t('userPage.serviceRequestDetail.label_floors')}
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
                   {serviceRequest.floors}
@@ -546,7 +546,7 @@ export default function ServiceRequestDetail() {
               <div className="border-l-4 border-blue-500 bg-blue-50 rounded-lg p-4">
                 <p className="text-xs text-blue-700 mb-1 uppercase tracking-wide font-medium">
                   <i className="fas fa-vector-square mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_area")}
+                  {t('userPage.serviceRequestDetail.label_area')}
                 </p>
                 <p className="text-2xl font-bold text-blue-900">
                   {(
@@ -561,23 +561,23 @@ export default function ServiceRequestDetail() {
               <div className="border-l-4 border-green-500 bg-green-50 rounded-lg p-4">
                 <p className="text-xs text-green-700 mb-1 uppercase tracking-wide font-medium">
                   <i className="fas fa-money-bill-wave mr-1"></i>
-                  {t("userPage.serviceRequestDetail.label_estimatePrice")}
+                  {t('userPage.serviceRequestDetail.label_estimatePrice')}
                 </p>
                 {serviceRequest.estimatePrice ? (
                   <>
                     <p className="text-2xl font-bold text-green-900">
                       {(serviceRequest.estimatePrice / 1000000).toFixed(0)}
                       <span className="text-sm font-normal">
-                        {i18n.language === "vi" ? " triệu" : " M"}
+                        {i18n.language === 'vi' ? ' triệu' : ' M'}
                       </span>
                     </p>
                     <p className="text-xs text-gray-600 mt-1">
-                      {serviceRequest.estimatePrice.toLocaleString("vi-VN")} VNĐ
+                      {serviceRequest.estimatePrice.toLocaleString('vi-VN')} VNĐ
                     </p>
                   </>
                 ) : (
                   <p className="text-sm text-gray-500 italic">
-                    {t("userPage.serviceRequestDetail.noEstimatePrice")}
+                    {t('userPage.serviceRequestDetail.noEstimatePrice')}
                   </p>
                 )}
               </div>
@@ -592,7 +592,7 @@ export default function ServiceRequestDetail() {
               <span className="flex items-center gap-2">
                 <i className="fas fa-hard-hat"></i>
                 <span>
-                  {t("userPage.serviceRequestDetail.label_selectedContractor")}
+                  {t('userPage.serviceRequestDetail.label_selectedContractor')}
                 </span>
               </span>
             ) : (
@@ -600,12 +600,12 @@ export default function ServiceRequestDetail() {
                 <span className="flex items-center gap-2">
                   <i className="fas fa-hard-hat"></i>
                   <span>
-                    {t("userPage.serviceRequestDetail.section_contractor")}
+                    {t('userPage.serviceRequestDetail.section_contractor')}
                   </span>
                 </span>
                 <span className="ml-2 px-4 py-1 bg-orange-100 text-orange-600 font-bold text-lg rounded-full">
-                  {totalCount}{" "}
-                  {t("userPage.serviceRequestDetail.contractorApplyCount")}
+                  {totalCount}{' '}
+                  {t('userPage.serviceRequestDetail.contractorApplyCount')}
                 </span>
               </>
             )}
@@ -619,7 +619,7 @@ export default function ServiceRequestDetail() {
                   className="flex items-center gap-2 text-gray-600 hover:text-orange-600 mb-6 font-medium"
                 >
                   <i className="fas fa-arrow-left"></i>
-                  <span>{t("BUTTON.Back")}</span>
+                  <span>{t('BUTTON.Back')}</span>
                 </button>
               )}
               <div className="text-center mb-6 pb-6 border-b">
@@ -627,7 +627,7 @@ export default function ServiceRequestDetail() {
                   C
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2 text-lg">
-                  {t("roles.Contractor")}
+                  {t('roles.Contractor')}
                 </h3>
                 <div className="flex items-center justify-center gap-8 text-sm mb-2">
                   {/* Cột trái - Số sao và điểm uy tín */}
@@ -651,24 +651,24 @@ export default function ServiceRequestDetail() {
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
                         <div className="font-semibold mb-1">
                           {t(
-                            "userPage.serviceRequestDetail.reputationTooltipTitle"
-                          ) || "Điểm uy tín theo giá trị công trình:"}
+                            'userPage.serviceRequestDetail.reputationTooltipTitle'
+                          ) || 'Điểm uy tín theo giá trị công trình:'}
                         </div>
                         <div className="space-y-0.5">
                           <div>
                             {t(
-                              "userPage.serviceRequestDetail.reputationSmall"
-                            ) || "• Dưới 1 tỷ: +1 điểm"}
+                              'userPage.serviceRequestDetail.reputationSmall'
+                            ) || '• Dưới 1 tỷ: +1 điểm'}
                           </div>
                           <div>
                             {t(
-                              "userPage.serviceRequestDetail.reputationMedium"
-                            ) || "• Từ 1-10 tỷ: +5 điểm"}
+                              'userPage.serviceRequestDetail.reputationMedium'
+                            ) || '• Từ 1-10 tỷ: +5 điểm'}
                           </div>
                           <div>
                             {t(
-                              "userPage.serviceRequestDetail.reputationLarge"
-                            ) || "• Trên 10 tỷ: +10 điểm"}
+                              'userPage.serviceRequestDetail.reputationLarge'
+                            ) || '• Trên 10 tỷ: +10 điểm'}
                           </div>
                         </div>
                         <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
@@ -684,8 +684,8 @@ export default function ServiceRequestDetail() {
                       <i className="fas fa-home text-green-400 w-4 text-center cursor-help"></i>
                       <span className="text-xs">
                         {t(
-                          "userPage.serviceRequestDetail.smallScaleProjects"
-                        ) || "Nhỏ"}
+                          'userPage.serviceRequestDetail.smallScaleProjects'
+                        ) || 'Nhỏ'}
                         :
                       </span>
                       <span className="font-semibold">
@@ -693,8 +693,8 @@ export default function ServiceRequestDetail() {
                       </span>
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/small:opacity-100 group-hover/small:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t("userPage.serviceRequestDetail.smallScaleTooltip") ||
-                          "Dưới 1 tỷ VNĐ"}
+                        {t('userPage.serviceRequestDetail.smallScaleTooltip') ||
+                          'Dưới 1 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -702,8 +702,8 @@ export default function ServiceRequestDetail() {
                       <i className="fas fa-building text-yellow-500 w-4 text-center cursor-help"></i>
                       <span className="text-xs">
                         {t(
-                          "userPage.serviceRequestDetail.mediumScaleProjects"
-                        ) || "Vừa"}
+                          'userPage.serviceRequestDetail.mediumScaleProjects'
+                        ) || 'Vừa'}
                         :
                       </span>
                       <span className="font-semibold">
@@ -712,8 +712,8 @@ export default function ServiceRequestDetail() {
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/medium:opacity-100 group-hover/medium:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
                         {t(
-                          "userPage.serviceRequestDetail.mediumScaleTooltip"
-                        ) || "Từ 1 - 10 tỷ VNĐ"}
+                          'userPage.serviceRequestDetail.mediumScaleTooltip'
+                        ) || 'Từ 1 - 10 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -721,8 +721,8 @@ export default function ServiceRequestDetail() {
                       <i className="fas fa-city text-red-500 w-4 text-center cursor-help"></i>
                       <span className="text-xs">
                         {t(
-                          "userPage.serviceRequestDetail.largeScaleProjects"
-                        ) || "Lớn"}
+                          'userPage.serviceRequestDetail.largeScaleProjects'
+                        ) || 'Lớn'}
                         :
                       </span>
                       <span className="font-semibold">
@@ -730,8 +730,8 @@ export default function ServiceRequestDetail() {
                       </span>
                       {/* Tooltip */}
                       <div className="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover/large:opacity-100 group-hover/large:visible transition-all duration-200 whitespace-nowrap z-50 shadow-lg">
-                        {t("userPage.serviceRequestDetail.largeScaleTooltip") ||
-                          "Trên 10 tỷ VNĐ"}
+                        {t('userPage.serviceRequestDetail.largeScaleTooltip') ||
+                          'Trên 10 tỷ VNĐ'}
                         <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-800"></div>
                       </div>
                     </div>
@@ -744,7 +744,7 @@ export default function ServiceRequestDetail() {
                 {/* Price Box */}
                 <div className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 rounded-xl p-6 mb-5 mt-5">
                   <p className="text-xs text-green-700 mb-1 uppercase tracking-widest font-semibold">
-                    {t("userPage.serviceRequestDetail.label_estimatePrice")}
+                    {t('userPage.serviceRequestDetail.label_estimatePrice')}
                   </p>
 
                   <p className="text-3xl font-bold text-green-900 mb-1">
@@ -756,7 +756,7 @@ export default function ServiceRequestDetail() {
 
                     {selectedContractor.estimatePrice >= 1_000_000 && (
                       <span className="text-lg font-normal ml-2">
-                        {i18n.language === "vi" ? "triệu" : "M"} VNĐ
+                        {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
                       </span>
                     )}
                   </p>
@@ -772,16 +772,16 @@ export default function ServiceRequestDetail() {
               {selectedContractor?.documentUrls?.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
-                    {t("contractorServiceRequestDetail.documents")}
+                    {t('contractorServiceRequestDetail.documents')}
                   </h4>
 
                   <div className="space-y-3">
                     {selectedContractor.documentUrls.map((doc) => {
                       const fileName = decodeURIComponent(
-                        doc.split("/").pop()?.split("?")[0] ?? "document"
+                        doc.split('/').pop()?.split('?')[0] ?? 'document'
                       );
                       const ext = (
-                        fileName.includes(".") ? fileName.split(".").pop() : ""
+                        fileName.includes('.') ? fileName.split('.').pop() : ''
                       ).toLowerCase();
 
                       const iconClass = ICON_MAP[ext] || DEFAULT_ICON;
@@ -806,7 +806,7 @@ export default function ServiceRequestDetail() {
                             </p>
                             <div className="mt-0.5 text-xs text-gray-500 flex items-center gap-2">
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-gray-100 border text-gray-600">
-                                {(ext || "file").toUpperCase()}
+                                {(ext || 'file').toUpperCase()}
                               </span>
                             </div>
                           </div>
@@ -818,7 +818,7 @@ export default function ServiceRequestDetail() {
                               download
                               className="px-2.5 py-1.5 text-xs rounded-md bg-orange-600 text-white hover:bg-orange-700 transition"
                             >
-                              {t("common.Download")}
+                              {t('common.Download')}
                             </a>
                           </div>
                         </div>
@@ -828,14 +828,14 @@ export default function ServiceRequestDetail() {
                 </div>
               )}
               {/* Contractor Contact Information - Show when Approved */}
-              {selectedContractor.status === "Approved" && (
+              {selectedContractor.status === 'Approved' && (
                 <div className="mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-6 border border-orange-200">
                   <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i className="fas fa-user-tie text-orange-600"></i>
                     <span>
                       {t(
-                        "userPage.serviceRequestDetail.label_contractorInfo"
-                      ) || "Thông tin nhà thầu"}
+                        'userPage.serviceRequestDetail.label_contractorInfo'
+                      ) || 'Thông tin nhà thầu'}
                     </span>
                   </h4>
                   <div className="space-y-3">
@@ -846,7 +846,7 @@ export default function ServiceRequestDetail() {
                       <div>
                         <p className="text-xs text-gray-500 uppercase tracking-wide">
                           {t(
-                            "userPage.serviceRequestDetail.label_contractorName"
+                            'userPage.serviceRequestDetail.label_contractorName'
                           )}
                         </p>
                         <p className="font-semibold text-gray-900">
@@ -864,7 +864,7 @@ export default function ServiceRequestDetail() {
                           Email
                         </p>
                         <p className="font-semibold text-gray-900">
-                          {selectedContractor.contractorEmail || "N/A"}
+                          {selectedContractor.contractorEmail || 'N/A'}
                         </p>
                       </div>
                     </div>
@@ -876,8 +876,8 @@ export default function ServiceRequestDetail() {
                         </div>
                         <div>
                           <p className="text-xs text-gray-500 uppercase tracking-wide">
-                            {t("userPage.serviceRequestDetail.label_phone") ||
-                              "Số điện thoại"}
+                            {t('userPage.serviceRequestDetail.label_phone') ||
+                              'Số điện thoại'}
                           </p>
                           <p className="font-semibold text-gray-900">
                             {selectedContractor.contractorPhone}
@@ -893,15 +893,15 @@ export default function ServiceRequestDetail() {
                       <div>
                         <p className="text-xs text-gray-500 uppercase tracking-wide">
                           {t(
-                            "userPage.serviceRequestDetail.label_estimatePrice"
+                            'userPage.serviceRequestDetail.label_estimatePrice'
                           )}
                         </p>
                         <p className="font-semibold text-gray-900 text-lg">
                           {(selectedContractor.estimatePrice / 1000000).toFixed(
                             0
-                          )}{" "}
+                          )}{' '}
                           <span className="text-sm">
-                            {i18n.language === "vi" ? "triệu" : "M"} VNĐ
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
                           </span>
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
@@ -914,7 +914,7 @@ export default function ServiceRequestDetail() {
               )}
 
               {/* Commission Countdown - Show when PendingCommission */}
-              {selectedContractor.status === "PendingCommission" &&
+              {selectedContractor.status === 'PendingCommission' &&
                 selectedContractor.dueCommisionTime && (
                   <div className="mb-6">
                     <CommissionCountdown
@@ -929,7 +929,7 @@ export default function ServiceRequestDetail() {
               <div className="mb-6">
                 <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">
                   {t(
-                    "userPage.serviceRequestDetail.label_descriptionContractor"
+                    'userPage.serviceRequestDetail.label_descriptionContractor'
                   )}
                 </h4>
                 <p
@@ -960,44 +960,44 @@ export default function ServiceRequestDetail() {
               </div>
 
               {/* Action Buttons */}
-              {selectedContractor.status === "Pending" && (
+              {selectedContractor.status === 'Pending' && (
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={handleAcceptContractor}
                     className="px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold"
                   >
                     <i className="fas fa-check mr-2"></i>
-                    {t("BUTTON.Accept")}
+                    {t('BUTTON.Accept')}
                   </button>
                   <button
                     onClick={handleRejectContractor}
                     className="px-4 py-3 bg-white border rounded-lg text-gray-700 hover:bg-gray-50 font-semibold"
                   >
                     <i className="fas fa-times mr-2"></i>
-                    {t("BUTTON.Reject")}
+                    {t('BUTTON.Reject')}
                   </button>
                 </div>
               )}
-              {selectedContractor.status === "Rejected" && (
+              {selectedContractor.status === 'Rejected' && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
                   <p className="text-red-700 font-semibold">
                     <i className="fas fa-times-circle mr-2"></i>
-                    {t("userPage.materialRequestDetail.alreadyRejected")}
+                    {t('userPage.materialRequestDetail.alreadyRejected')}
                   </p>
                 </div>
               )}
-              {selectedContractor.status === "PendingCommission" && (
+              {selectedContractor.status === 'PendingCommission' && (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
                   <p className="text-green-700 font-semibold">
                     <i className="fas fa-check-circle mr-2"></i>
-                    {t("userPage.materialRequestDetail.waiting")}
+                    {t('userPage.materialRequestDetail.waiting')}
                   </p>
                 </div>
               )}
             </>
           ) : contractorApplications.length === 0 ? (
             <div className="text-center py-10 text-gray-500">
-              {t("userPage.serviceRequestDetail.noContractor")}
+              {t('userPage.serviceRequestDetail.noContractor')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -1020,7 +1020,7 @@ export default function ServiceRequestDetail() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-gray-900 truncate mb-1">
-                            {`${t("roles.Contractor")} ${idx + 1}`}
+                            {`${t('roles.Contractor')} ${idx + 1}`}
                           </h4>
                           <div className="flex items-center gap-3 text-xs text-gray-500 flex-wrap">
                             <span className="flex items-center gap-1">
@@ -1039,24 +1039,24 @@ export default function ServiceRequestDetail() {
                               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg min-w-max">
                                 <div className="font-semibold mb-1">
                                   {t(
-                                    "userPage.serviceRequestDetail.reputationTooltipTitle"
-                                  ) || "Điểm uy tín theo giá trị công trình:"}
+                                    'userPage.serviceRequestDetail.reputationTooltipTitle'
+                                  ) || 'Điểm uy tín theo giá trị công trình:'}
                                 </div>
                                 <div className="space-y-0.5">
                                   <div>
                                     {t(
-                                      "userPage.serviceRequestDetail.reputationSmall"
-                                    ) || "• Dưới 1 tỷ: +1 điểm"}
+                                      'userPage.serviceRequestDetail.reputationSmall'
+                                    ) || '• Dưới 1 tỷ: +1 điểm'}
                                   </div>
                                   <div>
                                     {t(
-                                      "userPage.serviceRequestDetail.reputationMedium"
-                                    ) || "• Từ 1-10 tỷ: +5 điểm"}
+                                      'userPage.serviceRequestDetail.reputationMedium'
+                                    ) || '• Từ 1-10 tỷ: +5 điểm'}
                                   </div>
                                   <div>
                                     {t(
-                                      "userPage.serviceRequestDetail.reputationLarge"
-                                    ) || "• Trên 10 tỷ: +10 điểm"}
+                                      'userPage.serviceRequestDetail.reputationLarge'
+                                    ) || '• Trên 10 tỷ: +10 điểm'}
                                   </div>
                                 </div>
                                 <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
@@ -1068,9 +1068,9 @@ export default function ServiceRequestDetail() {
                       <div className="flex items-center justify-between pt-3 border-t">
                         <StatusBadge status={c.status} type="Application" />
                         <span className="text-lg font-bold text-orange-600">
-                          {(c.estimatePrice / 1000000).toFixed(0)}{" "}
+                          {(c.estimatePrice / 1000000).toFixed(0)}{' '}
                           <span className="text-sm">
-                            {i18n.language === "vi" ? "triệu" : "M"} VNĐ
+                            {i18n.language === 'vi' ? 'triệu' : 'M'} VNĐ
                           </span>
                         </span>
                       </div>
@@ -1093,7 +1093,7 @@ export default function ServiceRequestDetail() {
                 </>
               ) : (
                 <div className="text-center py-6 text-gray-500">
-                  {t("common.noData")}
+                  {t('common.noData')}
                 </div>
               )}
             </div>
