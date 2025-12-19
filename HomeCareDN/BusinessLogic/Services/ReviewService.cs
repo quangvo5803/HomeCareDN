@@ -170,8 +170,15 @@ namespace BusinessLogic.Services
 
             UpdateAverageRating(partner, rating);
 
+<<<<<<< HEAD
             int ratingBonus = CalculateRatingBonus(rating);
             partner.ReputationPoints += ratingBonus;
+=======
+            double projectValue = await GetProjectValueAsync(serviceRequestId, materialRequestId);
+
+            int reputationChange = CalculateReputationPoints(projectValue, rating);
+            partner.ReputationPoints += reputationChange;
+>>>>>>> develop
 
             await _userManager.UpdateAsync(partner);
         }
@@ -188,6 +195,7 @@ namespace BusinessLogic.Services
         {
             return rating switch
             {
+<<<<<<< HEAD
                 5 => 5,
                 4 => 3,
                 3 => 0,
@@ -195,6 +203,60 @@ namespace BusinessLogic.Services
                 1 => -10,
                 _ => 0
             };
+=======
+                var serviceRequest = await _unitOfWork.ServiceRequestRepository.GetAsync(
+                    filter: sr => sr.ServiceRequestID == serviceRequestId.Value,
+                    includeProperties: "SelectedContractorApplication"
+                );
+
+                if (serviceRequest?.SelectedContractorApplication != null)
+                {
+                    return serviceRequest.SelectedContractorApplication.EstimatePrice;
+                }
+            }
+            else if (materialRequestId.HasValue)
+            {
+                var materialRequest = await _unitOfWork.MaterialRequestRepository.GetAsync(
+                    filter: mr => mr.MaterialRequestID == materialRequestId.Value,
+                    includeProperties: "SelectedDistributorApplication"
+                );
+
+                if (materialRequest?.SelectedDistributorApplication != null)
+                {
+                    return materialRequest.SelectedDistributorApplication.TotalEstimatePrice;
+                }
+            }
+            return 0;
+        }
+
+        private static int CalculateReputationPoints(double projectValue, int rating)
+        {
+            int point = 0;
+
+            switch (rating)
+            {
+                case 5:
+                    point += 5;
+                    break;
+                case 4:
+                    point += 3;
+                    break;
+                case 3:
+                    point += 0;
+                    break;
+                case 2:
+                    point -= 5;
+                    break;
+                case 1:
+                    point -= 10;
+                    break;
+                default:
+                    point += 0;
+                    break;
+            }
+
+            return point;
+>>>>>>> develop
         }
     }
 }

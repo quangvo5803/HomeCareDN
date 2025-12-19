@@ -80,7 +80,7 @@ namespace BusinessLogic.Services
                     throw new CustomValidationException(
                         new Dictionary<string, string[]>
                         {
-                            { "Password", new[] { "INCORRECT PASSWORD" } },
+                            { "Password", new[] { "INCORRECT_PASSWORD" } },
                         }
                     );
                 }
