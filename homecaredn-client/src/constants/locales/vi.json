@@ -343,7 +343,8 @@
       "label_contractorApplyCount": "đơn ứng tuyển",
       "label_open": "Đang mở",
       "label_close": "Đã đóng",
-      "label_contractorApplied": "nhà thầu"
+      "label_contractorApplied": "nhà thầu",
+      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại."
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -443,7 +444,8 @@
       "lbl_materialList": "Danh sách vật liệu",
       "lbl_materialUnit": "vật liệu",
       "lbl_andMoreMaterial": "... và {{count}} vật liêu khác",
-      "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu."
+      "lbl_emptyMaterialList": "Danh sách yêu cầu đang rỗng. Vào xem chi tiết để thêm vật liệu yêu cầu.",
+      "materialApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu vật tư đã được mở lại."
     },
     "materialRequestDetail": {
       "title": "Chi tiết yêu cầu vật liệu",
@@ -512,7 +514,11 @@
     "statusOpen": "Mở",
     "statusClosed": "Đóng",
     "searchPlaceholder": "Tìm kiếm yêu cầu dịch vụ...",
-    "showAppliedOnly": "Yêu cầu dịch vụ đã ứng tuyển"
+    "showAppliedOnly": "Yêu cầu dịch vụ đã ứng tuyển",
+    "otherPaymentExpiredMessage": "Đơn bạn đã nộp đã được mở lại vì người khác chưa thanh toán.",
+    "sortDefault": "Mặc định",
+    "sortOldest": "Cũ nhất",
+    "sortNewest": "Mới nhất"
   },
   "contractorServiceRequestDetail": {
     "privacyNotice": "Thông tin của bạn chỉ được hiển thị cho chủ dự án.",
@@ -597,7 +603,8 @@
     "reviewImages": "Hình ảnh đánh giá",
     "reviewedAt": "Ngày đánh giá",
     "reviewImageTitle": "Ảnh đánh giá",
-    "realTime": "Yêu cầu dịch vụ đã bị xóa"
+    "realTime": "Yêu cầu dịch vụ đã bị xóa",
+    "paymentExpiredMessage": "Hết hạn thanh toán hoa hồng. Vui lòng thử lại."
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
@@ -610,7 +617,8 @@
     "applied": "nhà phân phối ứng tuyển",
     "canAddMaterial": "Có thể thêm vật tư",
     "noEditQuantity": "Không sửa số lượng",
-    "noAddMaterial": "Không thêm vật tư"
+    "noAddMaterial": "Không thêm vật tư",
+    "otherPaymentExpiredMessage": "Đơn ứng tuyển của bạn đã được mở lại vì một người khác chưa thanh toán."
   },
   "distributorMaterialRequestDetail": {
     "realTime": "Yêu cầu vật liệu đã bị xóa",
@@ -663,7 +671,8 @@
     "canDeleteWhilePending": "Bạn có thể xóa đơn ứng tuyển hiện tại để tạo đơn ứng tuyển mới",
     "customerInfo": "Thông tin khách hàng",
     "customerName": "Tên khách hàng",
-    "customerPhone": "Số điện thoại"
+    "customerPhone": "Số điện thoại",
+    "paymentExpiredMessage": "Phí hoa hồng hết hạn thanh toán. Vui lòng thử lại."
   },
   "partnerDashboard": {
     "material": "Vật Liệu",
@@ -887,7 +896,8 @@
       "commission": "Tiền hoa hồng"
     },
     "pieChart": {
-      "serviceRequests": "Tổng dịch vụ đã yêu cầu"
+      "serviceRequests": "Tổng dịch vụ đã yêu cầu",
+      "amount": "Tiền đã thu"
     },
     "barChart": {
       "salesOverview": "Doanh số trong năm"
@@ -1802,7 +1812,7 @@
     },
     "customer": {
       "expiredTitle": "Đơn ứng tuyển của đối tác đã bị từ chối",
-      "expiredMessage": "Do đối tác chưa hoàn tấtthủ tục để nhận dự án nên dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
+      "expiredMessage": "Do đối tác chưa hoàn tất thủ tục để nhận dự án nên dịch vụ của bạn sẽ được mở lại để các nhà thầu khác ứng tuyển.",
       "urgent": "Đang chờ đối tác hoàn tất thủ tục đăng kí nhận dự án",
       "less24h": "Nếu đối tác không hoàn tất trong 24 giờ, hệ thống sẽ mở lại dịch vụ cho nhà thầu khác.",
       "deadline": "Vui lòng đợi nhà thầu/nhà phân phối hoàn tất thủ tục",

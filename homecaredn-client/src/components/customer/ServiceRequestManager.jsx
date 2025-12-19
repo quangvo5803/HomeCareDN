@@ -81,6 +81,21 @@ export default function ServiceRequestManager() {
         )
       );
     },
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) => {
+          if (sr.serviceRequestID === payload.serviceRequestID) {
+            return {
+              ...sr,
+              status: 'Opening',
+              selectedContractorApplication: null,
+              selectedContractorApplicationID: null,
+            };
+          }
+          return sr;
+        })
+      );
+    },
   });
 
   const handleServiceRequestViewDetail = (serviceRequestId) => {

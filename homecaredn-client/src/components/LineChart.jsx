@@ -40,6 +40,9 @@ export default function LineChart({
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
+      datalabels: {
+        display: false,
+      },
       legend: {
         display: true,
         labels: { color: '#333' },
@@ -133,7 +136,7 @@ export default function LineChart({
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-2xl">
               <LoadingComponent />
             </div>
           )}

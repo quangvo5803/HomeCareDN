@@ -118,6 +118,13 @@ namespace DataAccess.Data
                 entity.Property(n => n.Type).HasConversion<string>();
                 entity.Property(n => n.Action).HasConversion<string>();
             });
+            modelBuilder
+                .Entity<PaymentTransaction>()
+                .HasOne(pt => pt.ContractorApplication)
+                .WithMany(ca => ca.PaymentTransactions)
+                .HasForeignKey(pt => pt.ContractorApplicationID)
+                .OnDelete(DeleteBehavior.Cascade);
+
             base.OnModelCreating(modelBuilder);
         }
     }

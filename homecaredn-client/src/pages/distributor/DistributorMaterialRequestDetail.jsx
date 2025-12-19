@@ -64,7 +64,7 @@ export default function MaterialRequestDetail() {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openCancel, setOpenCancel] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isExpired, setIsExpired] = useState(false);
   //Realtime
   useRealtime({
     //Accept
@@ -106,11 +106,33 @@ export default function MaterialRequestDetail() {
       });
     },
     //Reject
-    [RealtimeEvents.DistributorApplicationRejected]: () => {
-      setExistingApplication((prev) => ({
-        ...prev,
-        status: 'Rejected',
-      }));
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      if (materialRequestId == payload.materialRequestID) {
+        if (
+          existingApplication?.distributorApplicationID ===
+          payload.distributorApplicationID
+        ) {
+          setExistingApplication((prev) => ({
+            ...prev,
+            status: 'Rejected',
+          }));
+
+          if (payload.reason === 'Commission payment expired') {
+            toast.error(
+              t('distributorMaterialRequestDetail.paymentExpiredMessage')
+            );
+          }
+        } else if (existingApplication) {
+          toast.info(
+            t('distributorMaterialRequest.otherPaymentExpiredMessage')
+          );
+        }
+
+        setMaterialRequest((prev) => ({
+          ...prev,
+          status: 'Opening',
+        }));
+      }
     },
     [RealtimeEvents.MaterialRequestDelete]: (payload) => {
       if (payload.materialRequestID === materialRequestId) {
@@ -597,17 +619,18 @@ export default function MaterialRequestDetail() {
         <>
           <CommissionCountdown
             dueCommisionTime={existingApplication.dueCommisionTime}
-            onExpired={() => {}}
+            onExpired={() => setIsExpired(true)}
           />
-          {new Date(existingApplication.dueCommisionTime) > new Date() && (
-            <button
-              onClick={handlePayCommission}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
-            >
-              <i className="fas fa-hand-holding-usd" />
-              {t('contractorServiceRequestDetail.payCommission')}
-            </button>
-          )}
+          {!isExpired &&
+            new Date(existingApplication.dueCommisionTime) > new Date() && (
+              <button
+                onClick={handlePayCommission}
+                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
+              >
+                <i className="fas fa-hand-holding-usd" />
+                {t('contractorServiceRequestDetail.payCommission')}
+              </button>
+            )}
         </>
       )}
     </>

@@ -24,8 +24,9 @@ export default function AdminMaterialManager() {
   const [editingMaterialID, setEditingMaterialID] = useState(null);
   const [modalReadOnly, setModalReadOnly] = useState(false);
 
-  const { fetchAllBrands } = useBrand();
-  const { fetchAllCategories } = useCategory();
+  const { fetchAllBrands, loading: loadingBrand } = useBrand();
+  const { fetchAllCategories, loading: loadingCategory } = useCategory();
+  const loadingInitialData = loadingBrand || loadingCategory;
   const [uploadProgress, setUploadProgress] = useState(0);
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -219,7 +220,8 @@ export default function AdminMaterialManager() {
               </div>
 
               <button
-                className="flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-orange-500 rounded-xl hover:bg-orange-700 transition-all duration-200 shadow-md sm:w-auto w-full cursor-pointer"
+                className={`flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white rounded-xl transition-all duration-200 shadow-md sm:w-auto w-full ${loadingInitialData ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-700 cursor-pointer'}`}
+                disabled={loadingInitialData}
                 onClick={() => {
                   if (brands.length === 0 || categories.length === 0) {
                     toast.error(t('adminMaterialManager.noBrandAndService'));
@@ -228,8 +230,17 @@ export default function AdminMaterialManager() {
                   setIsModalOpen(true);
                 }}
               >
-                <i className="fa-solid fa-plus"></i>
-                {t('BUTTON.AddNewMaterial')}
+                {loadingInitialData ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                    {t('common.loadingData', { defaultValue: 'Đang tải dữ liệu...' })}
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-plus"></i>
+                    {t('BUTTON.AddNewMaterial')}
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -434,7 +445,8 @@ export default function AdminMaterialManager() {
                               {t('adminMaterialManager.letStart')}
                             </p>
                             <button
-                              className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
+                              className={`px-4 py-2 text-white rounded-lg ${loadingInitialData ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-700 cursor-pointer'}`}
+                              disabled={loadingInitialData}
                               onClick={() => {
                                 if (
                                   brands.length === 0 ||
@@ -450,8 +462,17 @@ export default function AdminMaterialManager() {
                                 setIsModalOpen(true);
                               }}
                             >
-                              <i className="mr-3 fa-solid fa-plus"></i>
-                              {t('BUTTON.AddNewMaterial')}
+                              {loadingInitialData ? (
+                                <>
+                                  <i className="mr-3 fa-solid fa-spinner fa-spin"></i>
+                                  {t('common.loadingData', { defaultValue: 'Đang tải dữ liệu...' })}
+                                </>
+                              ) : (
+                                <>
+                                  <i className="mr-3 fa-solid fa-plus"></i>
+                                  {t('BUTTON.AddNewMaterial')}
+                                </>
+                              )}
                             </button>
                           </div>
                         </td>
@@ -611,7 +632,8 @@ export default function AdminMaterialManager() {
                       {t('adminMaterialManager.letStart')}
                     </p>
                     <button
-                      className="px-4 py-2 text-white bg-orange-500 rounded-lg hover:bg-orange-700 cursor-pointer"
+                      className={`px-4 py-2 text-white rounded-lg ${loadingInitialData ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-700 cursor-pointer'}`}
+                      disabled={loadingInitialData}
                       onClick={() => {
                         if (brands.length === 0 || categories.length === 0) {
                           toast.error(
@@ -624,8 +646,17 @@ export default function AdminMaterialManager() {
                         setIsModalOpen(true);
                       }}
                     >
-                      <i className="mr-3 fa-solid fa-plus"></i>
-                      {t('BUTTON.AddNewMaterial')}
+                      {loadingInitialData ? (
+                        <>
+                          <i className="mr-3 fa-solid fa-spinner fa-spin"></i>
+                          {t('common.loadingData', { defaultValue: 'Đang tải dữ liệu...' })}
+                        </>
+                      ) : (
+                        <>
+                          <i className="mr-3 fa-solid fa-plus"></i>
+                          {t('BUTTON.AddNewMaterial')}
+                        </>
+                      )}
                     </button>
                   </div>
                 )}

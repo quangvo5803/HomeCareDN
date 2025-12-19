@@ -1,4 +1,6 @@
 import { Pie } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import { formatVND } from "../utils/formatters";
 import {
   Chart as ChartJS,
   Title,
@@ -10,9 +12,9 @@ import PropTypes from "prop-types";
 import LoadingComponent from '../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement);
+ChartJS.register(Title, Tooltip, Legend, ArcElement, ChartDataLabels);
 
-export default function PieChart({ title, year, onYearChange, data, type, loading }) {
+export default function PieChart({ title, year, onYearChange, data, type, loading, rawData }) {
 
   const { t } = useTranslation();
 
@@ -22,6 +24,28 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
     plugins: {
       legend: { position: "bottom", labels: { color: "#333" } },
       title: { display: false },
+      // HIỂN THỊ % 
+      datalabels: {
+        formatter: (value) => `${value}%`,
+        color: "#fff",
+        font: {
+          weight: "bold",
+          size: 14,
+        },
+      },
+
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const item = rawData?.[context.dataIndex];
+            if (!item) return context.label;
+            return [
+              `${t('adminDashboard.pieChart.serviceRequests')}: ${item.count}`,
+              `${t('adminDashboard.pieChart.amount')}: ${formatVND(item.totalAmount)}`,
+            ];
+          },
+        },
+      },
     },
   };
 
@@ -79,7 +103,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-xl">
               <LoadingComponent />
             </div>
           )}
@@ -150,4 +174,5 @@ PieChart.propTypes = {
   data: PropTypes.object.isRequired,
   type: PropTypes.string,
   loading: PropTypes.bool,
+  rawData: PropTypes.object.isRequired,
 };

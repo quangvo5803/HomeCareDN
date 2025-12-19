@@ -9,6 +9,7 @@ import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import useRealtime from '../../realtime/useRealtime';
 import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import Loading from '../../components/Loading';
+import { toast } from 'react-toastify';
 
 export default function MaterialRequestManager() {
   const { t, i18n } = useTranslation();
@@ -49,7 +50,7 @@ export default function MaterialRequestManager() {
       );
       setTotalMaterialRequests((prev) => Math.max(0, prev - 1));
     },
-    [RealtimeEvents.MaterialRequestClosedClosed]: (payload) => {
+    [RealtimeEvents.MaterialRequestClosed]: (payload) => {
       setMaterialRequests((prev) =>
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
@@ -101,7 +102,43 @@ export default function MaterialRequestManager() {
         )
       );
     },
+    [RealtimeEvents.DistributorApplicationRejected]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((mr) => {
+          if (mr.materialRequestID === payload.materialRequestID) {
+            const isMyApplicationRejected =
+              mr.selectedDistributorApplication?.distributorID === user.id;
 
+            if (
+              isMyApplicationRejected &&
+              payload.reason === 'Commission payment expired'
+            ) {
+              toast.error(
+                t('distributorMaterialRequestDetail.paymentExpiredMessage'),
+                {
+                  toastId: `reject-self-${payload.distributorApplicationID}`,
+                }
+              );
+            } else if (payload.reason === 'Commission payment expired') {
+              toast.info(
+                t('distributorMaterialRequest.otherPaymentExpiredMessage'),
+                {
+                  toastId: `reject-other-${payload.distributorApplicationID}`,
+                }
+              );
+            }
+
+            return {
+              ...mr,
+              status: 'Opening',
+              selectedDistributorApplicationID: null,
+              selectedDistributorApplication: null,
+            };
+          }
+          return mr;
+        })
+      );
+    },
     // 🔸 Khi trạng thái thanh toán thay đổi (Contractor đã thanh toán)
     [RealtimeEvents.PaymentTransactionUpdated]: (payload) => {
       setMaterialRequests((prev) =>

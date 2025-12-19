@@ -131,6 +131,18 @@ export default function ServiceRequestDetail() {
         }
       }
     },
+    [RealtimeEvents.ContractorApplicationRejected]: (payload) => {
+      if (serviceRequestId == payload.serviceRequestID) {
+        setServiceRequest((prev) => ({
+          ...prev,
+          status: "Opening",
+          selectedContractorApplication: null,
+          selectedContractorApplicationID: null,
+        }));
+
+        toast.info(t("userPage.serviceRequest.serviceApplicationExpired"));
+      }
+    },
   });
 
   // ---- CONTRACTOR ACTIONS ----
@@ -907,13 +919,7 @@ export default function ServiceRequestDetail() {
                   <div className="mb-6">
                     <CommissionCountdown
                       dueCommisionTime={selectedContractor.dueCommisionTime}
-                      onExpired={() => {
-                        toast.warning(
-                          t(
-                            "contractorServiceRequestDetail.paymentDeadlineExpired"
-                          )
-                        );
-                      }}
+                      onExpired={() => {}}
                       role="customer"
                     />
                   </div>
