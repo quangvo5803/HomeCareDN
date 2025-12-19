@@ -37,7 +37,7 @@ export default function ServiceRequestDetail() {
   const [totalCount, setTotalCount] = useState(0);
 
   const hasSelectedContractor = Boolean(selectedContractor);
-
+  const [isSubmiting, setIsSubmiting] = useState(false);
   // Use realtime
   useRealtime({
     [RealtimeEvents.ContractorApplicationCreated]: (payload) => {
@@ -150,6 +150,7 @@ export default function ServiceRequestDetail() {
     if (!selectedContractor) return;
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
+      setIsSubmiting(true);
       const approvedContractor = await contractorApplicationService.accept(
         contractorApplicationID
       );
@@ -164,7 +165,9 @@ export default function ServiceRequestDetail() {
         )
       );
     } catch (error) {
-      toast.error(t(handleApiError(error)));
+      toast.error(handleApiError(error));
+    } finally {
+      setIsSubmiting(false);
     }
   };
 
@@ -172,6 +175,7 @@ export default function ServiceRequestDetail() {
     if (!selectedContractor) return;
     const contractorApplicationID = selectedContractor.contractorApplicationID;
     try {
+      setIsSubmiting(true);
       const rejected = await contractorApplicationService.reject(
         contractorApplicationID
       );
@@ -185,7 +189,9 @@ export default function ServiceRequestDetail() {
       );
       toast.success(t('SUCCESS.REJECT_APPLICATION'));
     } catch (error) {
-      toast.error(t(handleApiError(error)));
+      toast.error(handleApiError(error));
+    } finally {
+      setIsSubmiting(false);
     }
   };
 
@@ -268,7 +274,7 @@ export default function ServiceRequestDetail() {
   };
   const DEFAULT_ICON = 'fa-file-alt text-gray-500';
 
-  if (loading || !serviceRequest) return <Loading />;
+  if (loading || !serviceRequest || isSubmiting) return <Loading />;
 
   // ---- UI ----
   return (

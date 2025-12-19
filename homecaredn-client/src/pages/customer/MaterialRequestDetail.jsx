@@ -416,6 +416,7 @@ export default function MaterialRequestDetail() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          setSubmitting(true);
           const acceptedExtraItemIDs = Array.from(acceptingItems);
           const approved = await distributorApplicationService.accept({
             DistributorApplicationID:
@@ -435,7 +436,9 @@ export default function MaterialRequestDetail() {
           setAcceptingItems(new Set());
           toast.success(t('SUCCESS.ACCEPT_APPLICATION'));
         } catch (err) {
-          toast.error(t(handleApiError(err)));
+          toast.error(handleApiError(err));
+        } finally {
+          setSubmitting(false);
         }
       }
     });
@@ -456,6 +459,7 @@ export default function MaterialRequestDetail() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          setSubmitting(true);
           const rejected = await distributorApplicationService.reject(
             selectedDistributor.distributorApplicationID
           );
@@ -471,7 +475,9 @@ export default function MaterialRequestDetail() {
           setAcceptingItems(new Set());
           toast.success(t('SUCCESS.REJECT_APPLICATION'));
         } catch (err) {
-          toast.error(t(handleApiError(err)));
+          toast.error(handleApiError(err));
+        } finally {
+          setSubmitting(true);
         }
       }
     });

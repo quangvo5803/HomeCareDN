@@ -28,7 +28,7 @@ namespace BusinessLogic.Services
         private const string OTP = "OTP";
         private const string TOKEN = "TOKEN";
         private const string ERROR_TOKEN_EXPIRED = "TOKEN_OTP_EXPIRED";
-        private const string ERROR_EMAIL_REGISTED = "EMAIL_REGISTED";
+        private const string ERROR_EMAIL_REGISTED = "REGISTER_ALREADY_EXISTS";
         private const string ERROR_OTP_VERIFY = "OTP_WRONG_OR_EXPIRED";
         private const string ERROR_PARTNER_REQUEST = "REGISTER_ALREADY_EXISTS";
         private const string ERROR_PARTNER_REQUEST_NOT_FOUND = "PARTNER_REQUEST_NOT_FOUND";
