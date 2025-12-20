@@ -1663,6 +1663,7 @@
     "MATERIAL_REQUEST_ADD": "Thêm yêu cầu vật liệu thành công",
     "MATERIAL_REQUEST_UPDATE": "Cập nhật yêu cầu vật liệu thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "PARTNER_REQUEST_Signature": "Ký hợp đồng thành công.",
     "CREATE_REVIEW": "Đã gửi đánh giá thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",

@@ -22,6 +22,7 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IMemoryCache _memoryCache;
+        private readonly IAuthorizeService _authorizeService;
 
         private const string PARTNER_REQUEST = "PartnerRequest";
         private const string EMAIL = "Email";
@@ -41,7 +42,8 @@ namespace BusinessLogic.Services
             IMapper mapper,
             IMemoryCache memoryCache,
             UserManager<ApplicationUser> userManager,
-            IEmailQueue emailQueue
+            IEmailQueue emailQueue,
+            IAuthorizeService authorizeService
         )
         {
             _unitOfWork = unitOfWork;
@@ -49,6 +51,7 @@ namespace BusinessLogic.Services
             _memoryCache = memoryCache;
             _userManager = userManager;
             _emailQueue = emailQueue;
+            _authorizeService = authorizeService;
         }
 
         public async Task<PagedResultDto<PartnerRequestDto>> GetAllPartnerRequestsAsync(
@@ -185,13 +188,6 @@ namespace BusinessLogic.Services
 
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);
 
-                partnerRequest.SignatureUrl = request.SignatureUrl;
-                partnerRequest.IsContractSigned = !string.IsNullOrEmpty(request.SignatureUrl);
-                if (partnerRequest.IsContractSigned)
-                {
-                    partnerRequest.SignedAt = DateTime.UtcNow;
-                }
-
                 await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
                 await ProcessPartnerImagesAsync(request, partnerRequest.PartnerRequestID);
                 await ProcessPartnerDocumentsAsync(request, partnerRequest.PartnerRequestID);
@@ -212,6 +208,34 @@ namespace BusinessLogic.Services
             }
         }
 
+        public async Task<string> UpdateSignaturePartnerRequestAsync(
+            PartnerRequestUpdateSignatureRequestDto request
+        )
+        {
+            var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
+                m => m.Email == request.Email,
+                asNoTracking: false
+            );
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (partnerRequest == null || user == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            partnerRequest.SignatureUrl = request.SignatureUrl;
+            partnerRequest.IsContractSigned = !string.IsNullOrEmpty(request.SignatureUrl);
+            if (partnerRequest.IsContractSigned)
+            {
+                partnerRequest.SignedAt = DateTime.UtcNow;
+            }
+            user.IsPartnerComfirm = true;
+            await _userManager.UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+            return await _authorizeService.GenerateToken(user);
+        }
         public async Task<PartnerRequestDto> ApprovePartnerRequestAsync(Guid partnerRequestID)
         {
             var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
@@ -237,6 +261,7 @@ namespace BusinessLogic.Services
                 UserName = partnerRequest.Email,
                 FullName = partnerRequest.CompanyName,
                 PhoneNumber = partnerRequest.PhoneNumber,
+                IsPartnerComfirm = false,
             };
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(

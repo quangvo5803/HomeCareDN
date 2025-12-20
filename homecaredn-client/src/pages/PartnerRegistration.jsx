@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import SignatureCanvas from 'react-signature-canvas';
 import { uploadToCloudinary } from '../utils/uploadToCloudinary';
 import { partnerRequestService } from '../services/partnerRequestService';
 import { isSafeEmail } from '../utils/validateEmail';
@@ -23,11 +22,7 @@ export default function PartnerRegistration() {
   // --- STATE ---
   const [currentStep, setCurrentStep] = useState(1);
   const [otpCode, setOtpCode] = useState('');
-  const [verificationToken, setVerificationToken] = useState(null);
-  const sigCanvas = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [isCanvasReady, setIsCanvasReady] = useState(false);
-
   const [partnerRequestType, setPartnerRequestType] =
     useState(partnerTypeFromUrl);
   const [companyName, setCompanyName] = useState('');
@@ -68,24 +63,6 @@ export default function PartnerRegistration() {
     setUploadProgress(percent);
   }, [imageProgress, documentProgress, uploadProgress]);
 
-  useEffect(() => {
-    if (currentStep === 3) {
-      const timer = setTimeout(() => {
-        if (sigCanvas.current) {
-          setIsCanvasReady(true);
-        } else {
-          setIsCanvasReady(false);
-        }
-      }, 200);
-
-      return () => {
-        clearTimeout(timer);
-        setIsCanvasReady(false);
-      };
-    } else {
-      setIsCanvasReady(false);
-    }
-  }, [currentStep]);
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -191,22 +168,22 @@ export default function PartnerRegistration() {
     const imageUploadPromise =
       newImageFiles.length > 0
         ? uploadToCloudinary(
-            newImageFiles,
-            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-            (progress) => setImageProgress(progress),
-            'HomeCareDN/PartnerRequest'
-          )
+          newImageFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (progress) => setImageProgress(progress),
+          'HomeCareDN/PartnerRequest'
+        )
         : Promise.resolve(null);
 
     const documentUploadPromise =
       newDocumentFiles.length > 0
         ? uploadToCloudinary(
-            newDocumentFiles,
-            import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-            (progress) => setDocumentProgress(progress),
-            'HomeCareDN/PartnerRequest/Documents',
-            'raw'
-          )
+          newDocumentFiles,
+          import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
+          (progress) => setDocumentProgress(progress),
+          'HomeCareDN/PartnerRequest/Documents',
+          'raw'
+        )
         : Promise.resolve(null);
 
     const [imageResults, documentResults] = await Promise.all([
@@ -246,92 +223,31 @@ export default function PartnerRegistration() {
 
   const handleStep2Submit = async (e) => {
     e.preventDefault();
+
     if (!otpCode || otpCode.length < 6) {
       toast.warning(
         t('partnerRequest.partnerRegistration.validation.otpInvalid')
       );
       return;
     }
+
     setLoading(true);
     try {
-      const response = await partnerRequestService.verifyOtp({
-        email,
-        otpCode,
-      });
+      const response = await partnerRequestService.verifyOtp({ email, otpCode });
       const token = typeof response === 'string' ? response : response?.token;
-      if (token) {
-        setVerificationToken(token);
-        toast.success(
-          t('partnerRequest.partnerRegistration.validation.otpSuccess')
-        );
-        setCurrentStep(3);
-      } else {
+
+      if (!token) {
         toast.error(
           t('partnerRequest.partnerRegistration.validation.otpError')
         );
+        return;
       }
-    } catch (error) {
-      toast.error(t(handleApiError(error)));
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const clearSignature = () => {
-    if (sigCanvas.current) {
-      sigCanvas.current.clear();
-    } else {
-      toast.warning(
-        t('partnerRequest.partnerRegistration.validation.signatureClearWarning')
-      );
-    }
-  };
-
-  const handleSubmitFinal = async () => {
-    if (!isCanvasReady || !sigCanvas.current) {
-      toast.error(
-        t('partnerRequest.partnerRegistration.validation.canvasNotReady')
-      );
-      return;
-    }
-
-    if (sigCanvas.current.isEmpty()) {
-      toast.warning(
-        t('partnerRequest.partnerRegistration.validation.signatureEmpty')
-      );
-      return;
-    }
-
-    let signatureDataURL;
-    try {
-      const canvas = sigCanvas.current.getCanvas();
-      signatureDataURL = canvas.toDataURL('image/png');
-    } catch {
-      toast.error(
-        t('partnerRequest.partnerRegistration.validation.signatureError')
-      );
-      return;
-    }
-
-    setLoading(true);
-    try {
       const { imageResults, documentResults } = await handleFileUploads();
       const { urls: ImageUrls, publicIds: ImagePublicIds } =
         formatUploadResults(imageResults);
       const { urls: DocumentUrls, publicIds: DocumentPublicIds } =
         formatUploadResults(documentResults);
-
-      const blob = await (await fetch(signatureDataURL)).blob();
-      const signatureFile = new File([blob], 'signature.png', {
-        type: 'image/png',
-      });
-
-      const signatureResult = await uploadToCloudinary(
-        signatureFile,
-        import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET,
-        null,
-        'HomeCareDN/PartnerRequest/Signatures'
-      );
 
       const payload = {
         PartnerRequestType: partnerRequestType,
@@ -339,15 +255,15 @@ export default function PartnerRegistration() {
         Email: email,
         PhoneNumber: phoneNumber,
         Description: description,
-        VerificationToken: verificationToken,
-        SignatureUrl: signatureResult.url,
-        ImageUrls: ImageUrls,
-        ImagePublicIds: ImagePublicIds,
-        DocumentUrls: DocumentUrls,
-        DocumentPublicIds: DocumentPublicIds,
+        VerificationToken: token,
+        ImageUrls,
+        ImagePublicIds,
+        DocumentUrls,
+        DocumentPublicIds,
       };
 
       await partnerRequestService.create(payload);
+
       toast.success(t('SUCCESS.PARTNER_REQUEST_ADD'));
       navigate('/Login');
     } catch (error) {
@@ -401,19 +317,16 @@ export default function PartnerRegistration() {
                   t('partnerRequest.partnerRegistration.subtitle')}
                 {currentStep === 2 &&
                   t('partnerRequest.partnerRegistration.step2.title')}
-                {currentStep === 3 &&
-                  t('partnerRequest.partnerRegistration.step3.title')}
               </p>
             </div>
             {/* Step Indicator */}
             <div className="shrink-0 inline-flex flex-col items-end gap-1">
               <div className="flex gap-1">
-                {[1, 2, 3].map((step) => (
+                {[1, 2].map((step) => (
                   <div
                     key={step}
-                    className={`w-2 h-2 rounded-full ${
-                      currentStep >= step ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
+                    className={`w-2 h-2 rounded-full ${currentStep >= step ? 'bg-blue-600' : 'bg-gray-300'
+                      }`}
                   ></div>
                 ))}
               </div>
@@ -704,114 +617,6 @@ export default function PartnerRegistration() {
                 >
                   {t('partnerRequest.partnerRegistration.step2.verifyButton')}
                   <i className="fas fa-check ml-2" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* --- STEP 3: CONTRACT --- */}
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 h-64 overflow-y-auto text-sm text-gray-700 shadow-inner">
-                <h4 className="text-center font-bold text-lg mb-4 uppercase">
-                  {t('partnerRequest.partnerRegistration.step3.contractTitle')}
-                  {partnerRequestType === 'Contractor'
-                    ? t('partnerRequest.partnerRegistration.step3.contractor')
-                    : t('partnerRequest.partnerRegistration.step3.distributor')}
-                </h4>
-                <p className="mb-2">
-                  <strong>
-                    {t(
-                      'partnerRequest.partnerRegistration.step3.contractPartyA'
-                    )}
-                  </strong>
-                  {t('partnerRequest.partnerRegistration.step3.partyA')}
-                </p>
-                <p className="mb-2">
-                  <strong>
-                    {t(
-                      'partnerRequest.partnerRegistration.step3.contractPartyB'
-                    )}
-                  </strong>
-                  {companyName}
-                </p>
-                <p className="mb-2">
-                  <strong>
-                    {t(
-                      'partnerRequest.partnerRegistration.step3.contractRepresentative'
-                    )}
-                  </strong>
-                  {email}
-                </p>
-                <p className="mt-4">
-                  {t(
-                    'partnerRequest.partnerRegistration.step3.contractContent'
-                  )}
-                </p>
-                <div className="whitespace-pre-wrap text-justify border-t border-gray-100 pt-4">
-                  {t(
-                    'partnerRequest.partnerRegistration.step3.contractDetails'
-                  )}
-                </div>
-                <p className="mt-4">
-                  {t(
-                    'partnerRequest.partnerRegistration.step3.contractCommitment'
-                  )}
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  <i className="fas fa-pen-nib mr-1 text-blue-600"></i>
-                  {t('partnerRequest.partnerRegistration.step3.signatureLabel')}
-                  <span className="text-red-500">*</span>
-                </label>
-                <div
-                  className="border-2 border-dashed border-gray-400 rounded-xl bg-white overflow-hidden relative"
-                  style={{ height: 200 }}
-                >
-                  <SignatureCanvas
-                    ref={sigCanvas}
-                    penColor="black"
-                    velocityFilterWeight={0.7}
-                    canvasProps={{
-                      className: 'w-full h-full cursor-crosshair',
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={clearSignature}
-                    className="absolute top-2 right-2 text-xs bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded text-gray-700"
-                  >
-                    <i className="fas fa-eraser"></i>
-                    {t(
-                      'partnerRequest.partnerRegistration.step3.signatureClear'
-                    )}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-1 text-right">
-                  {t('partnerRequest.partnerRegistration.step3.signatureNote')}
-                </p>
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(1)}
-                  className="py-3 px-6 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-50"
-                >
-                  {t('partnerRequest.partnerRegistration.step3.reviewButton')}
-                </button>
-                <button
-                  onClick={handleSubmitFinal}
-                  disabled={!isCanvasReady}
-                  className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 px-4 rounded-lg font-bold hover:from-green-700 hover:to-green-800 shadow-lg shadow-green-200 flex items-center justify-center uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {!isCanvasReady && (
-                    <i className="fas fa-spinner fa-spin mr-2" />
-                  )}
-                  <i className="fas fa-file-signature mr-2" />
-                  {t('partnerRequest.partnerRegistration.step3.submitButton')}
                 </button>
               </div>
             </div>

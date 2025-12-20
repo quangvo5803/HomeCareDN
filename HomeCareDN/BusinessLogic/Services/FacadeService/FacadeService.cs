@@ -90,7 +90,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 coreDeps.MemoryCache,
                 identityDeps.UserManager,
-                infraDeps.EmailQueue
+                infraDeps.EmailQueue,
+                coreDeps.AuthorizeService
             );
 
             PaymentService = new PaymentService(

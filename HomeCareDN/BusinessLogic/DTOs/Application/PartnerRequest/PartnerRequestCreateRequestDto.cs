@@ -19,7 +19,6 @@ namespace BusinessLogic.DTOs.Application.PartnerRequest
 
         [MaxLength(1000)]
         public string? Description { get; set; }
-        public string? SignatureUrl { get; set; }
         public string? VerificationToken { get; set; }
         public required List<string> ImageUrls { get; set; }
         public required List<string> ImagePublicIds { get; set; }

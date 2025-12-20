@@ -1670,6 +1670,7 @@
     "MATERIAL_REQUEST_ADD": "Add material request successfully.",
     "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "PARTNER_REQUEST_Signature": "Contract signed successfully.",
     "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
