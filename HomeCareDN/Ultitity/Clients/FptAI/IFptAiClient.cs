@@ -7,6 +7,9 @@ namespace Ultitity.Clients.FptAI
         Task<string> OcrCccdAsync(IFormFile image);
         Task<string> LivenessWithFaceMatchAsync(
             IFormFile cccdImage,
-            IFormFile faceVideo);
+            byte[] faceVideoBytes,
+            string fileName = "face-video.mp4",
+            string contentType = "video/mp4"
+        );
     }
 }

@@ -18,16 +18,9 @@ namespace Ultitity.Clients.FptAI
         public async Task<string> OcrCccdAsync(IFormFile image)
         {
             using var content = new MultipartFormDataContent();
-            content.Add(
-                new StreamContent(image.OpenReadStream()),
-                "image",
-                image.FileName
-            );
+            content.Add(new StreamContent(image.OpenReadStream()), "image", image.FileName);
 
-            var response = await _httpClient.PostAsync(
-                _config["FptAi:OcrUrl"],
-                content
-            );
+            var response = await _httpClient.PostAsync(_config["FptAi:OcrUrl"], content);
 
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
@@ -35,30 +28,29 @@ namespace Ultitity.Clients.FptAI
 
         public async Task<string> LivenessWithFaceMatchAsync(
             IFormFile cccdImage,
-            IFormFile faceVideo)
+            byte[] faceVideoBytes,
+            string fileName = "face-video.mp4",
+            string contentType = "video/mp4"
+        )
         {
             using var content = new MultipartFormDataContent();
 
-            content.Add(
-                new StreamContent(cccdImage.OpenReadStream()),
-                "image",
-                cccdImage.FileName
+            // Thêm CCCD Image như cũ
+            content.Add(new StreamContent(cccdImage.OpenReadStream()), "image", cccdImage.FileName);
+
+            // Thêm video từ byte[]
+            var videoStream = new MemoryStream(faceVideoBytes);
+            var videoContent = new StreamContent(videoStream);
+            videoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                contentType
             );
 
-            content.Add(
-                new StreamContent(faceVideo.OpenReadStream()),
-                "video",
-                faceVideo.FileName
-            );
+            content.Add(videoContent, "video", fileName);
 
-            var response = await _httpClient.PostAsync(
-                _config["FptAi:LivenessUrl"],
-                content
-            );
+            var response = await _httpClient.PostAsync(_config["FptAi:LivenessUrl"], content);
 
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
-
     }
 }

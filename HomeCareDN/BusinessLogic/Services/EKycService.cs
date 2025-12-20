@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json.Linq;
 using Ultitity.Clients.FptAI;
 using Ultitity.Exceptions;
-
+using FFMpegCore;
 namespace BusinessLogic.Services
 {
     public class EKycService : IEKycService
@@ -44,12 +44,28 @@ namespace BusinessLogic.Services
                     }
                 );
             }
+            var webmPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.webm");
+            await using (var fs = new FileStream(webmPath, FileMode.Create))
+            {
+                await requestDto.FaceVideo.CopyToAsync(fs);
+            }
+
+            var mp4Path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.mp4");
+            await FFMpegArguments
+                .FromFileInput(webmPath)
+                .OutputToFile(mp4Path, true, options => options
+                    .WithVideoCodec("libx264")
+                    .WithAudioCodec("aac")
+                    .ForceFormat("mp4"))
+                .ProcessAsynchronously();
+
+            byte[] mp4Bytes = await File.ReadAllBytesAsync(mp4Path);
 
             var ocrResult = await _fptAiClient.OcrCccdAsync(requestDto.CccdImage);
 
             var resultJson = await _fptAiClient.LivenessWithFaceMatchAsync(
                 requestDto.CccdImage,
-                requestDto.FaceVideo
+                mp4Bytes
             );
 
             var json = JsonDocument.Parse(resultJson);
@@ -138,6 +154,8 @@ namespace BusinessLogic.Services
 
             _cache.Set($"EKYC_{ekycToken}", true, TimeSpan.FromMinutes(EKYC_EXPIRE_MINUTES));
 
+            File.Delete(webmPath);
+            File.Delete(mp4Path);
             return ekycToken;
         }
     }
