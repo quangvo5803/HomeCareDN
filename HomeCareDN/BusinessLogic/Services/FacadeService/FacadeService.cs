@@ -26,6 +26,7 @@ namespace BusinessLogic.Services.FacadeService
         public IDistributorApplicationService DistributorApplicationService { get; }
         public INotificationService NotificationService { get; }
         public ISearchHistoryService SearchHistoryService { get; }
+
         public FacadeService(
             CoreDependencies coreDeps,
             InfraDependencies infraDeps,
@@ -61,7 +62,6 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.GroqClient,
                 infraDeps.Cache,
                 coreDeps.UnitOfWork,
-                infraDeps.Configuration,
                 infraDeps.HostEnvironment,
                 coreDeps.MaterialService,
                 coreDeps.ServicesService

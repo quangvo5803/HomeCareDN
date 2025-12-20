@@ -736,6 +736,28 @@
     "no_applications": "No data to display"
   },
   "supportChat": {
+    "btnYes":"Yes",
+    "btnNo":"No",
+    "userConfirmYes": "Yes, find for me",
+    "promptFindMaterial": "Please find materials for this project.",
+    "smartGreeting": "Hello, the system noticed you just created a request for Service Type: **{{serviceType}}**, Building Type: **{{buildingType}}** and with address is **{{serviceAdress}}**. Would you like me to find suitable materials for this project?",
+    "serviceType":{
+      "Construction": "Construction",
+      "Repair": "Repair"
+    },
+    "buildingType":{
+      "SingleStoryHouse": "SingleStoryHouse",
+      "Townhouse": "Townhouse",
+      "RentalHouse": "RentalHouse",
+      "Apartment": "Apartment",
+      "Villa": "Villa",
+      "Hotel": "Hotel",
+      "Showroom": "Showroom",
+      "School": "School",
+      "Hospital": "Hospital",
+      "Warehouse": "Warehouse",
+      "Other": "Other"
+    },
     "adminStartedChat": "Admin has started the chat!",
     "newMessageFromAdmin": "New message from Admin!",
     "error": "An error occurred while loading the chat. Please try again later.",

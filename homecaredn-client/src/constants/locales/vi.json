@@ -734,6 +734,28 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "btnYes":"Có",
+    "btnNo":"Không",
+    "userConfirmYes":"Có, hãy tìm giúp tôi",
+    "promptFindMaterial":"Vui lòng giúp tôi tìm vật liệu xây dựng phù hợp cho dự án này.",
+    "smartGreeting": "Chào bạn, hệ thống ghi nhận bạn vừa tạo yêu cầu Loại Dịch Vụ: **{{serviceType}}**, Loại Công Trình: **{{buildingType}}**, ở địa chỉ **{{serviceAdress}}**. Bạn có muốn tôi tìm kiếm vật liệu phù hợp cho dự án này không?",
+    "serviceType":{
+      "Construction": "Xây dựng",
+      "Repair": "Sửa chữa"
+    },
+    "buildingType":{
+      "SingleStoryHouse": "Nhà cấp 4",
+      "Townhouse": "Nhà phố",
+      "RentalHouse": "Nhà cho thuê",
+      "Apartment": "Căn hộ",
+      "Villa": "Biệt thự",
+      "Hotel": "Khách sạn",
+      "Showroom": "Cửa hàng trưng bày",
+      "School": "Trường học",
+      "Hospital": "Bệnh viện",
+      "Warehouse": "Kho hàng",
+      "Other": "Khác"
+    },
     "adminStartedChat": "Quản Trị Viên đã bắt đầu cuộc trò chuyện!",
     "newMessageFromAdmin": "Tin nhắn mới từ Quản Trị Viên!",
     "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
@@ -1699,7 +1721,7 @@
       "Apartment": "Căn hộ",
       "Villa": "Biệt thự",
       "Hotel": "Khách sạn",
-      "Showroom": "Showroom",
+      "Showroom": "Cửa hàng trưng bày",
       "School": "Trường học",
       "Hospital": "Bệnh viện",
       "Warehouse": "Kho xưởng",

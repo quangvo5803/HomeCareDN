@@ -3,13 +3,10 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.Ai;
-using BusinessLogic.DTOs.Application.ServiceRequest;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.UnitOfWork;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Org.BouncyCastle.Utilities.Collections;
 using Ultitity.Clients.Groqs;
 using Ultitity.Exceptions;
 
@@ -17,7 +14,6 @@ namespace BusinessLogic.Services
 {
     public class AiChatService : IAiChatService
     {
-        private readonly IConfiguration _config;
         private readonly IGroqClient _groq;
         private readonly IDistributedCache _cache;
         private readonly IUnitOfWork _unitOfWork;
@@ -25,47 +21,14 @@ namespace BusinessLogic.Services
         private readonly IMaterialService _materialService;
         private readonly IServicesService _servicesService;
 
-        private const string MESSAGE = "Message";
+        private const string USER = "user";
         private const string SYSTEM = "system";
-
-        private const string ERROR_EMPTY_MESSAGE = "EMPTY_MESSAGE";
-
-        private const string SYSTEM_PROMPT_CHAT =
-            @"Bạn là Trợ lý ảo HomeCareDN (Tiếng Việt).
-              
-              NHIỆM VỤ:
-              1. Hỗ trợ tìm kiếm vật liệu, dịch vụ.
-              2. Dựa vào [DỮ LIỆU HỆ THỐNG] bên dưới để trả lời.
-
-              QUY TẮC GẮN LINK (BẮT BUỘC):
-              - Hãy nhìn vào phần [DỮ LIỆU HỆ THỐNG].
-              - Nếu thấy dòng bắt đầu bằng 'LINK:', hãy copy nguyên văn dòng đó để gửi cho khách.
-              - Ví dụ: Nếu dữ liệu có 'LINK: [Gạch A](/path/123)', bạn hãy trả lời: 'Bạn có thể tham khảo [Gạch A](/path/123)'.
-              - NẾU KHÔNG CÓ DÒNG 'LINK:' NÀO -> TUYỆT ĐỐI KHÔNG ĐƯỢC TỰ BỊA LINK.
-
-              QUY TẮC TRẢ LỜI:
-              - Nếu [DỮ LIỆU HỆ THỐNG] có sản phẩm khớp nhu cầu -> Giới thiệu và gắn link.
-              - Nếu [DỮ LIỆU HỆ THỐNG] trả về sản phẩm KHÔNG khớp (Gợi ý khác) -> Bạn nói: 'Hiện tại chưa có đúng loại bạn tìm, nhưng bên mình có các loại này...' (Gắn link các loại đó).
-              - Nếu hoàn toàn không có gì -> Hướng dẫn tạo 'Yêu cầu' (Request).
-              
-              QUY TẮC TẠO YÊU CẦU:
-              - Kiểm tra [USER PROFILE]. Nếu 'HasAddress' = false -> Nhắc cập nhật địa chỉ tại [Hồ sơ](/Customer).
-              - Chỉ hướng dẫn tạo yêu cầu khi không tìm thấy sản phẩm ưng ý.";
-
-        private const string SYSTEM_PROMPT_SUGGEST =
-            @"Bạn là API gợi ý từ khóa (Autocomplete). 
-              Nhiệm vụ: Dựa vào input của user, hãy đoán và trả về 5 từ khóa liên quan nhất trong lĩnh vực xây dựng/sửa chữa nhà.
-              BẮT BUỘC: Chỉ trả về mảng JSON thuần túy (Array String). Không Markdown, không giải thích.
-              Ví dụ: [""sửa điện"", ""thợ điện"", ""bóng đèn""]";
-
-        private const string SYSTEM_PROMPT_SEARCH =
-            @"Bạn là trợ lý tìm kiếm thông minh. Nhiệm vụ của bạn là dựa trên lịch sử tìm kiếm của người dùng để gợi ý các từ khóa liên quan, có thể dùng cho tìm kiếm sản phẩm (Material) hoặc dịch vụ (Repair/Construction). Trả về kết quả dưới dạng JSON danh sách từ khóa.";
+        private const string ASSISTANT = "assistant";
 
         public AiChatService(
             IGroqClient groq,
             IDistributedCache cache,
             IUnitOfWork unitOfWork,
-            IConfiguration config,
             IHostEnvironment env,
             IMaterialService materialService,
             IServicesService servicesService
@@ -74,7 +37,6 @@ namespace BusinessLogic.Services
             _groq = groq;
             _cache = cache;
             _unitOfWork = unitOfWork;
-            _config = config;
             _env = env;
             _materialService = materialService;
             _servicesService = servicesService;
@@ -84,47 +46,54 @@ namespace BusinessLogic.Services
         {
             if (string.IsNullOrWhiteSpace(dto.Prompt))
             {
-                var error = new Dictionary<string, string[]>
+                if (dto.Language == "vi")
                 {
-                    { MESSAGE, new[] { ERROR_EMPTY_MESSAGE } },
-                };
-                throw new CustomValidationException(error);
+                    return new AiChatResponseDto { Reply = "Bạn cần hỗ trợ gì không?" };
+                }
+                else
+                {
+                    return new AiChatResponseDto { Reply = "Do you need some support?" };
+                }
             }
-            string internalContext = await BuildInternalContextAsync(dto.Prompt);
 
             var history = await GetHistoryFromCacheAsync(dto.SessionId);
+
+            bool isFirstMessage = !history.Any(x => x.Role == USER);
+
+            string internalContext = await BuildContextFromFeDataAsync(dto.Context, dto.Prompt);
 
             history.RemoveAll(x => x.Role == SYSTEM);
 
             var dynamicSystemPrompt =
-                $"{SYSTEM_PROMPT_CHAT}\n\n[DỮ LIỆU HỆ THỐNG HIỆN TẠI]:\n{internalContext}";
+                $"@\"- Write all text in {dto.Language} \n\rYou are the HomeCareDN Virtual Assistant (English).\r\n   \r\n   TASKS:\r\n   1. Support searching for materials and services.\r\n   2. Answer based on the [SYSTEM DATA] below.\r\n\r\n   LINK ATTACHMENT RULES (MANDATORY):\r\n   - Look at the [SYSTEM DATA] section.\r\n   - If you see a line starting with 'LINK:', copy that line verbatim to send to the customer.\r\n   - Example: If the data has 'LINK: [Tile A](/path/123)', you reply: 'You can refer to [Tile A](/path/123)'.\r\n   - IF THERE IS NO 'LINK:' LINE -> ABSOLUTELY DO NOT MAKE UP LINKS.\r\n\r\n   RESPONSE RULES:\r\n   - If the [SYSTEM DATA] has a product matching the need -> Introduce it and attach the link.\r\n   - If the [SYSTEM DATA] returns products that DO NOT match (Other suggestions) -> Say: 'Currently we do not have the exact type you are looking for, but we have these types...' (Attach links to those types).\r\n   - If there is absolutely nothing -> Guide the user to create a 'Request'.\r\n\r\n   REQUEST CREATION RULES:\r\n   - Check the [USER PROFILE]. If 'HasAddress' = false -> Remind to update the address at [Profile](/Customer).\r\n   - Only guide creating a request when no suitable product is found.\";\r\n\n\n{internalContext}";
 
             history.Insert(0, new ChatHistoryItem { Role = SYSTEM, Content = dynamicSystemPrompt });
 
-            history.Add(new ChatHistoryItem { Role = "user", Content = dto.Prompt });
+            history.Add(new ChatHistoryItem { Role = USER, Content = dto.Prompt });
 
             var result = await _groq.ChatAsync(history);
 
             if (!string.IsNullOrEmpty(result))
             {
-                history.Add(new ChatHistoryItem { Role = "assistant", Content = result });
-                await SaveHistoryToCacheAsync(dto.SessionId, history);
+                var historyToSave = history.Where(x => x.Role != SYSTEM).ToList();
+                historyToSave.Add(new ChatHistoryItem { Role = ASSISTANT, Content = result });
+                await SaveHistoryToCacheAsync(dto.SessionId, historyToSave);
             }
 
             return new AiChatResponseDto { Reply = result };
         }
 
-        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSuggest)
+        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto dto)
         {
-            if (aiSuggest == null || string.IsNullOrWhiteSpace(aiSuggest.SearchType))
+            if (dto == null || string.IsNullOrWhiteSpace(dto.SearchType))
                 return new List<string>();
 
-            if (string.IsNullOrWhiteSpace(aiSuggest.Language))
-                aiSuggest.Language = "en";
+            if (string.IsNullOrWhiteSpace(dto.Language))
+                dto.Language = "en";
 
-            var userHistory = aiSuggest.History ?? new List<string>();
+            var userHistory = dto.History ?? new List<string>();
 
-            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSuggest, userHistory);
+            var (systemPrompt, userPrompt) = BuildSuggestPrompt(dto, userHistory);
 
             string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
 
@@ -150,20 +119,20 @@ namespace BusinessLogic.Services
 
         // ==================== Build Suggest Prompt ====================
         private static (string systemPrompt, string userPrompt) BuildSuggestPrompt(
-            AiSearchRequestDto aiSearchDto,
+            AiSearchRequestDto dto,
             List<string> userHistory
         )
         {
             string systemPrompt =
                 @"You are a search keyword suggestion system for a construction and home repair marketplace.
 
-CRITICAL RULES:
-1. Response must be ONLY a valid JSON array of strings
-2. NO markdown, NO ```json wrapper, NO explanation
-3. NO extra text before or after JSON
-4. Output format EXACTLY: [""keyword1"", ""keyword2"", ""keyword3""]
-5. Each keyword must be relevant to the search category
-6. Keywords should be practical and commonly searched";
+                CRITICAL RULES:
+                1. Response must be ONLY a valid JSON array of strings
+                2. NO markdown, NO ```json wrapper, NO explanation
+                3. NO extra text before or after JSON
+                4. Output format EXACTLY: [""keyword1"", ""keyword2"", ""keyword3""]
+                5. Each keyword must be relevant to the search category
+                6. Keywords should be practical and commonly searched";
 
             string userPrompt;
 
@@ -174,51 +143,51 @@ CRITICAL RULES:
                 userPrompt =
                     $@"Generate search suggestions based on user history.
 
-USER PROFILE:
-- Search Category: {aiSearchDto.SearchType}
-- Recent Searches: {historyText}
-- Language: {aiSearchDto.Language}
+                    USER PROFILE:
+                    - Search Category: {dto.SearchType}
+                    - Recent Searches: {historyText}
+                    - Language: {dto.Language}
 
-TASK:
-Generate 8-10 relevant search keywords for ""{aiSearchDto.SearchType}"" category.
+                    TASK:
+                    Generate 8-10 relevant search keywords for ""{dto.SearchType}"" category.
 
-STRATEGY:
-- 60% related to user's search history
-- 40% popular items in this category
+                    STRATEGY:
+                    - 60% related to user's search history
+                    - 40% popular items in this category
 
-EXAMPLES FOR CATEGORIES:
-- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
-- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
-- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+                    EXAMPLES FOR CATEGORIES:
+                    - Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+                    - Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+                    - Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
 
-OUTPUT (start with [ immediately):
-[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+                    OUTPUT (start with [ immediately):
+                    [""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
             }
             else
             {
                 userPrompt =
                     $@"Generate popular search suggestions for first-time visitor.
 
-USER PROFILE:
-- Search Category: {aiSearchDto.SearchType}
-- Search History: None
-- Language: {aiSearchDto.Language}
+                USER PROFILE:
+                - Search Category: {dto.SearchType}
+                - Search History: None
+                - Language: {dto.Language}
 
-TASK:
-Suggest 8-10 MOST POPULAR keywords for ""{aiSearchDto.SearchType}"" category.
+                TASK:
+                Suggest 8-10 MOST POPULAR keywords for ""{dto.SearchType}"" category.
 
-FOCUS ON:
-- Best-selling products/services
-- Most frequently searched items
-- Essential items people often look for
+                FOCUS ON:
+                - Best-selling products/services
+                - Most frequently searched items
+                - Essential items people often look for
 
-EXAMPLES FOR CATEGORIES:
-- Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
-- Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
-- Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
+                EXAMPLES FOR CATEGORIES:
+                - Material: ""xi măng"", ""sắt thép"", ""gạch ốp lát"", ""sơn tường"", ""ống nước"", ""cát xây dựng"", ""đá"", ""thép"", ""gỗ""
+                - Repair: ""sửa điện"", ""sửa ống nước"", ""sơn nhà"", ""chống thấm"", ""sửa mái"", ""lắp điều hòa"", ""sửa tường""
+                - Construction: ""xây nhà"", ""sửa chữa nhà"", ""đổ bê tông"", ""làm móng"", ""xây tường"", ""lợp mái"", ""hoàn thiện""
 
-OUTPUT (start with [ immediately):
-[""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
+                OUTPUT (start with [ immediately):
+                [""keyword1"", ""keyword2"", ""keyword3"", ""keyword4"", ""keyword5"", ""keyword6"", ""keyword7"", ""keyword8""]";
             }
 
             return (systemPrompt, userPrompt);
@@ -247,9 +216,9 @@ OUTPUT (start with [ immediately):
             return raw.Substring(start, end - start + 1);
         }
 
-        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSuggest)
+        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto dto)
         {
-            var aiKeywords = await SuggestSearchAsync(aiSuggest);
+            var aiKeywords = await SuggestSearchAsync(dto);
             var results = new List<object>();
 
             foreach (var keyword in aiKeywords)
@@ -257,10 +226,10 @@ OUTPUT (start with [ immediately):
                 var parameter = new QueryParameters
                 {
                     Search = keyword,
-                    SearchType = aiSuggest.SearchType,
+                    SearchType = dto.SearchType,
                 };
 
-                switch (aiSuggest.SearchType)
+                switch (dto.SearchType)
                 {
                     case "Material":
                         var materialResult = await _materialService.GetAllMaterialAsync(parameter);
@@ -513,100 +482,106 @@ OUTPUT (start with [ immediately):
         // -----------------------------
         // PRIVATE HELPER
         // -----------------------------
-        private async Task<string> BuildInternalContextAsync(string userPrompt)
+        private async Task<string> BuildContextFromFeDataAsync(AiContextDto? dto, string userPrompt)
         {
             var sb = new StringBuilder();
+            var searchKeywords = new List<string>();
 
-            List<string> keywords = new List<string>();
-            try
+            // A.Project Context
+            if (dto != null)
             {
-                var extractResult = await _groq.ChatAsync(SYSTEM_PROMPT_SUGGEST, userPrompt);
-                keywords = ExtractJsonList(extractResult, userPrompt);
+                sb.AppendLine("[PROJECT OF CUSTOMER]");
+
+                string sType = dto.ServiceType;
+                string bType = dto.BuildingType;
+                string addr = dto.Address;
+                string size = $" ({dto.Width} x {dto.Length} x {dto.Floors}m )";
+
+                sb.AppendLine($"Project: {sType}, {bType}, {size}, {addr}");
+                if (!string.IsNullOrEmpty(dto.Description))
+                    sb.AppendLine($"Note: {dto.Description}");
+
+                if (!string.IsNullOrEmpty(dto.BuildingType))
+                    searchKeywords.Add(dto.BuildingType);
+                if (!string.IsNullOrEmpty(dto.ServiceType))
+                    searchKeywords.Add(dto.ServiceType);
+
+                // If user agrees to material suggestion
+                if (IsAgreement(userPrompt))
+                {
+                    searchKeywords.AddRange(new[] { "cement", "brick", "pain", "steel", "sand" });
+                }
             }
-            catch
+
+            //B.USER PROMPT
+            if (!string.IsNullOrWhiteSpace(userPrompt))
             {
-                keywords.Add(userPrompt);
+                searchKeywords.Add(userPrompt);
             }
+
+            sb.AppendLine("\n[SYSTEM DATA]");
 
             var allMaterials = await _unitOfWork.MaterialRepository.GetAllAsync();
 
-            var foundMaterials = allMaterials
-                .Where(m =>
-                    keywords.Any(k => m.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
-                )
-                .Take(5)
-                .ToList();
-
-            if (!foundMaterials.Any())
+            if (allMaterials != null && allMaterials.Any())
             {
-                foundMaterials = allMaterials.Take(5).ToList();
-            }
+                var matchedMaterials = allMaterials
+                    .Where(m =>
+                        !string.IsNullOrEmpty(m.Name)
+                        && searchKeywords.Any(k =>
+                            m.Name.Contains(k, StringComparison.OrdinalIgnoreCase)
+                            || (
+                                m.Description != null
+                                && m.Description.Contains(k, StringComparison.OrdinalIgnoreCase)
+                            )
+                        )
+                    )
+                    .Take(10)
+                    .ToList();
 
-            if (foundMaterials.Any())
-            {
-                sb.AppendLine("--- DANH SÁCH VẬT LIỆU CÓ SẴN TRONG HỆ THỐNG ---");
-                foreach (var m in foundMaterials)
+                if (!matchedMaterials.Any())
                 {
-                    sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
+                    matchedMaterials = allMaterials.Take(5).ToList();
+                }
+
+                if (matchedMaterials.Any())
+                {
+                    sb.AppendLine("--- SUGGESTION PRODUCTS ---");
+                    foreach (var m in matchedMaterials)
+                    {
+                        sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
+                    }
                 }
             }
-
-            var allServices = await _unitOfWork.ServiceRepository.GetAllAsync();
-
-            var foundServices = allServices
-                .Where(s =>
-                    keywords.Any(k => s.Name.Contains(k, StringComparison.OrdinalIgnoreCase))
-                )
-                .Take(5)
-                .ToList();
-
-            if (!foundServices.Any())
+            else
             {
-                foundServices = allServices.Take(5).ToList();
-            }
-
-            if (foundServices.Any())
-            {
-                sb.AppendLine("--- DANH SÁCH DỊCH VỤ CÓ SẴN TRONG HỆ THỐNG ---");
-                foreach (var s in foundServices)
-                {
-                    sb.AppendLine($"LINK: [{s.Name}](/ServiceDetail/{s.ServiceID})");
-                }
-            }
-
-            if (sb.Length == 0)
-            {
-                sb.AppendLine(
-                    "HỆ THỐNG: Hiện tại kho dữ liệu đang trống. Hãy hướng dẫn khách tạo yêu cầu."
-                );
+                sb.AppendLine("(The system temporary not have any material)");
             }
 
             return sb.ToString();
         }
 
+        private bool IsAgreement(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+            var t = text.ToLower();
+            return t.Contains("yes");
+        }
+
         private async Task<List<ChatHistoryItem>> GetHistoryFromCacheAsync(string sessionId)
         {
             var key = $"chat_history_{sessionId}";
-
             try
             {
                 var json = await _cache.GetStringAsync(key);
-                if (string.IsNullOrEmpty(json))
-                {
-                    return new List<ChatHistoryItem>
-                    {
-                        new ChatHistoryItem { Role = SYSTEM, Content = SYSTEM_PROMPT_CHAT },
-                    };
-                }
-                return JsonSerializer.Deserialize<List<ChatHistoryItem>>(json)
-                    ?? new List<ChatHistoryItem>();
+                return string.IsNullOrEmpty(json)
+                    ? new List<ChatHistoryItem>()
+                    : JsonSerializer.Deserialize<List<ChatHistoryItem>>(json)!;
             }
             catch
             {
-                return new List<ChatHistoryItem>
-                {
-                    new ChatHistoryItem { Role = SYSTEM, Content = SYSTEM_PROMPT_CHAT },
-                };
+                return new List<ChatHistoryItem>();
             }
         }
 
@@ -615,40 +590,13 @@ OUTPUT (start with [ immediately):
             try
             {
                 var key = $"chat_history_{sessionId}";
-                var options = new DistributedCacheEntryOptions
-                {
-                    SlidingExpiration = TimeSpan.FromDays(3),
-                };
-
-                var result = JsonSerializer.Serialize(history);
-                await _cache.SetStringAsync(key, result, options);
+                await _cache.SetStringAsync(
+                    key,
+                    JsonSerializer.Serialize(history),
+                    new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(1) }
+                );
             }
-            catch
-            {
-                // Ignore cache save errors
-            }
-        }
-
-        private static List<string> ExtractJsonList(string aiResponse, string originalQuery)
-        {
-            try
-            {
-                int startIndex = aiResponse.IndexOf('[');
-                int endIndex = aiResponse.LastIndexOf(']');
-
-                if (startIndex != -1 && endIndex != -1 && endIndex > startIndex)
-                {
-                    string jsonPart = aiResponse.Substring(startIndex, endIndex - startIndex + 1);
-                    var result = JsonSerializer.Deserialize<List<string>>(jsonPart);
-                    return result ?? new List<string> { originalQuery };
-                }
-
-                return new List<string> { originalQuery };
-            }
-            catch
-            {
-                return new List<string> { originalQuery };
-            }
+            catch { }
         }
 
         // -----------------------------
