@@ -9,6 +9,7 @@ import { isSafePhone } from '../utils/validatePhone';
 import Loading from '../components/Loading';
 import { handleApiError } from '../utils/handleApiError';
 import { eKycService } from '../services/eKycService';
+import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
@@ -38,7 +39,7 @@ export default function PartnerRegistration() {
     loaded: 0,
     total: 0,
   });
-
+  const ffmpeg = createFFmpeg({ log: true });
   const [cccdImage, setCccdImage] = useState(null);
   const [faceVideo, setFaceVideo] = useState(null);
 
@@ -237,14 +238,24 @@ export default function PartnerRegistration() {
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
 
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
-      const file = new File([blob], 'face-video.webm', {
-        type: 'video/webm',
-      });
-      const url = URL.createObjectURL(file);
-      setFaceVideo(file);
+    mediaRecorder.onstop = async () => {
+      const webmBlob = new Blob(chunksRef.current, { type: 'video/webm' });
+      const webmFile = new File([webmBlob], 'face-video.webm', { type: 'video/webm' });
+
+      // Convert WebM -> MP4
+      if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+      ffmpeg.FS('writeFile', 'input.webm', await fetchFile(webmFile));
+      await ffmpeg.run('-i', 'input.webm', '-c:v', 'libx264', '-preset', 'fast', 'output.mp4');
+
+      const mp4Data = ffmpeg.FS('readFile', 'output.mp4');
+      const mp4Blob = new Blob([mp4Data.buffer], { type: 'video/mp4' });
+      const mp4File = new File([mp4Blob], 'face-video.mp4', { type: 'video/mp4' });
+
+      const url = URL.createObjectURL(mp4File);
+      setFaceVideo(mp4File);
       setFaceVideoUrl(url);
+
       closeModal();
     };
 

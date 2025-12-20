@@ -13,7 +13,6 @@ namespace BusinessLogic.Services
     {
         private readonly IFptAiClient _fptAiClient;
         private readonly IMemoryCache _cache;
-        private const double CONFIDENCE_THRESHOLD = 0.8;
         private const int EKYC_EXPIRE_MINUTES = 10;
         
 
