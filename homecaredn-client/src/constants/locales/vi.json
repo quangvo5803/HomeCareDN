@@ -344,7 +344,8 @@
       "label_open": "Đang mở",
       "label_close": "Đã đóng",
       "label_contractorApplied": "nhà thầu",
-      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại."
+      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại.",
+      "otherPaymentExpiredMessage": "Yêu cầu của bạn đã được mở lại do một đối tác chưa hoàn thành thủ tục."
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
