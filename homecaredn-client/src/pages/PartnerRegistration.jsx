@@ -9,7 +9,7 @@ import { isSafePhone } from '../utils/validatePhone';
 import Loading from '../components/Loading';
 import { handleApiError } from '../utils/handleApiError';
 import { eKycService } from '../services/eKycService';
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import * as FFmpeg from '@ffmpeg/ffmpeg';
 
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
@@ -39,6 +39,8 @@ export default function PartnerRegistration() {
     loaded: 0,
     total: 0,
   });
+  const { createFFmpeg, fetchFile } = FFmpeg;
+
   const ffmpeg = createFFmpeg({ log: true });
   const [cccdImage, setCccdImage] = useState(null);
   const [faceVideo, setFaceVideo] = useState(null);
