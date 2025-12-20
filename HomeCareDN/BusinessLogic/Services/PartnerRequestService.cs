@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text.Json;
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.PartnerRequest;
@@ -6,9 +7,11 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Ultitity.Clients.FptAI;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
@@ -36,7 +39,7 @@ namespace BusinessLogic.Services
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
         private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
         private const string PARTNER_REQUEST_INCLUDES = "Images,Documents";
-
+        private const string EKYC_CACHE_PREFIX = "EKYC_";
         public PartnerRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
@@ -183,9 +186,31 @@ namespace BusinessLogic.Services
                         }
                     );
                 }
+                //KYC Verification
+                if (string.IsNullOrEmpty(request.EkycToken))
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { "EKYC", new[] { "Thiếu eKYC token" } },
+                        }
+                    );
+
+                if (
+                    !_memoryCache.TryGetValue(
+                        $"{EKYC_CACHE_PREFIX}{request.EkycToken}",
+                        out bool isVerified
+                    ) || !isVerified
+                )
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { "EKYC", new[] { "Danh tính chưa được xác minh" } },
+                        }
+                    );
+                }
 
                 await ValidatePartnerRequestAsync(request);
-
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);
 
                 await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
@@ -195,7 +220,7 @@ namespace BusinessLogic.Services
                 await _unitOfWork.SaveAsync();
 
                 _memoryCache.Remove($"VerifiedToken_{request.Email}");
-
+                _memoryCache.Remove($"{EKYC_CACHE_PREFIX}{request.EkycToken}");
                 QueueEmailReceived(partnerRequest);
 
                 return _mapper.Map<PartnerRequestDto>(partnerRequest);
@@ -236,6 +261,7 @@ namespace BusinessLogic.Services
             await _unitOfWork.SaveAsync();
             return await _authorizeService.GenerateToken(user);
         }
+
         public async Task<PartnerRequestDto> ApprovePartnerRequestAsync(Guid partnerRequestID)
         {
             var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(

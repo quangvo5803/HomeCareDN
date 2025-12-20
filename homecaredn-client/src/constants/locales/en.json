@@ -1646,7 +1646,13 @@
     "NOT_FOUND": "Requested page not found!",
     "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!",
     "EMPTY_DESCRIPTION": "Please provide a detailed description!",
-    "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
+    "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission.",
+    "EKYC_MISSING_INPUT": "Please upload your ID card and record a face video.",
+    "EKYC_VIDEO_QUALITY_LOW": "Please record a video with a clear face and sufficient lighting.",
+    "EKYC_LIVENESS_FAILED": "Liveness verification failed. Please try again.",
+    "EKYC_FACE_NOT_DETECTED": "Face could not be detected in the video. Please ensure your face is clearly visible and well-lit.",
+    "EKYC_FACE_MATCH_INVALID": "Invalid face verification data.",
+    "EKYC_FACE_NOT_MATCH": "The face does not match the ID card."
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
@@ -1679,7 +1685,8 @@
     "RECONNECTED": "Reconnected to the server!",
     "ACCEPT_APPLICATION": "Accept application successfully!",
     "REJECT_APPLICATION": "Reject application successfully!",
-    "NOTIFY_ADD": "Add notification successfully."
+    "NOTIFY_ADD": "Add notification successfully.",
+    "EKYC_SUCCESS": "Verification successful"
   },
   "roles": {
     "Distributor": "Distributor",

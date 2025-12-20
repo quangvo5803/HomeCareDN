@@ -1639,7 +1639,13 @@
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
     "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
-    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
+    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi.",
+    "EKYC_MISSING_INPUT": "Vui lòng tải lên thẻ căn cước và quay video khuôn mặt.",
+    "EKYC_VIDEO_QUALITY_LOW": "Vui lòng quay video rõ mặt, đủ sáng.",
+    "EKYC_LIVENESS_FAILED": "Xác minh tính xác thực không thành công. Vui lòng thử lại.",
+    "EKYC_FACE_NOT_DETECTED": "Không thể nhận diện khuôn mặt trong video. Vui lòng đảm bảo khuôn mặt của bạn rõ ràng và đủ ánh sáng.",
+    "EKYC_FACE_MATCH_INVALID": "Dữ liệu xác minh khuôn mặt không hợp lệ.",
+    "EKYC_FACE_NOT_MATCH": "Khuôn mặt không khớp với thẻ căn cước."
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1672,7 +1678,8 @@
     "RECONNECTED": "Đã kết nối lại với server!",
     "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
     "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!",
-    "NOTIFY_ADD": "Tạo thông báo thành công."
+    "NOTIFY_ADD": "Tạo thông báo thành công.",
+    "EKYC_SUCCESS": "Xác minh thành công"
   },
   "roles": {
     "Distributor": "Nhà phân phối",

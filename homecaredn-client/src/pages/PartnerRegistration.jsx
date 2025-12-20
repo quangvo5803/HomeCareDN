@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { isSafeEmail } from '../utils/validateEmail';
 import { isSafePhone } from '../utils/validatePhone';
 import Loading from '../components/Loading';
 import { handleApiError } from '../utils/handleApiError';
+import { eKycService } from '../services/eKycService';
 
 const MAX_IMAGES = 5;
 const MAX_DOCUMENTS = 5;
@@ -37,6 +38,21 @@ export default function PartnerRegistration() {
     loaded: 0,
     total: 0,
   });
+
+  const [cccdImage, setCccdImage] = useState(null);
+  const [faceVideo, setFaceVideo] = useState(null);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordTime, setRecordTime] = useState(0);
+
+  const videoRef = useRef(null);
+  const mediaRecorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const timerRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
+  const [faceVideoUrl, setFaceVideoUrl] = useState(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isEkycVerified, setIsEkycVerified] = useState(false);
 
   useEffect(() => {
     setPartnerRequestType(partnerTypeFromUrl);
@@ -202,9 +218,119 @@ export default function PartnerRegistration() {
     };
   };
 
+  const startRecording = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user' },
+      audio: false,
+    });
+
+    videoRef.current.srcObject = stream;
+
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm',
+    });
+
+    mediaRecorderRef.current = mediaRecorder;
+    chunksRef.current = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: 'video/webm' });
+      const file = new File([blob], 'face-video.webm', {
+        type: 'video/webm',
+      });
+      const url = URL.createObjectURL(file);
+      setFaceVideo(file);
+      setFaceVideoUrl(url);
+      closeModal();
+    };
+
+    mediaRecorder.start();
+    setIsRecording(true);
+    setRecordTime(0);
+
+    timerRef.current = setInterval(() => {
+      setRecordTime((t) => {
+        if (t >= 15) {
+          stopRecording();
+          return t;
+        }
+        return t + 1;
+      });
+    }, 1000);
+  };
+
+  const stopRecording = () => {
+    if (recordTime < 10) {
+      toast.error('Video phải dài ít nhất 10 giây');
+      return;
+    }
+
+    clearInterval(timerRef.current);
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
+  };
+
+  const closeModal = () => {
+    if (isRecording) return;
+
+    const stream = videoRef.current?.srcObject;
+    stream?.getTracks().forEach((t) => t.stop());
+
+    setShowModal(false);
+  };
+  const handleRemoveFaceVideo = () => {
+    if (faceVideoUrl) {
+      URL.revokeObjectURL(faceVideoUrl);
+    }
+    setFaceVideo(null);
+    setFaceVideoUrl(null);
+    setIsEkycVerified(false);
+  };
+
+  const handleCccdChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('CCCD phải là hình ảnh');
+      return;
+    }
+    setIsEkycVerified(false);
+    setCccdImage(file);
+  };
+
+  const handleVerify = async () => {
+    if (!cccdImage || !faceVideo) {
+      toast.error('Vui lòng tải CCCD và quay video khuôn mặt');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('CccdImage', cccdImage);
+    formData.append('FaceVideo', faceVideo);
+    console.log("formData", formData);
+    try {
+      setIsVerifying(true);
+      await eKycService.verify(formData);
+      setIsEkycVerified(true);
+      toast.success(t('SUCCESS.EKYC_SUCCESS'));
+    } catch (err) {
+      toast.error(t(handleApiError(err)));
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const handleStep1Submit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    if (!cccdImage || !faceVideo) {
+      toast.error('Vui lòng xác minh CCCD và khuôn mặt');
+      return;
+    }
     setLoading(true);
     try {
       await partnerRequestService.sendOtp({ email, companyName });
@@ -221,7 +347,7 @@ export default function PartnerRegistration() {
     }
   };
 
-  const handleStep2Submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!otpCode || otpCode.length < 6) {
@@ -429,6 +555,162 @@ export default function PartnerRegistration() {
                 </label>
               </div>
 
+              {/* ===== EKYC: CCCD ===== */}
+              <div div className="space-y-3">
+                <label className="flex items-center text-sm font-medium text-gray-700">
+                  <i className="fas fa-id-card text-green-600 mr-2"></i>
+                  Xác minh CCCD <span className="text-red-500 ml-1">*</span>
+                </label>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCccdChange}
+                  className="block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-lg file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-green-50 file:text-green-700
+                    hover:file:bg-green-100"
+                />
+
+                {cccdImage && (
+                  <img
+                    src={URL.createObjectURL(cccdImage)}
+                    alt="CCCD Preview"
+                    className="mt-2 w-64 border rounded-lg"
+                  />
+                )}
+              </div>
+
+              {/* ===== QUAY VIDEO WEBCAM ===== */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700 flex items-center">
+                  <i className="fas fa-video mr-2 text-purple-600"></i>
+                  Quay video khuôn mặt <span className="text-red-500 ml-1">*</span>
+                </label>
+
+                <div className="flex gap-3">
+                  {!isRecording && !faceVideo && (
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(true)}
+                      disabled={!cccdImage}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg cursor-pointer"
+                    >
+                      Quay video khuôn mặt
+                    </button>
+                  )}
+                </div>
+
+                <p className="text-xs text-gray-500">
+                  Video từ 10–15 giây, nhìn thẳng camera, đủ sáng
+                </p>
+              </div>
+              {faceVideo && (
+                <div className="relative mt-2 w-64">
+                  <video
+                    src={faceVideoUrl}
+                    controls
+                    className="w-full rounded-lg border"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleRemoveFaceVideo}
+                    className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center hover:bg-red-700"
+                    title="Xoá video"
+                  >
+                    <i className="fas fa-times text-xs"></i>
+                  </button>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleVerify}
+                disabled={isVerifying || isEkycVerified}
+                className={`w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white
+                  ${isEkycVerified
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : isVerifying
+                      ? 'bg-green-400 cursor-not-allowed'
+                      : 'bg-green-600 hover:bg-green-700 cursor-pointer'
+                  }
+                `}
+              >
+                {isEkycVerified ? (
+                  <>
+                    <i className="fas fa-check-circle"></i>
+                    Đã xác minh eKYC
+                  </>
+                ) : isVerifying ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                    {t('common.loadingData', { defaultValue: 'Đang kiểm tra...' })}
+                  </>
+                ) : (
+                  'Kiểm tra eKYC'
+                )}
+              </button>
+
+              {showModal && (
+                <div className="fixed inset-0 z-50 bg-gray-900 bg-opacity-60 flex items-center justify-center">
+                  <div className=" rounded-xl p-6 w-96 relative flex flex-col items-center">
+                    <h3 className="text-lg font-semibold mb-4">
+                      Xác minh khuôn mặt
+                    </h3>
+
+                    {/* Oval frame */}
+                    <div className="w-64 h-80 rounded-full overflow-hidden flex items-center justify-center bg-gray-900">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <p className="text-sm text-gray-500 mt-2">
+                      Thời gian: {recordTime}s (10–15s)
+                    </p>
+
+                    <div className="flex gap-3 mt-4 w-full">
+                      {!isRecording && (
+                        <button
+                          type="button"
+                          onClick={startRecording}
+                          className="flex-1 bg-purple-600 text-white py-2 rounded-lg cursor-pointer"
+                        >
+                          Bắt đầu
+                        </button>
+                      )}
+
+                      {isRecording && recordTime >= 10 && (
+                        <button
+                          type="button"
+                          onClick={stopRecording}
+                          className="flex-1 bg-red-600 text-white py-2 rounded-lg cursor-pointer"
+                        >
+                          Dừng
+                        </button>
+                      )}
+                      {!isRecording && (
+                        <button
+                          type="button"
+                          onClick={closeModal}
+                          className="flex-1 bg-red-600 text-white py-2 rounded-lg cursor-pointer"
+                        >
+                          Huỷ
+                        </button>
+                      )}
+
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Images Upload */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -562,8 +844,9 @@ export default function PartnerRegistration() {
                   <i className="fas fa-arrow-left mr-2" /> {t('BUTTON.Back')}
                 </button>
                 <button
+                  disabled={!isEkycVerified}
                   type="submit"
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  className="flex-1 bg-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 focus:ring-4 focus:ring-blue-300 transition disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center justify-center"
                 >
                   {t('BUTTON.Continue')} &nbsp;
                   <i className="fas fa-arrow-right" />
@@ -611,7 +894,7 @@ export default function PartnerRegistration() {
                   {t('partnerRequest.partnerRegistration.step2.backButton')}
                 </button>
                 <button
-                  onClick={handleStep2Submit}
+                  onClick={handleSubmit}
                   disabled={otpCode.length < 6}
                   className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-200 disabled:opacity-50"
                 >
@@ -635,6 +918,6 @@ export default function PartnerRegistration() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
