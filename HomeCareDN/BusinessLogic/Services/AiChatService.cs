@@ -121,7 +121,7 @@ namespace BusinessLogic.Services
 
         // ==================== Build Suggest Prompt ====================
         private static (string systemPrompt, string userPrompt) BuildSuggestPrompt(
-            AiSearchRequestDto dto,
+            AiSearchRequestDto aiSuggest,
             List<string> userHistory
         )
         {
@@ -146,12 +146,12 @@ namespace BusinessLogic.Services
                     $@"Generate search suggestions based on user history.
 
                     USER PROFILE:
-                    - Search Category: {dto.SearchType}
+                    - Search Category: {aiSuggest.SearchType}
                     - Recent Searches: {historyText}
-                    - Language: {dto.Language}
+                    - Language: {aiSuggest.Language}
 
                     TASK:
-                    Generate 8-10 relevant search keywords for ""{dto.SearchType}"" category.
+                    Generate 8-10 relevant search keywords for ""{aiSuggest.SearchType}"" category.
 
                     STRATEGY:
                     - 60% related to user's search history
@@ -171,12 +171,12 @@ namespace BusinessLogic.Services
                     $@"Generate popular search suggestions for first-time visitor.
 
                 USER PROFILE:
-                - Search Category: {dto.SearchType}
+                - Search Category: {aiSuggest.SearchType}
                 - Search History: None
-                - Language: {dto.Language}
+                - Language: {aiSuggest.Language}
 
                 TASK:
-                Suggest 8-10 MOST POPULAR keywords for ""{dto.SearchType}"" category.
+                Suggest 8-10 MOST POPULAR keywords for ""{aiSuggest.SearchType}"" category.
 
                 FOCUS ON:
                 - Best-selling products/services
@@ -218,9 +218,9 @@ namespace BusinessLogic.Services
             return raw.Substring(start, end - start + 1);
         }
 
-        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto dto)
+        public async Task<List<object>> SearchWithAISuggestionsAsync(AiSearchRequestDto aiSuggest)
         {
-            var aiKeywords = await SuggestSearchAsync(dto);
+            var aiKeywords = await SuggestSearchAsync(aiSuggest);
             var results = new List<object>();
 
             foreach (var keyword in aiKeywords)
@@ -228,10 +228,10 @@ namespace BusinessLogic.Services
                 var parameter = new QueryParameters
                 {
                     Search = keyword,
-                    SearchType = dto.SearchType,
+                    SearchType = aiSuggest.SearchType,
                 };
 
-                switch (dto.SearchType)
+                switch (aiSuggest.SearchType)
                 {
                     case "Material":
                         var materialResult = await _materialService.GetAllMaterialAsync(parameter);
@@ -509,7 +509,7 @@ namespace BusinessLogic.Services
         }
 
         // Helper 1: ChatAsync
-        private void AppendProjectInfo(StringBuilder sb, AiContextDto? dto)
+        private static void AppendProjectInfo(StringBuilder sb, AiContextDto? dto)
         {
             if (dto == null)
                 return;
@@ -525,7 +525,7 @@ namespace BusinessLogic.Services
         }
 
         // Helper 2: ChatAsync
-        private List<string> GetSearchKeywords(AiContextDto? dto, string userPrompt)
+        private static List<string> GetSearchKeywords(AiContextDto? dto, string userPrompt)
         {
             var keywords = new List<string>();
 
@@ -587,7 +587,7 @@ namespace BusinessLogic.Services
         }
 
         // Helper 4: ChatAsync
-        private void AppendMaterialSuggestions(
+        private static void AppendMaterialSuggestions(
             StringBuilder sb,
             List<DataAccess.Entities.Application.Material> materials
         )
