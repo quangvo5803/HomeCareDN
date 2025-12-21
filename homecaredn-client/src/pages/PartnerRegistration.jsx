@@ -373,11 +373,15 @@ export default function PartnerRegistration() {
     }
   };
 
-  const buttonClassName = isEkycVerified
-    ? 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-gray-400 cursor-not-allowed'
-    : isVerifying
-      ? 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-400 cursor-not-allowed'
-      : 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 cursor-pointer';
+  let buttonClassName;
+
+  if (isEkycVerified) {
+    buttonClassName = 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-gray-400 cursor-not-allowed';
+  } else if (isVerifying) {
+    buttonClassName = 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-400 cursor-not-allowed';
+  } else {
+    buttonClassName = 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 cursor-pointer';
+  }
 
   let buttonContent;
   if (isEkycVerified) {
