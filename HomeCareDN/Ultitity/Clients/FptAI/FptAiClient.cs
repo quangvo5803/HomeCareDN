@@ -28,21 +28,21 @@ namespace Ultitity.Clients.FptAI
         }
 
         public async Task<string> CheckFaceAsync(
-            IFormFile cccdImage,
-            IFormFile selfieImage)
+            IFormFile image1,
+            IFormFile image2)
         {
             using var content = new MultipartFormDataContent();
 
             content.Add(
-                new StreamContent(cccdImage.OpenReadStream()),
+                new StreamContent(image1.OpenReadStream()),
                 "file[]",
-                cccdImage.FileName
+                image1.FileName
             );
 
             content.Add(
-                new StreamContent(selfieImage.OpenReadStream()),
+                new StreamContent(image2.OpenReadStream()),
                 "file[]",
-                selfieImage.FileName
+                image2.FileName
             );
 
             var response = await _httpClient.PostAsync(

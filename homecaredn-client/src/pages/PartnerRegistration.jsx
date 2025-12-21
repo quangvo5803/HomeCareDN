@@ -373,6 +373,31 @@ export default function PartnerRegistration() {
     }
   };
 
+  const buttonClassName = isEkycVerified
+    ? 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-gray-400 cursor-not-allowed'
+    : isVerifying
+      ? 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-400 cursor-not-allowed'
+      : 'w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white bg-green-600 hover:bg-green-700 cursor-pointer';
+
+  let buttonContent;
+  if (isEkycVerified) {
+    buttonContent = (
+      <>
+        <i className="fas fa-check-circle"></i>
+        {t('partnerRequest.partnerRegistration.verified')}
+      </>
+    );
+  } else if (isVerifying) {
+    buttonContent = (
+      <>
+        <i className="fa-solid fa-spinner fa-spin"></i>
+        {t('common.loadingData', { defaultValue: t('partnerRequest.partnerRegistration.verifying') })}
+      </>
+    );
+  } else {
+    buttonContent = t('partnerRequest.partnerRegistration.confirm_ekyc');
+  }
+
   if (loading) return <Loading />;
   if (uploadProgress) return <Loading progress={uploadProgress} />;
 
@@ -600,28 +625,9 @@ export default function PartnerRegistration() {
                 type="button"
                 onClick={handleVerify}
                 disabled={isVerifying || isEkycVerified}
-                className={`w-full py-3 rounded-lg mt-6 flex items-center justify-center gap-2 text-white
-                  ${isEkycVerified
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : isVerifying
-                      ? 'bg-green-400 cursor-not-allowed'
-                      : 'bg-green-600 hover:bg-green-700 cursor-pointer'
-                  }
-                `}
+                className={buttonClassName}
               >
-                {isEkycVerified ? (
-                  <>
-                    <i className="fas fa-check-circle"></i>
-                    {t('partnerRequest.partnerRegistration.verified')}
-                  </>
-                ) : isVerifying ? (
-                  <>
-                    <i className="fa-solid fa-spinner fa-spin"></i>
-                    {t('common.loadingData', { defaultValue: t('partnerRequest.partnerRegistration.verifying') })}
-                  </>
-                ) : (
-                  t('partnerRequest.partnerRegistration.confirm_ekyc')
-                )}
+                {buttonContent}
               </button>
 
               {showModal && (

@@ -37,7 +37,11 @@ namespace BusinessLogic.Services
         private const int EKYC_MAX_FAIL = 3;
         private static readonly TimeSpan EKYC_COOLDOWN = TimeSpan.FromHours(1);
 
-        public EKycService(IFptAiClient fptAiClient, IMemoryCache cache, IHttpContextAccessor httpContextAccessor)
+        public EKycService(
+            IFptAiClient fptAiClient,
+            IMemoryCache cache,
+            IHttpContextAccessor httpContextAccessor
+        )
         {
             _fptAiClient = fptAiClient;
             _cache = cache;
@@ -47,7 +51,34 @@ namespace BusinessLogic.Services
         public async Task<string> VerifyAsync(EKycVerifyRequestDto requestDto)
         {
             EnsureNotLocked();
+            ValidateInput(requestDto);
 
+            try
+            {
+                var ocrResult = await GetOcrResultAsync(requestDto.CccdImage);
+                var cccd = ValidateOcrData(ocrResult);
+
+                ValidateProbabilities(cccd);
+
+                var faceData = await GetFaceDataAsync(requestDto.CccdImage, requestDto.SelfieImage);
+                ValidateFaceData(faceData);
+
+                var ekycToken = Guid.NewGuid().ToString();
+                _cache.Set($"EKYC_{ekycToken}", true, TimeSpan.FromMinutes(EKYC_EXPIRE_MINUTES));
+                ResetFailCount();
+                return ekycToken;
+            }
+            catch (CustomValidationException)
+            {
+                IncreaseFailCount();
+                throw;
+            }
+        }
+
+        //======= Helper methods ========
+
+        private static void ValidateInput(EKycVerifyRequestDto requestDto)
+        {
             if (requestDto.CccdImage == null || requestDto.SelfieImage == null)
             {
                 throw new CustomValidationException(
@@ -57,189 +88,159 @@ namespace BusinessLogic.Services
                     }
                 );
             }
+        }
 
+        private async Task<FptOcrCccdResponse> GetOcrResultAsync(IFormFile cccdImage)
+        {
             try
             {
-                FptOcrCccdResponse ocrResult;
-                try
-                {
-                    var ocrJson = await _fptAiClient.OcrCccdAsync(requestDto.CccdImage);
-                    ocrResult = JsonSerializer.Deserialize<FptOcrCccdResponse>(
-                        ocrJson,
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-                    )!;
-                }
-                catch (Exception)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_CCCD_INVALID, new[] { EKYC_CCCD_INVALID } },
-                        }
-                    );
-                }
-
+                var ocrJson = await _fptAiClient.OcrCccdAsync(cccdImage);
+                var ocrResult = JsonSerializer.Deserialize<FptOcrCccdResponse>(
+                    ocrJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                )!;
                 if (ocrResult == null || ocrResult.ErrorCode != 0)
-                {
                     throw new CustomValidationException(
                         new Dictionary<string, string[]>
                         {
-                        { EKYC_CCCD_INVALID, new[] { EKYC_CCCD_INVALID } },
+                            { EKYC_CCCD_INVALID, new[] { EKYC_CCCD_INVALID } },
                         }
                     );
-                }
 
                 if (ocrResult.Data == null || ocrResult.Data.Count == 0)
-                {
                     throw new CustomValidationException(
                         new Dictionary<string, string[]>
                         {
+                            { EKYC_CCCD_NOT_DETECTED, new[] { EKYC_CCCD_NOT_DETECTED } },
+                        }
+                    );
+
+                return ocrResult;
+            }
+            catch
+            {
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_CCCD_INVALID, new[] { EKYC_CCCD_INVALID } },
+                    }
+                );
+            }
+        }
+
+        private static FptOcrCccdData ValidateOcrData(FptOcrCccdResponse ocrResult)
+        {
+            var cccd = ocrResult.Data[0];
+
+            if (string.IsNullOrWhiteSpace(cccd.Type))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
                         { EKYC_CCCD_NOT_DETECTED, new[] { EKYC_CCCD_NOT_DETECTED } },
-                        }
-                    );
-                }
-                var cccd = ocrResult.Data[0];
-                if (string.IsNullOrWhiteSpace(cccd.Type))
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_CCCD_NOT_DETECTED, new[] { EKYC_CCCD_NOT_DETECTED } },
-                        }
-                    );
-                }
-
-                if (string.IsNullOrWhiteSpace(cccd.Id) || cccd.Id.Length < 9)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_CCCD_ID_INVALID, new[] { EKYC_CCCD_ID_INVALID } },
-                        }
-                    );
-                }
-                bool LowProb(string prob, double min = 0.7)
-                {
-                    return !double.TryParse(
-                            prob,
-                            NumberStyles.Any,
-                            CultureInfo.InvariantCulture,
-                            out var v
-                        )
-                        || v < min;
-                }
-
-                if (LowProb(cccd.Id_prob) || LowProb(cccd.Name_prob) || LowProb(cccd.Dob_prob))
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_CCCD_IMAGE_QUALITY_LOW, new[] { EKYC_CCCD_IMAGE_QUALITY_LOW } },
-                        }
-                    );
-                }
-
-                var faceJson = await _fptAiClient.CheckFaceAsync(
-                    requestDto.CccdImage,
-                    requestDto.SelfieImage
+                    }
                 );
 
-                var faceDoc = JsonDocument.Parse(faceJson);
-                var root = faceDoc.RootElement;
+            if (string.IsNullOrWhiteSpace(cccd.Id) || cccd.Id.Length < 9)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_CCCD_ID_INVALID, new[] { EKYC_CCCD_ID_INVALID } },
+                    }
+                );
 
-                if (root.ValueKind != JsonValueKind.Object)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
-                        }
-                    );
-                }
+            return cccd;
+        }
 
-                if (root.TryGetProperty("errorCode", out _))
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_FACE_NOT_DETECTED, new[] { EKYC_FACE_NOT_DETECTED } },
-                        }
-                    );
-                }
+        private static void ValidateProbabilities(FptOcrCccdData cccd)
+        {
+            bool LowProb(string prob, double min = 0.7) =>
+                !double.TryParse(prob, NumberStyles.Any, CultureInfo.InvariantCulture, out var v)
+                || v < min;
 
-                if (
-                    !root.TryGetProperty("data", out var data)
-                    || data.ValueKind != JsonValueKind.Object
-                )
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
-                        }
-                    );
-                }
-
-                bool isMatch = data.GetProperty("isMatch").GetBoolean();
-                double similarity = data.GetProperty("similarity").GetDouble();
-                bool isBothImgIDCard = data.GetProperty("isBothImgIDCard").GetBoolean();
-
-                //Upload sai loại ảnh
-                if (isBothImgIDCard)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
-                        }
-                    );
-                }
-
-                //Không detect được khuôn mặt
-                if (similarity < 10)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_FACE_NOT_DETECTED, new[] { EKYC_FACE_NOT_DETECTED } },
-                        }
-                    );
-                }
-
-                //Ảnh kém chất lượng
-                if (similarity < 50)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_FACE_IMAGE_QUALITY_LOW, new[] { EKYC_FACE_IMAGE_QUALITY_LOW } },
-                        }
-                    );
-                }
-
-                //Có khuôn mặt nhưng không khớp
-                if (!isMatch || similarity < 80)
-                {
-                    throw new CustomValidationException(
-                        new Dictionary<string, string[]>
-                        {
-                        { EKYC_FACE_NOT_MATCH, new[] { EKYC_FACE_NOT_MATCH } },
-                        }
-                    );
-                }
-
-                var ekycToken = Guid.NewGuid().ToString();
-
-                _cache.Set($"EKYC_{ekycToken}", true, TimeSpan.FromMinutes(EKYC_EXPIRE_MINUTES));
-
-                ResetFailCount();
-                return ekycToken;
-            }
-            catch (CustomValidationException)
+            if (LowProb(cccd.Id_prob) || LowProb(cccd.Name_prob) || LowProb(cccd.Dob_prob))
             {
-                IncreaseFailCount();
-                throw;
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_CCCD_IMAGE_QUALITY_LOW, new[] { EKYC_CCCD_IMAGE_QUALITY_LOW } },
+                    }
+                );
             }
+        }
+
+        private async Task<JsonElement> GetFaceDataAsync(IFormFile cccdImage, IFormFile selfieImage)
+        {
+            var faceJson = await _fptAiClient.CheckFaceAsync(cccdImage, selfieImage);
+            var faceDoc = JsonDocument.Parse(faceJson);
+            var root = faceDoc.RootElement;
+
+            if (root.ValueKind != JsonValueKind.Object)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
+                    }
+                );
+
+            if (root.TryGetProperty("errorCode", out _))
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_FACE_NOT_DETECTED, new[] { EKYC_FACE_NOT_DETECTED } },
+                    }
+                );
+
+            if (
+                !root.TryGetProperty("data", out var data)
+                || data.ValueKind != JsonValueKind.Object
+            )
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
+                    }
+                );
+
+            return data;
+        }
+
+        private static void ValidateFaceData(JsonElement data)
+        {
+            bool isMatch = data.GetProperty("isMatch").GetBoolean();
+            double similarity = data.GetProperty("similarity").GetDouble();
+            bool isBothImgIDCard = data.GetProperty("isBothImgIDCard").GetBoolean();
+
+            if (isBothImgIDCard)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_SELFIE_INVALID, new[] { EKYC_SELFIE_INVALID } },
+                    }
+                );
+
+            if (similarity < 10)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_FACE_NOT_DETECTED, new[] { EKYC_FACE_NOT_DETECTED } },
+                    }
+                );
+
+            if (similarity < 50)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_FACE_IMAGE_QUALITY_LOW, new[] { EKYC_FACE_IMAGE_QUALITY_LOW } },
+                    }
+                );
+
+            if (!isMatch || similarity < 80)
+                throw new CustomValidationException(
+                    new Dictionary<string, string[]>
+                    {
+                        { EKYC_FACE_NOT_MATCH, new[] { EKYC_FACE_NOT_MATCH } },
+                    }
+                );
         }
 
         private string GetClientKey()

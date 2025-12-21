@@ -97,7 +97,14 @@ export default function Signature() {
             const res = await partnerRequestService.update(payload);
             login(res.accessToken);
             toast.success(t('SUCCESS.PARTNER_REQUEST_Signature'));
-            navigate(user?.role === 'Contractor' ? '/Contractor' : user?.role === 'Distributor' ? '/Distributor' : '/');
+            let redirectPath = '/';
+            if (user?.role === 'Contractor') {
+                redirectPath = '/Contractor';
+            } else if (user?.role === 'Distributor') {
+                redirectPath = '/Distributor';
+            }
+
+            navigate(redirectPath);
         } catch (error) {
             toast.error(t(handleApiError(error)));
         } finally {
