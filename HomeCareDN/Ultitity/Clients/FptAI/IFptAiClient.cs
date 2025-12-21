@@ -5,11 +5,6 @@ namespace Ultitity.Clients.FptAI
     public interface IFptAiClient
     {
         Task<string> OcrCccdAsync(IFormFile image);
-        Task<string> LivenessWithFaceMatchAsync(
-            IFormFile cccdImage,
-            byte[] faceVideoBytes,
-            string fileName = "face-video.mp4",
-            string contentType = "video/mp4"
-        );
+        Task<string> CheckFaceAsync(IFormFile img1, IFormFile img2);
     }
 }

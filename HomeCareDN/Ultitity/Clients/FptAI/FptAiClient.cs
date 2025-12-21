@@ -22,35 +22,37 @@ namespace Ultitity.Clients.FptAI
 
             var response = await _httpClient.PostAsync(_config["FptAi:OcrUrl"], content);
 
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync();
+
+            return body;
         }
 
-        public async Task<string> LivenessWithFaceMatchAsync(
+        public async Task<string> CheckFaceAsync(
             IFormFile cccdImage,
-            byte[] faceVideoBytes,
-            string fileName = "face-video.mp4",
-            string contentType = "video/mp4"
-        )
+            IFormFile selfieImage)
         {
             using var content = new MultipartFormDataContent();
 
-            // Thêm CCCD Image như cũ
-            content.Add(new StreamContent(cccdImage.OpenReadStream()), "image", cccdImage.FileName);
-
-            // Thêm video từ byte[]
-            var videoStream = new MemoryStream(faceVideoBytes);
-            var videoContent = new StreamContent(videoStream);
-            videoContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
-                contentType
+            content.Add(
+                new StreamContent(cccdImage.OpenReadStream()),
+                "file[]",
+                cccdImage.FileName
             );
 
-            content.Add(videoContent, "video", fileName);
+            content.Add(
+                new StreamContent(selfieImage.OpenReadStream()),
+                "file[]",
+                selfieImage.FileName
+            );
 
-            var response = await _httpClient.PostAsync(_config["FptAi:LivenessUrl"], content);
+            var response = await _httpClient.PostAsync(
+                _config["FptAi:CheckFaceUrl"],
+                content
+            );
 
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
+            var body = await response.Content.ReadAsStringAsync();
+
+            return body;
         }
     }
 }

@@ -151,7 +151,8 @@ namespace BusinessLogic.Services.FacadeService
             );
             EKycService = new EKycService(
                 infraDeps.FptAiClient,
-                coreDeps.MemoryCache
+                coreDeps.MemoryCache,
+                infraDeps.Http
             );
         }
     }
