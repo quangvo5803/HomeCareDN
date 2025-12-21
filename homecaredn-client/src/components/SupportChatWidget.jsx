@@ -120,6 +120,12 @@ const MessageShape = PropTypes.exact({
     PropTypes.number,
     PropTypes.instanceOf(Date),
   ]),
+  actions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })
+  ),
 });
 const MessageContext = createContext({ isUser: false });
 const MarkdownP = ({ children }) => (
@@ -222,12 +228,12 @@ function MessageBubble({ message, onAction }) {
           </MessageContext.Provider>
         </div>
 
-        {!isUser && message.actions && message.actions.length > 0 && (
+        {!isUser && message.actions?.length > 0 && (
           <div className="flex gap-2 mt-1">
             {message.actions.map((action, idx) => (
               <button
-                key={idx}
-                onClick={() => onAction && onAction(action.value, message.id)}
+                key={`${action.value}-${idx}`}
+                onClick={() => onAction?.(action.value, message.id)}
                 className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium rounded-lg border border-indigo-200 transition-colors"
               >
                 {action.label}
@@ -280,6 +286,7 @@ function MessageList({ messages, filter, onAction }) {
 MessageList.propTypes = {
   messages: PropTypes.arrayOf(MessageShape).isRequired,
   filter: PropTypes.string,
+  onAction: PropTypes.func,
 };
 
 function ChatHeader({

@@ -5,10 +5,10 @@ using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.Chat.Ai;
 using BusinessLogic.Services.Interfaces;
 using DataAccess.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Hosting;
 using Ultitity.Clients.Groqs;
-using Ultitity.Exceptions;
 
 namespace BusinessLogic.Services
 {
@@ -58,14 +58,12 @@ namespace BusinessLogic.Services
 
             var history = await GetHistoryFromCacheAsync(dto.SessionId);
 
-            bool isFirstMessage = !history.Any(x => x.Role == USER);
-
             string internalContext = await BuildContextFromFeDataAsync(dto.Context, dto.Prompt);
 
             history.RemoveAll(x => x.Role == SYSTEM);
 
             var dynamicSystemPrompt =
-                $"@\"- Write all text in {dto.Language} \n\rYou are the HomeCareDN Virtual Assistant (English).\r\n   \r\n   TASKS:\r\n   1. Support searching for materials and services.\r\n   2. Answer based on the [SYSTEM DATA] below.\r\n\r\n   LINK ATTACHMENT RULES (MANDATORY):\r\n   - Look at the [SYSTEM DATA] section.\r\n   - If you see a line starting with 'LINK:', copy that line verbatim to send to the customer.\r\n   - Example: If the data has 'LINK: [Tile A](/path/123)', you reply: 'You can refer to [Tile A](/path/123)'.\r\n   - IF THERE IS NO 'LINK:' LINE -> ABSOLUTELY DO NOT MAKE UP LINKS.\r\n\r\n   RESPONSE RULES:\r\n   - If the [SYSTEM DATA] has a product matching the need -> Introduce it and attach the link.\r\n   - If the [SYSTEM DATA] returns products that DO NOT match (Other suggestions) -> Say: 'Currently we do not have the exact type you are looking for, but we have these types...' (Attach links to those types).\r\n   - If there is absolutely nothing -> Guide the user to create a 'Request'.\r\n\r\n   REQUEST CREATION RULES:\r\n   - Check the [USER PROFILE]. If 'HasAddress' = false -> Remind to update the address at [Profile](/Customer).\r\n   - Only guide creating a request when no suitable product is found.\";\r\n\n\n{internalContext}";
+                $"@\"- Write all text in {dto.Language} \n\rYou are the HomeCareDN Virtual Assistant (English/Vietnamese).\r\n   \r\n   TASKS:\r\n   1. Support searching for materials and services.\r\n   2. Answer based on the [SYSTEM DATA] below.\r\n\r\n   LINK ATTACHMENT RULES (MANDATORY):\r\n   - Look at the [SYSTEM DATA] section.\r\n   - If you see a line starting with 'LINK:', copy that line verbatim to send to the customer.\r\n   - Example: If the data has 'LINK: [Tile A](/path/123)', you reply: 'You can refer to [Tile A](/path/123)'.\r\n   - IF THERE IS NO 'LINK:' LINE -> ABSOLUTELY DO NOT MAKE UP LINKS.\r\n\r\n   RESPONSE RULES:\r\n   - If the [SYSTEM DATA] has a product matching the need -> Introduce it and attach the link.\r\n   - If the [SYSTEM DATA] returns products that DO NOT match (Other suggestions) -> Say: 'Currently we do not have the exact type you are looking for, but we have these types...' (Attach links to those types).\r\n   - If there is absolutely nothing -> Guide the user to create a 'Request'.\r\n\r\n   REQUEST CREATION RULES:\r\n   - Check the [USER PROFILE]. If 'HasAddress' = false -> Remind to update the address at [Profile](/Customer).\r\n   - Only guide creating a request when no suitable product is found.\";\r\n\n\n{internalContext}";
 
             history.Insert(0, new ChatHistoryItem { Role = SYSTEM, Content = dynamicSystemPrompt });
 
@@ -83,17 +81,17 @@ namespace BusinessLogic.Services
             return new AiChatResponseDto { Reply = result };
         }
 
-        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto dto)
+        public async Task<List<string>> SuggestSearchAsync(AiSearchRequestDto aiSuggest)
         {
-            if (dto == null || string.IsNullOrWhiteSpace(dto.SearchType))
+            if (aiSuggest == null || string.IsNullOrWhiteSpace(aiSuggest.SearchType))
                 return new List<string>();
 
-            if (string.IsNullOrWhiteSpace(dto.Language))
-                dto.Language = "en";
+            if (string.IsNullOrWhiteSpace(aiSuggest.Language))
+                aiSuggest.Language = "en";
 
-            var userHistory = dto.History ?? new List<string>();
+            var userHistory = aiSuggest.History ?? new List<string>();
 
-            var (systemPrompt, userPrompt) = BuildSuggestPrompt(dto, userHistory);
+            var (systemPrompt, userPrompt) = BuildSuggestPrompt(aiSuggest, userHistory);
 
             string raw = await _groq.ChatAsync(systemPrompt, userPrompt);
 
@@ -116,6 +114,10 @@ namespace BusinessLogic.Services
                 return new List<string>();
             }
         }
+
+        // -------------------------------------------------------------
+        // PRIVATE HELPER
+        // -------------------------------------------------------------
 
         // ==================== Build Suggest Prompt ====================
         private static (string systemPrompt, string userPrompt) BuildSuggestPrompt(
@@ -248,6 +250,8 @@ namespace BusinessLogic.Services
 
             return results.Distinct().ToList();
         }
+
+        //============================================= EstimatePrice ===========================================
 
         public async Task<AiServiceRequestPredictionResponseDto> EstimatePriceAsync(
             AIServiceRequestPredictionRequestDto dto
@@ -479,89 +483,130 @@ namespace BusinessLogic.Services
             return raw.Substring(start, end - start + 1);
         }
 
-        // -----------------------------
-        // PRIVATE HELPER
-        // -----------------------------
+        //=======================================================================================================
+
+
+        //=============================================ChatAsync ================================================
         private async Task<string> BuildContextFromFeDataAsync(AiContextDto? dto, string userPrompt)
         {
             var sb = new StringBuilder();
-            var searchKeywords = new List<string>();
 
-            // A.Project Context
-            if (dto != null)
-            {
-                sb.AppendLine("[PROJECT OF CUSTOMER]");
+            // 1. Build Project Context
+            AppendProjectInfo(sb, dto);
 
-                string sType = dto.ServiceType;
-                string bType = dto.BuildingType;
-                string addr = dto.Address;
-                string size = $" ({dto.Width} x {dto.Length} x {dto.Floors}m )";
-
-                sb.AppendLine($"Project: {sType}, {bType}, {size}, {addr}");
-                if (!string.IsNullOrEmpty(dto.Description))
-                    sb.AppendLine($"Note: {dto.Description}");
-
-                if (!string.IsNullOrEmpty(dto.BuildingType))
-                    searchKeywords.Add(dto.BuildingType);
-                if (!string.IsNullOrEmpty(dto.ServiceType))
-                    searchKeywords.Add(dto.ServiceType);
-
-                // If user agrees to material suggestion
-                if (IsAgreement(userPrompt))
-                {
-                    searchKeywords.AddRange(new[] { "cement", "brick", "pain", "steel", "sand" });
-                }
-            }
-
-            //B.USER PROMPT
-            if (!string.IsNullOrWhiteSpace(userPrompt))
-            {
-                searchKeywords.Add(userPrompt);
-            }
+            // 2. Prepare Keywords
+            var searchKeywords = GetSearchKeywords(dto, userPrompt);
 
             sb.AppendLine("\n[SYSTEM DATA]");
 
-            var allMaterials = await _unitOfWork.MaterialRepository.GetAllAsync();
+            // 3. Search Materials
+            var matchedMaterials = await SearchMaterialsAsync(searchKeywords);
 
-            if (allMaterials != null && allMaterials.Any())
+            // 4. Append Suggestions to StringBuilder
+            AppendMaterialSuggestions(sb, matchedMaterials);
+
+            return sb.ToString();
+        }
+
+        // Helper 1: ChatAsync
+        private void AppendProjectInfo(StringBuilder sb, AiContextDto? dto)
+        {
+            if (dto == null)
+                return;
+
+            sb.AppendLine("[PROJECT OF CUSTOMER]");
+            string size = $" ({dto.Width} x {dto.Length} x {dto.Floors}m )";
+            sb.AppendLine($"Project: {dto.ServiceType}, {dto.BuildingType}, {size}, {dto.Address}");
+
+            if (!string.IsNullOrEmpty(dto.Description))
             {
-                var matchedMaterials = allMaterials
-                    .Where(m =>
-                        !string.IsNullOrEmpty(m.Name)
-                        && searchKeywords.Any(k =>
-                            m.Name.Contains(k, StringComparison.OrdinalIgnoreCase)
-                            || (
-                                m.Description != null
-                                && m.Description.Contains(k, StringComparison.OrdinalIgnoreCase)
+                sb.AppendLine($"Note: {dto.Description}");
+            }
+        }
+
+        // Helper 2: ChatAsync
+        private List<string> GetSearchKeywords(AiContextDto? dto, string userPrompt)
+        {
+            var keywords = new List<string>();
+
+            if (dto != null)
+            {
+                if (!string.IsNullOrEmpty(dto.BuildingType))
+                    keywords.Add(dto.BuildingType);
+                if (!string.IsNullOrEmpty(dto.ServiceType))
+                    keywords.Add(dto.ServiceType);
+
+                if (IsAgreement(userPrompt))
+                {
+                    keywords.AddRange(new[] { "cement", "brick", "pain", "steel", "sand" });
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(userPrompt))
+            {
+                keywords.Add(userPrompt);
+            }
+
+            return keywords;
+        }
+
+        // Helper 3: ChatAsync
+        private async Task<List<DataAccess.Entities.Application.Material>> SearchMaterialsAsync(
+            List<string> keywords
+        )
+        {
+            var query = _unitOfWork.MaterialRepository.GetQueryable().AsNoTracking();
+            var matchedMaterials = new List<DataAccess.Entities.Application.Material>();
+
+            if (keywords.Any())
+            {
+                foreach (var k in keywords)
+                {
+                    var foundItems = await query
+                        .Where(m =>
+                            !string.IsNullOrEmpty(m.Name)
+                            && (
+                                m.Name.Contains(k)
+                                || (m.Description != null && m.Description.Contains(k))
                             )
                         )
-                    )
-                    .Take(10)
-                    .ToList();
+                        .Take(10)
+                        .ToListAsync();
 
-                if (!matchedMaterials.Any())
-                {
-                    matchedMaterials = allMaterials.Take(5).ToList();
+                    matchedMaterials.AddRange(foundItems);
                 }
 
-                if (matchedMaterials.Any())
+                return matchedMaterials
+                    .GroupBy(m => m.MaterialID)
+                    .Select(g => g.First())
+                    .Take(10)
+                    .ToList();
+            }
+
+            return await query.Where(m => !string.IsNullOrEmpty(m.Name)).Take(5).ToListAsync();
+        }
+
+        // Helper 4: ChatAsync
+        private void AppendMaterialSuggestions(
+            StringBuilder sb,
+            List<DataAccess.Entities.Application.Material> materials
+        )
+        {
+            if (materials.Any())
+            {
+                sb.AppendLine("--- SUGGESTION PRODUCTS ---");
+                foreach (var m in materials)
                 {
-                    sb.AppendLine("--- SUGGESTION PRODUCTS ---");
-                    foreach (var m in matchedMaterials)
-                    {
-                        sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
-                    }
+                    sb.AppendLine($"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})");
                 }
             }
             else
             {
                 sb.AppendLine("(The system temporary not have any material)");
             }
-
-            return sb.ToString();
         }
 
-        private bool IsAgreement(string text)
+        private static bool IsAgreement(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return false;
@@ -569,6 +614,7 @@ namespace BusinessLogic.Services
             return t.Contains("yes");
         }
 
+        //=======================================================================================================
         private async Task<List<ChatHistoryItem>> GetHistoryFromCacheAsync(string sessionId)
         {
             var key = $"chat_history_{sessionId}";
@@ -596,7 +642,10 @@ namespace BusinessLogic.Services
                     new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromDays(1) }
                 );
             }
-            catch { }
+            catch
+            {
+                // Intentionally ignore cache errors to prevent blocking the chat flow
+            }
         }
 
         // -----------------------------
