@@ -346,7 +346,7 @@
       "label_close": "Closed",
       "label_contractorApplied": "contractor(s)",
       "serviceApplicationExpired": "The application period service request has ended.",
-      "otherPaymentExpiredMessage": "Your Application just reopen because some one not paid."
+      "otherPaymentExpiredMessage": "Your Application just reopen because some one have not finished the process."
     },
     "createServiceRequest": {
       "title": "Create Service Request",
@@ -521,7 +521,8 @@
     "showAppliedOnly": "Service Requests Applied",
     "sortDefault": "Default",
     "sortOldest": "Oldest",
-    "sortNewest": "Newest"
+    "sortNewest": "Newest",
+    "otherPaymentExpiredMessage": "Your Application just reopen because some one have not finished the process."
   },
   "contractorServiceRequestDetail": {
     "privacyNotice": "Your information is only visible to the project owner.",
@@ -735,6 +736,28 @@
     "no_applications": "No data to display"
   },
   "supportChat": {
+    "btnYes":"Yes",
+    "btnNo":"No",
+    "userConfirmYes": "Yes, find for me",
+    "promptFindMaterial": "Please find materials for this project.",
+    "smartGreeting": "Hello, the system noticed you just created a request for Service Type: **{{serviceType}}**, Building Type: **{{buildingType}}** and with address is **{{serviceAdress}}**. Would you like me to find suitable materials for this project?",
+    "serviceType":{
+      "Construction": "Construction",
+      "Repair": "Repair"
+    },
+    "buildingType":{
+      "SingleStoryHouse": "SingleStoryHouse",
+      "Townhouse": "Townhouse",
+      "RentalHouse": "RentalHouse",
+      "Apartment": "Apartment",
+      "Villa": "Villa",
+      "Hotel": "Hotel",
+      "Showroom": "Showroom",
+      "School": "School",
+      "Hospital": "Hospital",
+      "Warehouse": "Warehouse",
+      "Other": "Other"
+    },
     "adminStartedChat": "Admin has started the chat!",
     "newMessageFromAdmin": "New message from Admin!",
     "error": "An error occurred while loading the chat. Please try again later.",

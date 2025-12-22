@@ -14,7 +14,6 @@ export default function CommissionCountdown({
   const { t, i18n } = useTranslation();
   const [timeLeft, setTimeLeft] = useState(null);
 
-  // Dùng useRef để lưu onExpired mới nhất mà không gây re-render cho useEffect chính
   const onExpiredRef = useRef(onExpired);
   const isExpiredCalled = useRef(false);
 
@@ -28,7 +27,6 @@ export default function CommissionCountdown({
     isExpiredCalled.current = false;
 
     const calculateTimeLeft = () => {
-      // FIX: Sửa new Date.now() thành Date.now()
       const now = Date.now();
       const dueTime = new Date(dueCommisionTime).getTime();
       const total = dueTime - now;
@@ -42,7 +40,7 @@ export default function CommissionCountdown({
             onExpiredRef.current();
           }
         }
-        return true; // Should stop
+        return true;
       }
 
       const days = Math.floor(total / (1000 * 60 * 60 * 24));
@@ -51,7 +49,7 @@ export default function CommissionCountdown({
       const seconds = Math.floor((total / 1000) % 60);
 
       setTimeLeft({ total, days, hours, minutes, seconds });
-      return false; // Should not stop
+      return false;
     };
 
     const initialExpired = calculateTimeLeft();

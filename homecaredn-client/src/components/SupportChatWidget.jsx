@@ -20,12 +20,13 @@ import useRealtime from '../realtime/useRealtime';
 import { RealtimeEvents } from '../realtime/realtimeEvents';
 import { chatMessageService } from '../services/chatMessageService';
 import { conversationService } from '../services/conversationService';
+import ServiceRequestContext from '../context/ServiceRequestContext';
 
 const ROLES = { USER: 'user', BOT: 'assistant' };
 const cn = (...xs) => xs.filter(Boolean).join(' ');
 
 // Keys local
-const STORAGE_KEY_SESSION = 'homecare_ai_session_id';
+const STORAGE_KEY_SESSION = 'homecare_ai_session';
 const STORAGE_KEY_MESSAGES = 'homecare_ai_messages';
 
 //AdminID
@@ -56,11 +57,12 @@ const uid = (() => {
 })();
 
 // Helper for AI UI Message
-const toAiUiMessage = (text, role) => ({
+const toAiUiMessage = (text, role, actions) => ({
   id: uid(),
   role: role,
   text: text,
   time: formatTime(new Date().toISOString()),
+  actions: actions,
 });
 
 // Helper to format time
@@ -118,6 +120,12 @@ const MessageShape = PropTypes.exact({
     PropTypes.number,
     PropTypes.instanceOf(Date),
   ]),
+  actions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })
+  ),
 });
 const MessageContext = createContext({ isUser: false });
 const MarkdownP = ({ children }) => (
@@ -186,7 +194,7 @@ const markdownComponents = {
   td: MarkdownTd,
 };
 
-function MessageBubble({ message }) {
+function MessageBubble({ message, onAction }) {
   const isUser = message.role === ROLES.USER;
   const contextValue = useMemo(() => ({ isUser }), [isUser]);
 
@@ -200,6 +208,7 @@ function MessageBubble({ message }) {
       {!isUser && <BotAvatar />}
       <div
         className={cn(
+          'flex flex-col gap-1',
           'max-w-[85%] md:max-w-[75%]',
           isUser ? 'items-end' : 'items-start'
         )}
@@ -212,16 +221,30 @@ function MessageBubble({ message }) {
               : 'bg-white text-gray-900 border-gray-200'
           )}
         >
-          {/* Truyền giá trị đã memo vào Provider */}
           <MessageContext.Provider value={contextValue}>
             <ReactMarkdown components={markdownComponents}>
               {message.text}
             </ReactMarkdown>
           </MessageContext.Provider>
         </div>
+
+        {!isUser && message.actions?.length > 0 && (
+          <div className="flex gap-2 mt-1">
+            {message.actions.map((action, idx) => (
+              <button
+                key={`${action.value}-${idx}`}
+                onClick={() => onAction?.(action.value, message.id)}
+                className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-medium rounded-lg border border-indigo-200 transition-colors"
+              >
+                {action.label}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div
           className={cn(
-            'mt-1 text-[10px] opacity-60',
+            'text-[10px] opacity-60',
             isUser ? 'text-right text-white/80' : 'text-left text-gray-500'
           )}
         >
@@ -234,8 +257,10 @@ function MessageBubble({ message }) {
 }
 MessageBubble.propTypes = {
   message: MessageShape.isRequired,
+  onAction: PropTypes.func,
 };
-function MessageList({ messages, filter }) {
+
+function MessageList({ messages, filter, onAction }) {
   const filtered = useMemo(() => {
     if (!filter) return messages;
     return messages.filter((m) =>
@@ -248,7 +273,11 @@ function MessageList({ messages, filter }) {
     <div className="h-[48vh] md:h-[50vh] overflow-y-auto pr-2" ref={ref}>
       <div className="flex flex-col gap-3 py-2">
         {filtered.map((m) => (
-          <MessageBubble key={m.id} message={m} />
+          <MessageBubble
+            key={m.id}
+            message={m}
+            onAction={onAction} // Truyền xuống Bubble
+          />
         ))}
       </div>
     </div>
@@ -257,6 +286,7 @@ function MessageList({ messages, filter }) {
 MessageList.propTypes = {
   messages: PropTypes.arrayOf(MessageShape).isRequired,
   filter: PropTypes.string,
+  onAction: PropTypes.func,
 };
 
 function ChatHeader({
@@ -404,19 +434,26 @@ ChatInput.propTypes = {
 };
 
 function ChatWindow({ open, onClose, onOpen, brand }) {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { user } = useAuth();
   const { chatConnection } = useContext(RealtimeContext);
-
+  const { serviceRequests } = useContext(ServiceRequestContext);
   // State
   const [currentTab, setCurrentTab] = useState('AI');
   const [filter, setFilter] = useState('');
   const [minimized, setMinimized] = useState(false);
 
   // State for AI
-  const [aiMessages, setAiMessages] = useState([]);
   const [aiTyping, setAiTyping] = useState(false);
   const [sessionId, setSessionId] = useState('');
+  const [aiMessages, setAiMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_MESSAGES);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // State for Chat Admin
   const [adminMessages, setAdminMessages] = useState([]);
@@ -425,6 +462,14 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
   const [adminSending, setAdminSending] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const countdownRef = useRef(null);
+  const lastGreetedRequestIdRef = useRef(null);
+
+  const latestServiceRequest = useMemo(() => {
+    if (!serviceRequests || serviceRequests.length === 0) return null;
+    return [...serviceRequests].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    )[0];
+  }, [serviceRequests]);
 
   useEffect(() => {
     if (open) {
@@ -435,18 +480,93 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
       }
       setSessionId(sid);
 
-      try {
-        const savedMessags = localStorage.getItem(STORAGE_KEY_MESSAGES);
-        if (savedMessags) {
-          setAiMessages(JSON.parse(savedMessags));
+      if (aiMessages.length > 0 && latestServiceRequest) {
+        lastGreetedRequestIdRef.current = latestServiceRequest.serviceRequestID;
+      }
+
+      if (aiMessages.length === 0) {
+        if (latestServiceRequest) {
+          triggerSmartGreeting(latestServiceRequest);
         } else {
           setAiMessages([toAiUiMessage(t('supportChat.aiWelcome'), ROLES.BOT)]);
         }
-      } catch {
-        setAiMessages([]);
       }
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, t]);
+  useEffect(() => {
+    if (!latestServiceRequest) return;
+
+    const currentId = latestServiceRequest.serviceRequestID;
+    const previousId = lastGreetedRequestIdRef.current;
+
+    // Kiểm tra trạng thái chat hiện tại
+    const isEmpty = aiMessages.length === 0;
+    const isDefaultWelcome =
+      aiMessages.length === 1 &&
+      aiMessages[0].role === ROLES.BOT &&
+      (!aiMessages[0].actions || aiMessages[0].actions.length === 0);
+
+    if (previousId && currentId !== previousId) {
+      triggerSmartGreeting(latestServiceRequest, true);
+      return;
+    }
+    if (!previousId && (isEmpty || isDefaultWelcome)) {
+      triggerSmartGreeting(latestServiceRequest, false);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [latestServiceRequest]);
+
+  const triggerSmartGreeting = (serviceRequests, isNewContext = false) => {
+    lastGreetedRequestIdRef.current = serviceRequests.serviceRequestID;
+
+    const text = t('supportChat.smartGreeting', {
+      serviceType: t(`supportChat.serviceType.${serviceRequests.serviceType}`),
+      buildingType: t(
+        `supportChat.buildingType.${serviceRequests.buildingType}`
+      ),
+      serviceAdress: `${serviceRequests.address.city}, ${serviceRequests.address.district}`,
+    });
+
+    const botMsg = toAiUiMessage(text, ROLES.BOT, [
+      { label: t('supportChat.btnYes'), value: 'yes' },
+      { label: t('supportChat.btnNo'), value: 'no' },
+    ]);
+
+    setAiMessages((prev) => {
+      if (isNewContext) {
+        return [...prev, botMsg];
+      }
+      return [botMsg];
+    });
+  };
+  const handleBotAction = async (value, messageId) => {
+    setAiMessages((prev) =>
+      prev.map((m) => {
+        if (m.id === messageId) {
+          return { ...m, actions: [] };
+        }
+        return m;
+      })
+    );
+
+    if (value === 'no') {
+      return;
+    }
+
+    if (value === 'yes') {
+      const userConfirmMsg = toAiUiMessage(
+        t('supportChat.userConfirmYes'),
+        ROLES.USER
+      );
+
+      setAiMessages((prev) => [...prev, userConfirmMsg]);
+
+      await sendAiMessage(t('supportChat.promptFindMaterial'), true);
+    }
+  };
 
   useEffect(() => {
     if (aiMessages.length > 0) {
@@ -454,16 +574,32 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
     }
   }, [aiMessages]);
 
-  const sendAiMessage = async (text) => {
+  const sendAiMessage = async (text, isAutoTrigger = false) => {
     try {
       setAiTyping(true);
 
-      const userMsg = toAiUiMessage(text, ROLES.USER);
-      setAiMessages((prev) => [...prev, userMsg]);
+      if (!isAutoTrigger) {
+        const userMsg = toAiUiMessage(text, ROLES.USER);
+        setAiMessages((prev) => [...prev, userMsg]);
+      }
 
       const dto = {
         sessionId: sessionId,
         prompt: text,
+        userId: user?.id,
+        language: i18n.language,
+        context: latestServiceRequest
+          ? {
+              serviceRequestID: latestServiceRequest.serviceRequestID,
+              serviceType: latestServiceRequest.serviceType,
+              buildingType: latestServiceRequest.buildingType,
+              address: `${latestServiceRequest.address.district}, ${latestServiceRequest.address.city}`,
+              width: latestServiceRequest.width,
+              length: latestServiceRequest.length,
+              floors: latestServiceRequest.floors,
+              description: latestServiceRequest.description,
+            }
+          : null,
       };
 
       const data = await aiChatService.chat(dto);
@@ -473,10 +609,7 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
         setAiMessages((prev) => [...prev, botMsg]);
       }
     } catch (err) {
-      const errorMessage = toAiUiMessage(
-        `${t('supportChat.error')}`,
-        ROLES.BOT
-      );
+      const errorMessage = toAiUiMessage(t('supportChat.error'), ROLES.BOT);
       setAiMessages((prev) => [...prev, errorMessage]);
       console.error(err);
     } finally {
@@ -764,7 +897,11 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
 
             {/* ==== HIỂN THỊ DANH SÁCH TIN NHẮN THEO TAB ==== */}
             {currentTab === 'AI' && (
-              <MessageList messages={currentMessages} filter={filter} />
+              <MessageList
+                messages={currentMessages}
+                filter={filter}
+                onAction={handleBotAction}
+              />
             )}
 
             {currentTab === 'ADMIN' && (
@@ -811,7 +948,7 @@ function ChatWindow({ open, onClose, onOpen, brand }) {
               )}
 
               <span className="text-[10px] rounded-full border px-2 py-0.5 text-gray-500">
-                {currentTab === 'AI' ? 'Cookie-backed' : 'Live Support'}
+                {currentTab === 'AI' ? 'AI Support' : 'Admin Support'}
               </span>
             </div>
 
