@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import {
   HubConnectionBuilder,
   LogLevel,
@@ -9,87 +10,131 @@ import RealtimeContext from './RealtimeContext';
 
 export const RealtimeProvider = ({ children }) => {
   const { user } = useAuth();
+  const connectionRef = useRef(null);
+  const chatConnectionRef = useRef(null);
 
-  const appRef = useRef(null);
-  const chatRef = useRef(null);
-
-  const [appState, setAppState] = useState('disconnected');
-  const [chatState, setChatState] = useState('disconnected');
+  const [connectionState, setConnectionState] = useState('disconnected');
+  const [chatConnectionState, setChatConnectionState] =
+    useState('disconnected');
 
   useEffect(() => {
-    // 🔴 Chưa login → ngắt hết
-    if (!user) {
-      appRef.current?.stop();
-      chatRef.current?.stop();
-      appRef.current = null;
-      chatRef.current = null;
-      setAppState('disconnected');
-      setChatState('disconnected');
+    let isCancelled = false;
+
+    // Nếu chưa đăng nhập thì ngắt kết nối
+    if (!user?.id) {
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        connectionRef.current = null;
+        setConnectionState('disconnected');
+      }
+      if (chatConnectionRef.current) {
+        chatConnectionRef.current.stop();
+        chatConnectionRef.current = null;
+        setChatConnectionState('disconnected');
+      }
       return;
     }
 
-    /* ========= Application Hub ========= */
-    if (!appRef.current) {
-      const appConn = new HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_API_URL}/hubs/application`, {
-          accessTokenFactory: () => localStorage.getItem('accessToken'),
+    // Nếu đã có connection thì không tạo lại
+    if (connectionRef.current) return;
+    if (chatConnectionRef.current) return;
+
+    const connection = new HubConnectionBuilder()
+      .withUrl(
+        `${import.meta.env.VITE_API_URL}/hubs/application?userId=${
+          user.id
+        }&role=${user.role}`,
+        {
           transport: HttpTransportType.WebSockets,
           skipNegotiation: true,
-        })
-        .withAutomaticReconnect()
-        .configureLogging(LogLevel.None)
-        .build();
+        }
+      )
+      .configureLogging(LogLevel.None)
+      .withAutomaticReconnect()
+      .build();
 
-      appRef.current = appConn;
+    connectionRef.current = connection;
 
-      appConn
-        .start()
-        .then(() => setAppState('connected'))
-        .catch(() => setAppState('error'));
+    // Dùng async function để tránh race condition
+    const startConnection = async () => {
+      try {
+        await connection.start();
+        if (!isCancelled) setConnectionState('connected');
+      } catch {
+        if (!isCancelled) {
+          setConnectionState('error');
+        }
+      }
+    };
 
-      appConn.onreconnecting(() => setAppState('reconnecting'));
-      appConn.onreconnected(() => setAppState('connected'));
-      appConn.onclose(() => setAppState('disconnected'));
-    }
+    startConnection();
 
-    /* ========= Chat Hub ========= */
-    if (!chatRef.current) {
-      const chatConn = new HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat`, {
-          accessTokenFactory: () => localStorage.getItem('accessToken'),
-          transport: HttpTransportType.WebSockets,
-          skipNegotiation: true,
-        })
-        .withAutomaticReconnect()
-        .configureLogging(LogLevel.None)
-        .build();
+    connection.onreconnecting(() => setConnectionState('reconnecting'));
+    connection.onreconnected(() => setConnectionState('connected'));
+    connection.onclose(() => setConnectionState('disconnected'));
 
-      chatRef.current = chatConn;
+    const chatConnection = new HubConnectionBuilder()
+      .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
+        transport: HttpTransportType.WebSockets,
+        skipNegotiation: true,
+      })
+      .configureLogging(LogLevel.None)
+      .withAutomaticReconnect()
+      .build();
 
-      chatConn
-        .start()
-        .then(() => setChatState('connected'))
-        .catch(() => setChatState('error'));
+    chatConnectionRef.current = chatConnection;
 
-      chatConn.onreconnecting(() => setChatState('reconnecting'));
-      chatConn.onreconnected(() => setChatState('connected'));
-      chatConn.onclose(() => setChatState('disconnected'));
-    }
+    // Dùng async function để tránh race condition
+    const startChatConnection = async () => {
+      try {
+        await chatConnection.start();
+        if (!isCancelled) setChatConnectionState('connected');
+      } catch {
+        if (!isCancelled) {
+          setChatConnectionState('error');
+        }
+      }
+    };
+
+    startChatConnection();
+
+    chatConnection.onreconnecting(() => setChatConnectionState('reconnecting'));
+    chatConnection.onreconnected(() => setChatConnectionState('connected'));
+    chatConnection.onclose(() => setChatConnectionState('disconnected'));
+
+    // Cleanup
+    return () => {
+      isCancelled = true;
+      if (connectionRef.current) {
+        connectionRef.current.stop();
+        connectionRef.current = null;
+        setConnectionState('disconnected');
+      }
+      if (chatConnectionRef.current) {
+        chatConnectionRef.current.stop();
+        chatConnectionRef.current = null;
+        setChatConnectionState('disconnected');
+      }
+    };
   }, [user]);
 
-  const value = useMemo(
+  const contextValue = useMemo(
     () => ({
-      applicationHub: appRef.current,
-      applicationState: appState,
-      chatHub: chatRef.current,
-      chatState,
+      connection: connectionRef.current,
+      connectionState,
+      chatConnection: chatConnectionRef.current,
+      chatConnectionState,
     }),
-    [appState, chatState]
+    [connectionState, chatConnectionState]
   );
 
   return (
-    <RealtimeContext.Provider value={value}>
+    <RealtimeContext.Provider value={contextValue}>
       {children}
     </RealtimeContext.Provider>
   );
+};
+
+RealtimeProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
