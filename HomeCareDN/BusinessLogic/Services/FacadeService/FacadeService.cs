@@ -62,7 +62,6 @@ namespace BusinessLogic.Services.FacadeService
                 infraDeps.GroqClient,
                 infraDeps.Cache,
                 coreDeps.UnitOfWork,
-                infraDeps.Configuration,
                 infraDeps.HostEnvironment,
                 coreDeps.MaterialService,
                 coreDeps.ServicesService

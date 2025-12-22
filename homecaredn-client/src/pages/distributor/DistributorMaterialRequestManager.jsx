@@ -62,7 +62,6 @@ export default function MaterialRequestManager() {
         )
       );
     },
-
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
       setMaterialRequests((prev) =>
         prev.map((mr) =>
