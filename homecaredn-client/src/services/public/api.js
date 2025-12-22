@@ -124,7 +124,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        authService.logout();
         throw err;
       } finally {
         isRefreshing = false;
