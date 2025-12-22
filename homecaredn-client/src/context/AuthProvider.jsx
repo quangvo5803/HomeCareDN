@@ -21,21 +21,22 @@ export default function AuthProvider({ children }) {
         id:
           decoded.sub ||
           decoded[
-          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
           ],
         role:
           decoded.role ||
           decoded[
-          'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+            'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
           ],
         email:
           decoded.email ||
           decoded[
-          'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
+            'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'
           ] ||
           '',
         isPartnerComfirm:
-          decoded.IsPartnerComfirm === 'True' || decoded.IsPartnerComfirm === true,
+          decoded.IsPartnerComfirm === 'True' ||
+          decoded.IsPartnerComfirm === true,
         exp: decoded.exp ? decoded.exp * 1000 : null,
       };
     } catch {
@@ -117,18 +118,15 @@ export default function AuthProvider({ children }) {
       try {
         const res = await authService.refreshToken();
         const newAccessToken = res.data?.accessToken;
-        if (newAccessToken) {
-          localStorage.setItem('accessToken', newAccessToken);
-          const newParsed = parseToken(newAccessToken);
-          if (newParsed) {
-            setUser(newParsed);
-            setLoading(false);
-            return;
-          }
-        }
-        await logout(); // refresh thất bại → logout
+
+        if (!newAccessToken) throw new Error('No token');
+
+        localStorage.setItem('accessToken', newAccessToken);
+        const newParsed = parseToken(newAccessToken);
+        setUser(newParsed);
       } catch {
-        return;
+        console.warn('Refresh failed, keep user for retry');
+        setUser(parsed);
       } finally {
         setLoading(false);
       }
