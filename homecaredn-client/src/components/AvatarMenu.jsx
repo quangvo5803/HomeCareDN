@@ -49,7 +49,7 @@ export default function AvatarMenu() {
         aria-haspopup="menu"
       >
         <Avatar
-          name={user.email}
+          name={user?.email}
           round={true}
           size="100%"
           color="#FB8C00"

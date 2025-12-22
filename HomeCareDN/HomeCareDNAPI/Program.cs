@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Net.payOS;
+using Ultitity.Clients.FptAI;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email;
 using Ultitity.Email.Interface;
@@ -148,6 +149,16 @@ namespace HomeCareDNAPI
                     ?? throw new InvalidOperationException("Missing Groq:BaseUrl");
                 client.BaseAddress = new Uri(baseUrl, UriKind.Absolute);
                 client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+            });
+            builder.Services.AddHttpClient<IFptAiClient, FptAiClient>(client =>
+            {
+                client.DefaultRequestHeaders.Add(
+                    "api-key",
+                    builder.Configuration["FptAi:ApiKey"]
+                    ?? throw new InvalidOperationException("Missing FptAi:ApiKey")
+                );
+
+                client.Timeout = TimeSpan.FromSeconds(60);
             });
             builder.Services.AddSingleton(sp =>
             {

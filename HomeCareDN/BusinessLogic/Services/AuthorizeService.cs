@@ -80,7 +80,7 @@ namespace BusinessLogic.Services
                     throw new CustomValidationException(
                         new Dictionary<string, string[]>
                         {
-                            { "Password", new[] { "INCORRECT PASSWORD" } },
+                            { "Password", new[] { "INCORRECT_PASSWORD" } },
                         }
                     );
                 }
@@ -445,6 +445,7 @@ namespace BusinessLogic.Services
                 new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("IsPartnerComfirm", user.IsPartnerComfirm.ToString()!),
             };
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));

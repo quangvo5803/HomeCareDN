@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Ultitity.Clients.FptAI;
 using Ultitity.Clients.Groqs;
 using Ultitity.Email.Interface;
 using Ultitity.Options;
@@ -20,6 +21,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public IOptions<PayOsOptions> PayOsOptions { get; }
         public ISignalRNotifier Notifier { get; }
         public IHostEnvironment HostEnvironment { get; }
+        public IFptAiClient FptAiClient { get; }
 
         public InfraDependencies(
             IConfiguration configuration,
@@ -29,7 +31,8 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             IGroqClient groqClient,
             IOptions<PayOsOptions> payOsOptions,
             ISignalRNotifier notifier,
-            IHostEnvironment hostEnvironment
+            IHostEnvironment hostEnvironment,
+            IFptAiClient fptAiClient
         )
         {
             Configuration = configuration;
@@ -40,6 +43,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             PayOsOptions = payOsOptions;
             Notifier = notifier;
             HostEnvironment = hostEnvironment;
+            FptAiClient = fptAiClient;
         }
     }
 }
