@@ -1,9 +1,12 @@
-﻿using DataAccess.Entities.Application;
+﻿using System.Security.Claims;
+using DataAccess.Entities.Application;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace HomeCareDNAPI.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -13,12 +16,10 @@ namespace HomeCareDNAPI.Hubs
             _unitOfWork = unitOfWork;
         }
 
+        private string CurrentUserId => Context.User!.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
         public async Task JoinConversation(Guid id)
         {
-            var httpContext = Context.GetHttpContext();
-            var userId = httpContext?.Request.Query["userId"].FirstOrDefault();
-
-            // Validate membership
             var conversation = await _unitOfWork.ConversationRepository.GetAsync(c =>
                 c.ConversationID == id
             );
@@ -26,21 +27,19 @@ namespace HomeCareDNAPI.Hubs
             if (conversation == null)
                 throw new HubException("CONVERSATION_NOT_FOUND");
 
-            bool isMember = false;
+            bool isMember = conversation.ConversationType switch
+            {
+                ConversationType.ServiceRequest => conversation.CustomerID == CurrentUserId
+                    || conversation.ContractorID == CurrentUserId,
 
-            if (conversation.ConversationType == ConversationType.ServiceRequest)
-            {
-                isMember = conversation.CustomerID == userId || conversation.ContractorID == userId;
-            }
-            else if (conversation.ConversationType == ConversationType.MaterialRequest)
-            {
-                isMember =
-                    conversation.CustomerID == userId || conversation.DistributorID == userId;
-            }
-            else if (conversation.ConversationType == ConversationType.AdminSupport)
-            {
-                isMember = conversation.UserID == userId || conversation.AdminID == userId;
-            }
+                ConversationType.MaterialRequest => conversation.CustomerID == CurrentUserId
+                    || conversation.DistributorID == CurrentUserId,
+
+                ConversationType.AdminSupport => conversation.UserID == CurrentUserId
+                    || conversation.AdminID == CurrentUserId,
+
+                _ => false,
+            };
 
             if (!isMember)
                 throw new HubException("PERMISSION_DENIED");
@@ -48,29 +47,7 @@ namespace HomeCareDNAPI.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, $"conversation_{id}");
         }
 
-        public async Task LeaveConversation(Guid id)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation_{id}");
-        }
-
-        public async Task JoinAdminGroup(string id)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"admin_{id}");
-        }
-
-        public async Task LeaveAdminGroup(string id)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"admin_{id}");
-        }
-
-        public async Task JoinUserGroup(string id)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{id}");
-        }
-
-        public async Task LeaveUserGroup(string id)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{id}");
-        }
+        public Task LeaveConversation(Guid id) =>
+            Groups.RemoveFromGroupAsync(Context.ConnectionId, $"conversation_{id}");
     }
 }
