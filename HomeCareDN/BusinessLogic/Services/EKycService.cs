@@ -35,7 +35,7 @@ namespace BusinessLogic.Services
         public const string EKYC_COOLDOWN_ACTIVE = "EKYC_COOLDOWN_ACTIVE";
 
         private const int EKYC_MAX_FAIL = 3;
-        private static readonly TimeSpan EKYC_COOLDOWN = TimeSpan.FromHours(1);
+        private static readonly TimeSpan EKYC_COOLDOWN = TimeSpan.FromMinutes(2);
 
         public EKycService(
             IFptAiClient fptAiClient,
