@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import {
+  HubConnectionBuilder,
+  LogLevel,
+  HttpTransportType,
+} from '@microsoft/signalr';
 import { useAuth } from '../hook/useAuth';
 import RealtimeContext from './RealtimeContext';
 
@@ -29,6 +33,8 @@ export const RealtimeProvider = ({ children }) => {
       const appConn = new HubConnectionBuilder()
         .withUrl(`${import.meta.env.VITE_API_URL}/hubs/application`, {
           accessTokenFactory: () => localStorage.getItem('accessToken'),
+          transport: HttpTransportType.WebSockets,
+          skipNegotiation: true,
         })
         .withAutomaticReconnect()
         .configureLogging(LogLevel.None)
@@ -51,6 +57,8 @@ export const RealtimeProvider = ({ children }) => {
       const chatConn = new HubConnectionBuilder()
         .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat`, {
           accessTokenFactory: () => localStorage.getItem('accessToken'),
+          transport: HttpTransportType.WebSockets,
+          skipNegotiation: true,
         })
         .withAutomaticReconnect()
         .configureLogging(LogLevel.None)

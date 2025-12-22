@@ -206,6 +206,7 @@ namespace HomeCareDNAPI
                 app.UseDeveloperExceptionPage();
             }
             app.UseRouting();
+            app.UseCors("AllowReactApp");
 
             app.UseMiddleware<ValidationExceptionMiddleware>();
             app.Use(
@@ -224,7 +225,6 @@ namespace HomeCareDNAPI
 
             app.UseHttpsRedirection();
             app.UseWebSockets();
-            app.UseCors("AllowReactApp");
             app.UseAuthentication();
             app.UseAuthorization();
 
