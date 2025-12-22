@@ -26,7 +26,7 @@ namespace BusinessLogic.Services.FacadeService
         public IDistributorApplicationService DistributorApplicationService { get; }
         public INotificationService NotificationService { get; }
         public ISearchHistoryService SearchHistoryService { get; }
-
+        public IEKycService EKycService { get; }
         public FacadeService(
             CoreDependencies coreDeps,
             InfraDependencies infraDeps,
@@ -90,7 +90,8 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 coreDeps.MemoryCache,
                 identityDeps.UserManager,
-                infraDeps.EmailQueue
+                infraDeps.EmailQueue,
+                coreDeps.AuthorizeService
             );
 
             PaymentService = new PaymentService(
@@ -146,6 +147,11 @@ namespace BusinessLogic.Services.FacadeService
                 coreDeps.Mapper,
                 coreDeps.MaterialService,
                 coreDeps.ServicesService
+            );
+            EKycService = new EKycService(
+                infraDeps.FptAiClient,
+                coreDeps.MemoryCache,
+                infraDeps.Http
             );
         }
     }

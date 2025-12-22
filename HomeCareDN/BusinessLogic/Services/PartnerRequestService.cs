@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text.Json;
 using AutoMapper;
 using BusinessLogic.DTOs.Application;
 using BusinessLogic.DTOs.Application.PartnerRequest;
@@ -6,9 +7,11 @@ using BusinessLogic.Services.Interfaces;
 using DataAccess.Entities.Application;
 using DataAccess.Entities.Authorize;
 using DataAccess.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Ultitity.Clients.FptAI;
 using Ultitity.Email.Interface;
 using Ultitity.Exceptions;
 using Ultitity.Extensions;
@@ -22,6 +25,7 @@ namespace BusinessLogic.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailQueue _emailQueue;
         private readonly IMemoryCache _memoryCache;
+        private readonly IAuthorizeService _authorizeService;
 
         private const string PARTNER_REQUEST = "PartnerRequest";
         private const string EMAIL = "Email";
@@ -35,13 +39,14 @@ namespace BusinessLogic.Services
         private const string ERROR_PARTNER_REQUEST_PENDING = "PARTNER_REQUEST_PENDING";
         private const string ERROR_PARTNER_REQUEST_REJECTED = "PARTNER_REQUEST_REJECTED";
         private const string PARTNER_REQUEST_INCLUDES = "Images,Documents";
-
+        private const string EKYC_CACHE_PREFIX = "EKYC_";
         public PartnerRequestService(
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IMemoryCache memoryCache,
             UserManager<ApplicationUser> userManager,
-            IEmailQueue emailQueue
+            IEmailQueue emailQueue,
+            IAuthorizeService authorizeService
         )
         {
             _unitOfWork = unitOfWork;
@@ -49,6 +54,7 @@ namespace BusinessLogic.Services
             _memoryCache = memoryCache;
             _userManager = userManager;
             _emailQueue = emailQueue;
+            _authorizeService = authorizeService;
         }
 
         public async Task<PagedResultDto<PartnerRequestDto>> GetAllPartnerRequestsAsync(
@@ -180,17 +186,32 @@ namespace BusinessLogic.Services
                         }
                     );
                 }
+                //KYC Verification
+                if (string.IsNullOrEmpty(request.EkycToken))
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { "EKYC", new[] { "Thiếu eKYC token" } },
+                        }
+                    );
+
+                if (
+                    !_memoryCache.TryGetValue(
+                        $"{EKYC_CACHE_PREFIX}{request.EkycToken}",
+                        out bool isVerified
+                    ) || !isVerified
+                )
+                {
+                    throw new CustomValidationException(
+                        new Dictionary<string, string[]>
+                        {
+                            { "EKYC", new[] { "Danh tính chưa được xác minh" } },
+                        }
+                    );
+                }
 
                 await ValidatePartnerRequestAsync(request);
-
                 var partnerRequest = _mapper.Map<PartnerRequest>(request);
-
-                partnerRequest.SignatureUrl = request.SignatureUrl;
-                partnerRequest.IsContractSigned = !string.IsNullOrEmpty(request.SignatureUrl);
-                if (partnerRequest.IsContractSigned)
-                {
-                    partnerRequest.SignedAt = DateTime.UtcNow;
-                }
 
                 await _unitOfWork.PartnerRequestRepository.AddAsync(partnerRequest);
                 await ProcessPartnerImagesAsync(request, partnerRequest.PartnerRequestID);
@@ -199,7 +220,7 @@ namespace BusinessLogic.Services
                 await _unitOfWork.SaveAsync();
 
                 _memoryCache.Remove($"VerifiedToken_{request.Email}");
-
+                _memoryCache.Remove($"{EKYC_CACHE_PREFIX}{request.EkycToken}");
                 QueueEmailReceived(partnerRequest);
 
                 return _mapper.Map<PartnerRequestDto>(partnerRequest);
@@ -210,6 +231,35 @@ namespace BusinessLogic.Services
                 await HandleDocumentError(request.DocumentPublicIds);
                 throw;
             }
+        }
+
+        public async Task<string> UpdateSignaturePartnerRequestAsync(
+            PartnerRequestUpdateSignatureRequestDto request
+        )
+        {
+            var partnerRequest = await _unitOfWork.PartnerRequestRepository.GetAsync(
+                m => m.Email == request.Email,
+                asNoTracking: false
+            );
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (partnerRequest == null || user == null)
+            {
+                var errors = new Dictionary<string, string[]>
+                {
+                    { PARTNER_REQUEST, new[] { ERROR_PARTNER_REQUEST_NOT_FOUND } },
+                };
+                throw new CustomValidationException(errors);
+            }
+            partnerRequest.SignatureUrl = request.SignatureUrl;
+            partnerRequest.IsContractSigned = !string.IsNullOrEmpty(request.SignatureUrl);
+            if (partnerRequest.IsContractSigned)
+            {
+                partnerRequest.SignedAt = DateTime.UtcNow;
+            }
+            user.IsPartnerComfirm = true;
+            await _userManager.UpdateAsync(user);
+            await _unitOfWork.SaveAsync();
+            return await _authorizeService.GenerateToken(user);
         }
 
         public async Task<PartnerRequestDto> ApprovePartnerRequestAsync(Guid partnerRequestID)
@@ -237,6 +287,7 @@ namespace BusinessLogic.Services
                 UserName = partnerRequest.Email,
                 FullName = partnerRequest.CompanyName,
                 PhoneNumber = partnerRequest.PhoneNumber,
+                IsPartnerComfirm = false,
             };
             await _userManager.CreateAsync(user);
             await _userManager.AddToRoleAsync(

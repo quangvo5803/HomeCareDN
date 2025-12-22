@@ -11,6 +11,13 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/Login" replace />;
   }
 
+  if (
+    (user.role === 'Contractor' || user.role === 'Distributor') &&
+    user.isPartnerComfirm === false
+  ) {
+    return <Navigate to="/Signature" replace />;
+  }
+
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/Unauthorized" replace />;
   }
