@@ -576,14 +576,23 @@ namespace BusinessLogic.Services
                     matchedMaterials.AddRange(foundItems);
                 }
 
-                return matchedMaterials
+                matchedMaterials = matchedMaterials
                     .GroupBy(m => m.MaterialID)
                     .Select(g => g.First())
                     .Take(10)
                     .ToList();
             }
 
-            return await query.Where(m => !string.IsNullOrEmpty(m.Name)).Take(5).ToListAsync();
+            if (!matchedMaterials.Any())
+            {
+                matchedMaterials = await query
+                    .Where(m => !string.IsNullOrEmpty(m.Name))
+                    .OrderByDescending(m => m.MaterialID)
+                    .Take(5)
+                    .ToListAsync();
+            }
+
+            return matchedMaterials;
         }
 
         // Helper 4: ChatAsync
@@ -602,7 +611,9 @@ namespace BusinessLogic.Services
             }
             else
             {
-                sb.AppendLine("(The system temporary not have any material)");
+                sb.AppendLine(
+                    "(The system temporary not have any material but display some material available for Customer be like+ $\"LINK: [{m.Name}](/MaterialDetail/{m.MaterialID})\")"
+                );
             }
         }
 
