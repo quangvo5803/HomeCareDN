@@ -5,18 +5,28 @@ import RealtimeContext from './RealtimeContext';
 
 export const RealtimeProvider = ({ children }) => {
   const { user } = useAuth();
-  const connectionRef = useRef(null);
-  const chatConnectionRef = useRef(null);
 
-  const [connectionState, setConnectionState] = useState('disconnected');
-  const [chatConnectionState, setChatConnectionState] =
-    useState('disconnected');
+  const appRef = useRef(null);
+  const chatRef = useRef(null);
+
+  const [appState, setAppState] = useState('disconnected');
+  const [chatState, setChatState] = useState('disconnected');
 
   useEffect(() => {
-    if (!user) return;
+    // 🔴 Chưa login → ngắt hết
+    if (!user) {
+      appRef.current?.stop();
+      chatRef.current?.stop();
+      appRef.current = null;
+      chatRef.current = null;
+      setAppState('disconnected');
+      setChatState('disconnected');
+      return;
+    }
 
-    if (!connectionRef.current) {
-      connectionRef.current = new HubConnectionBuilder()
+    /* ========= Application Hub ========= */
+    if (!appRef.current) {
+      const appConn = new HubConnectionBuilder()
         .withUrl(`${import.meta.env.VITE_API_URL}/hubs/application`, {
           accessTokenFactory: () => localStorage.getItem('accessToken'),
         })
@@ -24,14 +34,21 @@ export const RealtimeProvider = ({ children }) => {
         .configureLogging(LogLevel.None)
         .build();
 
-      connectionRef.current
+      appRef.current = appConn;
+
+      appConn
         .start()
-        .then(() => setConnectionState('connected'))
-        .catch(() => setConnectionState('error'));
+        .then(() => setAppState('connected'))
+        .catch(() => setAppState('error'));
+
+      appConn.onreconnecting(() => setAppState('reconnecting'));
+      appConn.onreconnected(() => setAppState('connected'));
+      appConn.onclose(() => setAppState('disconnected'));
     }
 
-    if (!chatConnectionRef.current) {
-      chatConnectionRef.current = new HubConnectionBuilder()
+    /* ========= Chat Hub ========= */
+    if (!chatRef.current) {
+      const chatConn = new HubConnectionBuilder()
         .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat`, {
           accessTokenFactory: () => localStorage.getItem('accessToken'),
         })
@@ -39,28 +56,27 @@ export const RealtimeProvider = ({ children }) => {
         .configureLogging(LogLevel.None)
         .build();
 
-      chatConnectionRef.current
-        .start()
-        .then(() => setChatConnectionState('connected'))
-        .catch(() => setChatConnectionState('error'));
-    }
+      chatRef.current = chatConn;
 
-    return () => {
-      connectionRef.current?.stop();
-      chatConnectionRef.current?.stop();
-      connectionRef.current = null;
-      chatConnectionRef.current = null;
-    };
+      chatConn
+        .start()
+        .then(() => setChatState('connected'))
+        .catch(() => setChatState('error'));
+
+      chatConn.onreconnecting(() => setChatState('reconnecting'));
+      chatConn.onreconnected(() => setChatState('connected'));
+      chatConn.onclose(() => setChatState('disconnected'));
+    }
   }, [user]);
 
   const value = useMemo(
     () => ({
-      connection: connectionRef.current,
-      chatConnection: chatConnectionRef.current,
-      connectionState,
-      chatConnectionState,
+      applicationHub: appRef.current,
+      applicationState: appState,
+      chatHub: chatRef.current,
+      chatState,
     }),
-    [connectionState, chatConnectionState]
+    [appState, chatState]
   );
 
   return (
