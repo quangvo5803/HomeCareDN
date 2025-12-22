@@ -4,12 +4,14 @@ import {
   HubConnectionBuilder,
   LogLevel,
   HttpTransportType,
+  HubConnectionState,
 } from '@microsoft/signalr';
 import { useAuth } from '../hook/useAuth';
 import RealtimeContext from './RealtimeContext';
 
 export const RealtimeProvider = ({ children }) => {
   const { user } = useAuth();
+
   const connectionRef = useRef(null);
   const chatConnectionRef = useRef(null);
 
@@ -20,109 +22,95 @@ export const RealtimeProvider = ({ children }) => {
   useEffect(() => {
     let isCancelled = false;
 
-    // Nếu chưa đăng nhập thì ngắt kết nối
+    // 🔴 Logout → stop all connections
     if (!user?.id) {
-      if (connectionRef.current) {
-        connectionRef.current.stop();
-        connectionRef.current = null;
-        setConnectionState('disconnected');
-      }
-      if (chatConnectionRef.current) {
-        chatConnectionRef.current.stop();
-        chatConnectionRef.current = null;
-        setChatConnectionState('disconnected');
-      }
+      connectionRef.current?.stop();
+      chatConnectionRef.current?.stop();
+
+      connectionRef.current = null;
+      chatConnectionRef.current = null;
+
+      setConnectionState('disconnected');
+      setChatConnectionState('disconnected');
       return;
     }
 
-    // Nếu đã có connection thì không tạo lại
-    if (connectionRef.current) return;
-    if (chatConnectionRef.current) return;
-
-    const connection = new HubConnectionBuilder()
-      .withUrl(
-        `${import.meta.env.VITE_API_URL}/hubs/application?userId=${
-          user.id
-        }&role=${user.role}`,
-        {
+    // 🟢 Create Application Hub
+    if (!connectionRef.current) {
+      const connection = new HubConnectionBuilder()
+        .withUrl(`${import.meta.env.VITE_API_URL}/hubs/application`, {
           transport: HttpTransportType.WebSockets,
           skipNegotiation: true,
+          accessTokenFactory: () => localStorage.getItem('accessToken') || '',
+        })
+        .configureLogging(LogLevel.None)
+        .withAutomaticReconnect()
+        .build();
+
+      connectionRef.current = connection;
+
+      connection.onreconnecting(() => setConnectionState('reconnecting'));
+      connection.onreconnected(() => setConnectionState('connected'));
+      connection.onclose(() => setConnectionState('disconnected'));
+
+      (async () => {
+        try {
+          await connection.start();
+          if (!isCancelled) setConnectionState('connected');
+        } catch {
+          if (!isCancelled) setConnectionState('error');
         }
-      )
-      .configureLogging(LogLevel.None)
-      .withAutomaticReconnect()
-      .build();
+      })();
+    }
 
-    connectionRef.current = connection;
+    // 🟢 Create Chat Hub
+    if (!chatConnectionRef.current) {
+      const chatConnection = new HubConnectionBuilder()
+        .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat`, {
+          transport: HttpTransportType.WebSockets,
+          skipNegotiation: true,
+          accessTokenFactory: () => localStorage.getItem('accessToken') || '',
+        })
+        .configureLogging(LogLevel.None)
+        .withAutomaticReconnect()
+        .build();
 
-    // Dùng async function để tránh race condition
-    const startConnection = async () => {
-      try {
-        await connection.start();
-        if (!isCancelled) setConnectionState('connected');
-      } catch {
-        if (!isCancelled) {
-          setConnectionState('error');
+      chatConnectionRef.current = chatConnection;
+
+      chatConnection.onreconnecting(() =>
+        setChatConnectionState('reconnecting')
+      );
+      chatConnection.onreconnected(() => setChatConnectionState('connected'));
+      chatConnection.onclose(() => setChatConnectionState('disconnected'));
+
+      (async () => {
+        try {
+          await chatConnection.start();
+          if (!isCancelled) setChatConnectionState('connected');
+        } catch {
+          if (!isCancelled) setChatConnectionState('error');
         }
-      }
-    };
+      })();
+    }
 
-    startConnection();
-
-    connection.onreconnecting(() => setConnectionState('reconnecting'));
-    connection.onreconnected(() => setConnectionState('connected'));
-    connection.onclose(() => setConnectionState('disconnected'));
-
-    const chatConnection = new HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
-        transport: HttpTransportType.WebSockets,
-        skipNegotiation: true,
-      })
-      .configureLogging(LogLevel.None)
-      .withAutomaticReconnect()
-      .build();
-
-    chatConnectionRef.current = chatConnection;
-
-    // Dùng async function để tránh race condition
-    const startChatConnection = async () => {
-      try {
-        await chatConnection.start();
-        if (!isCancelled) setChatConnectionState('connected');
-      } catch {
-        if (!isCancelled) {
-          setChatConnectionState('error');
-        }
-      }
-    };
-
-    startChatConnection();
-
-    chatConnection.onreconnecting(() => setChatConnectionState('reconnecting'));
-    chatConnection.onreconnected(() => setChatConnectionState('connected'));
-    chatConnection.onclose(() => setChatConnectionState('disconnected'));
-
-    // Cleanup
     return () => {
       isCancelled = true;
-      if (connectionRef.current) {
-        connectionRef.current.stop();
-        connectionRef.current = null;
-        setConnectionState('disconnected');
-      }
-      if (chatConnectionRef.current) {
-        chatConnectionRef.current.stop();
-        chatConnectionRef.current = null;
-        setChatConnectionState('disconnected');
-      }
     };
   }, [user]);
 
+  /* 🛡️ Safe wrapper: chỉ expose connection khi CONNECTED */
   const contextValue = useMemo(
     () => ({
-      connection: connectionRef.current,
+      connection:
+        connectionRef.current?.state === HubConnectionState.Connected
+          ? connectionRef.current
+          : null,
       connectionState,
-      chatConnection: chatConnectionRef.current,
+
+      chatConnection:
+        chatConnectionRef.current?.state === HubConnectionState.Connected
+          ? chatConnectionRef.current
+          : null,
       chatConnectionState,
     }),
     [connectionState, chatConnectionState]
