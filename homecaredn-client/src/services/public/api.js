@@ -17,8 +17,9 @@ let failedQueue = [];
 // 🔒 Lock toast to avoid spam
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
-let isLoggingOut = false;
+let hasForcedLogout = false;
 
+// ✅ Process queued requests after refresh
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
@@ -27,31 +28,27 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// ✅ Force logout function
-const forceLogout = () => {
-  if (isLoggingOut) return;
-  isLoggingOut = true;
+// ✅ Force logout
+export const forceLogout = () => {
+  if (hasForcedLogout) return;
+  hasForcedLogout = true;
 
-  // Clear token
   localStorage.removeItem('accessToken');
-
-  // ✅ Dispatch event to AuthProvider
   window.dispatchEvent(new Event('auth:force-logout'));
-
-  // Show toast once
   toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
 
-  // Clear all pending requests
-  failedQueue = [];
+  processQueue(new Error('Session expired'), null);
   isRefreshing = false;
-
-  // Navigate to login
   navigateTo('/Login');
+};
 
-  // ✅ CRITICAL: Reset flag after a short delay to allow new login
-  setTimeout(() => {
-    isLoggingOut = false;
-  }, 1000);
+// ✅ Reset flags after login (call this in login success)
+export const resetApiFlags = () => {
+  hasForcedLogout = false;
+  isRefreshing = false;
+  failedQueue = [];
+  isShowingNetworkError = false;
+  networkErrorToastId = null;
 };
 
 /* =========================
@@ -59,7 +56,7 @@ const forceLogout = () => {
 ========================= */
 api.interceptors.request.use(
   (config) => {
-    if (isLoggingOut) {
+    if (hasForcedLogout) {
       return Promise.reject(
         new axios.Cancel('Session expired, redirecting to login')
       );
@@ -92,11 +89,9 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    if (isLoggingOut) {
-      return Promise.reject(error);
-    }
-
     const originalRequest = error.config;
+
+    if (axios.isCancel(error)) return Promise.reject(error);
 
     /* 🟧 403 Forbidden */
     if (error.response?.status === 403 && !originalRequest?._forbiddenHandled) {
@@ -127,7 +122,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 
-      // ✅ Token expired → force logout immediately
+      // ✅ Token expired → force logout
       if (error.response?.data?.errorCode === 'LOGIN_TOKEN_EXPIRED') {
         forceLogout();
         return Promise.reject(error);
