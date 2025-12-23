@@ -17,7 +17,7 @@ let failedQueue = [];
 // 🔒 Lock toast to avoid spam
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
-let isLoggingOut = false; // ✅ NEW: Prevent multiple logout
+let isLoggingOut = false;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -27,13 +27,16 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-// ✅ NEW: Force logout function
+// ✅ Force logout function
 const forceLogout = () => {
-  if (isLoggingOut) return; // Prevent multiple logout
+  if (isLoggingOut) return;
   isLoggingOut = true;
 
   // Clear token
   localStorage.removeItem('accessToken');
+
+  // ✅ Dispatch event to AuthProvider
+  window.dispatchEvent(new Event('auth:force-logout'));
 
   // Show toast once
   toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
@@ -43,7 +46,9 @@ const forceLogout = () => {
   isRefreshing = false;
 
   // Navigate to login
-  navigateTo('/Login');
+  setTimeout(() => {
+    navigateTo('/Login');
+  }, 100);
 };
 
 /* =========================
@@ -51,7 +56,6 @@ const forceLogout = () => {
 ========================= */
 api.interceptors.request.use(
   (config) => {
-    // ✅ Block all requests if logging out
     if (isLoggingOut) {
       return Promise.reject(
         new axios.Cancel('Session expired, redirecting to login')
@@ -85,7 +89,6 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    // ✅ If already logging out, reject immediately
     if (isLoggingOut) {
       return Promise.reject(error);
     }
@@ -127,7 +130,6 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      // ✅ If already refreshing, queue the request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -156,7 +158,6 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (err) {
-        // ✅ Refresh failed → force logout
         processQueue(err, null);
         forceLogout();
         return Promise.reject(err);
