@@ -66,27 +66,33 @@ export default function AuthProvider({ children }) {
         localStorage.setItem('accessToken', token);
         const parsed = parseToken(token);
         if (parsed) {
+          // ✅ CRITICAL FIX: Set user FIRST
           setUser(parsed);
           setPendingEmail(null);
 
-          // Điều hướng theo role
-          switch (parsed.role) {
-            case 'Admin':
-              navigate('/AdminDashboard');
-              break;
-            case 'Contractor':
-              navigate('/Contractor');
-              break;
-            case 'Distributor':
-              navigate('/DistributorDashboard');
-              break;
-            default:
-              navigate('/');
-          }
+          // ✅ Wait for state to update before navigation
+          setTimeout(() => {
+            // Điều hướng theo role
+            switch (parsed.role) {
+              case 'Admin':
+                navigate('/AdminDashboard');
+                break;
+              case 'Contractor':
+                navigate('/Contractor');
+                break;
+              case 'Distributor':
+                navigate('/DistributorDashboard');
+                break;
+              default:
+                navigate('/');
+            }
+            setLoading(false);
+          }, 100);
+        } else {
+          setLoading(false);
         }
       } catch (err) {
         toast.error(handleApiError(err));
-      } finally {
         setLoading(false);
       }
     },
