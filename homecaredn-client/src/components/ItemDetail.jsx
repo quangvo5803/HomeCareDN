@@ -36,13 +36,13 @@ export default function ItemDetail({ item, relatedItems = [] }) {
 
   const serviceTypeConfig = {
     Construction: {
-      route: '/ConstructionViewAll',
+      route: '/ItemViewAll?type=Construction',
       breadcrumb: 'serviceDetail.breadcrumb_construction',
       more: 'home.service_construction_more',
       related: 'serviceDetail.relatedConstruction',
     },
     Repair: {
-      route: '/RepairViewAll',
+      route: '/ItemViewAll?type=Repair',
       breadcrumb: 'serviceDetail.breadcrumb_repair',
       more: 'home.service_repair_more',
       related: 'serviceDetail.relatedRepair',
@@ -100,7 +100,7 @@ export default function ItemDetail({ item, relatedItems = [] }) {
             <Link
               to={
                 item.type === 'material'
-                  ? '/MaterialViewAll'
+                  ? '/ItemViewAll?type=Material'
                   : serviceTypeConfig[item.serviceType]?.route
               }
               className="text-gray-600 hover:text-gray-900 transition-colors"
@@ -160,11 +160,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
                     <button
                       key={src}
                       onClick={() => setMainImage(src)}
-                      className={`flex-shrink-0 w-20 h-20 bg-white border flex items-center justify-center overflow-hidden transition-all ${
-                        mainImage === src
-                          ? 'border-2 border-black'
-                          : 'border-gray-200 hover:border-gray-400'
-                      }`}
+                      className={`flex-shrink-0 w-20 h-20 bg-white border flex items-center justify-center overflow-hidden transition-all ${mainImage === src
+                        ? 'border-2 border-black'
+                        : 'border-gray-200 hover:border-gray-400'
+                        }`}
                       aria-label={`${item.name} thumbnail ${i + 1}`}
                     >
                       <img
@@ -360,11 +359,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
             <div className="border-b border-gray-300 mb-6">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`px-6 py-3 font-semibold text-sm transition-colors relative inline-flex items-center gap-2 ${
-                  activeTab === 'description'
-                    ? 'text-gray-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-black'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
+                className={`px-6 py-3 font-semibold text-sm transition-colors relative inline-flex items-center gap-2 ${activeTab === 'description'
+                  ? 'text-gray-900 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-black'
+                  : 'text-gray-600 hover:text-gray-900'
+                  }`}
               >
                 <i className="fas fa-align-left text-xs"></i>
                 {t(`materialDetail.description`)}
@@ -443,11 +441,10 @@ export default function ItemDetail({ item, relatedItems = [] }) {
               {relatedItems.map((m) => (
                 <Link
                   key={m.serviceID || m.materialID}
-                  to={`/${
-                    item.type === 'material'
-                      ? 'MaterialDetail'
-                      : 'ServiceDetail'
-                  }/${m.serviceID || m.materialID}`}
+                  to={`/${item.type === 'material'
+                    ? 'MaterialDetail'
+                    : 'ServiceDetail'
+                    }/${m.serviceID || m.materialID}`}
                   className="group bg-white hover:shadow-lg transition-shadow border border-gray-200"
                 >
                   <div className="aspect-square bg-white flex items-center justify-center overflow-hidden border-b border-gray-200">
