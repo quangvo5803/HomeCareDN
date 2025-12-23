@@ -155,7 +155,7 @@ namespace HomeCareDNAPI
                 client.DefaultRequestHeaders.Add(
                     "api-key",
                     builder.Configuration["FptAi:ApiKey"]
-                    ?? throw new InvalidOperationException("Missing FptAi:ApiKey")
+                        ?? throw new InvalidOperationException("Missing FptAi:ApiKey")
                 );
 
                 client.Timeout = TimeSpan.FromSeconds(60);
@@ -188,6 +188,7 @@ namespace HomeCareDNAPI
                 app.UseDeveloperExceptionPage();
             }
             app.UseRouting();
+            app.UseCors("AllowReactApp");
 
             app.UseMiddleware<ValidationExceptionMiddleware>();
             app.Use(
@@ -206,7 +207,6 @@ namespace HomeCareDNAPI
 
             app.UseHttpsRedirection();
             app.UseWebSockets();
-            app.UseCors("AllowReactApp");
             app.UseAuthentication();
             app.UseAuthorization();
 
