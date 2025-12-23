@@ -85,7 +85,7 @@ namespace HomeCareDNAPI.Controllers
             return Ok(partner);
         }
 
-        [AllowAnonymous]
+        [Authorize(Roles = "Contractor, Distributor")]
         [HttpPut("update-signature-partner-request")]
         public async Task<IActionResult> UpdateSignaturePartner(
             [FromBody] PartnerRequestUpdateSignatureRequestDto request

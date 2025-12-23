@@ -9,7 +9,7 @@ import { useAuth } from '../hook/useAuth';
 import RealtimeContext from './RealtimeContext';
 
 export const RealtimeProvider = ({ children }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const connectionRef = useRef(null);
   const chatConnectionRef = useRef(null);
 
@@ -20,7 +20,6 @@ export const RealtimeProvider = ({ children }) => {
   useEffect(() => {
     let isCancelled = false;
 
-    // Nếu chưa đăng nhập thì ngắt kết nối
     if (!user?.id) {
       if (connectionRef.current) {
         connectionRef.current.stop();
@@ -35,87 +34,62 @@ export const RealtimeProvider = ({ children }) => {
       return;
     }
 
-    // Nếu đã có connection thì không tạo lại
     if (connectionRef.current) return;
     if (chatConnectionRef.current) return;
 
-    const connection = new HubConnectionBuilder()
-      .withUrl(
-        `${import.meta.env.VITE_API_URL}/hubs/application?userId=${
-          user.id
-        }&role=${user.role}`,
-        {
+    const startHub = async (hubUrl, ref, setState) => {
+      const connection = new HubConnectionBuilder()
+        .withUrl(hubUrl, {
           transport: HttpTransportType.WebSockets,
           skipNegotiation: true,
+        })
+        .configureLogging(LogLevel.None)
+        .withAutomaticReconnect([0, 2000, 5000, 10000])
+        .build();
+
+      ref.current = connection;
+
+      connection.onclose((err) => {
+        setState('disconnected');
+        if (err?.message?.includes('Unauthorized')) {
+          logout();
         }
-      )
-      .configureLogging(LogLevel.None)
-      .withAutomaticReconnect()
-      .build();
+      });
+      connection.onreconnecting(() => setState('reconnecting'));
+      connection.onreconnected(() => setState('connected'));
 
-    connectionRef.current = connection;
-
-    // Dùng async function để tránh race condition
-    const startConnection = async () => {
       try {
         await connection.start();
-        if (!isCancelled) setConnectionState('connected');
+        if (!isCancelled) setState('connected');
       } catch {
-        if (!isCancelled) {
-          setConnectionState('error');
-        }
+        if (!isCancelled) setState('error');
       }
     };
 
-    startConnection();
+    startHub(
+      `${import.meta.env.VITE_API_URL}/hubs/application?userId=${
+        user.id
+      }&role=${user.role}`,
+      connectionRef,
+      setConnectionState
+    );
+    startHub(
+      `${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`,
+      chatConnectionRef,
+      setChatConnectionState
+    );
 
-    connection.onreconnecting(() => setConnectionState('reconnecting'));
-    connection.onreconnected(() => setConnectionState('connected'));
-    connection.onclose(() => setConnectionState('disconnected'));
-
-    const chatConnection = new HubConnectionBuilder()
-      .withUrl(`${import.meta.env.VITE_API_URL}/hubs/chat?userId=${user.id}`, {
-        transport: HttpTransportType.WebSockets,
-        skipNegotiation: true,
-      })
-      .configureLogging(LogLevel.None)
-      .withAutomaticReconnect()
-      .build();
-
-    chatConnectionRef.current = chatConnection;
-
-    // Dùng async function để tránh race condition
-    const startChatConnection = async () => {
-      try {
-        await chatConnection.start();
-        if (!isCancelled) setChatConnectionState('connected');
-      } catch {
-        if (!isCancelled) {
-          setChatConnectionState('error');
-        }
-      }
-    };
-
-    startChatConnection();
-
-    chatConnection.onreconnecting(() => setChatConnectionState('reconnecting'));
-    chatConnection.onreconnected(() => setChatConnectionState('connected'));
-    chatConnection.onclose(() => setChatConnectionState('disconnected'));
-
-    // Cleanup
     return () => {
       isCancelled = true;
-      if (connectionRef.current) {
-        connectionRef.current.stop();
-        connectionRef.current = null;
-        setConnectionState('disconnected');
-      }
-      if (chatConnectionRef.current) {
-        chatConnectionRef.current.stop();
-        chatConnectionRef.current = null;
-        setChatConnectionState('disconnected');
-      }
+      if (connectionRef.current) connectionRef.current.stop();
+      if (chatConnectionRef.current) chatConnectionRef.current.stop();
+      setConnectionState('disconnected');
+      setChatConnectionState('disconnected');
+      connectionRef.current = null;
+      chatConnectionRef.current = null;
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const contextValue = useMemo(

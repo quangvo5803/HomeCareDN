@@ -154,14 +154,12 @@ export default function MaterialRequestManager() {
   });
 
   useEffect(() => {
-    if (user?.role === 'Distributor') {
-      fetchMaterialRequests({
-        PageNumber: currentPage,
-        PageSize: pageSize,
-        FilterID: showAppliedOnly ? user.id : undefined,
-        SortBy: sortOption,
-      });
-    }
+    fetchMaterialRequests({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      FilterID: showAppliedOnly ? user.id : undefined,
+      SortBy: sortOption,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentPage, showAppliedOnly, sortOption]);
 
