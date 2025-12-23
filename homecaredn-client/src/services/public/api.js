@@ -46,9 +46,12 @@ const forceLogout = () => {
   isRefreshing = false;
 
   // Navigate to login
+  navigateTo('/Login');
+
+  // ✅ CRITICAL: Reset flag after a short delay to allow new login
   setTimeout(() => {
-    navigateTo('/Login');
-  }, 100);
+    isLoggingOut = false;
+  }, 1000);
 };
 
 /* =========================
