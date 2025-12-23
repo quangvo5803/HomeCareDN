@@ -14,68 +14,120 @@ const api = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-// 🟢 Network error spam lock
+// 🔒 Lock toast to avoid spam
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
+let isLoggingOut = false; // ✅ NEW: Prevent multiple logout
 
 const processQueue = (error, token = null) => {
-  for (const prom of failedQueue) {
+  failedQueue.forEach((prom) => {
     if (error) prom.reject(error);
     else prom.resolve(token);
-  }
+  });
   failedQueue = [];
 };
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+// ✅ NEW: Force logout function
+const forceLogout = () => {
+  if (isLoggingOut) return; // Prevent multiple logout
+  isLoggingOut = true;
 
+  // Clear token
+  localStorage.removeItem('accessToken');
+
+  // Show toast once
+  toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
+
+  // Clear all pending requests
+  failedQueue = [];
+  isRefreshing = false;
+
+  // Navigate to login
+  navigateTo('/Login');
+};
+
+/* =========================
+   REQUEST INTERCEPTOR
+========================= */
+api.interceptors.request.use(
+  (config) => {
+    // ✅ Block all requests if logging out
+    if (isLoggingOut) {
+      return Promise.reject(
+        new axios.Cancel('Session expired, redirecting to login')
+      );
+    }
+
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/* =========================
+   RESPONSE INTERCEPTOR
+========================= */
 api.interceptors.response.use(
   (response) => {
-    // ✅ Hide toast when server reconnects
+    // ✅ Server reconnected
     if (isShowingNetworkError && networkErrorToastId) {
       toast.dismiss(networkErrorToastId);
       isShowingNetworkError = false;
       networkErrorToastId = null;
-
-      // Optional: show reconnection success
       toast.success(i18n.t('SUCCESS.RECONNECTED'));
     }
     return response;
   },
   async (error) => {
+    // ✅ If already logging out, reject immediately
+    if (isLoggingOut) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
-    // 🟧 403 Forbidden
-    if (error.response?.status === 403 && !originalRequest._forbiddenHandled) {
+    /* 🟧 403 Forbidden */
+    if (error.response?.status === 403 && !originalRequest?._forbiddenHandled) {
       originalRequest._forbiddenHandled = true;
       toast.error(i18n.t('ERROR.FORBIDDEN'));
       navigateTo('/Unauthorized');
-      return error;
+      return Promise.reject(error);
     }
 
-    // 🟧 404 Not Found
-    if (error.response?.status === 404 && !originalRequest._forbiddenHandled) {
-      originalRequest._forbiddenHandled = true;
+    /* 🟧 404 Not Found */
+    if (error.response?.status === 404 && !originalRequest?._notFoundHandled) {
+      originalRequest._notFoundHandled = true;
       toast.error(i18n.t('ERROR.NOT_FOUND'));
       navigateTo('/NotFound');
-      return error;
+      return Promise.reject(error);
     }
 
-    // 🔴 Network Error (server unreachable)
+    /* 🔴 Network Error */
     if (error.message === 'Network Error' && !error.response) {
       if (!isShowingNetworkError) {
-        isShowingNetworkError = true; // lock to avoid spam
+        isShowingNetworkError = true;
         networkErrorToastId = toast.error(i18n.t('ERROR.NETWORK_UNREACHABLE'));
       }
-      error._handledByInterceptor = true; // 🟢 mark as handled (for handleApiError)
-      throw error;
+      return Promise.reject(error);
     }
 
-    // 🟡 401 Unauthorized → refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    /* 🟡 401 Unauthorized → Refresh token */
+    if (error.response?.status === 401 && !originalRequest?._retry) {
+      originalRequest._retry = true;
+
+      // ✅ Token expired → force logout immediately
+      if (error.response?.data?.errorCode === 'LOGIN_TOKEN_EXPIRED') {
+        forceLogout();
+        return Promise.reject(error);
+      }
+
+      // ✅ If already refreshing, queue the request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -88,33 +140,32 @@ api.interceptors.response.use(
         });
       }
 
-      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
         const res = await authService.refreshToken();
-        const newAccessToken = res.data?.accessToken;
+        const newAccessToken = res?.data?.accessToken;
 
-        if (newAccessToken) {
-          localStorage.setItem('accessToken', newAccessToken);
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          processQueue(null, newAccessToken);
-          return api(originalRequest);
-        } else {
+        if (!newAccessToken) {
           throw new Error('Refresh token failed');
         }
+
+        localStorage.setItem('accessToken', newAccessToken);
+        processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
       } catch (err) {
+        // ✅ Refresh failed → force logout
         processQueue(err, null);
-        authService.logout();
-        return;
+        forceLogout();
+        return Promise.reject(err);
       } finally {
         isRefreshing = false;
       }
     }
-    if (error.response?.status === 401 && error.config?._retry) {
-      return;
-    }
-    throw error;
+
+    return Promise.reject(error);
   }
 );
 
