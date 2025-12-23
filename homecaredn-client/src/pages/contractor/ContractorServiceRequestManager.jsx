@@ -151,14 +151,12 @@ export default function ContractorServiceRequestManager() {
   });
   useEffect(() => {
     // chỉ fetch khi có user
-    if (user?.role === 'Contractor') {
-      fetchServiceRequests({
-        PageNumber: currentPage,
-        PageSize: pageSize,
-        FilterID: showAppliedOnly ? user.id : undefined,
-        SortBy: sortOption,
-      });
-    }
+    fetchServiceRequests({
+      PageNumber: currentPage,
+      PageSize: pageSize,
+      FilterID: showAppliedOnly ? user.id : undefined,
+      SortBy: sortOption,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, currentPage, showAppliedOnly, sortOption]);
 
