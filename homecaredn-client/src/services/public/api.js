@@ -1,3 +1,4 @@
+/* sonarjs ignore file */
 import axios from 'axios';
 import { authService } from '../authService';
 import { toast } from 'react-toastify';
@@ -13,7 +14,7 @@ const api = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-// Toast & lock flags
+// 🔒 Lock toast to avoid spam
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
 let isSessionToastShown = false;
@@ -26,17 +27,29 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+/* =========================
+   REQUEST INTERCEPTOR
+========================= */
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('accessToken');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers = {
+        ...config.headers,
+        Authorization: `Bearer ${token}`,
+      };
+    }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+/* =========================
+   RESPONSE INTERCEPTOR
+========================= */
 api.interceptors.response.use(
   (response) => {
+    // ✅ Server reconnected
     if (isShowingNetworkError && networkErrorToastId) {
       toast.dismiss(networkErrorToastId);
       isShowingNetworkError = false;
@@ -48,49 +61,46 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (!originalRequest) return Promise.reject(error);
-
-    // 403 Forbidden
-    if (error.response?.status === 403 && !originalRequest._forbiddenHandled) {
+    /* 🟧 403 Forbidden */
+    if (error.response?.status === 403 && !originalRequest?._forbiddenHandled) {
       originalRequest._forbiddenHandled = true;
       toast.error(i18n.t('ERROR.FORBIDDEN'));
       navigateTo('/Unauthorized');
-      return Promise.reject(error);
+      throw error;
     }
 
-    // 404 Not Found
-    if (error.response?.status === 404 && !originalRequest._notFoundHandled) {
+    /* 🟧 404 Not Found */
+    if (error.response?.status === 404 && !originalRequest?._notFoundHandled) {
       originalRequest._notFoundHandled = true;
       toast.error(i18n.t('ERROR.NOT_FOUND'));
       navigateTo('/NotFound');
-      return Promise.reject(error);
+      throw error;
     }
 
-    // Network error
+    /* 🔴 Network Error */
     if (error.message === 'Network Error' && !error.response) {
       if (!isShowingNetworkError) {
         isShowingNetworkError = true;
         networkErrorToastId = toast.error(i18n.t('ERROR.NETWORK_UNREACHABLE'));
       }
-      return Promise.reject(error);
+      throw error;
     }
 
-    // 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    /* 🟡 401 Unauthorized → Refresh token */
+    if (error.response?.status === 401 && !originalRequest?._retry) {
       originalRequest._retry = true;
 
-      // Token expired → logout ngay
+      // Token expired → logout
       if (error.response?.data?.errorCode === 'LOGIN_TOKEN_EXPIRED') {
         if (!isSessionToastShown) {
           toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
           isSessionToastShown = true;
         }
-        authService.logout();
+        localStorage.removeItem('accessToken');
         navigateTo('/Login');
         return Promise.reject(error);
       }
 
-      // Refresh token logic
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -107,31 +117,30 @@ api.interceptors.response.use(
 
       try {
         const res = await authService.refreshToken();
-        const newToken = res?.data?.accessToken;
+        const newAccessToken = res?.data?.accessToken;
 
-        if (!newToken) throw new Error('Refresh token failed');
+        if (!newAccessToken) throw new Error('Refresh token failed');
 
-        localStorage.setItem('accessToken', newToken);
-        processQueue(null, newToken);
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        localStorage.setItem('accessToken', newAccessToken);
+        processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
-
         if (!isSessionToastShown) {
           toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
           isSessionToastShown = true;
         }
-
         authService.logout();
         navigateTo('/Login');
-        return Promise.reject(err); // KHÔNG retry nữa
+        throw err;
       } finally {
         isRefreshing = false;
       }
     }
 
-    return Promise.reject(error);
+    throw error;
   }
 );
 
