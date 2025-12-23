@@ -25,5 +25,6 @@ namespace BusinessLogic.Services.FacadeService
         IDistributorApplicationService DistributorApplicationService { get; }
         INotificationService NotificationService { get; }
         ISearchHistoryService SearchHistoryService { get; }
+        IEKycService EKycService { get; }
     }
 }

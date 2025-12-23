@@ -251,6 +251,17 @@
       "form_documents": "Tài liệu",
       "process_infor": "Đơn yêu cầu của bạn cần 3-5 ngày để xử lí và sẽ được thông báo đến email của bạn trong thời gian sớm nhất. Cảm ơn bạn đã tin tưởng và lựa chọn HomeCareDN để làm đối tác",
       "represent": "Đại diện cho doanh nghiệp",
+      "verify_err": "Vui lòng xác minh CCCD và khuôn mặt",
+      "verify_succ": "Xác minh eKYC thành công",
+      "cccd": "Xác minh CCCD",
+      "face": "Xác minh khuôn mặt",
+      "selfie": "Chụp ảnh khuôn mặt",
+      "selfie_again": "Chụp lại",
+      "confirm_ekyc": "Kiểm tra eKYC",
+      "verified": "Đã xác minh eKYC",
+      "verifying": "Đang kiểm tra...",
+      "confirm_photo": "Chụp",
+      "cancel": "Hủy",
       "step2": {
         "title": "Xác thực Email",
         "otpSent": "Mã xác thực (OTP) đã được gửi đến email: ",
@@ -344,7 +355,8 @@
       "label_open": "Đang mở",
       "label_close": "Đã đóng",
       "label_contractorApplied": "nhà thầu",
-      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại."
+      "serviceApplicationExpired": "Thời gian hoàn thành thủ tục của đối tác đã kết thúc và yêu cầu dịch vụ đã được mở lại.",
+      "otherPaymentExpiredMessage": "Yêu cầu của bạn đã được mở lại do một đối tác chưa hoàn thành thủ tục."
     },
     "createServiceRequest": {
       "title": "Tạo yêu cầu dịch vụ",
@@ -745,6 +757,28 @@
     "revenue": "Doanh Thu"
   },
   "supportChat": {
+    "btnYes":"Có",
+    "btnNo":"Không",
+    "userConfirmYes":"Có, hãy tìm giúp tôi",
+    "promptFindMaterial":"Vui lòng giúp tôi tìm vật liệu xây dựng phù hợp cho dự án này.",
+    "smartGreeting": "Chào bạn, hệ thống ghi nhận bạn vừa tạo yêu cầu Loại Dịch Vụ: **{{serviceType}}**, Loại Công Trình: **{{buildingType}}**, ở địa chỉ **{{serviceAdress}}**. Bạn có muốn tôi tìm kiếm vật liệu phù hợp cho dự án này không?",
+    "serviceType":{
+      "Construction": "Xây dựng",
+      "Repair": "Sửa chữa"
+    },
+    "buildingType":{
+      "SingleStoryHouse": "Nhà cấp 4",
+      "Townhouse": "Nhà phố",
+      "RentalHouse": "Nhà cho thuê",
+      "Apartment": "Căn hộ",
+      "Villa": "Biệt thự",
+      "Hotel": "Khách sạn",
+      "Showroom": "Cửa hàng trưng bày",
+      "School": "Trường học",
+      "Hospital": "Bệnh viện",
+      "Warehouse": "Kho hàng",
+      "Other": "Khác"
+    },
     "adminStartedChat": "Quản Trị Viên đã bắt đầu cuộc trò chuyện!",
     "newMessageFromAdmin": "Tin nhắn mới từ Quản Trị Viên!",
     "error": "Đã xảy ra lỗi khi tải cuộc trò chuyện. Vui lòng thử lại sau.",
@@ -1675,7 +1709,18 @@
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
     "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
-    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
+    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi.",
+
+    "EKYC_MISSING_INPUT": "Vui lòng tải lên thẻ căn cước và ảnh khuôn mặt của bạn.",
+    "EKYC_CCCD_NOT_DETECTED": "Không phát hiện ảnh CCCD",
+    "EKYC_CCCD_INVALID": "Ảnh tải lên không phải là CCCD hợp lệ",
+    "EKYC_CCCD_ID_INVALID": "Số CCCD không hợp lệ hoặc không rõ",
+    "EKYC_CCCD_IMAGE_QUALITY_LOW": "Ảnh CCCD mờ hoặc thiếu sáng, vui lòng chụp lại",
+    "EKYC_SELFIE_INVALID": "Ảnh khuôn mặt không hợp lệ, vui lòng chụp ảnh trực tiếp",
+    "EKYC_FACE_NOT_DETECTED": "Không phát hiện khuôn mặt trong ảnh",
+    "EKYC_FACE_NOT_MATCH": "Khuôn mặt không khớp với CCCD",
+    "EKYC_FACE_IMAGE_QUALITY_LOW": "Ảnh khuôn mặt mờ hoặc thiếu sáng, vui lòng chụp lại",
+    "EKYC_COOLDOWN_ACTIVE": "Bạn đã xác minh quá nhiều lần. Vui lòng thử lại sau 1 giờ."
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",
@@ -1699,6 +1744,7 @@
     "MATERIAL_REQUEST_ADD": "Thêm yêu cầu vật liệu thành công",
     "MATERIAL_REQUEST_UPDATE": "Cập nhật yêu cầu vật liệu thành công.",
     "PARTNER_REQUEST_ADD": "Tạo đơn đăng kí thành công.",
+    "PARTNER_REQUEST_Signature": "Ký hợp đồng thành công.",
     "CREATE_REVIEW": "Đã gửi đánh giá thành công.",
     "REJECT": "Đã từ chối thành công yêu cầu",
     "APPROVE": "Đã phê duyệt thành công yêu cầu",
@@ -1707,7 +1753,8 @@
     "RECONNECTED": "Đã kết nối lại với server!",
     "ACCEPT_APPLICATION": "Chấp nhận đơn ứng tuyển thành công!",
     "REJECT_APPLICATION": "Từ chối đơn ứng tuyển thành công!",
-    "NOTIFY_ADD": "Tạo thông báo thành công."
+    "NOTIFY_ADD": "Tạo thông báo thành công.",
+    "EKYC_SUCCESS": "Xác minh thành công"
   },
   "roles": {
     "Distributor": "Nhà phân phối",
@@ -1734,7 +1781,7 @@
       "Apartment": "Căn hộ",
       "Villa": "Biệt thự",
       "Hotel": "Khách sạn",
-      "Showroom": "Showroom",
+      "Showroom": "Cửa hàng trưng bày",
       "School": "Trường học",
       "Hospital": "Bệnh viện",
       "Warehouse": "Kho xưởng",

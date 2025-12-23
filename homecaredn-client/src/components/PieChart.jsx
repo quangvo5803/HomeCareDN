@@ -1,35 +1,36 @@
-import { Pie } from "react-chartjs-2";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-import { formatVND } from "../utils/formatters";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  ArcElement,
-} from "chart.js";
-import PropTypes from "prop-types";
+import { Pie } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { formatVND } from '../utils/formatters';
+import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import PropTypes from 'prop-types';
 import LoadingComponent from '../components/LoadingComponent';
 import { useTranslation } from 'react-i18next';
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, ChartDataLabels);
 
-export default function PieChart({ title, year, onYearChange, data, type, loading, rawData }) {
-
+export default function PieChart({
+  title,
+  year,
+  onYearChange,
+  data,
+  type,
+  loading,
+  rawData,
+}) {
   const { t } = useTranslation();
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { position: "bottom", labels: { color: "#333" } },
+      legend: { position: 'bottom', labels: { color: '#333' } },
       title: { display: false },
-      // HIỂN THỊ % 
+      // HIỂN THỊ %
       datalabels: {
         formatter: (value) => `${value}%`,
-        color: "#fff",
+        color: '#fff',
         font: {
-          weight: "bold",
+          weight: 'bold',
           size: 14,
         },
       },
@@ -41,7 +42,9 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
             if (!item) return context.label;
             return [
               `${t('adminDashboard.pieChart.serviceRequests')}: ${item.count}`,
-              `${t('adminDashboard.pieChart.amount')}: ${formatVND(item.totalAmount)}`,
+              `${t('adminDashboard.pieChart.amount')}: ${formatVND(
+                item.totalAmount
+              )}`,
             ];
           },
         },
@@ -50,35 +53,33 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
   };
 
   const defaultData = {
-    labels: ["No Data"],
+    labels: ['No Data'],
     datasets: [
       {
-        label: "Empty",
+        label: 'Empty',
         data: [1],
-        backgroundColor: ["rgba(200,200,200,0.5)"],
-        borderColor: ["#ccc"],
+        backgroundColor: ['rgba(200,200,200,0.5)'],
+        borderColor: ['#ccc'],
         borderWidth: 1,
       },
     ],
   };
 
-  const hasData = !!(
-    data?.datasets?.some(
-      ds => Array.isArray(ds.data) && ds.data.some(v => v !== 0)
-    )
+  const hasData = !!data?.datasets?.some(
+    (ds) => Array.isArray(ds.data) && ds.data.some((v) => v !== 0)
   );
 
-  if (type === "Admin") {
+  if (type === 'Admin') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-4 dark:bg-slate-850">
+      <div className="bg-white rounded-2xl shadow-xl p-4">
         <div className="flex items-center justify-between mb-1">
-          <h6 className="text-xl capitalize dark:text-white">{title}</h6>
+          <h6 className="text-xl capitalize">{title}</h6>
 
           {onYearChange && (
             <select
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
             >
               {Array.from({ length: 6 }, (_, i) => {
                 const y = new Date().getFullYear() - i;
@@ -98,7 +99,9 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           {!hasData && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
               <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
-              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
             </div>
           )}
 
@@ -112,7 +115,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
     );
   }
 
-  if (type === "Contractor") {
+  if (type === 'Contractor') {
     return (
       <div className="bg-green-50 border border-green-300 rounded-xl p-4 shadow">
         <div className="flex justify-between items-center mb-2">
@@ -142,12 +145,14 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
           {!hasData && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-xl">
               <i className="fa-solid fa-inbox text-4xl text-gray-400 mb-2"></i>
-              <p className="text-gray-500 italic">{t('adminDashboard.noData')}</p>
+              <p className="text-gray-500 italic">
+                {t('adminDashboard.noData')}
+              </p>
             </div>
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-xl">
               <LoadingComponent />
             </div>
           )}
@@ -159,7 +164,7 @@ export default function PieChart({ title, year, onYearChange, data, type, loadin
   // Mặc định
   return (
     <div className="bg-gray-100 p-4 rounded-xl">
-      <h6 className="text-gray-700 mb-2">{title || "Default Empty Pie"}</h6>
+      <h6 className="text-gray-700 mb-2">{title || 'Default Empty Pie'}</h6>
       <Pie data={defaultData} options={options} />
       <p className="text-gray-400 text-xs italic mt-2">
         Invalid or missing type — showing default pie.

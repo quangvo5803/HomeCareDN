@@ -100,16 +100,16 @@ export default function LineChart({
   // cho admin
   if (type === 'Admin') {
     return (
-      <div className="border-black/12.5 dark:bg-slate-850 dark:shadow-dark-xl shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
+      <div className="border-black/12.5 shadow-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
         <div className="border-black/12.5 mb-0 flex items-center justify-between rounded-t-2xl border-b-0 border-solid p-6 pt-4 pb-0">
-          <h6 className="capitalize dark:text-white text-xl">{title}</h6>
+          <h6 className="capitalize">{title}</h6>
 
           {/* Dropdown chọn năm */}
           {onYearChange && (
             <select
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
             >
               {Array.from({ length: 6 }, (_, i) => {
                 const y = new Date().getFullYear() - i;
@@ -148,9 +148,9 @@ export default function LineChart({
   // cho Contractor
   if (type === 'Contractor') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+      <div className="bg-white rounded-2xl shadow-xl p-6 h-full">
         <div className="flex justify-between items-center mb-4">
-          <h6 className=" dark:text-white text-xl font-semibold">{title}</h6>
+          <h6 className="text-xl font-semibold">{title}</h6>
 
           {onYearChange && (
             <select
@@ -182,7 +182,7 @@ export default function LineChart({
             </div>
           )}
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-2xl">
               <LoadingComponent />
             </div>
           )}
@@ -192,9 +192,9 @@ export default function LineChart({
   }
   if (type === 'Distributor') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+      <div className="bg-white rounded-2xl shadow-xl p-6 h-full">
         <div className="flex justify-between items-center mb-4">
-          <h6 className=" dark:text-white text-xl font-semibold">{title}</h6>
+          <h6 className="text-xl font-semibold">{title}</h6>
 
           {onYearChange && (
             <select
@@ -226,7 +226,7 @@ export default function LineChart({
             </div>
           )}
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-2xl">
               <LoadingComponent />
             </div>
           )}

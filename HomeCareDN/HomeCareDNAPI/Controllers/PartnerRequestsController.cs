@@ -84,5 +84,18 @@ namespace HomeCareDNAPI.Controllers
             var partner = await _facadeService.PartnerService.CreatePartnerRequestAsync(request);
             return Ok(partner);
         }
+
+        [AllowAnonymous]
+        [HttpPut("update-signature-partner-request")]
+        public async Task<IActionResult> UpdateSignaturePartner(
+            [FromBody] PartnerRequestUpdateSignatureRequestDto request
+        )
+        {
+            var result = await _facadeService.PartnerService.UpdateSignaturePartnerRequestAsync(request);
+            return Ok(new
+            {
+                accessToken = result
+            });
+        }
     }
 }

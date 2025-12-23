@@ -18,6 +18,14 @@ export const partnerRequestService = {
     return response.data;
   },
 
+  update: async (dto) => {
+    const response = await api.put(
+      '/partner-requests/update-signature-partner-request',
+      dto
+    );
+    return response.data;
+  },
+
   // ====================== ADMIN ======================
   getAll: async (params) => {
     const response = await api.get('/partner-requests', { params });

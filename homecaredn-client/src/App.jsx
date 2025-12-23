@@ -24,6 +24,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import MaterialCatalog from './pages/MaterialCatalog';
+import Signature from './pages/Signature';
 
 //Admin pages
 import AdminLayout from './pages/admin/AdminLayout';
@@ -251,6 +252,8 @@ function Layout() {
             )
           }
         />
+        {/* Signature */}
+        <Route path="Signature" element={<Signature />} />
         {/* Customer routes */}
         <Route
           path="/Customer"
