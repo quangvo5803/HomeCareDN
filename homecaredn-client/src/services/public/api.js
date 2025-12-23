@@ -87,6 +87,11 @@ api.interceptors.response.use(
 
     /* 🟡 401 Unauthorized → Refresh token */
     if (error.response?.status === 401 && !originalRequest?._retry) {
+      if (error.response?.data?.errorCode === 'LOGIN_TOKEN_EXPIRED') {
+        authService.logout();
+        navigateTo('/Login');
+        return Promise.reject(error);
+      }
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -110,6 +115,8 @@ api.interceptors.response.use(
         const newAccessToken = res?.data?.accessToken;
 
         if (!newAccessToken) {
+          authService.logout();
+          navigateTo('/Login');
           throw new Error('Refresh token failed');
         }
 
