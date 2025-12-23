@@ -66,53 +66,32 @@ export default function AuthProvider({ children }) {
         localStorage.setItem('accessToken', token);
         const parsed = parseToken(token);
         if (parsed) {
-          // ✅ CRITICAL FIX: Set user FIRST
           setUser(parsed);
           setPendingEmail(null);
 
-          // ✅ Wait for state to update before navigation
-          setTimeout(() => {
-            // Điều hướng theo role
-            switch (parsed.role) {
-              case 'Admin':
-                navigate('/AdminDashboard');
-                break;
-              case 'Contractor':
-                navigate('/Contractor');
-                break;
-              case 'Distributor':
-                navigate('/DistributorDashboard');
-                break;
-              default:
-                navigate('/');
-            }
-            setLoading(false);
-          }, 100);
-        } else {
-          setLoading(false);
+          // Điều hướng theo role
+          switch (parsed.role) {
+            case 'Admin':
+              navigate('/AdminDashboard');
+              break;
+            case 'Contractor':
+              navigate('/Contractor');
+              break;
+            case 'Distributor':
+              navigate('/DistributorDashboard');
+              break;
+            default:
+              navigate('/');
+          }
         }
       } catch (err) {
         toast.error(handleApiError(err));
+      } finally {
         setLoading(false);
       }
     },
     [navigate, parseToken]
   );
-
-  // ✅ Listen for force logout event from API interceptor
-  useEffect(() => {
-    const handleForceLogout = () => {
-      setUser(null);
-      setPendingEmail(null);
-      setLoading(false);
-    };
-
-    window.addEventListener('auth:force-logout', handleForceLogout);
-
-    return () => {
-      window.removeEventListener('auth:force-logout', handleForceLogout);
-    };
-  }, []);
 
   // 🟢 Khi F5 hoặc mở lại tab → kiểm tra token, nếu hết hạn thì tự refresh
   useEffect(() => {
@@ -146,17 +125,15 @@ export default function AuthProvider({ children }) {
         const newParsed = parseToken(newAccessToken);
         setUser(newParsed);
       } catch {
-        console.warn('Refresh failed, clearing user');
-        // ✅ Nếu refresh fail thì clear user luôn
-        localStorage.removeItem('accessToken');
-        setUser(null);
+        console.warn('Refresh failed, keep user for retry');
+        setUser(parsed);
       } finally {
         setLoading(false);
       }
     };
 
     initAuth();
-  }, [parseToken]);
+  }, [parseToken, logout]);
 
   const value = useMemo(
     () => ({
