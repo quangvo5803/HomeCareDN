@@ -93,6 +93,21 @@ export default function AuthProvider({ children }) {
     [navigate, parseToken]
   );
 
+  // ✅ Listen for force logout event from API interceptor
+  useEffect(() => {
+    const handleForceLogout = () => {
+      setUser(null);
+      setPendingEmail(null);
+      setLoading(false);
+    };
+
+    window.addEventListener('auth:force-logout', handleForceLogout);
+
+    return () => {
+      window.removeEventListener('auth:force-logout', handleForceLogout);
+    };
+  }, []);
+
   // 🟢 Khi F5 hoặc mở lại tab → kiểm tra token, nếu hết hạn thì tự refresh
   useEffect(() => {
     const initAuth = async () => {
@@ -125,15 +140,17 @@ export default function AuthProvider({ children }) {
         const newParsed = parseToken(newAccessToken);
         setUser(newParsed);
       } catch {
-        console.warn('Refresh failed, keep user for retry');
-        setUser(parsed);
+        console.warn('Refresh failed, clearing user');
+        // ✅ Nếu refresh fail thì clear user luôn
+        localStorage.removeItem('accessToken');
+        setUser(null);
       } finally {
         setLoading(false);
       }
     };
 
     initAuth();
-  }, [parseToken, logout]);
+  }, [parseToken]);
 
   const value = useMemo(
     () => ({
