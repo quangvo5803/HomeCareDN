@@ -14,9 +14,10 @@ const api = axios.create({
 let isRefreshing = false;
 let failedQueue = [];
 
-// 🟢 Network error spam lock
+// 🔒 Lock toast to avoid spam
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
+let isSessionToastShown = false;
 
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
@@ -87,19 +88,24 @@ api.interceptors.response.use(
 
     /* 🟡 401 Unauthorized → Refresh token */
     if (error.response?.status === 401 && !originalRequest?._retry) {
+      originalRequest._retry = true;
+
+      // Token expired → logout
       if (error.response?.data?.errorCode === 'LOGIN_TOKEN_EXPIRED') {
+        if (!isSessionToastShown) {
+          toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
+          isSessionToastShown = true;
+        }
         authService.logout();
         navigateTo('/Login');
         return Promise.reject(error);
       }
+
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: (token) => {
-              originalRequest.headers = {
-                ...originalRequest.headers,
-                Authorization: `Bearer ${token}`,
-              };
+              originalRequest.headers.Authorization = `Bearer ${token}`;
               resolve(api(originalRequest));
             },
             reject,
@@ -107,30 +113,27 @@ api.interceptors.response.use(
         });
       }
 
-      originalRequest._retry = true;
       isRefreshing = true;
 
       try {
         const res = await authService.refreshToken();
         const newAccessToken = res?.data?.accessToken;
 
-        if (!newAccessToken) {
-          authService.logout();
-          navigateTo('/Login');
-          throw new Error('Refresh token failed');
-        }
+        if (!newAccessToken) throw new Error('Refresh token failed');
 
         localStorage.setItem('accessToken', newAccessToken);
         processQueue(null, newAccessToken);
 
-        originalRequest.headers = {
-          ...originalRequest.headers,
-          Authorization: `Bearer ${newAccessToken}`,
-        };
-
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
+        if (!isSessionToastShown) {
+          toast.error(i18n.t('ERROR.SESSION_EXPIRED'));
+          isSessionToastShown = true;
+        }
+        authService.logout();
+        navigateTo('/Login');
         throw err;
       } finally {
         isRefreshing = false;
