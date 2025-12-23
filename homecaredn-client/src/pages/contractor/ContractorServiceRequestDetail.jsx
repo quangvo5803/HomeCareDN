@@ -215,18 +215,6 @@ export default function ContractorServiceRequestDetail() {
     return () => clearTimeout(timer);
   }, [status]);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!serviceRequest && !loading) {
-        navigate('/Customer', {
-          state: { tab: 'service_requests' },
-        });
-      }
-    }, 3000);
-
-    return () => clearTimeout(timeout);
-  }, [serviceRequest, loading, navigate]);
-
   // Init VenoBox
   useEffect(() => {
     const vb = new VenoBox({ selector: '.venobox' });
