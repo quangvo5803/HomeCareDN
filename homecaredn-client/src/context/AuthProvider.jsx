@@ -44,14 +44,29 @@ export default function AuthProvider({ children }) {
     }
   }, []);
 
+  // 🟢 Listen for session expired event from interceptor
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setUser(null);
+      setPendingEmail(null);
+      navigate('/Login');
+    };
+
+    window.addEventListener('session-expired', handleSessionExpired);
+
+    return () => {
+      window.removeEventListener('session-expired', handleSessionExpired);
+    };
+  }, [navigate]);
+
   const logout = useCallback(async () => {
     try {
       setLoading(true);
       await authService.logout();
-    } catch {
-      // ignore
+    } catch (err) {
+      console.warn('Logout API failed:', err);
     } finally {
-      localStorage.removeItem('accessToken');
+      authService.clearSession();
       setUser(null);
       setPendingEmail(null);
       navigate('/Login');
@@ -69,7 +84,6 @@ export default function AuthProvider({ children }) {
           setUser(parsed);
           setPendingEmail(null);
 
-          // Điều hướng theo role
           switch (parsed.role) {
             case 'Admin':
               navigate('/AdminDashboard');
@@ -93,7 +107,6 @@ export default function AuthProvider({ children }) {
     [navigate, parseToken]
   );
 
-  // 🟢 Khi F5 hoặc mở lại tab → kiểm tra token, nếu hết hạn thì tự refresh
   useEffect(() => {
     const initAuth = async () => {
       setLoading(true);
@@ -107,33 +120,45 @@ export default function AuthProvider({ children }) {
 
       const parsed = parseToken(token);
 
-      // Nếu token còn hạn → set user bình thường
       if (parsed?.exp && parsed.exp > Date.now()) {
         setUser(parsed);
         setLoading(false);
         return;
       }
 
-      // Nếu token hết hạn → thử refresh
+      // ⚠️ Token hết hạn → thử refresh
+      console.log('Token expired, attempting refresh...');
       try {
         const res = await authService.refreshToken();
         const newAccessToken = res.data?.accessToken;
 
-        if (!newAccessToken) throw new Error('No token');
+        if (!newAccessToken) {
+          throw new Error('No access token in refresh response');
+        }
 
         localStorage.setItem('accessToken', newAccessToken);
         const newParsed = parseToken(newAccessToken);
-        setUser(newParsed);
-      } catch {
-        console.warn('Refresh failed, keep user for retry');
-        setUser(parsed);
+
+        if (newParsed) {
+          setUser(newParsed);
+        } else {
+          throw new Error('Failed to parse new token');
+        }
+      } catch (err) {
+        console.warn('Refresh failed on init:', err);
+
+        authService.clearSession();
+        setUser(null);
+        setPendingEmail(null);
+
+        navigate('/Login');
       } finally {
         setLoading(false);
       }
     };
 
     initAuth();
-  }, [parseToken, logout]);
+  }, [parseToken, navigate]);
 
   const value = useMemo(
     () => ({
