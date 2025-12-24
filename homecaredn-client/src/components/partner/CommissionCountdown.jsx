@@ -5,6 +5,20 @@ import { formatDate } from '../../utils/formatters';
 
 const HOURS_6_IN_MS = 6 * 60 * 60 * 1000;
 const HOURS_24_IN_MS = 24 * 60 * 60 * 1000;
+function parseUtc(dateInput) {
+  if (!dateInput) return new Date(NaN);
+
+  if (dateInput instanceof Date) return dateInput;
+
+  let s = dateInput;
+
+  // Nếu BE không trả timezone → ép UTC
+  if (typeof s === 'string' && !s.endsWith('Z') && !s.includes('+')) {
+    s = s + 'Z';
+  }
+
+  return new Date(s);
+}
 
 export default function CommissionCountdown({
   dueCommisionTime,
@@ -28,7 +42,7 @@ export default function CommissionCountdown({
 
     const calculateTimeLeft = () => {
       const now = Date.now();
-      const dueTime = new Date(dueCommisionTime).getTime();
+      const dueTime = parseUtc(dueCommisionTime).getTime();
       const total = dueTime - now;
 
       if (total <= 0) {
