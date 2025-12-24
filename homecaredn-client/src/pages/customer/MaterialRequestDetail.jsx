@@ -359,7 +359,10 @@ export default function MaterialRequestDetail() {
     await updateMaterialRequest(dto);
     setSubmitting(false);
     navigate('/Customer', {
-      state: { tab: 'material_requests' },
+      state: {
+        tab: 'material_requests',
+        showLoading: true,
+      },
     });
   };
 
