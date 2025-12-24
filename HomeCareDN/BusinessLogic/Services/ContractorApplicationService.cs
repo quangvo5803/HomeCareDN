@@ -396,8 +396,8 @@ namespace BusinessLogic.Services
                         app.Status = ApplicationStatus.Rejected;
                         var payload = new
                         {
-                            contractorApplication.ContractorApplicationID,
-                            contractorApplication.ServiceRequestID,
+                            app.ContractorApplicationID,
+                            serviceRequest.ServiceRequestID,
                             Status = ApplicationStatus.Rejected.ToString(),
                         };
                         await _notifier.SendToApplicationGroupAsync(
