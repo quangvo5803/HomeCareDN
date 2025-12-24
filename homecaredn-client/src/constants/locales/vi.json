@@ -1662,7 +1662,21 @@
     "NOT_FOUND": "Không tìm thấy trang được yêu cầu!",
     "NETWORK_UNREACHABLE": "Không thể kết nối tới server, vui lòng thử lại sau!",
     "EMPTY_DESCRIPTION": "Vui lòng mô tả chi tiết!",
-    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi."
+    "DETECT_UNCESS_INFO": "Văn bản chứa thông tin nhạy cảm hoặc dữ liệu cá nhân. Vui lòng kiểm tra và loại bỏ số điện thoại, email, mạng xã hội, tên riêng, địa chỉ, số tài khoản, số CMND/CCCD, hay thông tin họp offline trước khi gửi.",
+
+    "EKYC_MISSING_INPUT": "Vui lòng tải lên thẻ căn cước và ảnh khuôn mặt của bạn.",
+    "EKYC_CCCD_NOT_DETECTED": "Không phát hiện ảnh CCCD",
+    "EKYC_CCCD_INVALID": "Ảnh tải lên không phải là CCCD hợp lệ",
+    "EKYC_CCCD_ID_INVALID": "Số CCCD không hợp lệ hoặc không rõ",
+    "EKYC_CCCD_IMAGE_QUALITY_LOW": "Ảnh CCCD mờ hoặc thiếu sáng, vui lòng chụp lại",
+    "EKYC_SELFIE_INVALID": "Ảnh khuôn mặt không hợp lệ, vui lòng chụp ảnh trực tiếp",
+    "EKYC_FACE_NOT_DETECTED": "Không phát hiện khuôn mặt trong ảnh",
+    "EKYC_FACE_NOT_MATCH": "Khuôn mặt không khớp với CCCD",
+    "EKYC_FACE_IMAGE_QUALITY_LOW": "Ảnh khuôn mặt mờ hoặc thiếu sáng, vui lòng chụp lại",
+    "EKYC_COOLDOWN_ACTIVE": "Bạn đã xác minh quá nhiều lần. Vui lòng thử lại sau 1 giờ.",
+
+    "OTP_INVALID_OR_EXPIRED":"OTP không hợp lệ hoặc đã hết hạn."
+
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",

@@ -1669,7 +1669,20 @@
     "NOT_FOUND": "Requested page not found!",
     "NETWORK_UNREACHABLE": "Unable to connect to the server. Please try again later!",
     "EMPTY_DESCRIPTION": "Please provide a detailed description!",
-    "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission."
+    "DETECT_UNCESS_INFO": "The text contains sensitive or personal information. Please ensure removal of phone numbers, emails, social handles, personal names, addresses, bank accounts, ID numbers, or offline meeting details before submission.",
+
+    "EKYC_MISSING_INPUT": "Please upload your ID card photo and a photo of your face.",
+    "EKYC_CCCD_NOT_DETECTED": "ID card image not detected",
+    "EKYC_CCCD_INVALID": "Uploaded image is not a valid ID card",
+    "EKYC_CCCD_ID_INVALID": "Invalid or unreadable ID number",
+    "EKYC_CCCD_IMAGE_QUALITY_LOW": "ID card image is blurry or poorly lit, please retake it.",
+    "EKYC_SELFIE_INVALID": "Invalid selfie image, please take a live photo",
+    "EKYC_FACE_NOT_DETECTED": "No face detected in the selfie image",
+    "EKYC_FACE_NOT_MATCH": "Face does not match the ID card",
+    "EKYC_FACE_IMAGE_QUALITY_LOW": "If the photo shows a blurry or poorly lit face, please retake it.",
+    "EKYC_COOLDOWN_ACTIVE": "Too many verification attempts. Please try again in 1 hour.",
+
+    "OTP_INVALID_OR_EXPIRED":"OTP is invalid or has expired."
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
