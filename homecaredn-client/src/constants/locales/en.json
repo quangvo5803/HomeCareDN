@@ -620,7 +620,7 @@
     "reviewedAt": "Reviewed At",
     "reviewImageTitle": "Review Image",
     "realTime": "Service request deleted",
-    "paymentExpiredMessage": "The commission payment window has expired. Please reapply for the project."
+    "paymentExpiredMessage": "The commission payment window has expired. You application was rejected."
   },
   "distributorMaterialRequest": {
     "title": "Material requests manager",
