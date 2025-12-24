@@ -1720,7 +1720,9 @@
     "EKYC_FACE_NOT_DETECTED": "Không phát hiện khuôn mặt trong ảnh",
     "EKYC_FACE_NOT_MATCH": "Khuôn mặt không khớp với CCCD",
     "EKYC_FACE_IMAGE_QUALITY_LOW": "Ảnh khuôn mặt mờ hoặc thiếu sáng, vui lòng chụp lại",
-    "EKYC_COOLDOWN_ACTIVE": "Bạn đã xác minh quá nhiều lần. Vui lòng thử lại sau 1 giờ."
+    "EKYC_COOLDOWN_ACTIVE": "Bạn đã xác minh quá nhiều lần. Vui lòng thử lại sau 1 giờ.",
+
+    "OTP_INVALID_OR_EXPIRED":"OTP không hợp lệ hoặc đã hết hạn."
   },
   "SUCCESS": {
     "UPLOAD": "Tải ảnh lên thành công.",

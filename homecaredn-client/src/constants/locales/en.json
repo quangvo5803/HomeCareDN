@@ -1727,7 +1727,9 @@
     "EKYC_FACE_NOT_DETECTED": "No face detected in the selfie image",
     "EKYC_FACE_NOT_MATCH": "Face does not match the ID card",
     "EKYC_FACE_IMAGE_QUALITY_LOW": "If the photo shows a blurry or poorly lit face, please retake it.",
-    "EKYC_COOLDOWN_ACTIVE": "Too many verification attempts. Please try again in 1 hour."
+    "EKYC_COOLDOWN_ACTIVE": "Too many verification attempts. Please try again in 1 hour.",
+
+    "OTP_INVALID_OR_EXPIRED":"OTP is invalid or has expired."
   },
   "SUCCESS": {
     "UPLOAD": "Uploaded successfully.",
