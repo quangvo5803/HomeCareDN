@@ -18,12 +18,38 @@ let failedQueue = [];
 let networkErrorToastId = null;
 let isShowingNetworkError = false;
 
+// 🟢 Session expired spam lock
+let isSessionExpired = false;
+
 const processQueue = (error, token = null) => {
   for (const prom of failedQueue) {
     if (error) prom.reject(error);
     else prom.resolve(token);
   }
   failedQueue = [];
+};
+
+// 🟢 Dispatch custom event for Provider to handle logout
+const triggerSessionExpired = () => {
+  if (isSessionExpired) return; // Already triggered
+
+  isSessionExpired = true;
+
+  // Clear tokens locally
+  authService.clearSession();
+
+  // Show toast once
+  toast.error(i18n.t('ERROR.SESSION_EXPIRED'), {
+    toastId: 'session-expired', // Prevent duplicates
+  });
+
+  // Dispatch event for AuthProvider to catch
+  window.dispatchEvent(new CustomEvent('session-expired'));
+
+  // Reset flag after 2s
+  setTimeout(() => {
+    isSessionExpired = false;
+  }, 2000);
 };
 
 api.interceptors.request.use((config) => {
@@ -39,9 +65,9 @@ api.interceptors.response.use(
       toast.dismiss(networkErrorToastId);
       isShowingNetworkError = false;
       networkErrorToastId = null;
-
-      // Optional: show reconnection success
-      toast.success(i18n.t('SUCCESS.RECONNECTED'));
+      toast.success(i18n.t('SUCCESS.RECONNECTED'), {
+        toastId: 'reconnected',
+      });
     }
     return response;
   },
@@ -53,29 +79,38 @@ api.interceptors.response.use(
       originalRequest._forbiddenHandled = true;
       toast.error(i18n.t('ERROR.FORBIDDEN'));
       navigateTo('/Unauthorized');
-      return error;
+      return Promise.reject(error);
     }
 
     // 🟧 404 Not Found
-    if (error.response?.status === 404 && !originalRequest._forbiddenHandled) {
-      originalRequest._forbiddenHandled = true;
+    if (error.response?.status === 404 && !originalRequest._notFoundHandled) {
+      originalRequest._notFoundHandled = true;
       toast.error(i18n.t('ERROR.NOT_FOUND'));
       navigateTo('/NotFound');
-      return error;
+      return Promise.reject(error);
     }
 
     // 🔴 Network Error (server unreachable)
     if (error.message === 'Network Error' && !error.response) {
       if (!isShowingNetworkError) {
-        isShowingNetworkError = true; // lock to avoid spam
-        networkErrorToastId = toast.error(i18n.t('ERROR.NETWORK_UNREACHABLE'));
+        isShowingNetworkError = true;
+        networkErrorToastId = toast.error(i18n.t('ERROR.NETWORK_UNREACHABLE'), {
+          autoClose: false,
+          toastId: 'network-error',
+        });
       }
-      error._handledByInterceptor = true; // 🟢 mark as handled (for handleApiError)
-      throw error;
+      error._handledByInterceptor = true;
+      return Promise.reject(error);
     }
 
     // 🟡 401 Unauthorized → refresh token
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // 🟢 If session already expired, reject immediately
+      if (isSessionExpired) {
+        return Promise.reject(error);
+      }
+
+      // 🟢 If already refreshing, queue this request
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -101,20 +136,30 @@ api.interceptors.response.use(
           processQueue(null, newAccessToken);
           return api(originalRequest);
         } else {
-          throw new Error('Refresh token failed');
+          throw new Error('No access token in refresh response');
         }
-      } catch (err) {
-        processQueue(err, null);
-        authService.logout();
-        return;
+      } catch (refreshError) {
+        console.warn('Refresh failed, triggering session expired');
+
+        // 🟢 Process queue with error
+        processQueue(refreshError, null);
+
+        // 🟢 Trigger session expired (Provider will handle logout)
+        triggerSessionExpired();
+
+        return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
       }
     }
-    if (error.response?.status === 401 && error.config?._retry) {
-      return;
+
+    // 🟢 If 401 after retry, trigger session expired
+    if (error.response?.status === 401 && originalRequest._retry) {
+      triggerSessionExpired();
+      return Promise.reject(error);
     }
-    throw error;
+
+    return Promise.reject(error);
   }
 );
 
