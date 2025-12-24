@@ -512,7 +512,7 @@ namespace BusinessLogic.Services
             {
                 application.DistributorApplicationID,
                 application.MaterialRequestID,
-                Status = "PendingCommission",
+                Status = ApplicationStatus.PendingCommission.ToString(),
                 application.DueCommisionTime,
                 resultDto.Items,
                 resultDto.TotalEstimatePrice,
