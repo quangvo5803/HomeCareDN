@@ -95,7 +95,6 @@ export default function ContractorServiceRequestDetail() {
   useRealtime({
     //Accept
     [RealtimeEvents.ContractorApplicationAccept]: (payload) => {
-      console.log(payload);
       setServiceRequests((prev) =>
         prev.map((sr) =>
           sr.serviceRequestID === payload.serviceRequestID
@@ -132,18 +131,43 @@ export default function ContractorServiceRequestDetail() {
             toast.error(
               t('contractorServiceRequestDetail.paymentExpiredMessage')
             );
+            setServiceRequest((prev) => ({
+              ...prev,
+              status: 'Opening',
+            }));
           }
         } else if (existingApplication) {
-          toast.info(
-            t('contractorServiceRequestManager.otherPaymentExpiredMessage')
-          );
+          if (payload.reason === 'Commission payment expired') {
+            toast.info(
+              t('contractorServiceRequestManager.otherPaymentExpiredMessage')
+            );
+            setExistingApplication((prev) => ({
+              ...prev,
+              status: 'Pending',
+            }));
+            setServiceRequest((prev) => ({
+              ...prev,
+              status: 'Opening',
+            }));
+          }
         }
-
-        setServiceRequest((prev) => ({
-          ...prev,
-          status: 'Opening',
-        }));
       }
+    },
+    [RealtimeEvents.ServiceRequestClosed]: (payload) => {
+      setServiceRequests((prev) =>
+        prev.map((sr) =>
+          sr.serviceRequestID === payload.serviceRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+      setServiceRequest((prev) => ({
+        ...prev,
+        status: 'Closed',
+      }));
     },
     //Delete
     [RealtimeEvents.ServiceRequestDelete]: (payload) => {
