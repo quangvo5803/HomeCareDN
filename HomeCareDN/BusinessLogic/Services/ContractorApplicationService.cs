@@ -384,7 +384,7 @@ namespace BusinessLogic.Services
 
             serviceRequest.Status = RequestStatus.Closed;
             contractorApplication.Status = ApplicationStatus.PendingCommission;
-            contractorApplication.DueCommisionTime = DateTime.Now.AddMinutes(2);
+            contractorApplication.DueCommisionTime = DateTime.UtcNow.AddMinutes(2);
             serviceRequest.SelectedContractorApplicationID = contractorApplicationID;
 
             if (serviceRequest.ContractorApplications != null)
