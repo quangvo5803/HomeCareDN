@@ -27,6 +27,11 @@ export const authService = {
 
   logout: () =>
     axios.post(`${BASE_URL}/Authorize/logout`, {}, { withCredentials: true }),
+
+  clearSession: () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+  },
   googleLogin: (credential) =>
     api.post(`/Authorize/google-login`, { credential }),
 };
