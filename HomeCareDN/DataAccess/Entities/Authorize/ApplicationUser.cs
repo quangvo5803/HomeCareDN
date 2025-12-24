@@ -17,6 +17,7 @@ namespace DataAccess.Entities.Authorize
         public int MediumScaleProjectCount { get; set; } = 0;
         public int LargeScaleProjectCount { get; set; } = 0;
         public int ReputationPoints { get; set; } = 0;
+        public bool? IsPartnerComfirm { get; set; }
         public ICollection<RefreshToken>? RefreshTokens { get; set; }
         public ICollection<Address> Addresses { get; set; } = new List<Address>();
     }

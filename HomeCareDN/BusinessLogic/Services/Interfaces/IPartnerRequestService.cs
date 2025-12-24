@@ -15,5 +15,8 @@ namespace BusinessLogic.Services.Interfaces
         Task SendPartnerOtpAsync(SendPartnerOtpRequestDto request);
         Task<string> VerifyPartnerOtpAsync(VerifyPartnerOtpRequestDto request);
         Task DeletePartnerRequestAsync(Guid partnerRequestId);
+        Task<string> UpdateSignaturePartnerRequestAsync(
+            PartnerRequestUpdateSignatureRequestDto request
+        );
     }
 }

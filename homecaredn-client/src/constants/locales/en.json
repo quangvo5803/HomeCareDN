@@ -252,6 +252,17 @@
       "form_documents": "Documents",
       "process_infor": "Your request will take 3-5 days to process and you will be notified via email as soon as possible. Thank you for trusting and choosing HomeCareDN as your partner.",
       "represent": "Representing the business",
+      "verify_err": "Please verify your ID card and face",
+      "verify_succ": "eKYC verification successful",
+      "cccd": "Verify ID card",
+      "face": "Verify face",
+      "selfie": "Take a photo of your face",
+      "selfie_again": "Take another photo",
+      "verified": "eKYC verified",
+      "confirm_ekyc": "Check eKYC",
+      "verifying": "Checking...",
+      "confirm_photo": "Take a photo",
+      "cancel": "Cancel",
       "step2": {
         "title": "Email Verification",
         "otpSent": "Verification code (OTP) has been sent to email: ",
@@ -609,7 +620,7 @@
     "reviewedAt": "Reviewed At",
     "reviewImageTitle": "Review Image",
     "realTime": "Service request deleted",
-    "paymentExpiredMessage": "The commission payment window has expired. Please reapply for the project."
+    "paymentExpiredMessage": "The commission payment window has expired. You application was rejected."
   },
   "distributorMaterialRequest": {
     "title": "Material requests manager",
@@ -1706,6 +1717,7 @@
     "MATERIAL_REQUEST_ADD": "Add material request successfully.",
     "MATERIAL_REQUEST_UPDATE": "Material request updated successfully.",
     "PARTNER_REQUEST_ADD": "Create partner register request successfully",
+    "PARTNER_REQUEST_Signature": "Contract signed successfully.",
     "CREATE_REVIEW": "Review submitted successfully.",
     "REJECT": "Request successfully rejected",
     "APPROVE": "Request successfully approved",
@@ -1714,7 +1726,8 @@
     "RECONNECTED": "Reconnected to the server!",
     "ACCEPT_APPLICATION": "Accept application successfully!",
     "REJECT_APPLICATION": "Reject application successfully!",
-    "NOTIFY_ADD": "Add notification successfully."
+    "NOTIFY_ADD": "Add notification successfully.",
+    "EKYC_SUCCESS": "Verification successful"
   },
   "roles": {
     "Distributor": "Distributor",

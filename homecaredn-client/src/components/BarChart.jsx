@@ -62,13 +62,13 @@ export default function BarChart({
 
   if (type === 'Admin') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-4 dark:bg-slate-850">
+      <div className="bg-white rounded-2xl shadow-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <h6 className="text-xl capitalize dark:text-white">{title}</h6>
+          <h6 className="text-xl capitalize">{title}</h6>
 
           {onYearChange && (
             <select
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
             >
@@ -108,13 +108,13 @@ export default function BarChart({
 
   if (type === 'Contractor') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+      <div className="bg-white rounded-2xl shadow-xl p-6 h-full">
         <div className="flex items-center justify-between mb-4">
-          <h6 className="text-xl font-semibold dark:text-white">{title}</h6>
+          <h6 className="text-xl font-semi-bold">{title}</h6>
 
           {onYearChange && (
             <select
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm "
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
             >
@@ -143,7 +143,7 @@ export default function BarChart({
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-2xl">
               <LoadingComponent />
             </div>
           )}
@@ -153,13 +153,13 @@ export default function BarChart({
   }
   if (type === 'Distributor') {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 dark:bg-slate-850 h-full">
+      <div className="bg-white rounded-2xl shadow-xl p-6 h-full">
         <div className="flex items-center justify-between mb-4">
-          <h6 className="text-xl font-semibold dark:text-white">{title}</h6>
+          <h6 className="text-xl font-semibold">{title}</h6>
 
           {onYearChange && (
             <select
-              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm dark:bg-slate-800 dark:text-white"
+              className="rounded-lg border border-gray-300 bg-white px-2 py-1 text-sm"
               value={year}
               onChange={(e) => onYearChange(Number.parseInt(e.target.value))}
             >
@@ -188,7 +188,7 @@ export default function BarChart({
           )}
 
           {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-slate-900/70 z-20 rounded-2xl">
+            <div className="absolute inset-0 flex items-center justify-center bg-white z-20 rounded-2xl">
               <LoadingComponent />
             </div>
           )}

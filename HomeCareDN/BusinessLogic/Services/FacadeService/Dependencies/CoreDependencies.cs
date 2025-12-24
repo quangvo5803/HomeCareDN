@@ -20,6 +20,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
         public INotificationService NotificationService { get; }
         public IMaterialService MaterialService { get; }
         public IServicesService ServicesService { get; }
+        public IAuthorizeService AuthorizeService { get; }
 
         public CoreDependencies(
             IUnitOfWork unitOfWork,
@@ -28,7 +29,8 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
             AuthorizeDbContext authorizeDbContext,
             UserManager<ApplicationUser> userManager,
             PayOS payOS,
-            INotificationService notificationService
+            INotificationService notificationService,
+            IAuthorizeService authorizeService
         )
         {
             UnitOfWork = unitOfWork;
@@ -44,6 +46,7 @@ namespace BusinessLogic.Services.FacadeService.Dependencies
                 userManager
             );
             ServicesService = new ServicesService(unitOfWork, mapper);
+            AuthorizeService = authorizeService;
         }
     }
 }
