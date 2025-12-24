@@ -121,18 +121,43 @@ export default function MaterialRequestDetail() {
             toast.error(
               t('distributorMaterialRequestDetail.paymentExpiredMessage')
             );
+            setMaterialRequest((prev) => ({
+              ...prev,
+              status: 'Opening',
+            }));
           }
         } else if (existingApplication) {
-          toast.info(
-            t('distributorMaterialRequest.otherPaymentExpiredMessage')
-          );
+          if (payload.reason === 'Commission payment expired') {
+            toast.info(
+              t('distributorMaterialRequest.otherPaymentExpiredMessage')
+            );
+            setExistingApplication((prev) => ({
+              ...prev,
+              status: 'Pending',
+            }));
+            setMaterialRequest((prev) => ({
+              ...prev,
+              status: 'Opening',
+            }));
+          }
         }
-
-        setMaterialRequest((prev) => ({
-          ...prev,
-          status: 'Opening',
-        }));
       }
+    },
+    [RealtimeEvents.MaterialRequestClosed]: (payload) => {
+      setMaterialRequests((prev) =>
+        prev.map((sr) =>
+          sr.materialRequestID === payload.materialRequestID
+            ? {
+                ...sr,
+                status: 'Closed',
+              }
+            : sr
+        )
+      );
+      setMaterialRequest((prev) => ({
+        ...prev,
+        status: 'Closed',
+      }));
     },
     [RealtimeEvents.MaterialRequestDelete]: (payload) => {
       if (payload.materialRequestID === materialRequestId) {

@@ -616,7 +616,7 @@
     "reviewedAt": "Ngày đánh giá",
     "reviewImageTitle": "Ảnh đánh giá",
     "realTime": "Yêu cầu dịch vụ đã bị xóa",
-    "paymentExpiredMessage": "Hết hạn thanh toán hoa hồng. Vui lòng thử lại."
+    "paymentExpiredMessage": "Hết hạn thanh toán hoa hồng. Đơn ứng tuyển của bạn đã bị từ chối."
   },
   "distributorMaterialRequest": {
     "title": "Quản lý yêu cầu vật tư",
