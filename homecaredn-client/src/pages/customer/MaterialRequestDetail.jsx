@@ -1409,7 +1409,7 @@ export default function MaterialRequestDetail() {
           </div>
         )}
         {selectedDistributor.status === 'PendingCommission' &&
-          selectedDistributor.dueCommisionTime && (
+          selectedDistributor.dueCommissionTime && (
             <div className="mb-6">
               <CommissionCountdown
                 dueCommisionTime={selectedDistributor.dueCommisionTime}
