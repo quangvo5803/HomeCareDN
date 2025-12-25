@@ -37,6 +37,7 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import { paymentService } from '../../services/paymentService';
 import ChatSection from '../../components/ChatSection';
 import detectSensitiveInfo from '../../utils/detectSensitiveInfo';
+import { parseUtc } from '../../utils/validateTimeZone';
 
 export default function MaterialRequestDetail() {
   const navigate = useNavigate();
@@ -73,9 +74,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -148,9 +149,9 @@ export default function MaterialRequestDetail() {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-              }
+              ...sr,
+              status: 'Closed',
+            }
             : sr
         )
       );
@@ -647,7 +648,7 @@ export default function MaterialRequestDetail() {
             onExpired={() => setIsExpired(true)}
           />
           {!isExpired &&
-            new Date(existingApplication.dueCommisionTime) > new Date() && (
+            parseUtc(existingApplication.dueCommisionTime) > new Date() && (
               <button
                 onClick={handlePayCommission}
                 className="w-full px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors flex items-center justify-center gap-2 font-semibold"
@@ -789,7 +790,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1589,7 +1590,7 @@ export default function MaterialRequestDetail() {
                     i18n.language === 'vi'
                       ? item.material.categoryName
                       : item.material.categoryNameEN ||
-                        item.material.categoryName;
+                      item.material.categoryName;
 
                   const displayBrand =
                     i18n.language === 'vi'
@@ -1880,22 +1881,20 @@ export default function MaterialRequestDetail() {
                 {statusList.map((status) => (
                   <div
                     key={status.label}
-                    className={`p-4 rounded-lg text-center border ${
-                      status.canDo
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-red-50 border-red-200'
-                    }`}
+                    className={`p-4 rounded-lg text-center border ${status.canDo
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                      }`}
                   >
                     <p className="text-sm text-gray-800 mb-2 whitespace-normal">
                       {status.label}
                     </p>
                     <div className="flex flex-col items-center gap-1">
                       <i
-                        className={`fa-solid text-xl ${
-                          status.canDo
-                            ? 'fa-check text-green-600'
-                            : 'fa-xmark text-red-600'
-                        }`}
+                        className={`fa-solid text-xl ${status.canDo
+                          ? 'fa-check text-green-600'
+                          : 'fa-xmark text-red-600'
+                          }`}
                       />
                     </div>
                   </div>
