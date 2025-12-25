@@ -309,61 +309,65 @@ export default function MaterialRequestDetail() {
   };
 
   const handleSave = async (isSubmit = false) => {
-    if (isSubmit) {
-      if (!addressID) {
-        toast.error(t('ERROR.REQUIRED_ADDRESS'));
-        return;
-      }
+    if (isSubmit && !addressID) {
+      toast.error(t('ERROR.REQUIRED_ADDRESS'));
+      return;
     }
     setSubmitting(true);
-    const addItems = items.filter(
-      (item) =>
-        !originalItems.some(
-          (o) => o.materialRequestItemID === item.materialRequestItemID
-        )
-    );
-    const updatedItems = items.filter((item) => {
-      const original = originalItems.find(
-        (o) => o.materialRequestItemID === item.materialRequestItemID
-      );
-      return original && original.quantity !== item.quantity;
-    });
-    const deletedItemIDs = originalItems
-      .filter(
-        (o) =>
-          !items.some(
-            (item) => item.materialRequestItemID === o.materialRequestItemID
-          )
-      )
-      .map((o) => o.materialRequestItemID);
+    setLoadingAction(true);
 
-    const dto = {
-      materialRequestID: materialRequestId,
-      description: description,
-      deliveryDate: deliveryDate,
-      canAddMaterial: canAddMaterial,
-      isSubmit: isSubmit,
-      addItems: addItems.map((a) => ({
-        materialID: a.material.materialID,
-        quantity: a.quantity,
-      })),
-      updateItems: updatedItems.map((u) => ({
-        materialRequestItemID: u.materialRequestItemID,
-        quantity: u.quantity,
-      })),
-      deleteItemIDs: deletedItemIDs,
-    };
-    if (addressID) {
-      dto.addressID = addressID;
+    try {
+      const addItems = items.filter(
+        (item) =>
+          !originalItems.some(
+            (o) => o.materialRequestItemID === item.materialRequestItemID
+          )
+      );
+      const updatedItems = items.filter((item) => {
+        const original = originalItems.find(
+          (o) => o.materialRequestItemID === item.materialRequestItemID
+        );
+        return original && original.quantity !== item.quantity;
+      });
+      const deletedItemIDs = originalItems
+        .filter(
+          (o) =>
+            !items.some(
+              (item) => item.materialRequestItemID === o.materialRequestItemID
+            )
+        )
+        .map((o) => o.materialRequestItemID);
+
+      const dto = {
+        materialRequestID: materialRequestId,
+        description: description,
+        deliveryDate: deliveryDate,
+        canAddMaterial: canAddMaterial,
+        isSubmit: isSubmit,
+        addItems: addItems.map((a) => ({
+          materialID: a.material.materialID,
+          quantity: a.quantity,
+        })),
+        updateItems: updatedItems.map((u) => ({
+          materialRequestItemID: u.materialRequestItemID,
+          quantity: u.quantity,
+        })),
+        deleteItemIDs: deletedItemIDs,
+      };
+
+      if (addressID) dto.addressID = addressID;
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      await updateMaterialRequest(dto);
+
+      navigate('/Customer', { state: { tab: 'material_requests' } });
+    } catch (err) {
+      toast.error(handleApiError(err));
+    } finally {
+      setSubmitting(false);
+      setLoadingAction(false);
     }
-    await updateMaterialRequest(dto);
-    setSubmitting(false);
-    navigate('/Customer', {
-      state: {
-        tab: 'material_requests',
-        showLoading: true,
-      },
-    });
   };
 
   const handleCancel = () => {
