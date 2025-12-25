@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { toast } from 'react-toastify';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import Loading from '../Loading';
@@ -19,7 +19,6 @@ import { formatDate } from '../../utils/formatters';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const { t, i18n } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const {
@@ -33,7 +32,6 @@ export default function MaterialRequestManager({ user }) {
   const [selectedMaterialRequest, setSelectedMaterialRequest] = useState(null);
   const [reviewReadOnly, setReviewReadOnly] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [pageLoading, setPageLoading] = useState(false);
 
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
@@ -108,16 +106,6 @@ export default function MaterialRequestManager({ user }) {
   const handleViewDetail = (materialRequestID) => {
     navigate(`/Customer/MaterialRequestDetail/${materialRequestID}`);
   };
-
-  useEffect(() => {
-    if (location.state?.showLoading) {
-      setPageLoading(true);
-
-      setTimeout(() => {
-        setPageLoading(false);
-      }, 500);
-    }
-  }, [location.state]);
 
   const handleCreate = async () => {
     if (
@@ -229,7 +217,7 @@ export default function MaterialRequestManager({ user }) {
       />
 
       {/* Loading State */}
-      {loading || pageLoading ? (
+      {loading ? (
         <div className="py-10 text-center bg-white rounded-xl">
           <LoadingComponent />
         </div>
