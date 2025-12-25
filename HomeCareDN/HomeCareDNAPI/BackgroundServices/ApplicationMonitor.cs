@@ -49,7 +49,11 @@ namespace HomeCareDNAPI.BackgroundServices
             var expiredContractors = await db
                 .ContractorApplications.AsTracking()
                 .Where(a =>
-                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now
+                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now && 
+                    !db.PaymentTransactions.Any(p =>
+                        p.ContractorApplicationID == a.ContractorApplicationID &&
+                        p.Status == PaymentStatus.Pending
+                    )
                 )
                 .ToListAsync();
 
@@ -106,7 +110,11 @@ namespace HomeCareDNAPI.BackgroundServices
             var expiredDistributors = await db
                 .DistributorApplications.AsTracking()
                 .Where(a =>
-                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now
+                    a.Status == ApplicationStatus.PendingCommission && a.DueCommisionTime < now &&
+                    !db.PaymentTransactions.Any(p =>
+                        p.DistributorApplicationID == a.DistributorApplicationID &&
+                        p.Status == PaymentStatus.Pending
+                    )
                 )
                 .ToListAsync();
 
