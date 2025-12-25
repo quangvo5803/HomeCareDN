@@ -53,7 +53,7 @@ export default function MaterialRequestDetail() {
   const [acceptingItems, setAcceptingItems] = useState(new Set());
   const pageSize = 5;
   const [totalCount, setTotalCount] = useState(0);
-
+  const [loadingAction, setLoadingAction] = useState(false);
   // Use realtime
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
@@ -61,9 +61,9 @@ export default function MaterialRequestDetail() {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-              }
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -87,9 +87,9 @@ export default function MaterialRequestDetail() {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -359,7 +359,10 @@ export default function MaterialRequestDetail() {
     await updateMaterialRequest(dto);
     setSubmitting(false);
     navigate('/Customer', {
-      state: { tab: 'material_requests' },
+      state: {
+        tab: 'material_requests',
+        showLoading: true,
+      },
     });
   };
 
@@ -417,6 +420,7 @@ export default function MaterialRequestDetail() {
       if (result.isConfirmed) {
         try {
           setSubmitting(true);
+          setLoadingAction(true);
           const acceptedExtraItemIDs = Array.from(acceptingItems);
           const approved = await distributorApplicationService.accept({
             DistributorApplicationID:
@@ -428,7 +432,7 @@ export default function MaterialRequestDetail() {
           setDistributorApplications((prev) =>
             prev.map((c) =>
               c.distributorApplicationID ===
-              selectedDistributor.distributorApplicationID
+                selectedDistributor.distributorApplicationID
                 ? approved
                 : c
             )
@@ -439,6 +443,7 @@ export default function MaterialRequestDetail() {
           toast.error(handleApiError(err));
         } finally {
           setSubmitting(false);
+          setLoadingAction(false);
         }
       }
     });
@@ -460,13 +465,14 @@ export default function MaterialRequestDetail() {
       if (result.isConfirmed) {
         try {
           setSubmitting(true);
+          setLoadingAction(true)
           const rejected = await distributorApplicationService.reject(
             selectedDistributor.distributorApplicationID
           );
           setDistributorApplications((prev) =>
             prev.map((c) =>
               c.distributorApplicationID ===
-              selectedDistributor.distributorApplicationID
+                selectedDistributor.distributorApplicationID
                 ? rejected
                 : c
             )
@@ -477,7 +483,8 @@ export default function MaterialRequestDetail() {
         } catch (err) {
           toast.error(handleApiError(err));
         } finally {
-          setSubmitting(true);
+          setSubmitting(false);
+          setLoadingAction(false)
         }
       }
     });
@@ -499,7 +506,7 @@ export default function MaterialRequestDetail() {
     ) || [];
 
   const isLoading = loading || !materialRequest;
-  if (isLoading) return <Loading />;
+  if (isLoading || loadingAction) return <Loading />;
 
   const getAddressDisplay = (addresses, id) => {
     const address = addresses?.find((a) => a.addressID === id);
@@ -797,9 +804,8 @@ export default function MaterialRequestDetail() {
                 />
               ) : null}
               <div
-                className={`absolute inset-0 flex items-center justify-center ${
-                  imageUrl ? 'hidden' : 'flex'
-                }`}
+                className={`absolute inset-0 flex items-center justify-center ${imageUrl ? 'hidden' : 'flex'
+                  }`}
               >
                 <i className="fas fa-image text-slate-300 text-2xl"></i>
               </div>
@@ -969,13 +975,12 @@ export default function MaterialRequestDetail() {
     return (
       <div
         key={item.materialID}
-        className={`border-2 rounded-xl p-5 transition-all bg-white group ${
-          isExtra
-            ? isChecked
-              ? 'border-green-300 bg-green-50'
-              : 'border-slate-200 hover:border-orange-400'
+        className={`border-2 rounded-xl p-5 transition-all bg-white group ${isExtra
+          ? isChecked
+            ? 'border-green-300 bg-green-50'
             : 'border-slate-200 hover:border-orange-400'
-        } hover:shadow-md`}
+          : 'border-slate-200 hover:border-orange-400'
+          } hover:shadow-md`}
       >
         <div className="hidden lg:grid lg:grid-cols-24 gap-4 items-center text-center">
           {/* Checkbox or STT */}
@@ -1413,7 +1418,7 @@ export default function MaterialRequestDetail() {
             <div className="mb-6">
               <CommissionCountdown
                 dueCommisionTime={selectedDistributor.dueCommisionTime}
-                onExpired={() => {}}
+                onExpired={() => { }}
                 role="customer"
               />
             </div>
@@ -1611,9 +1616,8 @@ export default function MaterialRequestDetail() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div
-        className={`bg-white shadow-lg ${
-          hasAnyChanges ? 'sticky top-24 z-20' : ''
-        }`}
+        className={`bg-white shadow-lg ${hasAnyChanges ? 'sticky top-24 z-20' : ''
+          }`}
       >
         <div className="px-6 lg:px-12 py-3">
           <div className="flex items-center justify-between gap-3">
