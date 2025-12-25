@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMaterialRequest } from '../../hook/useMaterialRequest';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { handleApiError } from '../../utils/handleApiError';
 import { showDeleteModal } from '../modal/DeleteModal';
 import Loading from '../Loading';
@@ -19,6 +19,7 @@ import { formatDate } from '../../utils/formatters';
 
 export default function MaterialRequestManager({ user }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const [isCreating, setIsCreating] = useState(false);
   const {
@@ -32,6 +33,7 @@ export default function MaterialRequestManager({ user }) {
   const [selectedMaterialRequest, setSelectedMaterialRequest] = useState(null);
   const [reviewReadOnly, setReviewReadOnly] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [pageLoading, setPageLoading] = useState(false);
 
   useRealtime({
     [RealtimeEvents.DistributorApplicationCreated]: (payload) => {
@@ -39,9 +41,9 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-              }
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -51,9 +53,9 @@ export default function MaterialRequestManager({ user }) {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -63,12 +65,12 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: Math.max(
-                  0,
-                  (sr.distributorApplyCount || 1) - 1
-                ),
-              }
+              ...sr,
+              distributorApplyCount: Math.max(
+                0,
+                (sr.distributorApplyCount || 1) - 1
+              ),
+            }
             : sr
         )
       );
@@ -78,10 +80,10 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-                startReviewDate: payload.startReviewDate,
-              }
+              ...sr,
+              status: 'Closed',
+              startReviewDate: payload.startReviewDate,
+            }
             : sr
         )
       );
@@ -106,6 +108,16 @@ export default function MaterialRequestManager({ user }) {
   const handleViewDetail = (materialRequestID) => {
     navigate(`/Customer/MaterialRequestDetail/${materialRequestID}`);
   };
+
+  useEffect(() => {
+    if (location.state?.showLoading) {
+      setPageLoading(true);
+
+      setTimeout(() => {
+        setPageLoading(false);
+      }, 500);
+    }
+  }, [location.state]);
 
   const handleCreate = async () => {
     if (
@@ -217,7 +229,7 @@ export default function MaterialRequestManager({ user }) {
       />
 
       {/* Loading State */}
-      {loading ? (
+      {loading || pageLoading ? (
         <div className="py-10 text-center bg-white rounded-xl">
           <LoadingComponent />
         </div>
@@ -324,7 +336,7 @@ export default function MaterialRequestManager({ user }) {
                                 {i18n.language === 'vi'
                                   ? item.material?.name
                                   : item.material?.nameEN ||
-                                    item.material?.name}
+                                  item.material?.name}
                                 :
                               </span>
                               <span className="text-black font-semibold">
