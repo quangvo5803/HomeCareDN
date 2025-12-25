@@ -13,7 +13,7 @@ import { RealtimeEvents } from '../../realtime/realtimeEvents';
 import useRealtime from '../../realtime/useRealtime';
 
 export default function ContractorLayout() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const [notifications, setNotifications] = useState([]);
@@ -22,13 +22,6 @@ export default function ContractorLayout() {
 
   // Real time
   const handleNewNotification = (payload) => {
-    const titleKey = i18n.language === 'vi' ? 'title' : 'titleEN';
-
-    const displayTitle =
-      titleKey === 'titleEN' && !payload.titleEN
-        ? payload.title
-        : payload[titleKey];
-
     setNotifications((prev) => {
       const exists = prev.some(
         (n) => n.notificationID === payload.notificationID
@@ -38,16 +31,6 @@ export default function ContractorLayout() {
       return [{ ...payload, isRead: false }, ...prev];
     });
 
-    toast.info(
-      <div>
-        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
-        {displayTitle}
-      </div>,
-      {
-        position: 'top-right',
-        autoClose: 3000,
-      }
-    );
   };
 
   useRealtime({

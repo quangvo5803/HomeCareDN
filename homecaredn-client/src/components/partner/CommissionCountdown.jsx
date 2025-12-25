@@ -2,9 +2,11 @@ import { useEffect, useState, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { formatDate } from '../../utils/formatters';
+import { parseUtc } from '../../utils/validateTimeZone';
 
 const HOURS_6_IN_MS = 6 * 60 * 60 * 1000;
 const HOURS_24_IN_MS = 24 * 60 * 60 * 1000;
+
 
 export default function CommissionCountdown({
   dueCommisionTime,
@@ -28,7 +30,7 @@ export default function CommissionCountdown({
 
     const calculateTimeLeft = () => {
       const now = Date.now();
-      const dueTime = new Date(dueCommisionTime).getTime();
+      const dueTime = parseUtc(dueCommisionTime).getTime();
       const total = dueTime - now;
 
       if (total <= 0) {

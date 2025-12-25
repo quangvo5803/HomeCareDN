@@ -39,9 +39,9 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
-              }
+              ...sr,
+              distributorApplyCount: (sr.distributorApplyCount || 0) + 1,
+            }
             : sr
         )
       );
@@ -51,9 +51,9 @@ export default function MaterialRequestManager({ user }) {
         prev.map((mr) =>
           mr.materialRequestID === payload.materialRequestID
             ? {
-                ...mr,
-                status: 'Closed',
-              }
+              ...mr,
+              status: 'Closed',
+            }
             : mr
         )
       );
@@ -63,12 +63,12 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                distributorApplyCount: Math.max(
-                  0,
-                  (sr.distributorApplyCount || 1) - 1
-                ),
-              }
+              ...sr,
+              distributorApplyCount: Math.max(
+                0,
+                (sr.distributorApplyCount || 1) - 1
+              ),
+            }
             : sr
         )
       );
@@ -78,10 +78,10 @@ export default function MaterialRequestManager({ user }) {
         prev.map((sr) =>
           sr.materialRequestID === payload.materialRequestID
             ? {
-                ...sr,
-                status: 'Closed',
-                startReviewDate: payload.startReviewDate,
-              }
+              ...sr,
+              status: 'Closed',
+              startReviewDate: payload.startReviewDate,
+            }
             : sr
         )
       );
@@ -324,7 +324,7 @@ export default function MaterialRequestManager({ user }) {
                                 {i18n.language === 'vi'
                                   ? item.material?.name
                                   : item.material?.nameEN ||
-                                    item.material?.name}
+                                  item.material?.name}
                                 :
                               </span>
                               <span className="text-black font-semibold">

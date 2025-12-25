@@ -158,23 +158,8 @@ namespace BusinessLogic.Services
             if (data.Code == "00")
             {
                 payment.Status = PaymentStatus.Paid;
-                if (
-                    DateTime.TryParseExact(
-                        data.TransactionDateTime,
-                        "yyyy-MM-dd HH:mm:ss",
-                        CultureInfo.InvariantCulture,
-                        DateTimeStyles.None,
-                        out var paidAt
-                    )
-                )
-                {
-                    payment.PaidAt = DateTime.SpecifyKind(paidAt.AddHours(-7), DateTimeKind.Local);
-                }
-                else
-                {
-                    payment.PaidAt = DateTime.UtcNow;
-                }
-
+                payment.PaidAt = DateTime.UtcNow;
+                
                 var tasks = new List<Task>();
                 if (isContractorPayment)
                     tasks.Add(HandleContractorPaymentAsync(payment));

@@ -317,6 +317,7 @@ namespace BusinessLogic.Services
                     CreatedAt = selected.CreatedAt,
                     Items = _mapper.Map<List<DistributorApplicationItemDto>>(selected.Items),
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
+                    DueCommisionTime = selected.DueCommisionTime,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
                     SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
@@ -351,6 +352,7 @@ namespace BusinessLogic.Services
                     CompletedProjectCount = distributor?.ProjectCount ?? 0,
                     AverageRating = distributor?.AverageRating ?? 0,
                     RatingCount = distributor?.RatingCount ?? 0,
+                    DueCommisionTime = selected.DueCommisionTime,
                     SmallScaleProjectCount = distributor?.SmallScaleProjectCount ?? 0,
                     MediumScaleProjectCount = distributor?.MediumScaleProjectCount ?? 0,
                     LargeScaleProjectCount = distributor?.LargeScaleProjectCount ?? 0,
@@ -405,6 +407,7 @@ namespace BusinessLogic.Services
                         DistributorEmail = contractor?.Email ?? string.Empty,
                         DistributorPhone = contractor?.PhoneNumber ?? string.Empty,
                         Status = selected.Status.ToString(),
+                        DueCommisionTime = selected.DueCommisionTime,
                         Message = selected.Message,
                         CreatedAt = selected.CreatedAt,
                     };

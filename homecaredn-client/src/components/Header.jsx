@@ -92,10 +92,6 @@ export default function Header() {
 
   // Use realtime
   const handleNotification = (payload) => {
-    const displayMessage =
-      i18n.language === 'vi'
-        ? payload.message
-        : payload.messageEN || payload.message;
     setNotifications((prev) => {
       const exists = prev.some(
         (n) => n.notificationID === payload.notificationID
@@ -104,16 +100,7 @@ export default function Header() {
       return [{ ...payload, isRead: false }, ...prev];
     });
 
-    toast.info(
-      <div>
-        <i className="fa-solid fa-bell text-orange-500 mr-1"></i>
-        {displayMessage}
-      </div>,
-      {
-        position: 'top-right',
-        autoClose: 3000,
-      }
-    );
+
   };
 
   const handleDeleteNotification = (payload) => {
